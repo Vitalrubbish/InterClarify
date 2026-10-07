@@ -10,7 +10,7 @@
 2. 在模型目录维护官方 DuplexCascade checkout，拒绝脏工作树，并切换到 `repo_commit`；若当前已处于目标提交且工作树干净则跳过网络 fetch（计算节点可能无法访问 GitHub，登录节点预置的 clone 仍可复用）；
 3. 按 `--provider` 选择下载来源：
    - `huggingface`：用服务器的 `HF_ENDPOINT` 与 Hugging Face 认证下载固定 `hf_revision`；
-   - `modelscope`（集群默认）：从 ModelScope 镜像下载，逐个文件按清单 SHA-256 校验，并用 `configs/base.yaml` 的 `duplexcascade.weight_sha256` 证明权重与固定 HF revision 逐字节一致；支持 HTTP Range 断点续传；
+   - `modelscope`（集群默认）：从 ModelScope 镜像下载，逐个文件按清单 SHA-256 校验，并用 `configs/base.yaml` 的 `duplexcascade.weight_sha256` 证明权重与固定 HF revision 逐字节一致；支持 HTTP Range 断点续传，`README.md`/`.gitattributes`/`configuration.json`/`LICENSE` 等元数据文件失败只告警不中断；
 4. 检查 `model_state.safetensors`、`train_cfg.json` 和 `tokenizer/`；
 5. 按 `train_cfg.json` 下载官方基础模型（可用 `--skip-base-model` 只做底座资产预取）；
 6. 输出 `manifest.json`、`resolved_config.yaml`、`assets.env` 和失败时的 `failure.json`。

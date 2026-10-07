@@ -30,6 +30,10 @@ DEFAULT_ARTIFACT_ROOT = "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifa
 MODELSCOPE_API = "https://www.modelscope.cn/api/v1/models"
 MODELSCOPE_RESOLVE = "https://www.modelscope.cn/models"
 
+# Metadata files that are not required for inference; a transient failure on
+# one of these must not abort the whole asset preparation.
+OPTIONAL_FILES = {"README.md", ".gitattributes", "configuration.json", "LICENSE"}
+
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -221,9 +225,15 @@ def _download_modelscope_snapshot(
                 f"[modelscope] {repo_id} {index}/{total} {record['path']} ({record['size']} bytes)",
                 flush=True,
             )
-            _modelscope_download_file(
-                session, repo_id, resolved_revision, record["path"], target, record["sha256"], record["size"]
-            )
+            try:
+                _modelscope_download_file(
+                    session, repo_id, resolved_revision, record["path"], target, record["sha256"], record["size"]
+                )
+            except Exception as exc:  # noqa: BLE001
+                if record["path"].rsplit("/", 1)[-1] in OPTIONAL_FILES:
+                    print(f"[modelscope] WARN optional file skipped: {record['path']}: {exc}", flush=True)
+                    continue
+                raise
         marker.write_text(resolved_revision + "\n", encoding="utf-8")
     return dest, resolved_revision
 
