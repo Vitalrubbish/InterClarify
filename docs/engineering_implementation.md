@@ -446,7 +446,7 @@ InterClarify/
 │   ├── src/interclarify/
 │   ├── experiments/
 │   └── jobs/
-└── third_party/
+└── 3rd-party/
 ```
 
 实现新文件时同步增加对应文档。例如 `src/interclarify/arbitration/arbiter.py` 对应 `docs/src/interclarify/arbitration/arbiter.md`；文档说明文件职责、主要类、核心方法、输入输出和关键约束。修改实现时同步更新对应文档。第三方代码本身不逐文件复制文档，但要记录来源、提交、补丁和许可证。

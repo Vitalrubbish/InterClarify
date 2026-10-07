@@ -7,7 +7,7 @@
 ## 主要流程
 
 1. 合并 `cluster` 配置并记录配置摘要；
-2. 在模型目录维护官方 DuplexCascade checkout，拒绝脏工作树，并切换到 `repo_commit`；若当前已处于目标提交且工作树干净则跳过网络 fetch（计算节点可能无法访问 GitHub，登录节点预置的 clone 仍可复用）；
+2. 默认使用项目内 `3rd-party/DuplexCascade` 的官方源码快照；该目录包含 `SOURCE_COMMIT`，脚本核对其与 `repo_commit` 一致。服务器也可用 `--source-root` 或 `INTERCLARIFY_DUPLEXCASCADE_SOURCE` 指定独立 Git checkout；
 3. 按 `--provider` 选择下载来源：
    - `huggingface`：用服务器的 `HF_ENDPOINT` 与 Hugging Face 认证下载固定 `hf_revision`；
    - `modelscope`（集群默认）：从 ModelScope 镜像下载，逐个文件按清单 SHA-256 校验，并用 `configs/base.yaml` 的 `duplexcascade.weight_sha256` 证明权重与固定 HF revision 逐字节一致；支持 HTTP Range 断点续传，`README.md`/`.gitattributes`/`configuration.json`/`LICENSE` 等元数据文件失败只告警不中断；
@@ -25,7 +25,7 @@
 - `--dry-run`：只解析路径和版本，不访问网络；
 - `--skip-base-model`：跳过 `train_cfg.json` 指定的基础模型，清单状态为 `PARTIAL`。
 
-模型缓存位于 `<model-root>/huggingface`（HF）与 `<model-root>/modelscope`（镜像）；DuplexCascade 源码位于 `<model-root>/duplexcascade/source`。脚本强制模型目录和证据目录位于仓库外，降低误把大文件写入 Git 工作树的风险。
+模型缓存位于 `<model-root>/huggingface`（HF）与 `<model-root>/modelscope`（镜像）；官方源码位于项目目录 `3rd-party/DuplexCascade`，由 Git 管理并用 `SOURCE_COMMIT` 固定来源。权重与证据仍位于仓库外；脚本强制模型目录和证据目录位于仓库外，降低误把大文件写入 Git 工作树的风险。
 
 ## 清单字段
 

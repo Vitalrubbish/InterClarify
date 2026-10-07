@@ -77,7 +77,10 @@ def _prepare_source(source_root: Path, repo_url: str, commit: str) -> str:
     if not source_root.exists():
         _run(["git", "clone", repo_url, str(source_root)])
     elif not (source_root / ".git").exists():
-        raise RuntimeError(f"source path exists but is not a git checkout: {source_root}")
+        marker = source_root / "SOURCE_COMMIT"
+        if not marker.is_file() or marker.read_text(encoding="utf-8").strip() != commit:
+            raise RuntimeError(f"source path is not a git checkout with the pinned SOURCE_COMMIT marker: {source_root}")
+        return commit
 
     if not _is_clean_git_checkout(source_root):
         raise RuntimeError(f"refusing to change a dirty source checkout: {source_root}")
@@ -265,6 +268,11 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--repo-root", default=os.environ.get("INTERCLARIFY_ROOT", str(Path.cwd())))
     parser.add_argument("--model-root", default=os.environ.get("INTERCLARIFY_MODEL_ROOT", DEFAULT_MODEL_ROOT))
     parser.add_argument("--artifact-root", default=os.environ.get("INTERCLARIFY_ARTIFACT_ROOT", DEFAULT_ARTIFACT_ROOT))
+    parser.add_argument(
+        "--source-root",
+        default=os.environ.get("INTERCLARIFY_DUPLEXCASCADE_SOURCE", ""),
+        help="Official DuplexCascade checkout; defaults to <repo-root>/3rd-party/DuplexCascade.",
+    )
     parser.add_argument("--run-id", default=None, help="Evidence directory name; defaults to UTC timestamp.")
     parser.add_argument("--dry-run", action="store_true", help="Resolve paths and pins without cloning or downloading.")
     parser.add_argument("--skip-base-model", action="store_true", help="Only prepare DuplexCascade assets.")
@@ -286,6 +294,11 @@ def main() -> int:
     repo_root = Path(args.repo_root).expanduser().resolve()
     model_root = Path(args.model_root).expanduser().resolve()
     artifact_root = Path(args.artifact_root).expanduser().resolve()
+    source_root = (
+        Path(args.source_root).expanduser().resolve()
+        if args.source_root
+        else repo_root / "3rd-party" / "DuplexCascade"
+    )
     if not repo_root.exists():
         raise RuntimeError(f"repository root does not exist: {repo_root}")
     if not model_root.is_absolute() or repo_root == model_root or repo_root in model_root.parents:
@@ -303,8 +316,6 @@ def main() -> int:
     expected_weight_sha = str(duplex.get("weight_sha256") or "")
     hf_endpoint = os.environ.get("HF_ENDPOINT") or str(config.get("env", {}).get("HF_ENDPOINT", "https://huggingface.co"))
 
-    dc_root = model_root / "duplexcascade"
-    source_root = dc_root / "source"
     hf_home = model_root / "huggingface"
     hf_cache = hf_home / "hub"
     artifact_dir = artifact_root / "p1_assets" / (args.run_id or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"))

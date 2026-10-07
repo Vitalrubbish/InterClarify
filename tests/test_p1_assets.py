@@ -35,6 +35,7 @@ def test_prepare_assets_dry_run_resolves_pinned_versions(tmp_path: Path) -> None
     assert plan["weight_filename"] == "model_state.safetensors"
     assert plan["download_base_model"] is True
     assert plan["provider"] == "huggingface"
+    assert plan["source_root"] == str(ROOT / "3rd-party" / "DuplexCascade")
 
 
 def test_prepare_assets_dry_run_accepts_modelscope_provider(tmp_path: Path) -> None:

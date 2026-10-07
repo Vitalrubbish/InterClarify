@@ -2,7 +2,7 @@
 
 ## 目标
 
-在远端 `pdgpu-4090` 环境完成 [engineering_implementation.md](../engineering_implementation.md) 第 5.2 节 P1.1 的前置工作：通过 GitHub 同步 InterClarify，固定官方 DuplexCascade 提交和 Hugging Face revision，在服务器共享存储下载并校验官方源码、适配器权重和基础模型。
+在远端 `pdgpu-4090` 环境完成 [engineering_implementation.md](../engineering_implementation.md) 第 5.2 节 P1.1 的前置工作：通过 GitHub 同步 InterClarify，使用仓库内受 Git 管理的 `3rd-party/DuplexCascade` 固定官方源码提交，并在服务器共享存储下载和校验适配器权重与基础模型。
 
 权重不经过本地开发机，也不进入 Git。此任务只准备并核对资产；实时 ASR/TTS 服务和固定最小输入的推理运行在后续步骤执行。
 
@@ -84,7 +84,7 @@ base_model.config.sha256=8b9a4f6c…
 
 验收清单第 1–6 项全部满足。资产位于共享存储：
 
-- 官方源码：`interclarify-p0-models/duplexcascade/source`（固定提交 `4289302`）；
+- 官方源码：`InterClarify/3rd-party/DuplexCascade`（`SOURCE_COMMIT=4289302`）；
 - DuplexCascade 快照：`interclarify-p0-models/modelscope/sbintuitions--DuplexCascade/c3dd51ce…`；
 - 基础模型：`interclarify-p0-models/modelscope/Qwen--Qwen2-7B-Instruct/8dce1f8a…`；
 - 环境导出：`…/20261007T134316Z/assets.env`。
@@ -94,4 +94,3 @@ base_model.config.sha256=8b9a4f6c…
 ## 历史记录
 
 早期作业 `job-179137597372421357871-xuan-zhang`（HF 直连）、`job-179137679109398113880-xuan-zhang`（GitHub fetch）和 `job-179137696446759664545-xuan-zhang`（Qwen README 元数据中断）均失败，仅作排障参考，不改变上面结论。
-
