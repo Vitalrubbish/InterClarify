@@ -80,4 +80,4 @@ config_digest: cb6a279b7254194d48552fa06c6169ae1ff31d84e918a624adddc8ba99d2fac1
 
 ## 下一步（P1）
 
-按 [engineering_implementation.md](../engineering_implementation.md) 第 5 节：固定官方提交与权重 → 跑通官方离线样例 → 拆分 ASR/控制模型/TTS 服务并接入实时双工链路 → 接入统一事件日志与 FDB 适配器，保存原版基线。P0 的配置层、清单与事件日志格式将在 P1 直接复用。
+按 [engineering_implementation.md](../engineering_implementation.md) 第 5 节：先通过 GitHub 中转同步代码，在服务器准备并校验官方提交与权重（[P1.1 任务单](../jobs/p1_official_assets.md)），再固定最小输入运行原版推理路径，随后拆分 ASR/控制模型/TTS 服务并接入实时双工链路。P0 的配置层、清单与事件日志格式将在 P1 直接复用。
