@@ -47,6 +47,22 @@ conda run -n interclarify-dev python \
 5. `base_model.config` 存在，`assets.env` 可供官方 `server.py` 复用同一 HF 缓存；
 6. 记录任务提交号、节点、证据路径和失败原因（若有）。
 
-## 当前状态
+## 集群作业方式
 
-本地脚本和任务单已准备，尚未在服务器下载模型。此前从本地直连 `js-hpc` 得到 SSH `Permission denied`；下一次执行应先把本提交推送到 GitHub，再在服务器按上面命令拉取。
+登录节点上的后台下载会被交互式会话清理中断，因此资产下载改为 `vc` 作业执行（见 [submit_p1_assets_job.sh](../../scripts/remote/submit_p1_assets_job.sh)）：
+
+```bash
+bash scripts/remote/submit_p1_assets_job.sh   # 默认 pdcpu，4 CPU / 16G
+vc list -j <JOBID>
+vc logs -t <TASKID>
+```
+
+作业内 node 脚本从 `INTERCLARIFY_ROOT/hf_token.txt`（已 gitignore）读取 token，不放到命令行或证据里。`huggingface_hub` 会复用 `.incomplete` 分块，作业中断后可重跑续传。
+
+## 当前状态（2026-10-07）
+
+- 服务器 `hf_token.txt` 已就绪；gated 小文件下载验证通过；
+- 官方源码固定到 `4289302`；
+- 作业 `job-179137597372421357871-xuan-zhang`（`pdcpu`，节点 `d6-hpc-cpu-015`）下载 DuplexCascade 权重与基础模型中；
+- `hf-mirror` 实测吞吐约 1–1.5 MB/s，总下载量约 32 GB，预计数小时完成；完成后按上面“验收”核对 `manifest.json` 并回填证据路径。
+
