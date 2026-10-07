@@ -59,10 +59,39 @@ vc logs -t <TASKID>
 
 node 脚本默认 `IC_ASSET_PROVIDER=modelscope`：从 ModelScope 镜像按 SHA-256 校验下载（快、支持断点续传），不需要 token；仅当改用 `huggingface` 时才从 `INTERCLARIFY_ROOT/hf_token.txt`（已 gitignore）读取 token，且不放到命令行或证据里。
 
-## 当前状态（2026-10-07）
+## 执行结果（2026-10-07）
 
-- 服务器 `hf_token.txt` 已就绪；gated 小文件下载验证通过，但 `hf-mirror` 吞吐仅约 0.1–1.5 MB/s 且大文件会中断；
-- 改用 ModelScope：`model_state.safetensors` 的 SHA-256 与固定 HF revision 的 LFS blob 名一致（`603070a3…`），内容逐字节相同；
-- 官方源码固定到 `4289302`；
-- DuplexCascade 权重与基础模型通过 `pdcpu` 作业下载中（`--provider modelscope`），预计约 1 小时；完成后按上面“验收”核对 `manifest.json` 并回填证据路径与任务号。
+| 项 | 值 |
+| --- | --- |
+| 作业 | `job-179138059345760136585-xuan-zhang`（Completed，rc=0） |
+| 节点 | `d6-hpc-cpu-015`（`pdcpu`） |
+| 提交 | 见仓库 `main`；镜像 `…/interclarify-p0:v0.2` |
+| 证据 | `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts/p1_assets/20261007T134316Z/` |
+
+`manifest.json` 核对：
+
+```text
+status=PASS, provider=modelscope
+source.commit=42893024ca90c8de8ac3ed624467ebc123512ff8
+duplexcascade.revision=c3dd51ce9a5a7d27f810ffd5dab309f132a94d28
+duplexcascade.equivalent_hf_revision=31c038ece2f006a28722dd60d1df3868fbb2cc42
+duplexcascade.weight.bytes=17419657672
+duplexcascade.weight.sha256=603070a3…  matches_pinned_sha256=true
+duplexcascade.tokenizer_files=6
+base_model.repo_id=Qwen/Qwen2-7B-Instruct  revision=8dce1f8a2d3286a7adf09b977e661350ad67e40a
+base_model.config.sha256=8b9a4f6c…
+```
+
+验收清单第 1–6 项全部满足。资产位于共享存储：
+
+- 官方源码：`interclarify-p0-models/duplexcascade/source`（固定提交 `4289302`）；
+- DuplexCascade 快照：`interclarify-p0-models/modelscope/sbintuitions--DuplexCascade/c3dd51ce…`；
+- 基础模型：`interclarify-p0-models/modelscope/Qwen--Qwen2-7B-Instruct/8dce1f8a…`；
+- 环境导出：`…/20261007T134316Z/assets.env`。
+
+> 说明：`hf-mirror` 路径在本集群不可用（约 0.1–1.5 MB/s 且大文件中断），改用 ModelScope 镜像；权重 SHA-256 与固定 HF revision 的 LFS blob 名一致，故内容等价。下一次 P1.1 步骤是“固定最小输入的官方推理适配”。
+
+## 历史记录
+
+早期作业 `job-179137597372421357871-xuan-zhang`（HF 直连）、`job-179137679109398113880-xuan-zhang`（GitHub fetch）和 `job-179137696446759664545-xuan-zhang`（Qwen README 元数据中断）均失败，仅作排障参考，不改变上面结论。
 
