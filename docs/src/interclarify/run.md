@@ -27,5 +27,5 @@ P0 的最小运行上下文，落实实验输出目录规范（[engineering_impl
 
 - 事件带单调时钟（`monotonic_ms`）与墙上时钟（`wall_time`）两种时间，便于离线回放按虚拟时钟重放；
 - `run_id` 必须唯一：`events.jsonl` 以写模式（`w`）新建，`create` 拒绝复用非空运行目录，因此不会出现追加旧日志、重复 `run_start` 或重复序号；
-- `output_root` 默认取配置 `run.output_root`（相对仓库根目录）；
+- `output_root` 默认取配置 `run.output_root`（相对仓库根目录），目前为 `experiments/`；该目录属于运行产物并由 `.gitignore` 忽略，避免冒烟或实验运行改变代码工作树状态；
 - 不涉及模型推理；P0 冒烟脚本（`scripts/run_p0_smoke.py`）是其唯一使用者。

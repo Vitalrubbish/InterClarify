@@ -14,6 +14,7 @@ env/
 !.env.example
 
 # Experiment outputs and model artifacts
+experiments/
 artifacts/
 checkpoints/
 outputs/
