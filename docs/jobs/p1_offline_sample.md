@@ -37,6 +37,35 @@ vc logs -t <TASKID>
 3. `metrics.json` 记录 `cuda_peak_allocated_mb`、`total_latency_s`、`rtf_vs_micro_turn`；
 4. 权重仍为固定快照（未改动），脚本不访问网络（`HF_HUB_OFFLINE=1`）。
 
+## 执行结果（2026-10-07）
+
+| 项 | 值 |
+| --- | --- |
+| 作业 | `job-179138919006004209910-xuan-zhang`（Completed，rc=0） |
+| 节点 | `d6-hpc-gpu-069`（1×RTX 4090） |
+| 提交 | `cccd84748281a542edb7be67fa35f132d69e6984`（工作树干净） |
+| 运行目录 | `interclarify-p0-artifacts/p1_offline/ic-20261007T160632-93c97783/` |
+
+`metrics.json` 摘要：
+
+```text
+device=cuda  dtype=bfloat16  num_turns=4  micro_turn_seconds=0.6
+total_latency_s=1.0911  mean_latency_s=0.2728  rtf_vs_micro_turn=0.4546
+cuda_peak_allocated_mb=17178.66  cuda_peak_reserved_mb=17328.0
+```
+
+逐 micro-turn 的官方控制行为：
+
+```text
+[1] user="Hello"                       -> <|user is talking|>        (等待)
+[2] user="how are you today"           -> <|user is talking|>        (等待)
+[3] user=null (静默)                    -> <|user finish talking|>   (开始回答)
+                                           text="As an AI, I don't have feelings,"
+[4] user="could you tell me a short joke" -> <|user interruption|>   (用户插话)
+```
+
+结论：固定权重下官方控制 token 路径可离线复现；bf16 单卡峰值显存约 17.2 GB（24 GB 内），micro-turn RTF 约 0.45（<1，可持续）。验收清单第 1–4 项满足。
+
 ## 已知取舍
 
 - 单卡 4090 需以 bf16 载入（官方默认 fp32 不适用）；这是内存精度选择，不改权重；

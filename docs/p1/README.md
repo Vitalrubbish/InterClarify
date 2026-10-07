@@ -15,7 +15,7 @@ P1 对应 [engineering_implementation.md](../engineering_implementation.md) 第 
 
 - **P1.1 资产准备完成**（2026-10-07，作业 `job-179138059345760136585-xuan-zhang`，`pdcpu`）：官方源码 `4289302`；DuplexCascade 权重 17.4 GB，SHA-256 `603070a3…` 与固定 HF revision 的 LFS blob 一致；基础模型 `Qwen/Qwen2-7B-Instruct` 就位；证据 `interclarify-p0-artifacts/p1_assets/20261007T134316Z/`。
 - `hf-mirror` 在本集群不可用（约 0.1–1.5 MB/s 且大文件中断），改用 ModelScope 镜像（约 9–10 MB/s，Range 续传，逐文件 SHA-256 校验）。
-- **离线样例适配器已实现**（`official_control.py` + `run_p1_offline_sample.py`），CPU 单元测试覆盖控制 token 与提示词拼装；待提交 `pdgpu-4090` 作业运行并回收原始输出、GPU 峰值显存与 RTF。
+- **离线样例已跑通**（2026-10-07，作业 `job-179138919006004209910-xuan-zhang`，`pdgpu-4090`）：4 个 micro-turn 的官方控制行为为 `talking → talking → finish talking(+回复) → interruption`；bf16 单卡峰值显存约 17.2 GB，`rtf_vs_micro_turn≈0.45`；证据 `interclarify-p0-artifacts/p1_offline/ic-20261007T160632-93c97783/`（`git_dirty=false`）。
 - 实时 ASR–LLM–TTS 链路属于 P1.2。
 
 
