@@ -48,3 +48,6 @@ Thumbs.db
 
 # Tutorial of using docker image to submit vc tasks
 image_use.md
+
+# Huggingface Token
+hf_token.txt
