@@ -1,0 +1,15 @@
+name: interclarify-dev
+# 仅声明 conda 层（解释器）依赖；所有 Python 第三方依赖由 pip 按 requirements.txt 固定。
+# conda 官方频道在集群不可达，固定使用清华 conda-forge 镜像并禁用 defaults。
+# 使用：
+#   conda env create -f environment.yml
+#   conda run -n interclarify-dev python -m pip install -r requirements.txt
+# 说明见 docs/p0/dependency_inventory.md。
+channels:
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
+  - nodefaults
+dependencies:
+  - python=3.10
+  - pip=24.0
+  # sounddevice 需要系统 PortAudio；local profile 采集/播放用，headless 集群无影响。
+  - portaudio

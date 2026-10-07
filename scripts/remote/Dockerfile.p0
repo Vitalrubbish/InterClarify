@@ -1,0 +1,43 @@
+# InterClarify P0 cluster image.
+#
+# Base image already provides CUDA 12.8.1, Python 3.11 (conda at /opt/conda),
+# torch 2.9.1+cu128 and vllm.  P0 only needs a reproducible Python 3.10 env
+# built from the tracked environment.yml + requirements.txt, plus the small
+# system packages used by the audio-service stack.
+#
+# Model weights and datasets are NOT baked in; they are read from shared
+# storage at run time (see scripts/remote/run_p0_node_job.sh).
+#
+# Build and push (naming per image_use.md; registry rejects overwriting a tag):
+#   docker build -f scripts/remote/Dockerfile.p0 \
+#     -t docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.1 .
+#   docker push docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.1
+FROM docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk:v0.17
+
+# The base pip.conf may point at a slow mirror; override via env for the build.
+ENV PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
+# Prevent ~/.local user site packages from leaking into mounted jobs
+# (image_use.md notes).
+ENV PYTHONNOUSERSITE=True
+ENV INTERCLARIFY_ROOT=/opt/interclarify
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        sudo \
+        ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Build the pinned conda env first so dependency layers cache independently of
+# the source tree.
+COPY environment.yml requirements.txt /opt/interclarify-build/
+RUN /opt/conda/bin/conda env create -f /opt/interclarify-build/environment.yml && \
+    /opt/conda/envs/interclarify-dev/bin/python -m pip install --no-cache-dir --upgrade pip && \
+    /opt/conda/envs/interclarify-dev/bin/python -m pip install --no-cache-dir \
+        -r /opt/interclarify-build/requirements.txt && \
+    /opt/conda/bin/conda clean -afy
+
+# Ship a snapshot of the repository so scripts run without the shared mount;
+# /hpc_stor03 is mounted at run time for models and artifacts.
+COPY . /opt/interclarify
+RUN chmod -R a+rX /opt/interclarify
+
+WORKDIR /opt/interclarify

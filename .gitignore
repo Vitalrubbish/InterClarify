@@ -44,3 +44,6 @@ Thumbs.db
 
 # Visual Studio Code settings
 .vscode/
+
+# Tutorial of using docker image to submit vc tasks
+image_use.md

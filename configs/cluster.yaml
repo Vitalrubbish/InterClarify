@@ -1,0 +1,28 @@
+# 集群实验 profile：8×RTX 4090 队列（pdgpu-4090），共享存储绝对路径，无音频设备。
+# 模型与实验产物写入共享存储，避免污染仓库工作树。
+profile: cluster
+
+device:
+  backend: cuda
+  index: 0
+  cuda_visible_devices: "0"
+
+audio:
+  input_device: null
+  output_device: null
+  echo_cancellation: false
+
+clock:
+  mode: real
+
+paths:
+  repo_root: ${INTERCLARIFY_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/InterClarify}
+  data_root: ${INTERCLARIFY_MODEL_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models}
+  model_root: ${INTERCLARIFY_MODEL_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models}
+  artifact_root: ${INTERCLARIFY_ARTIFACT_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts}
+
+# Hugging Face 官方站点在集群不可达，统一使用镜像；权重访问条件见
+# docs/p0/duplexcascade_registry.md。
+env:
+  HF_ENDPOINT: https://hf-mirror.com
+  PYTHONNOUSERSITE: "True"

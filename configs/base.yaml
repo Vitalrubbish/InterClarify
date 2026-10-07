@@ -1,0 +1,64 @@
+# InterClarify 基础配置（所有 profile 共享）。
+# 研究范围与约束见 docs/research_design.md，工程门禁见 docs/engineering_implementation.md。
+schema_version: 1
+
+run:
+  # 相对仓库根目录的运行输出目录；每次运行在其中生成 <run_prefix>-<时间>-<随机> 子目录。
+  output_root: experiments
+  run_prefix: ic
+  seed: 0
+  tags: []
+  # 可选会话标识，写入每条日志事件；离线回放由调用方赋值。
+  session_id: null
+
+paths:
+  # "." 表示以实际仓库根目录为准；cluster profile 会覆盖为共享存储绝对路径。
+  repo_root: "."
+  data_root: data
+  model_root: models
+  artifact_root: artifacts
+
+device:
+  # backend: cpu | cuda
+  backend: cpu
+  index: 0
+  # 需要固定可见 GPU 时设置，例如 "0" 或 "0,1"；null 表示不修改环境变量。
+  cuda_visible_devices: null
+
+audio:
+  # DuplexCascade 前端与 Kyutai STT/TTS 均按 24 kHz 单声道 float32 传输。
+  sample_rate: 24000
+  channels: 1
+  dtype: float32
+  # 每个 micro-turn / 音频块的时长（毫秒）；80 ms @24k = 1920 samples。
+  chunk_ms: 80
+  # local profile 使用真实设备名；replay/cluster 无音频设备时为 null。
+  input_device: null
+  output_device: null
+  # 是否假定存在回声消除；headless 集群固定为 false。
+  echo_cancellation: false
+  # P0 冒烟脚本在缺少输入音频时合成的时长（秒）。
+  smoke_seconds: 1.0
+
+clock:
+  # real: 使用墙上时钟；virtual: 离线回放按事件时间快速推进。
+  mode: virtual
+  # DuplexCascade 官方 micro-turn 起点，作为复现基线固定值。
+  micro_turn_seconds: 0.6
+
+duplexcascade:
+  # P0 只登记引用与版本，不下载权重、不运行模型（见 P1）。
+  repo_url: https://github.com/sbintuitions/DuplexCascade
+  repo_commit: 42893024ca90c8de8ac3ed624467ebc123512ff8
+  hf_repo_id: sbintuitions/DuplexCascade
+  hf_revision: 31c038ece2f006a28722dd60d1df3868fbb2cc42
+  weight_filename: model_state.safetensors
+  # Kyutai delayed-streams-modeling 的 ASR/TTS 服务端点（moshi-server）。
+  stt_ws: ws://127.0.0.1:31607/api/asr-streaming
+  tts_ws: ws://127.0.0.1:31608/api/tts_streaming
+  llm_port: 31606
+  max_new_tokens: 64
+
+logging:
+  level: INFO
+  events_file: events.jsonl

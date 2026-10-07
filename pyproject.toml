@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "interclarify"
+version = "0.1.0"
+description = "Within-turn clarification policy for full-duplex voice agents"
+requires-python = ">=3.10,<3.12"
+dependencies = [
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+runtime = [
+    "torch>=2.1.0",
+    "transformers>=4.40.0,<5.0.0",
+    "peft>=0.11.0",
+    "huggingface_hub>=0.23.0",
+    "safetensors>=0.4.3",
+    "numpy>=1.24.0",
+    "websockets>=12.0,<14.0",
+    "msgpack>=1.0.5",
+    "soundfile>=0.12.1",
+    "librosa>=0.10.0",
+    "sounddevice>=0.4.6",
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

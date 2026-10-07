@@ -1,0 +1,18 @@
+# 本地开发者 profile：真实设备、实时时钟、单卡 GPU。
+# 适用于有麦克风/扬声器的开发机；集群登录节点没有音频设备，不要用此 profile。
+profile: local
+
+device:
+  backend: cuda
+  index: 0
+
+audio:
+  input_device: default
+  output_device: default
+  echo_cancellation: false
+
+clock:
+  mode: real
+
+paths:
+  repo_root: "."

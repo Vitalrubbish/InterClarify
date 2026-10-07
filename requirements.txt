@@ -1,0 +1,39 @@
+# InterClarify P0 pinned third-party dependencies.
+#
+# Rationale and provenance are recorded in docs/p0/dependency_inventory.md.
+# The LLM-side pins follow the DuplexCascade reference requirements
+# (torch>=2.1, transformers>=4.40,<5, peft, huggingface_hub, safetensors,
+# websockets<14, msgpack).  torch 2.4.1 ships CUDA 12.1 runtime wheels that
+# support RTX 4090 (sm_89).  Audio/service pins are fixed independently.
+#
+# Install with (see scripts/remote/setup_env.sh):
+#   python -m pip install -r requirements.txt
+
+# --- LLM / reference-model stack -----------------------------------------
+torch==2.4.1
+torchaudio==2.4.1
+transformers==4.44.2
+peft==0.12.0
+accelerate==0.34.2
+huggingface_hub==0.24.6
+safetensors==0.4.3
+tokenizers==0.19.1
+
+# --- numerics / audio -----------------------------------------------------
+numpy==1.26.4
+scipy==1.13.1
+soundfile==0.12.1
+librosa==0.10.2.post1
+sounddevice==0.4.6
+
+# --- duplex transport / service ------------------------------------------
+websockets==12.0
+msgpack==1.0.8
+fastapi==0.115.0
+uvicorn==0.30.6
+python-multipart==0.0.9
+requests==2.32.3
+
+# --- project / tooling ----------------------------------------------------
+PyYAML==6.0.2
+pytest==8.3.2

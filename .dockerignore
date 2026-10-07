@@ -1,0 +1,31 @@
+# Keep the build context small and reproducible: no VCS history, no generated
+# experiment output, no model weights, no render of docs/figures.
+.git
+.gitignore
+__pycache__
+*.py[cod]
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.venv
+venv
+experiments
+artifacts
+models
+data
+logs
+runs
+outputs
+docs
+tests
+figures
+*.wav
+*.flac
+*.mp3
+*.jsonl
+*.ckpt
+*.safetensors
+*.pt
+*.pth
+*.md
+!README.md

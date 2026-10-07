@@ -1,0 +1,18 @@
+# 离线回放 profile：无音频设备、虚拟时钟、CPU 即可运行。
+# 用于确定性日志与配置/清单验收，不进行真实模型推理。
+profile: replay
+
+device:
+  backend: cpu
+  index: 0
+
+audio:
+  input_device: null
+  output_device: null
+  echo_cancellation: false
+
+clock:
+  mode: virtual
+
+paths:
+  repo_root: "."
