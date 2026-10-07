@@ -13,7 +13,7 @@
 | `INTERCLARIFY_ARTIFACT_ROOT` | `…/interclarify-p0-artifacts` | 运行产物 |
 | `P1_OFFLINE_IMAGE` | `…/interclarify-p0:v0.2` | 运行镜像 |
 | `P1_OFFLINE_JOB_NAME` | `interclarify-p1-offline` | 作业名 |
-| `P1_OFFLINE_GPUS` / `P1_OFFLINE_CPU` / `P1_OFFLINE_MEM_G` | `1` / `8` / `64` | 资源 |
+| `P1_OFFLINE_GPUS` / `P1_OFFLINE_CPU` / `P1_OFFLINE_MEM_G` | `1` / `8` / `32` | 资源（队列限制：单 GPU ≤8 核且 ≤32G） |
 
 ## 使用
 

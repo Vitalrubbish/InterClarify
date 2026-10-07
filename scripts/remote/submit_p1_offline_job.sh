@@ -19,7 +19,7 @@ IMAGE="${P1_OFFLINE_IMAGE:-docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-inte
 JOB_NAME="${P1_OFFLINE_JOB_NAME:-interclarify-p1-offline}"
 GPUS="${P1_OFFLINE_GPUS:-1}"
 CPU="${P1_OFFLINE_CPU:-8}"
-MEM="${P1_OFFLINE_MEM_G:-64}G"
+MEM="${P1_OFFLINE_MEM_G:-32}G"
 
 LOG_DIR="$ARTIFACT_ROOT/p1_offline/logs_submit"
 mkdir -p "$LOG_DIR"
