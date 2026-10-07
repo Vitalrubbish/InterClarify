@@ -1,0 +1,46 @@
+audio:
+  channels: 1
+  chunk_ms: 80
+  dtype: float32
+  echo_cancellation: false
+  input_device: null
+  output_device: null
+  sample_rate: 24000
+  smoke_seconds: 1.0
+clock:
+  micro_turn_seconds: 0.6
+  mode: real
+device:
+  backend: cuda
+  cuda_visible_devices: '0'
+  index: 0
+duplexcascade:
+  hf_repo_id: sbintuitions/DuplexCascade
+  hf_revision: 31c038ece2f006a28722dd60d1df3868fbb2cc42
+  llm_port: 31606
+  max_new_tokens: 64
+  repo_commit: 42893024ca90c8de8ac3ed624467ebc123512ff8
+  repo_url: https://github.com/sbintuitions/DuplexCascade
+  stt_ws: ws://127.0.0.1:31607/api/asr-streaming
+  tts_ws: ws://127.0.0.1:31608/api/tts_streaming
+  weight_filename: model_state.safetensors
+  weight_sha256: 603070a3251613328859105fa66fe0711e101099a7b0885da41617f575bed5e9
+env:
+  HF_ENDPOINT: https://hf-mirror.com
+  PYTHONNOUSERSITE: 'True'
+logging:
+  events_file: events.jsonl
+  level: INFO
+paths:
+  artifact_root: /hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts
+  data_root: /hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models
+  model_root: /hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models
+  repo_root: /hpc_stor03/sjtu_home/xuan.zhang/InterClarify
+profile: cluster
+run:
+  output_root: experiments
+  run_prefix: ic
+  seed: 0
+  session_id: null
+  tags: []
+schema_version: 1

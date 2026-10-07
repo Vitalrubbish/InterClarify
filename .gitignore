@@ -14,7 +14,8 @@ env/
 !.env.example
 
 # Experiment outputs and model artifacts
-experiments/
+experiments/*
+!experiments/p1_offline/
 artifacts/
 checkpoints/
 outputs/
@@ -51,3 +52,10 @@ image_use.md
 
 # Huggingface Token
 hf_token.txt
+
+# Curated milestone evidence (small JSON/log run artifacts) is committed on
+# purpose for regression; everything else under experiments/ stays ignored.
+!experiments/p1_offline/
+!experiments/p1_offline/**
+!experiments/p1_offline/**/*.jsonl
+!experiments/p1_offline/**/*.log

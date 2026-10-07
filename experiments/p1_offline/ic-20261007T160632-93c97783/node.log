@@ -1,0 +1,10 @@
+[p1_offline] repo=/hpc_stor03/sjtu_home/xuan.zhang/InterClarify model_root=/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:00,  3.08it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:00<00:00,  2.71it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:01<00:00,  2.65it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.28it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.43it/s]
+/opt/conda/envs/interclarify-dev/lib/python3.10/site-packages/transformers/generation/configuration_utils.py:567: UserWarning: `do_sample` is set to `False`. However, `temperature` is set to `0.7` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `temperature`.
+  warnings.warn(
+/opt/conda/envs/interclarify-dev/lib/python3.10/site-packages/transformers/generation/configuration_utils.py:572: UserWarning: `do_sample` is set to `False`. However, `top_p` is set to `0.8` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_p`.
+  warnings.warn(
+/opt/conda/envs/interclarify-dev/lib/python3.10/site-packages/transformers/generation/configuration_utils.py:589: UserWarning: `do_sample` is set to `False`. However, `top_k` is set to `20` -- this flag is only used in sample-based generation modes. You should set `do_sample=True` or unset `top_k`.
+  warnings.warn(
+{"run_id": "ic-20261007T160632-93c97783", "run_dir": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts/p1_offline/ic-20261007T160632-93c97783", "status": "PASS"}
+[p1_offline] run_p1_offline_sample.py rc=0

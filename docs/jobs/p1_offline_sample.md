@@ -45,6 +45,7 @@ vc logs -t <TASKID>
 | 节点 | `d6-hpc-gpu-069`（1×RTX 4090） |
 | 提交 | `cccd84748281a542edb7be67fa35f132d69e6984`（工作树干净） |
 | 运行目录 | `interclarify-p0-artifacts/p1_offline/ic-20261007T160632-93c97783/` |
+| 仓库内证据 | [`experiments/p1_offline/ic-20261007T160632-93c97783/`](../../experiments/p1_offline/ic-20261007T160632-93c97783/)（小文件，已入库；见 [说明](../../experiments/p1_offline/README.md)） |
 
 `metrics.json` 摘要：
 
