@@ -53,6 +53,9 @@ duplexcascade:
   hf_repo_id: sbintuitions/DuplexCascade
   hf_revision: 31c038ece2f006a28722dd60d1df3868fbb2cc42
   weight_filename: model_state.safetensors
+  # 权重文件内容 SHA-256；HF LFS blob 名与 ModelScope 清单的 Sha256 均为该值，
+  # 用于验证 ModelScope 镜像与固定 HF revision 逐字节一致。
+  weight_sha256: 603070a3251613328859105fa66fe0711e101099a7b0885da41617f575bed5e9
   # Kyutai delayed-streams-modeling 的 ASR/TTS 服务端点（moshi-server）。
   stt_ws: ws://127.0.0.1:31607/api/asr-streaming
   tts_ws: ws://127.0.0.1:31608/api/tts_streaming

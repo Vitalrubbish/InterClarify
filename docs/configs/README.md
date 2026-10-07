@@ -11,7 +11,7 @@
 - `device`：CPU/GPU 选择与可见卡号；
 - `audio`：采样率 24000、单声道、float32、块长 80 ms、设备名、回声消除与冒烟时长；
 - `clock`：`real` 或 `virtual`，以及 micro-turn 起点 0.6 s；
-- `duplexcascade`：仓库地址与提交、HF 仓库与权重修订、权重文件名、STT/TTS WebSocket 端点、LLM 端口、`max_new_tokens`；
+- `duplexcascade`：仓库地址与提交、HF 仓库与权重修订、权重文件名与内容 SHA-256（`weight_sha256`）、STT/TTS WebSocket 端点、LLM 端口、`max_new_tokens`；
 - `logging`：日志级别与事件文件名。
 
 ## `local.yaml`

@@ -6,10 +6,10 @@ P1.1 资产准备作业的容器内入口。它在集群节点上调用 [prepare
 
 ## 关键行为
 
-- 环境变量：`INTERCLARIFY_ROOT`（默认 `/opt/interclarify`）、`INTERCLARIFY_MODEL_ROOT`、`INTERCLARIFY_ARTIFACT_ROOT`、`IC_HF_TOKEN_FILE`、`IC_PYTHON`、`HF_ENDPOINT`；
+- 环境变量：`INTERCLARIFY_ROOT`（默认 `/opt/interclarify`）、`INTERCLARIFY_MODEL_ROOT`、`INTERCLARIFY_ARTIFACT_ROOT`、`IC_HF_TOKEN_FILE`、`IC_PYTHON`、`IC_ASSET_PROVIDER`、`HF_ENDPOINT`；
+- `IC_ASSET_PROVIDER` 默认 `modelscope`（快速镜像，逐文件 SHA-256 校验）；设为 `huggingface` 时走 gated HF 路径；
 - `HF_ENDPOINT` 默认 `https://hf-mirror.com`，`PYTHONNOUSERSITE=True`；
-- Hugging Face token 从 `HF_TOKEN` 或 `IC_HF_TOKEN_FILE`（默认 `$INTERCLARIFY_ROOT/hf_token.txt`，已被 `.gitignore` 排除）读取，**不写入命令行或证据文件**；
-- 缺少 token 时立即以退出码 2 失败，不发起下载；
+- 仅当 `provider=huggingface` 时才要求 token，从 `HF_TOKEN` 或 `IC_HF_TOKEN_FILE`（默认 `$INTERCLARIFY_ROOT/hf_token.txt`，已被 `.gitignore` 排除）读取，**不写入命令行或证据文件**；缺少 token 时以退出码 2 失败；
 - 用镜像内的 `interclarify-dev` 解释器运行，脚本 rc 通过管道透传，写 `logs_submit/node.<UTC>.log`。
 
 ## 为什么用作业而不是登录节点后台进程

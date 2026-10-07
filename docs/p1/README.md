@@ -12,6 +12,8 @@ P1 对应 [engineering_implementation.md](../engineering_implementation.md) 第 
 ## 进度
 
 - Hugging Face token 已在服务器 `hf_token.txt`（已被 `.gitignore` 排除）就绪；gated 小文件下载验证通过，`train_cfg.json` 指向基础模型 `Qwen/Qwen2-7B-Instruct`（LoRA `qv`，r=16）。
-- 官方源码已固定在 `4289302`；DuplexCascade 权重（约 17.4 GB）与基础模型（约 15 GB）通过作业 `job-179137597372421357871-xuan-zhang`（`pdcpu`）下载中。
+- 集群到 `hf-mirror` 实测约 0.1–1.5 MB/s 且大文件会 `ChunkedEncodingError` 中断；改用 **ModelScope 镜像**（约 9–10 MB/s，支持 Range 续传）。ModelScope 的 `model_state.safetensors` SHA-256 与固定 HF revision 的 LFS blob 名完全一致（`603070a3…`），故内容与固定底座逐字节相同。
+- 官方源码已固定在 `4289302`；DuplexCascade 权重（约 17.4 GB）与基础模型（约 15 GB）通过 `pdcpu` 作业下载中（`prepare_p1_assets.py --provider modelscope`）。
 - 资产完成后继续实现固定最小输入的官方推理适配，并保存原始输出、GPU 峰值显存和实时因子（P1.1 剩余项）；实时 ASR–LLM–TTS 链路属于 P1.2。
+
 

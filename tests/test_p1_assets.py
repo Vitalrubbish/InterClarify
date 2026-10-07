@@ -34,6 +34,30 @@ def test_prepare_assets_dry_run_resolves_pinned_versions(tmp_path: Path) -> None
     assert plan["hf_revision"] == "31c038ece2f006a28722dd60d1df3868fbb2cc42"
     assert plan["weight_filename"] == "model_state.safetensors"
     assert plan["download_base_model"] is True
+    assert plan["provider"] == "huggingface"
+
+
+def test_prepare_assets_dry_run_accepts_modelscope_provider(tmp_path: Path) -> None:
+    result = subprocess.run(
+        [
+            sys.executable,
+            str(SCRIPT),
+            "--repo-root",
+            str(ROOT),
+            "--model-root",
+            str(tmp_path / "models"),
+            "--artifact-root",
+            str(tmp_path / "artifacts"),
+            "--provider",
+            "modelscope",
+            "--dry-run",
+        ],
+        check=True,
+        text=True,
+        capture_output=True,
+    )
+    plan = json.loads(result.stdout)
+    assert plan["provider"] == "modelscope"
 
 
 def test_prepare_assets_rejects_model_root_inside_checkout(tmp_path: Path) -> None:
