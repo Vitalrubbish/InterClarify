@@ -1,0 +1,81 @@
+% InterClarify three-layer reference implementation and clarification loop.
+% Requires \usepackage{tikz} and \usetikzlibrary{arrows.meta}.
+\begin{tikzpicture}[x=1cm,y=1cm,font=\sffamily\scriptsize,
+  >={Latex[length=1.7mm]},
+  lane/.style={rounded corners=2pt,draw=black!50,line width=.55pt},
+  cell/.style={rounded corners=2pt,draw=black!55,line width=.55pt,align=center},
+  next/.style={draw=black!65,-Latex,line width=.7pt},
+  reasoning/.style={draw=violet!75!black,-Latex,dashed,line width=.75pt}
+]
+  \def\a{3.6} \def\b{6.8} \def\c{10.0} \def\d{13.2} \def\e{16.4}
+  \node[anchor=east,font=\bfseries] at (1.95,8.15) {System audio};
+  \path[lane,fill=gray!10] (2.25,7.94) rectangle (18.0,8.36);
+  \node at (10.1,8.15) {Streaming TTS; user audio continues to be received during playback};
+
+  \node[anchor=east,font=\bfseries] at (1.95,7.32) {Selected output};
+  \path[cell,fill=cyan!12] (2.25,7.02) rectangle (4.95,7.62);
+  \node at (\a,7.32) {L0: backchannel};
+  \path[cell,fill=blue!10] (5.45,7.02) rectangle (8.15,7.62);
+  \node at (\b,7.32) {L1: brief response};
+  \path[cell,fill=blue!10] (8.65,7.02) rectangle (11.35,7.62);
+  \node at (\c,7.32) {L1: continue};
+  \path[cell,fill=violet!12] (11.85,7.02) rectangle (14.55,7.62);
+  \node at (\d,7.32) {L2: Which Alex?};
+  \path[cell,fill=green!11] (15.05,7.02) rectangle (17.75,7.62);
+  \node at (\e,7.32) {resume original task};
+  \foreach \x in {3.6,6.8,10.0,13.2,16.4} {\draw[next] (\x,7.62)--(\x,7.94);}
+
+  \node[anchor=east,font=\bfseries] at (1.95,6.56) {Output selector};
+  \path[lane,fill=orange!12] (2.25,6.32) rectangle (18.0,6.80);
+  \node at (10.1,6.56) {Valid Layer 2 text overrides Layer 1; otherwise Layer 1, then Layer 0. Discard stale requests.};
+  \foreach \x in {3.6,6.8,10.0,13.2,16.4} {\draw[next] (\x,6.80)--(\x,7.02);}
+
+  \node[anchor=east,font=\bfseries,text=violet!75!black] at (1.95,5.65) {Layer 2};
+  \path[lane,fill=violet!8] (2.25,5.39) rectangle (18.0,5.91);
+  \node at (\a,5.65) {idle};
+  \node at (\b,5.65) {request accepted};
+  \node at (\c,5.65) {ambiguity + timing};
+  \node at (\d,5.65) {CLARIFY, valid};
+  \node at (\e,5.65) {no override};
+  \draw[reasoning] (\d,5.91)--(\d,6.32);
+
+  \node[anchor=east,font=\bfseries,text=blue!70!black] at (1.95,4.80) {Layer 1};
+  \path[lane,fill=blue!8] (2.25,4.54) rectangle (18.0,5.06);
+  \node at (\a,4.80) {SILENCE};
+  \node at (\b,4.80) {ANSWER + CALL L2};
+  \node at (\c,4.80) {ANSWER};
+  \node at (\d,4.80) {SILENCE};
+  \node at (\e,4.80) {ANSWER};
+  \draw[reasoning] (\b,5.06)--(\b,5.39);
+
+  \node[anchor=east,font=\bfseries,text=cyan!55!black] at (1.95,3.95) {Layer 0};
+  \path[lane,fill=cyan!8] (2.25,3.69) rectangle (18.0,4.21);
+  \node at (\a,3.95) {BACKCHANNEL};
+  \node at (\b,3.95) {SILENCE};
+  \node at (\c,3.95) {SILENCE};
+  \node at (\d,3.95) {SILENCE};
+  \node at (\e,3.95) {SILENCE};
+
+  \node[anchor=east,font=\bfseries] at (1.95,3.03) {User micro-turn};
+  \path[cell,fill=red!8] (2.25,2.73) rectangle (4.95,3.33);
+  \node at (\a,3.03) {Could you ...};
+  \path[cell,fill=red!8] (5.45,2.73) rectangle (8.15,3.33);
+  \node at (\b,3.03) {text Alex ...};
+  \path[cell,fill=red!8] (8.65,2.73) rectangle (11.35,3.33);
+  \node at (\c,3.03) {about the meeting ...};
+  \path[cell,fill=red!8] (11.85,2.73) rectangle (14.55,3.33);
+  \node at (\d,3.03) {brief opening};
+  \path[cell,fill=red!8] (15.05,2.73) rectangle (17.75,3.33);
+  \node at (\e,3.03) {Alex Chen};
+
+  \node[anchor=east,font=\bfseries] at (1.95,2.15) {ASR + context};
+  \path[lane,fill=teal!8] (2.25,1.91) rectangle (18.0,2.39);
+  \node at (10.1,2.15) {Partial transcripts, timestamps, revisions and dialogue history; each decision sees only the current prefix};
+  \foreach \x in {3.6,6.8,10.0,13.2,16.4} {\draw[next] (\x,2.39)--(\x,2.73);}
+
+  \node[anchor=east,font=\bfseries] at (1.95,1.33) {User audio};
+  \path[lane,fill=gray!10] (2.25,1.11) rectangle (18.0,1.55);
+  \node at (10.1,1.33) {Continuous listening across fixed micro-turn windows; clarification answer updates the same task};
+  \foreach \x in {3.6,6.8,10.0,13.2,16.4} {\draw[next] (\x,1.55)--(\x,1.91);}
+  \node[anchor=west,font=\tiny,text=black!55] at (2.25,.64) {Reference system: retain general duplex behavior; evaluate FDB before and after adding clarification.};
+\end{tikzpicture}

@@ -1,0 +1,46 @@
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Experiment outputs and model artifacts
+artifacts/
+checkpoints/
+outputs/
+runs/
+logs/
+*.ckpt
+*.safetensors
+*.pt
+*.pth
+
+# Audio and transcript captures generated during experiments
+*.wav
+*.flac
+*.mp3
+*.jsonl
+
+# LaTeX build intermediates
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+
+# Visual Studio Code settings
+.vscode/
