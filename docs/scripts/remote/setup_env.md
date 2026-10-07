@@ -19,10 +19,11 @@
 
 1. 可选删除旧环境；
 2. `conda env create -f environment.yml`（已存在则跳过）；
-3. 解析出环境内 python 绝对路径，升级 pip；
+3. 解析出环境内 python 绝对路径，打印 pip 版本；
 4. `pip install -r requirements.txt`；
 5. 可选 `pip install -e .[dev]`。
 
 ## 约束
 
-集群作业命令中需使用环境内 python 的**绝对路径**（见 [image_use.md](../../../image_use.md) 注意事项“显式指定 python 路径”）。
+- 集群作业命令中需使用环境内 python 的**绝对路径**（见 [image_use.md](../../../image_use.md) 注意事项“显式指定 python 路径”）；
+- **不执行 `pip install --upgrade pip`**：pip 由 `environment.yml` 固定为 24.0，升级会造成实际环境版本漂移。

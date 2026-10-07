@@ -7,7 +7,7 @@
 | 组件 | 版本/来源 | 位置 |
 | --- | --- | --- |
 | 基础镜像 | `docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk:v0.17` | CUDA 12.8.1 / Python 3.11 / torch 2.9.1+cu128 |
-| P0 镜像 | `docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.1` | 由 [Dockerfile.p0](../../scripts/remote/Dockerfile.p0.md) 构建 |
+| P0 镜像 | `docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.2` | 由 [Dockerfile.p0](../../scripts/remote/Dockerfile.p0.md) 构建 |
 | conda 环境 | `interclarify-dev`（Python 3.10） | 镜像内 `/opt/conda/envs/interclarify-dev` |
 | 仓库 | `Vitalrubbish/InterClarify` | 共享存储 `/hpc_stor03/sjtu_home/xuan.zhang/InterClarify` |
 | 证据产物 | 本次作业输出 | `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts/p0_env/<时间戳>/` |
@@ -22,8 +22,8 @@
 
 ```bash
 docker build -f scripts/remote/Dockerfile.p0 \
-  -t docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.1 .
-docker push docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.1
+  -t docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.2 .
+docker push docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.2
 ```
 
 registry 不允许覆盖已有 tag；修改依赖或代码后递增版本（`v0.2`、`v0.3` …）。

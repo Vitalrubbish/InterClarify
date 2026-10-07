@@ -45,15 +45,45 @@ echo "[run_p0_node_job] environment check (require GPU)" | tee -a "$ARTIFACT_DIR
   --json-out "$ARTIFACT_DIR/env.json" | tee -a "$ARTIFACT_DIR/run.log"
 ENV_RC=${PIPESTATUS[0]}
 
-echo "[run_p0_node_job] audio I/O probe" | tee -a "$ARTIFACT_DIR/run.log"
+echo "[run_p0_node_job] audio I/O probe (informational)" | tee -a "$ARTIFACT_DIR/run.log"
 "$PYTHON" "$REPO_ROOT/scripts/check_audio_io.py" \
   --json-out "$ARTIFACT_DIR/audio_io.json" | tee -a "$ARTIFACT_DIR/run.log" || true
 
 echo "[run_p0_node_job] two identical replay smoke runs" | tee -a "$ARTIFACT_DIR/run.log"
+SMOKE_RC=0
 "$PYTHON" "$REPO_ROOT/scripts/run_p0_smoke.py" --profile cluster \
-  --output-root "$ARTIFACT_DIR/smoke" --run-id p0-smoke-a | tee -a "$ARTIFACT_DIR/run.log"
+  --output-root "$ARTIFACT_DIR/smoke" --run-id p0-smoke-a | tee -a "$ARTIFACT_DIR/run.log" || SMOKE_RC=1
 "$PYTHON" "$REPO_ROOT/scripts/run_p0_smoke.py" --profile cluster \
-  --output-root "$ARTIFACT_DIR/smoke" --run-id p0-smoke-b | tee -a "$ARTIFACT_DIR/run.log"
+  --output-root "$ARTIFACT_DIR/smoke" --run-id p0-smoke-b | tee -a "$ARTIFACT_DIR/run.log" || SMOKE_RC=1
 
-echo "[run_p0_node_job] evidence written to $ARTIFACT_DIR" | tee -a "$ARTIFACT_DIR/run.log"
-exit "$ENV_RC"
+# The acceptance claim is "structurally consistent logs", so verify it here
+# instead of only producing the two runs.
+CONSISTENCY_RC=0
+"$PYTHON" - "$ARTIFACT_DIR" <<'PY' | tee -a "$ARTIFACT_DIR/run.log" || CONSISTENCY_RC=1
+import json
+import pathlib
+import sys
+
+art = pathlib.Path(sys.argv[1])
+
+def events(run):
+    lines = (art / "smoke" / run / "events.jsonl").read_text().splitlines()
+    return [json.loads(line)["event_type"] for line in lines]
+
+def metrics(run):
+    return json.loads((art / "smoke" / run / "metrics.json").read_text())
+
+a, b = events("p0-smoke-a"), events("p0-smoke-b")
+assert a == b, "smoke event structure mismatch"
+assert metrics("p0-smoke-a") == metrics("p0-smoke-b"), "smoke metrics mismatch"
+assert len(a) > 0, "empty smoke event log"
+print(f"smoke consistency check: PASS ({len(a)} events)")
+PY
+
+RC=0
+[ "$ENV_RC" -eq 0 ] || RC=1
+[ "$SMOKE_RC" -eq 0 ] || RC=1
+[ "$CONSISTENCY_RC" -eq 0 ] || RC=1
+
+echo "[run_p0_node_job] evidence written to $ARTIFACT_DIR (rc=$RC)" | tee -a "$ARTIFACT_DIR/run.log"
+exit "$RC"

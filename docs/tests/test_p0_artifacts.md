@@ -15,6 +15,9 @@ P0 交付物的单元与集成测试，覆盖配置合并、清单确定性与�
 - `ManifestTest`：
   - `manifest_fingerprint` 忽略 `run_id`、时间、输出目录等易变字段；
   - Git 提交被记录且为 40 位十六进制。
+- `RunContextTest`：
+  - 复用非空 `run_id` 目录时 `RunContext.create` 抛 `FileExistsError`；
+  - 每次运行 `events.jsonl` 从空新建，`run_start` 只出现一次，`seq` 从 1 连续递增。
 - `SmokeTest`：
   - 通过子进程运行两次 `run_p0_smoke.py`，断言事件类型序列相同、`metrics.json` 相同、`manifest.json` 关键字段正确。
 

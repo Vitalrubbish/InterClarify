@@ -23,6 +23,7 @@ from interclarify.config import (  # noqa: E402
     write_resolved_config,
 )
 from interclarify.manifest import build_manifest, manifest_fingerprint  # noqa: E402
+from interclarify.run import RunContext  # noqa: E402
 
 
 class ConfigTest(unittest.TestCase):
@@ -87,6 +88,24 @@ class ManifestTest(unittest.TestCase):
             m = build_manifest(cfg, tmp, repo_root=REPO_ROOT)
             self.assertIsNotNone(m.git_commit)
             self.assertRegex(m.git_commit, r"^[0-9a-f]{40}$")
+
+
+class RunContextTest(unittest.TestCase):
+    def test_reused_run_id_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            RunContext.create(output_root=Path(tmp), profile="replay", run_id="fixed").close()
+            with self.assertRaises(FileExistsError):
+                RunContext.create(output_root=Path(tmp), profile="replay", run_id="fixed")
+
+    def test_fresh_events_file(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            ctx = RunContext.create(output_root=Path(tmp), profile="replay", run_id="only")
+            ctx.record("audio_input_opened")
+            ctx.close()
+            lines = (Path(tmp) / "only" / "events.jsonl").read_text().splitlines()
+            events = [json.loads(line) for line in lines]
+            self.assertEqual([e["event_type"] for e in events].count("run_start"), 1)
+            self.assertEqual([e["seq"] for e in events], list(range(1, len(events) + 1)))
 
 
 class SmokeTest(unittest.TestCase):

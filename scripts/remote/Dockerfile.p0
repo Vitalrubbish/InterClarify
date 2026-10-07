@@ -11,8 +11,8 @@
 # Build and push (naming per image_use.md; registry rejects overwriting a tag).
 # Use BuildKit: the legacy builder trips OverlayFS "max depth exceeded" on this host.
 #   DOCKER_BUILDKIT=1 docker build -f scripts/remote/Dockerfile.p0 \
-#     -t docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.1 .
-#   docker push docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.1
+#     -t docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.2 .
+#   docker push docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.2
 FROM docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk:v0.17
 
 # The base pip.conf may point at a slow mirror; override via env for the build.
@@ -30,8 +30,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Build the pinned conda env first so dependency layers cache independently of
 # the source tree.
 COPY environment.yml requirements.txt /opt/interclarify-build/
+# pip stays at the version pinned by environment.yml (24.0); do not upgrade it,
+# otherwise the built environment drifts from the tracked pin.
 RUN /opt/conda/bin/conda env create -f /opt/interclarify-build/environment.yml && \
-    /opt/conda/envs/interclarify-dev/bin/python -m pip install --no-cache-dir --upgrade pip && \
     /opt/conda/envs/interclarify-dev/bin/python -m pip install --no-cache-dir \
         -r /opt/interclarify-build/requirements.txt && \
     /opt/conda/bin/conda clean -afy

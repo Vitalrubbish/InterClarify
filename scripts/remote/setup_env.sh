@@ -34,8 +34,9 @@ fi
 
 ENV_PY="$(conda run -n "$ENV_NAME" python -c 'import sys; print(sys.executable)')"
 echo "[setup_env] python=$ENV_PY"
+# Keep the pip pinned by environment.yml (24.0); do not upgrade it.
+echo "[setup_env] pip: $("$ENV_PY" -m pip --version)"
 echo "[setup_env] installing pinned requirements"
-"$ENV_PY" -m pip install --no-cache-dir --upgrade pip
 "$ENV_PY" -m pip install --no-cache-dir --index-url "$PYPI_INDEX" -r "$REPO_ROOT/requirements.txt"
 
 if [[ "${IC_INSTALL_DEV:-0}" == "1" ]]; then

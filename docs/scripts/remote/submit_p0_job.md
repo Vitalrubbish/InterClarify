@@ -9,7 +9,7 @@
 | 变量 | 默认 | 说明 |
 | --- | --- | --- |
 | `INTERCLARIFY_ROOT` | 共享存储仓库路径 | 传给容器内脚本 |
-| `P0_IMAGE` | `.../sjtu_yukai-xuanzhang-interclarify-p0:v0.1` | 运行镜像 |
+| `P0_IMAGE` | `.../sjtu_yukai-xuanzhang-interclarify-p0:v0.2` | 运行镜像 |
 | `P0_JOB_NAME` | `interclarify-p0-env` | 作业名 |
 | `P0_GPUS` | `1` | 每任务 GPU 数 |
 | `P0_CPU_PER_GPU` | `8` | 每卡 CPU 配额 |

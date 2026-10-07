@@ -76,6 +76,13 @@ class RunContext:
         run_id = run_id or new_run_id(str(cfg.get("run", {}).get("run_prefix", "ic")))
         run_dir = Path(root) / run_id
         run_dir.mkdir(parents=True, exist_ok=True)
+        # A run directory must be unique: never append to an existing one, or
+        # events/manifest would mix two runs under the same run_id.
+        if any(run_dir.iterdir()):
+            raise FileExistsError(
+                f"run directory already exists and is not empty: {run_dir}; "
+                "use a new run_id or remove the directory"
+            )
 
         manifest = build_manifest(cfg, run_dir, repo_root=paths["repo_root"], run_id=run_id, tags=tags)
         manifest.environment = collect_environment(cfg)
@@ -86,7 +93,8 @@ class RunContext:
         write_environment(manifest.environment, run_dir / "environment.txt")
 
         ctx = cls(run_id=run_id, run_dir=run_dir, config=cfg, manifest=manifest)
-        ctx._events_handle = (run_dir / EVENTS_FILENAME).open("a", encoding="utf-8")
+        # Fresh run: write (not append) so a reused path can never carry stale events.
+        ctx._events_handle = (run_dir / EVENTS_FILENAME).open("w", encoding="utf-8")
         ctx.record("run_start", profile=profile, config_digest=manifest.config_digest)
         return ctx
 

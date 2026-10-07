@@ -18,7 +18,7 @@ P0 的最小运行上下文，落实实验输出目录规范（[engineering_impl
 
 ## 主要类与方法
 
-- `RunContext.create(output_root, profile, config_dir, overrides, repo_root, run_id, tags)`：加载配置、解析路径、创建运行目录，写入清单/配置/环境文件，并记录 `run_start`。
+- `RunContext.create(output_root, profile, config_dir, overrides, repo_root, run_id, tags)`：加载配置、解析路径、创建运行目录，写入清单/配置/环境文件，并记录 `run_start`；若 `run_id` 对应的目录已存在且非空则抛 `FileExistsError`，避免两次运行混入同一目录。
 - `RunContext.record(event_type, **payload)`：追加一条事件并 flush，返回事件字典。
 - `RunContext.write_metrics(metrics)` / `finalize(metrics)`：写指标、收尾时间、更新清单并记录 `run_end`。
 - `close()` 与上下文管理器支持。
@@ -26,5 +26,6 @@ P0 的最小运行上下文，落实实验输出目录规范（[engineering_impl
 ## 关键约束
 
 - 事件带单调时钟（`monotonic_ms`）与墙上时钟（`wall_time`）两种时间，便于离线回放按虚拟时钟重放；
+- `run_id` 必须唯一：`events.jsonl` 以写模式（`w`）新建，`create` 拒绝复用非空运行目录，因此不会出现追加旧日志、重复 `run_start` 或重复序号；
 - `output_root` 默认取配置 `run.output_root`（相对仓库根目录）；
 - 不涉及模型推理；P0 冒烟脚本（`scripts/run_p0_smoke.py`）是其唯一使用者。

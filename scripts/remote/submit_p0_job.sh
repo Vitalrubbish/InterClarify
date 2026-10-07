@@ -14,7 +14,7 @@
 set -euo pipefail
 
 REPO_HPC="${INTERCLARIFY_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/InterClarify}"
-IMAGE="${P0_IMAGE:-docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.1}"
+IMAGE="${P0_IMAGE:-docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.2}"
 JOB_NAME="${P0_JOB_NAME:-interclarify-p0-env}"
 ARTIFACT_ROOT="${INTERCLARIFY_ARTIFACT_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts}"
 LOG_DIR="$ARTIFACT_ROOT/p0_env/logs_submit"

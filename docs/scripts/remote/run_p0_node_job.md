@@ -23,4 +23,10 @@ $INTERCLARIFY_ARTIFACT_ROOT/p0_env/<UTC 时间戳>/
 
 ## 退出码
 
-以环境检查的退出码收尾：环境不完整或（要求 GPU 时）无 CUDA 设备则非零，作业视为未通过。
+退出码聚合三类结果，任一失败即非零，作业不会在冒烟失败时仍报 `Completed`：
+
+1. `check_env.py --require-gpu` 的退出码（环境缺依赖或不可见 CUDA）；
+2. 两次 `run_p0_smoke.py` 的退出码；
+3. 冒烟一致性内联校验：两次运行的事件类型序列与 `metrics.json` 必须相同，否则失败。
+
+`check_audio_io.py` 为信息性探测（headless 允许 `NO_DEVICES`），不计入失败。脚本末尾把三类返回码合并为最终退出码并写入 `run.log`。
