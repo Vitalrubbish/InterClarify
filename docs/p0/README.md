@@ -48,27 +48,29 @@ metrics.json: 完全相等
 
 ### 3. 单元测试
 
-`python -m pytest -q`：`9 passed`，覆盖配置合并、清单确定性与冒烟结构一致性。
+`python -m pytest -q`：`11 passed`，覆盖配置合并、清单确定性、`run_id` 唯一性与冒烟结构一致性。
 
 ## 集群验收（2026-10-07，pdgpu-4090）
 
 - 任务单：[docs/jobs/p0_environment_check.md](../jobs/p0_environment_check.md)
 - 执行手册：[remote/p0_job_runbook.md](remote/p0_job_runbook.md)
-- 镜像：`docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.1`（digest `sha256:7b1a6162…`）
-- 提交：`bash scripts/remote/submit_p0_job.sh`，作业 `job-179136223910414023233-xuan-zhang`
-- 证据：`/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts/p0_env/20261007T083841Z/`
+- 镜像：`docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.2`（digest `sha256:6df80573…`），由提交 `57a5c77` 的 Dockerfile 构建；
+- 提交：`bash scripts/remote/submit_p0_job.sh`，作业 `job-179136453153150934891-xuan-zhang`（Completed，节点 `d6-hpc-gpu-069`）；
+- 证据：`/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts/p0_env/20261007T091659Z/`。
 
 结果：
 
 ```text
+git.txt:   57a5c77c6350c0086c5f1a8bccc68dd6336332cd（工作树干净，无附加状态行）
 env.json:  status=PASS, missing_core=[], failures=0
 gpu:       NVIDIA GeForce RTX 4090 sm_89 23.52GB, cuda_available=true
 audio_io:  NO_DEVICES（headless，属预期）
 smoke:     p0-smoke-a 与 p0-smoke-b 事件序列一致（17 条，13 个音频块），metrics.json 相等
+consistency check: PASS (17 events)；run_p0_node_job.sh 最终 rc=0
 config_digest: cb6a279b7254194d48552fa06c6169ae1ff31d84e918a624adddc8ba99d2fac1
 ```
 
-集群证据满足 [docs/jobs/p0_environment_check.md](../jobs/p0_environment_check.md) 的验收清单第 1–4 项。
+集群证据记录在干净提交 `57a5c77` 上，满足 [docs/jobs/p0_environment_check.md](../jobs/p0_environment_check.md) 的验收清单第 1–4 项。另以本机模拟（`IC_PYTHON` 包装器令冒烟失败）验证：环境检查通过但冒烟失败时 `run_p0_node_job.sh` 返回非零，作业不会误报 `Completed`。
 
 ## 已知限制
 

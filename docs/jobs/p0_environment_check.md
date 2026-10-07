@@ -53,20 +53,27 @@ vc logs -t <TASKID>
 
 | 项 | 值 |
 | --- | --- |
-| 作业 | `job-179136223910414023233-xuan-zhang`（Completed） |
+| 作业 | `job-179136453153150934891-xuan-zhang`（Completed） |
 | 节点 | `d6-hpc-gpu-069` |
-| 镜像 | `docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.1` |
-| 证据 | `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts/p0_env/20261007T083841Z/` |
+| 提交 | `57a5c77c6350c0086c5f1a8bccc68dd6336332cd`（工作树干净） |
+| 镜像 | `docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.2`（由该提交的 Dockerfile 构建） |
+| 证据 | `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts/p0_env/20261007T091659Z/` |
 
 验收清单逐项结果：
 
 1. `env.json` `status=PASS`、`missing_core=[]`、`gpu.cuda_available=true`、设备 `NVIDIA GeForce RTX 4090`（sm_89, 23.52 GB）——通过；
 2. `audio_io.json` 有结果，`status=NO_DEVICES`（headless，允许）——通过；
-3. `smoke/p0-smoke-a` 与 `p0-smoke-b` 事件类型序列一致（17 条，13 个 `audio_chunk_received`），`metrics.json` 相等——通过；
-4. `git.txt` 记录提交 `3ba5ae1e…`（含构建后的 Dockerfile 修复，见下）——通过；
+3. `smoke/p0-smoke-a` 与 `p0-smoke-b` 事件类型序列一致（17 条，13 个 `audio_chunk_received`），`metrics.json` 相等，内联一致性校验 `PASS`——通过；
+4. `git.txt` 仅含提交 `57a5c77c…`（无附加状态行，工作树干净）——通过；
 5. 证据已回填至 [docs/p0/README.md](../p0/README.md)。
 
-构建说明：本机 overlay2 对旧式构建器在 `WORKDIR` 步骤报 `max depth exceeded`，改用 BuildKit（`DOCKER_BUILDKIT=1 docker build …`）成功；同时移除了非必要的递归 `chmod`。
+修复与说明：
+
+- 本机 overlay2 对旧式构建器在 `WORKDIR` 步骤报 `max depth exceeded`，改用 BuildKit（`DOCKER_BUILDKIT=1 docker build …`）成功；同时移除了非必要的递归 `chmod`；
+- `run_p0_node_job.sh` 现聚合环境检查、两次冒烟与一致性校验的返回码，任一失败即非零（已用本机包装器模拟冒烟失败验证）；
+- 为消除版本漂移，`setup_env.sh` 与 `Dockerfile.p0` 不再 `pip install --upgrade pip`，pip 固定为 `environment.yml` 的 24.0；镜像相应升为 `v0.2`。
+
+> 早期 `job-179136223910414023233-xuan-zhang`（镜像 v0.1，证据目录 `20261007T083841Z`）在提交 `3ba5ae1` 的脏工作树上运行，仅作历史记录，不作为验收依据。
 
 ## 失败处理
 
