@@ -78,7 +78,16 @@ def _prepare_source(source_root: Path, repo_url: str, commit: str) -> str:
     if not _is_clean_git_checkout(source_root):
         raise RuntimeError(f"refusing to change a dirty source checkout: {source_root}")
 
-    _run(["git", "fetch", "--tags", "origin"], cwd=source_root)
+    # If the pinned commit is already checked out and clean, do not touch the
+    # network: compute nodes may not reach GitHub while the login node does.
+    current = _run(["git", "rev-parse", "HEAD"], cwd=source_root, capture=True)
+    if current == commit:
+        return current
+
+    try:
+        _run(["git", "fetch", "--tags", "origin"], cwd=source_root)
+    except RuntimeError:
+        pass  # offline node; rely on an already-present commit below
     try:
         _run(["git", "cat-file", "-e", f"{commit}^{{commit}}"], cwd=source_root)
     except RuntimeError:
