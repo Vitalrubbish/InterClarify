@@ -8,8 +8,9 @@
 # Model weights and datasets are NOT baked in; they are read from shared
 # storage at run time (see scripts/remote/run_p0_node_job.sh).
 #
-# Build and push (naming per image_use.md; registry rejects overwriting a tag):
-#   docker build -f scripts/remote/Dockerfile.p0 \
+# Build and push (naming per image_use.md; registry rejects overwriting a tag).
+# Use BuildKit: the legacy builder trips OverlayFS "max depth exceeded" on this host.
+#   DOCKER_BUILDKIT=1 docker build -f scripts/remote/Dockerfile.p0 \
 #     -t docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.1 .
 #   docker push docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.1
 FROM docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk:v0.17
@@ -36,8 +37,9 @@ RUN /opt/conda/bin/conda env create -f /opt/interclarify-build/environment.yml &
     /opt/conda/bin/conda clean -afy
 
 # Ship a snapshot of the repository so scripts run without the shared mount;
-# /hpc_stor03 is mounted at run time for models and artifacts.
+# /hpc_stor03 is mounted at run time for models and artifacts.  Copied files
+# keep world-readable default permissions, so no recursive chmod is needed
+# (a recursive chmod can trip OverlayFS "max depth exceeded" on some hosts).
 COPY . /opt/interclarify
-RUN chmod -R a+rX /opt/interclarify
 
 WORKDIR /opt/interclarify

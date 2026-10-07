@@ -49,6 +49,25 @@ vc logs -t <TASKID>
 4. `git.txt` 的可复现提交与工作树状态已记录；
 5. 上述证据回填至 [docs/p0/README.md](../p0/README.md)。
 
+## 执行结果（2026-10-07）
+
+| 项 | 值 |
+| --- | --- |
+| 作业 | `job-179136223910414023233-xuan-zhang`（Completed） |
+| 节点 | `d6-hpc-gpu-069` |
+| 镜像 | `docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.1` |
+| 证据 | `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts/p0_env/20261007T083841Z/` |
+
+验收清单逐项结果：
+
+1. `env.json` `status=PASS`、`missing_core=[]`、`gpu.cuda_available=true`、设备 `NVIDIA GeForce RTX 4090`（sm_89, 23.52 GB）——通过；
+2. `audio_io.json` 有结果，`status=NO_DEVICES`（headless，允许）——通过；
+3. `smoke/p0-smoke-a` 与 `p0-smoke-b` 事件类型序列一致（17 条，13 个 `audio_chunk_received`），`metrics.json` 相等——通过；
+4. `git.txt` 记录提交 `3ba5ae1e…`（含构建后的 Dockerfile 修复，见下）——通过；
+5. 证据已回填至 [docs/p0/README.md](../p0/README.md)。
+
+构建说明：本机 overlay2 对旧式构建器在 `WORKDIR` 步骤报 `max depth exceeded`，改用 BuildKit（`DOCKER_BUILDKIT=1 docker build …`）成功；同时移除了非必要的递归 `chmod`。
+
 ## 失败处理
 
 - 镜像拉取失败：确认 `docker.v2.aispeech.com` 登录状态与 tag 拼写；
