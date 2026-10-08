@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "description": "P1.2 scripted scenarios for the real-time duplex link. Speech segments carry synth_text used by scripts/prepare_p1_2_scenarios.py to synthesize the referenced wav files through the pinned Kyutai TTS service; segments with audio=null are digital silence and need no file. All start_seconds are relative to scenario start, but because segments are sent sequentially a start_seconds in the past simply means 'right after the previous segment'; only start_condition-based segments wait explicitly.",
+  "sample_rate": 24000,
+  "scenarios": [
+    {
+      "name": "silence_warmup",
+      "description": "纯静音 4 秒：系统不应产生 ASR 文本、控制 token 或 TTS；验证静音路径不会崩溃或误答。",
+      "segments": [
+        {"label": "silence", "audio": null, "duration_seconds": 4.0, "start_seconds": 0.0}
+      ],
+      "expect": {"expect_no_asr": true}
+    },
+    {
+      "name": "regular_answer",
+      "description": "单轮提问后保持安静：micro-turn 静音 tick 应触发 <|user finish talking|> 与常规回答（P1.2 验收项：常规回答）。",
+      "segments": [
+        {
+          "label": "question",
+          "audio": "regular_answer/01_question.wav",
+          "synth_text": "Could you tell me a short joke, please?",
+          "start_seconds": 0.0
+        },
+        {"label": "tail_silence", "audio": null, "duration_seconds": 6.0, "start_seconds": 0.0}
+      ],
+      "expect": {"answer_expected": true, "user_asr_contains": "joke"}
+    },
+    {
+      "name": "pause_then_continue",
+      "description": "说话中途停顿 3.5 秒再继续：停顿期间的 micro-turn 走 <|no voice|> 路径，系统应继续倾听而不是抢答（P1.2 验收项：静音 + 继续倾听）。",
+      "segments": [
+        {
+          "label": "part_one",
+          "audio": "pause_then_continue/01_part_one.wav",
+          "synth_text": "Hi, I have two quick things to ask you.",
+          "start_seconds": 0.0
+        },
+        {"label": "pause", "audio": null, "duration_seconds": 3.5, "start_seconds": 0.0},
+        {
+          "label": "part_two",
+          "audio": "pause_then_continue/02_part_two.wav",
+          "synth_text": "First, what day is it today?",
+          "start_seconds": 0.0
+        },
+        {"label": "tail_silence", "audio": null, "duration_seconds": 6.0, "start_seconds": 0.0}
+      ],
+      "expect": {"answer_expected": true, "user_asr_contains": "today"}
+    },
+    {
+      "name": "barge_in_stop",
+      "description": "系统开始回答后中途插话：脚本在 TTS 已播放 3 秒后发起点打断，验证用户音频在系统发声期间仍被接收、服务端 <|user interruption|> 触发 audio_control stop、未播放音频被取消、随后倾听并回答新问题（P1.2 验收项：发声期接收 + 打断停播 + 继续倾听）。",
+      "segments": [
+        {
+          "label": "question",
+          "audio": "barge_in_stop/01_question.wav",
+          "synth_text": "Please tell me a very long and detailed story about a dragon.",
+          "start_seconds": 0.0
+        },
+        {
+          "label": "barge_in",
+          "audio": "barge_in_stop/02_barge_in.wav",
+          "synth_text": "Stop! Wait, actually, what time is it right now?",
+          "start_seconds": 0.0,
+          "start_condition": {"tts_played_min_seconds": 3.0}
+        },
+        {"label": "tail_silence", "audio": null, "duration_seconds": 6.0, "start_seconds": 0.0}
+      ],
+      "expect": {
+        "answer_expected": true,
+        "barge_in_stop_expected": true,
+        "user_asr_contains": "time"
+      }
+    },
+    {
+      "name": "backchannel_long_speech",
+      "description": "约 9 秒连续长语音：系统应在用户说话期间保持倾听，可能给出 backchannel（是否出现作为信息记录），说完后再回答（P1.2 验收项：backchannel + 继续倾听）。",
+      "segments": [
+        {
+          "label": "long_speech",
+          "audio": "backchannel_long_speech/01_long_speech.wav",
+          "synth_text": "I am going to tell you about my whole morning routine, so please just listen for a moment before you answer anything, alright?",
+          "start_seconds": 0.0
+        },
+        {"label": "tail_silence", "audio": null, "duration_seconds": 6.0, "start_seconds": 0.0}
+      ],
+      "expect": {"answer_expected": true, "user_asr_contains": "morning"}
+    },
+    {
+      "name": "continuous_two_questions",
+      "description": "连续快速两个问题：验证模型在 micro-turn 节奏下连续处理、回答不崩溃（P1.2 验收项：连续脚本化场景）。",
+      "segments": [
+        {
+          "label": "two_questions",
+          "audio": "continuous_two_questions/01_two_questions.wav",
+          "synth_text": "What is two plus two? Also, what is three plus three?",
+          "start_seconds": 0.0
+        },
+        {"label": "tail_silence", "audio": null, "duration_seconds": 6.0, "start_seconds": 0.0}
+      ],
+      "expect": {"answer_expected": true, "user_asr_contains": "plus"}
+    }
+  ]
+}

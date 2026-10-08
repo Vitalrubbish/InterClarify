@@ -61,6 +61,33 @@ duplexcascade:
   tts_ws: ws://127.0.0.1:31608/api/tts_streaming
   llm_port: 31606
   max_new_tokens: 64
+  # 服务端默认值（server.py --kyutai-tts-voice / --stt-pre-silence-s）。
+  tts_voice: expresso/ex03-ex01_happy_001_channel1_334s.wav
+  stt_pre_silence_s: 0.0
+
+p1_2:
+  # 实时双工链路（P1.2）的运行参数，任务单见 docs/jobs/p1_2_live_link.md。
+  # 脚本化场景定义（入库）；音频经 scripts/prepare_p1_2_scenarios.py 合成到
+  # scenario_audio_root（*.wav 不入库，运行前必须已生成）。
+  scenarios_path: configs/p1_2_scenarios.json
+  scenario_audio_root: assets/p1_2_scenarios
+  # launch: 本机拉起官方 LLM 服务子进程（默认）；connect: 连接 --llm-url 指向的已运行服务。
+  llm: launch
+  llm_url: null
+  # reset: 同一条 WebSocket 连接内场景间发送文本 Reset；reconnect: 每场景新建连接。
+  reset_mode: reset
+  # auto: 配置了输出设备时用 sounddevice，否则用 virtual（headless 集群）。
+  playback_sink: auto
+  connect_timeout_s: 10
+  post_audio_timeout_s: 30
+  idle_gap_s: 2.0
+  no_tts_grace_s: 8.0
+  reset_settle_seconds: 1.5
+  llm_ready_timeout_s: 900
+  send_pace_budget_ms: 120
+  # audio_chunk_sent 事件按每 N 帧记录一次（末帧始终记录），避免事件 I/O
+  # 抖动污染发送 pacing 测量；需要逐帧事件时设为 1。
+  chunk_event_stride: 5
 
 logging:
   level: INFO
