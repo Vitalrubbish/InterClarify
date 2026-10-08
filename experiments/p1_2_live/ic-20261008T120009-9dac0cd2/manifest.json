@@ -1,0 +1,59 @@
+{
+  "run_id": "ic-20261008T120009-9dac0cd2",
+  "profile": "cluster",
+  "config_digest": "969f9c8d8532ddfe8492efea9c1cb7480e343cfbb590b94c544a46f7d94cd174",
+  "seed": 0,
+  "device": {
+    "backend": "cuda",
+    "index": 0,
+    "cuda_visible_devices": "0"
+  },
+  "output_dir": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts/p1_2_live/ic-20261008T120009-9dac0cd2",
+  "repo_root": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify",
+  "git_commit": "416eaf01d4bf53ca7f89efb3f013a3e7420032e1",
+  "git_dirty": false,
+  "git_branch": "main",
+  "model": {
+    "repo_url": "https://github.com/sbintuitions/DuplexCascade",
+    "repo_commit": "42893024ca90c8de8ac3ed624467ebc123512ff8",
+    "hf_repo_id": "sbintuitions/DuplexCascade",
+    "hf_revision": "31c038ece2f006a28722dd60d1df3868fbb2cc42",
+    "weight_filename": "model_state.safetensors",
+    "weight_sha256": "603070a3251613328859105fa66fe0711e101099a7b0885da41617f575bed5e9",
+    "stt_ws": "ws://127.0.0.1:31607/api/asr-streaming",
+    "tts_ws": "ws://127.0.0.1:31608/api/tts_streaming",
+    "llm_port": 31606,
+    "max_new_tokens": 64,
+    "tts_voice": "expresso/ex03-ex01_happy_001_channel1_334s.wav",
+    "stt_pre_silence_s": 0.0
+  },
+  "environment": {
+    "hostname": "job-179146072814769675121-xuan-zhang-master-0",
+    "platform": "Linux-4.18.0-425.3.1.el8_lustre.x86_64-x86_64-with-glibc2.35",
+    "python_version": "3.10.21",
+    "python_executable": "/opt/conda/envs/interclarify-dev/bin/python",
+    "conda_env": null,
+    "cuda_visible_devices": null,
+    "torch_version": "2.4.1+cu121",
+    "torch_cuda_version": "12.1",
+    "cuda_available": true,
+    "cuda_device_count": 2,
+    "cuda_device_names": [
+      "NVIDIA GeForce RTX 4090",
+      "NVIDIA GeForce RTX 4090"
+    ],
+    "device": {
+      "backend": "cuda",
+      "index": 0,
+      "cuda_visible_devices": "0"
+    },
+    "profile": "cluster"
+  },
+  "started_at": "2026-10-08T12:00:11.449227+00:00",
+  "finished_at": "2026-10-08T12:04:12.248470+00:00",
+  "tags": [
+    "p1",
+    "live-link"
+  ],
+  "extra": {}
+}

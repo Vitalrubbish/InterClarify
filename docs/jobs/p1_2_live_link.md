@@ -43,13 +43,38 @@ vc logs -t <TASKID>
 5. 权重为固定快照（`weight_verified` 事件，`--no-verify-weight` 未使用），服务代码为固定提交、零修改；
 6. 本地 CPU 测试 `tests/test_p1_2_realtime.py` 全绿（提交前已在开发机验证 31/31）。
 
-## 执行结果
+## 执行结果（2026-10-08）
 
-待执行。执行后补充：作业号、节点、提交号、运行目录、`metrics.json` 摘要（各场景 checks、双工计数、墙钟时长）、已知取舍。
+| 项 | 值 |
+| --- | --- |
+| 作业 | `job-179146072814769675121-xuan-zhang`（Completed；首次提交 `job-179146027480894011099` 暴露容器缺 libssl 1.1，补共享存储兼容库后重提） |
+| 节点 | `d6-hpc-gpu-053`（2×RTX 4090，GPU 0 控制模型 / GPU 1 Kyutai STT+TTS） |
+| 提交 | `416eaf0`（工作树干净） |
+| 运行目录 | `interclarify-p0-artifacts/p1_2_live/ic-20261008T120009-9dac0cd2/`（含 `artifacts/played_*.f32le` 已播音频 + 官方服务日志） |
+| 仓库内证据 | [`experiments/p1_2_live/ic-20261008T120009-9dac0cd2/`](../../experiments/p1_2_live/ic-20261008T120009-9dac0cd2/)（见 [说明](../../experiments/p1_2_live/README.md)） |
 
-## 已知取舍
+**结论：`status=PASS`，6/6 场景期望全部通过，`send_underruns=0`，墙钟 240.8s。**
 
-- headless 集群无麦克风/扬声器：麦克风由 24 kHz 预生成 wav 按实时 pacing 注入，扬声器由虚拟播放所有者 + 已播音频落盘代替；本地有设备的开发机可用 `--playback-sink sounddevice` 走真实声卡（对应第 5.4 节的降级路径声明）；
-- ASR 语言为英/法（Kyutai STT），场景语音为英文；目标域“日程时间选择”的中文适配若需要替换 ASR/TTS，必须先保存本官方组合的结果（第 5.1 节）；
-- 播放队列堆积观测在客户端侧（backlog 峰值 + 发送 pacing 欠 run）；服务端 `audio_q` 满丢旧属官方既有行为，不在 P1.2 修改；
-- 统一事件日志（P1.3）会复用本运行目录的 `events.jsonl` 格式并扩展事件字典（`micro_turn_tick`、`layer0/layer1_decision`、修订版本等）。
+`metrics.json` 摘要（采样率 24 kHz，已播/取消时长按样本数折算）：
+
+```text
+silence_warmup          no_asr=pass                                   （纯静音零 ASR 零 TTS）
+regular_answer          answer=pass user_asr=pass  发声期收帧= 56  已播 8.80s
+pause_then_continue     answer=pass user_asr=pass  发声期收帧=108  已播24.88s 取消8.48s 服务端插话=1
+barge_in_stop           answer=pass user_asr=pass  barge_in_stop=pass  发声期收帧=73
+                        已播35.78s 取消1.22s 客户端插话=1 服务端插话=1 backchannel=1
+backchannel_long_speech answer=pass user_asr=pass  发声期收帧=128 已播10.12s 取消76.66s 服务端插话=14
+continuous_two_questions answer=pass user_asr=pass  发声期收帧= 52  已播 4.64s
+duplex: 5/6 场景在系统发声期间持续收用户音频（共 417 帧）；打断停播成功 1/1
+```
+
+关键事件链（`events.jsonl`）：`weight_verified`（固定快照校验）→ `playback_started` → `user_barge_in`（含打断时刻播放头位置）→ 服务端 `<|user interruption|>` + `audio_control stop` → `playback_stopped`（`cancelled_samples` 只含未播尾部）→ 新 `answer_phase`。验收清单第 1–6 项满足。
+
+行为观察（官方控制模型的真实表现，非缺陷）：停顿场景中模型在 3.5s 停顿内先作答、被继续说话的用户打断后再次作答；长语音场景中模型多次尝试接话均被用户打断（`server_barge_in=14`），符合 DuplexCascade micro-turn 话轮决策。
+
+## 已知取舍（执行后更新）
+
+- 首次作业失败暴露容器 libssl 1.1 缺失：已将调试节点的 `libssl/libcrypto.so.1.1` 复制到 `interclarify-kyutai/lib/` 并由启动脚本注入 `LD_LIBRARY_PATH`；
+- 调试节点（RTX 2080 Ti，sm_75）无法运行 candle STT（bf16 kernel 按 `__CUDA_ARCH__ >= 800` 门控），故二进制按 sm_89 构建、STT 与全链路在 4090 队列验证；TTS（torch）在调试节点完成合成链路验证；
+- 场景语音在作业内经 TTS 重新合成（两次合成摘要不同为采样随机性，`live_link_start` 事件记录当次 SHA-256，可追溯）；
+- 其余同部署前记录：headless 用虚拟播放 sink + 已播音频落盘代替扬声器；STT 为英/法语料；事件字典扩展归 P1.3。

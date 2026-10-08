@@ -15,7 +15,6 @@ env/
 
 # Experiment outputs and model artifacts
 experiments/*
-!experiments/p1_offline/
 artifacts/
 checkpoints/
 outputs/
@@ -59,3 +58,6 @@ hf_token.txt
 !experiments/p1_offline/**
 !experiments/p1_offline/**/*.jsonl
 !experiments/p1_offline/**/*.log
+!experiments/p1_2_live/
+!experiments/p1_2_live/**
+!experiments/p1_2_live/**/*.jsonl
