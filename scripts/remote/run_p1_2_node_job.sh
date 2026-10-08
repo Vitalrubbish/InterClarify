@@ -1,22 +1,25 @@
 #!/usr/bin/env bash
 # P1.2 real-time duplex link, executed inside a cluster GPU container.
 #
-# Prerequisites (see docs/jobs/p1_2_live_link.md):
-#   1. the Kyutai STT/TTS moshi-server instances must be reachable at the
-#      configured endpoints (ports 31607/31608 on 127.0.0.1 of this node);
-#   2. P1.1 assets (DuplexCascade snapshot + base model) on shared storage.
+# The job requests two GPUs: GPU 0 runs the official DuplexCascade control
+# model (bf16, ~17 GB), GPU 1 runs the pinned Kyutai STT/TTS services (started
+# here from shared storage if not already reachable).  Scenario audio is
+# synthesized through the TTS service, then the continuous scripted scenarios
+# run headlessly with a virtual playback sink.
 #
-# Steps: synthesize the scripted scenario audio through the TTS service, then
-# launch the unmodified official control-model server (bf16, local weights)
-# and run the continuous scripted scenarios headlessly (virtual playback sink).
+# Assets (built once, see docs/jobs/p1_2_live_link.md):
+#   P1.1 models : $INTERCLARIFY_MODEL_ROOT/modelscope/...
+#   Kyutai stack: /hpc_stor03/sjtu_home/xuan.zhang/interclarify-kyutai/
 #
 # Overrides: INTERCLARIFY_ROOT, INTERCLARIFY_MODEL_ROOT,
-#            INTERCLARIFY_ARTIFACT_ROOT, IC_PYTHON
+#            INTERCLARIFY_ARTIFACT_ROOT, IC_PYTHON, KYUTAI_ROOT,
+#            IC_STT_GPU, IC_TTS_GPU
 set -uo pipefail
 
 REPO_ROOT="${INTERCLARIFY_ROOT:-/opt/interclarify}"
 MODEL_ROOT="${INTERCLARIFY_MODEL_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models}"
 ARTIFACT_ROOT="${INTERCLARIFY_ARTIFACT_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts}"
+KYUTAI_ROOT="${KYUTAI_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/interclarify-kyutai}"
 PYTHON="${IC_PYTHON:-/opt/conda/envs/interclarify-dev/bin/python}"
 
 export PYTHONNOUSERSITE=True
@@ -28,30 +31,11 @@ LOG_DIR="$ARTIFACT_ROOT/p1_2_live/logs_submit"
 mkdir -p "$LOG_DIR"
 LOG="$LOG_DIR/node.$(date -u +%Y%m%dT%H%M%SZ).log"
 
-# -- prerequisite probe: Kyutai STT/TTS services -----------------------------
-probe() {
-  "$PYTHON" - "$1" <<'PY'
-import socket, sys
-host, port = sys.argv[1].rsplit(":", 1)
-try:
-    with socket.create_connection((host, int(port)), timeout=3):
-        sys.exit(0)
-except OSError as exc:
-    print(f"unreachable: {exc}")
-    sys.exit(1)
-PY
-}
-
-STT_ENDPOINT="${IC_STT_ENDPOINT:-127.0.0.1:31607}"
-TTS_ENDPOINT="${IC_TTS_ENDPOINT:-127.0.0.1:31608}"
-for endpoint in "$STT_ENDPOINT" "$TTS_ENDPOINT"; do
-  if ! probe "$endpoint"; then
-    echo "[p1_2_live] ERROR: Kyutai service at $endpoint not reachable." | tee "$LOG"
-    echo "[p1_2_live] Deploy moshi-server first, see docs/jobs/p1_2_live_link.md (前置条件)." | tee -a "$LOG"
-    exit 3
-  fi
-done
-echo "[p1_2_live] STT/TTS endpoints reachable: $STT_ENDPOINT $TTS_ENDPOINT" | tee "$LOG"
+# -- step 0: Kyutai STT/TTS services on GPU 1 --------------------------------
+if ! bash "$REPO_ROOT/scripts/remote/start_kyutai_services.sh" "${IC_STT_GPU:-1}" "${IC_TTS_GPU:-1}" 2>&1 | tee -a "$LOG"; then
+  echo "[p1_2_live] ERROR: Kyutai services failed to start (see $KYUTAI_ROOT/logs)" | tee -a "$LOG"
+  exit 3
+fi
 
 # -- step 1: synthesize scripted scenario audio via the TTS service ----------
 echo "[p1_2_live] synthesizing scenario audio" | tee -a "$LOG"

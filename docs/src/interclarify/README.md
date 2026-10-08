@@ -34,6 +34,7 @@
 | `scripts/remote/submit_p1_offline_job.sh` | [../../scripts/remote/submit_p1_offline_job.md](../../scripts/remote/submit_p1_offline_job.md) |
 | `scripts/remote/run_p1_2_node_job.sh` | [../../scripts/remote/run_p1_2_node_job.md](../../scripts/remote/run_p1_2_node_job.md) |
 | `scripts/remote/submit_p1_2_job.sh` | [../../scripts/remote/submit_p1_2_job.md](../../scripts/remote/submit_p1_2_job.md) |
+| `scripts/remote/start_kyutai_services.sh` | [../../scripts/remote/start_kyutai_services.md](../../scripts/remote/start_kyutai_services.md) |
 | `3rd-party/DuplexCascade/*` | [../../3rd-party/DuplexCascade.md](../../3rd-party/DuplexCascade.md) |
 | `configs/*.yaml`、`configs/p1_2_scenarios.json` | [../../configs/README.md](../../configs/README.md) |
 | `tests/test_p0_artifacts.py` | [../../tests/test_p0_artifacts.md](../../tests/test_p0_artifacts.md) |

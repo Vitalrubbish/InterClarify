@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Submit the P1.2 real-time duplex link job to the SJTU cluster.
 #
-# One RTX 4090 runs the official control model (bf16); the scripted scenarios
-# play through a headless client with a virtual playback sink, so no audio
-# devices are needed on the node.  The Kyutai STT/TTS moshi-server instances
-# must already be running on the allocated node (see docs/jobs/p1_2_live_link.md).
+# Two RTX 4090 GPUs per task: GPU 0 runs the official control model (bf16,
+# ~17 GB); GPU 1 runs the pinned Kyutai STT/TTS services (started inside the
+# job from shared storage).  The scripted scenarios play through a headless
+# client with a virtual playback sink, so no audio devices are needed.
 #
 # Overrides: P1_2_IMAGE, P1_2_JOB_NAME, P1_2_GPUS, P1_2_CPU, P1_2_MEM_G,
 #            INTERCLARIFY_ROOT, INTERCLARIFY_MODEL_ROOT, INTERCLARIFY_ARTIFACT_ROOT
@@ -17,9 +17,9 @@ MODEL_ROOT="${INTERCLARIFY_MODEL_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/intercla
 ARTIFACT_ROOT="${INTERCLARIFY_ARTIFACT_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts}"
 IMAGE="${P1_2_IMAGE:-docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.2}"
 JOB_NAME="${P1_2_JOB_NAME:-interclarify-p1-2-live}"
-GPUS="${P1_2_GPUS:-1}"
-CPU="${P1_2_CPU:-8}"
-MEM="${P1_2_MEM_G:-32}G"
+GPUS="${P1_2_GPUS:-2}"
+CPU="${P1_2_CPU:-16}"
+MEM="${P1_2_MEM_G:-64}G"
 
 LOG_DIR="$ARTIFACT_ROOT/p1_2_live/logs_submit"
 mkdir -p "$LOG_DIR"

@@ -48,7 +48,7 @@ def _build_tts_ws_url(base_ws_url: str, voice: str, api_key_qs: Optional[str]) -
     return urlunparse(parsed._replace(query=urlencode(query)))
 
 
-async def _connect(url: str, api_key: str):
+def _connect(url: str, api_key: str):
     """websockets 12/13+ compatible connect with the Kyutai auth header."""
     import websockets
 
@@ -59,7 +59,7 @@ async def _connect(url: str, api_key: str):
             kwargs["additional_headers"] = {"kyutai-api-key": api_key}
         else:
             kwargs["extra_headers"] = {"kyutai-api-key": api_key}
-    return await websockets.connect(url, max_size=8 << 20, open_timeout=15, **kwargs)
+    return websockets.connect(url, max_size=8 << 20, open_timeout=15, **kwargs)
 
 
 async def synthesize_text(
@@ -81,7 +81,7 @@ async def synthesize_text(
 
     url = _build_tts_ws_url(tts_ws, voice=voice, api_key_qs=(api_key or None))
     chunks: List[List[float]] = []
-    async with await _connect(url, api_key) as ws:
+    async with _connect(url, api_key) as ws:
         await ws.send(msgpack.packb({"type": "Text", "text": text}, use_bin_type=True))
         await ws.send(msgpack.packb({"type": "Eos"}, use_bin_type=True))
         last_audio = time.monotonic()
