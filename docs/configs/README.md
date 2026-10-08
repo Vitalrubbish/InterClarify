@@ -11,8 +11,11 @@
 - `device`：CPU/GPU 选择与可见卡号；
 - `audio`：采样率 24000、单声道、float32、块长 80 ms、设备名、回声消除与冒烟时长；
 - `clock`：`real` 或 `virtual`，以及 micro-turn 起点 0.6 s；
-- `duplexcascade`：仓库地址与提交、HF 仓库与权重修订、权重文件名与内容 SHA-256（`weight_sha256`）、STT/TTS WebSocket 端点、LLM 端口、`max_new_tokens`；
+- `duplexcascade`：仓库地址与提交、HF 仓库与权重修订、权重文件名与内容 SHA-256（`weight_sha256`）、STT/TTS WebSocket 端点、LLM 端口、`max_new_tokens`、TTS voice 与 STT 预静音默认值；
+- `p1_2`：实时双工链路（P1.2）参数——场景定义文件与音频根目录、LLM 服务 `launch|connect`、`reset|reconnect` 场景衔接、播放 sink `auto|virtual|sounddevice`、连接/超时/复位等待等参数，以及 `chunk_event_stride`（`audio_chunk_sent` 事件的降频粒度，避免事件 I/O 污染发送 pacing 测量）；
 - `logging`：日志级别与事件文件名。
+
+场景定义 `configs/p1_2_scenarios.json`（入库）声明脚本化用户音频（含合成文本与期望）；其语音音频由 `scripts/prepare_p1_2_scenarios.py` 生成到 `scenario_audio_root`（`*.wav` 不入库）。
 
 ## `local.yaml`
 
