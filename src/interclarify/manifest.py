@@ -171,7 +171,7 @@ def build_manifest(
         git_commit=git.get("git_commit"),
         git_dirty=git.get("git_dirty"),
         git_branch=git.get("git_branch"),
-        model=dict(cfg.get("duplexcascade", {})),
+        model=dict(cfg.get("xtalk", {})),
         tags=list(tags or cfg.get("run", {}).get("tags", []) or []),
     )
 

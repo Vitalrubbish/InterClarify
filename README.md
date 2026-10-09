@@ -2,14 +2,16 @@
 
 InterClarify 研究全双工语音代理在**用户话轮内**主动澄清的时机与措辞：当持续到达的语音前缀存在会改变任务结果的解释分歧时，系统应继续听、趁合适的接话机会简短提问，还是直接回答；用户回应后如何把答案并回原任务。研究范围见 [docs/research_design.md](docs/research_design.md)，工程阶段、门禁与模块边界见 [docs/engineering_implementation.md](docs/engineering_implementation.md)。
 
-参考底座为 [DuplexCascade](https://github.com/sbintuitions/DuplexCascade)（流式 ASR–LLM–TTS + micro-turn 控制）。**当前完成 P0（工程准备）**；P1 起才复现官方推理链路，本仓库暂不包含 Layer 0/1/2 运行时。
+参考底座改为 [X-Talk](https://github.com/xcc-zach/xtalk)。项目将在 X-Talk 的事件、轮次检测、生成、TTS 与播放链路上补齐 micro-turn、backchannel、提前回答、持续监听和用户打断停播，再接入 InterClarify Layer 2。DuplexCascade 只作为功能与相关工作参照，不再复现或内嵌其官方源码。
+
+**当前状态：P0 路线重置完成，P1 X-Talk 基线与功能差距审计尚未开始。** 仓库暂不包含新的 Layer 0/1/2 运行时。
 
 ## P0 交付物
 
 | 交付物 | 位置 |
 | --- | --- |
 | 固定 conda 环境 | [environment.yml](environment.yml) + [requirements.txt](requirements.txt) |
-| 依赖与模型清单 | [docs/p0/dependency_inventory.md](docs/p0/dependency_inventory.md)、[docs/p0/duplexcascade_registry.md](docs/p0/duplexcascade_registry.md) |
+| 依赖与底座清单 | [docs/p0/dependency_inventory.md](docs/p0/dependency_inventory.md)、[docs/p0/xtalk_registry.md](docs/p0/xtalk_registry.md) |
 | 三类配置模板 | [configs/](configs/)（local / replay / cluster） |
 | 实验清单格式 | `manifest.json` / `resolved_config.yaml` / `events.jsonl`，见 [docs/p0/README.md](docs/p0/README.md) |
 | 集群镜像与任务脚本 | [scripts/remote/](scripts/remote/)、任务单 [docs/jobs/p0_environment_check.md](docs/jobs/p0_environment_check.md) |

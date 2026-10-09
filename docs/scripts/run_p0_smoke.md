@@ -2,7 +2,7 @@
 
 ## 作用
 
-P0 确定性离线冒烟脚本，验证“同一离线输入在相同配置下产生结构一致的日志”（[engineering_implementation.md](../../engineering_implementation.md) 第 4.4 节）。它不进行任何模型推理，只走通配置加载、运行目录、清单写入与分段音频事件记录。
+P0 确定性离线冒烟脚本，验证“同一离线输入在相同配置下产生结构一致的日志”（[engineering_implementation.md](../engineering_implementation.md) 第 4.3 节）。它不进行任何模型推理，只走通配置加载、运行目录、清单写入与分段音频事件记录。
 
 ## 流程
 

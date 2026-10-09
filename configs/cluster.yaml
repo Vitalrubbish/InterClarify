@@ -21,8 +21,7 @@ paths:
   model_root: ${INTERCLARIFY_MODEL_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models}
   artifact_root: ${INTERCLARIFY_ARTIFACT_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts}
 
-# Hugging Face 官方站点在集群不可达，统一使用镜像；权重访问条件见
-# docs/p0/duplexcascade_registry.md。
+# Hugging Face 官方站点在集群不可达；后续选定的 X-Talk 模型若使用 HF，统一使用镜像。
 env:
   HF_ENDPOINT: https://hf-mirror.com
   PYTHONNOUSERSITE: "True"

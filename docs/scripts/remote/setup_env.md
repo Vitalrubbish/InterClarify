@@ -25,5 +25,5 @@
 
 ## 约束
 
-- 集群作业命令中需使用环境内 python 的**绝对路径**（见 [image_use.md](../../../image_use.md) 注意事项“显式指定 python 路径”）；
+- 集群作业命令中需使用环境内 python 的**绝对路径**，避免误用基础环境解释器；
 - **不执行 `pip install --upgrade pip`**：pip 由 `environment.yml` 固定为 24.0，升级会造成实际环境版本漂移。

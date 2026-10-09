@@ -31,20 +31,16 @@ from typing import Any, Dict, List
 # module name -> distribution name (for importlib.metadata)
 CORE_MODULES: Dict[str, str] = {
     "torch": "torch",
-    "transformers": "transformers",
-    "peft": "peft",
-    "accelerate": "accelerate",
-    "huggingface_hub": "huggingface_hub",
-    "safetensors": "safetensors",
     "numpy": "numpy",
     "scipy": "scipy",
     "soundfile": "soundfile",
     "librosa": "librosa",
     "websockets": "websockets",
-    "msgpack": "msgpack",
     "yaml": "PyYAML",
     "fastapi": "fastapi",
     "uvicorn": "uvicorn",
+    "aiohttp": "aiohttp",
+    "requests": "requests",
 }
 OPTIONAL_MODULES: Dict[str, str] = {"sounddevice": "sounddevice"}
 

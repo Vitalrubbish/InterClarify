@@ -90,7 +90,7 @@ def main(argv: Optional[List[str]] = None) -> int:
     )
     cfg = ctx.config
     audio_cfg = cfg.get("audio", {})
-    sample_rate = int(audio_cfg.get("sample_rate", 24000))
+    sample_rate = int(audio_cfg.get("sample_rate", 16000))
     chunk_ms = int(audio_cfg.get("chunk_ms", 80))
     chunk_samples = max(1, int(round(sample_rate * chunk_ms / 1000.0)))
     seed = int(cfg.get("run", {}).get("seed", 0))

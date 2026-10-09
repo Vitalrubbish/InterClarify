@@ -22,4 +22,4 @@
 bash scripts/remote/submit_p0_job.sh
 ```
 
-脚本按 `vc submit` 约定拼装参数，把提交日志重定向到 `$ARTIFACT_ROOT/p0_env/logs_submit/submit.JOB.log`，并在容器内执行 [run_p0_node_job.sh](run_p0_node_job.sh)。跟踪用 `vc list -j <JOBID>`、`vc logs -t <TASKID>`。
+脚本按 `vc submit` 约定拼装参数，把提交日志重定向到 `$ARTIFACT_ROOT/p0_env/logs_submit/submit.JOB.log`，并在容器内执行 [run_p0_node_job.sh](run_p0_node_job.md)。跟踪用 `vc list -j <JOBID>`、`vc logs -t <TASKID>`。

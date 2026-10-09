@@ -1,41 +1,41 @@
-# 任务单：P0 集群环境验收
+# 任务单：P0 路线重置后集群环境验收
 
 ## 目标
 
-在远端 8×RTX 4090 集群上，用固定镜像与固定 conda 环境完成 [engineering_implementation.md](../engineering_implementation.md) 第 4.4 节的 P0 验收：
+在远端 RTX 4090 集群上重新验证 X-Talk 路线的通用基础设施：
 
-1. 新 conda 环境能导入核心依赖并识别预期 GPU；
-2. DuplexCascade 权重可访问，或已明确记录无法访问的条件与替代时间表；
-3. 同一离线输入在相同配置下产生结构一致的日志。
+1. conda 环境能导入当前 P0 固定依赖并识别 GPU；
+2. 配置和 manifest 正确记录固定的 X-Talk 来源，不再包含旧底座字段；
+3. 同一离线输入在相同配置下产生结构一致的日志；
+4. 保存镜像 digest，为 P1 核验 `xtalk:v0.17` 与源码提交的对应关系提供输入。
+
+本任务不安装 X-Talk、不下载模型，也不声称完成 P1。
 
 ## 前置条件
 
-- 镜像 `docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.1` 已构建并推送（[Dockerfile.p0](../scripts/remote/Dockerfile.p0.md)）；
-- 仓库在共享存储 `/hpc_stor03/sjtu_home/xuan.zhang/InterClarify` 有最新提交；
-- 配额可用：`vc info -u` 显示有 `pdgpu-4090` 名额；
-- 已按 [duplexcascade_registry.md](../p0/duplexcascade_registry.md) 确认权重访问条件（本任务不需下载权重）。
+- 使用由当前 `scripts/remote/Dockerfile.p0` 构建的新镜像标签，禁止覆盖旧标签；
+- 仓库已同步到共享存储并记录干净提交；
+- `docs/p0/xtalk_registry.md` 已固定候选源码提交；
+- `pdgpu-4090` 配额可用。
 
-## 资源与队列
+## 资源
 
 | 项 | 值 |
 | --- | --- |
 | 队列 | `pdgpu-4090` |
-| GPU | 1（仅验证可见性） |
+| GPU | 1（只验证可见性） |
 | CPU / 内存 | 8 核 / 32 GB |
 | 任务数 | 1 |
 
 ## 执行
 
 ```bash
-# 1. 提交
 bash scripts/remote/submit_p0_job.sh
-
-# 2. 跟踪
 vc list -j <JOBID>
 vc logs -t <TASKID>
 ```
 
-脚本在容器内执行 [run_p0_node_job.sh](../scripts/remote/run_p0_node_job.sh)，证据写入共享存储：
+证据目录：
 
 ```text
 /hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts/p0_env/<时间戳>/
@@ -43,41 +43,21 @@ vc logs -t <TASKID>
 
 ## 验收清单
 
-1. `env.json` 中 `status=PASS`，`missing_core=[]`，`gpu.cuda_available=true`，设备名为 `NVIDIA GeForce RTX 4090`；
-2. `audio_io.json` 有结果（headless 允许 `status=NO_DEVICES`）；
-3. `smoke/p0-smoke-a` 与 `smoke/p0-smoke-b` 的事件类型序列与 `metrics.json` 相同；
-4. `git.txt` 的可复现提交与工作树状态已记录；
-5. 上述证据回填至 [docs/p0/README.md](../p0/README.md)。
+1. `env.json` 中 `status=PASS`、`missing_core=[]`、`gpu.cuda_available=true`；
+2. `audio_io.json` 有结果，headless 节点允许 `status=NO_DEVICES`；
+3. 两次 smoke 的事件类型序列和 `metrics.json` 相同；
+4. smoke 的 `manifest.json.model.repo_url` 为 `https://github.com/xcc-zach/xtalk`；
+5. `git.txt`、镜像标签和镜像 digest 已归档；
+6. 结果回填 [docs/p0/README.md](../p0/README.md)。
 
-## 执行结果（2026-10-07）
+## 历史结果说明
 
-| 项 | 值 |
-| --- | --- |
-| 作业 | `job-179136453153150934891-xuan-zhang`（Completed） |
-| 节点 | `d6-hpc-gpu-069` |
-| 提交 | `57a5c77c6350c0086c5f1a8bccc68dd6336332cd`（工作树干净） |
-| 镜像 | `docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-interclarify-p0:v0.2`（由该提交的 Dockerfile 构建） |
-| 证据 | `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-artifacts/p0_env/20261007T091659Z/` |
-
-验收清单逐项结果：
-
-1. `env.json` `status=PASS`、`missing_core=[]`、`gpu.cuda_available=true`、设备 `NVIDIA GeForce RTX 4090`（sm_89, 23.52 GB）——通过；
-2. `audio_io.json` 有结果，`status=NO_DEVICES`（headless，允许）——通过；
-3. `smoke/p0-smoke-a` 与 `p0-smoke-b` 事件类型序列一致（17 条，13 个 `audio_chunk_received`），`metrics.json` 相等，内联一致性校验 `PASS`——通过；
-4. `git.txt` 仅含提交 `57a5c77c…`（无附加状态行，工作树干净）——通过；
-5. 证据已回填至 [docs/p0/README.md](../p0/README.md)。
-
-修复与说明：
-
-- 本机 overlay2 对旧式构建器在 `WORKDIR` 步骤报 `max depth exceeded`，改用 BuildKit（`DOCKER_BUILDKIT=1 docker build …`）成功；同时移除了非必要的递归 `chmod`；
-- `run_p0_node_job.sh` 现聚合环境检查、两次冒烟与一致性校验的返回码，任一失败即非零（已用本机包装器模拟冒烟失败验证）；
-- 为消除版本漂移，`setup_env.sh` 与 `Dockerfile.p0` 不再 `pip install --upgrade pip`，pip 固定为 `environment.yml` 的 24.0；镜像相应升为 `v0.2`。
-
-> 早期 `job-179136223910414023233-xuan-zhang`（镜像 v0.1，证据目录 `20261007T083841Z`）在提交 `3ba5ae1` 的脏工作树上运行，仅作历史记录，不作为验收依据。
+2026-10-07 的 P0 作业证明旧配置下的通用脚手架能在 4090 节点运行，但其依赖集合、24 kHz 配置和 manifest 底座字段已经失效，不能作为本任务的验收结果。
 
 ## 失败处理
 
-- 镜像拉取失败：确认 `docker.v2.aispeech.com` 登录状态与 tag 拼写；
-- 环境导入失败：检查镜像内 `/opt/conda/envs/interclarify-dev` 是否完整，必要时重建镜像并递增 tag；
-- 无 GPU：检查 `--gpu-per-task` 与队列配额；
-- 日志结构不一致：保留两份证据并定位 `RunContext.record` 的确定性字段。
+- 环境导入失败：核对新 `requirements.txt` 与镜像构建日志；
+- 无 GPU：检查队列配额和 `--gpu-per-task`；
+- manifest 仍出现旧字段：检查配置与 `build_manifest`；
+- 日志不一致：保留两份运行目录并定位非确定性字段；
+- 镜像无法映射到 X-Talk 源码：在 P1.0 标记为阻塞，不以标签猜测版本。

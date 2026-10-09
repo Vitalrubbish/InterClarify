@@ -26,11 +26,11 @@ device:
   cuda_visible_devices: null
 
 audio:
-  # DuplexCascade 前端与 Kyutai STT/TTS 均按 24 kHz 单声道 float32 传输。
-  sample_rate: 24000
+  # X-Talk turn detector 的统一输入起点为 16 kHz 单声道；具体 ASR/TTS 可在适配层重采样。
+  sample_rate: 16000
   channels: 1
   dtype: float32
-  # 每个 micro-turn / 音频块的时长（毫秒）；80 ms @24k = 1920 samples。
+  # 每个音频块的时长（毫秒）；80 ms @16k = 1280 samples。
   chunk_ms: 80
   # local profile 使用真实设备名；replay/cluster 无音频设备时为 null。
   input_device: null
@@ -43,51 +43,21 @@ audio:
 clock:
   # real: 使用墙上时钟；virtual: 离线回放按事件时间快速推进。
   mode: virtual
-  # DuplexCascade 官方 micro-turn 起点，作为复现基线固定值。
+  # 功能对齐阶段的 micro-turn 实验起点；后续允许事件驱动提前触发。
   micro_turn_seconds: 0.6
 
-duplexcascade:
-  # P0 只登记引用与版本，不下载权重、不运行模型（见 P1）。
-  repo_url: https://github.com/sbintuitions/DuplexCascade
-  repo_commit: 42893024ca90c8de8ac3ed624467ebc123512ff8
-  hf_repo_id: sbintuitions/DuplexCascade
-  hf_revision: 31c038ece2f006a28722dd60d1df3868fbb2cc42
-  weight_filename: model_state.safetensors
-  # 权重文件内容 SHA-256；HF LFS blob 名与 ModelScope 清单的 Sha256 均为该值，
-  # 用于验证 ModelScope 镜像与固定 HF revision 逐字节一致。
-  weight_sha256: 603070a3251613328859105fa66fe0711e101099a7b0885da41617f575bed5e9
-  # Kyutai delayed-streams-modeling 的 ASR/TTS 服务端点（moshi-server）。
-  stt_ws: ws://127.0.0.1:31607/api/asr-streaming
-  tts_ws: ws://127.0.0.1:31608/api/tts_streaming
-  llm_port: 31606
-  max_new_tokens: 64
-  # 服务端默认值（server.py --kyutai-tts-voice / --stt-pre-silence-s）。
-  tts_voice: expresso/ex03-ex01_happy_001_channel1_334s.wav
-  stt_pre_silence_s: 0.0
-
-p1_2:
-  # 实时双工链路（P1.2）的运行参数，任务单见 docs/jobs/p1_2_live_link.md。
-  # 脚本化场景定义（入库）；音频经 scripts/prepare_p1_2_scenarios.py 合成到
-  # scenario_audio_root（*.wav 不入库，运行前必须已生成）。
-  scenarios_path: configs/p1_2_scenarios.json
-  scenario_audio_root: assets/p1_2_scenarios
-  # launch: 本机拉起官方 LLM 服务子进程（默认）；connect: 连接 --llm-url 指向的已运行服务。
-  llm: launch
-  llm_url: null
-  # reset: 同一条 WebSocket 连接内场景间发送文本 Reset；reconnect: 每场景新建连接。
-  reset_mode: reset
-  # auto: 配置了输出设备时用 sounddevice，否则用 virtual（headless 集群）。
-  playback_sink: auto
-  connect_timeout_s: 10
-  post_audio_timeout_s: 30
-  idle_gap_s: 2.0
-  no_tts_grace_s: 8.0
-  reset_settle_seconds: 1.5
-  llm_ready_timeout_s: 900
-  send_pace_budget_ms: 120
-  # audio_chunk_sent 事件按每 N 帧记录一次（末帧始终记录），避免事件 I/O
-  # 抖动污染发送 pacing 测量；需要逐帧事件时设为 1。
-  chunk_event_stride: 5
+xtalk:
+  # P0 只固定来源，不在当前仓库内嵌 X-Talk 源码；P1 使用固定 checkout/fork。
+  repo_url: https://github.com/xcc-zach/xtalk
+  repo_commit: 5f0d9959edf1026588246efbed827b078cbb114c
+  base_image: docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk:v0.17
+  source_root: null
+  # 具体模型组件在 P1.0 差距审计后固定，所有策略共享同一组合。
+  asr: null
+  llm_agent: null
+  tts: null
+  vad: null
+  turn_detector: null
 
 logging:
   level: INFO

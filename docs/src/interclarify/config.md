@@ -2,11 +2,11 @@
 
 ## 作用
 
-统一配置层，落实 [engineering_implementation.md](../../engineering_implementation.md) 第 4.2 节第 4 项与第 4.3 节：把“本地开发 / 离线回放 / 集群实验”三类环境的差异集中到 `configs/`，代码只读取合并后的结果。配置同时被运行清单引用其摘要（digest），保证“同一次运行的配置可追溯”。
+统一配置层，落实 [engineering_implementation.md](../../engineering_implementation.md) 第 4 节：把“本地开发 / 离线回放 / 集群实验”三类环境的差异集中到 `configs/`，代码只读取合并后的结果。配置同时被运行清单引用其摘要（digest），保证“同一次运行的配置可追溯”。
 
 ## 配置合并顺序
 
-1. `configs/base.yaml`：共享默认值，并登记 DuplexCascade 仓库提交、权重修订和服务端点；
+1. `configs/base.yaml`：共享默认值，并登记 X-Talk 仓库提交和集群基础镜像；
 2. `configs/<profile>.yaml`：`local` / `replay` / `cluster` 之一；
 3. 运行时 `overrides`：调用方显式覆盖。
 

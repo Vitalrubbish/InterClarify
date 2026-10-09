@@ -2,8 +2,8 @@
 
 The configuration is built from three layers, merged in order:
 
-1. ``configs/base.yaml`` -- shared defaults and the pinned DuplexCascade
-   reference (repository commit, weight revision, service endpoints);
+1. ``configs/base.yaml`` -- shared defaults and the pinned X-Talk source
+   reference (repository commit and cluster image);
 2. ``configs/<profile>.yaml`` -- one of ``local``, ``replay`` or ``cluster``;
 3. runtime overrides -- explicit keyword overrides passed by callers.
 

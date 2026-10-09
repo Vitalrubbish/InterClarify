@@ -2,7 +2,7 @@
 
 ## 作用
 
-实现 [engineering_implementation.md](../../engineering_implementation.md) 第 4.2 节第 5 项与第 12 节的“实验清单”格式：每次运行用唯一 `run_id`，并记录可从何处复现——代码提交、配置摘要、模型修订、随机种子、设备、起止时间与输出目录。清单只记录**来源信息**，不写入隐藏任务真值，可安全与在线日志并存。
+实现 [engineering_implementation.md](../../engineering_implementation.md) 第 2.4 节与第 12 节的“实验清单”格式：每次运行用唯一 `run_id`，并记录可从何处复现——代码提交、配置摘要、底座与模型修订、随机种子、设备、起止时间与输出目录。清单只记录**来源信息**，不写入隐藏任务真值，可安全与在线日志并存。
 
 ## 主要数据类与函数
 
@@ -16,6 +16,6 @@
 
 ## 关键约束
 
-- `model` 字段从配置的 `duplexcascade` 段复制，登记仓库提交与 HF 权重修订（见 [../../p0/duplexcascade_registry.md](../../p0/duplexcascade_registry.md)）；
+- `model` 字段从配置的 `xtalk` 段复制，登记仓库提交、基础镜像和后续固定的组件信息（见 [../../p0/xtalk_registry.md](../../p0/xtalk_registry.md)）；
 - 时间字段一律使用带时区的 UTC ISO 8601；
 - Git 调用失败时字段为 `null`，不抛异常，保证无 Git 环境仍可运行。

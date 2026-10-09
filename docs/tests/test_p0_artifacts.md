@@ -8,6 +8,7 @@ P0 交付物的单元与集成测试，覆盖配置合并、清单确定性与�
 
 - `ConfigTest`：
   - profile 在 base 之上正确合并，未覆盖的 base 值保留；
+  - 基础音频采样率为 X-Talk 入口起点 16 kHz；
   - 未知 profile 抛 `ValueError`；
   - 配置指纹稳定且随 profile 变化；
   - `${VAR:-default}` 环境展开；
@@ -19,7 +20,7 @@ P0 交付物的单元与集成测试，覆盖配置合并、清单确定性与�
   - 复用非空 `run_id` 目录时 `RunContext.create` 抛 `FileExistsError`；
   - 每次运行 `events.jsonl` 从空新建，`run_start` 只出现一次，`seq` 从 1 连续递增。
 - `SmokeTest`：
-  - 通过子进程运行两次 `run_p0_smoke.py`，断言事件类型序列相同、`metrics.json` 相同、`manifest.json` 关键字段正确。
+  - 通过子进程运行两次 `run_p0_smoke.py`，断言事件类型序列相同、`metrics.json` 相同、`manifest.json` 关键字段和 X-Talk 来源正确。
 
 ## 运行
 

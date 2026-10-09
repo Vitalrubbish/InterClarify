@@ -60,6 +60,6 @@ PY
 
 ## 已知取舍
 
-- P0 只申请 1 张 4090 验证环境可见性，不加载任何模型权重；P1 才部署 ASR/TTS/LLM 并接入 FDB。
+- P0 只申请 1 张 4090 验证环境可见性，不加载任何模型权重；P1 才固定 X-Talk 组件并接入 FDB。
 - 容器无音频设备，`check_audio_io.py` 预期返回 `NO_DEVICES`；真实设备验证在带麦克风/扬声器的开发机上用 `configs/local.yaml` 完成。
-- HF 官方站点不可达，权重下载统一走 `HF_ENDPOINT=https://hf-mirror.com`；gated 权重仍需接受条件，见 [../duplexcascade_registry.md](../duplexcascade_registry.md)。
+- HF 官方站点不可达；后续选定的 X-Talk 模型若使用 HF，统一走 `HF_ENDPOINT=https://hf-mirror.com`，并在 [../xtalk_registry.md](../xtalk_registry.md) 的后续资产登记中记录访问条件。

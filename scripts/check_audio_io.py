@@ -119,7 +119,7 @@ def _format_text(report: Dict[str, Any]) -> str:
 
 def main(argv: Optional[List[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--sample-rate", type=int, default=24000)
+    parser.add_argument("--sample-rate", type=int, default=16000)
     parser.add_argument("--chunk-ms", type=int, default=80)
     parser.add_argument("--assume-aec", action="store_true")
     parser.add_argument("--require-devices", action="store_true")

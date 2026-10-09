@@ -33,7 +33,7 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(replay["device"]["backend"], "cpu")
         self.assertEqual(replay["clock"]["mode"], "virtual")
         # base value survives when profile does not override it
-        self.assertEqual(replay["audio"]["sample_rate"], 24000)
+        self.assertEqual(replay["audio"]["sample_rate"], 16000)
 
         cluster = load_config("cluster")
         self.assertEqual(cluster["device"]["backend"], "cuda")
@@ -147,6 +147,7 @@ class SmokeTest(unittest.TestCase):
             self.assertEqual(manifest["profile"], "replay")
             self.assertEqual(manifest["seed"], 0)
             self.assertTrue(manifest["config_digest"])
+            self.assertEqual(manifest["model"]["repo_url"], "https://github.com/xcc-zach/xtalk")
 
 
 if __name__ == "__main__":
