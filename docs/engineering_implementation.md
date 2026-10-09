@@ -111,6 +111,8 @@ P1 和 P2 是最早的两个强制门禁。P2 未通过前，不开展大规模�
 
 ## 5. P1：基于 X-Talk 的功能对齐
 
+具体扩展点、事件协议、响应生命周期、文件布局和测试矩阵见 [xtalk_modification_plan.md](xtalk_modification_plan.md)。本节定义阶段门禁；该方案文档定义实现细节。
+
 ### 5.1 P1.0 固定并导入 X-Talk
 
 - 使用固定提交的独立 checkout、fork 或可编辑安装；不得追踪浮动的 `main`。

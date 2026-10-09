@@ -41,5 +41,6 @@ conda run -n interclarify-dev python -m pytest -q
 - P0 阶段总览与验收：[docs/p0/README.md](docs/p0/README.md)
 - 实现文档（按源码树镜像）：[docs/src/interclarify/](docs/src/interclarify/)、[docs/scripts/](docs/scripts/)、[docs/configs/](docs/configs/)
 - 研究设计：[docs/research_design.md](docs/research_design.md)；工程方案：[docs/engineering_implementation.md](docs/engineering_implementation.md)
+- X-Talk 具体改造方案：[docs/xtalk_modification_plan.md](docs/xtalk_modification_plan.md)
 
 实现行为若与文档不一致，先更新文档并说明原因，再改代码。
