@@ -30,7 +30,7 @@
 | 官方 upstream | `https://github.com/xcc-zach/xtalk` | 已关联，只读同步 |
 | 起始提交 | `5f0d9959edf1026588246efbed827b078cbb114c` | 已固定，待导入验证 |
 | 集群基础镜像 | `sjtu_yukai-xuanzhang-xtalk:v0.17` | 已存在，待记录 digest 和源码对应关系 |
-| ASR/TTS/LLM/turn detector | 未选择 | P1.0 差距审计后固定 |
+| ASR/TTS/LLM/turn detector | Qwen3-ASR 1.7B / MOSS-TTS-Realtime / Qwen3-30B-A3B AWQ / XTurnix | 候选已选择，模型 revision 与运行基线待冻结 |
 | FDB | `DanielLin94144/Full-Duplex-Bench` | P1 固定具体提交 |
 
 详细来源和风险见 [xtalk_registry.md](xtalk_registry.md)。

@@ -121,6 +121,7 @@ P1 和 P2 是最早的两个强制门禁。P2 未通过前，不开展大规模�
 - 在独立 X-Talk fork 中开发；`origin` 指向 `Vitalrubbish/xtalk`，`upstream` 指向官方仓库，不使用子模块。
 - 记录 X-Talk 核心依赖和实际启用的 optional extras。
 - 按 [xtalk_baseline_stack.md](xtalk_baseline_stack.md) 选择一套自部署的 ASR、LLM agent、TTS、VAD/turn detector 组合；实际权重 revision、服务提交和推理参数核验后才视为冻结。所有后续策略共享该组合。
+- 首轮配置为 Qwen3-ASR 1.7B + MOSS-TTS-Realtime（含 codec），LLM 与 XTurnix 沿用既定候选，见 `configs/xtalk_round1.yaml`。先按 [jobs/xtalk_round1_baseline.md](jobs/xtalk_round1_baseline.md) 验收模型服务；补齐 Qwen ASR 接口适配后才执行 X-Talk 全链路基线，不把模型独立 smoke 当作联调成功。
 - 跑通 X-Talk 原生示例，保存启动配置、首包延迟、实时因子、显存和事件日志。
 - 在未完成来源与许可证核验前，不把 X-Talk 源码直接复制进本仓库。
 

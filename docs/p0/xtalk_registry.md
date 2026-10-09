@@ -23,7 +23,7 @@ X-Talk 已提供模块化 ASR、LLM agent、TTS、VAD/turn detector、EventBus�
 2. **许可证元数据差异**：固定提交的根目录 `LICENSE` 是 Apache-2.0，但 `pyproject.toml` 的 license 字段写为 MIT。使用或分发前必须以项目方说明和实际依赖许可证审计为准，并记录结论。
 3. **optional extras**：X-Talk 不同 ASR、TTS、turn detector 和本地 LLM 使用不同依赖与许可证。只安装实验实际需要的 extras。
 4. **接口稳定性**：上游声明仍处于 active prototyping。所有扩展点以固定提交为准，升级前重新运行差距审计和回归测试。
-5. **模型来源**：ASR、TTS、LLM agent 和 turn detector 尚未固定。任何权重都必须记录来源、revision、校验值和访问条件。
+5. **模型来源**：首轮候选已选为 Qwen3-ASR 1.7B、MOSS-TTS-Realtime（含 codec）、Qwen3-30B-A3B AWQ 与 XTurnix，详见 `configs/xtalk_round1.yaml`。实际权重仍须记录 revision、校验值和访问条件，模型服务 smoke 不能替代完整 X-Talk 联调。
 
 ## 集成策略
 

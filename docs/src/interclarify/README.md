@@ -16,5 +16,9 @@
 | `scripts/remote/run_p0_node_job.sh` | [../../scripts/remote/run_p0_node_job.md](../../scripts/remote/run_p0_node_job.md) |
 | `scripts/remote/submit_p0_job.sh` | [../../scripts/remote/submit_p0_job.md](../../scripts/remote/submit_p0_job.md) |
 | `scripts/remote/sync_from_github.sh` | [../../scripts/remote/sync_from_github.md](../../scripts/remote/sync_from_github.md) |
+| `scripts/remote/run_xtalk_round1.py` | [../../scripts/remote/run_xtalk_round1.md](../../scripts/remote/run_xtalk_round1.md) |
+| `scripts/remote/start_xtalk_round1_service.sh` | [../../scripts/remote/start_xtalk_round1_service.md](../../scripts/remote/start_xtalk_round1_service.md) |
 | `configs/*.yaml` | [../../configs/README.md](../../configs/README.md) |
+| `configs/xtalk_round1.yaml` | [../../configs/xtalk_round1.md](../../configs/xtalk_round1.md) |
 | `tests/test_p0_artifacts.py` | [../../tests/test_p0_artifacts.md](../../tests/test_p0_artifacts.md) |
+| `tests/test_xtalk_round1.py` | [../../tests/test_xtalk_round1.md](../../tests/test_xtalk_round1.md) |

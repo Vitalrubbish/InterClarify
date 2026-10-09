@@ -53,12 +53,34 @@ xtalk:
   repo_commit: 5f0d9959edf1026588246efbed827b078cbb114c
   base_image: docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk:v0.17
   source_root: null
-  # 具体模型组件在 P1.0 差距审计后固定，所有策略共享同一组合。
-  asr: null
-  llm_agent: null
-  tts: null
-  vad: null
-  turn_detector: null
+  # Selected candidates; model revisions and runtime integration remain pending.
+  round1_config: configs/xtalk_round1.yaml
+  baseline_status: candidate
+  system_backchannel_enabled: false
+  asr:
+    model_id: Qwen/Qwen3-ASR-1.7B
+    revision: null
+    backend: qwen_asr_vllm_streaming
+    adapter_status: pending
+  llm_agent:
+    type: DefaultAgent
+    model_id: cpatonn/Qwen3-30B-A3B-Instruct-2507-AWQ-4bit
+    revision: null
+    backchannel_model: null
+    backchannel_source_dir: null
+  tts:
+    type: MossTTSRealtime
+    model_id: OpenMOSS-Team/MOSS-TTS-Realtime
+    revision: null
+    codec_model_id: OpenMOSS-Team/MOSS-Audio-Tokenizer
+    codec_revision: null
+    output_sample_rate: 48000
+  vad:
+    backend: frontend_silero
+  turn_detector:
+    type: XTurnix
+    model_id: xcczach/xturnix-zh-base
+    revision: null
 
 logging:
   level: INFO
