@@ -57,9 +57,22 @@ LLM 单卡接近 90%，是本组合最紧的一环；四卡分服务方案在 24
 
 - **测试音频语言**：`request.wav` 取自 `assets/p1_2_scenarios/barge_in_stop/01_question.wav`，实际为英文问句（转写为英文）。任务单要求中文测试音，需补一份中文 16 kHz 音频再复测 ASR；参考音色同理需替换为中文音色。
 - **首字延迟**：ASR 首 partial 接近句尾，需在 A0 适配阶段确认 `chunk_size_sec`、`unfixed_chunk_num/token_num` 与输入步长的组合。
-- **镜像体积**：v0.1 约 57.5 GB（base 31.7 GB + 三个独立 torch/vLLM 环境）。若需精简，可考虑合并环境或去除客户端重型依赖，但不影响本轮验收。
+- **镜像体积**：v0.1 约 57.5 GB（base 31.7 GB + 三个独立 torch/vLLM 环境）。已通过压平并精简基座（`xtalk-lean:v0.1`，31.7 → 21.8 GB，431 层 → 1 层）与后续在 lean 基座上重建 round-one（v0.2）来降低体积；详见第 8 节。
 - 音质、日期/时间读法、人名与停播仍需人工试听；`COMPLETE` 仅表示独立请求执行完成。
 
 ## 7. 下一步
 
 补齐 Qwen ASR 的会话隔离、累计前缀/修订、临时 final 与 reset/clone 适配，生成可运行的 X-Talk 全链路配置，再进行音频闭环、用户附和、有效插话与 FDB smoke；完成冻结门禁后才开始无 System Backchannel 的控制层改造。
+
+## 8. 基座瘦身与镜像体积
+
+`xtalk:v0.17` 是 431 层迭代链，后续层覆盖了早先安装的文件（最典型是 2.59 GB 的 `vllm==0.10.2` 层被 `vllm==0.16.0` 覆盖），这些死字节仍随镜像分发；同时它带着本组合不用的栈（onnxruntime/funasr/modelscope/sherpa、pynini/pyopenjtalk、gradio/wandb/kubernetes/verl、node）。
+
+| 镜像 | 大小 | 层数 | 说明 |
+| --- | --- | --- | --- |
+| `xtalk:v0.17` | 31.7 GB | 431 | 原始基座 |
+| `xtalk-lean:v0.1` | 21.8 GB | 1 | 压平 + 剔除无用栈（保留 vLLM 硬依赖 ray/numba/opencv/pyarrow/triton） |
+| `xtalk-round1:v0.1` | 57.5 GB | — | 基于 v0.17 的首轮镜像 |
+| `xtalk-round1:v0.2` | 见构建产物 | — | 基于 lean 基座重建 |
+
+压平与剔除流程见 [build_xtalk_lean_base.sh](../scripts/remote/build_xtalk_lean_base.md)；剔除在 build 阶段执行（集群 `docker run` 以映射用户启动，无法删除 root 拥有的文件）。进一步可考虑按作业拆分镜像或把 ASR 适配到 vLLM 0.16 以消掉 vLLM 0.14.0 独立环境。

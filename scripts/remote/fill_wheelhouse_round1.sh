@@ -31,6 +31,7 @@ download() {  # download <stage-name> <requirements...>
   mkdir -p "$dest"
   echo "[fill] resolving $name"
   "$PY" -m pip download --dest "$dest" \
+    --find-links "$WHEELS" \
     --index-url "$INDEX" --extra-index-url "$TORCH_INDEX" "$@" \
     || { echo "[fill] WARNING: $name download incomplete" >&2; return 1; }
 }
@@ -41,7 +42,8 @@ download tools PyYAML==6.0.3 huggingface_hub &
 download vllm vllm==0.14.0 &
 download asr "transformers==4.57.6" "nagisa==0.2.11" "soynlp==0.0.493" \
   "accelerate==1.12.0" qwen-omni-utils librosa soundfile sox gradio flask pytz &
-download moss "torch==2.9.1+cu128" "torchaudio==2.9.1+cu128" "transformers==5.0.0" \
+download moss "$ROUND1_ROOT/moss-source[torch-runtime]" \
+  "torch==2.9.1+cu128" "torchaudio==2.9.1+cu128" "transformers==5.0.0" \
   fastapi uvicorn requests soxr websockets &
 download client "$ROUND1_ROOT/xtalk[example,dev]" PyYAML==6.0.3 aiohttp soundfile soxr &
 wait || true

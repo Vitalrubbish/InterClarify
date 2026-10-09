@@ -1,9 +1,10 @@
 # Round-one X-Talk model-service acceptance image.
 #
-# Built directly on the existing xtalk:v0.17 image (CUDA 12.8.1, conda at
-# /opt/conda, ffmpeg, sudo, vLLM 0.16.0, torch 2.9.1+cu128) rather than
-# through the P0 intermediate, so the added stack is as small as the base
-# permits.  The model-serving LLM and turn detector reuse the base
+# Built on the flattened, stripped xtalk base (CUDA 12.8.1, conda at
+# /opt/conda, ffmpeg, sudo, vLLM 0.16.0, torch 2.9.1+cu128).  The base is
+# `xtalk:v0.17` flattened to one layer and stripped of components this stack
+# does not use (see docs/jobs/xtalk_round1_baseline_results.md); it is ~22 GB
+# instead of ~32 GB.  The model-serving LLM and turn detector reuse the base
 # environment's vLLM 0.16.0; only ASR needs its own environment because
 # qwen_asr is incompatible with vLLM 0.16 (its multimodal processor still
 # overrides BaseMultiModalProcessor._get_data_parser, moved in v0.16).
@@ -19,7 +20,7 @@
 # Build (see build_xtalk_round1_image.sh; naming per image_use.md, the
 # registry rejects tag reuse):
 #   bash scripts/remote/build_xtalk_round1_image.sh
-FROM docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk:v0.17
+FROM docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-lean:v0.1
 
 # Prevent user-site leakage through mounted homes (image_use.md note).
 ENV PYTHONNOUSERSITE=True
@@ -40,16 +41,12 @@ RUN --mount=type=bind,from=wheels,target=/wheelhouse,ro \
     for env in xtalk-round1-tools xtalk-round1-asr xtalk-round1-moss xtalk-round1-client; do \
         "$CONDA" create --override-channels -c "$MAIN" -n "$env" python=3.12 pip -y; \
     done; \
-    PY() { local env="$1"; shift; \
-        if [ "$env" = base ]; then \
-            /opt/conda/bin/python -m pip install --find-links /wheelhouse \
-                --index-url https://pypi.org/simple/ \
-                --extra-index-url https://download.pytorch.org/whl/cu128 "$@"; \
-        else \
-            "/opt/conda/envs/$env/bin/python" -m pip install --find-links /wheelhouse \
-                --index-url https://pypi.org/simple/ \
-                --extra-index-url https://download.pytorch.org/whl/cu128 "$@"; \
-        fi; }; \
+    PY() { local env="$1"; shift; local py; \
+        if [ "$env" = base ]; then py=/opt/conda/bin/python; \
+        else py="/opt/conda/envs/$env/bin/python"; fi; \
+        "$py" -m pip install --find-links /wheelhouse \
+             --index-url https://pypi.org/simple/ \
+             --extra-index-url https://download.pytorch.org/whl/cu128 "$@"; }; \
     PY xtalk-round1-tools PyYAML==6.0.3 huggingface_hub; \
     PY xtalk-round1-asr "vllm==0.14.0" setuptools; \
     PY xtalk-round1-asr --no-build-isolation -e "/opt/src/qwen-asr[vllm]" soundfile PyYAML==6.0.3; \

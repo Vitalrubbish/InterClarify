@@ -22,7 +22,7 @@
 
 首轮配置见 [../configs/xtalk_round1.yaml](../configs/xtalk_round1.yaml)，远端任务单见 [jobs/xtalk_round1_baseline.md](jobs/xtalk_round1_baseline.md)。配置区分模型服务验收与 X-Talk 联调：当前 `Qwen3ASRClient` 的输入类型、参数签名、累计文本和会话接口均与现行 ASR 抽象不匹配，且缺少 `reset` / `clone` 实现；首轮先独立验证官方流式 API，补齐适配后才生成可启动的全链路配置。模型适配属于 A0 接入工作，不改变轮次控制策略。
 
-首轮验收镜像 `sjtu_yukai-xuanzhang-xtalk-round1:v0.1` 直接基于已有 `sjtu_yukai-xuanzhang-xtalk:v0.17` 构建（CUDA 12.8.1 + conda + ffmpeg + vLLM 0.16.0）；LLM 与 turn detector 复用基座 base 环境，另用一个合并层加入四个 `xtalk-round1-*` 环境（ASR 因 `qwen_asr` 不兼容 vLLM 0.16 而保留独立的 0.14.0 环境）。wheelhouse 与源码树通过 BuildKit named build contexts 提供，wheel 仅 bind-mount，约 6 GB 不进镜像层。构建脚本见 [scripts/remote/build_xtalk_round1_image.md](scripts/remote/build_xtalk_round1_image.md)。
+首轮验收镜像 `sjtu_yukai-xuanzhang-xtalk-round1:v0.2` 基于 `sjtu_yukai-xuanzhang-xtalk-lean:v0.1` 构建：后者由 `xtalk:v0.17` 压平并剔除本组合用不到的栈得到（约 32 GB → 22 GB，431 层 → 1 层，见 [scripts/remote/build_xtalk_lean_base.md](scripts/remote/build_xtalk_lean_base.md)）。LLM 与 turn detector 复用基座 base 环境，另用一个合并层加入四个 `xtalk-round1-*` 环境（ASR 因 `qwen_asr` 不兼容 vLLM 0.16 而保留独立的 0.14.0 环境）。wheelhouse 与源码树通过 BuildKit named build contexts 提供，wheel 仅 bind-mount，约 6 GB 不进镜像层。构建脚本见 [scripts/remote/build_xtalk_round1_image.md](scripts/remote/build_xtalk_round1_image.md)。
 
 ## 3. 能力与实现差异
 

@@ -2,7 +2,7 @@
 
 ## 整体作用
 
-首轮 X-Talk 模型服务验收的集群运行镜像。**直接基于已有的 `xtalk:v0.17` 镜像**（CUDA 12.8.1 + conda + ffmpeg + sudo + vLLM 0.16.0），不再经过 P0 中间镜像，也不重建 X-Talk 迭代链。LLM 与 turn detector 复用基座 base 环境，另外**用一个合并层**建好四个 round-one conda 环境。
+首轮 X-Talk 模型服务验收的集群运行镜像。**基于压平并精简后的基座 `xtalk-lean:v0.1`**（由 [build_xtalk_lean_base.sh](build_xtalk_lean_base.sh) 从 `xtalk:v0.17` 得到，CUDA 12.8.1 + conda + ffmpeg + sudo + vLLM 0.16.0），不经过 P0 中间镜像，也不重建 X-Talk 迭代链。LLM 与 turn detector 复用基座 base 环境，另外**用一个合并层**建好四个 round-one conda 环境。
 
 ## 构建方式
 
@@ -20,14 +20,14 @@ DOCKER_BUILDKIT=1 docker build -f scripts/remote/Dockerfile.round1 \
   --build-context qwen-asr=/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/qwen-asr \
   --build-context moss-source=/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/moss-source \
   --build-context xtalk=/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/xtalk \
-  -t docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.1 \
+  -t docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.2 \
   /hpc_stor03/sjtu_home/xuan.zhang/InterClarify
-docker push docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.1
+docker push docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.2
 ```
 
 ## 设计要点
 
-- **精简层数**：`FROM .../xtalk:v0.17`，把三份固定源码树合并成一个 `COPY` 层；wheelhouse 与源码树都通过 named context 提供，`wheels/` 仅以 `RUN --mount=type=bind` 挂载参与构建，约 6 GB wheel 不会进入镜像层。
+- **精简基座与层数**：`FROM .../xtalk-lean:v0.1`（压平 + 剔除无用栈，约 22 GB / 单层；见 [build_xtalk_lean_base.sh](build_xtalk_lean_base.md)），把三份固定源码树合并成一个 `COPY` 层；wheelhouse 与源码树都通过 named context 提供，`wheels/` 仅以 `RUN --mount=type=bind` 挂载参与构建，约 6 GB wheel 不会进入镜像层。
 - **基座环境复用**：LLM（Qwen3-8B-AWQ）与 turn detector 直接使用镜像 base 环境自带的 **vLLM 0.16.0 + torch 2.9.1+cu128**，不再单独建 `xtalk-round1-vllm` 环境。
 - **ASR 独立环境（vLLM 0.14.0）**：`qwen_asr` 的多模态 processor 仍覆写 `BaseMultiModalProcessor._get_data_parser`，该接口在 vLLM 0.16 已迁移到 `BaseProcessingInfo.build_data_parser`，实测在 base 环境直接报错，因此 ASR 必须保留 vLLM 0.14.0 + transformers 4.57.6 的独立环境。MOSS 环境单独装 torch/torchaudio 2.9.1+cu128 + transformers 5.0.0，互不混装；环境名与共享存储版相同（`xtalk-round1-*`），作业脚本无需区分。
 - **wheelhouse 作为本地缓存**：构建先 `--find-links /wheelhouse` 命中已下载的大 wheel（torch cu128、vllm、transformers），其余依赖从 `pypi.org` 拉取（阿里云镜像对个别 wheel 会卡死）；安装后的真实版本由任务单第 7 节归档冻结。

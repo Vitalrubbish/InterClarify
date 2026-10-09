@@ -22,6 +22,7 @@
 | `scripts/remote/fill_wheelhouse_round1.sh` | [../../scripts/remote/fill_wheelhouse_round1.md](../../scripts/remote/fill_wheelhouse_round1.md) |
 | `scripts/remote/Dockerfile.round1` | [../../scripts/remote/Dockerfile.round1.md](../../scripts/remote/Dockerfile.round1.md) |
 | `scripts/remote/build_xtalk_round1_image.sh` | [../../scripts/remote/build_xtalk_round1_image.md](../../scripts/remote/build_xtalk_round1_image.md) |
+| `scripts/remote/build_xtalk_lean_base.sh` | [../../scripts/remote/build_xtalk_lean_base.md](../../scripts/remote/build_xtalk_lean_base.md) |
 | `scripts/remote/submit_xtalk_round1_job.sh` | [../../scripts/remote/submit_xtalk_round1_job.md](../../scripts/remote/submit_xtalk_round1_job.md) |
 | `scripts/remote/run_xtalk_round1_node_job.sh` | [../../scripts/remote/run_xtalk_round1_node_job.md](../../scripts/remote/run_xtalk_round1_node_job.md) |
 | `scripts/remote/download_xtalk_round1_models.py` | [../../scripts/remote/download_xtalk_round1_models.md](../../scripts/remote/download_xtalk_round1_models.md) |
