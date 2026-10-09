@@ -1,0 +1,62 @@
+# Round-one X-Talk model-service acceptance image.
+#
+# Built directly on the existing xtalk:v0.17 image (CUDA 12.8.1, conda at
+# /opt/conda, ffmpeg, sudo, vLLM 0.16.0, torch 2.9.1+cu128) rather than
+# through the P0 intermediate, so the added stack is as small as the base
+# permits.  The model-serving LLM and turn detector reuse the base
+# environment's vLLM 0.16.0; only ASR needs its own environment because
+# qwen_asr is incompatible with vLLM 0.16 (its multimodal processor still
+# overrides BaseMultiModalProcessor._get_data_parser, moved in v0.16).
+#
+# A single consolidated RUN layer creates the remaining conda environments
+# and installs the Qwen-ASR/MOSS/client stacks.  The pinned source trees are
+# copied in; the wheelhouse and sources arrive as named build contexts, so the
+# huge model cache under $XTALK_ROUND1_ROOT is never part of the context.  The
+# wheelhouse is used as a local cache via --find-links while remaining
+# dependencies come from pypi.org (the aliyun mirror stalled on some wheels);
+# the resolved versions are archived after the job so the stack stays pinned.
+#
+# Build (see build_xtalk_round1_image.sh; naming per image_use.md, the
+# registry rejects tag reuse):
+#   bash scripts/remote/build_xtalk_round1_image.sh
+FROM docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk:v0.17
+
+# Prevent user-site leakage through mounted homes (image_use.md note).
+ENV PYTHONNOUSERSITE=True
+
+# Pinned sources for editable installs from the named contexts.
+COPY --from=qwen-asr . /opt/src/qwen-asr
+COPY --from=moss-source . /opt/src/moss-source
+COPY --from=xtalk . /opt/src/xtalk
+
+# One consolidated layer.  The base env (/opt/conda) keeps vLLM 0.16.0 for
+# LLM/turn_detector.  MOSS pins torch/torchaudio 2.9.1+cu128 and
+# transformers 5.0.0; the ASR env pins vLLM 0.14.0 and transformers 4.57.6, so
+# they stay in separate environments per the round-one job document.
+RUN --mount=type=bind,from=wheels,target=/wheelhouse,ro \
+    set -eux; \
+    CONDA=/opt/conda/bin/conda; \
+    MAIN=https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main; \
+    for env in xtalk-round1-tools xtalk-round1-asr xtalk-round1-moss xtalk-round1-client; do \
+        "$CONDA" create --override-channels -c "$MAIN" -n "$env" python=3.12 pip -y; \
+    done; \
+    PY() { local env="$1"; shift; \
+        if [ "$env" = base ]; then \
+            /opt/conda/bin/python -m pip install --find-links /wheelhouse \
+                --index-url https://pypi.org/simple/ \
+                --extra-index-url https://download.pytorch.org/whl/cu128 "$@"; \
+        else \
+            "/opt/conda/envs/$env/bin/python" -m pip install --find-links /wheelhouse \
+                --index-url https://pypi.org/simple/ \
+                --extra-index-url https://download.pytorch.org/whl/cu128 "$@"; \
+        fi; }; \
+    PY xtalk-round1-tools PyYAML==6.0.3 huggingface_hub; \
+    PY xtalk-round1-asr "vllm==0.14.0" setuptools; \
+    PY xtalk-round1-asr --no-build-isolation -e "/opt/src/qwen-asr[vllm]" soundfile PyYAML==6.0.3; \
+    PY xtalk-round1-moss setuptools; \
+    PY xtalk-round1-moss --no-build-isolation -e "/opt/src/moss-source[torch-runtime]" "torch==2.9.1+cu128" "torchaudio==2.9.1+cu128" transformers==5.0.0 fastapi uvicorn requests soxr websockets; \
+    PY xtalk-round1-client setuptools; \
+    PY xtalk-round1-client --no-build-isolation -e "/opt/src/xtalk[example,dev]" PyYAML==6.0.3 aiohttp soundfile soxr; \
+    "$CONDA" clean -afy
+
+WORKDIR /opt/interclarify

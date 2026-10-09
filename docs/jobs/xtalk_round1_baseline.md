@@ -2,7 +2,7 @@
 
 ## 目标与当前阻塞
 
-首轮组合：Qwen3-ASR 1.7B、Qwen3-30B-A3B AWQ、MOSS-TTS-Realtime + MOSS-Audio-Tokenizer、XTurnix-ZH Base。System Backchannel 关闭，Layer 0 移除。先验收模型服务，再补齐 ASR 接入并运行原生 X-Talk 基线；尚不实现 micro-turn 控制层或 InterClarify。
+首轮组合：Qwen3-ASR 1.7B、Qwen/Qwen3-8B-AWQ（2026-10-09 由部署示例的 30B-A3B AWQ 变更为本地已验证的 8B AWQ，依据 [xtalk_baseline_stack.md](../xtalk_baseline_stack.md) 的变更记录；参考系统 DuplexCascade 的 LLM 为 7B 级）、MOSS-TTS-Realtime + MOSS-Audio-Tokenizer、XTurnix-ZH Base。System Backchannel 关闭，Layer 0 移除。先验收模型服务，再补齐 ASR 接入并运行原生 X-Talk 基线；尚不实现 micro-turn 控制层或 InterClarify。
 
 当前 X-Talk `Qwen3ASRClient` 与其 ASR 抽象不匹配，不能直接用作完整链路。下面的 ASR 测试调用官方 API；禁止把准备 YAML 当成 `Xtalk.from_config` 的服务配置。该适配缺口须由后续 A0 接入工作补齐，完整音频闭环和 FDB 仍待完成。
 
@@ -27,46 +27,36 @@ git -C "$INTERCLARIFY_ROOT" pull --ff-only
 
 当前远端账号/共享存储若不同，修改这些根路径。模型、源码服务与 InterClarify 各自独立，不放入 `3rd-party`。已有 checkout 有本地改动时先保存，使用新的目录克隆，避免覆盖。
 
-## 2. 固定四份源码并创建 conda 环境
+## 2. 固定四份源码并构建验收镜像
 
-以下命令首次执行；目录已存在时先检查提交和工作树。X-Talk 先使用已关联 fork 的原生固定提交。
-
-```bash
-git clone https://github.com/Vitalrubbish/xtalk.git "$XTALK_ROUND1_ROOT/xtalk"
-git -C "$XTALK_ROUND1_ROOT/xtalk" checkout --detach 5f0d9959edf1026588246efbed827b078cbb114c
-git clone https://github.com/QwenLM/Qwen3-ASR.git "$XTALK_ROUND1_ROOT/qwen-asr"
-git -C "$XTALK_ROUND1_ROOT/qwen-asr" checkout --detach 7c6daf77a2421100f5fb066495372c00129d39ff
-git clone https://github.com/xcc-zach/xtalk-moss-tts-realtime.git "$XTALK_MOSS_SERVICE_ROOT"
-git -C "$XTALK_MOSS_SERVICE_ROOT" checkout --detach b3306b97f8a64c1a2f25b9803c070ff32ecff6b1
-git clone https://github.com/OpenMOSS/MOSS-TTS.git "$XTALK_MOSS_SOURCE_ROOT"
-git -C "$XTALK_MOSS_SOURCE_ROOT" checkout --detach 58b20a0d5fcc6766658d50967a90a9d890009a46
-
-conda create -n xtalk-round1-tools python=3.12 pip -y
-conda create -n xtalk-round1-asr python=3.12 pip -y
-conda create -n xtalk-round1-moss python=3.12 pip -y
-conda create -n xtalk-round1-vllm python=3.12 pip -y
-conda create -n xtalk-round1-client python=3.12 pip -y
-
-conda run -n xtalk-round1-tools python -m pip install PyYAML==6.0.3 huggingface_hub
-conda run -n xtalk-round1-asr python -m pip install -e "$XTALK_ROUND1_ROOT/qwen-asr[vllm]" soundfile PyYAML==6.0.3
-conda run -n xtalk-round1-moss python -m pip install --extra-index-url https://download.pytorch.org/whl/cu128 -e "$XTALK_MOSS_SOURCE_ROOT[torch-runtime]" fastapi uvicorn requests soxr websockets
-conda run -n xtalk-round1-vllm python -m pip install vllm==0.14.0
-conda run -n xtalk-round1-client python -m pip install -e "$XTALK_ROUND1_ROOT/xtalk[example,dev]" PyYAML==6.0.3 aiohttp soundfile soxr
-```
-
-使用集群可达的 conda/PyPI 镜像。不要执行 MOSS 封装的 `install.sh` / `start.sh`，它们使用 `.venv`；本任务由项目启动脚本直接在 conda 环境调用其 Python 入口。MOSS 固定源码要求 torch/torchaudio `2.9.1+cu128`、Transformers `5.0.0`；Qwen 固定源码要求 vLLM `0.14.0`、Transformers `4.57.6`。GPU 驱动需支持相应 CUDA，MOSS 要求 CUDA 12.8，FFmpeg 需可用。候选依赖尚未运行冻结，安装后记录完整版本与测试结果；不在同一环境混装 Qwen 与 MOSS 的推理栈。
-
-归档环境：
+准备阶段在允许下载与安装的节点执行；目录已存在时先检查提交和工作树。X-Talk 使用已关联 fork 的原生固定提交。除源码外不再手工创建 conda 环境：首轮验收统一运行 `sjtu_yukai-xuanzhang-xtalk-round1` 镜像，它**直接基于已有 `xtalk:v0.17` 镜像**（CUDA 12.8.1 + conda + ffmpeg + vLLM 0.16.0 已就绪，不重建迭代链）；LLM 与 turn detector 复用基座 base 环境，另用**一个合并层**建好四个 `xtalk-round1-*` 环境（ASR 因 `qwen_asr` 不兼容 vLLM 0.16 而保留独立 0.14.0 环境）。
 
 ```bash
-for round1_env in xtalk-round1-tools xtalk-round1-asr xtalk-round1-moss xtalk-round1-vllm xtalk-round1-client; do
-  conda run -n "$round1_env" python -m pip freeze > "$XTALK_ROUND1_ARTIFACT_ROOT/$round1_env.pip.txt"
-  conda list -n "$round1_env" --explicit > "$XTALK_ROUND1_ARTIFACT_ROOT/$round1_env.conda.txt"
-done
-nvidia-smi > "$XTALK_ROUND1_ARTIFACT_ROOT/nvidia-smi.txt"
+bash "$INTERCLARIFY_ROOT/scripts/remote/setup_xtalk_round1_env.sh"
 ```
 
-这里的 `nvidia-smi` 在计算节点执行，不能把登录节点的无 GPU 结果当成模型失败。
+`setup_xtalk_round1_env.sh` 幂等地克隆并固定四份源码、创建四个环境并安装依赖（git 不可达时允许 `PINNED_UPSTREAM_COMMIT` 标记的 tarball 导入树）。构建主机上打镜像时，wheelhouse 作为本地缓存（`--find-links`），其余依赖走 pypi.org；可先用 `fill_wheelhouse_round1.sh` 预填缓存，再构建并推送镜像：
+
+```bash
+bash "$INTERCLARIFY_ROOT/scripts/remote/fill_wheelhouse_round1.sh"
+PUSH=1 bash "$INTERCLARIFY_ROOT/scripts/remote/build_xtalk_round1_image.sh"
+```
+
+`fill_wheelhouse_round1.sh` 用集群可达镜像补齐 `wheels/`（初次 `pip download` 漏掉了 `compressed-tensors` 等 vLLM 依赖）；`build_xtalk_round1_image.sh` 用 BuildKit named contexts 把 `wheels/` 与源码树作为构建上下文，wheel 仅 bind-mount 参与构建、不进入镜像层。使用集群可达的 conda/PyPI 镜像，不要执行 MOSS 封装的 `install.sh` / `start.sh`（它们使用 `.venv`），本任务由项目启动脚本直接在镜像 conda 环境调用其 Python 入口。
+
+MOSS 固定源码要求 torch/torchaudio `2.9.1+cu128`、Transformers `5.0.0`；Qwen 固定源码要求 vLLM `0.14.0`、Transformers `4.57.6`。GPU 驱动需支持相应 CUDA，MOSS 要求 CUDA 12.8，FFmpeg 需可用。候选依赖尚未运行冻结，安装后记录完整版本与测试结果；不在同一环境混装 Qwen 与 MOSS 的推理栈。
+
+镜像内环境可用如下方式归档到共享产物目录，避免依赖登录节点环境（LLM/turn detector 用镜像 base 环境）：
+
+```bash
+docker run --rm -v "$XTALK_ROUND1_ARTIFACT_ROOT:/artifacts" "$XTALK_ROUND1_IMAGE" bash -lc '
+  for env in base xtalk-round1-tools xtalk-round1-asr xtalk-round1-moss xtalk-round1-client; do
+    /opt/conda/bin/conda run -n $env python -m pip freeze > /artifacts/$env.pip.txt
+    /opt/conda/bin/conda list -n $env --explicit > /artifacts/$env.conda.txt
+  done'
+```
+
+节点作业脚本在计算节点内运行 `nvidia-smi` 并写入产物目录；不能把登录节点的无 GPU 结果当成模型失败。
 
 ## 3. 下载并锁定五组权重
 
@@ -90,6 +80,12 @@ conda run --no-capture-output -n xtalk-round1-asr python \
 
 默认使用已分配四卡中的逻辑 GPU 2；单卡作业追加 `--gpu-index 0`。分别重跑 `--chunk-seconds 1.2` 和 `2.0`，使用 `asr-12`、`asr-20` 等新输出目录。脚本按 80 ms 步长原速输入，记录首 partial、文本修订、纯解码 RTF 与最终转写。0.6 秒是内部解码窗口试验值，不是已保证的首字延迟。
 
+在集群上提交单卡作业自动跑完三档窗口（`run_xtalk_round1_node_job.sh asr` 内部按 0.6/1.2/2.0 顺序调用上述命令并归档）：
+
+```bash
+bash "$INTERCLARIFY_ROOT/scripts/remote/submit_xtalk_round1_job.sh" asr
+```
+
 ## 5. 启动三个服务并验证
 
 在同一四卡计算节点的三个终端分别执行，保留进程前台运行；或按集群允许方式管理同一作业内的服务。所有命令都从已分配设备列表选择卡，禁止在登录节点直接启动推理。
@@ -101,6 +97,14 @@ bash "$INTERCLARIFY_ROOT/scripts/remote/start_xtalk_round1_service.sh" tts
 ```
 
 上述三行各自占用一个终端，不应在同一终端顺序执行。默认为逻辑 GPU 0/1/3，端口 8000/8003/8004；单服务作业追加 `--gpu-index 0`。首轮 TTS 并发为 1，模型和 codec 同卡。若 24 GB OOM，保存日志和显存，不根据封装仓库中 48 GB 改装卡的报告推定我们也能运行。
+
+集群上由单个四卡作业自动完成本节与第 6 节：`run_xtalk_round1_node_job.sh services` 在后台启动三个服务、等待端点就绪、抓取 `/v1/models` 与流式补全、跑 XTurnix 适配器探针与上游 pytest、再执行 TTS 冷/热/双流 smoke，最后统一写入 `$XTALK_ROUND1_ARTIFACT_ROOT/services/<时间戳>/`。
+
+```bash
+bash "$INTERCLARIFY_ROOT/scripts/remote/submit_xtalk_round1_job.sh" services
+vc list -j <JOBID>
+vc logs -t <TASKID>
+```
 
 在同节点另一个终端检查模型与 TTS 服务：
 

@@ -18,13 +18,17 @@ sources:
     commit: 58b20a0d5fcc6766658d50967a90a9d890009a46
 
 # Null revisions are resolved once into models.lock.json before downloading.
+# The round-one LLM was changed from cpatonn/Qwen3-30B-A3B-Instruct-2507-AWQ-4bit
+# to Qwen/Qwen3-8B-AWQ on 2026-10-09: the reference system DuplexCascade uses a
+# 7B-class LLM (Qwen2-7B-Instruct), the verified local AWQ snapshot fits the
+# 24 GB 4090 deployment, and the revision below is hash-verified against it.
 models:
   asr:
     model_id: Qwen/Qwen3-ASR-1.7B
     revision: null
   llm:
-    model_id: cpatonn/Qwen3-30B-A3B-Instruct-2507-AWQ-4bit
-    revision: null
+    model_id: Qwen/Qwen3-8B-AWQ
+    revision: 4da05a8edb55c6046cce958586c33b61da07bb79
   tts:
     model_id: OpenMOSS-Team/MOSS-TTS-Realtime
     revision: null
@@ -38,8 +42,8 @@ models:
 environments:
   prepare: xtalk-round1-tools
   asr: xtalk-round1-asr
-  llm: xtalk-round1-vllm
-  turn_detector: xtalk-round1-vllm
+  llm: base
+  turn_detector: base
   tts: xtalk-round1-moss
   client: xtalk-round1-client
 

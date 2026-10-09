@@ -64,7 +64,7 @@ xtalk:
     adapter_status: pending
   llm_agent:
     type: DefaultAgent
-    model_id: cpatonn/Qwen3-30B-A3B-Instruct-2507-AWQ-4bit
+    model_id: Qwen/Qwen3-8B-AWQ
     revision: null
     backchannel_model: null
     backchannel_source_dir: null

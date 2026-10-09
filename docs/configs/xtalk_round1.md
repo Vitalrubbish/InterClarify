@@ -8,7 +8,7 @@
 
 - `sources` 固定 X-Talk、Qwen ASR、MOSS 服务封装和 MOSS 模型源码的 Git 提交。
 - `models` 记录 ASR、LLM、TTS、codec 与 XTurnix 的 ID；`revision=null` 表示尚未解析，下载工具第一次解析具体 SHA，后续复用锁定文件。
-- `environments` 分别指定四个模型服务和准备工具的 conda 环境；不复用 P0 的 torch 2.4.1 环境，不运行会创建 `.venv` 的上游安装脚本。
+- `environments` 指定各模型服务与准备工具的 conda 环境：LLM 与 turn detector 复用镜像 base 环境（vLLM 0.16.0），ASR 用独立环境（vLLM 0.14.0，因 `qwen_asr` 不兼容 0.16），TTS 与客户端各自独立。不复用 P0 的 torch 2.4.1 环境，不运行会创建 `.venv` 的上游安装脚本。
 - `dependency_candidates` 记录固定模型源码要求的 vLLM、Transformers 与 MOSS torch 起始版本；完整依赖以远端验收后的 conda/pip 快照为准。
 - `services` 记录已分配 GPU 中的逻辑编号、端口与模型启动参数。`0/1/2/3` 对应申请到的四张 GPU，不代表任意物理卡。
 - `asr_streaming` 区分 80 ms 回放步长与内部解码窗口；默认窗口 0.6 秒是待测值。

@@ -12,15 +12,17 @@
 | --- | --- | --- |
 | X-Talk | `Vitalrubbish/xtalk`，起点 `5f0d9959edf1026588246efbed827b078cbb114c` | 原生 `DefaultService` / `DefaultAgent`；改造前保存源码提交和配置摘要 |
 | ASR | 本地 `Qwen/Qwen3-ASR-1.7B`，官方 vLLM 流式 API | 优先识别质量及真实增量输入；固定模型 revision、chunk 参数和前缀修订；X-Talk 适配尚未完成 |
-| LLM | `DefaultAgent` + 本地 vLLM；`cpatonn/Qwen3-30B-A3B-Instruct-2507-AWQ-4bit` | 固定提交的本地部署示例给出该模型；核验权重 revision、量化来源、上下文上限和生成参数 |
+| LLM | `DefaultAgent` + 本地 vLLM；`Qwen/Qwen3-8B-AWQ` | 2026-10-09 由 `cpatonn/Qwen3-30B-A3B-Instruct-2507-AWQ-4bit` 变更而来：参考系统 DuplexCascade 的 LLM 为 7B 级（Qwen2-7B-Instruct），本地已有该官方 AWQ 快照且经 LFS SHA-256 全量核验（revision `4da05a8edb55c6046cce958586c33b61da07bb79`），单张 24 GB 4090 部署友好；固定量化来源、上下文上限和生成参数 |
 | TTS | `MossTTSRealtime` + `OpenMOSS-Team/MOSS-TTS-Realtime`，外加 `OpenMOSS-Team/MOSS-Audio-Tokenizer` | 使用已有增量文本/流式音频接口；固定服务提交、模型与 codec revision、一份参考音色及校验值 |
 | turn detector | `XTurnix` + XTurnix-ZH Base 0.6B，本地 vLLM | 已有适配器，提供 listening 下的 keep/start 与 speaking 下的 keep/stop；固定权重 revision、服务名 `xturnix`、上下文和超时 |
 | VAD | 原生浏览器 VAD，额外服务端 VAD 默认不加载 | 固定前端版本、模型和阈值；headless 回放须提供并记录等效 speech start/end 事件 |
 | 系统附和 | `backchannel_model=null`，`backchannel_source_dir=null` | 原生 Agent 的 partial 分支仍更新历史，但不调用附和模型或产生附和音频 |
 
-2026-10-09 根据用户确认升级首轮 ASR/TTS，原因是 SenseVoice 离线增量模拟和 IndexTTS 分句合成不充分覆盖目标流式链路。[Qwen3-ASR](https://github.com/QwenLM/Qwen3-ASR) 提供官方流式 API，[MOSS-TTS-Realtime](https://github.com/OpenMOSS/MOSS-TTS) 提供增量合成。LLM 的具体候选沿用固定 checkout 的本地部署示例。选择 [XTurnix](https://github.com/xcc-zach/xturnix) 是因为它同时提供开始回答与停止说话决策；不把 keep/stop 分类预先当作已验证的用户附和能力。
+2026-10-09 根据用户确认升级首轮 ASR/TTS，原因是 SenseVoice 离线增量模拟和 IndexTTS 分句合成不充分覆盖目标流式链路。[Qwen3-ASR](https://github.com/QwenLM/Qwen3-ASR) 提供官方流式 API，[MOSS-TTS-Realtime](https://github.com/OpenMOSS/MOSS-TTS) 提供增量合成。LLM 原候选沿用固定 checkout 的本地部署示例（30B-A3B AWQ）；同日根据用户确认与资源核验变更为本地已验证的 `Qwen/Qwen3-8B-AWQ`（DuplexCascade 参考系统的 LLM 同为 7B 级），组件级置换不改变轮次控制策略。选择 [XTurnix](https://github.com/xcc-zach/xturnix) 是因为它同时提供开始回答与停止说话决策；不把 keep/stop 分类预先当作已验证的用户附和能力。
 
 首轮配置见 [../configs/xtalk_round1.yaml](../configs/xtalk_round1.yaml)，远端任务单见 [jobs/xtalk_round1_baseline.md](jobs/xtalk_round1_baseline.md)。配置区分模型服务验收与 X-Talk 联调：当前 `Qwen3ASRClient` 的输入类型、参数签名、累计文本和会话接口均与现行 ASR 抽象不匹配，且缺少 `reset` / `clone` 实现；首轮先独立验证官方流式 API，补齐适配后才生成可启动的全链路配置。模型适配属于 A0 接入工作，不改变轮次控制策略。
+
+首轮验收镜像 `sjtu_yukai-xuanzhang-xtalk-round1:v0.1` 直接基于已有 `sjtu_yukai-xuanzhang-xtalk:v0.17` 构建（CUDA 12.8.1 + conda + ffmpeg + vLLM 0.16.0）；LLM 与 turn detector 复用基座 base 环境，另用一个合并层加入四个 `xtalk-round1-*` 环境（ASR 因 `qwen_asr` 不兼容 vLLM 0.16 而保留独立的 0.14.0 环境）。wheelhouse 与源码树通过 BuildKit named build contexts 提供，wheel 仅 bind-mount，约 6 GB 不进镜像层。构建脚本见 [scripts/remote/build_xtalk_round1_image.md](scripts/remote/build_xtalk_round1_image.md)。
 
 ## 3. 能力与实现差异
 
