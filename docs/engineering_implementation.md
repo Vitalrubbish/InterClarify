@@ -6,10 +6,10 @@
 
 自 2026-10-09 起，项目不再直接复现、内嵌或改造 DuplexCascade 官方源码。新的工程路线是：
 
-1. 以 [X-Talk](https://github.com/xcc-zach/xtalk) 的模块化全双工级联系统为唯一运行底座；
-2. 在 X-Talk 的事件总线、轮次检测、生成、TTS 协调和播放链路上做最小扩展；
+1. 以独立维护的 [Vitalrubbish/xtalk](https://github.com/Vitalrubbish/xtalk) fork 为唯一运行底座；
+2. 先在 X-Talk fork 中实现通用的 DuplexCascade 功能层，再由独立的 InterClarify 项目接入 Layer 2；
 3. 以 DuplexCascade 展示的能力作为功能目标和相关工作参照，不依赖其官方权重、控制 token、Kyutai 服务或源码实现；
-4. 先让改造后的 X-Talk 具备可观察、可回归的 micro-turn、backchannel、提前回答、用户打断停播和持续监听能力，再接入 InterClarify 的 Layer 2；
+4. 阶段 A 只实现 micro-turn、Layer 0/1、backchannel、提前回答、用户打断停播和持续监听；阶段 B 才接入 InterClarify 的 Layer 2；
 5. 快速验证话轮内主动澄清是否值得继续，只有通过门禁后才扩大数据、训练和真人实验。
 
 因此，旧路线中的 `3rd-party/DuplexCascade`、官方权重准备脚本、Kyutai `moshi-server` 编排、官方控制模型适配器及其测试和实验产物均不再属于当前实现。
@@ -26,7 +26,7 @@ MVP 只选择一个可程序核验结果的任务域，默认采用**日程安�
 - 能否生成一个具体、简短、可回答的问题；
 - 收到回答后能否恢复同一个任务。
 
-X-Talk 提供 ASR、LLM agent、TTS、VAD、轮次检测、异步事件和 WebSocket 服务基础。项目不建设第二套并行语音运行时，也不把复现 DuplexCascade 的模型或训练流程作为前置条件。
+X-Talk fork 提供 ASR、LLM agent、TTS、VAD、轮次检测、异步事件和 WebSocket 服务基础。InterClarify 不建设第二套并行语音运行时，也不把复现 DuplexCascade 的模型或训练流程作为前置条件。
 
 ### 2.2 Layer 与动作边界
 
@@ -42,7 +42,7 @@ X-Talk 提供 ASR、LLM agent、TTS、VAD、轮次检测、异步事件和 WebSo
 ### 2.3 对 X-Talk 的改造原则
 
 - 固定上游提交后再开发；镜像标签不能代替源码提交记录。
-- 优先通过 InterClarify 适配器、自定义 manager、event 和 model slot 扩展 X-Talk。
+- 通用双工能力直接在 X-Talk fork 中实现；InterClarify 专属代码留在本仓库，等底座稳定后通过公开扩展接口接入。
 - 必须修改上游文件时，以最小补丁维护，并记录文件、原因、上游提交和回归测试。
 - 不复制 X-Talk 已有的 EventBus、会话管理、ASR/TTS manager 或播放队列。
 - 不允许 Layer 0、Layer 1、Layer 2 分别创建播放通道。
@@ -66,7 +66,7 @@ X-Talk 提供 ASR、LLM agent、TTS、VAD、轮次检测、异步事件和 WebSo
 | 能力 | 可测试定义 |
 | --- | --- |
 | 持续监听 | 系统播放期间仍持续接收用户音频并更新会话状态 |
-| micro-turn | 按固定或事件驱动的短窗口检查是否保持静默、backchannel、回答或请求澄清 |
+| micro-turn | 按固定或事件驱动的短窗口检查是否保持静默、backchannel 或回答 |
 | backchannel | 能产生与正式回答可区分的低强度反馈，且不错误结束用户话轮 |
 | 提前回答 | 在用户话轮未正式结束但语义和时机允许时，可以启动常规回答 |
 | 用户打断停播 | 用户有效插话后停止未完成播放并恢复监听 |
@@ -79,7 +79,7 @@ X-Talk 提供 ASR、LLM agent、TTS、VAD、轮次检测、异步事件和 WebSo
 | 阶段 | 核心目标 | 主要产物 | 继续条件 |
 | --- | --- | --- | --- |
 | P0 路线重置 | 固定 X-Talk 来源、环境和记录格式 | conda 环境、配置、来源登记 | 基础环境与日志脚手架可重复运行 |
-| P1 X-Talk 功能对齐 | 建立原生基线并补齐目标双工行为 | X-Talk 基线、差距表、改造运行时、FDB smoke | 目标行为稳定且关键事件可观察 |
+| P1 X-Talk Duplex | 在 X-Talk fork 中补齐 DuplexCascade 风格的 Layer 0/1 行为 | 原生基线、差距表、改造运行时、FDB smoke | 目标行为稳定且关键事件可观察 |
 | P2 快速可行性验证 | 验证话轮内澄清现象和闭环 | 小样本、规则/提示策略、试交互报告 | 存在足够可问窗口且任务可恢复 |
 | P3 数据与评测基础设施 | 形成可训练、可审计的数据资产 | 回放器、标注格式、切分和检查工具 | 无未来泄漏，正负轨迹覆盖充分 |
 | P4 决策方法与可选训练 | 固定 Layer 2 方法并完成对照 | 各策略、可选 LoRA、消融结果 | 主方法在固定底座上有稳定收益 |
@@ -95,7 +95,7 @@ P1 和 P2 是最早的两个强制门禁。P2 未通过前，不开展大规模�
 
 ### 4.2 工作项
 
-1. 在 `configs/base.yaml` 固定 X-Talk 仓库地址与源码提交；当前起点记录在 [p0/xtalk_registry.md](p0/xtalk_registry.md)。
+1. 在 `configs/base.yaml` 固定 X-Talk fork、官方 upstream 与源码提交；当前起点记录在 [p0/xtalk_registry.md](p0/xtalk_registry.md)。
 2. 明确集群镜像 `xtalk:v0.17` 与源码提交的对应关系；对应关系未证明前，不把镜像标签当作可复现版本。
 3. 用 conda 创建本地和远端环境；P1 选择具体 ASR、TTS、LLM agent 和 turn detector 后，再锁定相应 X-Talk extras。
 4. 保留 local / replay / cluster 三类配置、唯一运行目录和结构化事件日志。
@@ -109,13 +109,13 @@ P1 和 P2 是最早的两个强制门禁。P2 未通过前，不开展大规模�
 - 配置和 manifest 不再引用 DuplexCascade 或 Kyutai；
 - 同一离线输入在相同配置下产生结构一致的日志。
 
-## 5. P1：基于 X-Talk 的功能对齐
+## 5. P1：在 X-Talk fork 中实现 DuplexCascade 功能层
 
-具体扩展点、事件协议、响应生命周期、文件布局和测试矩阵见 [xtalk_modification_plan.md](xtalk_modification_plan.md)。本节定义阶段门禁；该方案文档定义实现细节。
+具体扩展点、事件协议、响应生命周期、文件布局和测试矩阵见 [xtalk_modification_plan.md](xtalk_modification_plan.md)。P1 不实现主动澄清；它只交付可供 InterClarify 后续复用的 Layer 0/1 全双工底座。
 
 ### 5.1 P1.0 固定并导入 X-Talk
 
-- 使用固定提交的独立 checkout、fork 或可编辑安装；不得追踪浮动的 `main`。
+- 在独立 X-Talk fork 中开发；`origin` 指向 `Vitalrubbish/xtalk`，`upstream` 指向官方仓库，不使用子模块。
 - 记录 X-Talk 核心依赖和实际启用的 optional extras。
 - 选择一套最小可本地部署的 ASR、LLM agent、TTS、VAD/turn detector 组合；所有后续策略共享该组合。
 - 跑通 X-Talk 原生示例，保存启动配置、首包延迟、实时因子、显存和事件日志。
@@ -126,7 +126,7 @@ P1 和 P2 是最早的两个强制门禁。P2 未通过前，不开展大规模�
 先不接入 InterClarify，逐项验证第 3.1 节能力。形成机器可读的差距表，每项标为：
 
 - `SUPPORTED`：X-Talk 固定版本原生满足；
-- `ADAPT`：已有扩展点，需 InterClarify 适配器；
+- `ADAPT`：已有扩展点，可在 X-Talk Duplex 控制层中适配；
 - `PATCH`：必须修改固定版本的上游实现；
 - `BLOCKED`：受模型、设备或环境阻塞。
 
@@ -141,13 +141,14 @@ P1 和 P2 是最早的两个强制门禁。P2 未通过前，不开展大规模�
 #### Layer 0/1 映射
 
 - Layer 0 根据说话状态、停顿和上下文提交 `SILENCE` 或 `BACKCHANNEL` 候选。
-- Layer 1 根据当前可见前缀提交 `SILENCE`、`ANSWER` 或 `REQUEST_LAYER2`。
+- Layer 1 根据当前可见前缀提交 `SILENCE` 或 `ANSWER`。
 - 两层可以复用同一 LLM/turn detector 的不同结构化输出，不要求先训练独立模型。
 - X-Talk 原有句末生成仍作为安全回退。
+- 可以预留 higher-layer policy 接口，但 P1 不加载 Layer 2。
 
 #### 单一仲裁器
 
-所有层输出统一转换为带有 `session_id`、`turn_id`、`prefix_version`、`priority`、`kind` 和 `payload` 的候选。`OutputArbiter` 是唯一选择器，不能直接操作音频设备。
+Layer 0/1 输出统一转换为带有 `session_id`、`turn_id`、`prefix_version`、`priority`、`kind` 和 `payload` 的候选。`OutputArbiter` 是唯一选择器，P1 优先级为 L1 > L0；它不能直接操作音频设备。
 
 #### 单一播放所有者
 
@@ -192,11 +193,12 @@ user_barge_in
 进入 P2 前必须确认：
 
 - 系统发声时仍能接收用户输入；
-- backchannel、正式回答和澄清候选在日志中可区分；
+- backchannel 和正式回答在日志中可区分；
 - 用户打断能停止未完成播放并继续同一会话；
 - 同一输入可从音频、ASR、决策、仲裁追踪到播放；
 - 原生 X-Talk 与功能对齐版本都有 FDB smoke 或明确阻塞记录；
-- 没有第二套仲裁器或第二个 TTS 播放所有者。
+- 没有第二套仲裁器或第二个 TTS 播放所有者；
+- higher-layer policy 扩展点存在，但未启用主动澄清。
 
 ## 6. P2：快速可行性验证
 
@@ -308,7 +310,7 @@ Layer 2 结果必须同时满足会话、话轮、前缀版本、任务状态、
 
 ## 11. 建议仓库结构与文档映射
 
-按实现进度逐步建立，不创建空目录：
+P1 的 X-Talk Duplex 源码位于独立 fork，不出现在本仓库文件树中。以下结构从 P2 的 InterClarify 接入开始逐步建立，不创建空目录：
 
 ```text
 InterClarify/
@@ -330,7 +332,7 @@ InterClarify/
 └── docs/
 ```
 
-新实现必须同步增加对应文档；例如 `src/interclarify/xtalk/runtime.py` 对应 `docs/src/interclarify/xtalk/runtime.md`。第三方代码不逐文件复制文档，但必须记录来源、提交、许可证和补丁。
+InterClarify 新实现必须同步增加对应文档；例如 `src/interclarify/xtalk/runtime.py` 对应 `docs/src/interclarify/xtalk/runtime.md`。X-Talk fork 遵循其自身文档约定，并在本仓库登记使用的提交、许可证和实验配置。
 
 ## 12. 实验记录与产物管理
 

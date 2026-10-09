@@ -2,9 +2,9 @@
 
 InterClarify 研究全双工语音代理在**用户话轮内**主动澄清的时机与措辞：当持续到达的语音前缀存在会改变任务结果的解释分歧时，系统应继续听、趁合适的接话机会简短提问，还是直接回答；用户回应后如何把答案并回原任务。研究范围见 [docs/research_design.md](docs/research_design.md)，工程阶段、门禁与模块边界见 [docs/engineering_implementation.md](docs/engineering_implementation.md)。
 
-参考底座改为 [X-Talk](https://github.com/xcc-zach/xtalk)。项目将在 X-Talk 的事件、轮次检测、生成、TTS 与播放链路上补齐 micro-turn、backchannel、提前回答、持续监听和用户打断停播，再接入 InterClarify Layer 2。DuplexCascade 只作为功能与相关工作参照，不再复现或内嵌其官方源码。
+参考底座为独立维护的 [Vitalrubbish/xtalk](https://github.com/Vitalrubbish/xtalk) fork。第一阶段先在该 fork 中补齐 DuplexCascade 风格的 micro-turn、Layer 0/1、backchannel、提前回答、持续监听和用户打断停播；底座稳定后，本项目再接入 InterClarify Layer 2。InterClarify 不跟踪 X-Talk 源码或子模块，只记录实验使用的 fork 提交。
 
-**当前状态：P0 路线重置完成，P1 X-Talk 基线与功能差距审计尚未开始。** 仓库暂不包含新的 Layer 0/1/2 运行时。
+**当前状态：P0 路线重置完成；P1 将在 X-Talk fork 中实现通用 DuplexCascade 功能层。** 本仓库暂不实现 Layer 2 运行时。
 
 ## P0 交付物
 

@@ -47,8 +47,9 @@ clock:
   micro_turn_seconds: 0.6
 
 xtalk:
-  # P0 只固定来源，不在当前仓库内嵌 X-Talk 源码；P1 使用固定 checkout/fork。
-  repo_url: https://github.com/xcc-zach/xtalk
+  # X-Talk 是独立 fork；本仓库只记录来源和实验使用的提交。
+  repo_url: https://github.com/Vitalrubbish/xtalk
+  upstream_url: https://github.com/xcc-zach/xtalk
   repo_commit: 5f0d9959edf1026588246efbed827b078cbb114c
   base_image: docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk:v0.17
   source_root: null

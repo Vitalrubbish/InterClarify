@@ -9,7 +9,7 @@
 - `device`：CPU/GPU 与可见卡号；
 - `audio`：16 kHz 单声道 float32、80 ms 块长、设备和 AEC 状态；
 - `clock`：真实/虚拟时钟和 0.6 秒 micro-turn 初始值；
-- `xtalk`：官方仓库、固定提交、集群基础镜像和待选模型组件；
+- `xtalk`：项目 fork、官方 upstream、固定提交、集群基础镜像和待选模型组件；
 - `logging`：日志级别与事件文件名。
 
 `xtalk.source_root` 和各模型组件当前为 `null`，表示 P1.0 尚未完成导入与选型，不代表运行时会自动下载浮动版本。

@@ -147,7 +147,7 @@ class SmokeTest(unittest.TestCase):
             self.assertEqual(manifest["profile"], "replay")
             self.assertEqual(manifest["seed"], 0)
             self.assertTrue(manifest["config_digest"])
-            self.assertEqual(manifest["model"]["repo_url"], "https://github.com/xcc-zach/xtalk")
+            self.assertEqual(manifest["model"]["repo_url"], "https://github.com/Vitalrubbish/xtalk")
 
 
 if __name__ == "__main__":

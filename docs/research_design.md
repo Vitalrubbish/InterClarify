@@ -84,7 +84,7 @@ Layer 0/1 是对 X-Talk 轮次检测与生成路径的功能划分：起步时�
 
 **资源使用顺序**：
 
-1. 固定 [X-Talk 官方仓库](https://github.com/xcc-zach/xtalk)提交和实际启用的 ASR、TTS、LLM agent、VAD/turn detector 组件；先跑原生链路和 FDB smoke，记录底座事件、延迟和资源占用。
+1. 在独立的 [Vitalrubbish/xtalk](https://github.com/Vitalrubbish/xtalk) fork 中固定提交和实际启用的 ASR、TTS、LLM agent、VAD/turn detector 组件；先只完成 DuplexCascade 风格的通用 Layer 0/1 链路和 FDB smoke，记录底座事件、延迟和资源占用。
 2. 在同一 X-Talk 底座上补齐 micro-turn、backchannel、提前回答、单一仲裁和单一播放所有权，再接入 Layer 2、版本检查与日志。用提示或规则建立澄清策略、任务数据和真人试验流程，立即检查是否存在足够多**人认为适合且用户能回答**的句中机会，并同步跑 FDB 回归。
 3. 现象与参考系统都成立后，再训练触发或澄清决策。先冻结 ASR/TTS、X-Talk 轮次控制和通用 LLM agent，使用 BF16、gradient checkpointing、小的每卡 batch 和梯度累积做短跑；按显存选择数据并行，必要时再用参数或优化器分片。若训练直接改动 Layer 1，必须重新测 FDB 并与只增设 Layer 2 的版本比较。训练目标是关键分歧识别、接话时机和问题质量，不是重训整个语音系统。
 
@@ -100,7 +100,7 @@ DuplexCascade 的模型结构、控制 token、官方权重和训练流程只作
 
 ## 8. 与相关工作的关系
 
-- [X-Talk](https://github.com/xcc-zach/xtalk)：提供实际采用的模块化全双工级联底座、事件系统、轮次检测和播放管理；本文在其上实现研究所需的控制边界。
+- [X-Talk](https://github.com/xcc-zach/xtalk)：提供模块化全双工级联底座、事件系统、轮次检测和播放管理；项目 fork 先补齐通用双工控制，再供本文的 Layer 2 研究复用。
 - [DuplexCascade](https://arxiv.org/abs/2603.09180)：提供 micro-turn、backchannel、提前回答和持续双工交互的能力参照；本文不复现其官方源码，而研究其未单独回答的主动澄清问题。
 - [AdaptDuplex](https://arxiv.org/abs/2609.29217)：已探索自适应窗口与异步认知动作；本文不把分层、异步或动态窗口本身当作主要新意。
 - [A Full-duplex Speech Dialogue Scheme Based on Large Language Model](https://proceedings.neurips.cc/paper_files/paper/2024/hash/180d4373aca26bd86bf45fc50d1a709f-Abstract-Conference.html)：duplex-dialogue-3k 支持机器句中打断的合理性判断；本文研究特定语义功能及真实语音中的用户回应和任务恢复。

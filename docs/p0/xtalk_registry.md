@@ -4,17 +4,18 @@
 
 | 项 | 值 |
 | --- | --- |
-| 仓库 | https://github.com/xcc-zach/xtalk |
+| 项目 fork | https://github.com/Vitalrubbish/xtalk |
+| 官方 upstream | https://github.com/xcc-zach/xtalk |
 | 起始提交 | `5f0d9959edf1026588246efbed827b078cbb114c` |
 | 提交日期 | 2026-10-03 |
 | 集群基础镜像 | `docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk:v0.17` |
 | Python 要求 | `>=3.10` |
 
-该提交只是路线重置时的固定起点。P1 开始前应确认是否采用此提交、内部 fork 的对应提交，或经评审后的更新版本；一旦开始实验不得追踪浮动 `main`。
+本地 fork、项目 fork `origin/main` 与官方 `upstream/main` 在登记时均指向该提交。开始实验后以具体提交为准，不追踪浮动 `main`。
 
 ## 采用原因
 
-X-Talk 已提供模块化 ASR、LLM agent、TTS、VAD/turn detector、EventBus、会话服务、TTS 协调和播放管理，适合通过扩展 manager、event 和 model slot 实现 InterClarify 所需行为。项目不再复制 DuplexCascade 的源码和权重，而把其能力拆成可测试目标。
+X-Talk 已提供模块化 ASR、LLM agent、TTS、VAD/turn detector、EventBus、会话服务、TTS 协调和播放管理。第一阶段在项目 fork 中先实现 DuplexCascade 风格的通用双工能力；底座稳定后，InterClarify 再通过公开扩展接口加入 Layer 2。
 
 ## 必须核验的事项
 
@@ -26,12 +27,13 @@ X-Talk 已提供模块化 ASR、LLM agent、TTS、VAD/turn detector、EventBus�
 
 ## 集成策略
 
-- 首选独立固定 checkout 或项目 fork，通过可编辑安装进入 conda 环境；
-- InterClarify 扩展放在 `src/interclarify/xtalk/`，通过公开事件和 manager 接口接入；
-- 若必须修改 X-Talk 上游文件，补丁需记录文件、原因、上游提交和对应测试；
-- 不在未核验来源前把整个 X-Talk 仓库复制到 `3rd-party/`；
+- X-Talk fork 与 InterClarify 保持独立 Git 仓库，不使用子模块；
+- 本地 `InterClarify/xtalk/` 仅作为工作区 checkout，并由 InterClarify `.gitignore` 排除；
+- 通用 DuplexCascade 功能直接在 X-Talk fork 中实现和测试；
+- InterClarify 只记录 X-Talk fork 提交，并在后续通过稳定扩展接口接入；
+- 修改 X-Talk 核心文件时记录原因、upstream 基线和对应测试；
 - 不创建第二套 EventBus、会话服务或 TTS 播放队列。
 
 ## 功能对齐范围
 
-需要在 X-Talk 上验证或补齐的行为是持续监听、micro-turn、backchannel、提前回答、用户打断停播、单一输出仲裁、单一播放所有权和完整事件时间线。DuplexCascade 仅作为这些行为的相关工作参照。
+阶段 A 在 X-Talk fork 上补齐持续监听、micro-turn、Layer 0/1、backchannel、提前回答、用户打断停播、单一输出仲裁、单一播放所有权和完整事件时间线。阶段 B 才由 InterClarify 加入主动澄清。

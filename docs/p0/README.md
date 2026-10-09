@@ -17,7 +17,7 @@
 
 - 已移除 DuplexCascade 第三方源码快照、官方权重/Kyutai 资产脚本、官方控制模型适配器、旧实时客户端、P1 测试和实验产物。
 - `configs/base.yaml` 和 `manifest.json` 改为记录 X-Talk 来源。
-- 当前仓库尚未导入或改造 X-Talk 源码；P1.0 必须先固定 checkout/fork、核验镜像与源码对应关系，再选择 ASR、TTS、LLM agent 和 turn detector。
+- X-Talk 项目 fork 已建立并与官方 upstream 关联；源码由独立 X-Talk Git 仓库管理，本仓库只记录提交。P1.0 仍需核验镜像与源码对应关系，并选择 ASR、TTS、LLM agent 和 turn detector。
 - 旧 P0 GPU 与冒烟记录只能证明通用脚手架曾在集群运行，不能证明新的 X-Talk 基线已经完成。路线重置后需重新执行 P0 验收。
 
 ## 验收命令
@@ -36,7 +36,7 @@ conda run -n interclarify-dev python -m pytest -q
 ## 下一步
 
 1. 核验 [xtalk_registry.md](xtalk_registry.md) 中的源码提交、镜像 digest 和许可证差异；
-2. 建立 X-Talk 专用 conda 环境锁定或在现有环境中固定安装；
+2. 在 X-Talk fork 中建立专用 conda 环境；
 3. 跑通原生 X-Talk 最小链路；
 4. 建立功能差距表和 FDB smoke；
-5. 再开始 micro-turn、Layer 0/1、仲裁和播放边界改造。
+5. 在 X-Talk fork 中开始 micro-turn、Layer 0/1、仲裁和播放边界改造；通过 P1 后再回到本仓库实现 Layer 2。

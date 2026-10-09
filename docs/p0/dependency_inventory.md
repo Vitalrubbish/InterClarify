@@ -26,7 +26,8 @@
 
 | 资产 | 固定值 | 当前状态 |
 | --- | --- | --- |
-| 官方仓库 | `https://github.com/xcc-zach/xtalk` | 已登记 |
+| 项目 fork | `https://github.com/Vitalrubbish/xtalk` | 已关联 |
+| 官方 upstream | `https://github.com/xcc-zach/xtalk` | 已关联，只读同步 |
 | 起始提交 | `5f0d9959edf1026588246efbed827b078cbb114c` | 已固定，待导入验证 |
 | 集群基础镜像 | `sjtu_yukai-xuanzhang-xtalk:v0.17` | 已存在，待记录 digest 和源码对应关系 |
 | ASR/TTS/LLM/turn detector | 未选择 | P1.0 差距审计后固定 |

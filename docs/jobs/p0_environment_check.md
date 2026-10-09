@@ -46,7 +46,7 @@ vc logs -t <TASKID>
 1. `env.json` 中 `status=PASS`、`missing_core=[]`、`gpu.cuda_available=true`；
 2. `audio_io.json` 有结果，headless 节点允许 `status=NO_DEVICES`；
 3. 两次 smoke 的事件类型序列和 `metrics.json` 相同；
-4. smoke 的 `manifest.json.model.repo_url` 为 `https://github.com/xcc-zach/xtalk`；
+4. smoke 的 `manifest.json.model.repo_url` 为 `https://github.com/Vitalrubbish/xtalk`，并记录官方 `upstream_url`；
 5. `git.txt`、镜像标签和镜像 digest 已归档；
 6. 结果回填 [docs/p0/README.md](../p0/README.md)。
 

@@ -52,12 +52,6 @@ image_use.md
 # Huggingface Token
 hf_token.txt
 
-# Curated milestone evidence (small JSON/log run artifacts) is committed on
-# purpose for regression; everything else under experiments/ stays ignored.
-!experiments/p1_offline/
-!experiments/p1_offline/**
-!experiments/p1_offline/**/*.jsonl
-!experiments/p1_offline/**/*.log
-!experiments/p1_2_live/
-!experiments/p1_2_live/**
-!experiments/p1_2_live/**/*.jsonl
+# Independent X-Talk fork checkout. Its commits are tracked in its own repo;
+# InterClarify records the selected revision in configs and run manifests.
+/xtalk/
