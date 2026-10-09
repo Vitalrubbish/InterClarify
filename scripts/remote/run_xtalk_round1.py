@@ -127,10 +127,21 @@ def asr_smoke(config: dict, args: argparse.Namespace) -> None:
         unfixed_chunk_num=stream["unfixed_chunk_num"],
         unfixed_token_num=stream["unfixed_token_num"],
     )
+    # Warm up the streaming/decode path: the first call carries a one-off cost
+    # (kernel/graph init) that otherwise dominates the reported first partial.
+    warm = np.zeros(int(rate * stream["chunk_size_sec"]), dtype=np.float32)
+    warm_state = model.init_streaming_state(
+        chunk_size_sec=stream["chunk_size_sec"],
+        unfixed_chunk_num=stream["unfixed_chunk_num"],
+        unfixed_token_num=stream["unfixed_token_num"],
+    )
+    model.streaming_transcribe(warm, warm_state)
+    model.streaming_transcribe(warm, warm_state)
     step = int(rate * stream["input_step_ms"] / 1000)
     started = time.monotonic()
     previous = ""
     first_partial = None
+    first_partial_audio = None
     decode_seconds = 0.0
     revisions = 0
     with (args.output / "asr_events.jsonl").open("w", encoding="utf-8") as events:
@@ -147,6 +158,7 @@ def asr_smoke(config: dict, args: argparse.Namespace) -> None:
             revisions += int(rewritten)
             if text and first_partial is None:
                 first_partial = arrival
+                first_partial_audio = end_seconds
             event = {
                 "audio_seconds": end_seconds, "arrival_seconds": arrival,
                 "text": text, "rewritten": rewritten,
@@ -165,6 +177,7 @@ def asr_smoke(config: dict, args: argparse.Namespace) -> None:
         "streaming": stream, "audio_seconds": duration,
         "audio_sha256": hashlib.sha256(args.audio.read_bytes()).hexdigest(),
         "model_load_seconds": load_seconds, "first_partial_seconds": first_partial,
+        "first_partial_audio_seconds": first_partial_audio,
         "revisions": revisions, "decode_seconds": decode_seconds,
         "decode_rtf": decode_seconds / duration,
         "replay_wall_seconds": time.monotonic() - started, "final_text": state.text,

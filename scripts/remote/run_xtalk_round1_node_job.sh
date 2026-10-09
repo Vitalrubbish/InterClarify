@@ -7,13 +7,17 @@
 #   bash run_xtalk_round1_node_job.sh services
 #       4-GPU job: start llm / turn_detector / tts on GPUs 0/1/3, verify all
 #       endpoints, run upstream X-Talk tests, then TTS cold/warm/gap smoke.
+#   bash run_xtalk_round1_node_job.sh chain
+#       4-GPU job: start the three services, then run the full path
+#       ASR (gpu2) -> LLM -> TTS on one input wav, measure per-stage latency,
+#       and copy the run dir under $INTERCLARIFY_ROOT/fullchain_logs/.
 #
 # All evidence is written under $XTALK_ROUND1_ARTIFACT_ROOT so it is visible
 # from the dev machine.  The script keeps going after individual check
 # failures and reports a per-step status JSON at the end.
 set -uo pipefail
 
-MODE="${1:?usage: run_xtalk_round1_node_job.sh [asr|services]}"
+MODE="${1:?usage: run_xtalk_round1_node_job.sh [asr|services|chain]}"
 
 export INTERCLARIFY_ROOT="${INTERCLARIFY_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/InterClarify}"
 export XTALK_ROUND1_ROOT="${XTALK_ROUND1_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1}"
@@ -108,6 +112,139 @@ if [ "$MODE" = "asr" ]; then
   OVERALL_RC=$(grep -c '"status": "FAIL"' "$RUN_DIR/steps.jsonl" || true)
   echo "[node-job] asr done, failures=$OVERALL_RC" | tee -a "$LOG"
   exit "$OVERALL_RC"
+fi
+
+# ---- chain mode: full path ASR -> LLM -> TTS on 4 GPUs ----
+if [ "$MODE" = "chain" ]; then
+  mkdir -p "$RUN_DIR/service_logs" "$RUN_DIR/curl"
+  nvidia-smi --query-gpu=index,name,memory.used,memory.total,utilization.gpu --format=csv,noheader -l 10 \
+    > "$RUN_DIR/gpu_samples.csv" 2>&1 &
+  GPU_LOG_PID=$!
+  FAILURES=0
+
+  start_service llm 0
+  wait_http "http://127.0.0.1:8000/v1/models" 1800 "$RUN_DIR/curl/llm_models.json" || FAILURES=$((FAILURES + 1))
+  start_service turn_detector 1
+  wait_http "http://127.0.0.1:8003/v1/models" 1800 "$RUN_DIR/curl/turn_detector_models.json" || FAILURES=$((FAILURES + 1))
+  start_service tts 3
+  wait_http "http://127.0.0.1:8004/health" 1800 "$RUN_DIR/curl/tts_health.json" || FAILURES=$((FAILURES + 1))
+  RC=0; [ "$FAILURES" -eq 0 ] || RC=1
+  step_status "chain_services_up" "$RC"
+
+  # Stage 1: ASR on GPU 2 (warm-up inside asr-smoke keeps latency clean).
+  RC=0
+  conda run --no-capture-output -n xtalk-round1-asr \
+    python "$ROUND1_PY" --model-root "$XTALK_ROUND1_MODEL_ROOT" \
+    asr-smoke --audio "$XTALK_ROUND1_ROOT/audio/request.wav" \
+    --output "$RUN_DIR/chain-asr" --chunk-seconds 0.6 --gpu-index 2 \
+    > "$RUN_DIR/chain-asr.log" 2>&1 || RC=$?
+  step_status "chain_asr" "$RC"
+
+  # Stage 2: LLM on the ASR transcript; measure first-token latency.
+  RC=0
+  conda run --no-capture-output -n xtalk-round1-client python - \
+    "$RUN_DIR/chain-asr/asr_report.json" \
+    > "$RUN_DIR/chain-llm.json" 2>"$RUN_DIR/chain-llm.log" <<'PY' || RC=$?
+import json, sys, time, urllib.request
+report = json.load(open(sys.argv[1]))
+prompt = report.get("final_text") or ""
+payload = json.dumps({
+    "model": "xtalk-round1-llm",
+    "messages": [{"role": "user", "content": prompt}],
+    "temperature": 0, "max_tokens": 256, "stream": True,
+}).encode()
+request = urllib.request.Request(
+    "http://127.0.0.1:8000/v1/chat/completions", data=payload,
+    headers={"Content-Type": "application/json"},
+)
+start = time.monotonic(); first = None; pieces = []
+with urllib.request.urlopen(request, timeout=600) as response:
+    for raw in response:
+        line = raw.decode("utf-8", "ignore").strip()
+        if not line.startswith("data:"):
+            continue
+        data = line[5:].strip()
+        if data == "[DONE]":
+            break
+        try:
+            chunk = json.loads(data)
+        except Exception:
+            continue
+        delta = chunk.get("choices", [{}])[0].get("delta", {})
+        piece = delta.get("content") or ""
+        if piece:
+            if first is None:
+                first = time.monotonic() - start
+            pieces.append(piece)
+seconds = time.monotonic() - start
+print(json.dumps({
+    "prompt": prompt, "response": "".join(pieces),
+    "first_token_seconds": first, "total_seconds": seconds,
+}, ensure_ascii=False))
+PY
+  step_status "chain_llm" "$RC"
+
+  # Stage 3: TTS on the LLM response; measure first audio.
+  RESP="$(conda run -n xtalk-round1-client python -c "import json;print(json.load(open('$RUN_DIR/chain-llm.json')).get('response',''))" 2>/dev/null)"
+  RC=0
+  if [ -n "$RESP" ]; then
+    conda run --no-capture-output -n xtalk-round1-client \
+      python "$ROUND1_PY" --model-root "$XTALK_ROUND1_MODEL_ROOT" \
+      tts-smoke --reference "$XTALK_ROUND1_ROOT/audio/reference.wav" \
+      --output "$RUN_DIR/chain-tts" --text "$RESP" \
+      > "$RUN_DIR/chain-tts.log" 2>&1 || RC=$?
+  else
+    RC=1
+    echo "[node-job] empty LLM response; skipping TTS" | tee -a "$LOG"
+  fi
+  step_status "chain_tts" "$RC"
+
+  # Aggregate the three stages into one report.
+  conda run -n base python - "$RUN_DIR" > "$RUN_DIR/chain_report.json" 2>>"$LOG" <<'PY'
+import json, pathlib, sys
+run = pathlib.Path(sys.argv[1])
+def load(path):
+    try:
+        return json.loads(pathlib.Path(path).read_text())
+    except Exception:
+        return {}
+asr = load(run / "chain-asr/asr_report.json")
+llm = load(run / "chain-llm.json")
+tts = load(run / "chain-tts/tts_report.json")
+report = {
+    "asr": {
+        "final_text": asr.get("final_text"),
+        "first_partial_audio_seconds": asr.get("first_partial_audio_seconds"),
+        "decode_rtf": asr.get("decode_rtf"),
+    },
+    "llm": {
+        "response": llm.get("response"),
+        "first_token_seconds": llm.get("first_token_seconds"),
+        "total_seconds": llm.get("total_seconds"),
+    },
+    "tts": {
+        "first_audio_seconds": tts.get("first_audio_seconds"),
+        "audio_seconds": tts.get("audio_seconds"),
+        "audio_before_flush": tts.get("audio_before_flush"),
+        "sample_rate": tts.get("sample_rate"),
+    },
+}
+report["content_ok"] = bool(asr.get("final_text")) and bool(llm.get("response")) and bool(tts.get("audio_seconds"))
+report["note"] = "Sequential stage measurement (ASR final -> LLM first token -> TTS first audio); not concurrent duplex."
+print(json.dumps(report, ensure_ascii=False, indent=2))
+PY
+  step_status "chain_report" "$?"
+
+  stop_services
+  kill "$GPU_LOG_PID" 2>/dev/null || true
+
+  # Copy the whole run dir under the repository root as requested.
+  DEST="$INTERCLARIFY_ROOT/fullchain_logs/$TAG"
+  mkdir -p "$(dirname "$DEST")"
+  cp -r "$RUN_DIR/." "$DEST/"
+  CHAIN_FAILURES=$(grep -c '"status": "FAIL"' "$RUN_DIR/steps.jsonl" || true)
+  echo "[node-job] chain done, failures=$CHAIN_FAILURES, logs copied to $DEST" | tee -a "$LOG"
+  exit "$CHAIN_FAILURES"
 fi
 
 # ---- services mode: 4 GPUs allocated ----
