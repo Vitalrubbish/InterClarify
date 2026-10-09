@@ -1,0 +1,15 @@
+{
+  "status": "COMPLETE",
+  "text_chunks": [
+    "<think>\nOkay, the user wants a very long and detailed story about a dragon. Let me start by brainstorming some ideas. First, I need to decide on the setting. Maybe a fantasy world with different regions. Let me think of a name for the dragon. Something unique, maybe not the usual names like Smaug. How about \"Ignarion\"? Sounds mythical.\n\nNow, the story should have a good structure. Maybe start with the dragon's origin, then introduce a conflict, and resolve it. Let me think about the dragon's characteristics. Maybe he's not the typical fire-breathing monster. Perhaps he has a unique ability, like controlling elements or something more mystical. Wait, the user might want a traditional dragon but with a twist. Maybe he's a guardian of something, like a sacred place.\n\nI need to create a world. Let's say the world is called Eldoria, with different regions like the Frostlands, the Ember Wastes, and the Verdant Vale. The dragon could be the guardian of the Heart of Eldoria, a magical artifact. But then, there's a threat, maybe a dark force or a corrupt ruler. The dragon's role in the story could be to protect the world, but maybe he's misunderstood or"
+  ],
+  "sample_rate": 48000,
+  "first_audio_seconds": 265.9735095212236,
+  "flush_seconds": 0.004814771004021168,
+  "audio_before_flush": false,
+  "wall_seconds": 310.2595165669918,
+  "audio_seconds": 66.24,
+  "audio_chunks": 141,
+  "reference_sha256": "88cb0b9378829cb398cdaf04cd1e040c1ebce07177e928e788e08bdca7dcfca0",
+  "note": "Report cold and warm runs separately; COMPLETE is not a quality verdict."
+}

@@ -1,0 +1,1 @@
+{"status":"ok","target_sr":48000,"model_path":"/hpc_stor03/sjtu_home/xuan.zhang/paratalker-p0-models/moss-tts-realtime","tokenizer_path":"/hpc_stor03/sjtu_home/xuan.zhang/paratalker-p0-models/moss-tts-realtime","codec_model_path":"/hpc_stor03/sjtu_home/xuan.zhang/paratalker-p0-models/moss-audio-tokenizer","device":"cuda:0","attn_impl":"sdpa"}

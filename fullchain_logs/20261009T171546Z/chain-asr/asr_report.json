@@ -1,0 +1,21 @@
+{
+  "status": "COMPLETE",
+  "streaming": {
+    "sample_rate": 16000,
+    "input_step_ms": 80,
+    "chunk_size_sec": 0.6,
+    "unfixed_chunk_num": 2,
+    "unfixed_token_num": 5
+  },
+  "audio_seconds": 4.4,
+  "audio_sha256": "ddb42d80f0583d30b72440c56d77203112fd5a45a7a7ea0400b172b5731dcd14",
+  "model_load_seconds": 45.453241529874504,
+  "first_partial_seconds": 1.2560723144561052,
+  "first_partial_audio_seconds": 1.2,
+  "revisions": 4,
+  "decode_seconds": 0.5341192726045847,
+  "decode_rtf": 0.12139074377376924,
+  "replay_wall_seconds": 4.448580370284617,
+  "final_text": "Please tell me a very long and detailed story about a dragon.",
+  "note": "Model smoke only; correctness and X-Talk integration require separate acceptance."
+}

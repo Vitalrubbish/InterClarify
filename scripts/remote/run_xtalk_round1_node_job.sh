@@ -131,6 +131,16 @@ if [ "$MODE" = "chain" ]; then
   RC=0; [ "$FAILURES" -eq 0 ] || RC=1
   step_status "chain_services_up" "$RC"
 
+  # Warm the TTS service: its first request triggers minutes of compilation, so
+  # warm it once before the measured chain to report warm-state first-audio.
+  RC=0
+  conda run --no-capture-output -n xtalk-round1-client \
+    python "$ROUND1_PY" --model-root "$XTALK_ROUND1_MODEL_ROOT" \
+    tts-smoke --reference "$XTALK_ROUND1_ROOT/audio/reference.wav" \
+    --output "$RUN_DIR/chain-tts-warmup" --text "你好，这是一次预热。" \
+    > "$RUN_DIR/chain-tts-warmup.log" 2>&1 || RC=$?
+  step_status "chain_tts_warmup" "$RC"
+
   # Stage 1: ASR on GPU 2 (warm-up inside asr-smoke keeps latency clean).
   RC=0
   conda run --no-capture-output -n xtalk-round1-asr \
@@ -199,8 +209,9 @@ PY
   fi
   step_status "chain_tts" "$RC"
 
-  # Aggregate the three stages into one report.
-  conda run -n base python - "$RUN_DIR" > "$RUN_DIR/chain_report.json" 2>>"$LOG" <<'PY'
+  # Aggregate the three stages into one report (via a file: `conda run` does
+  # not forward a heredoc on stdin to the child process).
+  cat > "$RUN_DIR/chain_report.py" <<'PY'
 import json, pathlib, sys
 run = pathlib.Path(sys.argv[1])
 def load(path):
@@ -233,6 +244,7 @@ report["content_ok"] = bool(asr.get("final_text")) and bool(llm.get("response"))
 report["note"] = "Sequential stage measurement (ASR final -> LLM first token -> TTS first audio); not concurrent duplex."
 print(json.dumps(report, ensure_ascii=False, indent=2))
 PY
+  conda run -n base python "$RUN_DIR/chain_report.py" "$RUN_DIR" > "$RUN_DIR/chain_report.json" 2>>"$LOG"
   step_status "chain_report" "$?"
 
   stop_services
