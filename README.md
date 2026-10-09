@@ -2,7 +2,7 @@
 
 InterClarify 研究全双工语音代理在**用户话轮内**主动澄清的时机与措辞：当持续到达的语音前缀存在会改变任务结果的解释分歧时，系统应继续听、趁合适的接话机会简短提问，还是直接回答；用户回应后如何把答案并回原任务。研究范围见 [docs/research_design.md](docs/research_design.md)，工程阶段、门禁与模块边界见 [docs/engineering_implementation.md](docs/engineering_implementation.md)。
 
-参考底座为独立维护的 [Vitalrubbish/xtalk](https://github.com/Vitalrubbish/xtalk) fork。第一阶段先在该 fork 中补齐 DuplexCascade 风格的 micro-turn、Layer 0/1、backchannel、提前回答、持续监听和用户打断停播；底座稳定后，本项目再接入 InterClarify Layer 2。InterClarify 不跟踪 X-Talk 源码或子模块，只记录实验使用的 fork 提交。
+参考底座为独立维护的 [Vitalrubbish/xtalk](https://github.com/Vitalrubbish/xtalk) fork。第一阶段先跑通并冻结一套原生组件组合，再补齐 DuplexCascade 无 System Backchannel 版本的 micro-turn、Layer 1、提前回答、持续监听、用户附和识别和打断停播；当前移除 Layer 0，底座稳定后再接入 InterClarify Layer 2。InterClarify 不跟踪 X-Talk 源码或子模块，只记录实验使用的 fork 提交。
 
 **当前状态：P0 路线重置完成；P1 将在 X-Talk fork 中实现通用 DuplexCascade 功能层。** 本仓库暂不实现 Layer 2 运行时。
 
@@ -42,5 +42,6 @@ conda run -n interclarify-dev python -m pytest -q
 - 实现文档（按源码树镜像）：[docs/src/interclarify/](docs/src/interclarify/)、[docs/scripts/](docs/scripts/)、[docs/configs/](docs/configs/)
 - 研究设计：[docs/research_design.md](docs/research_design.md)；工程方案：[docs/engineering_implementation.md](docs/engineering_implementation.md)
 - X-Talk 具体改造方案：[docs/xtalk_modification_plan.md](docs/xtalk_modification_plan.md)
+- 第一套组件候选与冻结门禁：[docs/xtalk_baseline_stack.md](docs/xtalk_baseline_stack.md)
 
 实现行为若与文档不一致，先更新文档并说明原因，再改代码。

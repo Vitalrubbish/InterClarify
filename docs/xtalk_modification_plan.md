@@ -13,10 +13,12 @@ X-Talk fork 与 InterClarify 是两个独立项目，不使用 Git 子模块。
 
 开发顺序固定为：
 
-1. **阶段 A：X-Talk Duplex**。在 X-Talk fork 中实现 micro-turn、Layer 0/1、backchannel、提前回答、持续监听、用户打断、单一仲裁和单一 TTS 所有权。
+1. **阶段 A：X-Talk Duplex**。先冻结第一套原生组件组合，再实现 DuplexCascade 无 System Backchannel 版的 micro-turn、Layer 1、提前回答、持续监听、用户打断、单一仲裁和单一 TTS 所有权。
 2. **阶段 B：InterClarify**。阶段 A 稳定后，InterClarify 通过扩展接口增加 Layer 2、前缀有效性、任务状态和澄清恢复。
 
 阶段 A 不包含主动澄清，不实现日程任务状态，也不引入 InterClarify 专属提示词。
+
+根据 2026-10-09 的范围调整，当前移除 Layer 0 和系统附和生成路径。论文第 4.1 节的 DuplexCascade 为无 System Backchannel 版，DuplexCascade-β 为有系统附和版，见[原文](https://arxiv.org/html/2603.09180v1#S4.SS1)。User Backchannel 识别仍保留；后续阶段 B 默认继承该配置。第一套组件候选与冻结条件见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
 
 ## 2. Git 与版本管理
 
@@ -55,7 +57,7 @@ upstream git@github.com:xcc-zach/xtalk.git
 
 1. ASR partial 没有显式 `prefix_version`，异步决策无法可靠失效。
 2. 默认 Agent 在 partial 上只尝试 backchannel，普通回答只在 final 后生成。
-3. 默认 backchannel 由 Agent 直接产生 `direct_audio`，没有经过统一的 Layer 1 > Layer 0 仲裁。
+3. 原生 Agent 配置附和模型与音频目录后可产生 `direct_audio`；本路线显式关闭两个配置，避免系统附和绕过控制层。
 4. `TTSResponseCoordinator` 只处理机械串行化，不负责语义优先级和前缀有效性。
 5. turn detector 的开始回答/停止说话事件缺少 turn、segment 和 prefix 上下文。
 6. `TurnDetectorManager` 在 `TTSChunkReady` 时切换 speaking 状态，早于真正打开客户端交付门。
@@ -63,16 +65,11 @@ upstream git@github.com:xcc-zach/xtalk.git
 
 ## 4. 阶段 A 的能力边界
 
-### 4.1 Layer 0
+### 4.1 移除 Layer 0 与 System Backchannel
 
-只产生：
+当前不实现或注册 `Layer0Policy`，不产生 `BACKCHANNEL` 候选，不加载系统附和音频资产。原生基线和改造版本均将 `backchannel_model` 与 `backchannel_source_dir` 固定为 `null`。Layer 1 也不能用单独的“嗯、我在听”等反馈冒充正式回答。
 
-```text
-SILENCE
-BACKCHANNEL
-```
-
-backchannel 可以使用预录音频，但必须经统一仲裁和 X-Talk 的唯一 TTS response lifecycle，不能直接向前端写音频。
+系统说话时仍区分用户附和与有效插话。移除系统附和不改变用户打断停播职责，也不删去 User Backchannel 的评测。
 
 ### 4.2 Layer 1
 
@@ -89,15 +86,15 @@ ANSWER
 
 ### 4.3 仲裁规则
 
-- 优先级为 `Layer 1 > Layer 0`；
+- 阶段 A 只接受 Layer 1 候选，检查版本、去重、过期与提交边界；
 - 同一时刻只能有一个获批候选；
 - 候选必须绑定当前 session、turn、segment 和 prefix version；
 - 旧前缀结果直接拒绝；
-- Layer 0 不能取消 Layer 1；
+- `SILENCE` 表示继续等待，不启动 TTS，也不取消已获批回答；
 - 响应提交后不能被新候选替换；
 - 用户打断可以停止剩余输出，但不能撤销已播内容。
 
-阶段 B 接入 InterClarify 后，只把优先级扩展为 `Layer 2 > Layer 1 > Layer 0`，不更换仲裁器和播放链路。
+阶段 B 接入 InterClarify 后，把优先级扩展为 `Layer 2 > Layer 1`，复用同一仲裁器和播放链路。Layer 0 恢复属于后续独立范围调整。
 
 ## 5. 提交与播放边界
 
@@ -126,13 +123,12 @@ ASR partial/final
     ▼
 PrefixTracker ──► PrefixSnapshot(versioned)
     │                         │
-    │                         ├────► Layer0Policy
     │                         └────► Layer1Policy
     │                                      │
     └──── fixed/event micro-turn ──────────┘
                                            ▼
                                     OutputArbiter
-                                      L1 > L0
+                                     校验 L1
                                            │
                                            ▼
                                    ResponseExecutor
@@ -173,9 +169,9 @@ session_id
 turn_id
 segment_id
 prefix_version
-layer: L0 | L1
-action: SILENCE | BACKCHANNEL | ANSWER
-payload_type: AUDIO | GENERATION
+layer: L1
+action: SILENCE | ANSWER
+payload_type: NONE | GENERATION
 payload
 created_monotonic
 expires_monotonic
@@ -217,8 +213,8 @@ src/xtalk/duplex_control/
 
 ### `policies.py`
 
-- `Layer0Policy`：规则优先，决定静默或 backchannel；
 - `Layer1Policy`：结构化模型判断静默或回答；
+- 用户附和与有效打断由冻结的 turn detector 提供线索，controller 验证并执行；
 - 策略只返回候选，不直接调用 TTS。
 
 ### `controller.py`
@@ -233,7 +229,7 @@ src/xtalk/duplex_control/
 
 ### `arbiter.py`
 
-`OutputArbiter` 是唯一语义选择器，实现版本校验、L1 > L0 和提交边界。
+`OutputArbiter` 是唯一语义选择器，实现版本校验、去重、过期和提交边界；阶段 A 只选择 L1。
 
 ### `agent.py`
 
@@ -250,7 +246,6 @@ src/xtalk/duplex_control/
 `ResponseExecutorManager`：
 
 - 为获批响应预分配 `response_id`；
-- backchannel 走同一 TTS response lifecycle；
 - answer 经 `LLMAgentConsumptionManager` 流式进入 TTS；
 - 负责取消尚未提交的旧响应；
 - 不直接操作 WebSocket 或音频设备。
@@ -270,7 +265,6 @@ src/xtalk/duplex_control/
 | --- | --- |
 | `serving/events.py` | generation request 支持预分配 `response_id` 和来源 metadata |
 | `llm_agent_generation_manager.py` | 使用预分配 response id |
-| `tts_manager.py` | `direct_audio` 接受外部 response id |
 | `turn_detector_manager.py` | speaking 状态从 `TTSChunkReady` 改由 `TTSStarted` 驱动 |
 | turn detector action events | 增加 turn、segment、prefix context |
 
@@ -290,13 +284,16 @@ src/xtalk/duplex_control/
 
 ## 11. 阶段 A 实现顺序
 
-### A0：fork 基线
+### A0：冻结第一套原生组合（控制层改造前的门禁）
 
 - 创建 feature branch；
 - 用 conda 建立 X-Talk 环境；
 - 跑上游测试；
-- 选择最小 ASR、LLM、TTS、turn detector 组合；
+- 按 [xtalk_baseline_stack.md](xtalk_baseline_stack.md) 核验候选组合，记录模型 revision、量化、服务提交、依赖、VAD 配置和参考音色；
+- 用原生 DefaultService / DefaultAgent 跑通链路，显式关闭 System Backchannel；
 - 保存原生行为和资源占用。
+
+模型来源和配置完整、原生链路 smoke 通过、延迟与资源记录齐全后，才允许进入 A1。当前组合处于候选状态，尚未完成运行冻结。
 
 ### A1：可观测性
 
@@ -306,27 +303,30 @@ src/xtalk/duplex_control/
 - 统一事件日志；
 - 修正 turn detector speaking 边界。
 
-### A2：micro-turn 与 Layer 0
+### A2：micro-turn 与等待状态
 
 - 固定/事件驱动 tick；
-- SILENCE/BACKCHANNEL；
+- 无新增 ASR 文本和用户思考期间仍产生窗口；
+- SILENCE 不生成音频；
 - 冷却、去重和提交边界；
-- backchannel 不结束用户 turn。
+- 短暂停顿不自动等于话轮结束。
 
 ### A3：Layer 1 与仲裁
 
 - SILENCE/ANSWER；
-- L1 > L0；
+- 单一仲裁器验证 L1 候选；
 - 提前回答；
 - final 安全回退；
-- 用户打断和恢复监听。
+- 用户打断和恢复监听；
+- 用户附和时保持回答，并验证无 System Backchannel 输出。
 
 ### A4：DuplexCascade 功能验收
 
 - 脚本化场景；
 - FDB smoke；
 - 原生 X-Talk 与 X-Talk Duplex 对照；
-- 延迟、显存、队列和长会话检查。
+- 延迟、显存、队列和长会话检查；
+- 用户附和保留为验收项；系统附和输出指标单列为范围外。
 
 阶段 A 通过后，InterClarify 才开始 Layer 2。
 
@@ -334,9 +334,11 @@ src/xtalk/duplex_control/
 
 - prefix append、rewrite、pause、final 的版本递增；
 - 旧策略结果失效；
-- L1 在提交前覆盖 L0；
+- 同一前缀的 L1 候选去重与过期检查；
 - 提交后新候选被拒绝；
-- backchannel 不结束用户 turn；
+- 系统附和候选、音频及策略调用均为零；
+- 用户附和不误触发停播，有效用户插话仍停播；
+- 短暂停顿及用户思考期间保持等待；
 - 提前回答后 final 不重复生成；
 - 没有提前回答时 final 正常回退；
 - 用户打断停止剩余音频并提交实际已播前缀；
@@ -352,7 +354,7 @@ InterClarify 在自己的仓库中实现：
 - 有后果的候选解释；
 - 自行消歧风险；
 - 任务状态与澄清回复补丁；
-- `L2 > L1 > L0` 仲裁扩展；
+- `L2 > L1` 仲裁扩展；
 - 澄清专用数据、评测和实验。
 
 X-Talk Duplex 需要对外提供：
@@ -371,6 +373,7 @@ InterClarify 不复制或 fork 第二套 X-Talk 运行时，只依赖固定的 X
 
 - 主动澄清和任务恢复；
 - Layer 3；
+- Layer 0 和 System Backchannel；
 - 多任务域；
 - 完整语音模型训练；
 - 通用工作流引擎；

@@ -36,4 +36,4 @@ X-Talk 已提供模块化 ASR、LLM agent、TTS、VAD/turn detector、EventBus�
 
 ## 功能对齐范围
 
-阶段 A 在 X-Talk fork 上补齐持续监听、micro-turn、Layer 0/1、backchannel、提前回答、用户打断停播、单一输出仲裁、单一播放所有权和完整事件时间线。阶段 B 才由 InterClarify 加入主动澄清。
+阶段 A 先跑通并冻结第一套原生组合，再补齐持续监听、micro-turn、Layer 1、提前回答、用户附和识别、用户打断停播、单一输出仲裁、单一播放所有权和完整事件时间线。当前移除 Layer 0，目标为 DuplexCascade 无 System Backchannel 版本；阶段 B 才由 InterClarify 加入主动澄清。组件候选和冻结状态见 [../xtalk_baseline_stack.md](../xtalk_baseline_stack.md)。

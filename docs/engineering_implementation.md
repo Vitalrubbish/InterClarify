@@ -9,10 +9,12 @@
 1. 以独立维护的 [Vitalrubbish/xtalk](https://github.com/Vitalrubbish/xtalk) fork 为唯一运行底座；
 2. 先在 X-Talk fork 中实现通用的 DuplexCascade 功能层，再由独立的 InterClarify 项目接入 Layer 2；
 3. 以 DuplexCascade 展示的能力作为功能目标和相关工作参照，不依赖其官方权重、控制 token、Kyutai 服务或源码实现；
-4. 阶段 A 只实现 micro-turn、Layer 0/1、backchannel、提前回答、用户打断停播和持续监听；阶段 B 才接入 InterClarify 的 Layer 2；
+4. 先冻结第一套原生 X-Talk 组件组合，再在阶段 A 实现 DuplexCascade 无 System Backchannel 版本的功能：micro-turn、Layer 1、提前回答、用户打断停播和持续监听；阶段 B 才接入 InterClarify 的 Layer 2；
 5. 快速验证话轮内主动澄清是否值得继续，只有通过门禁后才扩大数据、训练和真人实验。
 
 因此，旧路线中的 `3rd-party/DuplexCascade`、官方权重准备脚本、Kyutai `moshi-server` 编排、官方控制模型适配器及其测试和实验产物均不再属于当前实现。
+
+本次收缩依据用户决定：从当前改造范围移除 Layer 0 和系统附和输出，先建立更简单的无 System Backchannel 底座。论文第 4.1 节将无系统附和版称为 DuplexCascade，有系统附和版称为 DuplexCascade-β，见[原文](https://arxiv.org/html/2603.09180v1#S4.SS1)。用户附和识别仍属于保留能力。第一套组件候选及冻结门禁见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
 
 ## 2. MVP 范围与不可破坏的边界
 
@@ -30,11 +32,11 @@ X-Talk fork 提供 ASR、LLM agent、TTS、VAD、轮次检测、异步事件和 
 
 ### 2.2 Layer 与动作边界
 
-- Layer 0 只产生 `SILENCE` 或低强度 `BACKCHANNEL`。
+- 当前移除 Layer 0：不注册该策略，不产生系统 `BACKCHANNEL` 候选，不加载系统附和模型或预录音频。未来若恢复，须先更新范围和评测方案，其动作边界仍为 `SILENCE` / `BACKCHANNEL`。
 - Layer 1 负责常规 `SILENCE` / `ANSWER`，并可请求 Layer 2。
 - Layer 2 只产生 `NO_OVERRIDE` 或澄清问题；识别到歧义也可以选择等待。
 - 当前不启用 Layer 3；只预留版本化修订接口。若后续启用，Layer 3 只能修订尚未提交播放的片段。
-- 所有候选输出必须经过一个 `OutputArbiter`。有效优先级为 Layer 2、Layer 1、Layer 0。
+- 所有候选输出必须经过一个 `OutputArbiter`。阶段 A 只接受 Layer 1；阶段 B 的有效优先级为 Layer 2 > Layer 1。
 - 只允许一个 TTS 播放所有者。X-Talk 的播放管理链路是唯一提交点，其他模块只能提交播放意图。
 - 已经播放给用户的内容不可撤销。高优先级结果只能取消或替换尚未提交的片段。
 - 在线策略只能读取决策时刻以前到达的音频、ASR 前缀、修订和运行状态；隐藏目标、完整转写和未来输入只用于数据构建与评价。
@@ -66,8 +68,9 @@ X-Talk fork 提供 ASR、LLM agent、TTS、VAD、轮次检测、异步事件和 
 | 能力 | 可测试定义 |
 | --- | --- |
 | 持续监听 | 系统播放期间仍持续接收用户音频并更新会话状态 |
-| micro-turn | 按固定或事件驱动的短窗口检查是否保持静默、backchannel 或回答 |
-| backchannel | 能产生与正式回答可区分的低强度反馈，且不错误结束用户话轮 |
+| micro-turn | 按固定或事件驱动的短窗口检查是否保持静默或回答；无新增文本的窗口也需处理等待状态 |
+| 无 System Backchannel | 用户说话时不输出系统附和；包括 Agent 的预录音频路径和正式回答路径中的伪附和 |
+| User Backchannel | 系统说话时识别用户短附和，避免无条件停播；有效插话仍可打断 |
 | 提前回答 | 在用户话轮未正式结束但语义和时机允许时，可以启动常规回答 |
 | 用户打断停播 | 用户有效插话后停止未完成播放并恢复监听 |
 | 单一输出仲裁 | 同一时刻只有一个模块决定哪个候选输出进入 TTS |
@@ -79,7 +82,7 @@ X-Talk fork 提供 ASR、LLM agent、TTS、VAD、轮次检测、异步事件和 
 | 阶段 | 核心目标 | 主要产物 | 继续条件 |
 | --- | --- | --- | --- |
 | P0 路线重置 | 固定 X-Talk 来源、环境和记录格式 | conda 环境、配置、来源登记 | 基础环境与日志脚手架可重复运行 |
-| P1 X-Talk Duplex | 在 X-Talk fork 中补齐 DuplexCascade 风格的 Layer 0/1 行为 | 原生基线、差距表、改造运行时、FDB smoke | 目标行为稳定且关键事件可观察 |
+| P1 X-Talk Duplex | 先冻结原生组件，再补齐无 System Backchannel 的 Layer 1 行为 | 组件锁定记录、原生基线、差距表、改造运行时、FDB smoke | 目标行为稳定且关键事件可观察 |
 | P2 快速可行性验证 | 验证话轮内澄清现象和闭环 | 小样本、规则/提示策略、试交互报告 | 存在足够可问窗口且任务可恢复 |
 | P3 数据与评测基础设施 | 形成可训练、可审计的数据资产 | 回放器、标注格式、切分和检查工具 | 无未来泄漏，正负轨迹覆盖充分 |
 | P4 决策方法与可选训练 | 固定 Layer 2 方法并完成对照 | 各策略、可选 LoRA、消融结果 | 主方法在固定底座上有稳定收益 |
@@ -111,13 +114,13 @@ P1 和 P2 是最早的两个强制门禁。P2 未通过前，不开展大规模�
 
 ## 5. P1：在 X-Talk fork 中实现 DuplexCascade 功能层
 
-具体扩展点、事件协议、响应生命周期、文件布局和测试矩阵见 [xtalk_modification_plan.md](xtalk_modification_plan.md)。P1 不实现主动澄清；它只交付可供 InterClarify 后续复用的 Layer 0/1 全双工底座。
+具体扩展点、事件协议、响应生命周期、文件布局和测试矩阵见 [xtalk_modification_plan.md](xtalk_modification_plan.md)。P1 交付无 System Backchannel 的 Layer 1 全双工底座。原生组合冻结前只做环境、配置和基线核验，不开始控制层改造。
 
 ### 5.1 P1.0 固定并导入 X-Talk
 
 - 在独立 X-Talk fork 中开发；`origin` 指向 `Vitalrubbish/xtalk`，`upstream` 指向官方仓库，不使用子模块。
 - 记录 X-Talk 核心依赖和实际启用的 optional extras。
-- 选择一套最小可本地部署的 ASR、LLM agent、TTS、VAD/turn detector 组合；所有后续策略共享该组合。
+- 按 [xtalk_baseline_stack.md](xtalk_baseline_stack.md) 选择一套自部署的 ASR、LLM agent、TTS、VAD/turn detector 组合；实际权重 revision、服务提交和推理参数核验后才视为冻结。所有后续策略共享该组合。
 - 跑通 X-Talk 原生示例，保存启动配置、首包延迟、实时因子、显存和事件日志。
 - 在未完成来源与许可证核验前，不把 X-Talk 源码直接复制进本仓库。
 
@@ -138,17 +141,17 @@ P1 和 P2 是最早的两个强制门禁。P2 未通过前，不开展大规模�
 
 新增短窗口调度器，默认以 0.6 秒作为实验起点，同时允许由 ASR partial、停顿和轮次检测事件提前触发。调度器只发布 tick，不直接生成或播放。
 
-#### Layer 0/1 映射
+#### Layer 1 映射
 
-- Layer 0 根据说话状态、停顿和上下文提交 `SILENCE` 或 `BACKCHANNEL` 候选。
 - Layer 1 根据当前可见前缀提交 `SILENCE` 或 `ANSWER`。
-- 两层可以复用同一 LLM/turn detector 的不同结构化输出，不要求先训练独立模型。
+- 不实现 Layer 0；显式关闭原生 Agent 的系统 backchannel 配置。
+- Layer 1 复用冻结的 LLM/turn detector；等待、正常回答、用户附和和有效打断必须区分。
 - X-Talk 原有句末生成仍作为安全回退。
 - 可以预留 higher-layer policy 接口，但 P1 不加载 Layer 2。
 
 #### 单一仲裁器
 
-Layer 0/1 输出统一转换为带有 `session_id`、`turn_id`、`prefix_version`、`priority`、`kind` 和 `payload` 的候选。`OutputArbiter` 是唯一选择器，P1 优先级为 L1 > L0；它不能直接操作音频设备。
+Layer 1 输出统一转换为带有 `session_id`、`turn_id`、`prefix_version`、`priority`、`kind` 和 `payload` 的候选。`OutputArbiter` 是唯一选择器，P1 执行版本、去重、过期和提交边界检查，不设置 L0 候选或占位回退；它不能直接操作音频设备。
 
 #### 单一播放所有者
 
@@ -163,7 +166,7 @@ generated -> tts_requested -> tts_ready -> playback_committed
 
 #### 持续监听与用户打断
 
-系统播放期间 ASR/VAD/turn detector 继续工作。有效用户插话触发停止生成和播放、关闭旧候选，并让会话回到监听状态。环境噪声、回声和短 backchannel 不应自动视为正式打断。
+系统播放期间 ASR/VAD/turn detector 继续工作。有效用户插话触发停止生成和播放、关闭旧候选，并让会话回到监听状态。环境噪声、回声和用户短附和不应自动视为正式打断。原生组合保留其 VAD 条件作为基线；去掉 Layer 0 不等于完成 VAD-free 改造，当前只声明功能对齐。
 
 ### 5.4 P1.3 统一事件日志
 
@@ -174,11 +177,11 @@ audio_chunk_received
 asr_partial / asr_revision / asr_final
 vad_speech_start / vad_speech_end
 micro_turn_tick
-layer0_decision / layer1_decision
+layer1_decision
 arbiter_selected / arbiter_rejected
 tts_requested / tts_ready
 playback_committed / playback_started / playback_stopped / playback_finished
-user_barge_in
+user_backchannel / user_barge_in
 ```
 
 每条事件包含单调时钟时间、会话 ID、话轮 ID、片段 ID、输入前缀版本、来源模块和必要载荷。文本必须区分“模型生成”“已提交 TTS”“已经播放”。
@@ -187,13 +190,13 @@ user_barge_in
 
 - 先对固定的原生 X-Talk 基线运行 Full-Duplex-Bench smoke，再运行功能对齐版本；
 - 两者使用同一 ASR、TTS、音频后端、数据版本和判分脚本；
-- 优先检查停顿、backchannel、顺畅接话、用户打断和重叠语音；
+- 优先检查停顿、用户附和、顺畅接话、用户打断和重叠语音；系统附和输出指标单列为范围外，不与有 System Backchannel 系统混为同一目标；
 - 不以复现 DuplexCascade 论文数值作为成功标准。
 
 进入 P2 前必须确认：
 
 - 系统发声时仍能接收用户输入；
-- backchannel 和正式回答在日志中可区分；
+- 用户附和和有效打断在日志中可区分，系统附和候选和音频输出均为零；
 - 用户打断能停止未完成播放并继续同一会话；
 - 同一输入可从音频、ASR、决策、仲裁追踪到播放；
 - 原生 X-Talk 与功能对齐版本都有 FDB smoke 或明确阻塞记录；
@@ -266,7 +269,7 @@ P2 通过后再建立正式数据流程。每个会话记录原始音频、隐�
 固定底座上至少实现：
 
 1. 原生 X-Talk：不主动澄清；
-2. 功能对齐 X-Talk：具备 Layer 0/1，但不启用 Layer 2；
+2. 功能对齐 X-Talk：具备 Layer 1，关闭 System Backchannel，尚未启用 Layer 2；
 3. Wait-until-end；
 4. Uncertainty-trigger；
 5. Direct-LLM；
@@ -297,16 +300,16 @@ P2 通过后再建立正式数据流程。每个会话记录原始音频、隐�
 | `XTalkRuntimeAdapter` | 连接固定版本 X-Talk 的事件和会话接口 | 不复制第二套服务运行时 |
 | `StreamingPrefixTracker` | 产生 partial、revision、final 和版本 | 不读取任务真值 |
 | `MicroTurnScheduler` | 发布固定/事件驱动 tick | 不直接决定输出 |
-| `Layer01Policy` | 产生 L0/L1 候选 | 不阻塞等待 Layer 2 |
+| `Layer1Policy` | 产生 SILENCE/ANSWER 候选 | 不产生系统附和，不阻塞等待 Layer 2 |
 | `ClarificationTrigger` | 决定是否发起 Layer 2 请求 | 不直接播放 |
 | `Layer2Policy` | 判断等待/澄清并生成短问题 | 不使用未来输入 |
 | `ResultValidator` | 检查版本、任务和自行消歧状态 | 不改写已播内容 |
-| `OutputArbiter` | 单点选择 L2/L1/L0 输出 | 不拥有播放设备 |
+| `OutputArbiter` | 单点选择 L2/L1 输出 | 不拥有播放设备 |
 | `XTalkPlaybackBridge` | 把唯一选中结果交给 X-Talk 播放链路 | 不创建第二个 TTS 队列 |
 | `TaskStateReducer` | 把澄清回答合并回同一任务 | 不另开无关任务 |
 | `EventRecorder` | 保存时间线、配置和结果 | 不把离线真值注入在线模块 |
 
-Layer 2 结果必须同时满足会话、话轮、前缀版本、任务状态、歧义状态、问题非空和目标片段未提交等条件；否则记录过时或拒绝原因并回退到 Layer 1/0。
+Layer 2 结果必须同时满足会话、话轮、前缀版本、任务状态、歧义状态、问题非空和目标片段未提交等条件；否则记录过时或拒绝原因并回退到 Layer 1。
 
 ## 11. 建议仓库结构与文档映射
 
@@ -356,7 +359,7 @@ artifacts/
 | X-Talk 接口快速变化 | P0/P1 | 固定提交，升级前做差距审计和回归 |
 | 镜像与源码版本不一致 | P0 | 记录镜像 digest，验证安装包与提交；未验证不作为基线 |
 | 组件依赖或许可证冲突 | P0/P1 | 按实际启用 extras 锁定并完成许可证审计 |
-| 原生轮次控制缺少 micro-turn/backchannel | P1 | 通过事件和 manager 扩展，必要时维护最小上游补丁 |
+| 原生轮次控制缺少 micro-turn 或误判用户附和 | P1 | 通过事件和 manager 扩展，必要时维护最小上游补丁 |
 | 多模块争抢 TTS | P1 | 单一仲裁器和单一播放所有者测试作为硬门槛 |
 | ASR 修订能力不足 | P1/P3 | 更换统一 ASR，所有方法共享相同底座 |
 | Layer 2 延迟导致过时覆盖 | P2/P4 | 版本失效、超时和轻量触发 |
@@ -366,9 +369,9 @@ artifacts/
 ## 14. 近期执行清单
 
 1. 固定并核验 X-Talk 提交、镜像 digest、许可证与可选依赖；
-2. 在 conda 环境中跑通原生 X-Talk 最小本地链路；
+2. 在 conda 环境中跑通第一套原生 X-Talk 自部署组合并冻结实际模型与参数；
 3. 建立第 3.1 节能力差距表和原生 FDB smoke；
-4. 依次实现 micro-turn、Layer 0/1 候选、单一仲裁、单一播放与统一日志；
+4. 依次实现 micro-turn、Layer 1 候选、单一仲裁、单一播放与统一日志；保持 System Backchannel 关闭；
 5. 保存功能对齐版本的 FDB smoke；
 6. 构造 30–50 条日程时间域探索轨迹；
 7. 实现规则/提示版 Layer 2、版本检查和任务恢复；
