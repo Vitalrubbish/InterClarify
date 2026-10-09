@@ -145,3 +145,5 @@ conda run --no-capture-output -n xtalk-round1-client python \
 回传 `models.lock.json`、五份 conda/pip 记录、源码提交、GPU/驱动信息、ASR 三档窗口报告及对应事件、TTS 冷/热态报告与样本、服务日志和上游测试结果。人工核对日期/时间与人名，报告前缀稳定性、首包、积压和峰值显存。
 
 这些结果通过后，补齐 Qwen ASR 的会话隔离、累计前缀/修订、临时 final 语义与 reset/clone 适配，生成可运行的 X-Talk 全链路配置，再进行音频闭环、用户附和、有效插话和 FDB smoke。完成上述冻结门禁后，才开始无 System Backchannel 的控制层改造。
+
+首轮实际执行结果与证据见 [xtalk_round1_baseline_results.md](xtalk_round1_baseline_results.md)。
