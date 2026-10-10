@@ -210,7 +210,9 @@ print(json.dumps({
 PY
   step_status "chain_llm" "$RC"
 
-  # Stage 3: TTS on the LLM response; measure first audio.
+  # Stage 3: TTS on the LLM response; measure first audio.  (Warming a fixed
+  # shape is not general, so the real fix belongs in the service compile
+  # configuration; here we only warm the service once above.)
   RESP="$(conda run -n xtalk-round1-client python -c "import json;print(json.load(open('$RUN_DIR/chain-llm.json')).get('response',''))" 2>/dev/null)"
   RC=0
   if [ -n "$RESP" ]; then

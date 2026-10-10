@@ -275,6 +275,12 @@ def serve(config: dict, args: argparse.Namespace) -> None:
         if not entrypoint.is_file():
             raise ValueError(f"Missing MOSS service entrypoint: {entrypoint}")
         os.environ["MOSS_TTS_UPSTREAM_DIR"] = str(roots["moss_source"])
+        if service.get("disable_torch_compile"):
+            # torch.compile recompiles per prefill length (minutes each); run
+            # eager so first-audio latency is stable regardless of response
+            # length.  See configs/xtalk_round1.yaml (services.tts).
+            os.environ["TORCH_COMPILE_DISABLE"] = "1"
+            os.environ["TORCHDYNAMO_DISABLE"] = "1"
         os.chdir(roots["moss_service"])
         tts = str(model_path(config, args.model_root, "tts"))
         command += ["python", str(entrypoint), "--host", service["host"],

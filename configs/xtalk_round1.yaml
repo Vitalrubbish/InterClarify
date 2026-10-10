@@ -81,6 +81,11 @@ services:
     attn_impl: sdpa
     output_sample_rate: 48000
     concurrency: 1
+    # MOSS compiles its streaming local transformer with torch.compile
+    # (StaticCache path) when attn_impl != flash_attention_2, and recompiles
+    # for every new prefill length -> minutes on the first request of each
+    # shape.  Disable torch.compile for the service so latency is stable.
+    disable_torch_compile: true
 
 asr_streaming:
   sample_rate: 16000
