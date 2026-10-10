@@ -31,9 +31,14 @@ COPY --from=moss-source . /opt/src/moss-source
 COPY --from=xtalk . /opt/src/xtalk
 
 # One consolidated layer.  The base env (/opt/conda) keeps vLLM 0.16.0 for
-# LLM/turn_detector.  MOSS pins torch/torchaudio 2.9.1+cu128 and
-# transformers 5.0.0; the ASR env pins vLLM 0.14.0 and transformers 4.57.6, so
-# they stay in separate environments per the round-one job document.
+# LLM/turn_detector.  The MOSS env keeps the upstream torch 2.9.1+cu128 pin and
+# adds the matching official prebuilt flash-attn 2.8.3 wheel
+# (cu12torch2.9/cp312/cxx11abiTRUE) staged in the wheelhouse, so MOSS can take
+# the attn_impl=flash_attention_2 DynamicCache path without torch.compile
+# latency.  No CUDA compilation happens at build time; the MOSS env stays fully
+# isolated from the base/ASR/client environments.  The ASR env pins vLLM 0.14.0
+# and transformers 4.57.6, so they stay in separate environments per the
+# round-one job document.
 RUN --mount=type=bind,from=wheels,target=/wheelhouse,ro \
     set -eux; \
     CONDA=/opt/conda/bin/conda; \
@@ -51,7 +56,7 @@ RUN --mount=type=bind,from=wheels,target=/wheelhouse,ro \
     PY xtalk-round1-asr "vllm==0.14.0" setuptools; \
     PY xtalk-round1-asr --no-build-isolation -e "/opt/src/qwen-asr[vllm]" soundfile PyYAML==6.0.3; \
     PY xtalk-round1-moss setuptools; \
-    PY xtalk-round1-moss --no-build-isolation -e "/opt/src/moss-source[torch-runtime]" "torch==2.9.1+cu128" "torchaudio==2.9.1+cu128" transformers==5.0.0 fastapi uvicorn requests soxr websockets; \
+    PY xtalk-round1-moss --no-build-isolation -e "/opt/src/moss-source[torch-runtime]" "torch==2.9.1+cu128" "torchaudio==2.9.1+cu128" transformers==5.0.0 fastapi uvicorn requests soxr websockets "flash-attn==2.8.3"; \
     PY xtalk-round1-client setuptools; \
     PY xtalk-round1-client --no-build-isolation -e "/opt/src/xtalk[example,dev]" PyYAML==6.0.3 aiohttp soundfile soxr; \
     "$CONDA" clean -afy

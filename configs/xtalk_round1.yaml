@@ -78,18 +78,17 @@ services:
     gpu_index: 3
     host: 127.0.0.1
     port: 8004
-    attn_impl: sdpa
+    # flash_attention_2 selects MOSS's no-compile DynamicCache path (see
+    # streaming_mossttsrealtime.py:84-105); it requires the flash-attn wheel
+    # shipped in the v0.3 image (official 2.8.3, cu12torch2.9, torch 2.9.1).
+    # The previous sdpa path went through torch.compile's StaticCache and
+    # recompiled for each new generation length (minutes per shape), which is
+    # the TTS latency bottleneck documented in the results doc.
+    attn_impl: flash_attention_2
     output_sample_rate: 48000
     concurrency: 1
-    # MOSS's torch.compile behaviour (attn_impl != flash_attention_2 uses the
-    # StaticCache compile path) is currently the TTS latency bottleneck:
-    #   default -> recompiles for each new prefill length (minutes per shape,
-    #              then fast steady state)
-    #   dynamic -> one graph for all lengths but compilation/generation are
-    #              far slower than real time in practice
-    #   disable -> eager, no recompile, but far slower than real time
-    # The intended no-compile path is attn_impl=flash_attention_2 (DynamicCache),
-    # which needs flash-attn; see the results doc.  Keep MOSS's default here.
+    # With attn_impl=flash_attention_2 MOSS skips torch.compile entirely, so
+    # this setting is inert on that path; kept for the sdpa fallback.
     torch_compile: default
 
 asr_streaming:

@@ -24,6 +24,8 @@
 
 首轮验收镜像 `sjtu_yukai-xuanzhang-xtalk-round1:v0.2` 基于 `sjtu_yukai-xuanzhang-xtalk-lean:v0.1` 构建：后者由 `xtalk:v0.17` 压平并剔除本组合用不到的栈得到（约 32 GB → 22 GB，431 层 → 1 层，见 [scripts/remote/build_xtalk_lean_base.md](scripts/remote/build_xtalk_lean_base.md)）。LLM 与 turn detector 复用基座 base 环境，另用一个合并层加入四个 `xtalk-round1-*` 环境（ASR 因 `qwen_asr` 不兼容 vLLM 0.16 而保留独立的 0.14.0 环境）。wheelhouse 与源码树通过 BuildKit named build contexts 提供，wheel 仅 bind-mount，约 6 GB 不进镜像层。构建脚本见 [scripts/remote/build_xtalk_round1_image.md](scripts/remote/build_xtalk_round1_image.md)。
 
+下一步 `xtalk-round1:v0.3` 在 v0.2 基础上给 MOSS 环境加入 `flash-attn`，让 TTS 走 `attn_impl=flash_attention_2` 的免编译 DynamicCache 路径。MOSS 环境保持上游 **torch 2.9.1+cu128** 钉版，并安装官方 `v2.8.3` release 的预编译 `flash_attn-2.8.3+cu12torch2.9cxx11abiTRUE-cp312-cp312-linux_x86_64.whl`（无编译；源码编译曾在共享调试机上 OOM）；base / ASR / client 环境不受影响。详见 [scripts/remote/Dockerfile.round1.md](scripts/remote/Dockerfile.round1.md)。
+
 ## 3. 能力与实现差异
 
 - Qwen3-ASR 官方示例的内部解码窗口为 2 秒，与输入音频块和 0.6 秒 micro-turn 是不同参数。首轮测试 0.6 / 1.2 / 2.0 秒解码窗口，记录真实前缀到达与修订，不能仅依据输入块大小声称首字延迟。
