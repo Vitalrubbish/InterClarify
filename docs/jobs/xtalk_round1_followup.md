@@ -92,3 +92,20 @@ T1 完成。T2–T4 见第 4–6 节。
 - 运行配置：`configs/xtalk_round1_runtime.json` 可被 `Xtalk.from_config` 实例化（已核对得到 `Qwen3ASRClient` / `DefaultAgent` / `MossTTSRealtime`），`DefaultAgent` 显式关闭 thinking，System Backchannel 关闭。
 
 T2 代码与文档完成，尚缺 T3（真实流式链路）与 T4（集群最小连接检查）。
+
+## 10. T3/T4 进展记录（2026-10-10）
+
+新增 `scripts/remote/xtalk_link_check.py`（见 [../scripts/remote/xtalk_link_check.md](../scripts/remote/xtalk_link_check.md)）与 node job 的 `link` 模式：在 v0.3 镜像内同起 asr/llm/turn_detector/tts 四服务，把 fork 适配器加载进容器（镜像内 `/opt` 只读，故原地覆盖 baked 源码或 `--target` 到 /tmp），再跑 headless WebSocket 客户端。`submit_xtalk_round1_job.sh link`（4 GPU）提交。
+
+已确认打通（`job-179164267062705402862-xuan-zhang`，tag `20261010T143113Z`）：
+
+- `dependency_check` 通过，四服务全部 ready；
+- 适配器加载成功（`link_adapter` 校验非抽象）；
+- ASR 链路完整：适配器创建会话并向 `qwen3_asr_service` 连续 `recognize`，X-Talk 侧收到正确的 `update_asr` partial（"Please tell me a very long and detailed story about a dragon."）。
+
+未通过项与原因：
+
+- 回合不结束：配置了 turn detector 时，`vad_speech_end` 只触发暂停（`TurnASRPauseRequested`），结束依赖 XTurnix 输出 `<|start|>`。但 pause 与上一 partial 文本相同，`xturnix.py` 的 `reuse_previous` 复用了上一轮 `<|keep|>` 决策，故 headless 回放里永不 start → 无 `finish_asr`/LLM/TTS。
+- 随后加了 `--drop-turn-detector`（无 TD 时 VAD end 直接收尾）重跑（`job-...`，tag `20261010T144705Z`），但本轮 TTS 服务在权重加载完成后卡住（GPU3 仅 ~4.9 GB），未 ready；为避免长时间占用已 `vc delete` 该作业。
+
+下一步：重跑 `link`（无 TD）验证 ASR→LLM→TTS→播放闭环，再单独排查 XTurnix 在 headless 回放下的轮次边界（需要 pause 文本变化或等价的前端信号）。

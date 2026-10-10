@@ -17,5 +17,6 @@ bash scripts/remote/submit_xtalk_round1_job.sh chain     # 4 GPU / 32 CPU / 128G
 - `asr`：三档 ASR 解码窗口 smoke（对应任务单第 4 节）。
 - `services`：三服务启动、验证、上游测试与 TTS 冷/热态（对应任务单第 5、6 节）。
 - `chain`：完整路径 ASR → LLM → TTS，测各阶段延迟与输出内容；日志同时复制到仓库根目录 `data/runs/<tag>/`（已 gitignore）。
+- `link`：真实 X-Talk 会话联调（同起四个模型服务 + headless WebSocket 客户端），见 [run_xtalk_round1_node_job.md](run_xtalk_round1_node_job.md) 的 `link` 模式与 [xtalk_link_check.md](xtalk_link_check.md)。
 
 提交日志写入 `$XTALK_ROUND1_ARTIFACT_ROOT/submit_logs/`；跟踪方式为 `vc list -j <JOBID>` 与 `vc logs -t <TASKID>`。镜像、作业名、各模式 GPU 数可用环境变量覆盖，实际作业命令委托给 `run_xtalk_round1_node_job.sh`。

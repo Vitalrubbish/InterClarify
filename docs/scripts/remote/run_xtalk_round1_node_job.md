@@ -10,6 +10,7 @@
 
 - `asr`（1 卡作业）：以 `--gpu-index 0` 依次运行 0.6 / 1.2 / 2.0 秒解码窗口的 ASR smoke，输出 `asr-06` / `asr-12` / `asr-20`。
 - `chain`（4 卡作业）：启动三服务后，在同一节点跑完整路径——ASR（逻辑卡 2）转写输入 WAV → 用 LLM 服务做流式对话并测首 token 延迟 → 用 MOSS TTS 合成回复并测首音频。TTS 跑两次：一次把整段回复一次性喂入（`chain-tts`），一次用 `--stream-chunk-words 6 --gap-seconds 0.12` 把同一回复按词分片流式喂入（`chain-tts-stream`，模拟 token 流式、更接近真实对话首音频）。各阶段结果聚合为 `chain_report.json`（含 `content_ok` 与 `tts`/`tts_stream` 两组读数），并把整个 run 目录复制到 `$INTERCLARIFY_ROOT/data/runs/<tag>/`。该链路是顺序分阶段测量（ASR final → LLM 首 token → TTS 首音频），并非并发全双工。
+- `link`（4 卡作业）：真实 X-Talk 会话联调。同起 asr（逻辑卡 2）/ llm（0）/ turn_detector（1）/ tts（3）四服务，把 fork 适配器加载进容器（原地覆盖 baked 源码或在 /tmp `--target` 安装），再运行 [xtalk_link_check.py](xtalk_link_check.py) 以 headless WebSocket 客户端驱动一段音频，记录 ASR/LLM/TTS/播放事件到 `link_report.json`。当前用 `--drop-turn-detector` 验证主链路（headless 回放简化，见任务单 T3/T4 记录）。
 - `services`（4 卡作业）：
   1. 采集 `nvidia-smi`、仓库提交与模型锁定文件；后台每 10 秒采样一次 GPU 显存与利用率（`gpu_samples.csv`）用于峰值追溯。
   2. 校验 `base` 与四个 `xtalk-round1-*` 环境在容器内可导入（提前暴露 glibc/二进制兼容问题），并按配置钉版校验 ASR/LLM/TTS 依赖，失败即中止。
