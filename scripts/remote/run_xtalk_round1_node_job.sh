@@ -343,15 +343,39 @@ if [ "$MODE" = "link" ]; then
   RC=0; [ "$FAILURES" -eq 0 ] || RC=1
   step_status "link_services_up" "$RC"
 
-  # Install the fork runtime under test (the image ships the pinned copy) into
-  # the client env, plus the websockets client dependency for the driver.
+  # Load the fork runtime under test. The image ships the pinned xtalk copy as
+  # an editable install under /opt/conda (read-only for the job user), so patch
+  # the baked source tree in place when writable and fall back to a --target
+  # install on PYTHONPATH otherwise.
   RC=0
-  conda run --no-capture-output -n xtalk-round1-client \
-    pip install --no-build-isolation --no-deps -e "$INTERCLARIFY_ROOT/xtalk" \
-    > "$RUN_DIR/link_install.log" 2>&1 || RC=$?
-  conda run --no-capture-output -n xtalk-round1-client \
-    pip install websockets >> "$RUN_DIR/link_install.log" 2>&1 || RC=$?
+  SRC="$INTERCLARIFY_ROOT/xtalk/src/xtalk/models/asr/qwen3asr_client.py"
+  DEST=/opt/src/xtalk/src/xtalk/models/asr/qwen3asr_client.py
+  {
+    echo "[link] id=$(id)"; ls -l "$DEST"
+    if cp -f "$SRC" "$DEST"; then
+      echo "[link] patched baked adapter in place"
+    else
+      echo "[link] baked tree not writable; installing to /tmp/ic_pkgs"
+      conda run --no-capture-output -n xtalk-round1-client \
+        pip install --no-build-isolation --no-deps --target /tmp/ic_pkgs "$INTERCLARIFY_ROOT/xtalk"
+      export PYTHONPATH="/tmp/ic_pkgs${PYTHONPATH:+:$PYTHONPATH}"
+    fi
+  } >> "$RUN_DIR/link_install.log" 2>&1 || RC=$?
   step_status "link_install" "$RC"
+
+  # Verify the loaded adapter is the conforming one (not the abstract baked copy).
+  CHECK="$RUN_DIR/link_adapter_check.py"
+  cat > "$CHECK" <<'PY'
+import xtalk.models.asr.qwen3asr_client as m
+abstract = getattr(m.Qwen3ASRClient, "__abstractmethods__", set())
+print("adapter_file", m.__file__)
+print("abstract_methods", sorted(abstract))
+raise SystemExit(1 if abstract else 0)
+PY
+  RC=0
+  conda run --no-capture-output -n xtalk-round1-client python "$CHECK" \
+    >> "$RUN_DIR/link_install.log" 2>&1 || RC=$?
+  step_status "link_adapter" "$RC"
 
   # Warm the TTS (compilation) and LLM (vLLM graphs) services as in chain mode.
   RC=0
