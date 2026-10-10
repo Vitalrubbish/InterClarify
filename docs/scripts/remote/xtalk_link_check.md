@@ -14,8 +14,8 @@ T3/T4 的最小连接检查：从运行配置启动 X-Talk 服务（其 ASR/LLM/
 - `--audio`：输入 WAV（16 kHz 单声道）。
 - `--out`：报告 JSON 路径。
 - `--rounds`：轮数（默认 2）。
-- `--timeout`：每轮等待 `finish_resp` 的超时（默认 120 s）。
-- `--drop-turn-detector`：启动前从配置移除 `turn_detector`。配置了 turn detector 时 `vad_speech_end` 只触发暂停，回合结束依赖检测器给出 `<|start|>`；该开关用于 headless 回放验证主链路（无 TD 时 `vad_speech_end` 直接收尾、`vad_speech_start` 打断）。
+- `--timeout`：每轮等待 `finish_resp` 的超时（默认 120 s；node job 的 `link` 模式传 240 s，因为“讲一个很长的故事”回复的模拟播放可达 ~2–3 分钟）。
+- `--drop-turn-detector`：仅调试用。启动前从配置移除 `turn_detector`；移除后 `vad_speech_end` 直接收尾、`vad_speech_start` 打断。切换到音频式 TurnSense 后，正常 `link` 不再使用该开关，走真实 turn detector 路径。
 
 流程：`_serve` 在子进程里 `Xtalk.from_config(config).mount_routes(app)` 起 uvicorn；`LinkClient` 先 `/api/auth/login` 取 token，连 `ws://.../ws?access_token=...`，随后 `run` 逐轮执行 `_run_turn`；`_receive` 并发收集 `update_asr`/`finish_asr`/`update_resp`/`finish_resp`/`tts_finished` 与二进制 TTS 音频，并对每个音频块回 `tts_chunk_played`、在 `tts_finished` 时回 `tts_playback_finished`。报告含每轮 `response_finished`、`first_audio_seconds`、`asr_final`、`tts_audio_bytes` 和完整事件列表。
 

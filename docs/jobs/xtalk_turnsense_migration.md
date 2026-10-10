@@ -45,6 +45,11 @@ bash scripts/remote/submit_xtalk_round1_job.sh services    # 服务与探针
 
 期望：`link_report.json` 出现 `finish_asr`、`update_resp`/`finish_resp` 与 TTS 音频（`tts_audio_bytes>0`），`response_finished=true`。
 
+## 验证结果（2026-10-11）
+
+- `job-179165281534613442146-xuan-zhang`（tag `20261010T172017Z`）：全部 step PASS，`finish_asr` + `start_tts` + `latency_metrics` + `finish_resp` + 11.9 MB TTS 音频；英文 request 被 TurnSense 判为 complete，话轮正常收尾。该次因回合 0 回复过长（~124 s 流式）超过驱动 120 s 预算，回合 1 起始时 MOSS 会话仍 active，报一次 `error`。
+- `job-179165328505645899791-xuan-zhang`（tag `20261010T172808Z`）：把驱动单回合预算调到 240 s 后，**两轮均 `response_finished=true`**、各有一份 `finish_resp`（回合 1 的故事还引用了回合 0），`tts_audio_bytes=33.5 MB`、`event_count=1324`、无 `error`。turn detector 路径（`vad_speech_start`→音频→`vad_speech_end`→TurnSense→回复）在英文输入下打通。
+
 ## 已知限制
 
 - `xtalk-round1-turnsense` 目前建在共享 home，未烘进 v0.3 镜像；node job 用 `XTALK_TURNSENSE_PYTHON` 绝对路径调用。下次镜像构建（`Dockerfile.round1`）会把它烘进去，届时可去掉该覆盖。

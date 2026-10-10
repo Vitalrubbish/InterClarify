@@ -118,4 +118,6 @@ T2 代码与文档完成，尚缺 T3（真实流式链路）与 T4（集群最�
 - `XTurnix` 是纯文本检测器（`xturnix.py` 忽略 audio），首轮 `audio/request.wav` 是英文；本地 CPU 复现（复刻模型 `turn_pipeline.py` 的 prompt/约束）该样例在 listening 下输出 `<|keep|>`（0.86），中文样例才输出 `<|start|>`；再叠加末尾 pause 的 `reuse_previous`，永无 `START_GENERATION`。
 - `TurnSense` 是音频检测器（忽略 text），本地实测同一英文 request → `complete` 0.93，与语言无关。
 
-据此把首轮 turn detector 从 XTurnix 切换为 TurnSense，改动与验证见 [xtalk_turnsense_migration.md](xtalk_turnsense_migration.md)。这样 headless 回放不再需要 `--drop-turn-detector`，走真实 VAD→turn detector→回复链路。XTurnix 适配器保留但首轮不再使用。TTS 服务启动卡顿作为独立问题继续跟进。
+据此把首轮 turn detector 从 XTurnix 切换为 TurnSense，改动与验证见 [xtalk_turnsense_migration.md](xtalk_turnsense_migration.md)。这样 headless 回放不再需要 `--drop-turn-detector`，走真实 VAD→turn detector→回复链路。XTurnix 适配器保留但首轮不再使用。
+
+验证：`job-179165328505645899791-xuan-zhang`（tag `20261010T172808Z`）link 全部 step PASS，两轮 `response_finished=true`、各一次 `finish_resp`、`tts_audio_bytes=33.5 MB`、无 `error`——T3 的 ASR→LLM→TTS→播放闭环已打通。剩余 T4 项为“播放中插话（barge-in）停止后继续”，需要专门的插话时序（先观察到 `stop_tts`，再验证会话可复用）；TTS 服务启动卡顿仍作为独立问题跟进。
