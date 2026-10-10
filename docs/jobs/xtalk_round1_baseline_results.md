@@ -79,20 +79,24 @@ LLM 单卡接近 90%，是本组合最紧的一环；四卡分服务方案在 24
 
 ## 9. 全链路测试（ASR → LLM → TTS）
 
-`chain` 模式（`submit_xtalk_round1_job.sh chain`）在 4 卡节点上启动三服务，再用同一输入 `request.wav` 顺序走 ASR（逻辑卡 2）→ LLM → TTS，日志同时复制到仓库根目录 `data/runs/<tag>/`（已 gitignore）。这是顺序分阶段测量，不是并发全双工。首轮完成记录 tag `20261009T171546Z`：
+`chain` 模式（`submit_xtalk_round1_job.sh chain`）在 4 卡节点上启动三服务，再顺序走 ASR（逻辑卡 2）→ LLM（关闭思考）→ TTS，各阶段前后都做预热，日志复制到 `data/runs/<tag>/`（已 gitignore）。这是顺序分阶段测量，不是并发全双工。有效完成记录 tag `20261010T025525Z`：
 
 | 阶段 | 指标 | 值 |
 | --- | --- | --- |
 | ASR（预热后） | 音频相对首 partial | 1.20 s |
-| ASR | 纯解码 RTF | 0.121 |
-| ASR | 最终转写 | "Please tell me a very long and detailed story about a dragon." |
-| LLM | 首 token | **0.108 s** |
-| LLM | 总耗时（256 token 上限） | 13.4 s |
-| TTS（首次请求） | 首音频 | 266 s（冷启动） |
-| TTS | 输出时长 / 采样率 | 66.2 s / 48 kHz |
+| ASR | 纯解码 RTF | 0.120 |
+| LLM（`enable_thinking=false`） | 首 token | **0.083 s** |
+| LLM | 总耗时（256 token 上限） | 12.7 s |
+| TTS（默认编译路径） | 首音频 | 136 s |
 
-**延迟读数**：LLM 首 token 与 TTS 热态首音频（服务作业中 0.17 s）都在**亚秒级**；ASR 首 partial 约 **1.2 s**（非亚秒）。但整条链路wall 时间被 **TTS 首个请求的编译冷启动**支配：MOSS 首请求需数分钟编译，且不稳定——services 作业冷启动 68 s，chain 首轮 266 s，二次 chain 重跑在 TTS 预热阶段卡死超过 28 分钟（GPU 空转、无新日志），只能终止作业。因此“全链路亚秒”**尚未证明**：必须先把 TTS 服务预热到热态，再测链路，否则测到的是编译时间。
+**延迟读数**：LLM 首 token 稳定在**亚秒级**（0.083 s），且关闭思考后内容是干净的故事正文（不再有 ` thinking`）。ASR 首 partial 约 **1.2 s**、解码 RTF 0.12。**TTS 是唯一瓶颈**：MOSS 在 `attn_impl=sdpa` 时对 `torch.compile` 走 StaticCache 路径，并按 prefill 长度逐个重编译，导致“每个新长度首请求”都要编译数分钟。实测三种模式都不理想：
 
-**内容读数**：ASR 正确转写英文输入；LLM（Qwen3-8B-AWQ）默认输出原始 ` thinking` 推理链、且在 256 token 处被截断，没有给出面向用户的最终回答；TTS 把这段推理链（含 markdown）合成为 66 s 音频。也就是说**链路能跑通、内容非空**，但当前 LLM 输出不适合直接播报，需要去 ` thinking`、限制或提升 max_tokens，并替换中文测试音/中文参考音色。
+| `torch_compile` | 首音频 | 说明 |
+| --- | --- | --- |
+| `default`（静态编译） | 136 s（新长度） / 0.17 s（重复长度） | 长度一变就重编译，运行时不可用 |
+| `disable`（eager） | ~1.9 s | 无重编译，但生成远慢于实时（RTF>1） |
+| `dynamic`（`assume_static_by_default=False`） | 98 s | 一次编译适配任意长度，但编译与生成都极慢（272 s 出 2.24 s 音频） |
 
-**待办**：给 chain 固定“先预热 TTS 到热态再计时”的流程并处理 MOSS 首请求编译卡死（例如固定输入形状、提高超时、或预编译缓存），然后再复测亚秒级端到端。
+因此**“全链路亚秒”目前不成立**，卡点是 MOSS TTS 的编译策略，而不是 ASR/LLM。按输入形状预热（同形状跑两遍）在运行时不可行（用户输入与回复长度不可预知），已被否决。MOSS 源码本身提供了免编译路径：当 `attn_impl=flash_attention_2` 时用 `DynamicCache`、跳过编译（`streaming_mossttsrealtime.py:86-105`）；该路径需要 `flash-attn`，当前环境未安装。建议下一步：安装匹配 torch 2.9.1+cu128 / py3.12 的 flash-attn 并切到 `attn_impl=flash_attention_2` 复测；或对 MOSS 服务做固定/预编译改动。
+
+**内容读数**：关闭思考后 LLM 输出正常的英文故事（无 `思考`）；ASR 转写正确。但测试音与参考音色仍是英文资产，需换中文后复测。

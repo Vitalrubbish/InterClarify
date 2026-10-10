@@ -81,13 +81,16 @@ services:
     attn_impl: sdpa
     output_sample_rate: 48000
     concurrency: 1
-    # MOSS compiles its streaming local transformer with torch.compile
-    # (StaticCache path) when attn_impl != flash_attention_2.  With the default
-    # static assumption it recompiles for every new prefill length (minutes on
-    # the first request of each shape); with compile fully disabled generation
-    # is far slower than real time.  "dynamic" makes dynamo treat shapes as
-    # dynamic (one compilation handles any length).
-    torch_compile: dynamic
+    # MOSS's torch.compile behaviour (attn_impl != flash_attention_2 uses the
+    # StaticCache compile path) is currently the TTS latency bottleneck:
+    #   default -> recompiles for each new prefill length (minutes per shape,
+    #              then fast steady state)
+    #   dynamic -> one graph for all lengths but compilation/generation are
+    #              far slower than real time in practice
+    #   disable -> eager, no recompile, but far slower than real time
+    # The intended no-compile path is attn_impl=flash_attention_2 (DynamicCache),
+    # which needs flash-attn; see the results doc.  Keep MOSS's default here.
+    torch_compile: default
 
 asr_streaming:
   sample_rate: 16000
