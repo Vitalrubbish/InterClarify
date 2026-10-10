@@ -392,7 +392,7 @@ PY
     python "$INTERCLARIFY_ROOT/scripts/remote/xtalk_link_check.py" \
     --config "$INTERCLARIFY_ROOT/configs/xtalk_round1_runtime.json" \
     --audio "$XTALK_ROUND1_ROOT/audio/request.wav" \
-    --out "$RUN_DIR/link_report.json" --rounds 2 \
+    --out "$RUN_DIR/link_report.json" --rounds 2 --drop-turn-detector \
     > "$RUN_DIR/link_check.log" 2>&1 || RC=$?
   step_status "link_check" "$RC"
 

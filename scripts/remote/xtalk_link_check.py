@@ -202,9 +202,18 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--rounds", type=int, default=2)
     parser.add_argument("--timeout", type=float, default=120.0)
+    parser.add_argument(
+        "--drop-turn-detector",
+        action="store_true",
+        help="remove turn_detector from the config (headless replay uses VAD "
+        "boundaries; without it vad_speech_end finalizes and vad_speech_start "
+        "during playback interrupts)",
+    )
     args = parser.parse_args()
 
     config = json.loads(args.config.read_text(encoding="utf-8"))
+    if args.drop_turn_detector:
+        config.pop("turn_detector", None)
     port = _pick_free_port()
     ctx = multiprocessing.get_context("spawn")
     server = ctx.Process(target=_serve, args=(config, "127.0.0.1", port))
