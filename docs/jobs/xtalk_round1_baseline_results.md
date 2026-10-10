@@ -100,3 +100,18 @@ LLM 单卡接近 90%，是本组合最紧的一环；四卡分服务方案在 24
 因此**“全链路亚秒”目前不成立**，卡点是 MOSS TTS 的编译策略，而不是 ASR/LLM。按输入形状预热（同形状跑两遍）在运行时不可行（用户输入与回复长度不可预知），已被否决。MOSS 源码本身提供了免编译路径：当 `attn_impl=flash_attention_2` 时用 `DynamicCache`、跳过编译（`streaming_mossttsrealtime.py:86-105`）；该路径需要 `flash-attn`，当前环境未安装。建议下一步：安装匹配 torch 2.9.1+cu128 / py3.12 的 flash-attn 并切到 `attn_impl=flash_attention_2` 复测；或对 MOSS 服务做固定/预编译改动。**后续决定**：源码编译 flash-attn 曾在共享调试机 OOM，因此 `xtalk-round1:v0.3` 采用官方 `v2.8.3` release 的预编译 `flash_attn-2.8.3+cu12torch2.9cxx11abiTRUE-cp312-cp312-linux_x86_64.whl`（无编译），MOSS 环境保持上游 torch 2.9.1+cu128 钉版；验证通过后再把 `configs/xtalk_round1.yaml` 的 `attn_impl` 切到 `flash_attention_2` 复测。
 
 **内容读数**：关闭思考后 LLM 输出正常的英文故事（无 `思考`）；ASR 转写正确。但测试音与参考音色仍是英文资产，需换中文后复测。
+
+## 10. v0.3 复测：flash-attn（`attn_impl=flash_attention_2`）
+
+镜像 `xtalk-round1:v0.3`（MOSS 环境保持 torch 2.9.1+cu128，安装官方预编译 `flash_attn-2.8.3+cu12torch2.9` wheel，无编译；见 [../scripts/remote/Dockerfile.round1.md](../scripts/remote/Dockerfile.round1.md)）。作业 `job-179162725903634772669-xuan-zhang`，节点 `d6-hpc-gpu-054`，tag `20261010T102317Z`，`failures=0`，配置 `tts.attn_impl=flash_attention_2`。
+
+| 阶段 | v0.2（sdpa + compile） | v0.3（flash_attention_2） |
+| --- | --- | --- |
+| ASR 首 partial | 1.2 s | 1.2 s |
+| LLM 首 token | 0.083 s | 0.081 s |
+| TTS 首音频（长回复整段喂入） | 81.76 s | **17.06 s** |
+| TTS warmup（短文本）首音频 | — | 1.22 s |
+
+- `service_logs/tts.log` 出现 “You are attempting to use Flash Attention 2 ...”，确认 flash-attn 生效；**不再按 prefill/生成长度重编译**。
+- 长文本 17.06 s 来自链式测量把整段回复一次性喂入（大 prefill）；短文本热路径仅 1.22 s，说明该路径本身很快。`audio_before_flush=false` 是因为测量客户端 push 后 2.9 ms 就 flush，不代表流式能力。
+- 结论：TTS 的 `torch.compile` 瓶颈（v0.2 的 81.76 s / 首轮 136 s）已被 flash-attn 的 DynamicCache 路径消除，首音频不再随长度爆炸。仍需在**分块流式文本**输入下复测，才能给出真实双工的首音频。
