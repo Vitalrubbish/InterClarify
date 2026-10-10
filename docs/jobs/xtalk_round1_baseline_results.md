@@ -1,5 +1,7 @@
 # 首轮验收结果：Qwen ASR + MOSS TTS 模型服务
 
+> 2026-10-10 审查补充：下文保留各轮历史记录，尚不作为冻结结论。0.72 秒是人为分块输入下的独立 TTS 首包，1.2 秒 ASR 指标为输入音频进度；真实墙钟和在线链路仍待核验。报告第 4 节正文“三次均在 flush 前出音频”与 cold 项不符，以表格为准。原始远端产物尚未在本次审查取得；下一步见 [xtalk_round1_followup.md](xtalk_round1_followup.md)。
+
 本文件记录按 [xtalk_round1_baseline.md](xtalk_round1_baseline.md) 执行的首轮验收证据。运行镜像 `sjtu_yukai-xuanzhang-xtalk-round1:v0.1`（直接基于 `xtalk:v0.17` 构建，manifest digest `sha256:acc050db798b49b849a12384677af386a026d333b239a9f323704494180058e4`），代码提交 `11ce89195a460b93fc582fa8e7583c486c532cc8`。
 
 ## 1. 作业与产物

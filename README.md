@@ -44,5 +44,6 @@ conda run -n interclarify-dev python -m pytest -q
 - X-Talk 具体改造方案：[docs/xtalk_modification_plan.md](docs/xtalk_modification_plan.md)
 - 第一套组件候选与冻结门禁：[docs/xtalk_baseline_stack.md](docs/xtalk_baseline_stack.md)
 - 首轮模型配置：[configs/xtalk_round1.yaml](configs/xtalk_round1.yaml)；远端部署与验收：[docs/jobs/xtalk_round1_baseline.md](docs/jobs/xtalk_round1_baseline.md)
+- 首轮审查后的下一步任务：[docs/jobs/xtalk_round1_followup.md](docs/jobs/xtalk_round1_followup.md)（A0 接入、真实流式验收与基线冻结）
 
 实现行为若与文档不一致，先更新文档并说明原因，再改代码。
