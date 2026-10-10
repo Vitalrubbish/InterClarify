@@ -64,3 +64,21 @@ Qwen 推理环境与 X-Talk 客户端环境继续隔离，采用明确的模型�
 本地执行接口、配置和确定性测试；GPU 模型推理及集群测试在远端进行，两端使用 conda。X-Talk 适配代码留在独立 fork，InterClarify 维护任务单与运行来源记录，不复制第二套运行时。
 
 本任务完成仅表示框架连接通过。中文质量评测、延迟预算、长会话、FDB 和正式基线冻结留到后续阶段，不作为当前接通工作的前置条件。接通后再按 [../xtalk_modification_plan.md](../xtalk_modification_plan.md) 推进无 System Backchannel 的控制层改造。
+
+## 8. T1 完成记录（2026-10-10）
+
+- 测试修复：`tests/test_xtalk_round1.py` 的 `tts_smoke` 用例补上缺失的 `stream_chunk_words=0`，并新增 `test_stream_chunk_words_splits_text_incrementally` 覆盖按词分片。`interclarify-dev` 环境下 `unittest discover tests` 15/15 通过（`test_p0_artifacts.py` 需要 numpy，`xtalk-round1-tools` 环境无 numpy，属环境差异）。
+- 镜像统一：`submit_xtalk_round1_job.sh` 默认镜像由 `v0.2` 改为 `v0.3`（v0.3 才带 MOSS 环境所需的 flash-attn）。
+- 依赖检查：`run_xtalk_round1.py` 新增 `check-deps --role {asr,llm,tts}`，按 `dependency_candidates` 校验 torch / transformers / vLLM（TTS 角色含 `moss_flash_attn`）的版本与可导入性；node job 在所有模式前置 `dependency_check` 步骤，失败即中止。`xtalk_round1.yaml` 增补 `moss_flash_attn: "2.8.3"`。
+- 模型锁一致：`$XTALK_ROUND1_ROOT/models/models.lock.json` 的 `model_id` 与配置一致；ASR `7278e1e7`、LLM `4da05a8e`、TTS `75682787`、codec `3cd226ba`、turn detector `b69ac8a4`。复用已有首轮产物，未为接通重跑完整首轮。
+
+本次对接使用的来源记录：
+
+| 项 | 值 |
+| --- | --- |
+| InterClarify 提交 | 本 T1 提交（见 `git log`；基线 `cb47d24`） |
+| X-Talk fork | `Vitalrubbish/xtalk`（远端 main），起点 `5f0d9959edf1026588246efbed827b078cbb114c` |
+| 首轮镜像 | `sjtu_yukai-xuanzhang-xtalk-round1:v0.3`，digest `sha256:a8eb99d8cafadc7f906ae6b24378f6686ce0c52ab8ac063b9c4f59de8ed47d23` |
+| 模型 revision | ASR `7278e1e7` / LLM `4da05a8e` / TTS `75682787` / codec `3cd226ba` / XTurnix `b69ac8a4` |
+
+T1 完成。T2–T4 见第 4–6 节，尚未开始。

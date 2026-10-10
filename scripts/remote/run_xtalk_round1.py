@@ -62,6 +62,72 @@ def model_path(config: dict, root: Path, role: str) -> Path:
     return path
 
 
+def check_dependencies(config: dict, role: str) -> dict:
+    """Verify the active conda environment matches the pinned versions.
+
+    The image must ship the exact dependencies the config expects (notably the
+    flash-attn wheel required by MOSS ``flash_attention_2``); checking at
+    startup turns silent version drift into a clear failure instead of a
+    confusing downstream crash.
+    """
+    from importlib import metadata
+
+    candidates = config.get("dependency_candidates", {})
+    dist_names = {
+        "torch": ("torch",),
+        "transformers": ("transformers",),
+        "vllm": ("vllm",),
+        "flash_attn": ("flash_attn", "flash-attn"),
+    }
+
+    def probe(import_name: str) -> dict:
+        installed = None
+        for name in dist_names.get(import_name, (import_name,)):
+            try:
+                installed = metadata.version(name)
+                break
+            except metadata.PackageNotFoundError:
+                continue
+        importable, error = True, None
+        try:
+            __import__(import_name)
+        except Exception as exc:  # noqa: BLE001 - record the import failure verbatim
+            importable, error = False, f"{type(exc).__name__}: {exc}"
+        return {"installed": installed, "importable": importable, "import_error": error}
+
+    expected: dict[str, str | None] = {}
+    if role == "asr":
+        expected["transformers"] = candidates.get("asr_transformers")
+    elif role == "llm":
+        expected["vllm"] = candidates.get("vllm")
+    elif role == "tts":
+        expected["torch"] = candidates.get("moss_torch")
+        expected["transformers"] = candidates.get("moss_transformers")
+        if config["services"]["tts"].get("attn_impl") == "flash_attention_2":
+            expected["flash_attn"] = candidates.get("moss_flash_attn")
+    else:
+        raise ValueError(f"Unknown dependency role: {role}")
+
+    packages: dict[str, dict] = {}
+    for package, want in expected.items():
+        info = probe(package)
+        info["expected"] = want
+        installed = info["installed"]
+        if want is None:
+            version_ok = installed is not None
+        elif installed is None:
+            version_ok = False
+        elif "+" in want:
+            version_ok = installed == want
+        else:
+            version_ok = installed.split("+")[0] == want
+        info["version_ok"] = version_ok
+        info["ok"] = version_ok and info["importable"]
+        packages[package] = info
+
+    return {"role": role, "ok": all(info["ok"] for info in packages.values()), "packages": packages}
+
+
 def download_models(config: dict, root: Path) -> None:
     """Resolve immutable revisions once and download resumable snapshots."""
     from huggingface_hub import HfApi, snapshot_download
@@ -343,6 +409,8 @@ def main() -> None:
     tts.add_argument("--text", action="append", default=None)
     tts.add_argument("--stream-chunk-words", type=int, default=0,
                      help="split each --text into N-word chunks pushed incrementally (0 = off)")
+    deps = commands.add_parser("check-deps")
+    deps.add_argument("--role", choices=("asr", "llm", "tts"), required=True)
     server = commands.add_parser("serve")
     server.add_argument("service", choices=("llm", "turn_detector", "tts"))
     server.add_argument("--gpu-index", type=int)
@@ -358,6 +426,11 @@ def main() -> None:
     elif args.command == "tts-smoke":
         args.text = args.text or ["你好，我们正在检查这套语音系统的流式输出。", "请把会议安排在下周三下午三点。", "如果需要修改时间，可以随时告诉我。"]
         asyncio.run(asyncio.wait_for(tts_smoke(config, args), timeout=args.timeout_seconds))
+    elif args.command == "check-deps":
+        report = check_dependencies(config, args.role)
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        if not report["ok"]:
+            raise SystemExit(f"dependencies for role {args.role!r} do not match the config")
     else:
         serve(config, args)
 

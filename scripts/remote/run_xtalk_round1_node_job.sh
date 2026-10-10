@@ -105,6 +105,28 @@ done
 step_status "env_imports" "$RC"
 [ "$RC" -eq 0 ] || { echo "[node-job] aborting: conda envs not usable in this container" | tee -a "$LOG"; exit "$RC"; }
 
+# Dependency check: the image must ship the exact versions the config pins
+# (torch / transformers / vllm, plus flash-attn for the TTS flash_attention_2
+# path).  Each role runs its own conda env; a mismatch fails fast so a drifted
+# image is not mistaken for a model problem.
+role_env() {  # role_env <asr|llm|tts>
+  case "$1" in
+    asr) echo xtalk-round1-asr ;;
+    llm) echo base ;;
+    tts) echo xtalk-round1-moss ;;
+  esac
+}
+DEP_ROLES="asr"
+if [ "$MODE" = "services" ] || [ "$MODE" = "chain" ]; then DEP_ROLES="asr llm tts"; fi
+RC=0
+for role in $DEP_ROLES; do
+  conda run --no-capture-output -n "$(role_env "$role")" python "$ROUND1_PY" \
+    --model-root "$XTALK_ROUND1_MODEL_ROOT" check-deps --role "$role" \
+    > "$RUN_DIR/deps_$role.json" 2>>"$LOG" || RC=1
+done
+step_status "dependency_check" "$RC"
+[ "$RC" -eq 0 ] || { echo "[node-job] aborting: image dependencies do not match the config" | tee -a "$LOG"; exit "$RC"; }
+
 if [ "$MODE" = "asr" ]; then
   for spec in "0.6:asr-06" "1.2:asr-12" "2.0:asr-20"; do
     chunk="${spec%%:*}"

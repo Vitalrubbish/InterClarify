@@ -22,7 +22,7 @@ set -euo pipefail
 MODE="${1:?usage: submit_xtalk_round1_job.sh [asr|services]}"
 
 REPO_HPC="${INTERCLARIFY_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/InterClarify}"
-IMAGE="${XTALK_ROUND1_IMAGE:-docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.2}"
+IMAGE="${XTALK_ROUND1_IMAGE:-docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.3}"
 JOB_NAME="${XTALK_JOB_NAME:-xtalk-round1-$MODE}"
 ARTIFACT_ROOT="${XTALK_ROUND1_ARTIFACT_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/artifacts}"
 LOG_DIR="$ARTIFACT_ROOT/submit_logs"

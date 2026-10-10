@@ -109,7 +109,7 @@ class RoundOneTest(unittest.TestCase):
             args = argparse.Namespace(
                 config=round1.DEFAULT_CONFIG, output=root / "result", reference=reference,
                 gap_seconds=0.02, text=["first", "second"], url=None, timeout_seconds=1,
-                model_root=root,
+                model_root=root, stream_chunk_words=0,
             )
             config = round1.read_config(args.config)
             module = types.SimpleNamespace(MossTTSRealtime=FakeTTS)
@@ -121,6 +121,60 @@ class RoundOneTest(unittest.TestCase):
             with wave.open(str(args.output / "tts.wav")) as audio:
                 self.assertEqual(audio.getframerate(), 48000)
                 self.assertEqual(audio.getnframes(), 200)
+
+    def test_stream_chunk_words_splits_text_incrementally(self) -> None:
+        """A single reply is pushed as several word chunks when asked."""
+        class FakeTTS:
+            """Record how many text fragments the client pushed."""
+
+            output_sample_rate = 48000
+
+            def __init__(self, **kwargs):
+                """Create independent streaming signals."""
+                self.ready = asyncio.Event()
+                self.finished = asyncio.Event()
+                self.pushed: list[str] = []
+
+            async def start(self):
+                """Start a test session."""
+
+            async def append_text(self, text):
+                """Record the fragment and make audio available."""
+                self.pushed.append(text)
+                self.ready.set()
+
+            async def flush(self):
+                """Permit synthesis completion."""
+                self.finished.set()
+
+            async def stop(self):
+                """Close the test session."""
+
+            async def audio_stream(self):
+                """Yield before and after the text flush boundary."""
+                await self.ready.wait()
+                yield b"\x01\x00" * 100
+                await self.finished.wait()
+                yield b"\x02\x00" * 100
+
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            reference = root / "reference.wav"
+            reference.write_bytes(b"test-reference")
+            (root / "models.lock.json").write_text('{"models": {}}')
+            args = argparse.Namespace(
+                config=round1.DEFAULT_CONFIG, output=root / "result", reference=reference,
+                gap_seconds=0.02, text=["one two three four five"], url=None, timeout_seconds=1,
+                model_root=root, stream_chunk_words=2,
+            )
+            config = round1.read_config(args.config)
+            module = types.SimpleNamespace(MossTTSRealtime=FakeTTS)
+            with patch.dict("sys.modules", {"xtalk.models.tts.moss_tts_realtime": module}):
+                asyncio.run(round1.tts_smoke(config, args))
+            report = json.loads((args.output / "tts_report.json").read_text())
+            self.assertEqual(report["text_chunk_count"], 3)
+            self.assertEqual(report["stream_chunk_words"], 2)
+            self.assertEqual(report["text_chunks"], ["one two ", "three four ", "five "])
 
 
 if __name__ == "__main__":
