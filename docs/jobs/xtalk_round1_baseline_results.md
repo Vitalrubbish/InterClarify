@@ -76,3 +76,23 @@ LLM 单卡接近 90%，是本组合最紧的一环；四卡分服务方案在 24
 | `xtalk-round1:v0.2` | 见构建产物 | — | 基于 lean 基座重建 |
 
 压平与剔除流程见 [build_xtalk_lean_base.sh](../scripts/remote/build_xtalk_lean_base.md)；剔除在 build 阶段执行（集群 `docker run` 以映射用户启动，无法删除 root 拥有的文件）。进一步可考虑按作业拆分镜像或把 ASR 适配到 vLLM 0.16 以消掉 vLLM 0.14.0 独立环境。
+
+## 9. 全链路测试（ASR → LLM → TTS）
+
+`chain` 模式（`submit_xtalk_round1_job.sh chain`）在 4 卡节点上启动三服务，再用同一输入 `request.wav` 顺序走 ASR（逻辑卡 2）→ LLM → TTS，日志同时复制到仓库根目录 `fullchain_logs/<tag>/`。这是顺序分阶段测量，不是并发全双工。首轮完成记录 tag `20261009T171546Z`：
+
+| 阶段 | 指标 | 值 |
+| --- | --- | --- |
+| ASR（预热后） | 音频相对首 partial | 1.20 s |
+| ASR | 纯解码 RTF | 0.121 |
+| ASR | 最终转写 | "Please tell me a very long and detailed story about a dragon." |
+| LLM | 首 token | **0.108 s** |
+| LLM | 总耗时（256 token 上限） | 13.4 s |
+| TTS（首次请求） | 首音频 | 266 s（冷启动） |
+| TTS | 输出时长 / 采样率 | 66.2 s / 48 kHz |
+
+**延迟读数**：LLM 首 token 与 TTS 热态首音频（服务作业中 0.17 s）都在**亚秒级**；ASR 首 partial 约 **1.2 s**（非亚秒）。但整条链路wall 时间被 **TTS 首个请求的编译冷启动**支配：MOSS 首请求需数分钟编译，且不稳定——services 作业冷启动 68 s，chain 首轮 266 s，二次 chain 重跑在 TTS 预热阶段卡死超过 28 分钟（GPU 空转、无新日志），只能终止作业。因此“全链路亚秒”**尚未证明**：必须先把 TTS 服务预热到热态，再测链路，否则测到的是编译时间。
+
+**内容读数**：ASR 正确转写英文输入；LLM（Qwen3-8B-AWQ）默认输出原始 ` thinking` 推理链、且在 256 token 处被截断，没有给出面向用户的最终回答；TTS 把这段推理链（含 markdown）合成为 66 s 音频。也就是说**链路能跑通、内容非空**，但当前 LLM 输出不适合直接播报，需要去 ` thinking`、限制或提升 max_tokens，并替换中文测试音/中文参考音色。
+
+**待办**：给 chain 固定“先预热 TTS 到热态再计时”的流程并处理 MOSS 首请求编译卡死（例如固定输入形状、提高超时、或预编译缓存），然后再复测亚秒级端到端。
