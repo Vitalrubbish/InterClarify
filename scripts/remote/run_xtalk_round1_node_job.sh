@@ -78,7 +78,7 @@ start_service() {  # start_service <role> <gpu_index>
 
 stop_services() {
   local role
-  for role in llm turn_detector tts; do
+  for role in asr llm turn_detector tts; do
     local pid_file="$RUN_DIR/service_logs/$role.pid"
     if [ -f "$pid_file" ]; then
       kill -TERM -"$(cat "$pid_file")" 2>/dev/null || true
@@ -322,6 +322,64 @@ PY
   CHAIN_FAILURES=$(grep -c '"status": "FAIL"' "$RUN_DIR/steps.jsonl" || true)
   echo "[node-job] chain done, failures=$CHAIN_FAILURES, logs copied to $DEST" | tee -a "$LOG"
   exit "$CHAIN_FAILURES"
+fi
+
+# ---- link mode: real ASR -> LLM -> TTS through the X-Talk runtime ----
+if [ "$MODE" = "link" ]; then
+  mkdir -p "$RUN_DIR/service_logs" "$RUN_DIR/curl"
+  nvidia-smi --query-gpu=index,name,memory.used,memory.total,utilization.gpu --format=csv,noheader -l 10 \
+    > "$RUN_DIR/gpu_samples.csv" 2>&1 &
+  GPU_LOG_PID=$!
+  FAILURES=0
+
+  start_service llm 0
+  wait_http "http://127.0.0.1:8000/v1/models" 1800 "$RUN_DIR/curl/llm_models.json" || FAILURES=$((FAILURES + 1))
+  start_service turn_detector 1
+  wait_http "http://127.0.0.1:8003/v1/models" 1800 "$RUN_DIR/curl/turn_detector_models.json" || FAILURES=$((FAILURES + 1))
+  start_service asr 2
+  wait_http "http://127.0.0.1:8005/health" 1800 "$RUN_DIR/curl/asr_health.json" || FAILURES=$((FAILURES + 1))
+  start_service tts 3
+  wait_http "http://127.0.0.1:8004/health" 1800 "$RUN_DIR/curl/tts_health.json" || FAILURES=$((FAILURES + 1))
+  RC=0; [ "$FAILURES" -eq 0 ] || RC=1
+  step_status "link_services_up" "$RC"
+
+  # Install the fork runtime under test (the image ships the pinned copy) into
+  # the client env, plus the websockets client dependency for the driver.
+  RC=0
+  conda run --no-capture-output -n xtalk-round1-client \
+    pip install --no-build-isolation --no-deps -e "$INTERCLARIFY_ROOT/xtalk" \
+    > "$RUN_DIR/link_install.log" 2>&1 || RC=$?
+  conda run --no-capture-output -n xtalk-round1-client \
+    pip install websockets >> "$RUN_DIR/link_install.log" 2>&1 || RC=$?
+  step_status "link_install" "$RC"
+
+  # Warm the TTS (compilation) and LLM (vLLM graphs) services as in chain mode.
+  RC=0
+  conda run --no-capture-output -n xtalk-round1-client \
+    python "$ROUND1_PY" --model-root "$XTALK_ROUND1_MODEL_ROOT" \
+    tts-smoke --reference "$XTALK_ROUND1_ROOT/audio/reference.wav" \
+    --output "$RUN_DIR/link-tts-warmup" --text "你好，这是一次预热。" \
+    > "$RUN_DIR/link-tts-warmup.log" 2>&1 || RC=$?
+  step_status "link_tts_warmup" "$RC"
+
+  # Drive the whole session: start X-Talk, stream request.wav, play back audio.
+  RC=0
+  conda run --no-capture-output -n xtalk-round1-client \
+    python "$INTERCLARIFY_ROOT/scripts/remote/xtalk_link_check.py" \
+    --config "$INTERCLARIFY_ROOT/configs/xtalk_round1_runtime.json" \
+    --audio "$XTALK_ROUND1_ROOT/audio/request.wav" \
+    --out "$RUN_DIR/link_report.json" --rounds 2 \
+    > "$RUN_DIR/link_check.log" 2>&1 || RC=$?
+  step_status "link_check" "$RC"
+
+  stop_services
+  kill "$GPU_LOG_PID" 2>/dev/null || true
+  DEST="$INTERCLARIFY_ROOT/data/runs/$TAG"
+  mkdir -p "$(dirname "$DEST")"
+  cp -r "$RUN_DIR/." "$DEST/"
+  LINK_FAILURES=$(grep -c '"status": "FAIL"' "$RUN_DIR/steps.jsonl" || true)
+  echo "[node-job] link done, failures=$LINK_FAILURES, logs copied to $DEST" | tee -a "$LOG"
+  exit "$LINK_FAILURES"
 fi
 
 # ---- services mode: 4 GPUs allocated ----

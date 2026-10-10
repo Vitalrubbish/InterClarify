@@ -5,11 +5,13 @@
 #   bash scripts/remote/submit_xtalk_round1_job.sh asr
 #   bash scripts/remote/submit_xtalk_round1_job.sh services
 #   bash scripts/remote/submit_xtalk_round1_job.sh chain
+#   bash scripts/remote/submit_xtalk_round1_job.sh link
 #
 # Modes:
 #   asr       1 GPU  /  8 CPU /  32G   -- three ASR chunk-window smokes
 #   services  4 GPU / 32 CPU / 128G   -- llm + turn_detector + tts verification
 #   chain     4 GPU / 32 CPU / 128G   -- full path ASR -> LLM -> TTS
+#   link      4 GPU / 32 CPU / 128G   -- real X-Talk session: asr+llm+td+tts
 #
 # Track:
 #   vc list -j <JOBID> ; vc logs -t <TASKID>
@@ -33,6 +35,7 @@ case "$MODE" in
   asr)      GPUS="${XTALK_ASR_GPUS:-1}";      CPU=8;  MEM=32G ;;
   services) GPUS="${XTALK_SERVICES_GPUS:-4}"; CPU=32; MEM=128G ;;
   chain)    GPUS="${XTALK_CHAIN_GPUS:-4}";    CPU=32; MEM=128G ;;
+  link)     GPUS="${XTALK_LINK_GPUS:-4}";     CPU=32; MEM=128G ;;
   *) echo "unknown mode: $MODE" >&2; exit 2 ;;
 esac
 
