@@ -122,7 +122,7 @@ P1 和 P2 是最早的两个强制门禁。P2 未通过前，不开展大规模�
 - 记录 X-Talk 核心依赖和实际启用的 optional extras。
 - 按 [xtalk_baseline_stack.md](xtalk_baseline_stack.md) 选择一套自部署的 ASR、LLM agent、TTS、VAD/turn detector 组合；实际权重 revision、服务提交和推理参数核验后才视为冻结。所有后续策略共享该组合。
 - 首轮配置为 Qwen3-ASR 1.7B + MOSS-TTS-Realtime（含 codec），LLM 与 XTurnix 沿用既定候选，见 `configs/xtalk_round1.yaml`。先按 [jobs/xtalk_round1_baseline.md](jobs/xtalk_round1_baseline.md) 验收模型服务；补齐 Qwen ASR 接口适配后才执行 X-Talk 全链路基线，不把模型独立 smoke 当作联调成功。
-- 2026-10-10 首轮审查后，按 [jobs/xtalk_round1_followup.md](jobs/xtalk_round1_followup.md) 完成入口修复、原始证据核验、中文复测、ASR 接入和真实流式交互验收，再决定是否冻结。现有人为分块的 TTS 首包属于独立服务指标，不能据此宣称端到端或全双工复现完成。
+- 2026-10-10 根据用户反馈，当前按 [jobs/xtalk_round1_followup.md](jobs/xtalk_round1_followup.md) 聚焦测试与启动修复、ASR 接入、真实流式链路和最小连接检查。中文质量评测、延迟预算、长会话和 FDB 留到框架接通后，不作为当前接入前置条件。现有人为分块的 TTS 首包属于独立服务指标，不能据此宣称端到端或全双工复现完成。
 - 跑通 X-Talk 原生示例，保存启动配置、首包延迟、实时因子、显存和事件日志。
 - 在未完成来源与许可证核验前，不把 X-Talk 源码直接复制进本仓库。
 

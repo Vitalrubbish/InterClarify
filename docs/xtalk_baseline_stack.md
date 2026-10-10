@@ -4,7 +4,7 @@
 
 先跑通原生组合并记录基线，再开始 `feature/duplex-control` 上的控制层改造。当前为**候选组合，尚未运行冻结**；模型权重 revision、服务提交和资源占用均待核验。InterClarify 的 P0 环境检查不能替代该组合的验收。
 
-2026-10-10 已完成首轮报告与代码审查，后续执行 [A0 接入与冻结任务单](jobs/xtalk_round1_followup.md)。模型服务与人为分块 TTS 的运行记录支持继续接入；中文质量、实际在线时间线、打断与原始来源证据仍需补齐。
+2026-10-10 已完成首轮报告与代码审查，当前执行 [框架接通任务单](jobs/xtalk_round1_followup.md)，先完成 ASR 适配与最小在线链路。正式质量、性能和基线冻结检查留到框架接通后。
 
 改造目标采用 DuplexCascade 无 System Backchannel 版本；Layer 0 当前移除，System Backchannel 始终关闭。用户附和识别、有效插话停播、持续监听、等待与回答仍属于目标能力。论文命名依据见[第 4.1 节](https://arxiv.org/html/2603.09180v1#S4.SS1)。
 
