@@ -25,6 +25,9 @@ logs/
 *.pt
 *.pth
 
+# Cluster run evidence copied back from compute nodes (chain logs, reports)
+data/runs/
+
 # Audio and transcript captures generated during experiments
 *.wav
 *.flac

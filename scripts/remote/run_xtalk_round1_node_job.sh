@@ -10,7 +10,7 @@
 #   bash run_xtalk_round1_node_job.sh chain
 #       4-GPU job: start the three services, then run the full path
 #       ASR (gpu2) -> LLM -> TTS on one input wav, measure per-stage latency,
-#       and copy the run dir under $INTERCLARIFY_ROOT/fullchain_logs/.
+#       and copy the run dir under $INTERCLARIFY_ROOT/data/runs/.
 #
 # All evidence is written under $XTALK_ROUND1_ARTIFACT_ROOT so it is visible
 # from the dev machine.  The script keeps going after individual check
@@ -28,6 +28,13 @@ export XTALK_MOSS_SOURCE_ROOT="${XTALK_MOSS_SOURCE_ROOT:-$XTALK_ROUND1_ROOT/moss
 export HF_ENDPOINT="${HF_ENDPOINT:-https://hf-mirror.com}"
 export PYTHONNOUSERSITE=1
 export TOKENIZERS_PARALLELISM=false
+# Keep TorchInductor/Triton compile caches on the container's local disk: the
+# mounted home on shared storage made the MOSS first-request compile extremely
+# slow / appear hung.
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-/tmp/ic_cache}"
+export TORCHINDUCTOR_CACHE_DIR="${TORCHINDUCTOR_CACHE_DIR:-/tmp/ic_cache/torchinductor}"
+export TRITON_CACHE_DIR="${TRITON_CACHE_DIR:-/tmp/ic_cache/triton}"
+mkdir -p "$XDG_CACHE_HOME" "$TORCHINDUCTOR_CACHE_DIR" "$TRITON_CACHE_DIR"
 
 CONDA_SH="${CONDA_SH:-/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/etc/profile.d/conda.sh}"
 # In round-one cluster images the same conda env names live under /opt/conda;
@@ -141,6 +148,14 @@ if [ "$MODE" = "chain" ]; then
     > "$RUN_DIR/chain-tts-warmup.log" 2>&1 || RC=$?
   step_status "chain_tts_warmup" "$RC"
 
+  # Warm the LLM service: the first request pays vLLM warm-up/graph costs.
+  RC=0
+  curl -sf -N http://127.0.0.1:8000/v1/chat/completions \
+    -H 'Content-Type: application/json' \
+    -d '{"model":"xtalk-round1-llm","messages":[{"role":"user","content":"你好"}],"temperature":0,"max_tokens":1,"stream":true,"chat_template_kwargs":{"enable_thinking":false}}' \
+    > "$RUN_DIR/curl/llm_warmup.txt" || RC=$?
+  step_status "chain_llm_warmup" "$RC"
+
   # Stage 1: ASR on GPU 2 (warm-up inside asr-smoke keeps latency clean).
   RC=0
   conda run --no-capture-output -n xtalk-round1-asr \
@@ -162,6 +177,7 @@ payload = json.dumps({
     "model": "xtalk-round1-llm",
     "messages": [{"role": "user", "content": prompt}],
     "temperature": 0, "max_tokens": 256, "stream": True,
+    "chat_template_kwargs": {"enable_thinking": False},
 }).encode()
 request = urllib.request.Request(
     "http://127.0.0.1:8000/v1/chat/completions", data=payload,
@@ -250,8 +266,8 @@ PY
   stop_services
   kill "$GPU_LOG_PID" 2>/dev/null || true
 
-  # Copy the whole run dir under the repository root as requested.
-  DEST="$INTERCLARIFY_ROOT/fullchain_logs/$TAG"
+  # Copy the whole run dir under data/runs/ in the repo root (git-ignored).
+  DEST="$INTERCLARIFY_ROOT/data/runs/$TAG"
   mkdir -p "$(dirname "$DEST")"
   cp -r "$RUN_DIR/." "$DEST/"
   CHAIN_FAILURES=$(grep -c '"status": "FAIL"' "$RUN_DIR/steps.jsonl" || true)

@@ -79,7 +79,7 @@ LLM 单卡接近 90%，是本组合最紧的一环；四卡分服务方案在 24
 
 ## 9. 全链路测试（ASR → LLM → TTS）
 
-`chain` 模式（`submit_xtalk_round1_job.sh chain`）在 4 卡节点上启动三服务，再用同一输入 `request.wav` 顺序走 ASR（逻辑卡 2）→ LLM → TTS，日志同时复制到仓库根目录 `fullchain_logs/<tag>/`。这是顺序分阶段测量，不是并发全双工。首轮完成记录 tag `20261009T171546Z`：
+`chain` 模式（`submit_xtalk_round1_job.sh chain`）在 4 卡节点上启动三服务，再用同一输入 `request.wav` 顺序走 ASR（逻辑卡 2）→ LLM → TTS，日志同时复制到仓库根目录 `data/runs/<tag>/`（已 gitignore）。这是顺序分阶段测量，不是并发全双工。首轮完成记录 tag `20261009T171546Z`：
 
 | 阶段 | 指标 | 值 |
 | --- | --- | --- |
