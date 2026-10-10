@@ -332,7 +332,18 @@ def serve(config: dict, args: argparse.Namespace) -> None:
     service = config["services"][role]
     select_gpu(service["gpu_index"] if args.gpu_index is None else args.gpu_index)
     command = ["conda", "run", "--no-capture-output", "-n", config["environments"][role]]
-    if role in {"llm", "turn_detector"}:
+    if role == "asr":
+        script = Path(__file__).with_name("qwen3_asr_service.py")
+        stream = config["asr_streaming"]
+        command += ["python", str(script),
+                    "--model", str(model_path(config, args.model_root, "asr")),
+                    "--host", service["host"], "--port", str(service["port"]),
+                    "--gpu-memory-utilization", str(service["gpu_memory_utilization"]),
+                    "--max-new-tokens", str(service["max_new_tokens"]),
+                    "--chunk-size-sec", str(stream["chunk_size_sec"]),
+                    "--unfixed-chunk-num", str(stream["unfixed_chunk_num"]),
+                    "--unfixed-token-num", str(stream["unfixed_token_num"])]
+    elif role in {"llm", "turn_detector"}:
         command += ["vllm", "serve", str(model_path(config, args.model_root, role)),
                     "--host", service["host"], "--port", str(service["port"]),
                     "--served-model-name", service["served_model_name"],
@@ -412,7 +423,7 @@ def main() -> None:
     deps = commands.add_parser("check-deps")
     deps.add_argument("--role", choices=("asr", "llm", "tts"), required=True)
     server = commands.add_parser("serve")
-    server.add_argument("service", choices=("llm", "turn_detector", "tts"))
+    server.add_argument("service", choices=("asr", "llm", "turn_detector", "tts"))
     server.add_argument("--gpu-index", type=int)
     args = parser.parse_args()
     args.config = args.config.resolve()

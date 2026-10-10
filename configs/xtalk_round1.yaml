@@ -74,6 +74,8 @@ services:
     gpu_memory_utilization: 0.35
   asr:
     gpu_index: 2
+    host: 127.0.0.1
+    port: 8005
     gpu_memory_utilization: 0.75
     max_new_tokens: 32
   tts:

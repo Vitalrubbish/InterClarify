@@ -1,0 +1,46 @@
+{
+  "asr": {
+    "type": "Qwen3ASRClient",
+    "params": {
+      "base_url": "http://127.0.0.1:8005",
+      "chunk_ms": 600
+    }
+  },
+  "llm_agent": {
+    "type": "DefaultAgent",
+    "params": {
+      "model": {
+        "api_key": "EMPTY",
+        "model": "xtalk-round1-llm",
+        "base_url": "http://127.0.0.1:8000/v1",
+        "extra_body": {
+          "chat_template_kwargs": {
+            "enable_thinking": false
+          }
+        }
+      },
+      "backchannel_model": null,
+      "backchannel_source_dir": null
+    }
+  },
+  "tts": {
+    "type": "MossTTSRealtime",
+    "params": {
+      "base_url": "http://127.0.0.1:8004",
+      "voices": [
+        {
+          "name": "round1",
+          "path": "/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/audio/reference.wav"
+        }
+      ]
+    }
+  },
+  "turn_detector": {
+    "type": "XTurnix",
+    "params": {
+      "base_url": "http://127.0.0.1:8003",
+      "timeout": 2.0,
+      "max_model_len": 2048
+    }
+  }
+}
