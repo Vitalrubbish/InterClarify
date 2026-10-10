@@ -48,8 +48,11 @@ environments:
   client: xtalk-round1-client
 
 dependency_candidates:
-  vllm: "0.14.0"
+  # Per role: the ASR env pins vLLM 0.14.0 (qwen_asr is incompatible with
+  # 0.16); the LLM runs in the image base env, which ships vLLM 0.16.0.
+  asr_vllm: "0.14.0"
   asr_transformers: "4.57.6"
+  llm_vllm: "0.16.0"
   moss_torch: "2.9.1+cu128"
   moss_transformers: "5.0.0"
   # Required by the TTS flash_attention_2 path; shipped in the v0.3 image.

@@ -100,8 +100,9 @@ def check_dependencies(config: dict, role: str) -> dict:
     expected: dict[str, str | None] = {}
     if role == "asr":
         expected["transformers"] = candidates.get("asr_transformers")
+        expected["vllm"] = candidates.get("asr_vllm")
     elif role == "llm":
-        expected["vllm"] = candidates.get("vllm")
+        expected["vllm"] = candidates.get("llm_vllm")
     elif role == "turn_detector":
         expected["onnxruntime"] = candidates.get("turnsense_onnxruntime")
         expected["kaldi_native_fbank"] = candidates.get(
