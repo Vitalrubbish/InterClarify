@@ -36,11 +36,9 @@
     }
   },
   "turn_detector": {
-    "type": "XTurnix",
+    "type": "TurnSense",
     "params": {
-      "base_url": "http://127.0.0.1:8003",
-      "timeout": 2.0,
-      "max_model_len": 2048
+      "base_url": "http://127.0.0.1:8003"
     }
   }
 }

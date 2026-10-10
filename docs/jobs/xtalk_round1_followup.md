@@ -110,3 +110,12 @@ T2 代码与文档完成，尚缺 T3（真实流式链路）与 T4（集群最�
 - 再次重跑（tag `20261010T151645Z`）在同一处持续卡住（>15 min，GPU3 ~4.9 GB），非偶发。`service_logs/tts.log` 在两次“Loading weights 100%”后无 `[warmup] Backend loaded`，且日志含 `trust_remote_code` 交互提示；而更早的 chain 与首次 link（tag `20261010T143113Z`，TTS 240 s ready）能正常加载。疑为 MOSS 服务加载子模型时的交互提示在非交互 stdin 下阻塞，或该节点/容器环境的差异，需在服务启动侧显式避免交互提示（如非交互 stdin 或把 `trust_remote_code` 透传到所有子模型）后重试。
 
 下一步：先解决 TTS 服务启动的确定性（消除交互提示阻塞），再重跑 `link`（无 TD）验证 ASR→LLM→TTS→播放闭环；之后单独排查 XTurnix 在 headless 回放下的轮次边界（需要 pause 文本变化或等价的前端信号）。
+
+## 11. 回合不结束的根因与处理（2026-10-11）
+
+排查确认“回合永不结束”不是框架 bug，而是**纯文本 turn detector + 英文输入**的组合问题：
+
+- `XTurnix` 是纯文本检测器（`xturnix.py` 忽略 audio），首轮 `audio/request.wav` 是英文；本地 CPU 复现（复刻模型 `turn_pipeline.py` 的 prompt/约束）该样例在 listening 下输出 `<|keep|>`（0.86），中文样例才输出 `<|start|>`；再叠加末尾 pause 的 `reuse_previous`，永无 `START_GENERATION`。
+- `TurnSense` 是音频检测器（忽略 text），本地实测同一英文 request → `complete` 0.93，与语言无关。
+
+据此把首轮 turn detector 从 XTurnix 切换为 TurnSense，改动与验证见 [xtalk_turnsense_migration.md](xtalk_turnsense_migration.md)。这样 headless 回放不再需要 `--drop-turn-detector`，走真实 VAD→turn detector→回复链路。XTurnix 适配器保留但首轮不再使用。TTS 服务启动卡顿作为独立问题继续跟进。

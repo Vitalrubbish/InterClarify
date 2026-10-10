@@ -35,15 +35,15 @@ models:
   codec:
     model_id: OpenMOSS-Team/MOSS-Audio-Tokenizer
     revision: null
-  turn_detector:
-    model_id: xcczach/xturnix-zh-base
-    revision: null
+  # The turn detector is the standalone audio-based TurnSense ONNX service, not
+  # a Hugging Face snapshot: its assets are staged under
+  # $XTALK_ROUND1_MODEL_ROOT/turnsense (see services.turn_detector).
 
 environments:
   prepare: xtalk-round1-tools
   asr: xtalk-round1-asr
   llm: base
-  turn_detector: base
+  turn_detector: xtalk-round1-turnsense
   tts: xtalk-round1-moss
   client: xtalk-round1-client
 
@@ -54,6 +54,9 @@ dependency_candidates:
   moss_transformers: "5.0.0"
   # Required by the TTS flash_attention_2 path; shipped in the v0.3 image.
   moss_flash_attn: "2.8.3"
+  # TurnSense ONNX runtime stack (xtalk-round1-turnsense env).
+  turnsense_onnxruntime: "1.23.2"
+  turnsense_kaldi_native_fbank: "1.22.3"
 
 # GPU indices refer to devices allocated to this job.
 services:
@@ -65,13 +68,29 @@ services:
     max_model_len: 4096
     gpu_memory_utilization: 0.85
     quantization: awq
+  # TurnSense: standalone audio-based turn detector (ONNX HTTP service). It
+  # decides complete/incomplete/invalid from the buffered user audio, so it is
+  # language independent (unlike the text-only XTurnix that replaced earlier).
+  # The vendored server lives in scripts/remote/turnsense; the model assets are
+  # staged under $XTALK_ROUND1_MODEL_ROOT/turnsense.
   turn_detector:
+    kind: turnsense
     gpu_index: 1
     host: 127.0.0.1
     port: 8003
-    served_model_name: xturnix
-    max_model_len: 2048
-    gpu_memory_utilization: 0.35
+    source_dir: scripts/remote/turnsense
+    onnx_file: turnsense/model_int8.onnx
+    cmvn_file: turnsense/am.mvn
+    onnx_sha256: d5105b9ad4df677578b8b7bbbdc360946ae64dc2fc8b208386c5b544b65a5e4c
+    cmvn_sha256: 29b3c740a2c0cfc6b308126d31d7f265fa2be74f3bb095cd2f143ea970896ae5
+    upstream_repo: https://github.com/xcc-zach/xtalk-TurnSense
+    upstream_commit: cc0681c85771117958785faf3d6a7f402018a83e
+    # CPU ONNX path is fast enough for 200 ms periodic inference; flip to true
+    # (and install onnxruntime-gpu) only if the service must share the GPU.
+    use_cuda: false
+    clip_mode: tail
+    max_concurrency: 8
+    max_workers: 4
   asr:
     gpu_index: 2
     host: 127.0.0.1

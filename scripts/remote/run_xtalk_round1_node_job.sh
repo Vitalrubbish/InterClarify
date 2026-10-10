@@ -25,6 +25,10 @@ export XTALK_ROUND1_MODEL_ROOT="${XTALK_ROUND1_MODEL_ROOT:-$XTALK_ROUND1_ROOT/mo
 export XTALK_ROUND1_ARTIFACT_ROOT="${XTALK_ROUND1_ARTIFACT_ROOT:-$XTALK_ROUND1_ROOT/artifacts}"
 export XTALK_MOSS_SERVICE_ROOT="${XTALK_MOSS_SERVICE_ROOT:-$XTALK_ROUND1_ROOT/moss-service}"
 export XTALK_MOSS_SOURCE_ROOT="${XTALK_MOSS_SOURCE_ROOT:-$XTALK_ROUND1_ROOT/moss-source}"
+# TurnSense is a standalone CPU ONNX service. Its conda env is provisioned on
+# the shared home (not baked into the round-one image), so launch/check it by
+# absolute interpreter path instead of `conda run`; see run_xtalk_round1.py.
+export XTALK_TURNSENSE_PYTHON="${XTALK_TURNSENSE_PYTHON:-/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/xtalk-round1-turnsense/bin/python}"
 export HF_ENDPOINT="${HF_ENDPOINT:-https://hf-mirror.com}"
 export PYTHONNOUSERSITE=1
 export TOKENIZERS_PARALLELISM=false
@@ -102,6 +106,8 @@ RC=0
 for env in base xtalk-round1-tools xtalk-round1-asr xtalk-round1-moss xtalk-round1-client; do
   conda run -n "$env" python -c "import yaml" >> "$LOG" 2>&1 || { RC=1; echo "[node-job] env $env: basic import FAILED" | tee -a "$LOG"; }
 done
+"$XTALK_TURNSENSE_PYTHON" -c "import onnxruntime, kaldi_native_fbank, yaml" >> "$LOG" 2>&1 \
+  || { RC=1; echo "[node-job] turnsense env: basic import FAILED" | tee -a "$LOG"; }
 step_status "env_imports" "$RC"
 [ "$RC" -eq 0 ] || { echo "[node-job] aborting: conda envs not usable in this container" | tee -a "$LOG"; exit "$RC"; }
 
@@ -109,20 +115,30 @@ step_status "env_imports" "$RC"
 # (torch / transformers / vllm, plus flash-attn for the TTS flash_attention_2
 # path).  Each role runs its own conda env; a mismatch fails fast so a drifted
 # image is not mistaken for a model problem.
-role_env() {  # role_env <asr|llm|tts>
+role_env() {  # role_env <asr|llm|turn_detector|tts>
   case "$1" in
     asr) echo xtalk-round1-asr ;;
     llm) echo base ;;
+    turn_detector) echo xtalk-round1-turnsense ;;
     tts) echo xtalk-round1-moss ;;
   esac
 }
 DEP_ROLES="asr"
-if [ "$MODE" = "services" ] || [ "$MODE" = "chain" ]; then DEP_ROLES="asr llm tts"; fi
+if [ "$MODE" = "services" ] || [ "$MODE" = "chain" ] || [ "$MODE" = "link" ]; then
+  DEP_ROLES="asr llm turn_detector tts"
+fi
 RC=0
 for role in $DEP_ROLES; do
-  conda run --no-capture-output -n "$(role_env "$role")" python "$ROUND1_PY" \
-    --model-root "$XTALK_ROUND1_MODEL_ROOT" check-deps --role "$role" \
-    > "$RUN_DIR/deps_$role.json" 2>>"$LOG" || RC=1
+  if [ "$role" = "turn_detector" ]; then
+    # The turnsense env lives on the shared home, not in the image.
+    "$XTALK_TURNSENSE_PYTHON" "$ROUND1_PY" \
+      --model-root "$XTALK_ROUND1_MODEL_ROOT" check-deps --role "$role" \
+      > "$RUN_DIR/deps_$role.json" 2>>"$LOG" || RC=1
+  else
+    conda run --no-capture-output -n "$(role_env "$role")" python "$ROUND1_PY" \
+      --model-root "$XTALK_ROUND1_MODEL_ROOT" check-deps --role "$role" \
+      > "$RUN_DIR/deps_$role.json" 2>>"$LOG" || RC=1
+  fi
 done
 step_status "dependency_check" "$RC"
 [ "$RC" -eq 0 ] || { echo "[node-job] aborting: image dependencies do not match the config" | tee -a "$LOG"; exit "$RC"; }
@@ -154,7 +170,7 @@ if [ "$MODE" = "chain" ]; then
   start_service llm 0
   wait_http "http://127.0.0.1:8000/v1/models" 1800 "$RUN_DIR/curl/llm_models.json" || FAILURES=$((FAILURES + 1))
   start_service turn_detector 1
-  wait_http "http://127.0.0.1:8003/v1/models" 1800 "$RUN_DIR/curl/turn_detector_models.json" || FAILURES=$((FAILURES + 1))
+  wait_http "http://127.0.0.1:8003/healthz" 600 "$RUN_DIR/curl/turn_detector_health.json" || FAILURES=$((FAILURES + 1))
   start_service tts 3
   wait_http "http://127.0.0.1:8004/health" 1800 "$RUN_DIR/curl/tts_health.json" || FAILURES=$((FAILURES + 1))
   RC=0; [ "$FAILURES" -eq 0 ] || RC=1
@@ -335,7 +351,7 @@ if [ "$MODE" = "link" ]; then
   start_service llm 0
   wait_http "http://127.0.0.1:8000/v1/models" 1800 "$RUN_DIR/curl/llm_models.json" || FAILURES=$((FAILURES + 1))
   start_service turn_detector 1
-  wait_http "http://127.0.0.1:8003/v1/models" 1800 "$RUN_DIR/curl/turn_detector_models.json" || FAILURES=$((FAILURES + 1))
+  wait_http "http://127.0.0.1:8003/healthz" 600 "$RUN_DIR/curl/turn_detector_health.json" || FAILURES=$((FAILURES + 1))
   start_service asr 2
   wait_http "http://127.0.0.1:8005/health" 1800 "$RUN_DIR/curl/asr_health.json" || FAILURES=$((FAILURES + 1))
   start_service tts 3
@@ -392,7 +408,7 @@ PY
     python "$INTERCLARIFY_ROOT/scripts/remote/xtalk_link_check.py" \
     --config "$INTERCLARIFY_ROOT/configs/xtalk_round1_runtime.json" \
     --audio "$XTALK_ROUND1_ROOT/audio/request.wav" \
-    --out "$RUN_DIR/link_report.json" --rounds 2 --drop-turn-detector \
+    --out "$RUN_DIR/link_report.json" --rounds 2 \
     > "$RUN_DIR/link_check.log" 2>&1 || RC=$?
   step_status "link_check" "$RC"
 
@@ -422,7 +438,7 @@ step_status "llm_service_up" "$RC"
 
 start_service turn_detector 1
 RC=0
-wait_http "http://127.0.0.1:8003/v1/models" 1800 "$RUN_DIR/curl/turn_detector_models.json" || RC=$?
+wait_http "http://127.0.0.1:8003/healthz" 600 "$RUN_DIR/curl/turn_detector_health.json" || RC=$?
 [ "$RC" -eq 0 ] || FAILURES=$((FAILURES + 1))
 step_status "turn_detector_service_up" "$RC"
 
@@ -435,7 +451,7 @@ step_status "tts_service_up" "$RC"
 # Endpoint checks per job document section 5.
 RC=0
 curl -sf http://127.0.0.1:8000/v1/models > "$RUN_DIR/curl/llm_models_final.json" || RC=1
-curl -sf http://127.0.0.1:8003/v1/models > "$RUN_DIR/curl/turn_detector_models_final.json" || RC=1
+curl -sf http://127.0.0.1:8003/healthz > "$RUN_DIR/curl/turn_detector_health_final.json" || RC=1
 curl -sf http://127.0.0.1:8004/health > "$RUN_DIR/curl/tts_health_final.json" || RC=1
 curl -sf -N http://127.0.0.1:8000/v1/chat/completions \
   -H 'Content-Type: application/json' \
@@ -444,39 +460,18 @@ curl -sf -N http://127.0.0.1:8000/v1/chat/completions \
 step_status "endpoint_checks" "$RC"
 [ "$RC" -eq 0 ] || FAILURES=$((FAILURES + 1))
 
-grep -q '"id":"xturnix"' "$RUN_DIR/curl/turn_detector_models_final.json" && echo "[node-job] turn detector served model name: xturnix" | tee -a "$LOG" \
-  || { echo "[node-job] WARNING: xturnix name not confirmed" | tee -a "$LOG"; }
+grep -q '"status":"ok"' "$RUN_DIR/curl/turn_detector_health_final.json" && echo "[node-job] turn detector (TurnSense) health ok" | tee -a "$LOG" \
+  || { echo "[node-job] WARNING: turnsense health not confirmed" | tee -a "$LOG"; }
 
-# Adapter-level keep/start/stop probe against the live XTurnix service.
+# Audio-based TurnSense probe: the English request clip must be "complete"
+# (this is exactly the case the text-only XTurnix misjudged as keep).
 RC=0
-conda run --no-capture-output -n xtalk-round1-client python - \
-  > "$RUN_DIR/curl/xturnix_adapter_probe.json" 2>&1 <<'PY' || RC=$?
-import json
-
-from xtalk.models.turn_detector.interfaces import TurnDetectionAction
-from xtalk.models.turn_detector.xturnix import XTurnix
-
-detector = XTurnix(base_url="http://127.0.0.1:8003", timeout=60)
-question = "明天下午三点能帮我安排一个会议吗？"
-detector.listening = True
-listening_result = detector.detect(
-    text=question, speech_start=True, speech_pause=True
-)
-detector.listening = False
-speaking_result = detector.detect(
-    text="等一下，我突然想到一个更重要的问题。", speech_start=True, speech_pause=True
-)
-report = {
-    "listening_action": listening_result.action.name,
-    "speaking_action": speaking_result.action.name,
-    "listening_valid": listening_result.action
-    in (TurnDetectionAction.DO_NOTHING, TurnDetectionAction.START_GENERATION),
-    "speaking_valid": speaking_result.action
-    in (TurnDetectionAction.DO_NOTHING, TurnDetectionAction.STOP_SPEAKING),
-}
-print(json.dumps(report, ensure_ascii=False))
-PY
-step_status "xturnix_adapter_probe" "$RC"
+curl -sf --max-time 60 -X POST "http://127.0.0.1:8003/infer/bytes" \
+  -H "Content-Type: audio/wav" -H "X-Audio-Source: request.wav" \
+  --data-binary @"$XTALK_ROUND1_ROOT/audio/request.wav" \
+  > "$RUN_DIR/curl/turnsense_probe.json" 2>>"$LOG" || RC=1
+grep -q '"prediction":"complete"' "$RUN_DIR/curl/turnsense_probe.json" || RC=1
+step_status "turnsense_probe" "$RC"
 [ "$RC" -eq 0 ] || FAILURES=$((FAILURES + 1))
 
 # Upstream X-Talk tests in the client environment.

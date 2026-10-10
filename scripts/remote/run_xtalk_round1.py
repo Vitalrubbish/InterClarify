@@ -78,6 +78,8 @@ def check_dependencies(config: dict, role: str) -> dict:
         "transformers": ("transformers",),
         "vllm": ("vllm",),
         "flash_attn": ("flash_attn", "flash-attn"),
+        "onnxruntime": ("onnxruntime",),
+        "kaldi_native_fbank": ("kaldi-native-fbank", "kaldi_native_fbank"),
     }
 
     def probe(import_name: str) -> dict:
@@ -100,6 +102,11 @@ def check_dependencies(config: dict, role: str) -> dict:
         expected["transformers"] = candidates.get("asr_transformers")
     elif role == "llm":
         expected["vllm"] = candidates.get("vllm")
+    elif role == "turn_detector":
+        expected["onnxruntime"] = candidates.get("turnsense_onnxruntime")
+        expected["kaldi_native_fbank"] = candidates.get(
+            "turnsense_kaldi_native_fbank"
+        )
     elif role == "tts":
         expected["torch"] = candidates.get("moss_torch")
         expected["transformers"] = candidates.get("moss_transformers")
@@ -343,14 +350,44 @@ def serve(config: dict, args: argparse.Namespace) -> None:
                     "--chunk-size-sec", str(stream["chunk_size_sec"]),
                     "--unfixed-chunk-num", str(stream["unfixed_chunk_num"]),
                     "--unfixed-token-num", str(stream["unfixed_token_num"])]
-    elif role in {"llm", "turn_detector"}:
-        command += ["vllm", "serve", str(model_path(config, args.model_root, role)),
+    elif role == "llm":
+        command += ["vllm", "serve", str(model_path(config, args.model_root, "llm")),
                     "--host", service["host"], "--port", str(service["port"]),
                     "--served-model-name", service["served_model_name"],
                     "--max-model-len", str(service["max_model_len"]),
-                    "--gpu-memory-utilization", str(service["gpu_memory_utilization"])]
-        if role == "llm":
-            command += ["--quantization", service["quantization"]]
+                    "--gpu-memory-utilization", str(service["gpu_memory_utilization"]),
+                    "--quantization", service["quantization"]]
+    elif role == "turn_detector":
+        # Standalone audio-based TurnSense ONNX HTTP service (vendored under
+        # scripts/remote/turnsense). Not vLLM: it reads the raw PCM buffered by
+        # the X-Talk TurnSense adapter and returns complete/incomplete/invalid.
+        source_dir = Path(__file__).with_name("turnsense").resolve()
+        onnx_path = (args.model_root / service["onnx_file"]).resolve()
+        cmvn_path = (args.model_root / service["cmvn_file"]).resolve()
+        required = {
+            "service.py": source_dir / "service.py",
+            "infer.py": source_dir / "infer.py",
+            "frontend/audio_frontend.py": source_dir / "frontend" / "audio_frontend.py",
+            "onnx": onnx_path,
+            "cmvn": cmvn_path,
+        }
+        missing = [name for name, path in required.items() if not path.is_file()]
+        if missing:
+            raise ValueError(f"missing TurnSense assets: {missing}")
+        # XTALK_TURNSENSE_PYTHON launches the vendored server with an explicit
+        # interpreter (used when the turnsense conda env is not baked into the
+        # container image); otherwise fall back to the configured conda env.
+        python_override = os.environ.get("XTALK_TURNSENSE_PYTHON")
+        command = [python_override] if python_override else command + ["python"]
+        command += [str(source_dir / "service.py"),
+                    "--host", service["host"], "--port", str(service["port"]),
+                    "--onnx-path", str(onnx_path), "--cmvn-file", str(cmvn_path),
+                    "--clip-mode", service.get("clip_mode", "tail"),
+                    "--max-concurrency", str(service.get("max_concurrency", 8)),
+                    "--max-workers", str(service.get("max_workers", 4))]
+        if service.get("use_cuda"):
+            command.append("--use-cuda")
+        os.chdir(source_dir)
     else:
         roots = {
             "moss_service": Path(os.environ["XTALK_MOSS_SERVICE_ROOT"]).resolve(),
@@ -421,7 +458,9 @@ def main() -> None:
     tts.add_argument("--stream-chunk-words", type=int, default=0,
                      help="split each --text into N-word chunks pushed incrementally (0 = off)")
     deps = commands.add_parser("check-deps")
-    deps.add_argument("--role", choices=("asr", "llm", "tts"), required=True)
+    deps.add_argument(
+        "--role", choices=("asr", "llm", "turn_detector", "tts"), required=True
+    )
     server = commands.add_parser("serve")
     server.add_argument("service", choices=("asr", "llm", "turn_detector", "tts"))
     server.add_argument("--gpu-index", type=int)

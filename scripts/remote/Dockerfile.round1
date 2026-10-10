@@ -30,6 +30,11 @@ COPY --from=qwen-asr . /opt/src/qwen-asr
 COPY --from=moss-source . /opt/src/moss-source
 COPY --from=xtalk . /opt/src/xtalk
 
+# Vendored, pinned TurnSense ONNX service (scripts/remote/turnsense/UPSTREAM.md
+# records the upstream commit). The model assets are staged from
+# $XTALK_ROUND1_MODEL_ROOT at runtime, not baked into the image.
+COPY scripts/remote/turnsense /opt/src/xtalk-TurnSense
+
 # One consolidated layer.  The base env (/opt/conda) keeps vLLM 0.16.0 for
 # LLM/turn_detector.  The MOSS env keeps the upstream torch 2.9.1+cu128 pin and
 # adds the matching official prebuilt flash-attn 2.8.3 wheel
@@ -43,7 +48,7 @@ RUN --mount=type=bind,from=wheels,target=/wheelhouse,ro \
     set -eux; \
     CONDA=/opt/conda/bin/conda; \
     MAIN=https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main; \
-    for env in xtalk-round1-tools xtalk-round1-asr xtalk-round1-moss xtalk-round1-client; do \
+    for env in xtalk-round1-tools xtalk-round1-asr xtalk-round1-moss xtalk-round1-client xtalk-round1-turnsense; do \
         "$CONDA" create --override-channels -c "$MAIN" -n "$env" python=3.12 pip -y; \
     done; \
     PY() { local env="$1"; shift; local py; \
@@ -59,6 +64,7 @@ RUN --mount=type=bind,from=wheels,target=/wheelhouse,ro \
     PY xtalk-round1-moss --no-build-isolation -e "/opt/src/moss-source[torch-runtime]" "torch==2.9.1+cu128" "torchaudio==2.9.1+cu128" transformers==5.0.0 fastapi uvicorn requests soxr websockets "flash-attn==2.8.3"; \
     PY xtalk-round1-client setuptools; \
     PY xtalk-round1-client --no-build-isolation -e "/opt/src/xtalk[example,dev]" PyYAML==6.0.3 aiohttp soundfile soxr; \
+    PY xtalk-round1-turnsense "numpy==2.2.6" "librosa==0.11.0" "soundfile==0.13.1" "kaldi-native-fbank==1.22.3" "fastapi==0.116.1" "uvicorn[standard]==0.35.0" "python-multipart==0.0.20" "onnxruntime==1.23.2" "PyYAML==6.0.3"; \
     "$CONDA" clean -afy
 
 WORKDIR /opt/interclarify
