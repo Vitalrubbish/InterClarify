@@ -275,12 +275,29 @@ def serve(config: dict, args: argparse.Namespace) -> None:
         if not entrypoint.is_file():
             raise ValueError(f"Missing MOSS service entrypoint: {entrypoint}")
         os.environ["MOSS_TTS_UPSTREAM_DIR"] = str(roots["moss_source"])
-        if service.get("disable_torch_compile"):
-            # torch.compile recompiles per prefill length (minutes each); run
-            # eager so first-audio latency is stable regardless of response
-            # length.  See configs/xtalk_round1.yaml (services.tts).
+        torch_compile = service.get("torch_compile", "default")
+        if torch_compile == "disable":
+            # Eager fallback: no per-shape recompilation but far slower than
+            # real time.  Kept for debugging only.
             os.environ["TORCH_COMPILE_DISABLE"] = "1"
             os.environ["TORCHDYNAMO_DISABLE"] = "1"
+        elif torch_compile == "dynamic":
+            # Make dynamo treat shapes as dynamic so one compilation serves any
+            # prefill length instead of recompiling per response length.
+            patch_dir = Path(os.environ.get("TMPDIR", "/tmp")) / "ic_moss_patch"
+            patch_dir.mkdir(parents=True, exist_ok=True)
+            (patch_dir / "sitecustomize.py").write_text(
+                "import torch._dynamo as _dynamo\n"
+                "_dynamo.config.assume_static_by_default = False\n"
+                "_dynamo.config.dynamic_shapes = True\n"
+                "_dynamo.config.cache_size_limit = max("
+                "getattr(_dynamo.config, 'cache_size_limit', 64), 256)\n",
+                encoding="utf-8",
+            )
+            existing = os.environ.get("PYTHONPATH", "")
+            os.environ["PYTHONPATH"] = str(patch_dir) + (
+                os.pathsep + existing if existing else ""
+            )
         os.chdir(roots["moss_service"])
         tts = str(model_path(config, args.model_root, "tts"))
         command += ["python", str(entrypoint), "--host", service["host"],
