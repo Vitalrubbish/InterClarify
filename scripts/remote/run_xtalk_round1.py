@@ -214,10 +214,21 @@ async def tts_smoke(config: dict, args: argparse.Namespace) -> None:
             chunks.append(chunk)
 
     collector = asyncio.create_task(receive_audio())
+    # Optionally split each provided text into fixed-size word chunks so the
+    # service sees the text arrive incrementally (LLM-style streaming) rather
+    # than as one big prefill.
+    texts: list[str] = []
+    for text in args.text:
+        if args.stream_chunk_words and args.stream_chunk_words > 0:
+            words = text.split()
+            for index in range(0, len(words), args.stream_chunk_words):
+                texts.append(" ".join(words[index:index + args.stream_chunk_words]) + " ")
+        else:
+            texts.append(text)
     try:
-        for index, text in enumerate(args.text):
+        for index, text in enumerate(texts):
             await client.append_text(text)
-            if index + 1 < len(args.text):
+            if index + 1 < len(texts):
                 await asyncio.sleep(args.gap_seconds)
         flush_seconds = time.monotonic() - started
         await client.flush()
@@ -235,7 +246,9 @@ async def tts_smoke(config: dict, args: argparse.Namespace) -> None:
         output.writeframes(pcm)
     write_json(args.output / "tts_report.json", {
         "status": "COMPLETE" if pcm else "EMPTY_AUDIO",
-        "text_chunks": args.text, "sample_rate": rate,
+        "text_chunks": texts, "text_chunk_count": len(texts),
+        "stream_chunk_words": args.stream_chunk_words,
+        "sample_rate": rate,
         "first_audio_seconds": first_audio, "flush_seconds": flush_seconds,
         "audio_before_flush": first_audio is not None and first_audio < flush_seconds,
         "wall_seconds": time.monotonic() - started, "audio_seconds": len(pcm) / (2 * rate),
@@ -328,6 +341,8 @@ def main() -> None:
     tts.add_argument("--gap-seconds", type=float, default=1.0)
     tts.add_argument("--timeout-seconds", type=float, default=900)
     tts.add_argument("--text", action="append", default=None)
+    tts.add_argument("--stream-chunk-words", type=int, default=0,
+                     help="split each --text into N-word chunks pushed incrementally (0 = off)")
     server = commands.add_parser("serve")
     server.add_argument("service", choices=("llm", "turn_detector", "tts"))
     server.add_argument("--gpu-index", type=int)

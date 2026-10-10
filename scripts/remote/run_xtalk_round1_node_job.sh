@@ -227,6 +227,23 @@ PY
   fi
   step_status "chain_tts" "$RC"
 
+  # Stage 3b: same reply, delivered as small word chunks with a short gap to
+  # emulate LLM token streaming.  This is the realistic first-audio latency:
+  # the model can start synthesizing audio before the whole text has arrived.
+  RC=0
+  if [ -n "$RESP" ]; then
+    conda run --no-capture-output -n xtalk-round1-client \
+      python "$ROUND1_PY" --model-root "$XTALK_ROUND1_MODEL_ROOT" \
+      tts-smoke --reference "$XTALK_ROUND1_ROOT/audio/reference.wav" \
+      --output "$RUN_DIR/chain-tts-stream" --text "$RESP" \
+      --stream-chunk-words 6 --gap-seconds 0.12 \
+      > "$RUN_DIR/chain-tts-stream.log" 2>&1 || RC=$?
+  else
+    RC=1
+    echo "[node-job] empty LLM response; skipping streaming TTS" | tee -a "$LOG"
+  fi
+  step_status "chain_tts_stream" "$RC"
+
   # Aggregate the three stages into one report (via a file: `conda run` does
   # not forward a heredoc on stdin to the child process).
   cat > "$RUN_DIR/chain_report.py" <<'PY'
@@ -240,6 +257,7 @@ def load(path):
 asr = load(run / "chain-asr/asr_report.json")
 llm = load(run / "chain-llm.json")
 tts = load(run / "chain-tts/tts_report.json")
+tts_stream = load(run / "chain-tts-stream/tts_report.json")
 report = {
     "asr": {
         "final_text": asr.get("final_text"),
@@ -257,9 +275,16 @@ report = {
         "audio_before_flush": tts.get("audio_before_flush"),
         "sample_rate": tts.get("sample_rate"),
     },
+    "tts_stream": {
+        "first_audio_seconds": tts_stream.get("first_audio_seconds"),
+        "audio_seconds": tts_stream.get("audio_seconds"),
+        "audio_before_flush": tts_stream.get("audio_before_flush"),
+        "text_chunk_count": tts_stream.get("text_chunk_count"),
+        "sample_rate": tts_stream.get("sample_rate"),
+    },
 }
 report["content_ok"] = bool(asr.get("final_text")) and bool(llm.get("response")) and bool(tts.get("audio_seconds"))
-report["note"] = "Sequential stage measurement (ASR final -> LLM first token -> TTS first audio); not concurrent duplex."
+report["note"] = "Sequential stage measurement (ASR final -> LLM first token -> TTS first audio); the tts_stream entry feeds the same reply as small word chunks to emulate token streaming; not concurrent duplex."
 print(json.dumps(report, ensure_ascii=False, indent=2))
 PY
   conda run -n base python "$RUN_DIR/chain_report.py" "$RUN_DIR" > "$RUN_DIR/chain_report.json" 2>>"$LOG"

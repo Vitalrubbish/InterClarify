@@ -114,4 +114,15 @@ LLM 单卡接近 90%，是本组合最紧的一环；四卡分服务方案在 24
 
 - `service_logs/tts.log` 出现 “You are attempting to use Flash Attention 2 ...”，确认 flash-attn 生效；**不再按 prefill/生成长度重编译**。
 - 长文本 17.06 s 来自链式测量把整段回复一次性喂入（大 prefill）；短文本热路径仅 1.22 s，说明该路径本身很快。`audio_before_flush=false` 是因为测量客户端 push 后 2.9 ms 就 flush，不代表流式能力。
-- 结论：TTS 的 `torch.compile` 瓶颈（v0.2 的 81.76 s / 首轮 136 s）已被 flash-attn 的 DynamicCache 路径消除，首音频不再随长度爆炸。仍需在**分块流式文本**输入下复测，才能给出真实双工的首音频。
+- 结论：TTS 的 `torch.compile` 瓶颈（v0.2 的 81.76 s / 首轮 136 s）已被 flash-attn 的 DynamicCache 路径消除，首音频不再随长度爆炸。
+
+### 10.1 分块流式复测（更接近真实对话）
+
+同一作业追加 `chain-tts-stream` 步骤：把同一段 LLM 回复按 **6 词/片、片间 0.12 s** 分块推送（模拟 token 流式），tag `20261010T104729Z`，`failures=0`。
+
+| TTS 输入方式 | 首音频 | `audio_before_flush` | 分片数 |
+| --- | --- | --- | --- |
+| 整段一次性喂入 | 16.94 s | false | 1 |
+| 分块流式（6 词/片） | **0.72 s** | **true** | 35 |
+
+在真实流式输入下 TTS 首音频为 **0.72 s（亚秒）**，且在 flush（4.11 s）之前已开始出音频，满足增量合成要求。整段喂入的 16.94 s 只是“先做完大 prefill 再出音频”的测量假象。至此全链路（流式口径）为：ASR 首 partial 1.2 s、LLM 首 token 0.081 s、TTS 首音频 0.72 s。
