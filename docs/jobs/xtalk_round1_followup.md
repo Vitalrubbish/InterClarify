@@ -121,3 +121,20 @@ T2 代码与文档完成，尚缺 T3（真实流式链路）与 T4（集群最�
 据此把首轮 turn detector 从 XTurnix 切换为 TurnSense，改动与验证见 [xtalk_turnsense_migration.md](xtalk_turnsense_migration.md)。这样 headless 回放不再需要 `--drop-turn-detector`，走真实 VAD→turn detector→回复链路。XTurnix 适配器保留但首轮不再使用。
 
 验证：`job-179165328505645899791-xuan-zhang`（tag `20261010T172808Z`）link 全部 step PASS，两轮 `response_finished=true`、各一次 `finish_resp`、`tts_audio_bytes=33.5 MB`、无 `error`——T3 的 ASR→LLM→TTS→播放闭环已打通。再次复核（tag `20261011T034216Z`）同样全 PASS，并补齐 T4 插话场景：`link_barge_check` 观察 `stop_tts`（播放中被打断）且插话后的回复正常 `finish_resp`（`barge_in_stop_observed=true`、`continuation_finished=true`）。至此 T3/T4 的验收项均已通过；TTS 服务启动卡顿作为独立问题继续跟进。
+
+## 12. 同步 `d9303c8` 后的 T3/T4 复跑记录（2026-10-11）
+
+拉取适配器与 InterClarify 最新提交后复跑，确认裁决加固与一次性会话修正不破坏既有闭环。
+
+- InterClarify `main` 更新到 `95246c2`（`fix: harden ASR adapter and link check verdicts`）：`configs/xtalk_round1.yaml` 的 `sources.xtalk.commit` 改为 `d9303c8…`，并新增 `base_commit: 5f0d995…` 与 `branch: feature/qwen3-asr-adapter`；`xtalk_link_check.py` 改为按 `response_id` 判定播放/打断/续答，并加 `errors` 与接收线程失败检测；新增 `tests/test_xtalk_link_check.py`（6 项）。
+- fork `feature/qwen3-asr-adapter` 快进到 `d9303c819c96230e527ea5159e7c74f1b5841a3e`，在 `edc572a` 之上加 `fix: isolate Qwen ASR one-shot sessions`：`recognize` 改用临时 `clone` 会话（用完即 `close`，不再污染流式会话），并补 EN/ZH 适配器与测试文档及 `mkdocs.yml` 导航。
+- 本地测试：适配器契约 9/9、`test_xtalk_link_check.py` 6/6 通过。
+
+复跑 `job-179169773753587979695-xuan-zhang`（node `d6-hpc-gpu-054`，tag `20261011T054900Z`）：**8/8 step PASS，`failures=0`**。
+
+- `link_check`（2 轮）：两轮均 `response_finished` / `audio_received` / `audio_before_tts_finished` = true（`response_id` `0e81d5d3…`、`b51fbd14…`）；`asr_final="Please tell me a very long and detailed story about a dragon."`；`tts_audio_bytes=26.76 MB`；首音频 5.32 s；`status=COMPLETE`、`errors=[]`。
+- `link_barge_check`：`playback_started` / `barge_in_stop_observed` / `continuation_finished` 均 true；被打断 `6b58067a…` → 续答 `4e3b24a4…`；`asr_final="Stop! Wait. Actually, what time is it right now?"`；`errors=[]`。
+
+产物：`…/xtalk-round1/artifacts/link/20261011T054900Z/` 与 `InterClarify/data/runs/20261011T054900Z/`（`steps.jsonl`、`link_report.json`、`link_barge_report.json` 及服务日志）。
+
+至此在 `d9303c8` 上 T3/T4 再次验收通过。
