@@ -49,6 +49,7 @@ bash scripts/remote/submit_xtalk_round1_job.sh services    # 服务与探针
 
 - `job-179165281534613442146-xuan-zhang`（tag `20261010T172017Z`）：全部 step PASS，`finish_asr` + `start_tts` + `latency_metrics` + `finish_resp` + 11.9 MB TTS 音频；英文 request 被 TurnSense 判为 complete，话轮正常收尾。该次因回合 0 回复过长（~124 s 流式）超过驱动 120 s 预算，回合 1 起始时 MOSS 会话仍 active，报一次 `error`。
 - `job-179165328505645899791-xuan-zhang`（tag `20261010T172808Z`）：把驱动单回合预算调到 240 s 后，**两轮均 `response_finished=true`**、各有一份 `finish_resp`（回合 1 的故事还引用了回合 0），`tts_audio_bytes=33.5 MB`、`event_count=1324`、无 `error`。turn detector 路径（`vad_speech_start`→音频→`vad_speech_end`→TurnSense→回复）在英文输入下打通。
+- 复核 + T4 插话（`job-179169013171064158688-xuan-zhang`，tag `20261011T034216Z`）：`link_check`（顺序两轮）再次全 PASS。新增的 `link_barge_check`（`--barge-in`，播放开始后 15 s 送入 `scenarios/barge_in_stop_02_barge_in.wav`）同样 PASS：`playback_started=true`、`barge_in_stop_observed=true`、`continuation_finished=true`。时间线：0.00 vad_start → 4.56 `start_tts`(A) → 20.29 vad_start(插话) → 21.45 `stop_tts`(A 被打断) → 21.95 `finish_resp`(A) → 24.25 `finish_asr`("Stop! Wait. Actually, what time is it right now?") → 24.36 `start_tts`(B) → B 完成。即“播放中插话停止后可以继续”这条 T4 验收已满足。
 
 ## 已知限制
 
