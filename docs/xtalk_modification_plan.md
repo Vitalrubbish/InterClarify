@@ -286,7 +286,7 @@ src/xtalk/duplex_control/
 
 ## 11. 阶段 A 实现顺序
 
-### A0：冻结第一套原生组合（控制层改造前的门禁）
+### A0：固定组件并接通框架（已通过）
 
 - 创建 feature branch；
 - 用 conda 建立 X-Talk 环境；

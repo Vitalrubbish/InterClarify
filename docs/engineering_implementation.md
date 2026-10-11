@@ -120,7 +120,7 @@ P1 和 P2 是最早的两个强制门禁。当前已通过框架连接子门禁�
 
 ## 5. P1：在 X-Talk fork 中实现 DuplexCascade 功能层
 
-具体扩展点、事件协议、响应生命周期、文件布局和测试矩阵见 [xtalk_modification_plan.md](xtalk_modification_plan.md)。P1 交付无 System Backchannel 的 Layer 1 全双工底座。原生组合冻结前只做环境、配置和基线核验，不开始控制层改造。
+具体扩展点、事件协议、响应生命周期、文件布局和测试矩阵见 [xtalk_modification_plan.md](xtalk_modification_plan.md)。P1 交付无 System Backchannel 的 Layer 1 全双工底座。当前组件与连接配置已固定，允许开始 A1 可观测性和控制层开发；正式质量、性能与 FDB 冻结不再作为 A1 的前置任务。这延续用户先接通框架、再逐步改造的安排，P2 的准入门槛仍按第 5.5 节执行。
 
 ### 5.1 P1.0 固定并导入 X-Talk
 

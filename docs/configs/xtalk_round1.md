@@ -6,7 +6,7 @@
 
 ## 字段与边界
 
-- `sources` 固定 X-Talk、Qwen ASR、MOSS 服务封装和 MOSS 模型源码的 Git 提交。`sources.xtalk.commit` 指向包含适配器修复的功能分支提交 `d9303c819c96230e527ea5159e7c74f1b5841a3e`，`base_commit` 保留原生基座来源。link 作业检查实际 checkout 及 dirty 状态。
+- `sources` 固定 X-Talk、Qwen ASR、MOSS 服务封装和 MOSS 模型源码的 Git 提交。`sources.xtalk.commit` 指向包含适配器修复的功能分支提交 `d9303c819c96230e527ea5159e7c74f1b5841a3e`，`base_commit` 保留原生基座来源。当前 link 作业尚未自动检查 fork 的实际提交与 dirty 状态，启动前须人工核对。
 - `models` 记录 ASR、LLM、TTS 与 codec 的 ID；`revision=null` 表示尚未解析，下载工具第一次解析具体 SHA，后续复用锁定文件。turn detector 不在 `models` 中：自 2026-10-11 起改用音频式的 TurnSense，它是独立 ONNX HTTP 服务，模型资产（`model_int8.onnx` + `am.mvn`）直接放在 `$XTALK_ROUND1_MODEL_ROOT/turnsense/`，源码 vendored 在 `scripts/remote/turnsense/`。
 - `environments` 指定各模型服务与准备工具的 conda 环境：LLM 复用镜像 base 环境（vLLM 0.16.0），ASR 用独立环境（vLLM 0.14.0，因 `qwen_asr` 不兼容 0.16），turn detector 用独立的 `xtalk-round1-turnsense`（ONNX runtime，无 torch/vLLM），TTS 与客户端各自独立。不复用 P0 的 torch 2.4.1 环境，不运行会创建 `.venv` 的上游安装脚本。
 - `dependency_candidates` 记录各角色固定依赖版本：`asr_vllm`（0.14.0）/`asr_transformers`（4.57.6）对应 ASR 环境，`llm_vllm`（0.16.0）对应镜像 base 上的 LLM，`moss_torch`/`moss_transformers`/`moss_flash_attn` 对应 MOSS 环境（`moss_flash_attn` 是 `attn_impl=flash_attention_2` 依赖的 flash-attn，随 v0.3 镜像提供），`turnsense_onnxruntime`/`turnsense_kaldi_native_fbank` 对应 TurnSense 服务环境。`check-deps` 子命令按这些钉版校验运行环境，完整依赖仍以远端验收后的 conda/pip 快照为准。

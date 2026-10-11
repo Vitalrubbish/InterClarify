@@ -22,7 +22,7 @@
 
 ## 3. 已通过的连接门禁
 
-2026-10-11 在 `d9303c8` 上完成远端复测：作业 `job-179169773753587979695-xuan-zhang`，节点 `d6-hpc-gpu-054`，tag `20261011T054900Z`，共 8/8 steps PASS、`failures=0`。
+拉取的复测记录报告：2026-10-11 在 `d9303c8` 上完成远端复测，InterClarify 为 `95246c2`；作业 `job-179169773753587979695-xuan-zhang`，节点 `d6-hpc-gpu-054`，tag `20261011T054900Z`，共 8/8 steps PASS、`failures=0`。本次本地审查核对了提交记录和判定代码，未取得该作业的原始报告与服务日志，因此远端结论依据已提交的运行记录。
 
 - 两轮顺序会话均得到独立 `response_id`、`response_finished=true`、`audio_received=true` 和 `audio_before_tts_finished=true`，报告为 `status=COMPLETE` 且 `errors=[]`。
 - 播放开始后发送有效插话，旧响应收到 `stop_tts`，新响应完成；`barge_in_stop_observed=true`、`continuation_finished=true`，且没有把旧响应的完成事件误计为新响应完成。
@@ -37,7 +37,9 @@
 - [submit_xtalk_round1_job.sh](scripts/remote/submit_xtalk_round1_job.md)：提交远端作业；
 - [qwen3_asr_service.py](scripts/remote/qwen3_asr_service.md)、[TurnSense 服务](scripts/remote/turnsense/README.md) 和 [xtalk_link_check.py](scripts/remote/xtalk_link_check.md)：当前连接链路的服务与验收驱动。
 
-运行前后均使用 conda 环境。若更换此表中的 X-Talk 提交、模型、轮次检测器或播放链路，必须重新运行 `link` 的顺序和插话检查。
+运行前后均使用 conda 环境。若更换此表中的 X-Talk 提交、模型、轮次检测器或播放链路，必须重新运行 `link` 的顺序和插话检查。当前脚本未自动核验 fork 提交；下一阶段先补齐来源检查，防止把未提交适配器当作固定底座。
+
+本轮整理删除了 6 份完成态任务单、5 份旧 P0 记录、10 份对应脚本文档和 10 个旧/重复脚本。旧环境脚本固定到未接入适配器的基座，音频准备依赖旧场景目录，并行下载重复现有入口；当前服务、联调与镜像构建链保留。删除文件可从 Git 历史恢复。最终方法图保留，作为最终设计而非当前实现状态。
 
 ## 5. 下一阶段边界
 
