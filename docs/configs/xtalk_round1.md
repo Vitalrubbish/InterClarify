@@ -2,7 +2,7 @@
 
 ## 整体作用
 
-记录首轮无 System Backchannel 的模型组合、源码来源、conda 环境、端口、分卡与推理参数。它是远端模型准备配置，通过 `scripts/remote/run_xtalk_round1.py` 和服务启动脚本读取，独立于 P0 profile。直接传给 `Xtalk.from_config` 会缺少完整运行时定义，因此只在 ASR 适配完成后转换成全链路配置。
+记录首轮无 System Backchannel 的模型组合、源码来源、conda 环境、端口、分卡与推理参数。它由 `scripts/remote/run_xtalk_round1.py` 和节点作业读取，独立于通用本地 profile。它不能直接传给 `Xtalk.from_config`；框架联调用 `configs/xtalk_round1_runtime.json`。
 
 ## 字段与边界
 
@@ -12,6 +12,6 @@
 - `dependency_candidates` 记录各角色固定依赖版本：`asr_vllm`（0.14.0）/`asr_transformers`（4.57.6）对应 ASR 环境，`llm_vllm`（0.16.0）对应镜像 base 上的 LLM，`moss_torch`/`moss_transformers`/`moss_flash_attn` 对应 MOSS 环境（`moss_flash_attn` 是 `attn_impl=flash_attention_2` 依赖的 flash-attn，随 v0.3 镜像提供），`turnsense_onnxruntime`/`turnsense_kaldi_native_fbank` 对应 TurnSense 服务环境。`check-deps` 子命令按这些钉版校验运行环境，完整依赖仍以远端验收后的 conda/pip 快照为准。
 - `services` 记录已分配 GPU 中的逻辑编号、端口与模型启动参数。`0/1/2/3` 对应申请到的四张 GPU，不代表任意物理卡。ASR 由 `run_xtalk_round1.py serve asr` 在 ASR 环境内以本地 HTTP 服务启动（端口 8005，见 [qwen3_asr_service.md](../scripts/remote/qwen3_asr_service.md)），供 X-Talk 适配器连接。`services.turn_detector` 描述 TurnSense：`kind`、`source_dir`、`onnx_file`/`cmvn_file` 及 sha256、`upstream_repo`/`upstream_commit`、`clip_mode`、`max_concurrency`/`max_workers`、`use_cuda`；`serve turn_detector` 据此启动 vendored 的 `service.py`（端口 8003，健康检查 `/healthz`）。`services.tts.torch_compile` 控制 MOSS 的 `torch.compile`（`attn_impl != flash_attention_2` 时走 StaticCache 编译路径）：`dynamic`（默认）通过在 `PYTHONPATH` 注入 `sitecustomize.py` 设 `assume_static_by_default=False`，让一次编译适配任意 prefill 长度；`disable` 为 eager 调试回退（无重编译但远慢于实时）。
 - `asr_streaming` 区分 80 ms 回放步长与内部解码窗口；默认窗口 0.6 秒是待测值。
-- `runtime.integration_status` 表示已实现适配、等待修复后远端复测；系统附和两项为 `null`。可实例化运行配置另见 `xtalk_round1_runtime.json`。
+- `runtime.integration_status = verified_remote_link` 表示 Qwen ASR 适配器、连续两轮和插话续答已经在远端联调通过；系统附和两项仍为 `null`。这只是框架连接门禁，不代表正式基线或 P1 控制层完成。
 
 模型配置尚未冻结。`models.lock.json` 记录实际模型 SHA 与本地 snapshot 路径；运行报告记录样本校验值、输入参数、首包与修订。环境版本通过远端 `pip freeze` 和 `conda list --explicit` 保存。

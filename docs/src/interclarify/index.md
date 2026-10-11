@@ -2,7 +2,7 @@
 
 ## 作用
 
-`interclarify` 包的入口。P0 阶段只导出工程准备层：配置、运行清单与最小运行上下文。Layer 0/1/2 的运行时模块在 P1 以后加入。
+`interclarify` 包的入口。当前只导出工程准备层：配置、运行清单与最小运行上下文。X-Talk 的 P1 控制层在独立 fork 中开发，Layer 0 不属于当前范围；InterClarify Layer 2 在底座稳定后加入。
 
 ## 核心内容
 

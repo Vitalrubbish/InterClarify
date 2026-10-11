@@ -9,6 +9,6 @@
 - `asr.type = Qwen3ASRClient`：X-Talk fork 中符合 `ASR` 契约的本地服务适配器；`base_url` 指向 `qwen3_asr_service.py`（默认端口 8005），`chunk_ms=600` 决定 `stream_chunk_bytes_hint`。
 - `llm_agent.type = DefaultAgent`：`model` 指向本地 vLLM（OpenAI 兼容，端口 8000，服务名 `xtalk-round1-llm`）；`extra_body.chat_template_kwargs.enable_thinking=false` 显式关闭 thinking。`backchannel_model`/`backchannel_source_dir` 为 `null`，System Backchannel 关闭。
 - `tts.type = MossTTSRealtime`：`base_url` 指向 MOSS 服务（端口 8004），`voices` 提供一份参考音色。
-- `turn_detector.type = TurnSense`：指向 TurnSense ONNX 服务（端口 8003，健康检查 `/healthz`）。该检测器**基于音频**预测 complete/incomplete/invalid，与文本/语言无关，2030 毫秒周期的推理在 `speech_pause` 时给出 `START_GENERATION`；其客户端实现在 X-Talk 的 `models/turn_detector/turn_sense.py`，默认 `inference_interval_ms=200`、`timeout=10`。
+- `turn_detector.type = TurnSense`：指向 TurnSense ONNX 服务（端口 8003，健康检查 `/healthz`）。该检测器**基于音频**预测 complete/incomplete/invalid，与文本/语言无关；其客户端实现在 X-Talk 的 `models/turn_detector/turn_sense.py`，默认 `inference_interval_ms=200`、`timeout=10`。
 
 端口与 `configs/xtalk_round1.yaml` 的 `services` 一致。参考音色路径为集群上的绝对路径，联调时按实际路径覆盖。

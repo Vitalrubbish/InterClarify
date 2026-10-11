@@ -1,6 +1,6 @@
 # Round-one model preparation; this is not a Xtalk.from_config runtime file.
 schema_version: 1
-baseline_status: candidate
+baseline_status: framework_connected
 target: duplexcascade_without_system_backchannel
 
 sources:
@@ -127,7 +127,7 @@ asr_streaming:
   unfixed_token_num: 5
 
 runtime:
-  integration_status: blocked_on_qwen_asr_adapter
+  integration_status: verified_remote_link
   micro_turn_seconds: 0.6
   system_backchannel_enabled: false
   backchannel_model: null

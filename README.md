@@ -4,17 +4,17 @@ InterClarify 研究全双工语音代理在**用户话轮内**主动澄清的时
 
 参考底座为独立维护的 [Vitalrubbish/xtalk](https://github.com/Vitalrubbish/xtalk) fork。第一阶段先跑通并冻结一套原生组件组合，再补齐 DuplexCascade 无 System Backchannel 版本的 micro-turn、Layer 1、提前回答、持续监听、用户附和识别和打断停播；当前移除 Layer 0，底座稳定后再接入 InterClarify Layer 2。InterClarify 不跟踪 X-Talk 源码或子模块，只记录实验使用的 fork 提交。
 
-**当前状态：P0 路线重置完成；P1 将在 X-Talk fork 中实现通用 DuplexCascade 功能层。** 本仓库暂不实现 Layer 2 运行时。
+**当前状态：P0 路线重置和首轮框架接通已完成；下一步进入 X-Talk fork 的 P1 通用 DuplexCascade 控制层。** 本仓库暂不实现 Layer 2 运行时。
 
-## P0 交付物
+## 当前基础设施
 
 | 交付物 | 位置 |
 | --- | --- |
 | 固定 conda 环境 | [environment.yml](environment.yml) + [requirements.txt](requirements.txt) |
-| 依赖与底座清单 | [docs/p0/dependency_inventory.md](docs/p0/dependency_inventory.md)、[docs/p0/xtalk_registry.md](docs/p0/xtalk_registry.md) |
+| 当前 X-Talk 组件与复测基线 | [docs/xtalk_baseline_stack.md](docs/xtalk_baseline_stack.md) |
 | 三类配置模板 | [configs/](configs/)（local / replay / cluster） |
-| 实验清单格式 | `manifest.json` / `resolved_config.yaml` / `events.jsonl`，见 [docs/p0/README.md](docs/p0/README.md) |
-| 集群镜像与任务脚本 | [scripts/remote/](scripts/remote/)、任务单 [docs/jobs/p0_environment_check.md](docs/jobs/p0_environment_check.md) |
+| 实验清单格式 | `manifest.json` / `resolved_config.yaml` / `events.jsonl`，见 [docs/src/interclarify/run.md](docs/src/interclarify/run.md) |
+| 当前远端复测入口 | [scripts/remote/submit_xtalk_round1_job.sh](scripts/remote/submit_xtalk_round1_job.sh) 与 [docs/scripts/remote/submit_xtalk_round1_job.md](docs/scripts/remote/submit_xtalk_round1_job.md) |
 
 ## 本地环境与验收
 
@@ -34,16 +34,15 @@ conda run -n interclarify-dev python scripts/run_p0_smoke.py --profile replay
 conda run -n interclarify-dev python -m pytest -q
 ```
 
-集群验收使用 [scripts/remote/submit_p0_job.sh](scripts/remote/submit_p0_job.sh) 提交，证据写入共享存储，执行手册见 [docs/p0/remote/p0_job_runbook.md](docs/p0/remote/p0_job_runbook.md)。
+当前模型链路复测使用 `bash scripts/remote/submit_xtalk_round1_job.sh link` 提交；它在远端 conda 环境中运行顺序两轮和插话续答检查。完整判据见 [docs/scripts/remote/xtalk_link_check.md](docs/scripts/remote/xtalk_link_check.md)。
 
 ## 文档索引
 
-- P0 阶段总览与验收：[docs/p0/README.md](docs/p0/README.md)
 - 实现文档（按源码树镜像）：[docs/src/interclarify/](docs/src/interclarify/)、[docs/scripts/](docs/scripts/)、[docs/configs/](docs/configs/)
 - 研究设计：[docs/research_design.md](docs/research_design.md)；工程方案：[docs/engineering_implementation.md](docs/engineering_implementation.md)
 - X-Talk 具体改造方案：[docs/xtalk_modification_plan.md](docs/xtalk_modification_plan.md)
-- 第一套组件候选与冻结门禁：[docs/xtalk_baseline_stack.md](docs/xtalk_baseline_stack.md)
-- 首轮模型配置：[configs/xtalk_round1.yaml](configs/xtalk_round1.yaml)；远端部署与验收：[docs/jobs/xtalk_round1_baseline.md](docs/jobs/xtalk_round1_baseline.md)
-- 首轮审查后的下一步任务：[docs/jobs/xtalk_round1_followup.md](docs/jobs/xtalk_round1_followup.md)（ASR 适配与最小框架接通）
+- 当前组件、复测证据与冻结边界：[docs/xtalk_baseline_stack.md](docs/xtalk_baseline_stack.md)
+- 首轮模型配置：[configs/xtalk_round1.yaml](configs/xtalk_round1.yaml)；运行配置：[configs/xtalk_round1_runtime.json](configs/xtalk_round1_runtime.json)
+- 下一阶段方案：[docs/xtalk_modification_plan.md](docs/xtalk_modification_plan.md)（P1 控制层改造）
 
 实现行为若与文档不一致，先更新文档并说明原因，再改代码。

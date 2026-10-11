@@ -50,18 +50,22 @@ xtalk:
   # X-Talk 是独立 fork；本仓库只记录来源和实验使用的提交。
   repo_url: https://github.com/Vitalrubbish/xtalk
   upstream_url: https://github.com/xcc-zach/xtalk
-  repo_commit: 5f0d9959edf1026588246efbed827b078cbb114c
+  repo_commit: d9303c819c96230e527ea5159e7c74f1b5841a3e
+  repo_branch: feature/qwen3-asr-adapter
+  repo_base_commit: 5f0d9959edf1026588246efbed827b078cbb114c
   base_image: docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk:v0.17
   source_root: null
-  # Selected candidates; model revisions and runtime integration remain pending.
+  # The round-one model services and the X-Talk adapter have passed the
+  # remote sequential and barge-in link checks. Formal baseline freezing is
+  # still a separate gate.
   round1_config: configs/xtalk_round1.yaml
-  baseline_status: candidate
+  baseline_status: framework_connected
   system_backchannel_enabled: false
   asr:
     model_id: Qwen/Qwen3-ASR-1.7B
     revision: null
     backend: qwen_asr_vllm_streaming
-    adapter_status: pending
+    adapter_status: verified_at_d9303c8
   llm_agent:
     type: DefaultAgent
     model_id: Qwen/Qwen3-8B-AWQ
@@ -78,8 +82,8 @@ xtalk:
   vad:
     backend: frontend_silero
   turn_detector:
-    type: XTurnix
-    model_id: xcczach/xturnix-zh-base
+    type: TurnSense
+    model_id: null
     revision: null
 
 logging:

@@ -11,13 +11,16 @@
 #       4-GPU job: start the three services, then run the full path
 #       ASR (gpu2) -> LLM -> TTS on one input wav, measure per-stage latency,
 #       and copy the run dir under $INTERCLARIFY_ROOT/data/runs/.
+#   bash run_xtalk_round1_node_job.sh link
+#       4-GPU job: start ASR / LLM / TurnSense / TTS, run two sequential turns,
+#       then run the barge-in continuation check through X-Talk.
 #
 # All evidence is written under $XTALK_ROUND1_ARTIFACT_ROOT so it is visible
 # from the dev machine.  The script keeps going after individual check
 # failures and reports a per-step status JSON at the end.
 set -uo pipefail
 
-MODE="${1:?usage: run_xtalk_round1_node_job.sh [asr|services|chain]}"
+MODE="${1:?usage: run_xtalk_round1_node_job.sh [asr|services|chain|link]}"
 
 export INTERCLARIFY_ROOT="${INTERCLARIFY_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/InterClarify}"
 export XTALK_ROUND1_ROOT="${XTALK_ROUND1_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1}"

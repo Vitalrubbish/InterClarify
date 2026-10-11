@@ -3,7 +3,7 @@
 # Built on the flattened, stripped xtalk base (CUDA 12.8.1, conda at
 # /opt/conda, ffmpeg, sudo, vLLM 0.16.0, torch 2.9.1+cu128).  The base is
 # `xtalk:v0.17` flattened to one layer and stripped of components this stack
-# does not use (see docs/jobs/xtalk_round1_baseline_results.md); it is ~22 GB
+# does not use (see docs/xtalk_baseline_stack.md); it is ~22 GB
 # instead of ~32 GB.  The model-serving LLM and turn detector reuse the base
 # environment's vLLM 0.16.0; only ASR needs its own environment because
 # qwen_asr is incompatible with vLLM 0.16 (its multimodal processor still

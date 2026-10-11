@@ -4,6 +4,12 @@
 
 本文把 [research_design.md](research_design.md) 中的研究构想转换为可执行、可验收和可停止的工程计划。
 
+## 当前状态（2026-10-11）
+
+P0 路线重置和首轮框架接通门禁已完成。远端在 X-Talk fork `d9303c819c96230e527ea5159e7c74f1b5841a3e` 上完成两轮顺序链路和一次播放中插话复测：8/8 steps PASS、两个报告均 `status=COMPLETE`、`errors=[]`。因此项目现在进入 P1 的 X-Talk Duplex 控制层实现；本仓库仍不实现第二套语音运行时或 Layer 2。
+
+这项通过只证明 ASR→LLM→TTS→播放和插话生命周期已经接通，不等于正式基线冻结、FDB 对照、质量评测或 Layer 2 完成。固定来源和证据见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
+
 自 2026-10-09 起，项目不再直接复现、内嵌或改造 DuplexCascade 官方源码。新的工程路线是：
 
 1. 以独立维护的 [Vitalrubbish/xtalk](https://github.com/Vitalrubbish/xtalk) fork 为唯一运行底座；
@@ -81,14 +87,14 @@ X-Talk fork 提供 ASR、LLM agent、TTS、VAD、轮次检测、异步事件和 
 
 | 阶段 | 核心目标 | 主要产物 | 继续条件 |
 | --- | --- | --- | --- |
-| P0 路线重置 | 固定 X-Talk 来源、环境和记录格式 | conda 环境、配置、来源登记 | 基础环境与日志脚手架可重复运行 |
-| P1 X-Talk Duplex | 先冻结原生组件，再补齐无 System Backchannel 的 Layer 1 行为 | 组件锁定记录、原生基线、差距表、改造运行时、FDB smoke | 目标行为稳定且关键事件可观察 |
+| P0 路线重置 | 固定 X-Talk 来源、环境和记录格式 | conda 环境、配置、来源登记 | 已完成；后续只修复发现的记录问题 |
+| P1 X-Talk Duplex | 在已接通底座上实现无 System Backchannel 的 Layer 1 行为 | 组件锁定记录、差距表、改造运行时、FDB smoke | 目标行为稳定且关键事件可观察 |
 | P2 快速可行性验证 | 验证话轮内澄清现象和闭环 | 小样本、规则/提示策略、试交互报告 | 存在足够可问窗口且任务可恢复 |
 | P3 数据与评测基础设施 | 形成可训练、可审计的数据资产 | 回放器、标注格式、切分和检查工具 | 无未来泄漏，正负轨迹覆盖充分 |
 | P4 决策方法与可选训练 | 固定 Layer 2 方法并完成对照 | 各策略、可选 LoRA、消融结果 | 主方法在固定底座上有稳定收益 |
 | P5 系统测试与正式评价 | 验证通用能力和论文主张 | FDB 对照、真人实验、最终报告 | 结果支持或清楚限定研究主张 |
 
-P1 和 P2 是最早的两个强制门禁。P2 未通过前，不开展大规模数据生产、训练或正式真人实验。
+P1 和 P2 是最早的两个强制门禁。当前已通过框架连接子门禁，尚未通过 P1 控制层门禁；P2 未通过前，不开展大规模数据生产、训练或正式真人实验。
 
 ## 4. P0：路线重置与工程准备
 
@@ -98,12 +104,12 @@ P1 和 P2 是最早的两个强制门禁。P2 未通过前，不开展大规模�
 
 ### 4.2 工作项
 
-1. 在 `configs/base.yaml` 固定 X-Talk fork、官方 upstream 与源码提交；当前起点记录在 [p0/xtalk_registry.md](p0/xtalk_registry.md)。
+1. 在 `configs/base.yaml` 固定 X-Talk fork、官方 upstream、适配器提交和基座提交；当前来源和验收证据登记在 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
 2. 明确集群镜像 `xtalk:v0.17` 与源码提交的对应关系；对应关系未证明前，不把镜像标签当作可复现版本。
 3. 用 conda 创建本地和远端环境；P1 选择具体 ASR、TTS、LLM agent 和 turn detector 后，再锁定相应 X-Talk extras。
 4. 保留 local / replay / cluster 三类配置、唯一运行目录和结构化事件日志。
 5. 重新检查音频采样率、客户端 VAD、服务端 turn detector、AEC 和播放设备条件。
-6. 集群测试前在 `docs/jobs/` 新建 X-Talk 专用任务单和对应脚本。
+6. 集群测试使用当前联调入口，并把来源、配置和结果摘要回填到 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
 
 ### 4.3 P0 验收门槛
 
@@ -121,8 +127,8 @@ P1 和 P2 是最早的两个强制门禁。P2 未通过前，不开展大规模�
 - 在独立 X-Talk fork 中开发；`origin` 指向 `Vitalrubbish/xtalk`，`upstream` 指向官方仓库，不使用子模块。
 - 记录 X-Talk 核心依赖和实际启用的 optional extras。
 - 按 [xtalk_baseline_stack.md](xtalk_baseline_stack.md) 选择一套自部署的 ASR、LLM agent、TTS、VAD/turn detector 组合；实际权重 revision、服务提交和推理参数核验后才视为冻结。所有后续策略共享该组合。
-- 当前连接配置固定到 X-Talk fork `feature/qwen3-asr-adapter@d9303c819c96230e527ea5159e7c74f1b5841a3e`，组件为 Qwen3-ASR 1.7B + MOSS-TTS-Realtime（含 codec）、Qwen3-8B-AWQ 和 TurnSense，见 `configs/xtalk_round1.yaml`；轮次检测迁移记录见 [jobs/xtalk_turnsense_migration.md](jobs/xtalk_turnsense_migration.md)。适配器边界与最小联调判据已补齐，远端复测必须使用该提交。
-- 2026-10-10 根据用户反馈，当前按 [jobs/xtalk_round1_followup.md](jobs/xtalk_round1_followup.md) 聚焦测试与启动修复、ASR 接入、真实流式链路和最小连接检查。中文质量评测、延迟预算、长会话和 FDB 留到框架接通后，不作为当前接入前置条件。现有人为分块的 TTS 首包属于独立服务指标，不能据此宣称端到端或全双工复现完成。
+- 当前连接配置固定到 X-Talk fork `feature/qwen3-asr-adapter@d9303c819c96230e527ea5159e7c74f1b5841a3e`，组件为 Qwen3-ASR 1.7B + MOSS-TTS-Realtime（含 codec）、Qwen3-8B-AWQ 和 TurnSense，见 `configs/xtalk_round1.yaml` 与 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。该提交已经通过最小联调，后续控制层开发不得漂移来源。
+- 框架接通门禁已经完成，证据摘要见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。中文质量评测、延迟预算、长会话和 FDB 留到 P1 控制层稳定后；人为分块的 TTS 首包仍只是独立服务指标，不能单独宣称端到端或全双工复现完成。
 - 跑通 X-Talk 原生示例，保存启动配置、首包延迟、实时因子、显存和事件日志。
 - 在未完成来源与许可证核验前，不把 X-Talk 源码直接复制进本仓库。
 

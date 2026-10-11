@@ -8,8 +8,8 @@
 # The MOSS env consumes a *prebuilt* flash-attn wheel from the wheelhouse (see
 # Dockerfile.round1), so the image build performs no CUDA compilation.  The
 # official flash-attn wheels carry a local version in the filename
-# (`2.8.3.post1+cu12torch2.8...`) while their METADATA `Version` is plain
-# `2.8.3.post1`; pip >= 24 rejects that as "inconsistent version" and would fall
+# (`2.8.3+cu12torch2.9...`) while their METADATA `Version` is plain
+# `2.8.3`; pip >= 24 rejects that as "inconsistent version" and would fall
 # back to the sdist (a minutes-long, memory-hungry compile).  To avoid that we
 # stage a filename-normalized copy of the wheel whose name matches its metadata.
 #
@@ -23,7 +23,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 ROUND1_ROOT="${XTALK_ROUND1_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1}"
-IMAGE="${XTALK_ROUND1_IMAGE:-docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.2}"
+IMAGE="${XTALK_ROUND1_IMAGE:-docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.3}"
 PUSH="${PUSH:-0}"
 
 WHEELS="$ROUND1_ROOT/wheels"

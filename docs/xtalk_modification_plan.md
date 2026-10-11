@@ -1,5 +1,7 @@
 # X-Talk 的 DuplexCascade 功能改造方案
 
+> 当前入口：框架连接门禁已在 `d9303c8` 上通过；以下 A1–A4 是下一阶段的控制层工作。模型组合、ASR 适配器和 TurnSense 在本阶段保持不变。
+
 ## 1. 路线结论
 
 X-Talk fork 与 InterClarify 是两个独立项目，不使用 Git 子模块。
@@ -31,7 +33,7 @@ upstream git@github.com:xcc-zach/xtalk.git
 
 - `main` 跟踪 `origin/main`；
 - `upstream` 只用于 fetch，禁用 push；
-- 起始提交为 `5f0d9959edf1026588246efbed827b078cbb114c`；
+- 基座提交为 `5f0d9959edf1026588246efbed827b078cbb114c`；当前联调提交为 `d9303c819c96230e527ea5159e7c74f1b5841a3e`；
 - 功能开发使用独立 feature branch；
 - 同步上游时先 fetch/rebase，再运行上游全量测试和项目回归测试；
 - InterClarify 的实验 manifest 记录 X-Talk fork 提交，不依赖浮动分支名。
@@ -293,7 +295,7 @@ src/xtalk/duplex_control/
 - 用原生 DefaultService / DefaultAgent 跑通链路，显式关闭 System Backchannel；
 - 保存原生行为和资源占用。
 
-模型来源和配置完整、原生链路 smoke 通过、延迟与资源记录齐全后，才允许进入 A1。当前组合处于候选状态，尚未完成运行冻结。
+框架连接 smoke 已通过，因此允许进入 A1；模型来源、依赖快照、延迟与资源记录补齐后才完成正式基线冻结。
 
 ### A1：可观测性
 

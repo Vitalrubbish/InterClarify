@@ -21,7 +21,7 @@
 #   XTALK_ASR_GPUS / XTALK_SERVICES_GPUS (GPU counts per mode)
 set -euo pipefail
 
-MODE="${1:?usage: submit_xtalk_round1_job.sh [asr|services]}"
+MODE="${1:?usage: submit_xtalk_round1_job.sh [asr|services|chain|link]}"
 
 REPO_HPC="${INTERCLARIFY_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/InterClarify}"
 IMAGE="${XTALK_ROUND1_IMAGE:-docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.3}"

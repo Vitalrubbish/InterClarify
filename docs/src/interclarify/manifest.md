@@ -16,6 +16,6 @@
 
 ## 关键约束
 
-- `model` 字段从配置的 `xtalk` 段复制，登记仓库提交、基础镜像和后续固定的组件信息（见 [../../p0/xtalk_registry.md](../../p0/xtalk_registry.md)）；
+- `model` 字段从配置的 `xtalk` 段复制，登记仓库提交、基础镜像和固定组件信息（见 [../../xtalk_baseline_stack.md](../../xtalk_baseline_stack.md)）；
 - 时间字段一律使用带时区的 UTC ISO 8601；
 - Git 调用失败时字段为 `null`，不抛异常，保证无 Git 环境仍可运行。

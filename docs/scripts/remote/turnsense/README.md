@@ -2,7 +2,7 @@
 
 ## 整体作用
 
-vendored 的 **TurnSense** 独立 ONNX HTTP 服务：一个基于**音频**的话轮检测器，对缓冲的用户语音预测 `complete` / `incomplete` / `invalid`。首轮 X-Talk 用它替换原先纯文本、中文微调的 XTurnix，避免“文本 + 语言”依赖导致的话轮不结束问题（见 [xtalk_turnsense_migration.md](../../../jobs/xtalk_turnsense_migration.md)）。
+vendored 的 **TurnSense** 独立 ONNX HTTP 服务：一个基于**音频**的话轮检测器，对缓冲的用户语音预测 `complete` / `incomplete` / `invalid`。当前 X-Talk 组合使用它处理音频式话轮边界；组件来源和连接证据见 [xtalk_baseline_stack.md](../../../xtalk_baseline_stack.md)。
 
 `scripts/remote/run_xtalk_round1.py serve turn_detector` 在端口 8003 启动 `service.py`；X-Talk 侧的客户端是 fork 的 `models/turn_detector/turn_sense.py`，运行配置 `configs/xtalk_round1_runtime.json` 指向它。
 

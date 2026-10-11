@@ -12,11 +12,11 @@
 - `xtalk`：项目 fork、官方 upstream、固定提交、集群基础镜像和首轮候选模型组件；
 - `logging`：日志级别与事件文件名。
 
-`xtalk.source_root` 和模型 `revision` 当前为 `null`，表示尚未完成部署核验和运行冻结。候选为 Qwen3-ASR 1.7B + MOSS-TTS-Realtime（含 codec），沿用 Qwen3 回答模型与 XTurnix。P0 loader 只记录这些元数据，不启动或下载模型。
+`xtalk.source_root` 和基础配置中的模型 `revision` 可以为空：实际模型 SHA 与环境快照由远端 `models.lock.json` 和作业产物记录。当前来源提交为 Qwen ASR 适配器修复后的 `d9303c8`，轮次检测使用 TurnSense。P0 loader 只记录元数据，不启动或下载模型；正式基线冻结仍未完成。
 
 ## `xtalk_round1.yaml`
 
-独立的首轮模型准备配置，记录源码提交、模型 ID、conda 环境、分卡、端口、流式参数与系统附和关闭状态。详细字段见 [xtalk_round1.md](xtalk_round1.md)，执行入口见 [远端任务单](../jobs/xtalk_round1_baseline.md)。它不参与 `load_config` 的 profile 合并，也不能直接传给 `Xtalk.from_config`。ASR 接入缺口在配置中显式标记。
+独立的首轮模型配置，记录源码提交、模型 ID、conda 环境、分卡、端口、流式参数与系统附和关闭状态。详细字段见 [xtalk_round1.md](xtalk_round1.md)，当前来源与验收见 [组件基线](../xtalk_baseline_stack.md)。它不参与 `load_config` 的 profile 合并，也不能直接传给 `Xtalk.from_config`；可实例化的运行配置见 `configs/xtalk_round1_runtime.json`。
 
 ## profiles
 
@@ -24,4 +24,4 @@
 - `replay.yaml`：CPU、无设备、虚拟时钟；
 - `cluster.yaml`：集群 GPU、共享存储、实时时钟和 HF 镜像环境变量。
 
-X-Talk 来源说明见 [xtalk_registry.md](../p0/xtalk_registry.md)。解析后的完整配置及 SHA-256 摘要随每次运行写入 manifest。
+X-Talk 来源说明见 [xtalk_baseline_stack.md](../xtalk_baseline_stack.md)。解析后的完整配置及 SHA-256 摘要随每次运行写入 manifest。
