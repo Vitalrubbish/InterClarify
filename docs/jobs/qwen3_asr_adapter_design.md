@@ -8,7 +8,7 @@
 
 ## 2. 现行 ASR 抽象契约
 
-来自 `xtalk/src/xtalk/models/asr/interfaces.py`（fork 提交 `5f0d995`）：
+来自 `xtalk/src/xtalk/models/asr/interfaces.py`（基座 `5f0d995`；适配器提交 `d9303c8`）：
 
 | 方法 | 约定 |
 | --- | --- |
@@ -49,8 +49,8 @@
 
 行为：
 
-- `recognize(audio)` → 新建/复用会话，`is_final=True`，返回最终累计文本。
-- `recognize_stream(audio, *, is_final, chat_history)`：把 `bytes` 直接作为 `application/octet-stream` 上送（服务端按 PCM16 解析），返回服务端的**累计**文本；`is_final` 表示临时边界/冲刷，服务端据此可选地 `finish` 尾部但保留会话；`chat_history` 目前忽略（量化为接口兼容，服务端未来可选用）。
+- `recognize(audio)` → 使用临时 clone 会话进行一次性识别，成功或失败后释放；连续调用独立，并保留调用实例已有的流式会话。
+- `recognize_stream(audio, *, is_final, chat_history)`：通过 JSON 发送 base64 PCM16，返回服务端的**累计**文本，包括空字符串与缩短修订；缺失或非字符串 text 为协议错误。`is_final` 为临时冲刷标记，保留会话；`chat_history` 目前忽略。
 - `reset()`：`DELETE /v1/session/{id}` 释放；清 `_session_id`/`_confirmed_text`。
 - `clone()`：返回同参数的新实例（不同 session）。
 - `close()`/`__del__`：尽力释放会话。

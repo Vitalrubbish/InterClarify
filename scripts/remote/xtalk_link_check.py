@@ -32,8 +32,6 @@ from pathlib import Path
 
 import numpy as np
 import requests
-import soundfile as sf
-import websockets
 
 
 FRAME_SAMPLES = 512
@@ -44,6 +42,7 @@ FRAME_SECONDS = FRAME_SAMPLES / SAMPLE_RATE
 
 def _load_pcm16(path: Path, target_rate: int = SAMPLE_RATE) -> bytes:
     """Load a WAV file as mono 16 kHz PCM16 bytes."""
+    import soundfile as sf
     audio, rate = sf.read(path, dtype="float32", always_2d=False)
     if audio.ndim > 1:
         audio = audio.mean(axis=1)
@@ -99,6 +98,13 @@ class LinkClient:
         self._start_resp_ids: list[str] = []
         self._finish_resp_ids: list[str] = []
         self._stop_tts_count = 0
+        self._stop_resp_ids: list[str] = []
+        self._current_response_id: str | None = None
+        self._audio_by_response: dict[str, int] = {}
+        self._audio_before_finished: set[str] = set()
+        self._tts_finished_ids: set[str] = set()
+        self._errors: list[str] = []
+        self._receiver: asyncio.Task | None = None
 
     async def run(
         self,
@@ -109,10 +115,15 @@ class LinkClient:
         barge_after_seconds: float = 15.0,
     ) -> dict:
         """Run the requested scenario and return a summary."""
+        import websockets
+
+        if rounds < 1:
+            raise ValueError("rounds must be positive")
         token = await asyncio.to_thread(self._login)
         url = f"{self._ws_base}?access_token={token}"
         async with websockets.connect(url, max_size=None) as ws:
             receiver = asyncio.create_task(self._receive(ws))
+            self._receiver = receiver
             await ws.send(json.dumps({"action": "attach_session", "session_id": None}))
             await asyncio.sleep(2.0)
             self._started = time.monotonic()
@@ -122,12 +133,26 @@ class LinkClient:
                 turns = []
                 for index in range(rounds):
                     turns.append(await self._run_turn(ws, audio_pcm, index))
+                    if not turns[-1]["response_finished"] or self._errors:
+                        break
                 summary = {"rounds": turns}
             await asyncio.sleep(2.0)
+            await self._wait_for(lambda: True, 0)
             receiver.cancel()
             await asyncio.gather(receiver, return_exceptions=True)
+        if barge_pcm is not None:
+            passed = all(summary[key] for key in (
+                "playback_started", "barge_in_stop_observed", "continuation_finished"
+            ))
+        else:
+            passed = len(summary["rounds"]) == rounds and all(
+                turn["response_finished"] and turn["audio_received"]
+                and turn["audio_before_tts_finished"] for turn in summary["rounds"]
+            )
         return {
-            "status": "COMPLETE",
+            "status": "COMPLETE" if passed and not self._errors else "FAILED",
+            "errors": self._errors,
+            "playback_mode": "immediate_headless_ack",
             **summary,
             "asr_final": self._asr_final,
             "response": self._response,
@@ -136,6 +161,19 @@ class LinkClient:
             "event_count": len(self._events),
             "events": self._events,
         }
+
+    async def _wait_for(self, predicate, timeout: float) -> bool:
+        """Wait for an event while observing receiver failures and errors."""
+        def ready_or_failed():
+            """Stop waiting if the receiver closes or the server reports an error."""
+            if self._receiver is not None and self._receiver.done():
+                error = self._receiver.exception() if not self._receiver.cancelled() else None
+                message = f"receiver failed: {error}" if error else "receiver closed"
+                if message not in self._errors:
+                    self._errors.append(message)
+            return bool(self._errors) or predicate()
+        await _wait(ready_or_failed, timeout)
+        return not self._errors and bool(predicate())
 
     async def _send_turn_input(
         self,
@@ -170,16 +208,22 @@ class LinkClient:
         audio_pcm: bytes,
         index: int,
     ) -> dict:
-        target = len(self._finish_resp_ids) + 1
+        starts_before = len(self._start_resp_ids)
         started, user_end = await self._send_turn_input(ws, audio_pcm, index)
-        completed = await _wait(
-            lambda: len(self._finish_resp_ids) >= target, self._timeout
+        completed = await self._wait_for(
+            lambda: any(rid in self._finish_resp_ids
+                        for rid in self._start_resp_ids[starts_before:]), self._timeout
         )
+        new_ids = self._start_resp_ids[starts_before:]
+        response_id = new_ids[0] if new_ids else None
         return {
             "index": index,
             "audio_seconds": len(audio_pcm) / (2 * SAMPLE_RATE),
             "user_end_seconds": user_end - started,
-            "response_finished": completed,
+            "response_id": response_id,
+            "response_finished": completed and response_id in self._finish_resp_ids,
+            "audio_received": self._audio_by_response.get(response_id, 0) > 0,
+            "audio_before_tts_finished": response_id in self._audio_before_finished,
             "first_audio_seconds": self._first_audio,
         }
 
@@ -192,23 +236,25 @@ class LinkClient:
     ) -> dict:
         """Play a long reply, interrupt it mid-playback, then let a turn finish."""
         a_start, a_end = await self._send_turn_input(ws, request_pcm, 0)
-        playback_started = await _wait(lambda: self._audio_bytes > 0, 90.0)
+        playback_started = await self._wait_for(lambda: self._audio_bytes > 0, 90.0)
         await asyncio.sleep(max(0.0, after_seconds))
         bytes_before = self._audio_bytes
-        stops_before = self._stop_tts_count
+        interrupted_id = self._current_response_id
+        active_before_barge = interrupted_id is not None and interrupted_id not in self._finish_resp_ids
         starts_before = len(self._start_resp_ids)
-        finishes_before = len(self._finish_resp_ids)
 
         b_start, b_end = await self._send_turn_input(ws, barge_pcm, 1)
 
-        await _wait(
-            lambda: self._stop_tts_count > stops_before, self._timeout
+        stopped = await self._wait_for(
+            lambda: interrupted_id in self._stop_resp_ids, self._timeout
         )
-        completed = await _wait(
+        completed = await self._wait_for(
             lambda: len(self._start_resp_ids) > starts_before
-            and len(self._finish_resp_ids) > finishes_before,
+            and self._start_resp_ids[starts_before] in self._finish_resp_ids,
             self._timeout,
         )
+        continuation_id = (self._start_resp_ids[starts_before]
+                           if len(self._start_resp_ids) > starts_before else None)
         return {
             "scenario": "barge_in",
             "request_audio_seconds": len(request_pcm) / (2 * SAMPLE_RATE),
@@ -216,9 +262,12 @@ class LinkClient:
             "barge_in_audio_seconds": len(barge_pcm) / (2 * SAMPLE_RATE),
             "barge_in_user_end_seconds": b_end - b_start,
             "barge_in_after_playback_seconds": after_seconds,
-            "playback_started": playback_started,
-            "barge_in_stop_observed": self._stop_tts_count > stops_before,
-            "continuation_finished": completed,
+            "playback_started": playback_started and active_before_barge,
+            "interrupted_response_id": interrupted_id,
+            "continuation_response_id": continuation_id,
+            "barge_in_stop_observed": stopped and active_before_barge,
+            "continuation_finished": completed and self._audio_by_response.get(continuation_id, 0) > 0
+            and continuation_id in self._audio_before_finished,
             "tts_audio_after_barge_in": self._audio_bytes - bytes_before,
             "first_audio_seconds": self._first_audio,
         }
@@ -229,7 +278,14 @@ class LinkClient:
                 if self._first_audio is None:
                     self._first_audio = time.monotonic() - self._started
                 self._audio_bytes += len(message)
-                await ws.send(json.dumps({"action": "tts_chunk_played"}))
+                rid = self._current_response_id
+                if rid is None:
+                    self._errors.append("audio received without start_tts response ID")
+                    continue
+                self._audio_by_response[rid] = self._audio_by_response.get(rid, 0) + len(message)
+                if rid not in self._tts_finished_ids:
+                    self._audio_before_finished.add(rid)
+                await ws.send(json.dumps({"action": "tts_chunk_played", "response_id": rid}))
                 continue
             payload = json.loads(message)
             action = payload.get("action")
@@ -241,15 +297,22 @@ class LinkClient:
                 self._response = str(data.get("text", ""))
             elif action == "start_tts" and isinstance(data, dict):
                 if data.get("response_id"):
-                    self._start_resp_ids.append(str(data["response_id"]))
+                    self._current_response_id = str(data["response_id"])
+                    self._start_resp_ids.append(self._current_response_id)
             elif action == "finish_resp" and isinstance(data, dict):
                 self._response = str(data.get("text", self._response))
                 if data.get("response_id"):
                     self._finish_resp_ids.append(str(data["response_id"]))
             elif action == "stop_tts":
                 self._stop_tts_count += 1
+                if isinstance(data, dict) and data.get("response_id"):
+                    self._stop_resp_ids.append(str(data["response_id"]))
             elif action == "tts_finished":
-                await ws.send(json.dumps({"action": "tts_playback_finished"}))
+                rid = str(data.get("response_id", "")) if isinstance(data, dict) else ""
+                self._tts_finished_ids.add(rid)
+                await ws.send(json.dumps({"action": "tts_playback_finished", "response_id": rid}))
+            elif action == "error":
+                self._errors.append(str(data or payload))
 
     def _record(self, action: str | None, index: int | None, data: object = None) -> None:
         entry = {"action": action, "seconds": time.monotonic() - self._started}
@@ -350,6 +413,8 @@ def main() -> None:
             ensure_ascii=False,
         )
     )
+    if report["status"] != "COMPLETE":
+        raise SystemExit(1)
 
 
 if __name__ == "__main__":

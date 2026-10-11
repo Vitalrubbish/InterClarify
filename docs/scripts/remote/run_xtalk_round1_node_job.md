@@ -8,6 +8,8 @@
 
 ## 模式与步骤
 
+2026-10-11 的复测先检查 `$INTERCLARIFY_ROOT/xtalk` 提交与 `sources.xtalk.commit` 一致且工作树干净，再加载适配器；不再接受只校验类非抽象的未提交文件。顺序与插话报告都要求 `status=COMPLETE`，超时、服务器错误与错误 response ID 匹配会失败。headless 播放回执仅作为模拟交付确认。
+
 - `asr`（1 卡作业）：以 `--gpu-index 0` 依次运行 0.6 / 1.2 / 2.0 秒解码窗口的 ASR smoke，输出 `asr-06` / `asr-12` / `asr-20`。
 - `chain`（4 卡作业）：启动三服务后，在同一节点跑完整路径——ASR（逻辑卡 2）转写输入 WAV → 用 LLM 服务做流式对话并测首 token 延迟 → 用 MOSS TTS 合成回复并测首音频。TTS 跑两次：一次把整段回复一次性喂入（`chain-tts`），一次用 `--stream-chunk-words 6 --gap-seconds 0.12` 把同一回复按词分片流式喂入（`chain-tts-stream`，模拟 token 流式、更接近真实对话首音频）。各阶段结果聚合为 `chain_report.json`（含 `content_ok` 与 `tts`/`tts_stream` 两组读数），并把整个 run 目录复制到 `$INTERCLARIFY_ROOT/data/runs/<tag>/`。该链路是顺序分阶段测量（ASR final → LLM 首 token → TTS 首音频），并非并发全双工。
 - `link`（4 卡作业）：真实 X-Talk 会话联调。同起 asr（逻辑卡 2）/ llm（0）/ turn_detector（1）/ tts（3）四服务，把 fork 适配器加载进容器（原地覆盖 baked 源码或在 /tmp `--target` 安装），再运行 [xtalk_link_check.py](xtalk_link_check.py) 以 headless WebSocket 客户端驱动音频。改用音频式 TurnSense 后，空转问题消除，回放走真实的 `vad_speech_start`→音频→`vad_speech_end`→turn detector→回复链路，不再传 `--drop-turn-detector`。link 模式跑两次驱动：顺序两轮（`link_report.json`，`--timeout 240`）与插话场景（`link_barge_report.json`，`--barge-in` + `scenarios/barge_in_stop_02_barge_in.wav`），后者要求 `barge_in_stop_observed` 与 `continuation_finished` 均为 true，分别记为 `link_check` 与 `link_barge_check`。

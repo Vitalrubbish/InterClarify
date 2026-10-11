@@ -77,7 +77,7 @@ Qwen 推理环境与 X-Talk 客户端环境继续隔离，采用明确的模型�
 | 项 | 值 |
 | --- | --- |
 | InterClarify 提交 | 本 T1 提交（见 `git log`；基线 `cb47d24`） |
-| X-Talk fork | `Vitalrubbish/xtalk`（远端 main），起点 `5f0d9959edf1026588246efbed827b078cbb114c` |
+| X-Talk fork | `Vitalrubbish/xtalk`，`feature/qwen3-asr-adapter`，提交 `d9303c819c96230e527ea5159e7c74f1b5841a3e`，基座 `5f0d9959edf1026588246efbed827b078cbb114c` |
 | 首轮镜像 | `sjtu_yukai-xuanzhang-xtalk-round1:v0.3`，digest `sha256:a8eb99d8cafadc7f906ae6b24378f6686ce0c52ab8ac063b9c4f59de8ed47d23` |
 | 模型 revision | ASR `7278e1e7` / LLM `4da05a8e` / TTS `75682787` / codec `3cd226ba` / XTurnix `b69ac8a4` |
 
@@ -87,7 +87,7 @@ T1 完成。T2–T4 见第 4–6 节。
 
 接口设计见 [qwen3_asr_adapter_design.md](qwen3_asr_adapter_design.md)。基座为 X-Talk fork `5f0d995`（含 `ASR` 抽象 `models/asr/interfaces.py`、`StreamingTextTTS`、`DefaultService/DefaultAgent`）。
 
-- 适配器：在 fork 分支 `feature/qwen3-asr-adapter`（worktree `InterClarify/xtalk/`，origin `Vitalrubbish/xtalk`）重写 `src/xtalk/models/asr/qwen3asr_client.py`：接收 `bytes`、`recognize_stream(*, is_final, chat_history)` 返回**累计文本**、实现 `reset`/`clone`/`stream_chunk_bytes_hint`，会话按 `session_id` 隔离。离线契约测试 `tests/test_qwen3_asr_client.py` 5/5 通过。**fork 改动尚未提交**（遵循 fork 的 `AGENTS.md`：仅在明确要求时提交）。
+- 适配器：fork 分支 `feature/qwen3-asr-adapter` 已提交为 `d9303c819c96230e527ea5159e7c74f1b5841a3e`：接收 `bytes`、`recognize_stream(*, is_final, chat_history)` 返回**累计文本**、实现 `reset`/`clone`/`stream_chunk_bytes_hint`，会话按 `session_id` 隔离。离线契约测试 9/9 通过，新增空/缩短修订、一次性临时会话和失败清理覆盖。
 - 服务：新增 `scripts/remote/qwen3_asr_service.py`（FastAPI 包装官方 `Qwen3ASRModel.LLM` 流式 API，按会话保留状态）；`run_xtalk_round1.py serve asr` 与配置 `services.asr` 的 host/port 已接入。
 - 运行配置：`configs/xtalk_round1_runtime.json` 可被 `Xtalk.from_config` 实例化（已核对得到 `Qwen3ASRClient` / `DefaultAgent` / `MossTTSRealtime`），`DefaultAgent` 显式关闭 thinking，System Backchannel 关闭。
 

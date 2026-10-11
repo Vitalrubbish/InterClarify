@@ -6,7 +6,9 @@ target: duplexcascade_without_system_backchannel
 sources:
   xtalk:
     repo_url: https://github.com/Vitalrubbish/xtalk.git
-    commit: 5f0d9959edf1026588246efbed827b078cbb114c
+    commit: d9303c819c96230e527ea5159e7c74f1b5841a3e
+    base_commit: 5f0d9959edf1026588246efbed827b078cbb114c
+    branch: feature/qwen3-asr-adapter
   qwen_asr:
     repo_url: https://github.com/QwenLM/Qwen3-ASR.git
     commit: 7c6daf77a2421100f5fb066495372c00129d39ff
