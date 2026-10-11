@@ -4,11 +4,13 @@
 
 本文把 [research_design.md](research_design.md) 中的研究构想转换为可执行、可验收和可停止的工程计划。
 
-## 当前状态（2026-10-11）
+## 当前状态（2026-10-12）
 
 P0 路线重置和首轮框架接通门禁已完成。远端在 X-Talk fork `d9303c819c96230e527ea5159e7c74f1b5841a3e` 上完成两轮顺序链路和一次播放中插话复测：8/8 steps PASS、两个报告均 `status=COMPLETE`、`errors=[]`。因此项目现在进入 P1 的 X-Talk Duplex 控制层实现；本仓库仍不实现第二套语音运行时或 Layer 2。
 
 这项通过只证明 ASR→LLM→TTS→播放和插话生命周期已经接通，不等于正式基线冻结、FDB 对照、质量评测或 Layer 2 完成。固定来源和证据见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
+
+A1 协议与可观测性补丁已提交至 X-Talk fork 的 dev 分支，提交为 9c131ed6399da66b66b001184cfa4005787b5f67，并完成本地验证：包括完整片段解析、协议错误观测、关联字段传递、JSONL 时间线和 TTSStarted 交付边界。定向测试 35/35 通过；远端真实模型、FDB 和 A4 验收仍未完成。A2 micro-turn 调度和 A3 在线 token 执行尚未实现。
 
 自 2026-10-09 起，项目不再直接复现、内嵌或改造 DuplexCascade 官方源码。新的工程路线是：
 
@@ -120,7 +122,7 @@ P1 和 P2 是最早的两个强制门禁。当前已通过框架连接子门禁�
 
 ## 5. P1：在 X-Talk fork 中实现 DuplexCascade 功能层
 
-具体扩展点、事件协议、响应生命周期、文件布局和测试矩阵见 [xtalk_modification_plan.md](xtalk_modification_plan.md)。P1 交付无 System Backchannel 的 Layer 1 全双工底座。当前组件与连接配置已固定，允许开始 A1 可观测性和控制层开发；正式质量、性能与 FDB 冻结不再作为 A1 的前置任务。这延续用户先接通框架、再逐步改造的安排，P2 的准入门槛仍按第 5.5 节执行。
+具体扩展点、事件协议、响应生命周期、文件布局和测试矩阵见 [xtalk_modification_plan.md](xtalk_modification_plan.md)。P1 交付无 System Backchannel 的 Layer 1 全双工底座。当前组件与连接配置已固定，A1 已通过本地门禁，下一步实现 A2 micro-turn 组装；正式质量、性能与 FDB 冻结不再作为 A1 的前置任务。这延续用户先接通框架、再逐步改造的安排，P2 的准入门槛仍按第 5.5 节执行。
 
 ### 5.1 P1.0 固定并导入 X-Talk
 
@@ -180,6 +182,8 @@ generated -> tts_requested -> tts_ready -> playback_committed
 系统播放期间 ASR/VAD/turn detector 继续工作。有效用户插话触发停止生成和播放、关闭旧候选，并让会话回到监听状态。环境噪声、回声和用户短附和不应自动视为正式打断。原生组合保留其 VAD 条件作为基线；去掉 Layer 0 不等于完成 VAD-free 改造，当前只声明功能对齐。
 
 ### 5.4 P1.3 统一事件日志
+
+A1 使用 X-Talk fork 的 `duplex_control/timeline.py` 记录原生事件，先补齐 request/response/turn/segment/prefix 字段的确定性传递、协议错误码和交付边界测试。补丁范围和审查原因见 [xtalk_modification_plan.md](xtalk_modification_plan.md) 第 8、10 节。A1 的完整输出解析器只产生协议观测；A2 建立 micro-turn 与前缀版本，A3 才接入在线协议执行。下方列表是 P1 最终日志目标，阶段 A 不产生跨层 arbiter 事件。
 
 至少记录：
 

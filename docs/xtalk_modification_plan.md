@@ -211,6 +211,7 @@ src/xtalk/duplex_control/
 ├── __init__.py
 ├── protocol.py
 ├── state.py
+├── timeline.py
 ├── micro_turn.py
 ├── runtime_adapter.py
 └── service.py
@@ -220,11 +221,12 @@ src/xtalk/duplex_control/
 | --- | --- |
 | protocol.py | 定义输入/输出 token、协议解析结果和错误类型；不包含语义规则 |
 | state.py | 定义 PrefixSnapshot、response 生命周期和不可变关联字段 |
+| timeline.py | A1 的会话事件记录器，保留原始关联字段、单调时间戳、协议错误码和已播文本 |
 | micro_turn.py | 按 tick 和 ASR 事件组装 user micro-turn；插入 `<no voice>` |
 | runtime_adapter.py | 解析 LLM token，执行取消、TTS 请求、提交边界和安全降级；不判断语义 |
 | service.py | 将 assembler、adapter 和现有 X-Talk manager 注册到 session service |
 
-首轮允许对以下现有文件做最小补丁：
+首轮允许对以下现有文件做最小补丁；A1 的交付关联字段跨越多个原生 manager，因此补充相应字段传递补丁：
 
 | 文件 | 补丁内容 |
 | --- | --- |
@@ -232,6 +234,10 @@ src/xtalk/duplex_control/
 | llm_agent_generation_manager.py | 使用预先关联的 response ID，保留流式 token 顺序 |
 | turn_detector_manager.py | speaking 状态由 TTSStarted 驱动，而不是 TTSChunkReady |
 | serving/service.py | 注册阶段 A assembler 和 runtime adapter |
+| llm_agent_context_manager.py | A1 传递输入关联字段，区分输入请求与已播反馈的 response ID |
+| tts_response_coordinator.py | A1 在准备、切换与交付请求之间保留每个 response 的关联快照 |
+| tts_manager.py | A1 在合成、交付和停止事件中保留关联快照 |
+| tts_playback_manager.py | A1 为已播更新、结算和关闭事件保留关联快照 |
 
 不复制 EventBus、会话管理、ASR、TTS 或播放队列。阶段 A 不新增语义 Arbiter、规则 Policy、第二个 executor 或第二条 TTS 通道。
 
@@ -270,12 +276,24 @@ src/xtalk/duplex_control/
 - 显式关闭系统附和模型与音频目录；
 - 保存事件日志、提交哈希、依赖和资源记录。
 
-### A1：协议与可观测性
+### A1：协议与可观测性（本地门禁已通过）
 
 - 补齐 prefix_version、request_id、response_id、turn/segment 字段；
 - 定义 token 解析事件和协议错误事件；
 - 记录从 ASR micro-turn 到 TTSStarted、ResponseUpdate、ResponseFinish 的统一时间线；
 - 把 speaking 边界从 TTSChunkReady 修正为 TTSStarted。
+
+2026-10-11 审查发现：已有字段定义、完整片段解析器、观测事件和记录器，但生成、交付和播放发布路径尚未完整传递关联信息；JSONL 缺少 error_code，边界测试只直接调用处理方法。因此 A1 补丁增加确定性的字段传递与事件总线回归，扩展上述四个原生 manager 的最小补丁范围。输入已经提供的 prefix_version 原样传递；版本生成与 micro-turn 调度仍属于 A2。协议观察只验证完整模型输出并记录结果，在线流解析、过期响应拒绝、取消与 final 去重属于 A3。
+
+记录器区分事件创建时间与记录顺序，保留错误码和原始输出，不从相邻事件推测缺失 ID。验收应包含并发响应隔离、预分配 response ID、响应结束后的新 ID、准备阶段持续监听、TTSStarted 后状态切换和已播文本结算；远端模型链路与 FDB 验收属于 A4。
+
+2026-10-12 补充结果：关联传递、协议错误码、事件总线边界测试和 shutdown 日志已补齐；定向测试 35/35 PASS。运行位置为 X-Talk fork 根目录：
+
+~~~bash
+conda run -n paratalker-dev env PYTHONPATH=src python -m unittest tests.test_duplex_protocol tests.test_duplex_observability tests.test_turn_detector_manager tests.test_llm_agent_persistent_stream tests.test_response_identity tests.test_tool_call_playback_barrier tests.test_tts_streaming_playback_alignment -q
+~~~
+
+A1 实现与双语文档提交为 9c131ed6399da66b66b001184cfa4005787b5f67，分支 dev，开发父提交为 b371bb4f8868fbb1672b055e13f631155213083c；远端已验证基线仍为 d9303c8。源码镜像说明、配置与测试索引位于独立 fork 的 docs/technical_reference/duplex_observability.zh.md。本地模拟链路结果不替代远端 conda 模型服务、FDB、长会话与音频质量验收。
 
 ### A2：Micro-turn 组装
 

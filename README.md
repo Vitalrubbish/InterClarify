@@ -4,7 +4,7 @@ InterClarify 研究全双工语音代理在**用户话轮内**主动澄清的时
 
 参考底座为独立维护的 [Vitalrubbish/xtalk](https://github.com/Vitalrubbish/xtalk) fork。第一阶段先跑通并冻结一套原生组件组合，再补齐 DuplexCascade 无 System Backchannel 版本的 micro-turn、Layer 1、提前回答、持续监听、用户附和识别和打断停播；当前移除 Layer 0，底座稳定后再接入 InterClarify Layer 2。InterClarify 不跟踪 X-Talk 源码或子模块，只记录实验使用的 fork 提交。
 
-**当前状态：P0 路线重置和首轮框架接通已完成；下一步进入 X-Talk fork 的 P1 通用 DuplexCascade 控制层。** 本仓库暂不实现 Layer 2 运行时。
+**当前状态：P0 路线重置、首轮框架接通和 A1 协议/可观测性本地门禁已完成；下一步进入 A2 micro-turn 组装。** A1 定向回归 35/35 通过，X-Talk 提交为 9c131ed；A3 在线协议执行、A4 远端验收及 Layer 2 尚未完成。
 
 ## 当前基础设施
 
