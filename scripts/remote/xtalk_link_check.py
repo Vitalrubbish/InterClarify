@@ -6,6 +6,13 @@ client: it sends ``vad_speech_start``, streams a 16 kHz mono WAV as PCM16 binary
 frames, sends ``vad_speech_end``, simulates playback of the received TTS audio,
 and records the observed event timeline.
 
+Two scenarios are supported:
+
+* sequential (default): ``--rounds`` turns run one after another.
+* barge-in (``--barge-in``): a long first turn starts playing, then a second
+  utterance is streamed while the reply is still playing, so the turn detector
+  must stop the reply (``stop_tts``) and the following turn must complete.
+
 The client protocol follows ``serving/modules/input_gateway.py`` and
 ``serving/modules/output_gateway.py``: text frames are JSON with an ``action``
 field, binary frames are raw PCM16 audio. This is a headless replay, so it
@@ -66,6 +73,16 @@ def _serve(config: dict, host: str, port: int) -> None:
     uvicorn.run(app, host=host, port=port, log_level="warning", lifespan="off")
 
 
+async def _wait(predicate, timeout: float) -> bool:
+    """Poll ``predicate`` until it is true or ``timeout`` seconds elapse."""
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if predicate():
+            return True
+        await asyncio.sleep(0.1)
+    return predicate()
+
+
 class LinkClient:
     """Drive one WebSocket session and record its event timeline."""
 
@@ -79,11 +96,19 @@ class LinkClient:
         self._asr_final: str | None = None
         self._response: str = ""
         self._first_audio: float | None = None
-        self._tts_finished = asyncio.Event()
-        self._response_finished = asyncio.Event()
+        self._start_resp_ids: list[str] = []
+        self._finish_resp_ids: list[str] = []
+        self._stop_tts_count = 0
 
-    async def run(self, audio_pcm: bytes, rounds: int) -> dict:
-        """Run the requested number of turns and return a summary."""
+    async def run(
+        self,
+        audio_pcm: bytes,
+        rounds: int,
+        *,
+        barge_pcm: bytes | None = None,
+        barge_after_seconds: float = 15.0,
+    ) -> dict:
+        """Run the requested scenario and return a summary."""
         token = await asyncio.to_thread(self._login)
         url = f"{self._ws_base}?access_token={token}"
         async with websockets.connect(url, max_size=None) as ws:
@@ -91,15 +116,19 @@ class LinkClient:
             await ws.send(json.dumps({"action": "attach_session", "session_id": None}))
             await asyncio.sleep(2.0)
             self._started = time.monotonic()
-            turn_reports = []
-            for index in range(rounds):
-                turn_reports.append(await self._run_turn(ws, audio_pcm, index))
+            if barge_pcm is not None:
+                summary = await self._run_barge_in(ws, audio_pcm, barge_pcm, barge_after_seconds)
+            else:
+                turns = []
+                for index in range(rounds):
+                    turns.append(await self._run_turn(ws, audio_pcm, index))
+                summary = {"rounds": turns}
             await asyncio.sleep(2.0)
             receiver.cancel()
             await asyncio.gather(receiver, return_exceptions=True)
         return {
             "status": "COMPLETE",
-            "rounds": turn_reports,
+            **summary,
             "asr_final": self._asr_final,
             "response": self._response,
             "first_audio_seconds": self._first_audio,
@@ -108,16 +137,20 @@ class LinkClient:
             "events": self._events,
         }
 
-    async def _run_turn(
-        self, ws: websockets.WebSocketClientProtocol, audio_pcm: bytes, index: int
-    ) -> dict:
-        self._tts_finished.clear()
-        self._response_finished.clear()
-        self._response = ""
+    async def _send_turn_input(
+        self,
+        ws: websockets.WebSocketClientProtocol,
+        audio_pcm: bytes,
+        index: int,
+    ) -> tuple[float, float]:
+        """Send one VAD-delimited utterance; return (start, user_end) seconds."""
         started = time.monotonic()
         await ws.send(json.dumps({"action": "vad_speech_start"}))
         self._record("vad_speech_start", index)
-        frames = [audio_pcm[i : i + FRAME_BYTES] for i in range(0, len(audio_pcm), FRAME_BYTES)]
+        frames = [
+            audio_pcm[i : i + FRAME_BYTES]
+            for i in range(0, len(audio_pcm), FRAME_BYTES)
+        ]
         for offset, frame in enumerate(frames):
             target = offset * FRAME_SECONDS
             now = time.monotonic() - started
@@ -129,18 +162,64 @@ class LinkClient:
         await ws.send(json.dumps({"action": "vad_speech_end"}))
         user_end = time.monotonic()
         self._record("vad_speech_end", index)
-        try:
-            await asyncio.wait_for(
-                self._response_finished.wait(), timeout=self._timeout
-            )
-            completed = True
-        except asyncio.TimeoutError:
-            completed = False
+        return started, user_end
+
+    async def _run_turn(
+        self,
+        ws: websockets.WebSocketClientProtocol,
+        audio_pcm: bytes,
+        index: int,
+    ) -> dict:
+        target = len(self._finish_resp_ids) + 1
+        started, user_end = await self._send_turn_input(ws, audio_pcm, index)
+        completed = await _wait(
+            lambda: len(self._finish_resp_ids) >= target, self._timeout
+        )
         return {
             "index": index,
             "audio_seconds": len(audio_pcm) / (2 * SAMPLE_RATE),
             "user_end_seconds": user_end - started,
             "response_finished": completed,
+            "first_audio_seconds": self._first_audio,
+        }
+
+    async def _run_barge_in(
+        self,
+        ws: websockets.WebSocketClientProtocol,
+        request_pcm: bytes,
+        barge_pcm: bytes,
+        after_seconds: float,
+    ) -> dict:
+        """Play a long reply, interrupt it mid-playback, then let a turn finish."""
+        a_start, a_end = await self._send_turn_input(ws, request_pcm, 0)
+        playback_started = await _wait(lambda: self._audio_bytes > 0, 90.0)
+        await asyncio.sleep(max(0.0, after_seconds))
+        bytes_before = self._audio_bytes
+        stops_before = self._stop_tts_count
+        starts_before = len(self._start_resp_ids)
+        finishes_before = len(self._finish_resp_ids)
+
+        b_start, b_end = await self._send_turn_input(ws, barge_pcm, 1)
+
+        await _wait(
+            lambda: self._stop_tts_count > stops_before, self._timeout
+        )
+        completed = await _wait(
+            lambda: len(self._start_resp_ids) > starts_before
+            and len(self._finish_resp_ids) > finishes_before,
+            self._timeout,
+        )
+        return {
+            "scenario": "barge_in",
+            "request_audio_seconds": len(request_pcm) / (2 * SAMPLE_RATE),
+            "request_user_end_seconds": a_end - a_start,
+            "barge_in_audio_seconds": len(barge_pcm) / (2 * SAMPLE_RATE),
+            "barge_in_user_end_seconds": b_end - b_start,
+            "barge_in_after_playback_seconds": after_seconds,
+            "playback_started": playback_started,
+            "barge_in_stop_observed": self._stop_tts_count > stops_before,
+            "continuation_finished": completed,
+            "tts_audio_after_barge_in": self._audio_bytes - bytes_before,
             "first_audio_seconds": self._first_audio,
         }
 
@@ -160,9 +239,15 @@ class LinkClient:
                 self._asr_final = data.get("text")
             elif action == "update_resp" and isinstance(data, dict):
                 self._response = str(data.get("text", ""))
+            elif action == "start_tts" and isinstance(data, dict):
+                if data.get("response_id"):
+                    self._start_resp_ids.append(str(data["response_id"]))
             elif action == "finish_resp" and isinstance(data, dict):
                 self._response = str(data.get("text", self._response))
-                self._response_finished.set()
+                if data.get("response_id"):
+                    self._finish_resp_ids.append(str(data["response_id"]))
+            elif action == "stop_tts":
+                self._stop_tts_count += 1
             elif action == "tts_finished":
                 await ws.send(json.dumps({"action": "tts_playback_finished"}))
 
@@ -195,7 +280,7 @@ async def _poll_port(host: str, port: int, deadline: float) -> None:
 
 
 def main() -> None:
-    """Start the X-Talk server, run the client turns, and write a report."""
+    """Start the X-Talk server, run the client scenario, and write a report."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--audio", type=Path, required=True)
@@ -203,17 +288,34 @@ def main() -> None:
     parser.add_argument("--rounds", type=int, default=2)
     parser.add_argument("--timeout", type=float, default=120.0)
     parser.add_argument(
+        "--barge-in",
+        action="store_true",
+        help="run the barge-in scenario instead of sequential turns",
+    )
+    parser.add_argument(
+        "--barge-in-audio",
+        type=Path,
+        help="WAV streamed as the interrupting utterance (required with --barge-in)",
+    )
+    parser.add_argument(
+        "--barge-in-after-seconds",
+        type=float,
+        default=15.0,
+        help="delay after playback starts before the interrupting utterance",
+    )
+    parser.add_argument(
         "--drop-turn-detector",
         action="store_true",
-        help="remove turn_detector from the config (headless replay uses VAD "
-        "boundaries; without it vad_speech_end finalizes and vad_speech_start "
-        "during playback interrupts)",
+        help="debug only: remove turn_detector from the config (VAD end finalizes)",
     )
     args = parser.parse_args()
 
     config = json.loads(args.config.read_text(encoding="utf-8"))
     if args.drop_turn_detector:
         config.pop("turn_detector", None)
+    if args.barge_in and args.barge_in_audio is None:
+        parser.error("--barge-in requires --barge-in-audio")
+
     port = _pick_free_port()
     ctx = multiprocessing.get_context("spawn")
     server = ctx.Process(target=_serve, args=(config, "127.0.0.1", port))
@@ -226,7 +328,12 @@ def main() -> None:
             timeout=args.timeout,
         )
         report = asyncio.run(
-            client.run(_load_pcm16(args.audio), rounds=args.rounds)
+            client.run(
+                _load_pcm16(args.audio),
+                rounds=args.rounds,
+                barge_pcm=_load_pcm16(args.barge_in_audio) if args.barge_in else None,
+                barge_after_seconds=args.barge_in_after_seconds,
+            )
         )
     finally:
         server.terminate()
@@ -237,7 +344,12 @@ def main() -> None:
     args.out.write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
-    print(json.dumps({k: v for k, v in report.items() if k != "events"}, ensure_ascii=False))
+    print(
+        json.dumps(
+            {k: v for k, v in report.items() if k != "events"},
+            ensure_ascii=False,
+        )
+    )
 
 
 if __name__ == "__main__":

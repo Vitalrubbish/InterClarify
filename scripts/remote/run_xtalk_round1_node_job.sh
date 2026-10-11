@@ -412,6 +412,21 @@ PY
     > "$RUN_DIR/link_check.log" 2>&1 || RC=$?
   step_status "link_check" "$RC"
 
+  # T4 barge-in: start a long reply, interrupt it mid-playback, and require the
+  # detector to stop it (stop_tts) and the interrupting turn to finish.
+  RC=0
+  conda run --no-capture-output -n xtalk-round1-client \
+    python "$INTERCLARIFY_ROOT/scripts/remote/xtalk_link_check.py" \
+    --config "$INTERCLARIFY_ROOT/configs/xtalk_round1_runtime.json" \
+    --audio "$XTALK_ROUND1_ROOT/audio/request.wav" \
+    --barge-in --barge-in-audio "$XTALK_ROUND1_ROOT/audio/scenarios/barge_in_stop_02_barge_in.wav" \
+    --barge-in-after-seconds 15 \
+    --out "$RUN_DIR/link_barge_report.json" --timeout 240 \
+    > "$RUN_DIR/link_barge_check.log" 2>&1 || RC=$?
+  grep -q '"barge_in_stop_observed": true' "$RUN_DIR/link_barge_report.json" || RC=1
+  grep -q '"continuation_finished": true' "$RUN_DIR/link_barge_report.json" || RC=1
+  step_status "link_barge_check" "$RC"
+
   stop_services
   kill "$GPU_LOG_PID" 2>/dev/null || true
   DEST="$INTERCLARIFY_ROOT/data/runs/$TAG"
