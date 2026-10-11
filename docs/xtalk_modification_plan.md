@@ -14,7 +14,7 @@ X-Talk fork 与 InterClarify 是两个独立项目，不使用 Git 子模块。
 阶段 A 的目标是让固定版本的 X-Talk 具备以下行为：
 
 1. 持续接收音频并由流式 ASR 产生 partial/final 文本；
-2. 按固定时间窗口形成 user micro-turn，空窗口使用 <no voice>；
+2. 按固定时间窗口形成 user micro-turn，空窗口使用 `<no voice>`；
 3. 让 DuplexCascade 风格的 LLM 直接决定等待、回答、用户附和和用户打断；
 4. 将 LLM 生成的系统 micro-turn 流式送入现有 TTS 与播放管理；
 5. 支持回答进行中的持续监听、用户打断和剩余输出取消；
@@ -53,7 +53,7 @@ LLM 的输入是截至当前窗口已经到达的对话历史和 user micro-turn
 运行时负责以下确定性工作：
 
 - 聚合 ASR partial/final 和空窗口；
-- 插入 <no voice> 与 <EOS>；
+- 插入 `<no voice>` 与 `<EOS>`；
 - 识别控制 token 的边界和顺序；
 - 启动、暂停、取消和结束对应的生成/TTS 任务；
 - 维护 session_id、turn_id、segment_id、prefix_version 和 response_id；
@@ -66,9 +66,9 @@ LLM 的输入是截至当前窗口已经到达的对话历史和 user micro-turn
 
 阶段 A 采用论文中的 DuplexCascade，而不是 DuplexCascade-beta：
 
-- 不训练、不生成 <system backchannel>；
+- 不训练、不生成 `<system backchannel>`；
 - 不加载系统附和模型、预录音频或 direct_audio 路径；
-- 用户附和 <user backchannel> 仍属于输入交互现象，必须保留；
+- 用户附和 `<user backchannel>` 仍属于输入交互现象，必须保留；
 - 当前阶段不实现 Layer 0 或其他系统倾听反馈。
 
 ## 4. DuplexCascade 控制协议
@@ -79,10 +79,10 @@ LLM 的输入是截至当前窗口已经到达的对话历史和 user micro-turn
 
 | token | 作用 |
 | --- | --- |
-| <no voice> | 当前窗口没有识别到用户文本，表示用户静默 |
-| <EOS> | 结束一个 micro-turn，分隔连续的用户和系统片段 |
+| `<no voice>` | 当前窗口没有识别到用户文本，表示用户静默 |
+| `<EOS>` | 结束一个 micro-turn，分隔连续的用户和系统片段 |
 
-<no voice> 是输入事件，不代表运行时自行判断用户正在思考；是否属于用户思考由 LLM 根据上下文输出对应系统 token。
+`<no voice>` 是输入事件，不代表运行时自行判断用户正在思考；是否属于用户思考由 LLM 根据上下文输出对应系统 token。
 
 ### 4.2 输出 token
 
@@ -90,17 +90,17 @@ LLM 的输入是截至当前窗口已经到达的对话历史和 user micro-turn
 
 | LLM 输出 token | 协议含义 | 运行时执行 |
 | --- | --- | --- |
-| <user is speaking> | 用户仍在继续当前表达 | 结束当前系统 micro-turn，不启动新 TTS |
-| <user finish speaking> | 当前可以接过话轮 | 允许后续回答文本进入流式 TTS |
-| <user is interrupting> | 用户正在打断系统 | 取消当前未完成生成和剩余未播放音频 |
-| <user backchannel> | 用户产生短附和 | 不创建新回答，保持当前回答流 |
-| <user is thinking> | 用户在系统回答结束后继续思考 | 结束当前系统 micro-turn，继续等待 |
+| `<user is speaking>` | 用户仍在继续当前表达 | 结束当前系统 micro-turn，不启动新 TTS |
+| `<user finish speaking>` | 当前可以接过话轮 | 允许后续回答文本进入流式 TTS |
+| `<user is interrupting>` | 用户正在打断系统 | 取消当前未完成生成和剩余未播放音频 |
+| `<user backchannel>` | 用户产生短附和 | 不创建新回答，保持当前回答流 |
+| `<user is thinking>` | 用户在系统回答结束后继续思考 | 结束当前系统 micro-turn，继续等待 |
 
-<user finish speaking> 后面可以跟系统回答文本；其他四个控制 token 按论文协议以 <EOS> 结束当前系统 micro-turn。阶段 A 不把这些 token 压缩为 SILENCE/ANSWER 训练标签。统计日志可以额外记录粗粒度投影，但投影不能替代原始 token。
+`<user finish speaking>` 后面可以跟系统回答文本；其他四个控制 token 按论文协议以 `<EOS>` 结束当前系统 micro-turn。阶段 A 不把这些 token 压缩为 SILENCE/ANSWER 训练标签。统计日志可以额外记录粗粒度投影，但投影不能替代原始 token。
 
 ### 4.3 协议错误
 
-运行时只接受当前 response 的合法 token 顺序，并检查 response/session/turn 上下文。遇到未知 token、缺失 <EOS>、重复提交或已取消 response 时：
+运行时只接受当前 response 的合法 token 顺序，并检查 response/session/turn 上下文。遇到未知 token、缺失 `<EOS>`、重复提交或已取消 response 时：
 
 1. 停止当前未提交的协议片段；
 2. 不根据 ASR 内容猜测替代动作；
@@ -112,7 +112,7 @@ LLM 的输入是截至当前窗口已经到达的对话历史和 user micro-turn
 ### 5.1 窗口策略
 
 - 默认窗口从 0.6 秒开始，作为实验参数而不是固定研究结论；
-- 定时 tick 产生窗口，即使当前没有新文本也要发送 <no voice>；
+- 定时 tick 产生窗口，即使当前没有新文本也要发送 `<no voice>`；
 - ASR partial、停顿和必要的输入事件可以提前触发 flush；
 - 同一窗口只发送当时已经到达的 ASR 前缀；
 - ASR revision 以新的 prefix_version 表示，不能覆盖已经提交或已经播放的 response；
@@ -220,7 +220,7 @@ src/xtalk/duplex_control/
 | --- | --- |
 | protocol.py | 定义输入/输出 token、协议解析结果和错误类型；不包含语义规则 |
 | state.py | 定义 PrefixSnapshot、response 生命周期和不可变关联字段 |
-| micro_turn.py | 按 tick 和 ASR 事件组装 user micro-turn；插入 <no voice> |
+| micro_turn.py | 按 tick 和 ASR 事件组装 user micro-turn；插入 `<no voice>` |
 | runtime_adapter.py | 解析 LLM token，执行取消、TTS 请求、提交边界和安全降级；不判断语义 |
 | service.py | 将 assembler、adapter 和现有 X-Talk manager 注册到 session service |
 
@@ -245,7 +245,7 @@ src/xtalk/duplex_control/
 
 1. 将用户和系统长话轮切成短 micro-turn；
 2. 在用户窗口后插入系统控制 micro-turn；
-3. 用 <no voice> 模拟自然停顿和系统回答后的思考；
+3. 用 `<no voice>` 模拟自然停顿和系统回答后的思考；
 4. 以受控概率插入用户打断和用户附和；
 5. 在系统微回合中监督五个无 System Backchannel 控制 token；
 6. 仅对系统 micro-turn 计算 next-token 监督，保护基础 LLM 的语言能力。
@@ -254,7 +254,7 @@ src/xtalk/duplex_control/
 
 ### 9.2 训练约束
 
-- 不加入 <system backchannel> 目标；
+- 不加入 `<system backchannel>` 目标；
 - 控制 token 的 embedding 与输出头必须纳入适配；
 - token 类别权重、窗口长度和系统 micro-turn 长度必须写入版本化配置；
 - 训练输入只能使用当时可见的 micro-turn 历史；
@@ -280,16 +280,16 @@ src/xtalk/duplex_control/
 ### A2：Micro-turn 组装
 
 - 实现 0.6 秒起始 tick 和事件驱动 flush；
-- 无新增文本时发送 <no voice>；
+- 无新增文本时发送 `<no voice>`；
 - 正确处理 partial、pause、rewrite 和 final 的版本递增；
 - 验证窗口组装不阻塞音频接收和 TTS 播放。
 
 ### A3：LLM 协议执行
 
 - 将 user micro-turn 送入 DuplexCascade 格式的 LLM 上下文；
-- 解析五个控制 token 和 <EOS>；
+- 解析五个控制 token 和 `<EOS>`；
 - 将回答文本流接入现有 TTS；
-- 实现 <user is interrupting> 的生成取消、剩余音频停止和监听恢复；
+- 实现 `<user is interrupting>` 的生成取消、剩余音频停止和监听恢复；
 - 实现用户附和保持当前回答、用户思考继续等待和提前回答后的 final 去重；
 - 处理 malformed output、过期 response 和 shutdown 取消。
 
@@ -306,15 +306,15 @@ src/xtalk/duplex_control/
 
 ### 协议测试
 
-- 输入 <no voice> 和 <EOS> 的序列化/反序列化；
-- 五个系统控制 token 的识别、边界和 <EOS> 处理；
-- 未知 token、缺失 <EOS>、重复 token 和乱序 response 的安全降级；
-- 不出现 <system backchannel> 和 direct-audio 旁路。
+- 输入 `<no voice>` 和 `<EOS>` 的序列化/反序列化；
+- 五个系统控制 token 的识别、边界和 `<EOS>` 处理；
+- 未知 token、缺失 `<EOS>`、重复 token 和乱序 response 的安全降级；
+- 不出现 `<system backchannel>` 和 direct-audio 旁路。
 
 ### Micro-turn 测试
 
 - 固定 tick、partial 触发、停顿触发和 final 触发；
-- 空窗口仍发送 <no voice>；
+- 空窗口仍发送 `<no voice>`；
 - append、rewrite、pause、final 的 prefix_version 单调递增；
 - 旧版本 response 不覆盖新版本上下文；
 - 调度器不阻塞 ASR、LLM 消费或 TTS 播放。
