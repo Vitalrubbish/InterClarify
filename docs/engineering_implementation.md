@@ -39,10 +39,10 @@ X-Talk fork 提供 ASR、LLM agent、TTS、VAD、轮次检测、异步事件和 
 ### 2.2 Layer 与动作边界
 
 - 当前移除 Layer 0：不注册该策略，不产生系统 `BACKCHANNEL` 候选，不加载系统附和模型或预录音频。未来若恢复，须先更新范围和评测方案，其动作边界仍为 `SILENCE` / `BACKCHANNEL`。
-- Layer 1 负责常规 `SILENCE` / `ANSWER`，并可请求 Layer 2。
+- Layer 1 采用 DuplexCascade 无 System Backchannel 的五种状态 token，由 LLM 直接生成；阶段 A 的运行时适配器只解析并执行 token，不重新判断语义。它可请求 Layer 2，但阶段 A 不设置独立跨层仲裁器。
 - Layer 2 只产生 `NO_OVERRIDE` 或澄清问题；识别到歧义也可以选择等待。
 - 当前不启用 Layer 3；只预留版本化修订接口。若后续启用，Layer 3 只能修订尚未提交播放的片段。
-- 所有候选输出必须经过一个 `OutputArbiter`。阶段 A 只接受 Layer 1；阶段 B 的有效优先级为 Layer 2 > Layer 1。
+- 阶段 A 只有一个 DuplexRuntimeAdapter，执行 DuplexCascade LLM 产生的细粒度状态 token；阶段 B 同时启用 Layer 2 后，才引入跨层 `OutputArbiter`，优先级为 Layer 2 > Layer 1。
 - 只允许一个 TTS 播放所有者。X-Talk 的播放管理链路是唯一提交点，其他模块只能提交播放意图。
 - 已经播放给用户的内容不可撤销。高优先级结果只能取消或替换尚未提交的片段。
 - 在线策略只能读取决策时刻以前到达的音频、ASR 前缀、修订和运行状态；隐藏目标、完整转写和未来输入只用于数据构建与评价。
@@ -79,7 +79,7 @@ X-Talk fork 提供 ASR、LLM agent、TTS、VAD、轮次检测、异步事件和 
 | User Backchannel | 系统说话时识别用户短附和，避免无条件停播；有效插话仍可打断 |
 | 提前回答 | 在用户话轮未正式结束但语义和时机允许时，可以启动常规回答 |
 | 用户打断停播 | 用户有效插话后停止未完成播放并恢复监听 |
-| 单一输出仲裁 | 同一时刻只有一个模块决定哪个候选输出进入 TTS |
+| 单层协议执行 | 阶段 A 由 DuplexRuntimeAdapter 执行 LLM 状态 token 与 TTS 请求；跨层场景再增加仲裁 |
 | 单一播放所有权 | 只有一个组件提交、开始、停止和完成播放 |
 | 可观测性 | 音频、ASR、决策、生成、TTS、播放和打断事件能串成一条时间线 |
 
@@ -151,19 +151,22 @@ P1 和 P2 是最早的两个强制门禁。当前已通过框架连接子门禁�
 
 #### Layer 1 映射
 
-- Layer 1 根据当前可见前缀提交 `SILENCE` 或 `ANSWER`。
+- DuplexCascade LLM 根据当前可见 micro-turn 输出 `<user is speaking>`、`<user finish speaking>`、`<user is interrupting>`、`<user backchannel>` 或 `<user is thinking>`；输入侧使用 `<no voice>` 和 `<EOS>`。
+- `DuplexRuntimeAdapter` 只解析状态 token，执行等待、回答、停止剩余输出或保持当前回答，并记录原始 token；它不输出规则状态，也不把 `SILENCE`/`ANSWER` 当作训练协议。
 - 不实现 Layer 0；显式关闭原生 Agent 的系统 backchannel 配置。
-- Layer 1 复用冻结的 LLM/turn detector；等待、正常回答、用户附和和有效打断必须区分。
+- Layer 1 复用冻结的 LLM/turn detector；等待、正常回答、用户附和和有效打断由不同 token 区分。
 - X-Talk 原有句末生成仍作为安全回退。
 - 可以预留 higher-layer policy 接口，但 P1 不加载 Layer 2。
 
-#### 单一仲裁器
+#### 单层控制与播放边界
 
-Layer 1 输出统一转换为带有 `session_id`、`turn_id`、`prefix_version`、`priority`、`kind` 和 `payload` 的候选。`OutputArbiter` 是唯一选择器，P1 执行版本、去重、过期和提交边界检查，不设置 L0 候选或占位回退；它不能直接操作音频设备。
+阶段 A 不设置独立 `OutputArbiter`。`DuplexRuntimeAdapter` 是唯一的协议执行者，所有结果都带有 `session_id`、`turn_id`、`segment_id`、`prefix_version`、`state_token` 和 `reason`，并在进入 TTS 协调链路前完成上下文、去重、过期和提交边界检查。适配器不直接操作音频设备。
+
+阶段 B 接入 Layer 2 后，再增加跨层 `OutputArbiter`，统一比较 Layer 2 与 Layer 1 的有效结果。
 
 #### 单一播放所有者
 
-选中的候选进入 X-Talk 的 TTS 协调与播放链路。播放 manager 是唯一所有者，并显式区分：
+通过检查的回答进入 X-Talk 的 TTS 协调与播放链路。播放 manager 是唯一所有者，并显式区分：
 
 ```text
 generated -> tts_requested -> tts_ready -> playback_committed
@@ -308,11 +311,12 @@ P2 通过后再建立正式数据流程。每个会话记录原始音频、隐�
 | `XTalkRuntimeAdapter` | 连接固定版本 X-Talk 的事件和会话接口 | 不复制第二套服务运行时 |
 | `StreamingPrefixTracker` | 产生 partial、revision、final 和版本 | 不读取任务真值 |
 | `MicroTurnScheduler` | 发布固定/事件驱动 tick | 不直接决定输出 |
-| `Layer1Policy` | 产生 SILENCE/ANSWER 候选 | 不产生系统附和，不阻塞等待 Layer 2 |
+| `DuplexCascade LLM` | 产生 DuplexCascade 状态 token | 不产生系统附和，不读取未来输入 |
+| `DuplexRuntimeAdapter` | 解析并执行状态 token | 不重新判断语义，不直接拥有播放设备 |
 | `ClarificationTrigger` | 决定是否发起 Layer 2 请求 | 不直接播放 |
 | `Layer2Policy` | 判断等待/澄清并生成短问题 | 不使用未来输入 |
 | `ResultValidator` | 检查版本、任务和自行消歧状态 | 不改写已播内容 |
-| `OutputArbiter` | 单点选择 L2/L1 输出 | 不拥有播放设备 |
+| `OutputArbiter` | 阶段 B 选择 L2/L1 输出 | 阶段 A 不加载，不拥有播放设备 |
 | `XTalkPlaybackBridge` | 把唯一选中结果交给 X-Talk 播放链路 | 不创建第二个 TTS 队列 |
 | `TaskStateReducer` | 把澄清回答合并回同一任务 | 不另开无关任务 |
 | `EventRecorder` | 保存时间线、配置和结果 | 不把离线真值注入在线模块 |
@@ -368,7 +372,7 @@ artifacts/
 | 镜像与源码版本不一致 | P0 | 记录镜像 digest，验证安装包与提交；未验证不作为基线 |
 | 组件依赖或许可证冲突 | P0/P1 | 按实际启用 extras 锁定并完成许可证审计 |
 | 原生轮次控制缺少 micro-turn 或误判用户附和 | P1 | 通过事件和 manager 扩展，必要时维护最小上游补丁 |
-| 多模块争抢 TTS | P1 | 单一仲裁器和单一播放所有者测试作为硬门槛 |
+| 多模块争抢 TTS | P1/P2 | 阶段 A 保持单协议执行者；跨层启用后以仲裁器和单一播放所有者测试作为硬门槛 |
 | ASR 修订能力不足 | P1/P3 | 更换统一 ASR，所有方法共享相同底座 |
 | Layer 2 延迟导致过时覆盖 | P2/P4 | 版本失效、超时和轻量触发 |
 | 真实可澄清窗口太少 | P2 | 调整单一任务域或收缩为句末澄清 |
@@ -379,7 +383,7 @@ artifacts/
 1. 固定并核验 X-Talk 提交、镜像 digest、许可证与可选依赖；
 2. 在 conda 环境中跑通第一套原生 X-Talk 自部署组合并冻结实际模型与参数；
 3. 建立第 3.1 节能力差距表和原生 FDB smoke；
-4. 依次实现 micro-turn、Layer 1 候选、单一仲裁、单一播放与统一日志；保持 System Backchannel 关闭；
+4. 依次实现 micro-turn、Layer 1 状态 token、单层控制、单一播放与统一日志；保持 System Backchannel 关闭；
 5. 保存功能对齐版本的 FDB smoke；
 6. 构造 30–50 条日程时间域探索轨迹；
 7. 实现规则/提示版 Layer 2、版本检查和任务恢复；

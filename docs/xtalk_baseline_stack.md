@@ -46,8 +46,8 @@
 连接通过不代表 P1 完成。下一步遵循 [xtalk_modification_plan.md](xtalk_modification_plan.md) 实现并测试：
 
 1. 前缀版本、请求/候选/响应 ID 与统一事件时间线；
-2. micro-turn 调度和 Layer 1 的 `SILENCE` / `ANSWER` 候选；
-3. 单一 `OutputArbiter` 与单一播放所有权；
+2. micro-turn 调度和 Layer 1 的 DuplexCascade 状态 token；
+3. 单一 DuplexRuntimeAdapter 与单一播放所有权；
 4. 提前回答、用户附和与有效插话的区分，以及 FDB smoke。
 
 正式模型基线冻结、中文/多场景质量评测、长会话、Layer 2 主动澄清和真人实验仍未开始。

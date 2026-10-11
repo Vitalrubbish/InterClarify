@@ -43,10 +43,10 @@
 根据 2026-10-09 的用户决策，先冻结一套原生 X-Talk 组件组合，再改造无 System Backchannel 底座。论文第 4.1 节的无系统附和版名为 DuplexCascade，有系统附和版为 DuplexCascade-β，见[原文](https://arxiv.org/html/2603.09180v1#S4.SS1)。当前移除 Layer 0，以减少通用底座改造变量；后续澄清对照也保持系统附和关闭。活跃层共享同一可见前缀：
 
 - **Layer 0：当前移除。** 不生成系统倾听反馈；其原有 SILENCE / BACKCHANNEL 动作边界只作为未来范围调整的约束。用户附和识别和插话停播由常规双工控制处理。
-- **Layer 1：常规话轮。** 判断 SILENCE / ANSWER，并决定是否请求 Layer 2。Layer 2 尚未返回时，Layer 1 继续按原有全双工策略工作，不让慢速语义分析阻塞回答与接话。
+- **Layer 1：常规话轮。** 参考 DuplexCascade 无 System Backchannel 的训练协议，由 LLM 输出 `<user is speaking>`、`<user finish speaking>`、`<user is interrupting>`、`<user backchannel>` 或 `<user is thinking>`；阶段 A 的 DuplexRuntimeAdapter 只执行 token 对应的协议动作，不重新判断语义。它可决定是否请求 Layer 2，但阶段 A 不设置独立跨层仲裁器。Layer 2 尚未返回时，Layer 1 继续按原有全双工策略工作，不让慢速语义分析阻塞回答与接话。
 - **Layer 2：按需澄清。** 对候选窗口分析有后果的解释分歧、用户是否正在自行说明、当前能否接话及能否问出具体短问题；输出 NO_OVERRIDE 或澄清文本。它可识别歧义但选择等待。收到有效澄清结果时，Layer 2 的内容优先于 Layer 1；否则采用 Layer 1，即有效覆盖时 L2 > L1。
 
-Layer 1 是对 X-Talk 轮次检测与生成路径的功能划分，优先复用冻结的 turn detector、LLM agent、ASR、TTS、事件总线、用户插话停播和播放管理，增加 micro-turn 候选、等待/回答决策、Layer 2 触发、有效性检查与输出选择接口。原生 VAD 条件须记录，移除 Layer 0 本身不构成 VAD-free 复现。
+Layer 1 是对 X-Talk 轮次检测与生成路径的功能划分，优先复用冻结的 turn detector、LLM agent、ASR、TTS、事件总线、用户插话停播和播放管理，增加 micro-turn、LLM special token 协议、DuplexRuntimeAdapter、Layer 2 触发和有效性检查。原生 VAD 条件须记录，移除 Layer 0 本身不构成 VAD-free 复现。阶段 B 需要跨层优先级时再增加 OutputArbiter。
 
 **研究方法位于 Layer 2 的澄清决策及其触发处**：候选解释是否导向不同结果、是否仍需问、何时问、问什么；Layer 1 和输出优先级是参考系统的控制壳。先以提示或规则实现澄清策略，确认数据和评价可行；再根据误差分析训练澄清决策器或 LoRA 适配。强模型按需调用的收益须与直接逐窗口调用比较，不能只凭省算力宣称方法有效。
 
