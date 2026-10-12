@@ -10,13 +10,13 @@ P0 路线重置和首轮框架接通门禁已完成。远端在 X-Talk fork `d93
 
 这项通过只证明 ASR→LLM→TTS→播放和插话生命周期已经接通，不等于正式基线冻结、FDB 对照、质量评测或 Layer 2 完成。固定来源和证据见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
 
-A1 协议与可观测性补丁已提交至 X-Talk fork 的 dev 分支，提交为 9c131ed6399da66b66b001184cfa4005787b5f67，并完成本地验证：包括完整片段解析、协议错误观测、关联字段传递、JSONL 时间线和 TTSStarted 交付边界。定向测试 35/35 通过；远端真实模型、FDB 和 A4 验收仍未完成。A2 micro-turn 调度和 A3 在线 token 执行尚未实现。
+A1 协议与可观测性补丁已提交至 X-Talk fork 的 dev 分支，提交为 9c131ed6399da66b66b001184cfa4005787b5f67，并完成本地验证：包括完整片段解析、协议错误观测、关联字段传递、JSONL 时间线和 TTSStarted 交付边界。定向测试 35/35 通过；官方权重真实模型的运行时冒烟已通过，完整音频、FDB 和 A4 验收仍未完成。A2 micro-turn 调度和 A3 在线 token 执行已实现于 X-Talk dev 提交 a06dd57，官方权重远端运行时冒烟已通过：12 个 micro-turn、协议错误 0，源码快照 17fd22d55cc7；完整音频与 FDB 的 A4 验收仍待完成。
 
 自 2026-10-09 起，项目不再直接复现、内嵌或改造 DuplexCascade 官方源码。新的工程路线是：
 
 1. 以独立维护的 [Vitalrubbish/xtalk](https://github.com/Vitalrubbish/xtalk) fork 为唯一运行底座；
 2. 先在 X-Talk fork 中实现通用的 DuplexCascade 功能层，再由独立的 InterClarify 项目接入 Layer 2；
-3. 以 DuplexCascade 展示的能力作为功能目标和相关工作参照，不依赖其官方权重、控制 token、Kyutai 服务或源码实现；
+3. 2026-10-12 用户指定阶段 A 先使用远端官方 DuplexCascade 权重，输入触发与实际 special token 遵循固定官方推理实现；ASR/TTS 与播放继续使用 X-Talk，训练另行决策；
 4. 先冻结第一套原生 X-Talk 组件组合，再在阶段 A 实现 DuplexCascade 无 System Backchannel 版本的功能：micro-turn、Layer 1、提前回答、用户打断停播和持续监听；阶段 B 才接入 InterClarify 的 Layer 2；
 5. 快速验证话轮内主动澄清是否值得继续，只有通过门禁后才扩大数据、训练和真人实验。
 
@@ -117,12 +117,12 @@ P1 和 P2 是最早的两个强制门禁。当前已通过框架连接子门禁�
 
 - 全新 conda 环境能运行当前 P0 测试和离线冒烟；
 - X-Talk 来源提交、许可证状态和镜像对应关系有明确记录；
-- 配置和 manifest 不再引用 DuplexCascade 或 Kyutai；
+- P0 原生基线配置保留；P1 duplex 配置单独固定官方 DuplexCascade 权重，不新增 Kyutai 运行时；
 - 同一离线输入在相同配置下产生结构一致的日志。
 
 ## 5. P1：在 X-Talk fork 中实现 DuplexCascade 功能层
 
-具体扩展点、事件协议、响应生命周期、文件布局和测试矩阵见 [xtalk_modification_plan.md](xtalk_modification_plan.md)。P1 交付无 System Backchannel 的 Layer 1 全双工底座。当前组件与连接配置已固定，A1 已通过本地门禁，下一步实现 A2 micro-turn 组装；正式质量、性能与 FDB 冻结不再作为 A1 的前置任务。这延续用户先接通框架、再逐步改造的安排，P2 的准入门槛仍按第 5.5 节执行。
+具体扩展点、事件协议、响应生命周期、文件布局和测试矩阵见 [xtalk_modification_plan.md](xtalk_modification_plan.md)。P1 交付无 System Backchannel 的 Layer 1 全双工底座。当前组件与连接配置已固定，A1 已通过本地门禁，当前实现 A2 micro-turn 组装和 A3 在线协议执行；正式质量、性能与 FDB 冻结不再作为 A1 的前置任务。这延续用户先接通框架、再逐步改造的安排，P2 的准入门槛仍按第 5.5 节执行。
 
 ### 5.1 P1.0 固定并导入 X-Talk
 
@@ -149,15 +149,15 @@ P1 和 P2 是最早的两个强制门禁。当前已通过框架连接子门禁�
 
 #### micro-turn 调度
 
-新增短窗口调度器，默认以 0.6 秒作为实验起点，同时允许由 ASR partial、停顿和轮次检测事件提前触发。调度器只发布 tick，不直接生成或播放。
+新增短窗口调度器，首次非空 ASR 后启动，默认 0.6 秒；partial、停顿和 final 只更新缓冲，串行生成完成后才 flush 下一窗口，与官方推理一致。累计前缀以增量发送；修订、空窗口和 final 去重见改造计划第 13 节。
 
 #### Layer 1 映射
 
 - DuplexCascade LLM 根据当前可见 micro-turn 输出 `<user is speaking>`、`<user finish speaking>`、`<user is interrupting>`、`<user backchannel>` 或 `<user is thinking>`；输入侧使用 `<no voice>` 和 `<EOS>`。
 - `DuplexRuntimeAdapter` 只解析状态 token，执行等待、回答、停止剩余输出或保持当前回答，并记录原始 token；它不输出规则状态，也不把 `SILENCE`/`ANSWER` 当作训练协议。
 - 不实现 Layer 0；显式关闭原生 Agent 的系统 backchannel 配置。
-- Layer 1 复用冻结的 LLM/turn detector；等待、正常回答、用户附和和有效打断由不同 token 区分。
-- X-Talk 原有句末生成仍作为安全回退。
+- Layer 1 使用官方 DuplexCascade 模型；实际 wire token 与论文语义映射见改造计划第 13 节。duplex 模式关闭原生 turn detector 的语义旁路。
+- duplex 模式协议错误记录并停止未播放输出，不从句末旁路另行触发回答。
 - 可以预留 higher-layer policy 接口，但 P1 不加载 Layer 2。
 
 #### 单层控制与播放边界

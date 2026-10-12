@@ -45,7 +45,7 @@
 
 2026-10-12，A1 协议、关联字段、JSONL 日志和交付边界在本地工作树通过定向回归 35/35。A1 已提交至 X-Talk dev 分支，提交为 9c131ed6399da66b66b001184cfa4005787b5f67。真实模型连接基线仍为第 2 节的 d9303c8，本次本地模拟测试不更新远端验收结论。源码与测试的中英文镜像文档保存在独立 fork 的 docs/src/xtalk 和 docs/tests 中。
 
-连接通过不代表 P1 完成。下一步遵循 [xtalk_modification_plan.md](xtalk_modification_plan.md) 实现并测试：
+连接通过不代表 P1 完成。下列 A2/A3 能力现已在本地实现，并通过官方权重运行时冒烟；完整音频与 FDB 回归仍按 [xtalk_modification_plan.md](xtalk_modification_plan.md) 验收：
 
 1. A2 的前缀版本生成与 micro-turn 输入组装；A1 已具备关联字段传递与统一事件时间线；
 2. micro-turn 调度和 Layer 1 的 DuplexCascade 状态 token；
@@ -53,3 +53,10 @@
 4. 提前回答、用户附和与有效插话的区分，以及 FDB smoke。
 
 正式模型基线冻结、中文/多场景质量评测、长会话、Layer 2 主动澄清和真人实验仍未开始。
+
+
+## 6. 阶段 A 官方权重接入（2026-10-12）
+
+用户指定先使用官方已训练 DuplexCascade 权重，后续再考虑训练。当前 X-Talk dev@a06dd57 的 A2/A3 运行时使用实际 wire token、raw ChatML 和首次非空 ASR 后的 0.6 秒串行 micro-turn；配置为 [xtalk_duplex_runtime.json](../configs/xtalk_duplex_runtime.json)，原生 round1 配置继续作为对照。远端 checkpoint、token IDs、conda 和任务判据见 [远端任务单](xtalk_duplex_remote_task.md)。此变更保留 X-Talk ASR/TTS/播放底座，只替换 Layer 1 模型及确定性执行；质量与 FDB 结论须重新测量。
+
+官方权重远端运行时冒烟：job-179179566806951798391-xuan-zhang，源码快照 17fd22d55cc7，status=PASS、12 micro-turn、协议 errors=0。真实 LLM + 脚本前缀 + 模拟 PCM 验证了接入，尚未更新原生 ASR/MOSS 音频和 FDB 质量基线。

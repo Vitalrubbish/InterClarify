@@ -4,7 +4,7 @@ InterClarify 研究全双工语音代理在**用户话轮内**主动澄清的时
 
 参考底座为独立维护的 [Vitalrubbish/xtalk](https://github.com/Vitalrubbish/xtalk) fork。第一阶段先跑通并冻结一套原生组件组合，再补齐 DuplexCascade 无 System Backchannel 版本的 micro-turn、Layer 1、提前回答、持续监听、用户附和识别和打断停播；当前移除 Layer 0，底座稳定后再接入 InterClarify Layer 2。InterClarify 不跟踪 X-Talk 源码或子模块，只记录实验使用的 fork 提交。
 
-**当前状态：P0 路线重置、首轮框架接通和 A1 协议/可观测性本地门禁已完成；下一步进入 A2 micro-turn 组装。** A1 定向回归 35/35 通过，X-Talk 提交为 9c131ed；A3 在线协议执行、A4 远端验收及 Layer 2 尚未完成。
+**当前状态：A2/A3 已实现于 X-Talk dev 提交 a06dd57，官方权重远端运行时冒烟通过。** A1 提交为 9c131ed；本次改造用源码摘要 17fd22d55cc7 标识。真实模型完成 12 个 micro-turn、协议错误 0；完整 ASR/MOSS 音频、FDB 与 A4 验收仍待完成，Layer 2 尚未接入。
 
 ## 当前基础设施
 
@@ -46,3 +46,5 @@ conda run -n interclarify-dev python -m pytest -q
 - 下一阶段方案：[docs/xtalk_modification_plan.md](docs/xtalk_modification_plan.md)（P1 控制层改造）
 
 实现行为若与文档不一致，先更新文档并说明原因，再改代码。
+
+阶段 A 当前已在本地完成 A2/A3 micro-turn 与官方 token 在线执行，官方权重验证和源码同步记录见 [远端任务单](docs/xtalk_duplex_remote_task.md)。配置入口为 [xtalk_duplex_runtime.json](configs/xtalk_duplex_runtime.json)，原生连接基线保留作对照。

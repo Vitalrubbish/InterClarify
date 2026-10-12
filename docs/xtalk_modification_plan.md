@@ -31,7 +31,7 @@ origin   git@github.com:Vitalrubbish/xtalk.git
 upstream git@github.com:xcc-zach/xtalk.git
 ~~~
 
-阶段 A 开发使用独立 feature/* 分支。当前框架连接基线为：
+阶段 A 开发使用 dev 分支。当前框架连接基线为：
 
 ~~~text
 base:        5f0d9959edf1026588246efbed827b078cbb114c
@@ -96,7 +96,7 @@ LLM 的输入是截至当前窗口已经到达的对话历史和 user micro-turn
 | `<user backchannel>` | 用户产生短附和 | 不创建新回答，保持当前回答流 |
 | `<user is thinking>` | 用户在系统回答结束后继续思考 | 结束当前系统 micro-turn，继续等待 |
 
-`<user finish speaking>` 后面可以跟系统回答文本；其他四个控制 token 按论文协议以 `<EOS>` 结束当前系统 micro-turn。阶段 A 不把这些 token 压缩为 SILENCE/ANSWER 训练标签。统计日志可以额外记录粗粒度投影，但投影不能替代原始 token。
+`<user finish speaking>` 后面跟系统回答文本；speaking、interrupting、thinking 状态立即以 `<EOS>` 结束当前系统 micro-turn。用户附和保持当前回答，在线路径允许实际 `<|user backchannel|>` 后继续回答文本，也允许直接 `<|im_end|>` 结束本窗口；原 A1 解析 API 保留旧格式约束。阶段 A 不把这些 token 压缩为 SILENCE/ANSWER 训练标签。统计日志可以额外记录粗粒度投影，但投影不能替代原始 token。
 
 ### 4.3 协议错误
 
@@ -105,7 +105,7 @@ LLM 的输入是截至当前窗口已经到达的对话历史和 user micro-turn
 1. 停止当前未提交的协议片段；
 2. 不根据 ASR 内容猜测替代动作；
 3. 记录 protocol_error、response ID、prefix version 和原始片段；
-4. 继续接收后续 micro-turn，或按配置执行安全的句末回退。
+4. 继续接收后续 micro-turn；在线 duplex 模式保持 LLM 唯一语义来源，不通过句末旁路生成替代回答。
 
 ## 5. Micro-turn 组装
 
@@ -113,7 +113,8 @@ LLM 的输入是截至当前窗口已经到达的对话历史和 user micro-turn
 
 - 默认窗口从 0.6 秒开始，作为实验参数而不是固定研究结论；
 - 定时 tick 产生窗口，即使当前没有新文本也要发送 `<no voice>`；
-- ASR partial、停顿和必要的输入事件可以提前触发 flush；
+- 与官方推理一致：首次非空 ASR 后启动时钟，partial、pause 和 final 只更新可见前缀，不提前触发 LLM；
+- 上一系统 micro-turn 完成后才能开始下一次生成；延迟时聚合截至下一次实际调用的新文本，保持串行且不积压过时快照；
 - 同一窗口只发送当时已经到达的 ASR 前缀；
 - ASR revision 以新的 prefix_version 表示，不能覆盖已经提交或已经播放的 response；
 - 窗口调度器只负责组装和发布，不执行 LLM 语义判断，不直接调用 TTS。
@@ -156,7 +157,7 @@ RECEIVED
 - 用户打断可以取消生成任务和未播放音频，但不能撤回 HEARD_PARTIAL 或其他已播文本；
 - ResponseUpdate 和 ResponseFinish 是已经交付的不可撤销事实；
 - 提前回答后到达的 ASR final 不得自动产生第二个相同回答；
-- 没有提前回答时，final 可以触发一次正常的句末生成。
+- 没有提前回答时，final 只更新缓冲，下个 micro-turn 由 LLM 决定是否生成回答。
 
 TurnDetectorManager 的 speaking 状态在 TTSStarted 后切换为非 listening，在 TTSPlaybackFinished 或 TTSStopped 后恢复。TTSChunkReady 只表示音频已生成，不能作为客户端交付边界。
 
@@ -247,7 +248,7 @@ src/xtalk/duplex_control/
 
 ### 9.1 数据构造
 
-论文从文本对话动态构造 duplex 训练序列。阶段 A 的训练适配器应支持同样的序列格式：
+2026-10-12 用户明确阶段 A 先使用远端官方训练权重，当前不启动训练、不实现训练适配器。下列数据构造与训练约束保留为后续研究参考：
 
 1. 将用户和系统长话轮切成短 micro-turn；
 2. 在用户窗口后插入系统控制 micro-turn；
@@ -295,14 +296,14 @@ conda run -n paratalker-dev env PYTHONPATH=src python -m unittest tests.test_dup
 
 A1 实现与双语文档提交为 9c131ed6399da66b66b001184cfa4005787b5f67，分支 dev，开发父提交为 b371bb4f8868fbb1672b055e13f631155213083c；远端已验证基线仍为 d9303c8。源码镜像说明、配置与测试索引位于独立 fork 的 docs/technical_reference/duplex_observability.zh.md。本地模拟链路结果不替代远端 conda 模型服务、FDB、长会话与音频质量验收。
 
-### A2：Micro-turn 组装
+### A2：Micro-turn 组装（本地实现与测试已完成）
 
-- 实现 0.6 秒起始 tick 和事件驱动 flush；
+- 首次非空 ASR 启动 0.6 秒 tick；ASR 事件更新缓冲，在串行 LLM 调用边界 flush；
 - 无新增文本时发送 `<no voice>`；
 - 正确处理 partial、pause、rewrite 和 final 的版本递增；
 - 验证窗口组装不阻塞音频接收和 TTS 播放。
 
-### A3：LLM 协议执行
+### A3：LLM 协议执行（本地门禁与官方权重运行时冒烟已通过）
 
 - 将 user micro-turn 送入 DuplexCascade 格式的 LLM 上下文；
 - 解析五个控制 token 和 `<EOS>`；
@@ -331,7 +332,7 @@ A1 实现与双语文档提交为 9c131ed6399da66b66b001184cfa4005787b5f67，分
 
 ### Micro-turn 测试
 
-- 固定 tick、partial 触发、停顿触发和 final 触发；
+- 首次非空输入启动、固定 tick、partial/pause/final 缓冲更新和串行 flush；
 - 空窗口仍发送 `<no voice>`；
 - append、rewrite、pause、final 的 prefix_version 单调递增；
 - 旧版本 response 不覆盖新版本上下文；
@@ -343,7 +344,7 @@ A1 实现与双语文档提交为 9c131ed6399da66b66b001184cfa4005787b5f67，分
 - TTSStarted 才打开 COMMITTED 边界；
 - 用户打断停止未播放尾部，已播文本保持不变；
 - 提前回答后 final 不重复生成；
-- 没有提前回答时 final 只触发一次安全回答；
+- 没有提前回答时 final 不独立触发，后续窗口由 LLM 决定回答；
 - shutdown 取消 assembler、LLM 和 TTS 相关任务。
 
 ### 回归测试
@@ -365,3 +366,40 @@ A1 实现与双语文档提交为 9c131ed6399da66b66b001184cfa4005787b5f67，分
 6. 阶段 A 验收场景和 FDB smoke 在远端 conda 环境可重复运行。
 
 阶段 A 不声称复现论文的官方权重、训练规模、硬件时长或全部论文数值。它验证的是在固定 X-Talk 底座上实现 DuplexCascade 无 System Backchannel 的可运行协议和全双工行为。
+
+
+## 13. 官方推理对齐（2026-10-12）
+
+用户决定先使用远端已有的官方 DuplexCascade 权重。参考官方仓库 [server.py](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/server.py) 与 [model.py](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/model.py)，固定提交 42893024ca90c8de8ac3ed624467ebc123512ff8；本地参考 checkout 位于 /tmp/interclarify-duplexcascade-reference，运行时不依赖该目录。
+
+### 13.1 说明性 token 与实际权重 token
+
+| 论文语义 | 官方 wire token | 操作 |
+| --- | --- | --- |
+| 用户静默 | <\|no voice\|> | 空窗口输入 |
+| 用户仍在说 | <\|user is talking\|> | 保持静默；官方 demo 在已有回答时也停止剩余输出 |
+| 用户说完 | <\|user finish talking\|> | 创建回答，流式文本送入现有 TTS |
+| 用户打断 | <\|user interruption\|> | 停止剩余输出 |
+| 用户附和 | <\|user backchannel\|> | 保留当前回答与 TTS 连接，允许同一 micro-turn 续写 |
+| 用户思考 | <\|user is thinking\|> | 结束当前回答的 TTS 文本输入并等待 |
+| micro-turn 结束 | <\|im_end\|> | 结束当前 ChatML 消息 |
+
+A1 的论文格式解析 API 保留。A2/A3 在线路径严格使用官方 tokenizer 的实际 token；控制事件同时记录原始输出，禁止系统附和。输入格式为 ChatML user header + 当前新增文本/静默 token + im_end + 换行，再添加 assistant header。历史包含用户和系统 micro-turn 的原始 token，结束标记不转换为普通文字 EOS。
+
+### 13.2 调用节奏与回答续写
+
+官方 server.py 在首次收到 ASR Word 后启动时钟，默认 0.6 秒；每次消费新增识别文本，空窗口为 no voice。LLM 串行生成，do_sample=False，默认 max_new_tokens=64。下一次调用继续使用含上次模型输出的 micro-turn 历史，回答的后续系统 micro-turn 可以直接产生普通文本，无需重复 finish token。
+
+X-Talk 的 ASR 返回累计前缀，assembler 只发送新增后缀。尚未发出的修订覆盖缓冲；已经发出的前缀发生 REWRITE 时，在下个调用前修订相应 user 消息，保留系统输出和已播事实，递增 prefix_version 并记录 revision_kind。这是适配累计 ASR 的工程扩展，官方 Word 流没有相应修订行为。final 不独立触发生成，也不重发相同内容。生成期间到达的输入保留到下一次 micro-turn，与官方串行推理一致；无论用户输入是否新增，持续空窗口仍允许回答续写和思考判断。
+
+### 13.3 权重加载与服务边界
+
+官方发布目录包含 train_cfg.json、tokenizer 和 model_state.safetensors，加载 Qwen2-7B-Instruct，resize embedding，创建 q/v LoRA（r=16、alpha=32），modules_to_save 为 embed_tokens/lm_head，然后装载发布 state dict。新增远端 conda HTTP 推理脚本复用该加载格式，保留 special token 输出；X-Talk adapter 发送 raw ChatML prompt，不经过普通聊天模板或 DefaultAgent。ASR/TTS/播放仍全部复用 X-Talk，duplex 模式持续接收音频并关闭 VAD/TurnSense 的语义动作旁路。
+
+远端模型绝对路径、基础模型目录和可用 conda 环境须实查；本地模拟回归不视为官方权重或 A4 验收。当前先交付在线组装、执行、配置和远端任务入口，训练留待后续决策。官方 state dict 完整装载，CUDA 推理采用 BF16 以适配 24GB 4090；此数值精度配置须写入 manifest，与官方 demo 默认 dtype 的差别不改变 micro-turn/token 协议。
+
+2026-10-12 本地验证：X-Talk unittest discovery 138 tests，3 skipped；InterClarify 24/24。A2/A3 行为测试 16/16，官方模型 HTTP/权重契约 3/3；X-Talk 实现提交为 a06dd57；源文件内容清单用于远端同步验证。
+
+远端首轮发现 interclarify-dev 的 fast tokenizer 不能解析发布 tokenizer.json，服务显式使用同发布目录 vocab/merges 的 Qwen2 slow tokenizer；实际 special token ID 与 added_tokens.json 一致并严格核验，health 记录 tokenizer 类和 dtype。该兼容变更单独登记，未来更新模型环境时可切回官方 fast 路径并做编码对照。
+
+2026-10-12 远端作业 job-179179566806951798391-xuan-zhang 在 4090 上完成官方权重运行时冒烟：12 个 micro-turn、errors=0、status=PASS；本地同步快照 17fd22d55cc7，160 文件校验通过。该任务使用真实 LLM、脚本 ASR 前缀和模拟 PCM；完整 ASR/MOSS、真实声卡、长会话与 FDB 继续属于 A4。
