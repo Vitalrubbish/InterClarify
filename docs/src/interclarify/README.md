@@ -21,9 +21,14 @@
 | `scripts/remote/run_xtalk_round1_node_job.sh` | [../../scripts/remote/run_xtalk_round1_node_job.md](../../scripts/remote/run_xtalk_round1_node_job.md) |
 | `scripts/remote/qwen3_asr_service.py` | [../../scripts/remote/qwen3_asr_service.md](../../scripts/remote/qwen3_asr_service.md) |
 | `scripts/remote/xtalk_link_check.py` | [../../scripts/remote/xtalk_link_check.md](../../scripts/remote/xtalk_link_check.md) |
+| `scripts/remote/create_duplex_source_manifest.py` | [../../scripts/remote/create_duplex_source_manifest.md](../../scripts/remote/create_duplex_source_manifest.md) |
+| `scripts/remote/duplex_a4_replay.py` | [../../scripts/remote/duplex_a4_replay.md](../../scripts/remote/duplex_a4_replay.md) |
+| `scripts/remote/run_xtalk_duplex_a4_node_job.sh` | [../../scripts/remote/run_xtalk_duplex_a4_node_job.md](../../scripts/remote/run_xtalk_duplex_a4_node_job.md) |
+| `scripts/remote/submit_xtalk_duplex_a4_job.sh` | [../../scripts/remote/submit_xtalk_duplex_a4_job.md](../../scripts/remote/submit_xtalk_duplex_a4_job.md) |
 | `scripts/remote/turnsense/` | [../../scripts/remote/turnsense/README.md](../../scripts/remote/turnsense/README.md) |
 | `configs/*.yaml` | [../../configs/README.md](../../configs/README.md) |
 | `configs/xtalk_round1.yaml` | [../../configs/xtalk_round1.md](../../configs/xtalk_round1.md) |
 | `tests/test_p0_artifacts.py` | [../../tests/test_p0_artifacts.md](../../tests/test_p0_artifacts.md) |
 | `tests/test_xtalk_round1.py` | [../../tests/test_xtalk_round1.md](../../tests/test_xtalk_round1.md) |
 | `tests/test_xtalk_link_check.py` | [../../tests/test_xtalk_link_check.md](../../tests/test_xtalk_link_check.md) |
+| `tests/test_duplex_a4_replay.py` | [../../tests/test_duplex_a4_replay.md](../../tests/test_duplex_a4_replay.md) |

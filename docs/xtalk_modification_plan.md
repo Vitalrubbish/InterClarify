@@ -92,15 +92,15 @@ LLM 的输入是截至当前窗口已经到达的对话历史和 user micro-turn
 | --- | --- | --- |
 | `<user is speaking>` | 用户仍在继续当前表达 | 结束当前系统 micro-turn，不启动新 TTS |
 | `<user finish speaking>` | 当前可以接过话轮 | 允许后续回答文本进入流式 TTS |
-| `<user is interrupting>` | 用户正在打断系统 | 取消当前未完成生成和剩余未播放音频 |
+| `<user is interrupting>` | 用户正在打断系统 | 立即结束当前 system micro-turn、取消当前 DuplexCascade 生成并停止剩余未播放音频 |
 | `<user backchannel>` | 用户产生短附和 | 不创建新回答，保持当前回答流 |
 | `<user is thinking>` | 用户在系统回答结束后继续思考 | 结束当前系统 micro-turn，继续等待 |
 
-`<user finish speaking>` 后面跟系统回答文本；speaking、interrupting、thinking 状态立即以 `<EOS>` 结束当前系统 micro-turn。用户附和保持当前回答，在线路径允许实际 `<|user backchannel|>` 后继续回答文本，也允许直接 `<|im_end|>` 结束本窗口；原 A1 解析 API 保留旧格式约束。阶段 A 不把这些 token 压缩为 SILENCE/ANSWER 训练标签。统计日志可以额外记录粗粒度投影，但投影不能替代原始 token。
+`<user finish speaking>` 后面跟系统回答文本；speaking 和 thinking 状态以 `<EOS>` 结束当前系统 micro-turn。`<user is interrupting>` 是例外：运行时一旦识别到完整 special token，立即将它作为当前 system micro-turn 的终止边界，停止未播放音频并关闭当前 DuplexCascade 流，不等待后续 `<EOS>`。为使下一次 raw ChatML prompt 保持完整，运行时只在内部历史中补入该 micro-turn 的 `<|im_end|>` 闭合符；协议事件仍保留模型实际输出的原始 interruption token。用户附和保持当前回答，在线路径允许实际 `<|user backchannel|>` 后继续回答文本，也允许直接 `<|im_end|>` 结束本窗口；原 A1 解析 API 保留旧格式约束。阶段 A 不把这些 token 压缩为 SILENCE/ANSWER 训练标签。统计日志可以额外记录粗粒度投影，但投影不能替代原始 token。
 
 ### 4.3 协议错误
 
-运行时只接受当前 response 的合法 token 顺序，并检查 response/session/turn 上下文。遇到未知 token、缺失 `<EOS>`、重复提交或已取消 response 时：
+运行时只接受当前 response 的合法 token 顺序，并检查 response/session/turn 上下文。除已识别的 `<|user interruption|>` 外，遇到未知 token、缺失 `<EOS>`、重复提交或已取消 response 时：
 
 1. 停止当前未提交的协议片段；
 2. 不根据 ASR 内容猜测替代动作；
@@ -303,16 +303,20 @@ A1 实现与双语文档提交为 9c131ed6399da66b66b001184cfa4005787b5f67，分
 - 正确处理 partial、pause、rewrite 和 final 的版本递增；
 - 验证窗口组装不阻塞音频接收和 TTS 播放。
 
+本地行为门禁包含首次输入、空窗口、修订、final 去重、慢模型串行化和 shutdown；与 A3 合计 16/16。
+
 ### A3：LLM 协议执行（本地门禁与官方权重运行时冒烟已通过）
 
 - 将 user micro-turn 送入 DuplexCascade 格式的 LLM 上下文；
 - 解析五个控制 token 和 `<EOS>`；
 - 将回答文本流接入现有 TTS；
-- 实现 `<user is interrupting>` 的生成取消、剩余音频停止和监听恢复；
+- 收到 `<|user interruption|>` 后立即结束当前 system micro-turn，取消生成、停止剩余音频并恢复监听；不等待 `<|im_end|>`；
 - 实现用户附和保持当前回答、用户思考继续等待和提前回答后的 final 去重；
 - 处理 malformed output、过期 response 和 shutdown 取消。
 
-### A4：阶段 A 验收
+当前 interruption 实现保留模型原始 `<|user interruption|>`，并在内部历史补 `<|im_end|>`；专门回归验证了分片 special token、模型流关闭、未等待 EOS、同 response 停止和已播文本保留。
+
+### A4：阶段 A 验收（远端入口已准备，尚未完成）
 
 - 脚本化 micro-turn、停顿、思考、用户附和、提前回答和用户打断场景；
 - X-Talk 原生基线与 DuplexCascade 运行时对照；
@@ -320,6 +324,8 @@ A1 实现与双语文档提交为 9c131ed6399da66b66b001184cfa4005787b5f67，分
 - 检查首 token、首 TTS chunk、TTSStarted、首个已播文本和停止延迟；
 - 检查长会话队列、任务取消、内存、显存和 shutdown；
 - 确认系统附和 token、音频和旁路播放调用均为零。
+
+已新增远端任务单 [xtalk_a4_remote_acceptance.md](xtalk_a4_remote_acceptance.md) 与节点入口。自动入口能生成真实音频回放、interruption/long-session 报告和 FDB 推理 WAV；未提供 FDB 资产时明确记录 `BLOCKED`。这些脚本和本地 8/8 驱动测试不替代真实服务器执行，因此 A4 仍保持未完成。
 
 ## 11. 阶段 A 测试矩阵
 
@@ -343,6 +349,7 @@ A1 实现与双语文档提交为 9c131ed6399da66b66b001184cfa4005787b5f67，分
 - response_id 在生成、TTS、播放和历史合并中保持一致；
 - TTSStarted 才打开 COMMITTED 边界；
 - 用户打断停止未播放尾部，已播文本保持不变；
+- interruption special token 到达后立即关闭当前模型流并结束 micro-turn；缺失 `<|im_end|>` 不构成该控制路径的协议错误；
 - 提前回答后 final 不重复生成；
 - 没有提前回答时 final 不独立触发，后续窗口由 LLM 决定回答；
 - shutdown 取消 assembler、LLM 和 TTS 相关任务。
@@ -379,7 +386,7 @@ A1 实现与双语文档提交为 9c131ed6399da66b66b001184cfa4005787b5f67，分
 | 用户静默 | <\|no voice\|> | 空窗口输入 |
 | 用户仍在说 | <\|user is talking\|> | 保持静默；官方 demo 在已有回答时也停止剩余输出 |
 | 用户说完 | <\|user finish talking\|> | 创建回答，流式文本送入现有 TTS |
-| 用户打断 | <\|user interruption\|> | 停止剩余输出 |
+| 用户打断 | <\|user interruption\|> | 立即结束当前 system micro-turn、关闭当前模型流并停止剩余输出 |
 | 用户附和 | <\|user backchannel\|> | 保留当前回答与 TTS 连接，允许同一 micro-turn 续写 |
 | 用户思考 | <\|user is thinking\|> | 结束当前回答的 TTS 文本输入并等待 |
 | micro-turn 结束 | <\|im_end\|> | 结束当前 ChatML 消息 |
@@ -390,7 +397,7 @@ A1 的论文格式解析 API 保留。A2/A3 在线路径严格使用官方 token
 
 官方 server.py 在首次收到 ASR Word 后启动时钟，默认 0.6 秒；每次消费新增识别文本，空窗口为 no voice。LLM 串行生成，do_sample=False，默认 max_new_tokens=64。下一次调用继续使用含上次模型输出的 micro-turn 历史，回答的后续系统 micro-turn 可以直接产生普通文本，无需重复 finish token。
 
-X-Talk 的 ASR 返回累计前缀，assembler 只发送新增后缀。尚未发出的修订覆盖缓冲；已经发出的前缀发生 REWRITE 时，在下个调用前修订相应 user 消息，保留系统输出和已播事实，递增 prefix_version 并记录 revision_kind。这是适配累计 ASR 的工程扩展，官方 Word 流没有相应修订行为。final 不独立触发生成，也不重发相同内容。生成期间到达的输入保留到下一次 micro-turn，与官方串行推理一致；无论用户输入是否新增，持续空窗口仍允许回答续写和思考判断。
+X-Talk 的 ASR 返回累计前缀，assembler 只发送新增后缀。尚未发出的修订覆盖缓冲；已经发出的前缀发生 REWRITE 时，在下个调用前修订相应 user 消息，保留系统输出和已播事实，递增 prefix_version 并记录 revision_kind。这是适配累计 ASR 的工程扩展，官方 Word 流没有相应修订行为。final 不独立触发生成，也不重发相同内容。生成期间到达的输入保留到下一次 micro-turn，与官方串行推理一致；无论用户输入是否新增，持续空窗口仍允许回答续写和思考判断。若模型流中出现完整 `<|user interruption|>`，该 token 立即终止本次调用：适配器关闭请求流，不再等待 `<|im_end|>`，并在内部 ChatML 历史补入闭合符后等待下一窗口。
 
 ### 13.3 权重加载与服务边界
 

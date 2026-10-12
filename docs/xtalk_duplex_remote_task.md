@@ -44,4 +44,16 @@
 
 回收报告核验：作业 Completed，运行路径为独立快照 xtalk/src/xtalk；report.source_sha256 与当前本地 xtalk/src/xtalk 的 Python 源码逐文件摘要一致。真实回答为 The capital of France is Paris.，原生播放结算的 heard 文本一致；状态序列含 user is talking、user finish talking 和 user is thinking。此单例没有覆盖真实模型的用户附和或打断质量，仍需 A4 场景验证。
 
-X-Talk 最新提交 a06dd57 包含随后补齐的 user backchannel 同一 micro-turn 续写支持；最新本地 X-Talk 138 项（135 PASS、3 skipped），行为门禁 16/16，InterClarify 24/24。17fd22d55cc7 为此前已通过的快照，最新提交另行复测。
+X-Talk 最新提交 `2f8a43343dd83153298c416d270a8843b023abc0` 包含 user backchannel 同一 micro-turn 续写和即时 interruption 处理；当前本地 X-Talk 138 项（135 PASS、3 skipped），A1 定向 35/35，A2/A3 行为 16/16，A4 驱动 8/8；InterClarify 根仓库当前 32 项。17fd22d55cc7 是此前已通过的官方模型 smoke 快照，不能代表当前提交的真实 ASR/MOSS/FDB 已复测。A4 新的远端入口和判据见 [xtalk_a4_remote_acceptance.md](xtalk_a4_remote_acceptance.md)。
+
+## A4 入口
+
+最新工作树需要重新生成 `source_manifest.json` 后再同步到服务器。提交和节点入口为：
+
+```bash
+conda run -n paratalker-dev python scripts/remote/create_duplex_source_manifest.py
+export INTERCLARIFY_DUPLEX_ROOT=/shared/xtalk-duplex-a4/current
+bash scripts/remote/submit_xtalk_duplex_a4_job.sh
+```
+
+入口默认申请 3 GPU，执行 A1–A3 回归、官方权重 smoke、真实 WAV 回放、interruption/long-session 场景和可选 FDB 对齐/评分。缺少 FDB 数据或固定评分环境时记录 `BLOCKED`；模型没有输出指定语义 token 时记录 `INCONCLUSIVE`。这些状态不会覆盖第三轮历史 smoke 结论。

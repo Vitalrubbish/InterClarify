@@ -10,7 +10,7 @@ P0 路线重置和首轮框架接通门禁已完成。远端在 X-Talk fork `d93
 
 这项通过只证明 ASR→LLM→TTS→播放和插话生命周期已经接通，不等于正式基线冻结、FDB 对照、质量评测或 Layer 2 完成。固定来源和证据见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
 
-A1 协议与可观测性补丁已提交至 X-Talk fork 的 dev 分支，提交为 9c131ed6399da66b66b001184cfa4005787b5f67，并完成本地验证：包括完整片段解析、协议错误观测、关联字段传递、JSONL 时间线和 TTSStarted 交付边界。定向测试 35/35 通过；官方权重真实模型的运行时冒烟已通过，完整音频、FDB 和 A4 验收仍未完成。A2 micro-turn 调度和 A3 在线 token 执行已实现于 X-Talk dev 提交 a06dd57，官方权重远端运行时冒烟已通过：12 个 micro-turn、协议错误 0，源码快照 17fd22d55cc7；完整音频与 FDB 的 A4 验收仍待完成。
+A1 协议与可观测性补丁已提交至 X-Talk fork 的 dev 分支，提交为 9c131ed6399da66b66b001184cfa4005787b5f67，并完成本地验证：包括完整片段解析、协议错误观测、关联字段传递、JSONL 时间线和 TTSStarted 交付边界。A2 micro-turn 调度和 A3 在线 token 执行已提交至 X-Talk dev 提交 `2f8a43343dd83153298c416d270a8843b023abc0`；该提交包含 interruption special token 的即时流关闭和 micro-turn 终止。本地记录为 X-Talk 138 项（3 skipped）、InterClarify 32 项、A1 定向 35/35、A2/A3 行为 16/16、A4 驱动 8/8。官方权重历史 smoke 为 12 个 micro-turn、协议错误 0，源码快照 17fd22d55cc7；最新提交的真实 ASR/MOSS、FDB 和 A4 远端验收尚未执行。
 
 自 2026-10-09 起，项目不再直接复现、内嵌或改造 DuplexCascade 官方源码。新的工程路线是：
 
@@ -96,7 +96,7 @@ X-Talk fork 提供 ASR、LLM agent、TTS、VAD、轮次检测、异步事件和 
 | P4 决策方法与可选训练 | 固定 Layer 2 方法并完成对照 | 各策略、可选 LoRA、消融结果 | 主方法在固定底座上有稳定收益 |
 | P5 系统测试与正式评价 | 验证通用能力和论文主张 | FDB 对照、真人实验、最终报告 | 结果支持或清楚限定研究主张 |
 
-P1 和 P2 是最早的两个强制门禁。当前已通过框架连接子门禁，尚未通过 P1 控制层门禁；P2 未通过前，不开展大规模数据生产、训练或正式真人实验。
+P1 和 P2 是最早的两个强制门禁。A1–A3 已通过本地实现门禁；A4 远端任务、真实音频与 FDB 证据仍是 P1 控制层的完成条件。P2 未通过前，不开展大规模数据生产、训练或正式真人实验。
 
 ## 4. P0：路线重置与工程准备
 
@@ -154,7 +154,7 @@ P1 和 P2 是最早的两个强制门禁。当前已通过框架连接子门禁�
 #### Layer 1 映射
 
 - DuplexCascade LLM 根据当前可见 micro-turn 输出 `<user is speaking>`、`<user finish speaking>`、`<user is interrupting>`、`<user backchannel>` 或 `<user is thinking>`；输入侧使用 `<no voice>` 和 `<EOS>`。
-- `DuplexRuntimeAdapter` 只解析状态 token，执行等待、回答、停止剩余输出或保持当前回答，并记录原始 token；它不输出规则状态，也不把 `SILENCE`/`ANSWER` 当作训练协议。
+- `DuplexRuntimeAdapter` 只解析状态 token，执行等待、回答、停止剩余输出或保持当前回答，并记录原始 token；收到完整 `<|user interruption|>` 时，它立即结束当前 system micro-turn、关闭当前模型流并停止未播放音频，不等待 `<|im_end|>`。它不输出规则状态，也不把 `SILENCE`/`ANSWER` 当作训练协议。
 - 不实现 Layer 0；显式关闭原生 Agent 的系统 backchannel 配置。
 - Layer 1 使用官方 DuplexCascade 模型；实际 wire token 与论文语义映射见改造计划第 13 节。duplex 模式关闭原生 turn detector 的语义旁路。
 - duplex 模式协议错误记录并停止未播放输出，不从句末旁路另行触发回答。
@@ -179,7 +179,7 @@ generated -> tts_requested -> tts_ready -> playback_committed
 
 #### 持续监听与用户打断
 
-系统播放期间 ASR/VAD/turn detector 继续工作。有效用户插话触发停止生成和播放、关闭旧候选，并让会话回到监听状态。环境噪声、回声和用户短附和不应自动视为正式打断。原生组合保留其 VAD 条件作为基线；去掉 Layer 0 不等于完成 VAD-free 改造，当前只声明功能对齐。
+系统播放期间 ASR/VAD/turn detector 继续工作。有效用户插话由模型输出 `<|user interruption|>` 确认；该完整 special token 触发停止生成和播放、立即结束当前 system micro-turn、关闭旧候选，并让会话回到监听状态。环境噪声、回声和用户短附和不应自动视为正式打断。原生组合保留其 VAD 条件作为基线；去掉 Layer 0 不等于完成 VAD-free 改造，当前只声明功能对齐。
 
 ### 5.4 P1.3 统一事件日志
 
