@@ -1,0 +1,2641 @@
+{
+  "status": "PASS",
+  "input_root": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/candor_pause_handling",
+  "output_root": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb/pause_handling/candor_pause_handling",
+  "samples": [
+    {
+      "status": "PASS",
+      "errors": [],
+      "scenario": "fdb",
+      "input_audio_seconds": 27.04,
+      "send_seconds": 27.00908649340272,
+      "response_ids": [
+        "a48d0b6dae2e4ad28598de90db859721"
+      ],
+      "finished_response_ids": [],
+      "asr_final": null,
+      "response": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you don't enjoy certain activities,",
+      "first_audio_seconds": 3.224667152389884,
+      "tts_audio_bytes": 2309760,
+      "event_count": 110,
+      "events": [
+        {
+          "action": "session_attached",
+          "seconds": 13742316.914109305,
+          "data": {
+            "session_id": "f7c5fa52-b19b-4666-910e-2e7a94cfe500"
+          }
+        },
+        {
+          "action": "vad_speech_start",
+          "seconds": 0.0001835152506828308,
+          "round": 0
+        },
+        {
+          "action": "update_asr",
+          "seconds": 0.6460264679044485,
+          "data": {
+            "text": "I never like.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.2694199103862047,
+          "data": {
+            "text": "I never like. I know like a lot.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.8499736990779638,
+          "data": {
+            "text": "I never like. I know like a lot of people.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "start_tts",
+          "seconds": 2.4994953237473965,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 3.075411608442664,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "latency_metrics",
+          "seconds": 3.2247168477624655,
+          "data": {
+            "network_latency_ms": 0,
+            "asr_latency_ms": 0,
+            "llm_first_token_ms": 0,
+            "llm_sentence_ms": 0,
+            "tts_first_chunk_ms": 724
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 3.684355802834034,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 4.209843119606376,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 4.283995756879449,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 4.719522591680288,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 4.896447567269206,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 5.190884362906218,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 5.495464378967881,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 5.574937971308827,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 5.95909189991653,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 6.130689676851034,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know a lot of.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 6.3421633914113045,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 6.730626307427883,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 6.74638931080699,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 7.130746323615313,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 7.330164493992925,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 7.514554616063833,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 7.898995911702514,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 7.929202564060688,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 8.201348276808858,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 8.560136791318655,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 8.585153665393591,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 8.969469944015145,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 9.162694353610277,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 9.173472443595529,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others,"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 9.557678494602442,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 9.766504840925336,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 9.941833963617682,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 10.32525259256363,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 10.389347238466144,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 10.709039691835642,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 11.112262286245823,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 11.495745800435543,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 11.601549969986081,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 11.880137544125319,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 11.981076722964644,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question,"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 12.191439663991332,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 12.364761816337705,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 12.748840829357505,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 12.799895964562893,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 13.131772035732865,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 13.414315620437264,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raised.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 13.535109646618366,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 13.918899159878492,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 14.017867723479867,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 14.302296986803412,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 14.624944720417261,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 14.686088260263205,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 15.069138864055276,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 15.253155771642923,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 15.270224880427122,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response."
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 15.654598888009787,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 15.848387787118554,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 16.038178130984306,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 16.442638847976923,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 16.469413124024868,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 16.82635443843901,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 17.073499960824847,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also like feel like it's.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 17.20981432683766,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 17.59355424158275,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 17.67758471146226,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also like feel like it's weird because your kids.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 17.8959580399096,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 18.2794305998832,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 18.2859015930444,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also like feel like it's weird because your kids are being filmed all.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 18.46117340400815,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 18.864347714930773,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 18.885047264397144,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also like feel like it's weird because your kids are being filmed all the time.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 19.046241275966167,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1."
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 19.34883799403906,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 19.507926968857646,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also like feel like it's weird because your kids are being filmed all the time, and it's like.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 19.73230137862265,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 20.111919375136495,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also like feel like it's weird because your kids are being filmed all the time, and it's like, what are they?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 20.117729276418686,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 20.602239990606904,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**:"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 20.985815227031708,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 21.31401395611465,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also like feel like it's weird because your kids are being filmed all the time, and it's like, what are they like?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 21.3690596614033,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 21.772120347246528,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 22.1554749943316,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 22.256642531603575,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \""
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 22.562691431492567,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also like feel like it's weird because your kids are being filmed all the time, and it's like, what are they like? They're gonna grow up.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 22.64104964211583,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 23.025286739692092,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 23.163054175674915,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also like feel like it's weird because your kids are being filmed all the time, and it's like, what are they like? They're gonna grow up and be like, oh my.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 23.408296747133136,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 23.771675484254956,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also like feel like it's weird because your kids are being filmed all the time, and it's like, what are they like? They're gonna grow up and be like, oh my gosh, my whole life.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 23.791644079610705,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\""
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 24.194830825552344,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 24.37849515117705,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also like feel like it's weird because your kids are being filmed all the time, and it's like, what are they like? They're gonna grow up and be like, oh my gosh, my whole life was on the internet.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 24.579225808382034,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 24.96250189654529,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 25.34585827216506,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 25.57676369510591,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also like feel like it's weird because your kids are being filmed all the time, and it's like, what are they like? They're gonna grow up and be like, oh my gosh, my whole life was on the internet, like.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 25.64806959964335,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 26.032464638352394,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you don"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 26.190077804028988,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also like feel like it's weird because your kids are being filmed all the time, and it's like, what are they like? They're gonna grow up and be like, oh my gosh, my whole life was on the internet. Like everyone could see.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 26.416121220216155,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you don't"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 26.800688548013568,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you don't enjoy"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 26.80249230004847,
+          "data": {
+            "text": "I never like. I know like a lot of people, like my age, they watch like the makeup vlogs or like I don't know. A lot of my friends would watch like the mommy bloggers, but I always thought that was like kind of weird because I was like, I don't want to like, I don't want to like know like how people are raising their kids or whatever like that. Like that's not really interesting to me, and I also like feel like it's weird because your kids are being filmed all the time, and it's like, what are they like? They're gonna grow up and be like, oh my gosh, my whole life was on the internet. Like everyone could see what I was doing.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "vad_speech_end",
+          "seconds": 27.00909572839737,
+          "round": 0
+        },
+        {
+          "action": "update_resp",
+          "seconds": 27.183468701317906,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you don't enjoy certain"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 27.58675648085773,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you don't enjoy certain activities"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 27.767559615895152,
+          "data": {
+            "response_id": "a48d0b6dae2e4ad28598de90db859721",
+            "text": "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you don't enjoy certain activities,"
+          }
+        }
+      ],
+      "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb/pause_handling/candor_pause_handling/1/output.wav",
+      "output_sample_rate": 48000,
+      "session_id": "f7c5fa52-b19b-4666-910e-2e7a94cfe500",
+      "playback_mode": "paced_headless_ack",
+      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/candor_pause_handling/1/input.wav",
+      "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb/pause_handling/candor_pause_handling/1/output.wav",
+      "sample_index": 0,
+      "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb_driver/pause_handling_candor_pause_handling/timelines/f7c5fa52-b19b-4666-910e-2e7a94cfe500.jsonl",
+      "timeline": {
+        "records": 1362,
+        "protocol_tokens": [
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user finish talking|>",
+          "<|user backchannel|>"
+        ],
+        "raw_outputs": [
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user finish talking|>It seems like you're expressing a general statement about<|im_end|>",
+          " yourself and others, but without any specific context or<|im_end|>",
+          " question, it's hard to provide a detailed response<|im_end|>",
+          ". Here's how you might clarify your statement:\n\n<|im_end|>",
+          "1. **Personal Preference**: If you're saying<|im_end|>",
+          " \"I never like,\" it could mean that you<|im_end|>",
+          " don't enjoy certain activities, such as watching makeup<|im_end|>",
+          " vlogs. This is perfectly fine, as everyone<|im_end|>",
+          " has their own interests and preferences.\n\n2. **<|im_end|>",
+          "Comparison with Others**: You mentioned that many people around<|im_end|>",
+          " your age watch makeup vlogs or follow mommy bloggers<|im_end|>",
+          ". This highlights the diversity of interests among young adults<|im_end|>",
+          ". It's important to remember that what one person<|im_end|>",
+          " enjoys might not be appealing to another. There's<|im_end|>",
+          " no right or wrong in this regard; it's<|im_end|>",
+          " all about personal choice.\n\n3. **Feeling<|im_end|>",
+          " Weird About It**: You felt that watching makeup v<|im_end|>",
+          "logs or following mommy bloggers was \"weird.\"<|im_end|>",
+          " This could stem from societal norms, personal values,<|im_end|>",
+          " or perhaps a lack of interest in those topics.<|im_end|>",
+          " It's completely normal to feel this way, and<|im_end|>",
+          " it doesn't make you weird. Everyone has unique<|im_end|>",
+          " tastes and interests.\n\n4. **Avoiding Information<|im_end|>",
+          " on Parenting**: You mentioned not wanting to know<|im_end|>",
+          " how people are raising their kids. This might be<|im_end|>",
+          " due to a desire for privacy, a lack of<|im_end|>",
+          " interest in parenting advice, or simply not being ready<|im_end|>",
+          " to think about parenthood. It's understandable to<|im_end|>",
+          " have boundaries around what information you consume, especially when<|im_end|>",
+          " it comes to sensitive topics like child-rearing.\n\n<|im_end|>",
+          "5. **Privacy Concerns**: You expressed concern<|im_end|>",
+          " about children being filmed all the time if their parents<|im_end|>",
+          " are mommy bloggers. This touches on broader issues of<|im_end|>",
+          " privacy and consent, particularly in the digital age.<|im_end|>",
+          "<|user backchannel|> It's important to consider the implications of sharing personal<|im_end|>",
+          " information online, especially when it involves minors. Parents<|im_end|>",
+          " who choose to share their children's lives online should<|im_end|>",
+          " do so responsibly, respecting their children's privacy and<|im_end|>",
+          " future autonomy.\n\nIn summary, your feelings and thoughts<|im_end|>",
+          " are valid and reflect your personal perspective. It's<|im_end|>",
+          " crucial to respect your own boundaries and interests while also<|im_end|>",
+          " being mindful of the impact of digital media on privacy<|im_end|>",
+          " and personal lives. If you have more specific questions<|im_end|>"
+        ],
+        "protocol_errors": [],
+        "event_counts": {
+          "asr.result_partial": 39,
+          "llm.first_chunk": 45,
+          "duplex.protocol_parsed": 45,
+          "duplex.micro_turn_ready": 45,
+          "tts.started": 1,
+          "turn.tts_delivery_start_requested": 1,
+          "turn.tts_start_requested": 1,
+          "llm_agent.response_update": 430,
+          "turn.tts_text_append_requested": 430,
+          "llm.sentence_ready": 1,
+          "tts.chunk_ready": 256,
+          "response.update": 66,
+          "tts.stopped": 1,
+          "turn.tts_stop_requested": 1
+        },
+        "response_ids": [
+          "a48d0b6dae2e4ad28598de90db859721"
+        ],
+        "latencies": {
+          "llm_to_tts_started_seconds": 1.1567019447684288,
+          "tts_to_first_played_text_seconds": 1.7104271855205297,
+          "stop_request_to_tts_stopped_seconds": [
+            0.00031570903956890106
+          ]
+        },
+        "interruption_events": [],
+        "stopped_response_ids": [
+          "a48d0b6dae2e4ad28598de90db859721"
+        ],
+        "played_text": {
+          "a48d0b6dae2e4ad28598de90db859721": [
+            "It",
+            "It seems",
+            "It seems like",
+            "It seems like you",
+            "It seems like you're",
+            "It seems like you're expressing",
+            "It seems like you're expressing a",
+            "It seems like you're expressing a general",
+            "It seems like you're expressing a general statement",
+            "It seems like you're expressing a general statement about",
+            "It seems like you're expressing a general statement about yourself",
+            "It seems like you're expressing a general statement about yourself and",
+            "It seems like you're expressing a general statement about yourself and others",
+            "It seems like you're expressing a general statement about yourself and others,",
+            "It seems like you're expressing a general statement about yourself and others, but",
+            "It seems like you're expressing a general statement about yourself and others, but without",
+            "It seems like you're expressing a general statement about yourself and others, but without any",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question,",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response.",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1.",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**:",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\"",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you don",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you don't",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you don't enjoy",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you don't enjoy certain",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you don't enjoy certain activities",
+            "It seems like you're expressing a general statement about yourself and others, but without any specific context or question, it's hard to provide a detailed response. Here's how you might clarify your statement:\n\n1. **Personal Preference**: If you're saying \"I never like,\" it could mean that you don't enjoy certain activities,"
+          ]
+        },
+        "played_text_monotonic": true,
+        "unplayed_tail_excluded": true,
+        "asr_updates_during_playback": 36,
+        "playback_window": [
+          13742321.366334144,
+          13742346.878646633
+        ],
+        "system_backchannel_seen": false,
+        "direct_audio_seen": false
+      }
+    },
+    {
+      "status": "PASS",
+      "errors": [],
+      "scenario": "fdb",
+      "input_audio_seconds": 13.44,
+      "send_seconds": 13.408734232187271,
+      "response_ids": [],
+      "finished_response_ids": [],
+      "asr_final": null,
+      "response": "",
+      "first_audio_seconds": null,
+      "tts_audio_bytes": 0,
+      "event_count": 18,
+      "events": [
+        {
+          "action": "session_attached",
+          "seconds": 13742347.541368272,
+          "data": {
+            "session_id": "d38fb84b-5b3d-4a18-abee-8a053e01dfea"
+          }
+        },
+        {
+          "action": "vad_speech_start",
+          "seconds": 0.0001607649028301239,
+          "round": 0
+        },
+        {
+          "action": "update_asr",
+          "seconds": 0.6368288192898035,
+          "data": {
+            "text": "She just like.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.2557807452976704,
+          "data": {
+            "text": "She just like stopped what she.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.8502002451568842,
+          "data": {
+            "text": "She just like stopped what she was doing.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 2.467175891622901,
+          "data": {
+            "text": "She just like stopped what she was doing and turned to look.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 3.0751691963523626,
+          "data": {
+            "text": "She just like stopped what she was doing and turned to look at me when I.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 3.6759635489434004,
+          "data": {
+            "text": "She just like stopped what she was doing and turned to look at me when I was describing.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 4.282711612060666,
+          "data": {
+            "text": "She just like stopped what she was doing and turned to look at me when I was describing her trip.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 4.904996937140822,
+          "data": {
+            "text": "She just like stopped what she was doing and turned to look at me when I was describing her chirping. She was like.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 7.328487161546946,
+          "data": {
+            "text": "She just like stopped what she was doing and turned to look at me when I was describing her chirping. She was like, \"Maybe.\"",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 7.936429690569639,
+          "data": {
+            "text": "She just like stopped what she was doing and turned to look at me when I was describing her chirping. She was like, \"Maybe,\" but she.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 8.545062633231282,
+          "data": {
+            "text": "She just like stopped what she was doing and turned to look at me when I was describing her chirping. She was like, \"Anyway, but she she's not.\"",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 9.147283509373665,
+          "data": {
+            "text": "She just like stopped what she was doing and turned to look at me when I was describing her chirping. She was like, \"Anyway, but she she's not like a.\"",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 9.755994256585836,
+          "data": {
+            "text": "She just like stopped what she was doing and turned to look at me when I was describing her chirping. She was like, \"Anyway, but she she's not like a meow.\"",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 11.577901801094413,
+          "data": {
+            "text": "She just like stopped what she was doing and turned to look at me when I was describing her chirping. She was like, \"Anyway, but she she's not like a meow cat.\"",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "vad_speech_end",
+          "seconds": 13.408743139356375,
+          "round": 0
+        },
+        {
+          "action": "update_asr",
+          "seconds": 13.41489184461534,
+          "data": {
+            "text": "She just like stopped what she was doing and turned to look at me when I was describing her chirping. She was like, \"Anyway, but she she's not like a meow type cat. Great choice.\"",
+            "origin": "asr"
+          }
+        }
+      ],
+      "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb/pause_handling/candor_pause_handling/10/output.wav",
+      "output_sample_rate": 48000,
+      "session_id": "d38fb84b-5b3d-4a18-abee-8a053e01dfea",
+      "playback_mode": "paced_headless_ack",
+      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/candor_pause_handling/10/input.wav",
+      "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb/pause_handling/candor_pause_handling/10/output.wav",
+      "sample_index": 1,
+      "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb_driver/pause_handling_candor_pause_handling/timelines/d38fb84b-5b3d-4a18-abee-8a053e01dfea.jsonl",
+      "timeline": {
+        "records": 81,
+        "protocol_tokens": [
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>"
+        ],
+        "raw_outputs": [
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>"
+        ],
+        "protocol_errors": [],
+        "event_counts": {
+          "asr.result_partial": 15,
+          "llm.first_chunk": 22,
+          "duplex.protocol_parsed": 22,
+          "duplex.micro_turn_ready": 22
+        },
+        "response_ids": [],
+        "latencies": {
+          "stop_request_to_tts_stopped_seconds": []
+        },
+        "interruption_events": [],
+        "stopped_response_ids": [],
+        "played_text": {},
+        "played_text_monotonic": true,
+        "unplayed_tail_excluded": true,
+        "asr_updates_during_playback": 0,
+        "playback_window": null,
+        "system_backchannel_seen": false,
+        "direct_audio_seen": false
+      }
+    },
+    {
+      "status": "PASS",
+      "errors": [],
+      "scenario": "fdb",
+      "input_audio_seconds": 28.8,
+      "send_seconds": 28.768819542601705,
+      "response_ids": [
+        "86da1b5b62ed470289e717f980a6ddf7"
+      ],
+      "finished_response_ids": [],
+      "asr_final": null,
+      "response": "It sounds like you're experiencing some challenging situations at work. Dealing with a coworker who has tested positive for",
+      "first_audio_seconds": 20.06170109473169,
+      "tts_audio_bytes": 871680,
+      "event_count": 71,
+      "events": [
+        {
+          "action": "session_attached",
+          "seconds": 13742364.554160217,
+          "data": {
+            "session_id": "7239aaa4-a548-4da3-a215-04fcb6b1a990"
+          }
+        },
+        {
+          "action": "vad_speech_start",
+          "seconds": 0.00016347132623195648,
+          "round": 0
+        },
+        {
+          "action": "update_asr",
+          "seconds": 0.6438030917197466,
+          "data": {
+            "text": "Well, it was like.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.2537090871483088,
+          "data": {
+            "text": "Well, it was like a.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 2.4666371066123247,
+          "data": {
+            "text": "Well, it was like a one of the coworkers.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 3.0655654948204756,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 3.6790590919554234,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 4.2864550072699785,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new, test pilot.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 4.890833139419556,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID and.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 5.4934796914458275,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID and uh.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 6.0973435547202826,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID and the.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 6.722520587965846,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 7.3383263275027275,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 9.162661824375391,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite recognize.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 9.76379127241671,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 10.380504513159394,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 10.983558623120189,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 11.592315999791026,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 12.211890507489443,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 12.804578451439738,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 14.02463885396719,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I had.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 14.625842014327645,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 15.229019191116095,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 15.850502895191312,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 16.455106012523174,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 17.071787267923355,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 17.65758452191949,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 18.2845068462193,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 18.897708628326654,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "start_tts",
+          "seconds": 19.342074474319816,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 19.492427622899413,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "latency_metrics",
+          "seconds": 20.061758326366544,
+          "data": {
+            "network_latency_ms": 0,
+            "asr_latency_ms": 0,
+            "llm_first_token_ms": 0,
+            "llm_sentence_ms": 0,
+            "tts_first_chunk_ms": 719
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 20.10100164450705,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and quit and.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 20.709555258974433,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and and quit and leave.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 21.057563306763768,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 21.313550036400557,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and in quit and leaving so.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 21.566674517467618,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 21.922053879126906,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and in quit and leaving, so.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 22.04476013034582,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 22.4284492097795,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 22.53897120989859,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and in quit and leaving, so I had had.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 22.812484120950103,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 23.14792733080685,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and in quit and leaving, so I had had decent amount of.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 23.19700206257403,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 23.60083763115108,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 23.751301910728216,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and in quit and leaving, so I had had decent my savings, especially.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 23.984208945184946,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 24.35865630954504,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and in quit and leaving, so I had had decent my savings, especially once once.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 24.3695028424263,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 24.754667846485972,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations at"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 24.96752999164164,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and in quit and leaving, so I had had decent my savings, especially once once COVID started.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 25.056994995102286,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations at work"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 25.238520443439484,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations at work."
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 25.57543896511197,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and in quit and leaving, so I had had decent my savings, especially once once COVID started, I just",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 25.62344054877758,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations at work. De"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 26.02706867456436,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations at work. Dealing"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 26.19281743839383,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and in quit and leaving, so I had had decent my savings, especially once once COVID started, I just started saving all.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 26.41144034266472,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations at work. Dealing with"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 26.793921740725636,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and in quit and leaving, so I had had decent my savings, especially once once COVID started, I just started saving all my money.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 26.79457467980683,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations at work. Dealing with a"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 27.179954938590527,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations at work. Dealing with a cowork"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 27.40057808160782,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and in quit and leaving, so I had had decent my savings, especially once once COVID started, I just started saving all my money like stop.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 27.563311962410808,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations at work. Dealing with a coworker"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 27.967128129675984,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations at work. Dealing with a coworker who"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 28.021522162482142,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and in quit and leaving, so I had had decent my savings, especially once once COVID started, I just started saving all my money, like stop spending it on anything.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 28.35054198652506,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations at work. Dealing with a coworker who has"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 28.614039378240705,
+          "data": {
+            "text": "Well, it was like a one of the coworkers we got who was new tested positive for COVID, and the the people at work kind of like they didn't quite brush under the table, but they were like didn't seem to have like a policy for it, and I was kind of annoyed, and I kind of like I I wasn't really enjoying the job too much, and was planning on saving up till the end of the year and in quit and leaving, so I had had decent my savings, especially once once COVID started, I just started saving all my money, like stop spending it on anything, just",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 28.734910706058145,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations at work. Dealing with a coworker who has tested"
+          }
+        },
+        {
+          "action": "vad_speech_end",
+          "seconds": 28.768826304003596,
+          "round": 0
+        },
+        {
+          "action": "update_resp",
+          "seconds": 29.116818714886904,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations at work. Dealing with a coworker who has tested positive"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 29.50140824727714,
+          "data": {
+            "response_id": "86da1b5b62ed470289e717f980a6ddf7",
+            "text": "It sounds like you're experiencing some challenging situations at work. Dealing with a coworker who has tested positive for"
+          }
+        }
+      ],
+      "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb/pause_handling/candor_pause_handling/100/output.wav",
+      "output_sample_rate": 48000,
+      "session_id": "7239aaa4-a548-4da3-a215-04fcb6b1a990",
+      "playback_mode": "paced_headless_ack",
+      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/candor_pause_handling/100/input.wav",
+      "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb/pause_handling/candor_pause_handling/100/output.wav",
+      "sample_index": 2,
+      "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb_driver/pause_handling_candor_pause_handling/timelines/7239aaa4-a548-4da3-a215-04fcb6b1a990.jsonl",
+      "timeline": {
+        "records": 677,
+        "protocol_tokens": [
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user finish talking|>",
+          "<|user backchannel|>"
+        ],
+        "raw_outputs": [
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user finish talking|>It sounds like you're experiencing some challenging situations at<|im_end|>",
+          " work. Dealing with a coworker who has<|im_end|>",
+          " tested positive for COVID-19 can indeed be<|im_end|>",
+          " unsettling, especially if there isn't a clear policy<|im_end|>",
+          " in place to address the situation. It's understandable<|im_end|>",
+          " that this might contribute to your dissatisfaction with the job<|im_end|>",
+          ".\n\nHere are a few steps you might consider:\n\n1<|im_end|>",
+          ". **Communication**: If you haven't already,<|im_end|>",
+          " discuss your concerns about workplace safety with your supervisor or<|im_end|>",
+          " HR department. They may not have been aware of<|im_end|>",
+          " the lack of a policy and could help implement measures<|im_end|>",
+          " to ensure everyone's safety.\n\n2. **Policy<|im_end|>",
+          "<|user backchannel|> Request**: If you feel comfortable, suggest implementing a<|im_end|>",
+          " clear policy regarding COVID-19 protocols, such<|im_end|>",
+          " as regular testing, mask-wearing, social distancing<|im_end|>",
+          ", and cleaning procedures. This can help create a<|im_end|>",
+          " safer environment for everyone.\n\n3. **Reflect on<|im_end|>",
+          " Your Decision**: Before quitting, consider whether this is<|im_end|>"
+        ],
+        "protocol_errors": [],
+        "event_counts": {
+          "asr.result_partial": 43,
+          "llm.first_chunk": 48,
+          "duplex.protocol_parsed": 48,
+          "duplex.micro_turn_ready": 48,
+          "tts.started": 1,
+          "turn.tts_delivery_start_requested": 1,
+          "turn.tts_start_requested": 1,
+          "llm_agent.response_update": 181,
+          "turn.tts_text_append_requested": 181,
+          "llm.sentence_ready": 1,
+          "tts.chunk_ready": 99,
+          "response.update": 23,
+          "tts.stopped": 1,
+          "turn.tts_stop_requested": 1
+        },
+        "response_ids": [
+          "86da1b5b62ed470289e717f980a6ddf7"
+        ],
+        "latencies": {
+          "llm_to_tts_started_seconds": 18.068509727716446,
+          "tts_to_first_played_text_seconds": 1.7155217621475458,
+          "stop_request_to_tts_stopped_seconds": [
+            0.00031771324574947357
+          ]
+        },
+        "interruption_events": [],
+        "stopped_response_ids": [
+          "86da1b5b62ed470289e717f980a6ddf7"
+        ],
+        "played_text": {
+          "86da1b5b62ed470289e717f980a6ddf7": [
+            "It",
+            "It sounds",
+            "It sounds like",
+            "It sounds like you",
+            "It sounds like you're",
+            "It sounds like you're experiencing",
+            "It sounds like you're experiencing some",
+            "It sounds like you're experiencing some challenging",
+            "It sounds like you're experiencing some challenging situations",
+            "It sounds like you're experiencing some challenging situations at",
+            "It sounds like you're experiencing some challenging situations at work",
+            "It sounds like you're experiencing some challenging situations at work.",
+            "It sounds like you're experiencing some challenging situations at work. De",
+            "It sounds like you're experiencing some challenging situations at work. Dealing",
+            "It sounds like you're experiencing some challenging situations at work. Dealing with",
+            "It sounds like you're experiencing some challenging situations at work. Dealing with a",
+            "It sounds like you're experiencing some challenging situations at work. Dealing with a cowork",
+            "It sounds like you're experiencing some challenging situations at work. Dealing with a coworker",
+            "It sounds like you're experiencing some challenging situations at work. Dealing with a coworker who",
+            "It sounds like you're experiencing some challenging situations at work. Dealing with a coworker who has",
+            "It sounds like you're experiencing some challenging situations at work. Dealing with a coworker who has tested",
+            "It sounds like you're experiencing some challenging situations at work. Dealing with a coworker who has tested positive",
+            "It sounds like you're experiencing some challenging situations at work. Dealing with a coworker who has tested positive for"
+          ]
+        },
+        "played_text_monotonic": true,
+        "unplayed_tail_excluded": true,
+        "asr_updates_during_playback": 16,
+        "playback_window": [
+          13742385.855048873,
+          13742396.286014805
+        ],
+        "system_backchannel_seen": false,
+        "direct_audio_seen": false
+      }
+    },
+    {
+      "status": "PASS",
+      "errors": [],
+      "scenario": "fdb",
+      "input_audio_seconds": 10.4,
+      "send_seconds": 10.368965910747647,
+      "response_ids": [
+        "caf700ac4d844a18ab975b3988894c17"
+      ],
+      "finished_response_ids": [],
+      "asr_final": null,
+      "response": "Giant sequoias are indeed a marvel of nature, and while they might",
+      "first_audio_seconds": 4.410798765718937,
+      "tts_audio_bytes": 614400,
+      "event_count": 32,
+      "events": [
+        {
+          "action": "session_attached",
+          "seconds": 13742396.93751334,
+          "data": {
+            "session_id": "877be368-74f7-4979-a233-cb9aa780198c"
+          }
+        },
+        {
+          "action": "vad_speech_start",
+          "seconds": 0.00015215016901493073,
+          "round": 0
+        },
+        {
+          "action": "update_asr",
+          "seconds": 0.6276413835585117,
+          "data": {
+            "text": "Yeah.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.2550235949456692,
+          "data": {
+            "text": "Yeah, giant sequoias.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 2.4667009841650724,
+          "data": {
+            "text": "Yeah, giant sequoias. I've never.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 3.09792965836823,
+          "data": {
+            "text": "Yeah, giant sequoias. I've I've never I've never been there. Like.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 3.683478843420744,
+          "data": {
+            "text": "Yeah, giant sequoias. I've I've never I've never been there, like to the redwoods.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "start_tts",
+          "seconds": 3.6869941111654043,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 4.2915063463151455,
+          "data": {
+            "text": "Yeah, giant sequoias. I've I've never I've never been there, like to the redwoods and sequoia.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "latency_metrics",
+          "seconds": 4.4108393006026745,
+          "data": {
+            "network_latency_ms": 0,
+            "asr_latency_ms": 0,
+            "llm_first_token_ms": 0,
+            "llm_sentence_ms": 0,
+            "tts_first_chunk_ms": 723
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 4.890859225764871,
+          "data": {
+            "text": "Yeah, giant sequoias. I've I've never I've never been there, like to the redwoods and Sequoia National Park.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 5.397619290277362,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "G"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 5.909099096432328,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 6.383713768795133,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant sequ"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 6.734095519408584,
+          "data": {
+            "text": "Yeah, giant sequoias. I've I've never I've never been there, like to the redwoods and Sequoia National Park, but I've never been.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 6.768115611746907,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant sequo"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 7.15204624645412,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant sequoias"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 7.324460374191403,
+          "data": {
+            "text": "Yeah, giant sequoias. I've I've never I've never been there, like to the redwoods and Sequoia National Park, but I've never been over there.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 7.536473233252764,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant sequoias are"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 7.939279485493898,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant sequoias are indeed"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 8.324461122974753,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant sequoias are indeed a"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 8.708534324541688,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant sequoias are indeed a marvel"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 9.093651931732893,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant sequoias are indeed a marvel of"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 9.163465583696961,
+          "data": {
+            "text": "Yeah, giant sequoias. I've I've never I've never been there, like to the redwoods and Sequoia National Park, but I've never been over there. But that's somewhere.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 9.396641811355948,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant sequoias are indeed a marvel of nature"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 9.579584879800677,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant sequoias are indeed a marvel of nature,"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 9.771411063149571,
+          "data": {
+            "text": "Yeah, giant sequoias. I've I've never I've never been there, like to the redwoods and Sequoia National Park, but I've never been over there. But that's somewhere I'd like to go.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 9.964023899286985,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant sequoias are indeed a marvel of nature, and"
+          }
+        },
+        {
+          "action": "vad_speech_end",
+          "seconds": 10.36897681467235,
+          "round": 0
+        },
+        {
+          "action": "update_resp",
+          "seconds": 10.369569182395935,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant sequoias are indeed a marvel of nature, and while"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 10.752042459324002,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant sequoias are indeed a marvel of nature, and while they"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 11.135379711166024,
+          "data": {
+            "response_id": "caf700ac4d844a18ab975b3988894c17",
+            "text": "Giant sequoias are indeed a marvel of nature, and while they might"
+          }
+        }
+      ],
+      "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb/pause_handling/candor_pause_handling/101/output.wav",
+      "output_sample_rate": 48000,
+      "session_id": "877be368-74f7-4979-a233-cb9aa780198c",
+      "playback_mode": "paced_headless_ack",
+      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/candor_pause_handling/101/input.wav",
+      "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb/pause_handling/candor_pause_handling/101/output.wav",
+      "sample_index": 3,
+      "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb_driver/pause_handling_candor_pause_handling/timelines/877be368-74f7-4979-a233-cb9aa780198c.jsonl",
+      "timeline": {
+        "records": 413,
+        "protocol_tokens": [
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user finish talking|>",
+          "<|user backchannel|>"
+        ],
+        "raw_outputs": [
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user finish talking|>Giant sequoias are indeed a marvel of<|im_end|>",
+          " nature, and while they might not be as widely<|im_end|>",
+          " recognized as the coastal redwoods, they offer a<|im_end|>",
+          " unique and breathtaking experience. Located in California, specifically<|im_end|>",
+          " within Sequoia National Park and Kings Canyon National<|im_end|>",
+          " Park, these ancient trees can be found in two<|im_end|>",
+          " main areas: the Giant Forest in Sequoia<|im_end|>",
+          " National Park and within the boundaries of Kings Canyon National<|im_end|>",
+          " Park.\n\nHere are some key points about giant sequ<|im_end|>",
+          "oias:\n\n1. **Age**: Giant sequ<|im_end|>",
+          "<|user backchannel|>oias can live for thousands of years. The<|im_end|>",
+          " oldest known sequoia, named \"General Sherman<|im_end|>",
+          ",\" is located in Sequoia National Park and<|im_end|>"
+        ],
+        "protocol_errors": [],
+        "event_counts": {
+          "asr.result_partial": 11,
+          "llm.first_chunk": 17,
+          "duplex.protocol_parsed": 17,
+          "duplex.micro_turn_ready": 17,
+          "tts.started": 1,
+          "turn.tts_delivery_start_requested": 1,
+          "turn.tts_start_requested": 1,
+          "llm_agent.response_update": 130,
+          "turn.tts_text_append_requested": 130,
+          "llm.sentence_ready": 1,
+          "tts.chunk_ready": 69,
+          "response.update": 16,
+          "tts.stopped": 1,
+          "turn.tts_stop_requested": 1
+        },
+        "response_ids": [
+          "caf700ac4d844a18ab975b3988894c17"
+        ],
+        "latencies": {
+          "llm_to_tts_started_seconds": 2.429262403398752,
+          "tts_to_first_played_text_seconds": 1.7106546610593796,
+          "stop_request_to_tts_stopped_seconds": [
+            0.0004088114947080612
+          ]
+        },
+        "interruption_events": [],
+        "stopped_response_ids": [
+          "caf700ac4d844a18ab975b3988894c17"
+        ],
+        "played_text": {
+          "caf700ac4d844a18ab975b3988894c17": [
+            "G",
+            "Giant",
+            "Giant sequ",
+            "Giant sequo",
+            "Giant sequoias",
+            "Giant sequoias are",
+            "Giant sequoias are indeed",
+            "Giant sequoias are indeed a",
+            "Giant sequoias are indeed a marvel",
+            "Giant sequoias are indeed a marvel of",
+            "Giant sequoias are indeed a marvel of nature",
+            "Giant sequoias are indeed a marvel of nature,",
+            "Giant sequoias are indeed a marvel of nature, and",
+            "Giant sequoias are indeed a marvel of nature, and while",
+            "Giant sequoias are indeed a marvel of nature, and while they",
+            "Giant sequoias are indeed a marvel of nature, and while they might"
+          ]
+        },
+        "played_text_monotonic": true,
+        "unplayed_tail_excluded": true,
+        "asr_updates_during_playback": 6,
+        "playback_window": [
+          13742402.587377228,
+          13742410.271608688
+        ],
+        "system_backchannel_seen": false,
+        "direct_audio_seen": false
+      }
+    },
+    {
+      "status": "PASS",
+      "errors": [],
+      "scenario": "fdb",
+      "input_audio_seconds": 7.36,
+      "send_seconds": 7.328863654285669,
+      "response_ids": [
+        "17f626500b134ebd842a46f0281b8f31"
+      ],
+      "finished_response_ids": [],
+      "asr_final": null,
+      "response": "As",
+      "first_audio_seconds": 6.827334651723504,
+      "tts_audio_bytes": 105600,
+      "event_count": 16,
+      "events": [
+        {
+          "action": "session_attached",
+          "seconds": 13742410.920960968,
+          "data": {
+            "session_id": "cc532bec-286f-4049-89b5-e24253183f80"
+          }
+        },
+        {
+          "action": "vad_speech_start",
+          "seconds": 0.00016211159527301788,
+          "round": 0
+        },
+        {
+          "action": "update_asr",
+          "seconds": 0.6364516038447618,
+          "data": {
+            "text": "The movie is.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.2585849035531282,
+          "data": {
+            "text": "The movie you spoke about is it?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.8357695043087006,
+          "data": {
+            "text": "The movie you spoke about is.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 3.0705847330391407,
+          "data": {
+            "text": "The movie you spoke about is the movie you.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 3.673840954899788,
+          "data": {
+            "text": "The movie you spoke about is the movie you spoke of.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 4.277253059670329,
+          "data": {
+            "text": "The movie you spoke about is the movie you spoke of about.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 4.8996878154575825,
+          "data": {
+            "text": "The movie you spoke about is the movie you spoke of about. Is is it?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 5.494228487834334,
+          "data": {
+            "text": "The movie you spoke about is the movie you spoke of about. Is it on Netflix?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "start_tts",
+          "seconds": 6.095705213025212,
+          "data": {
+            "response_id": "17f626500b134ebd842a46f0281b8f31"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 6.724849840626121,
+          "data": {
+            "text": "The movie you spoke about is the movie you spoke of about. Is it on Netflix? Is it on?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "latency_metrics",
+          "seconds": 6.827381763607264,
+          "data": {
+            "network_latency_ms": 0,
+            "asr_latency_ms": 0,
+            "llm_first_token_ms": 0,
+            "llm_sentence_ms": 0,
+            "tts_first_chunk_ms": 731
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 7.3226498775184155,
+          "data": {
+            "text": "The movie you spoke about is the movie you spoke of about. Is it on Netflix? Is it on Netflix?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "vad_speech_end",
+          "seconds": 7.328877028077841,
+          "round": 0
+        },
+        {
+          "action": "update_resp",
+          "seconds": 7.820389911532402,
+          "data": {
+            "response_id": "17f626500b134ebd842a46f0281b8f31",
+            "text": "As"
+          }
+        }
+      ],
+      "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb/pause_handling/candor_pause_handling/102/output.wav",
+      "output_sample_rate": 48000,
+      "session_id": "cc532bec-286f-4049-89b5-e24253183f80",
+      "playback_mode": "paced_headless_ack",
+      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/candor_pause_handling/102/input.wav",
+      "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb/pause_handling/candor_pause_handling/102/output.wav",
+      "sample_index": 4,
+      "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T024524Z/fdb_driver/pause_handling_candor_pause_handling/timelines/cc532bec-286f-4049-89b5-e24253183f80.jsonl",
+      "timeline": {
+        "records": 148,
+        "protocol_tokens": [
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user finish talking|>",
+          "<|user backchannel|>"
+        ],
+        "raw_outputs": [
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user is talking|><|im_end|>",
+          "<|user finish talking|>As an AI, I don't have real-time<|im_end|>",
+          " access to current streaming information or databases. Therefore,<|im_end|>",
+          "<|user backchannel|> I cannot confirm whether a specific movie is currently available<|im_end|>",
+          " on Netflix. However, you can easily check if<|im_end|>"
+        ],
+        "protocol_errors": [],
+        "event_counts": {
+          "asr.result_partial": 10,
+          "llm.first_chunk": 12,
+          "duplex.protocol_parsed": 12,
+          "duplex.micro_turn_ready": 12,
+          "tts.started": 1,
+          "turn.tts_delivery_start_requested": 1,
+          "turn.tts_start_requested": 1,
+          "llm_agent.response_update": 40,
+          "turn.tts_text_append_requested": 40,
+          "llm.sentence_ready": 1,
+          "tts.chunk_ready": 14,
+          "response.update": 2,
+          "tts.stopped": 1,
+          "turn.tts_stop_requested": 1
+        },
+        "response_ids": [
+          "17f626500b134ebd842a46f0281b8f31"
+        ],
+        "latencies": {
+          "llm_to_tts_started_seconds": 4.829179489985108,
+          "tts_to_first_played_text_seconds": 1.7247688099741936,
+          "stop_request_to_tts_stopped_seconds": [
+            0.00022927112877368927
+          ]
+        },
+        "interruption_events": [],
+        "stopped_response_ids": [
+          "17f626500b134ebd842a46f0281b8f31"
+        ],
+        "played_text": {
+          "17f626500b134ebd842a46f0281b8f31": [
+            "As",
+            "As an"
+          ]
+        },
+        "played_text_monotonic": true,
+        "unplayed_tail_excluded": true,
+        "asr_updates_during_playback": 2,
+        "playback_window": [
+          13742418.979397167,
+          13742421.216068322
+        ],
+        "system_backchannel_seen": false,
+        "direct_audio_seen": false
+      }
+    }
+  ],
+  "note": "Inference audio only; run official FDB ASR alignment and scoring separately."
+}

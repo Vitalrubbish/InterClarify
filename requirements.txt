@@ -27,6 +27,14 @@ uvicorn==0.30.6
 requests==2.32.3
 aiohttp==3.10.5
 
+# --- official DuplexCascade model service (scripts/remote/duplex_model_service.py) ---
+# The released tokenizer.json carries `ignore_merges` and needs tokenizers>=0.20
+# for the fast tokenizer the official server.py uses; transformers<5 matches the
+# upstream requirements.txt and peft 0.13 pairs with transformers 4.46.
+transformers==4.46.3
+tokenizers==0.20.3
+peft==0.13.2
+
 # --- project / tooling ----------------------------------------------------
 PyYAML==6.0.2
 pytest==8.3.2

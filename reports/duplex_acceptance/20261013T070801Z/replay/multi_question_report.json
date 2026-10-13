@@ -1,0 +1,300 @@
+{
+  "status": "PASS",
+  "errors": [],
+  "scenario": "multi_question",
+  "audio_seconds": 4.96,
+  "send_seconds": 4.929014600813389,
+  "response_ids": [
+    "3b47e247c0624489b71f83d5dc9b9d8d"
+  ],
+  "finished_response_ids": [
+    "3b47e247c0624489b71f83d5dc9b9d8d"
+  ],
+  "response_finished": true,
+  "audio_received": true,
+  "asr_final": null,
+  "response": "Two plus two equals four Three plus three equals six",
+  "first_audio_seconds": 6.800711268559098,
+  "tts_audio_bytes": 445440,
+  "event_count": 24,
+  "events": [
+    {
+      "action": "session_attached",
+      "seconds": 13757219.010845456,
+      "data": {
+        "session_id": "19b248b9-5876-486e-a0fa-84a6d68b9569"
+      }
+    },
+    {
+      "action": "vad_speech_start",
+      "seconds": 0.00015982240438461304,
+      "round": 0
+    },
+    {
+      "action": "update_asr",
+      "seconds": 0.635282352566719,
+      "data": {
+        "text": "What.",
+        "origin": "asr"
+      }
+    },
+    {
+      "action": "update_asr",
+      "seconds": 1.2441927138715982,
+      "data": {
+        "text": "What is two plus?",
+        "origin": "asr"
+      }
+    },
+    {
+      "action": "update_asr",
+      "seconds": 1.843680003657937,
+      "data": {
+        "text": "What is two plus two?",
+        "origin": "asr"
+      }
+    },
+    {
+      "action": "update_asr",
+      "seconds": 2.455635491758585,
+      "data": {
+        "text": "What is two plus two? Also.",
+        "origin": "asr"
+      }
+    },
+    {
+      "action": "update_asr",
+      "seconds": 3.066201727837324,
+      "data": {
+        "text": "What is two plus two? Also, what is",
+        "origin": "asr"
+      }
+    },
+    {
+      "action": "update_asr",
+      "seconds": 3.674250377342105,
+      "data": {
+        "text": "What is two plus two? Also, what is three plus",
+        "origin": "asr"
+      }
+    },
+    {
+      "action": "update_asr",
+      "seconds": 4.280502770096064,
+      "data": {
+        "text": "What is two plus two? Also, what is three plus three?",
+        "origin": "asr"
+      }
+    },
+    {
+      "action": "vad_speech_end",
+      "seconds": 4.929023541510105,
+      "round": 0
+    },
+    {
+      "action": "start_tts",
+      "seconds": 5.496583290398121,
+      "data": {
+        "response_id": "3b47e247c0624489b71f83d5dc9b9d8d"
+      }
+    },
+    {
+      "action": "latency_metrics",
+      "seconds": 6.800769438967109,
+      "data": {
+        "network_latency_ms": 0,
+        "asr_latency_ms": 0,
+        "llm_first_token_ms": 0,
+        "llm_sentence_ms": 0,
+        "tts_first_chunk_ms": 1303
+      }
+    },
+    {
+      "action": "update_resp",
+      "seconds": 7.760882098227739,
+      "data": {
+        "response_id": "3b47e247c0624489b71f83d5dc9b9d8d",
+        "text": "Two"
+      }
+    },
+    {
+      "action": "update_resp",
+      "seconds": 8.254683084785938,
+      "data": {
+        "response_id": "3b47e247c0624489b71f83d5dc9b9d8d",
+        "text": "Two plus"
+      }
+    },
+    {
+      "action": "update_resp",
+      "seconds": 8.720654206350446,
+      "data": {
+        "response_id": "3b47e247c0624489b71f83d5dc9b9d8d",
+        "text": "Two plus two"
+      }
+    },
+    {
+      "action": "update_resp",
+      "seconds": 9.103137981146574,
+      "data": {
+        "response_id": "3b47e247c0624489b71f83d5dc9b9d8d",
+        "text": "Two plus two equals"
+      }
+    },
+    {
+      "action": "update_resp",
+      "seconds": 9.48574954457581,
+      "data": {
+        "response_id": "3b47e247c0624489b71f83d5dc9b9d8d",
+        "text": "Two plus two equals four"
+      }
+    },
+    {
+      "action": "update_resp",
+      "seconds": 9.86788959801197,
+      "data": {
+        "response_id": "3b47e247c0624489b71f83d5dc9b9d8d",
+        "text": "Two plus two equals four Three"
+      }
+    },
+    {
+      "action": "update_resp",
+      "seconds": 10.27083676494658,
+      "data": {
+        "response_id": "3b47e247c0624489b71f83d5dc9b9d8d",
+        "text": "Two plus two equals four Three plus"
+      }
+    },
+    {
+      "action": "update_resp",
+      "seconds": 10.653684109449387,
+      "data": {
+        "response_id": "3b47e247c0624489b71f83d5dc9b9d8d",
+        "text": "Two plus two equals four Three plus three"
+      }
+    },
+    {
+      "action": "update_resp",
+      "seconds": 11.036277029663324,
+      "data": {
+        "response_id": "3b47e247c0624489b71f83d5dc9b9d8d",
+        "text": "Two plus two equals four Three plus three equals"
+      }
+    },
+    {
+      "action": "update_resp",
+      "seconds": 11.418357320129871,
+      "data": {
+        "response_id": "3b47e247c0624489b71f83d5dc9b9d8d",
+        "text": "Two plus two equals four Three plus three equals six"
+      }
+    },
+    {
+      "action": "tts_finished",
+      "seconds": 11.51973158493638,
+      "data": {
+        "response_id": "3b47e247c0624489b71f83d5dc9b9d8d"
+      }
+    },
+    {
+      "action": "finish_resp",
+      "seconds": 11.881122155115008,
+      "data": {
+        "response_id": "3b47e247c0624489b71f83d5dc9b9d8d",
+        "text": "Two plus two equals four Three plus three equals six"
+      }
+    }
+  ],
+  "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/replay/multi_question/output.wav",
+  "output_sample_rate": 48000,
+  "session_id": "19b248b9-5876-486e-a0fa-84a6d68b9569",
+  "playback_mode": "paced_headless_ack",
+  "timeline_path": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/replay/timelines/19b248b9-5876-486e-a0fa-84a6d68b9569.jsonl",
+  "timeline": {
+    "records": 139,
+    "protocol_tokens": [
+      "<|user is talking|>",
+      "<|user is talking|>",
+      "<|user is talking|>",
+      "<|user is talking|>",
+      "<|user is talking|>",
+      "<|user is talking|>",
+      "<|user is talking|>",
+      "<|user finish talking|>",
+      "<|user is thinking|>",
+      "<|user is thinking|>",
+      "<|user is thinking|>",
+      "<|user is thinking|>"
+    ],
+    "raw_outputs": [
+      "<|user is talking|>",
+      "<|user is talking|>",
+      "<|user is talking|>",
+      "<|user is talking|>",
+      "<|user is talking|>",
+      "<|user is talking|>",
+      "<|user is talking|>",
+      "<|user finish talking|>",
+      "<|user is thinking|>",
+      "<|user is thinking|>",
+      "<|user is thinking|>",
+      "<|user is thinking|>"
+    ],
+    "protocol_errors": [],
+    "event_counts": {
+      "asr.result_partial": 7,
+      "llm.first_chunk": 13,
+      "duplex.protocol_parsed": 12,
+      "duplex.micro_turn_ready": 13,
+      "tts.started": 1,
+      "turn.tts_delivery_start_requested": 1,
+      "turn.tts_start_requested": 1,
+      "llm_agent.response_update": 12,
+      "turn.tts_text_append_requested": 12,
+      "llm.sentence_ready": 1,
+      "llm_agent.response_finish": 1,
+      "tts.chunk_ready": 50,
+      "response.update": 10,
+      "turn.tts_flush_requested": 1,
+      "tts.finished": 1,
+      "response.finish": 1,
+      "tts.response_closed": 1,
+      "tts.playback_finished": 1
+    },
+    "response_ids": [
+      "3b47e247c0624489b71f83d5dc9b9d8d"
+    ],
+    "latencies": {
+      "llm_to_tts_started_seconds": 4.231142476201057,
+      "tts_to_first_played_text_seconds": 2.264383342117071,
+      "stop_request_to_tts_stopped_seconds": []
+    },
+    "interruption_events": [],
+    "stopped_response_ids": [],
+    "interruption_stop_response_ids": [],
+    "teardown_stop_response_ids": [],
+    "played_text": {
+      "3b47e247c0624489b71f83d5dc9b9d8d": [
+        "Two",
+        "Two plus",
+        "Two plus two",
+        "Two plus two equals",
+        "Two plus two equals four",
+        "Two plus two equals four Three",
+        "Two plus two equals four Three plus",
+        "Two plus two equals four Three plus three",
+        "Two plus two equals four Three plus three equals",
+        "Two plus two equals four Three plus three equals six"
+      ]
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 0,
+    "playback_window": [
+      13757226.466132903,
+      13757232.85074195
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+  }
+}

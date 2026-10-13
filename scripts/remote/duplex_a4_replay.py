@@ -20,7 +20,13 @@ if str(SCRIPT_DIR) not in sys.path:
 from xtalk_link_check import LinkClient, _load_pcm16, _pick_free_port, _poll_port, _serve
 
 SAMPLE_RATE = 16_000
-SCENARIOS = ("normal", "interruption", "long_session")
+SCENARIOS = ("normal", "interruption", "long_session", "pause", "multi_question")
+# Acoustic settle window: after the reset, the interrupted response must stay silent.
+INTERRUPTION_SETTLE_SECONDS = 1.0
+# Reset reasons written by the adapter: the released speaking window opened.
+INTERRUPTION_STOP_REASONS = ("<|user interruption|>", "<|user is talking|>")
+# Teardown reasons: the session closed or inference failed, which is not an interruption.
+TEARDOWN_STOP_REASONS = ("shutdown", "cancelled", "protocol_error", "model_service_error")
 
 
 class TimedPcmCapture:
@@ -100,6 +106,8 @@ class A4ReplayClient(LinkClient):
         scenario: str = "normal",
         barge_pcm: bytes | None = None,
         barge_after_seconds: float = 2.0,
+        pause_pcm: bytes | None = None,
+        pause_gap_seconds: float = 1.5,
     ) -> dict:
         """Run one A4 scenario with protocol-specific completion criteria."""
         import websockets
@@ -132,6 +140,17 @@ class A4ReplayClient(LinkClient):
                         audio_pcm,
                         rounds,
                     )
+                elif scenario == "pause":
+                    if pause_pcm is None:
+                        raise ValueError("pause scenario requires a second PCM segment")
+                    result, passed = await self._run_pause(
+                        ws,
+                        audio_pcm,
+                        pause_pcm,
+                        pause_gap_seconds,
+                    )
+                elif scenario == "multi_question":
+                    result, passed = await self._run_multi_question(ws, audio_pcm)
                 elif scenario == "fdb":
                     result, passed = await self._run_fdb(ws, audio_pcm)
                 else:
@@ -196,7 +215,11 @@ class A4ReplayClient(LinkClient):
         interruption_pcm: bytes,
         after_seconds: float,
     ) -> tuple[dict[str, Any], bool]:
-        """Require the active response to stop without requiring a new answer."""
+        """Require the active response to stop without requiring a new answer.
+
+        The event check confirms the interruption reset, and the acoustic check
+        confirms the interrupted response stops receiving audio afterwards.
+        """
         request_start, request_end = await self._send_turn_input(ws, request_pcm, 0)
         playback_started = await self._wait_for(
             lambda: self._audio_bytes > 0 and self._current_response_id is not None,
@@ -215,10 +238,22 @@ class A4ReplayClient(LinkClient):
             interruption_pcm,
             1,
         )
-        stopped = await self._wait_for(
-            lambda: interrupted_id in self._stop_resp_ids,
+        # Bound the wait on the interrupted response reaching a terminal state, so a
+        # scenario whose answer already ended cannot stall for the full timeout.
+        await self._wait_for(
+            lambda: interrupted_id in self._stop_resp_ids
+            or interrupted_id in self._finish_resp_ids,
             self._timeout,
         )
+        stopped = interrupted_id in self._stop_resp_ids
+        audio_at_stop = 0
+        audio_after_stop = 0
+        if stopped:
+            await asyncio.sleep(INTERRUPTION_SETTLE_SECONDS / 20)
+            audio_at_stop = self._audio_by_response.get(interrupted_id, 0)
+            await asyncio.sleep(INTERRUPTION_SETTLE_SECONDS)
+            audio_after_stop = self._audio_by_response.get(interrupted_id, 0) - audio_at_stop
+        frozen = bool(stopped and audio_after_stop <= 0)
         result = {
             "scenario": "interruption",
             "request_audio_seconds": len(request_pcm) / (2 * SAMPLE_RATE),
@@ -229,9 +264,12 @@ class A4ReplayClient(LinkClient):
             "playback_started": bool(playback_started and active),
             "interrupted_response_id": interrupted_id,
             "interruption_stop_observed": bool(stopped and active),
+            "interrupted_response_audio_bytes": audio_at_stop,
+            "interrupted_response_audio_after_stop": audio_after_stop,
+            "interrupted_audio_frozen": frozen,
             "played_audio_after_interruption_input": self._audio_bytes - bytes_before,
         }
-        return result, bool(playback_started and active and stopped)
+        return result, bool(playback_started and active and stopped and frozen)
 
     async def _run_long_session(
         self,
@@ -260,6 +298,59 @@ class A4ReplayClient(LinkClient):
         result = {
             "scenario": "long_session",
             "rounds": inputs,
+            "response_ids": list(self._start_resp_ids),
+            "finished_response_ids": list(self._finish_resp_ids),
+            "response_finished": completed,
+            "audio_received": self._audio_bytes > 0,
+        }
+        return result, bool(completed and self._audio_bytes > 0)
+
+    async def _run_pause(
+        self,
+        ws: Any,
+        first_pcm: bytes,
+        second_pcm: bytes,
+        gap_seconds: float,
+    ) -> tuple[dict[str, Any], bool]:
+        """Send a user turn in two parts and observe behavior across the gap."""
+        first_start, first_end = await self._send_turn_input(ws, first_pcm, 0)
+        await asyncio.sleep(max(0.0, gap_seconds))
+        answered_before_continue = bool(self._finish_resp_ids)
+        second_start, second_end = await self._send_turn_input(ws, second_pcm, 1)
+        completed = await self._wait_for(
+            lambda: bool(self._finish_resp_ids),
+            self._timeout,
+        )
+        result = {
+            "scenario": "pause",
+            "first_audio_seconds": len(first_pcm) / (2 * SAMPLE_RATE),
+            "second_audio_seconds": len(second_pcm) / (2 * SAMPLE_RATE),
+            "first_send_seconds": first_end - first_start,
+            "second_send_seconds": second_end - second_start,
+            "pause_gap_seconds": gap_seconds,
+            "answered_before_continue": answered_before_continue,
+            "response_ids": list(self._start_resp_ids),
+            "finished_response_ids": list(self._finish_resp_ids),
+            "response_finished": completed,
+            "audio_received": self._audio_bytes > 0,
+        }
+        return result, bool(completed and self._audio_bytes > 0)
+
+    async def _run_multi_question(
+        self,
+        ws: Any,
+        audio_pcm: bytes,
+    ) -> tuple[dict[str, Any], bool]:
+        """Stream one continuous two-question clip and require an answer."""
+        started, ended = await self._send_turn_input(ws, audio_pcm, 0)
+        completed = await self._wait_for(
+            lambda: bool(self._finish_resp_ids),
+            self._timeout,
+        )
+        result = {
+            "scenario": "multi_question",
+            "audio_seconds": len(audio_pcm) / (2 * SAMPLE_RATE),
+            "send_seconds": ended - started,
             "response_ids": list(self._start_resp_ids),
             "finished_response_ids": list(self._finish_resp_ids),
             "response_finished": completed,
@@ -477,6 +568,86 @@ def summarize_timeline(records: list[dict[str, Any]]) -> dict[str, Any]:
             and record.get("response_id")
         }
     )
+    interruption_stop_response_ids = sorted(
+        {
+            str(record.get("response_id"))
+            for record in records
+            if record.get("event_type") == "turn.tts_stop_requested"
+            and record.get("response_id")
+            and record.get("reason") in INTERRUPTION_STOP_REASONS
+        }
+    )
+    teardown_stop_response_ids = sorted(
+        {
+            str(record.get("response_id"))
+            for record in records
+            if record.get("event_type") == "turn.tts_stop_requested"
+            and record.get("response_id")
+            and record.get("reason") in TEARDOWN_STOP_REASONS
+        }
+    )
+    played: dict[str, list[dict[str, Any]]] = {}
+    for record in records:
+        if record.get("event_type") == "response.update":
+            played.setdefault(str(record.get("response_id") or ""), []).append(
+                {
+                    "monotonic_timestamp": record.get("monotonic_timestamp"),
+                    "text": str(record.get("text") or ""),
+                }
+            )
+    played_text = {
+        response_id: [entry["text"] for entry in entries]
+        for response_id, entries in played.items()
+    }
+    played_text_monotonic = all(
+        entries[index + 1].startswith(entries[index])
+        for entries in played_text.values()
+        for index in range(len(entries) - 1)
+    )
+    unplayed_tail_excluded = True
+    for record in records:
+        if record.get("event_type") != "response.finish":
+            continue
+        final_text = str(record.get("text") or "")
+        chain = played_text.get(str(record.get("response_id") or ""))
+        if not chain:
+            unplayed_tail_excluded = unplayed_tail_excluded and not final_text
+        elif not chain[-1].startswith(final_text):
+            unplayed_tail_excluded = False
+    playback_starts = [
+        float(record["monotonic_timestamp"])
+        for record in records
+        if record.get("event_type") == "tts.started"
+        and record.get("monotonic_timestamp") is not None
+    ]
+    playback_ends = [
+        float(record["monotonic_timestamp"])
+        for record in records
+        if record.get("event_type") in {"response.finish", "tts.stopped", "tts.playback_finished"}
+        and record.get("monotonic_timestamp") is not None
+    ]
+    if playback_starts:
+        window_start = min(playback_starts)
+        observed = [
+            float(record["monotonic_timestamp"])
+            for record in records
+            if record.get("monotonic_timestamp") is not None
+        ]
+        window_end = max(playback_ends) if playback_ends else max(observed, default=window_start)
+    else:
+        window_start = None
+        window_end = None
+    asr_updates_during_playback = (
+        sum(
+            1
+            for record in records
+            if record.get("event_type") in {"asr.result_partial", "asr.result_final"}
+            and record.get("monotonic_timestamp") is not None
+            and window_start <= float(record["monotonic_timestamp"]) <= window_end
+        )
+        if window_start is not None
+        else 0
+    )
     serialized = [json.dumps(record, ensure_ascii=False).lower() for record in records]
     return {
         "records": len(records),
@@ -488,6 +659,13 @@ def summarize_timeline(records: list[dict[str, Any]]) -> dict[str, Any]:
         "latencies": latencies,
         "interruption_events": interruption_events,
         "stopped_response_ids": stopped_response_ids,
+        "interruption_stop_response_ids": interruption_stop_response_ids,
+        "teardown_stop_response_ids": teardown_stop_response_ids,
+        "played_text": played_text,
+        "played_text_monotonic": played_text_monotonic,
+        "unplayed_tail_excluded": unplayed_tail_excluded,
+        "asr_updates_during_playback": asr_updates_during_playback,
+        "playback_window": [window_start, window_end] if window_start is not None else None,
         "system_backchannel_seen": any("system backchannel" in value for value in serialized),
         "direct_audio_seen": any("direct_audio" in value for value in serialized),
     }
@@ -497,21 +675,24 @@ def classify(scenario: str, report: dict[str, Any], timeline: dict[str, Any], re
     """Return PASS, FAIL or INCONCLUSIVE without guessing absent model semantics."""
     if report.get("errors") or timeline.get("protocol_errors") or timeline.get("system_backchannel_seen") or timeline.get("direct_audio_seen"):
         return "FAIL"
+    if not timeline.get("played_text_monotonic", True) or not timeline.get("unplayed_tail_excluded", True):
+        return "FAIL"
     counts = timeline.get("event_counts", {})
     if scenario == "interruption":
         interrupted_response_id = str(report.get("interrupted_response_id") or "")
         has_token = any(
             event["response_id"] == interrupted_response_id
             and event["reason"] == "interruption"
-            and event["raw_output"].startswith("<|user interruption|>")
+            and "<|user interruption|>" in event["raw_output"]
             for event in timeline.get("interruption_events", [])
         )
         stopped_same_response = (
-            interrupted_response_id in timeline.get("stopped_response_ids", [])
+            interrupted_response_id in timeline.get("interruption_stop_response_ids", [])
         )
         if (
             has_token
             and stopped_same_response
+            and report.get("interrupted_audio_frozen")
             and report.get("tts_audio_bytes", 0)
             and report.get("status") == "COMPLETE"
         ):
@@ -530,6 +711,33 @@ def classify(scenario: str, report: dict[str, Any], timeline: dict[str, Any], re
         if counts.get("duplex.micro_turn_ready", 0) < len(report.get("rounds", [])):
             return "FAIL"
     return "PASS"
+
+
+def parse_scenario_audio(entries: list[str] | None) -> dict[str, list[Path]]:
+    """Parse ``NAME=PATH[,PATH...]`` overrides into a scenario audio mapping."""
+    mapping: dict[str, list[Path]] = {}
+    for entry in entries or []:
+        name, separator, value = entry.partition("=")
+        if not separator or not name.strip():
+            raise ValueError(f"scenario audio must be NAME=PATH: {entry}")
+        paths = [
+            Path(item).expanduser().resolve()
+            for item in value.split(",")
+            if item.strip()
+        ]
+        if not paths:
+            raise ValueError(f"scenario audio has no path: {entry}")
+        mapping[name.strip()] = paths
+    return mapping
+
+
+def scenario_audio_paths(
+    scenario: str,
+    mapping: dict[str, list[Path]],
+    default: Path,
+) -> list[Path]:
+    """Return the request audio paths for one scenario, falling back to default."""
+    return list(mapping.get(scenario) or [default])
 
 
 def serve_config(config_path: Path, out: Path, model_url: str, native: bool = False) -> dict[str, Any]:
@@ -686,8 +894,19 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
             if scenario == "interruption" and not args.interruption_audio.is_file():
                 results.append({"scenario": scenario, "status": "BLOCKED", "reason": "missing interruption audio"})
                 continue
+            inputs = scenario_audio_paths(scenario, args.scenario_audio, args.audio)
+            missing = [path for path in inputs if not path.is_file()]
+            if missing or (scenario == "pause" and len(inputs) != 2):
+                results.append(
+                    {
+                        "scenario": scenario,
+                        "status": "BLOCKED",
+                        "reason": f"missing or malformed scenario audio: {[str(path) for path in missing]}",
+                    }
+                )
+                continue
             client = A4ReplayClient(f"http://127.0.0.1:{port}", f"ws://127.0.0.1:{port}/ws", args.timeout, scenario_out / "output.wav")
-            pcm = _load_pcm16(args.audio)
+            pcm = _load_pcm16(inputs[0])
             if scenario == "interruption":
                 report = await client.run(
                     pcm,
@@ -701,6 +920,14 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
                     pcm,
                     args.rounds,
                     scenario=scenario,
+                )
+            elif scenario == "pause":
+                report = await client.run(
+                    pcm,
+                    1,
+                    scenario=scenario,
+                    pause_pcm=_load_pcm16(inputs[1]),
+                    pause_gap_seconds=args.pause_gap_seconds,
                 )
             else:
                 report = await client.run(pcm, 1, scenario=scenario)
@@ -732,11 +959,18 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--model-url", default="http://127.0.0.1:8006")
     parser.add_argument("--interruption-audio", type=Path)
+    parser.add_argument(
+        "--scenario-audio",
+        action="append",
+        metavar="NAME=PATH[,PATH...]",
+        help="per-scenario request audio; pause takes two comma-separated paths",
+    )
     parser.add_argument("--scenario", dest="scenarios", action="append", choices=SCENARIOS)
     parser.add_argument("--rounds", type=int, default=3)
     parser.add_argument("--timeout", type=float, default=240.0)
     parser.add_argument("--server-timeout", type=float, default=60.0)
     parser.add_argument("--barge-after-seconds", type=float, default=2.0)
+    parser.add_argument("--pause-gap-seconds", type=float, default=1.5)
     parser.add_argument("--require-interruption", action="store_true")
     parser.add_argument("--fdb-input-root", type=Path)
     parser.add_argument("--fdb-output-root", type=Path)
@@ -754,17 +988,26 @@ def main() -> None:
         args.fdb_output_root = args.fdb_output_root.resolve()
         summary = asyncio.run(run_fdb_batch(args))
     else:
-        if args.audio is None:
-            parser.error("scenario mode requires --audio")
-        args.audio = args.audio.resolve()
+        args.scenario_audio = parse_scenario_audio(args.scenario_audio)
+        args.scenarios = args.scenarios or list(SCENARIOS)
+        default_audio = args.audio.resolve() if args.audio is not None else None
+        without_override = [
+            scenario
+            for scenario in args.scenarios
+            if scenario not in args.scenario_audio
+        ]
+        if default_audio is None and without_override:
+            parser.error(
+                f"--audio is required for scenarios without overrides: {without_override}"
+            )
+        if default_audio is not None and not default_audio.is_file():
+            parser.error(f"missing input WAV: {default_audio}")
+        args.audio = default_audio or Path("/__missing_default_audio__")
         args.interruption_audio = (
             args.interruption_audio.resolve()
             if args.interruption_audio is not None
             else Path("/__missing_interruption_audio__")
         )
-        args.scenarios = args.scenarios or list(SCENARIOS)
-        if not args.audio.is_file():
-            parser.error(f"missing input WAV: {args.audio}")
         summary = asyncio.run(run(args))
     print(json.dumps(summary, ensure_ascii=False))
     raise SystemExit(0 if summary["status"] == "PASS" else 1)

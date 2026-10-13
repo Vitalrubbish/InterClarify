@@ -10,7 +10,7 @@ P0 路线重置和首轮框架接通门禁已完成。远端在 X-Talk fork `d93
 
 这项通过只证明 ASR→LLM→TTS→播放和插话生命周期已经接通，不等于正式基线冻结、FDB 对照、质量评测或 Layer 2 完成。固定来源和证据见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
 
-A1 协议与可观测性补丁已提交至 X-Talk fork 的 dev 分支，提交为 9c131ed6399da66b66b001184cfa4005787b5f67，并完成本地验证：包括完整片段解析、协议错误观测、关联字段传递、JSONL 时间线和 TTSStarted 交付边界。A2 micro-turn 调度和 A3 在线 token 执行已提交至 X-Talk dev 提交 `2f8a43343dd83153298c416d270a8843b023abc0`；该提交包含 interruption special token 的即时流关闭和 micro-turn 终止。本地记录为 X-Talk 138 项（3 skipped）、InterClarify 32 项、A1 定向 35/35、A2/A3 行为 16/16、A4 驱动 8/8。官方权重历史 smoke 为 12 个 micro-turn、协议错误 0，源码快照 17fd22d55cc7；最新提交的真实 ASR/MOSS、FDB 和 A4 远端验收尚未执行。
+A1 协议与可观测性补丁已提交至 X-Talk fork 的 dev 分支，提交为 9c131ed6399da66b66b001184cfa4005787b5f67，并完成本地验证：包括完整片段解析、协议错误观测、关联字段传递、JSONL 时间线和 TTSStarted 交付边界。A2 micro-turn 调度和 A3 在线 token 执行已提交至 X-Talk dev 提交 `2f8a43343dd83153298c416d270a8843b023abc0`。2026-10-13 的第二轮官方对齐把打断改为"播报窗口内 reset 未播音频 + 继续解码到 `<|im_end|>`"，并把 assistant 历史改存 token id；本地记录为 X-Talk 142 项（3 skipped）、InterClarify 40 项、A1 定向 35/35、A2/A3 行为 34/34。官方权重历史 smoke 为 12 个 micro-turn、协议错误 0，源码快照 17fd22d55cc7；最新提交的真实 ASR/MOSS、FDB 和 A4 远端验收见 [A4 任务单](xtalk_a4_remote_acceptance.md)。
 
 自 2026-10-09 起，项目不再直接复现、内嵌或改造 DuplexCascade 官方源码。新的工程路线是：
 

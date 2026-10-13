@@ -19,7 +19,7 @@ SPEC.loader.exec_module(MODULE)
 class A4ReplayTests(unittest.TestCase):
     """Protect A4 status distinctions and timeline extraction."""
 
-    def timeline(self, token="<|user finish talking|>", stopped=False):
+    def timeline(self, token="<|user finish talking|>", stopped=False, stop_reason=None):
         records = [
             {"event_type": "llm.first_chunk", "monotonic_timestamp": 1.0},
             {"event_type": "tts.started", "monotonic_timestamp": 1.1, "response_id": "r1"},
@@ -38,38 +38,76 @@ class A4ReplayTests(unittest.TestCase):
             },
         ]
         if stopped:
+            records.append(
+                {
+                    "event_type": "turn.tts_stop_requested",
+                    "monotonic_timestamp": 1.3,
+                    "response_id": "r1",
+                    "reason": token if stop_reason is None else stop_reason,
+                }
+            )
             records.append({"event_type": "tts.stopped", "monotonic_timestamp": 1.31, "response_id": "r1"})
         return MODULE.summarize_timeline(records)
+
+    def frozen_report(self, **overrides):
+        """Return a COMPLETE interruption report whose audio stopped acoustically."""
+        report = {
+            "status": "COMPLETE",
+            "tts_audio_bytes": 100,
+            "errors": [],
+            "interrupted_response_id": "r1",
+            "interrupted_audio_frozen": True,
+        }
+        report.update(overrides)
+        return report
 
     def test_interruption_without_model_token_is_inconclusive(self):
         """A normal response cannot be relabeled as an interruption pass."""
         verdict = MODULE.classify(
             "interruption",
-            {
-                "status": "COMPLETE",
-                "tts_audio_bytes": 100,
-                "errors": [],
-                "interrupted_response_id": "r1",
-            },
+            self.frozen_report(),
             self.timeline(stopped=True),
             False,
         )
         self.assertEqual(verdict, "INCONCLUSIVE")
 
     def test_interruption_requires_wire_token_and_stop(self):
-        """The official wire token and a stop event are both required."""
+        """The official wire token, a matching reset and silence are all required."""
         verdict = MODULE.classify(
             "interruption",
-            {
-                "status": "COMPLETE",
-                "tts_audio_bytes": 100,
-                "errors": [],
-                "interrupted_response_id": "r1",
-            },
+            self.frozen_report(),
             self.timeline("<|user interruption|>", stopped=True),
             True,
         )
         self.assertEqual(verdict, "PASS")
+
+    def test_interruption_requires_acoustic_silence(self):
+        """A reset receipt alone cannot pass while the response keeps speaking."""
+        verdict = MODULE.classify(
+            "interruption",
+            self.frozen_report(interrupted_audio_frozen=False),
+            self.timeline("<|user interruption|>", stopped=True),
+            True,
+        )
+        self.assertEqual(verdict, "FAIL")
+
+    def test_interruption_teardown_stop_is_not_evidence(self):
+        """A session shutdown stop cannot be presented as an interruption reset."""
+        timeline = self.timeline("<|user interruption|>", stopped=True, stop_reason="shutdown")
+        self.assertEqual(timeline["interruption_stop_response_ids"], [])
+        self.assertEqual(timeline["teardown_stop_response_ids"], ["r1"])
+        self.assertEqual(timeline["stopped_response_ids"], ["r1"])
+        # The marker was emitted, so a teardown-only stop is a real failure.
+        verdict = MODULE.classify("interruption", self.frozen_report(), timeline, False)
+        self.assertEqual(verdict, "FAIL")
+        # Without any marker the same stop stays inconclusive instead of passing.
+        no_marker = MODULE.classify(
+            "interruption",
+            self.frozen_report(),
+            self.timeline(stopped=True, stop_reason="shutdown"),
+            False,
+        )
+        self.assertEqual(no_marker, "INCONCLUSIVE")
 
     def test_protocol_error_is_failure(self):
         """A protocol error cannot be hidden by otherwise valid audio."""
@@ -86,14 +124,113 @@ class A4ReplayTests(unittest.TestCase):
     def test_interruption_stop_must_match_response(self):
         """A stop for another response cannot satisfy interruption evidence."""
         timeline = self.timeline("<|user interruption|>", stopped=True)
-        timeline["stopped_response_ids"] = ["other-response"]
+        timeline["interruption_stop_response_ids"] = ["other-response"]
         verdict = MODULE.classify(
             "interruption",
-            {"status": "COMPLETE", "tts_audio_bytes": 100, "errors": [], "interrupted_response_id": "r1"},
+            self.frozen_report(),
             timeline,
             True,
         )
         self.assertEqual(verdict, "FAIL")
+
+    def playback_timeline(self, updates, finish=None, asr=None, started=1.1):
+        records = [{"event_type": "tts.started", "monotonic_timestamp": started, "response_id": "r1"}]
+        for index, text in enumerate(updates):
+            records.append(
+                {
+                    "event_type": "response.update",
+                    "monotonic_timestamp": started + 0.1 * (index + 1),
+                    "response_id": "r1",
+                    "text": text,
+                }
+            )
+        for offset, text in enumerate(finish or []):
+            records.append(
+                {
+                    "event_type": "response.finish",
+                    "monotonic_timestamp": started + 0.5 + 0.1 * offset,
+                    "response_id": "r1",
+                    "text": text,
+                }
+            )
+        for kind, timestamp in asr or []:
+            records.append({"event_type": kind, "monotonic_timestamp": timestamp})
+        return MODULE.summarize_timeline(records)
+
+    def test_played_text_must_be_monotonic(self):
+        """Confirmed playback text can only grow by prefix, never shrink."""
+        timeline = self.playback_timeline(["你", "你好"])
+        self.assertTrue(timeline["played_text_monotonic"])
+        passed = MODULE.classify(
+            "normal",
+            {"status": "COMPLETE", "tts_audio_bytes": 100, "errors": []},
+            timeline,
+            False,
+        )
+        self.assertEqual(passed, "PASS")
+        broken = self.playback_timeline(["你好", "你"])
+        self.assertFalse(broken["played_text_monotonic"])
+        verdict = MODULE.classify(
+            "normal",
+            {"status": "COMPLETE", "tts_audio_bytes": 100, "errors": []},
+            broken,
+            False,
+        )
+        self.assertEqual(verdict, "FAIL")
+
+    def test_unplayed_tail_is_not_counted_as_played(self):
+        """Final settlement text cannot exceed the last confirmed prefix."""
+        timeline = self.playback_timeline(["你好"], finish=["你好世界"])
+        self.assertFalse(timeline["unplayed_tail_excluded"])
+        verdict = MODULE.classify(
+            "normal",
+            {"status": "COMPLETE", "tts_audio_bytes": 100, "errors": []},
+            timeline,
+            False,
+        )
+        self.assertEqual(verdict, "FAIL")
+        trimmed = self.playback_timeline(["你好世界"], finish=["你好"])
+        self.assertTrue(trimmed["unplayed_tail_excluded"])
+
+    def test_asr_updates_during_playback_window(self):
+        """Only ASR updates inside the playback window are counted."""
+        timeline = self.playback_timeline(
+            ["你好"],
+            finish=["你好"],
+            asr=[("asr.result_partial", 1.3), ("asr.result_partial", 5.0)],
+        )
+        self.assertEqual(timeline["asr_updates_during_playback"], 1)
+
+    def test_pause_scenario_passes_with_two_segments(self):
+        """A pause scenario with a settled answer passes the base gate."""
+        timeline = self.playback_timeline(["好的"])
+        verdict = MODULE.classify(
+            "pause",
+            {
+                "status": "COMPLETE",
+                "tts_audio_bytes": 100,
+                "errors": [],
+                "response_finished": True,
+            },
+            timeline,
+            False,
+        )
+        self.assertEqual(verdict, "PASS")
+
+    def test_scenario_audio_overrides_are_parsed(self):
+        """Per-scenario overrides name one path, or two for pause."""
+        mapping = MODULE.parse_scenario_audio(["normal=/a.wav", "pause=/b.wav,/c.wav"])
+        self.assertEqual([path.name for path in mapping["pause"]], ["b.wav", "c.wav"])
+        self.assertEqual(
+            [path.name for path in MODULE.scenario_audio_paths("normal", mapping, Path("/d.wav"))],
+            ["a.wav"],
+        )
+        self.assertEqual(
+            [path.name for path in MODULE.scenario_audio_paths("multi_question", mapping, Path("/d.wav"))],
+            ["d.wav"],
+        )
+        with self.assertRaises(ValueError):
+            MODULE.parse_scenario_audio(["broken-without-equals"])
 
     def test_source_manifest_is_deterministic(self):
         """Manifest hashing is stable for a temporary source tree."""

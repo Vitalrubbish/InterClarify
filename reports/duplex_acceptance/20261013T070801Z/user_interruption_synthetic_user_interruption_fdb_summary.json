@@ -1,0 +1,2222 @@
+{
+  "status": "PASS",
+  "input_root": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption",
+  "output_root": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption",
+  "samples": [
+    {
+      "status": "PASS",
+      "errors": [],
+      "scenario": "fdb",
+      "input_audio_seconds": 27.568,
+      "send_seconds": 27.552699968218803,
+      "response_ids": [
+        "f8a23a8776fb4bc187959b6187d98602"
+      ],
+      "finished_response_ids": [],
+      "asr_final": null,
+      "response": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can cut back\n\n2 **Cut Un",
+      "first_audio_seconds": 2.6152768321335316,
+      "tts_audio_bytes": 2300160,
+      "event_count": 76,
+      "events": [
+        {
+          "action": "session_attached",
+          "seconds": 13757595.79149906,
+          "data": {
+            "session_id": "dd6e8e2c-c230-4ed3-bbec-748cb55d7b70"
+          }
+        },
+        {
+          "action": "vad_speech_start",
+          "seconds": 0.00021728873252868652,
+          "round": 0
+        },
+        {
+          "action": "update_asr",
+          "seconds": 0.626739339902997,
+          "data": {
+            "text": "How.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.2521982081234455,
+          "data": {
+            "text": "How can I save my life?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.8370428942143917,
+          "data": {
+            "text": "How can I save money?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "start_tts",
+          "seconds": 1.8804319687187672,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 2.4598669912666082,
+          "data": {
+            "text": "How can I save money more effectively?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "latency_metrics",
+          "seconds": 2.6153359841555357,
+          "data": {
+            "network_latency_ms": 0,
+            "asr_latency_ms": 0,
+            "llm_first_token_ms": 0,
+            "llm_sentence_ms": 0,
+            "tts_first_chunk_ms": 734
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 3.6638975758105516,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 4.196688167750835,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 4.702513813972473,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 5.099456517025828,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 5.505017828196287,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 5.889470621943474,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 6.31122600287199,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 6.74896290525794,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 7.166679076850414,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 7.570240216329694,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 7.873141881078482,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 8.274859596043825,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 8.68033523671329,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 9.085189633071423,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 9.468807581812143,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 9.889472154900432,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 10.292609160766006,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 10.367294739931822,
+          "data": {
+            "text": "How can I save money more effectively? Actually.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 10.69245352037251,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 10.979461772367358,
+          "data": {
+            "text": "How can I save money more effectively? Actually, what are some",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 11.092814346775413,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 11.476167308166623,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 11.577261039987206,
+          "data": {
+            "text": "How can I save money more effectively? Actually, what are some financial",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 11.930562602356076,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 12.190751681104302,
+          "data": {
+            "text": "How can I save money more effectively? Actually, what are some financial goals?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 12.329553227871656,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 12.729423584416509,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 12.806716546416283,
+          "data": {
+            "text": "How can I save money more effectively? Actually, what are some financial goals I should set?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 12.931675788015127,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 13.33315802924335,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 13.635217452421784,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 14.018796592950821,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budget"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 14.439696606248617,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 14.944426899775863,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**:"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 15.349204700440168,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 15.750125212594867,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 16.156214479357004,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 16.540688958019018,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 16.995253793895245,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 17.39785474911332,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 17.800966024398804,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 18.20229708403349,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 18.505365760996938,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 18.91493850387633,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 19.318776320666075,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 19.727328456938267,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 20.111433843150735,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 20.552310144528747,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 20.95881485939026,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 21.364231690764427,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 21.797379167750478,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 22.182455874979496,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 22.605959735810757,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 23.012114100158215,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 23.414531407877803,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 23.81329938210547,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 24.197975520044565,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 24.623377796262503,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 25.028093492612243,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 25.43391142040491,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 25.839878672733903,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 26.22358445636928,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can cut"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 26.650017211213708,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can cut back\n\n"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 27.083179589360952,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can cut back\n\n2"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 27.38270867243409,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can cut back\n\n2 **"
+          }
+        },
+        {
+          "action": "vad_speech_end",
+          "seconds": 27.552712680771947,
+          "round": 0
+        },
+        {
+          "action": "update_resp",
+          "seconds": 27.766386341303587,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can cut back\n\n2 **Cut"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 28.187857747077942,
+          "data": {
+            "response_id": "f8a23a8776fb4bc187959b6187d98602",
+            "text": "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can cut back\n\n2 **Cut Un"
+          }
+        }
+      ],
+      "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/1/output.wav",
+      "output_sample_rate": 48000,
+      "session_id": "dd6e8e2c-c230-4ed3-bbec-748cb55d7b70",
+      "playback_mode": "paced_headless_ack",
+      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/1/input.wav",
+      "output": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/1/output.wav",
+      "sample_index": 0,
+      "timeline_path": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/dd6e8e2c-c230-4ed3-bbec-748cb55d7b70.jsonl",
+      "timeline": {
+        "records": 1262,
+        "protocol_tokens": [
+          "<|user is talking|>",
+          "<|user finish talking|>",
+          "<|user backchannel|>",
+          "<|user backchannel|>",
+          "<|user backchannel|>"
+        ],
+        "raw_outputs": [
+          "<|user is talking|>",
+          "<|user finish talking|>",
+          "<|user backchannel|>",
+          "<|user backchannel|>",
+          "<|user backchannel|>"
+        ],
+        "protocol_errors": [],
+        "event_counts": {
+          "asr.result_partial": 9,
+          "llm.first_chunk": 44,
+          "duplex.protocol_parsed": 5,
+          "duplex.micro_turn_ready": 43,
+          "tts.started": 1,
+          "turn.tts_delivery_start_requested": 1,
+          "turn.tts_start_requested": 1,
+          "llm_agent.response_update": 418,
+          "turn.tts_text_append_requested": 418,
+          "llm.sentence_ready": 1,
+          "tts.chunk_ready": 254,
+          "response.update": 63,
+          "llm_agent.response_finish": 1,
+          "tts.finished": 1,
+          "tts.stopped": 1,
+          "turn.tts_stop_requested": 1
+        },
+        "response_ids": [
+          "f8a23a8776fb4bc187959b6187d98602"
+        ],
+        "latencies": {
+          "llm_to_tts_started_seconds": 0.6240809001028538,
+          "tts_to_first_played_text_seconds": 1.7834639754146338,
+          "stop_request_to_tts_stopped_seconds": [
+            9.002536535263062e-05
+          ]
+        },
+        "interruption_events": [],
+        "stopped_response_ids": [
+          "f8a23a8776fb4bc187959b6187d98602"
+        ],
+        "interruption_stop_response_ids": [],
+        "teardown_stop_response_ids": [
+          "f8a23a8776fb4bc187959b6187d98602"
+        ],
+        "played_text": {
+          "f8a23a8776fb4bc187959b6187d98602": [
+            "Saving",
+            "Saving your",
+            "Saving your life",
+            "Saving your life involves",
+            "Saving your life involves taking",
+            "Saving your life involves taking care",
+            "Saving your life involves taking care of",
+            "Saving your life involves taking care of both",
+            "Saving your life involves taking care of both your",
+            "Saving your life involves taking care of both your physical",
+            "Saving your life involves taking care of both your physical and",
+            "Saving your life involves taking care of both your physical and mental",
+            "Saving your life involves taking care of both your physical and mental health",
+            "Saving your life involves taking care of both your physical and mental health Here",
+            "Saving your life involves taking care of both your physical and mental health Here are",
+            "Saving your life involves taking care of both your physical and mental health Here are some",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budget",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**:",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can cut",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can cut back\n\n",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can cut back\n\n2",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can cut back\n\n2 **",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can cut back\n\n2 **Cut",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can cut back\n\n2 **Cut Un",
+            "Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively:\n\n1 **Budgeting**: Start by creating a budget Track your income and expenses to understand where your money goes each month This will help you identify areas where you can cut back\n\n2 **Cut Unnecessary Expenses**: Review your spending habits and eliminate non-essential purchases This could include subscriptions you don't use, eating out less frequently, or reducing your utility bills by being more energy-efficient\n\n3 **Plan Meals**: Cooking at home is generally cheaper than eating out Plan your meals for the week, make a shopping list, and stick to it to avoid impulse buys\n\n4 **Use Cashback Apps**: There are many apps that offer cashback or rewards for purchases made through them These can add up over time and reduce your overall spending\n\n5 **Automate Savings**: Set up automatic transfers from your checking account to a savings account right after you get paid This makes saving a priority and ensures you don't forget about it\n\n6 **Emergency Fund**: Aim to build an emergency fund that covers 3-6 months of living expenses This fund can save you from going into debt when unexpected expenses arise\n\n7 **Reduce Debt**: High-interest debts like credit card balances can eat into your savings Prioritize paying off these debts, especially if they have high interest rates\n\n8 **Shop Smart**: Look for discounts, coupons, and sales Consider buying second-hand items or renting instead of buying new\n\n9 **Invest Wisely**: Once you have a solid foundation of savings, consider investing in stocks, bonds, or other assets Diversification can help manage risk and potentially grow your wealth\n\n10 **Educate Yourself**: Stay informed about personal finance topics Reading books, attending workshops, or consulting with a financial advisor can provide valuable insights and strategies\n\nRemember, saving money is not just about cutting costs; it's also about making smart choices and planning for "
+          ]
+        },
+        "played_text_monotonic": true,
+        "unplayed_tail_excluded": true,
+        "asr_updates_during_playback": 6,
+        "playback_window": [
+          13757599.625761544,
+          13757626.307387777
+        ],
+        "system_backchannel_seen": false,
+        "direct_audio_seen": false
+      }
+    },
+    {
+      "status": "PASS",
+      "errors": [],
+      "scenario": "fdb",
+      "input_audio_seconds": 26.9706875,
+      "send_seconds": 26.94521720148623,
+      "response_ids": [
+        "b1d7d32025fd4e0daff16efcced66687"
+      ],
+      "finished_response_ids": [],
+      "asr_final": null,
+      "response": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly:\n\n1 **Deep Breathing",
+      "first_audio_seconds": 3.3328284081071615,
+      "tts_audio_bytes": 1128960,
+      "event_count": 42,
+      "events": [
+        {
+          "action": "session_attached",
+          "seconds": 13757626.97687613,
+          "data": {
+            "session_id": "87c1a9e7-bfc6-428f-acbb-78f15ef4c103"
+          }
+        },
+        {
+          "action": "vad_speech_start",
+          "seconds": 0.00018073618412017822,
+          "round": 0
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.2382343914359808,
+          "data": {
+            "text": "How can I?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.8462947644293308,
+          "data": {
+            "text": "How can I reduce stress?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 2.4525744523853064,
+          "data": {
+            "text": "How can I reduce stress quickly?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "start_tts",
+          "seconds": 2.4936517737805843,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687"
+          }
+        },
+        {
+          "action": "latency_metrics",
+          "seconds": 3.3329029008746147,
+          "data": {
+            "network_latency_ms": 0,
+            "asr_latency_ms": 0,
+            "llm_first_token_ms": 0,
+            "llm_sentence_ms": 0,
+            "tts_first_chunk_ms": 838
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 5.148067148402333,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reduc"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 6.081603210419416,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 7.0437758937478065,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 7.908406365662813,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 8.775436010211706,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 9.159086648374796,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 9.758652687072754,
+          "data": {
+            "text": "How can I reduce stress quickly? Can we?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 10.042394684627652,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 10.369606889784336,
+          "data": {
+            "text": "How can I reduce stress quickly? Can we switch to talking?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 10.923207273706794,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 10.970306759700179,
+          "data": {
+            "text": "How can I reduce stress quickly? Can we switch to talking about sleep?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 11.574131505563855,
+          "data": {
+            "text": "How can I reduce stress quickly? Can we switch to talking about sleep improvement?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 11.787453593686223,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 12.653389500454068,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 12.955951232463121,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 13.818388873711228,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 14.6811389811337,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 15.549075910821557,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 15.93248100578785,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 16.826637476682663,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 17.694346437230706,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 18.566338265314698,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 19.44035828113556,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 19.823803732171655,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 20.71552411839366,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 21.59638661891222,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 22.465965881943703,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 23.361379228532314,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 23.56344562023878,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly:\n\n"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 24.46498340368271,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly:\n\n1"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 24.747760331258178,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly:\n\n1 **"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 25.631253749132156,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly:\n\n1 **Deep"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 26.505798511207104,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly:\n\n1 **Deep Bre"
+          }
+        },
+        {
+          "action": "vad_speech_end",
+          "seconds": 26.945227924734354,
+          "round": 0
+        },
+        {
+          "action": "update_resp",
+          "seconds": 27.375688498839736,
+          "data": {
+            "response_id": "b1d7d32025fd4e0daff16efcced66687",
+            "text": "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly:\n\n1 **Deep Breathing"
+          }
+        }
+      ],
+      "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/10/output.wav",
+      "output_sample_rate": 48000,
+      "session_id": "87c1a9e7-bfc6-428f-acbb-78f15ef4c103",
+      "playback_mode": "paced_headless_ack",
+      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/10/input.wav",
+      "output": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/10/output.wav",
+      "sample_index": 1,
+      "timeline_path": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/87c1a9e7-bfc6-428f-acbb-78f15ef4c103.jsonl",
+      "timeline": {
+        "records": 1118,
+        "protocol_tokens": [
+          "<|user is talking|>",
+          "<|user finish talking|>",
+          "<|user backchannel|>"
+        ],
+        "raw_outputs": [
+          "<|user is talking|>",
+          "<|user finish talking|>",
+          "<|user backchannel|>"
+        ],
+        "protocol_errors": [],
+        "event_counts": {
+          "asr.result_partial": 7,
+          "llm.first_chunk": 44,
+          "duplex.protocol_parsed": 3,
+          "duplex.micro_turn_ready": 44,
+          "tts.started": 1,
+          "turn.tts_delivery_start_requested": 1,
+          "turn.tts_start_requested": 1,
+          "llm_agent.response_update": 430,
+          "turn.tts_text_append_requested": 430,
+          "llm.sentence_ready": 1,
+          "tts.chunk_ready": 124,
+          "response.update": 30,
+          "tts.stopped": 1,
+          "turn.tts_stop_requested": 1
+        },
+        "response_ids": [
+          "b1d7d32025fd4e0daff16efcced66687"
+        ],
+        "latencies": {
+          "llm_to_tts_started_seconds": 0.6259657051414251,
+          "tts_to_first_played_text_seconds": 2.654328618198633,
+          "stop_request_to_tts_stopped_seconds": [
+            0.0003129206597805023
+          ]
+        },
+        "interruption_events": [],
+        "stopped_response_ids": [
+          "b1d7d32025fd4e0daff16efcced66687"
+        ],
+        "interruption_stop_response_ids": [],
+        "teardown_stop_response_ids": [
+          "b1d7d32025fd4e0daff16efcced66687"
+        ],
+        "played_text": {
+          "b1d7d32025fd4e0daff16efcced66687": [
+            "Reduc",
+            "Reducing",
+            "Reducing stress",
+            "Reducing stress is",
+            "Reducing stress is crucial",
+            "Reducing stress is crucial for",
+            "Reducing stress is crucial for maintaining",
+            "Reducing stress is crucial for maintaining both",
+            "Reducing stress is crucial for maintaining both your",
+            "Reducing stress is crucial for maintaining both your mental",
+            "Reducing stress is crucial for maintaining both your mental and",
+            "Reducing stress is crucial for maintaining both your mental and physical",
+            "Reducing stress is crucial for maintaining both your mental and physical health",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly:\n\n",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly:\n\n1",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly:\n\n1 **",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly:\n\n1 **Deep",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly:\n\n1 **Deep Bre",
+            "Reducing stress is crucial for maintaining both your mental and physical health Here are several strategies you can use to alleviate stress quickly:\n\n1 **Deep Breathing"
+          ]
+        },
+        "played_text_monotonic": true,
+        "unplayed_tail_excluded": true,
+        "asr_updates_during_playback": 4,
+        "playback_window": [
+          13757631.432405425,
+          13757656.88654368
+        ],
+        "system_backchannel_seen": false,
+        "direct_audio_seen": false
+      }
+    },
+    {
+      "status": "PASS",
+      "errors": [],
+      "scenario": "fdb",
+      "input_audio_seconds": 28.2506875,
+      "send_seconds": 28.224544579163194,
+      "response_ids": [
+        "0330198937a44957b9b87c33854b31b8"
+      ],
+      "finished_response_ids": [],
+      "asr_final": null,
+      "response": "To provide a comprehensive answer, it would be helpful if you could specify the context or topic you're referring",
+      "first_audio_seconds": 2.869767965748906,
+      "tts_audio_bytes": 806400,
+      "event_count": 35,
+      "events": [
+        {
+          "action": "session_attached",
+          "seconds": 13757657.558620224,
+          "data": {
+            "session_id": "a1064537-2105-4f12-90c7-02d0fca952f2"
+          }
+        },
+        {
+          "action": "vad_speech_start",
+          "seconds": 0.0001691225916147232,
+          "round": 0
+        },
+        {
+          "action": "update_asr",
+          "seconds": 0.6273461133241653,
+          "data": {
+            "text": "我。",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.2442820575088263,
+          "data": {
+            "text": "What should I know?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.8443774580955505,
+          "data": {
+            "text": "What should I know before?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "start_tts",
+          "seconds": 1.8798795696347952,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 2.451094798743725,
+          "data": {
+            "text": "What should I know before getting?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "latency_metrics",
+          "seconds": 2.869812900200486,
+          "data": {
+            "network_latency_ms": 0,
+            "asr_latency_ms": 0,
+            "llm_first_token_ms": 0,
+            "llm_sentence_ms": 0,
+            "tts_first_chunk_ms": 989
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 3.0714474823325872,
+          "data": {
+            "text": "What should I know before getting a new puppy?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 5.5393572468310595,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 6.8863833993673325,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 8.345648406073451,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 9.721656870096922,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 10.978447729721665,
+          "data": {
+            "text": "What should I know before getting a new puppy? Hold on.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 11.087843682616949,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 11.18892583809793,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer,"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 12.202233351767063,
+          "data": {
+            "text": "What should I know before getting a new puppy? Hold on. How do I choose?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 12.572869684547186,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 12.800884116441011,
+          "data": {
+            "text": "What should I know before getting a new puppy? Hold on. How do I choose the right type?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 12.957010617479682,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it would"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 13.409495590254664,
+          "data": {
+            "text": "What should I know before getting a new puppy? Hold on. How do I choose the right type of pet food?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 14.342659147456288,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it would be"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 15.713007114827633,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it would be helpful"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 17.082777371630073,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it would be helpful if"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 18.511202462017536,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it would be helpful if you"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 18.896083572879434,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it would be helpful if you could"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 20.278621746227145,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it would be helpful if you could specify"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 21.63924252986908,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it would be helpful if you could specify the"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 23.02138588577509,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it would be helpful if you could specify the context"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 24.400038607418537,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it would be helpful if you could specify the context or"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 24.783955169841647,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it would be helpful if you could specify the context or topic"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 26.155323138460517,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it would be helpful if you could specify the context or topic you"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 27.5132805313915,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it would be helpful if you could specify the context or topic you're"
+          }
+        },
+        {
+          "action": "vad_speech_end",
+          "seconds": 28.224554052576423,
+          "round": 0
+        },
+        {
+          "action": "update_resp",
+          "seconds": 28.883216185495257,
+          "data": {
+            "response_id": "0330198937a44957b9b87c33854b31b8",
+            "text": "To provide a comprehensive answer, it would be helpful if you could specify the context or topic you're referring"
+          }
+        }
+      ],
+      "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/100/output.wav",
+      "output_sample_rate": 48000,
+      "session_id": "a1064537-2105-4f12-90c7-02d0fca952f2",
+      "playback_mode": "paced_headless_ack",
+      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/100/input.wav",
+      "output": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/100/output.wav",
+      "sample_index": 2,
+      "timeline_path": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/a1064537-2105-4f12-90c7-02d0fca952f2.jsonl",
+      "timeline": {
+        "records": 1143,
+        "protocol_tokens": [
+          "<|user is talking|>",
+          "<|user finish talking|>",
+          "<|user backchannel|>",
+          "<|user backchannel|>"
+        ],
+        "raw_outputs": [
+          "<|user is talking|>",
+          "<|user finish talking|>",
+          "<|user backchannel|>",
+          "<|user backchannel|>"
+        ],
+        "protocol_errors": [],
+        "event_counts": {
+          "asr.result_partial": 9,
+          "llm.first_chunk": 47,
+          "duplex.protocol_parsed": 4,
+          "duplex.micro_turn_ready": 47,
+          "tts.started": 1,
+          "turn.tts_delivery_start_requested": 1,
+          "turn.tts_start_requested": 1,
+          "llm_agent.response_update": 460,
+          "turn.tts_text_append_requested": 460,
+          "llm.sentence_ready": 1,
+          "tts.chunk_ready": 89,
+          "response.update": 21,
+          "tts.stopped": 1,
+          "turn.tts_stop_requested": 1
+        },
+        "response_ids": [
+          "0330198937a44957b9b87c33854b31b8"
+        ],
+        "latencies": {
+          "llm_to_tts_started_seconds": 0.6230050157755613,
+          "tts_to_first_played_text_seconds": 3.6594555638730526,
+          "stop_request_to_tts_stopped_seconds": [
+            0.000277666375041008
+          ]
+        },
+        "interruption_events": [],
+        "stopped_response_ids": [
+          "0330198937a44957b9b87c33854b31b8"
+        ],
+        "interruption_stop_response_ids": [],
+        "teardown_stop_response_ids": [
+          "0330198937a44957b9b87c33854b31b8"
+        ],
+        "played_text": {
+          "0330198937a44957b9b87c33854b31b8": [
+            "To",
+            "To provide",
+            "To provide a",
+            "To provide a comprehensive",
+            "To provide a comprehensive answer",
+            "To provide a comprehensive answer,",
+            "To provide a comprehensive answer, it",
+            "To provide a comprehensive answer, it would",
+            "To provide a comprehensive answer, it would be",
+            "To provide a comprehensive answer, it would be helpful",
+            "To provide a comprehensive answer, it would be helpful if",
+            "To provide a comprehensive answer, it would be helpful if you",
+            "To provide a comprehensive answer, it would be helpful if you could",
+            "To provide a comprehensive answer, it would be helpful if you could specify",
+            "To provide a comprehensive answer, it would be helpful if you could specify the",
+            "To provide a comprehensive answer, it would be helpful if you could specify the context",
+            "To provide a comprehensive answer, it would be helpful if you could specify the context or",
+            "To provide a comprehensive answer, it would be helpful if you could specify the context or topic",
+            "To provide a comprehensive answer, it would be helpful if you could specify the context or topic you",
+            "To provide a comprehensive answer, it would be helpful if you could specify the context or topic you're",
+            "To provide a comprehensive answer, it would be helpful if you could specify the context or topic you're referring"
+          ]
+        },
+        "played_text_monotonic": true,
+        "unplayed_tail_excluded": true,
+        "asr_updates_during_playback": 6,
+        "playback_window": [
+          13757661.399302926,
+          13757688.74635012
+        ],
+        "system_backchannel_seen": false,
+        "direct_audio_seen": false
+      }
+    },
+    {
+      "status": "PASS",
+      "errors": [],
+      "scenario": "fdb",
+      "input_audio_seconds": 28.272,
+      "send_seconds": 28.25708200968802,
+      "response_ids": [
+        "2d9532f4696e4a3d9cf807dceb43ab5b"
+      ],
+      "finished_response_ids": [],
+      "asr_final": null,
+      "response": "The \"best time to play\" can vary greatly depending on your",
+      "first_audio_seconds": 2.992175480350852,
+      "tts_audio_bytes": 483840,
+      "event_count": 25,
+      "events": [
+        {
+          "action": "session_attached",
+          "seconds": 13757689.419561855,
+          "data": {
+            "session_id": "45e7882e-1636-485f-b7b5-8f3b30afaa02"
+          }
+        },
+        {
+          "action": "vad_speech_start",
+          "seconds": 0.00017346814274787903,
+          "round": 0
+        },
+        {
+          "action": "update_asr",
+          "seconds": 0.6402065716683865,
+          "data": {
+            "text": "What's the best.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.2583117727190256,
+          "data": {
+            "text": "What's the best time to play?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.8440533373504877,
+          "data": {
+            "text": "What's the best time to plant tomatoes?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "start_tts",
+          "seconds": 1.894757041707635,
+          "data": {
+            "response_id": "2d9532f4696e4a3d9cf807dceb43ab5b"
+          }
+        },
+        {
+          "action": "latency_metrics",
+          "seconds": 2.992302607744932,
+          "data": {
+            "network_latency_ms": 0,
+            "asr_latency_ms": 0,
+            "llm_first_token_ms": 0,
+            "llm_sentence_ms": 0,
+            "tts_first_chunk_ms": 1096
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 6.736205048859119,
+          "data": {
+            "response_id": "2d9532f4696e4a3d9cf807dceb43ab5b",
+            "text": "The"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 8.480874689295888,
+          "data": {
+            "response_id": "2d9532f4696e4a3d9cf807dceb43ab5b",
+            "text": "The \""
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 10.676283791661263,
+          "data": {
+            "response_id": "2d9532f4696e4a3d9cf807dceb43ab5b",
+            "text": "The \"best"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 10.978359734639525,
+          "data": {
+            "response_id": "2d9532f4696e4a3d9cf807dceb43ab5b",
+            "text": "The \"best time"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 10.979398295283318,
+          "data": {
+            "text": "What's the best time to plant tomatoes? Oh, before.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 11.580138370394707,
+          "data": {
+            "text": "What's the best time to plant tomatoes? Oh, before I forget.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 12.188299536705017,
+          "data": {
+            "text": "What's the best time to plant tomatoes? Oh, before I forget, how do",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 12.820615025237203,
+          "data": {
+            "text": "What's the best time to plant tomatoes? Oh, before I forget, how do I fix a leaky faucet?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 13.358896810561419,
+          "data": {
+            "response_id": "2d9532f4696e4a3d9cf807dceb43ab5b",
+            "text": "The \"best time to"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 16.541554648429155,
+          "data": {
+            "response_id": "2d9532f4696e4a3d9cf807dceb43ab5b",
+            "text": "The \"best time to play"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 16.743459524586797,
+          "data": {
+            "response_id": "2d9532f4696e4a3d9cf807dceb43ab5b",
+            "text": "The \"best time to play\""
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 18.99941024929285,
+          "data": {
+            "response_id": "2d9532f4696e4a3d9cf807dceb43ab5b",
+            "text": "The \"best time to play\" can"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 21.108303409069777,
+          "data": {
+            "response_id": "2d9532f4696e4a3d9cf807dceb43ab5b",
+            "text": "The \"best time to play\" can vary"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 23.217526895925403,
+          "data": {
+            "response_id": "2d9532f4696e4a3d9cf807dceb43ab5b",
+            "text": "The \"best time to play\" can vary greatly"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 23.601831721141934,
+          "data": {
+            "response_id": "2d9532f4696e4a3d9cf807dceb43ab5b",
+            "text": "The \"best time to play\" can vary greatly depending"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 25.693980464711785,
+          "data": {
+            "response_id": "2d9532f4696e4a3d9cf807dceb43ab5b",
+            "text": "The \"best time to play\" can vary greatly depending on"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 27.756224362179637,
+          "data": {
+            "response_id": "2d9532f4696e4a3d9cf807dceb43ab5b",
+            "text": "The \"best time to play\" can vary greatly depending on your"
+          }
+        },
+        {
+          "action": "vad_speech_end",
+          "seconds": 28.257096661254764,
+          "round": 0
+        }
+      ],
+      "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/101/output.wav",
+      "output_sample_rate": 48000,
+      "session_id": "45e7882e-1636-485f-b7b5-8f3b30afaa02",
+      "playback_mode": "paced_headless_ack",
+      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/101/input.wav",
+      "output": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/101/output.wav",
+      "sample_index": 3,
+      "timeline_path": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/45e7882e-1636-485f-b7b5-8f3b30afaa02.jsonl",
+      "timeline": {
+        "records": 770,
+        "protocol_tokens": [
+          "<|user is talking|>",
+          "<|user finish talking|>",
+          "<|user backchannel|>",
+          "<|user backchannel|>"
+        ],
+        "raw_outputs": [
+          "<|user is talking|>",
+          "<|user finish talking|>",
+          "<|user backchannel|>",
+          "<|user backchannel|>"
+        ],
+        "protocol_errors": [],
+        "event_counts": {
+          "asr.result_partial": 7,
+          "llm.first_chunk": 33,
+          "duplex.protocol_parsed": 4,
+          "duplex.micro_turn_ready": 32,
+          "tts.started": 1,
+          "turn.tts_delivery_start_requested": 1,
+          "turn.tts_start_requested": 1,
+          "llm_agent.response_update": 309,
+          "turn.tts_text_append_requested": 309,
+          "llm.sentence_ready": 1,
+          "tts.chunk_ready": 54,
+          "response.update": 14,
+          "llm_agent.response_finish": 1,
+          "tts.finished": 1,
+          "tts.stopped": 1,
+          "turn.tts_stop_requested": 1
+        },
+        "response_ids": [
+          "2d9532f4696e4a3d9cf807dceb43ab5b"
+        ],
+        "latencies": {
+          "llm_to_tts_started_seconds": 0.6254225876182318,
+          "tts_to_first_played_text_seconds": 4.841318018734455,
+          "stop_request_to_tts_stopped_seconds": [
+            4.1233375668525696e-05
+          ]
+        },
+        "interruption_events": [],
+        "stopped_response_ids": [
+          "2d9532f4696e4a3d9cf807dceb43ab5b"
+        ],
+        "interruption_stop_response_ids": [],
+        "teardown_stop_response_ids": [
+          "2d9532f4696e4a3d9cf807dceb43ab5b"
+        ],
+        "played_text": {
+          "2d9532f4696e4a3d9cf807dceb43ab5b": [
+            "The",
+            "The \"",
+            "The \"best",
+            "The \"best time",
+            "The \"best time to",
+            "The \"best time to play",
+            "The \"best time to play\"",
+            "The \"best time to play\" can",
+            "The \"best time to play\" can vary",
+            "The \"best time to play\" can vary greatly",
+            "The \"best time to play\" can vary greatly depending",
+            "The \"best time to play\" can vary greatly depending on",
+            "The \"best time to play\" can vary greatly depending on your",
+            "The \"best time to play\" can vary greatly depending on your specific location and climate However, generally speaking, the best time to plant tomatoes is when the risk of frost has passed and the soil has warmed up sufficiently \n\nIn many areas, this means planting tomatoes in late spring or early summer, after the last expected frost date In warmer climates, you might be able to start planting earlier, while in cooler climates, you might need to wait until later in the season\n\nHere are some general guidelines:\n\n1 **Cooler Climates**: Wait until the soil temperature reaches around 60°F (15°C) before planting This usually happens in late May or early June\n\n2 **Warmer Climates**: You can often start planting earlier, possibly as early as March or April, depending on the specific weather conditions\n\n3 **Container Gardening**: If you're growing tomatoes in containers, you can start them indoors about 6-8 weeks before the last expected frost date This allows them to grow strong roots before being moved outdoors\n\n4 **Determining Soil Temperature**: You can use a soil thermometer to check the soil temperature Aim for a minimum of 60°F (15°C) before planting\n\n5 **Check Local Weather Forecasts**: Always check the local weather forecast to ensure that the risk of frost has truly passed\n\nRemember, the key factors are soil temperature and the absence of frost Adjusting these times based on your local climate will help ensure your tomato plants thrive"
+          ]
+        },
+        "played_text_monotonic": true,
+        "unplayed_tail_excluded": true,
+        "asr_updates_during_playback": 4,
+        "playback_window": [
+          13757693.269214602,
+          13757720.63469496
+        ],
+        "system_backchannel_seen": false,
+        "direct_audio_seen": false
+      }
+    },
+    {
+      "status": "PASS",
+      "errors": [],
+      "scenario": "fdb",
+      "input_audio_seconds": 28.4213125,
+      "send_seconds": 28.417210023850203,
+      "response_ids": [
+        "9ccbc6026e844d8fb775d1669fd4d5ac",
+        "02b145ea5efc4bf88a16df1ab53ca4b2"
+      ],
+      "finished_response_ids": [],
+      "asr_final": null,
+      "response": "Absolutely! Here are some additional travel",
+      "first_audio_seconds": 14.491940522566438,
+      "tts_audio_bytes": 282240,
+      "event_count": 23,
+      "events": [
+        {
+          "action": "session_attached",
+          "seconds": 13757721.311793808,
+          "data": {
+            "session_id": "9d706d8f-43f2-43b4-8659-8feb9e5079e1"
+          }
+        },
+        {
+          "action": "vad_speech_start",
+          "seconds": 0.00016033276915550232,
+          "round": 0
+        },
+        {
+          "action": "update_asr",
+          "seconds": 0.6319090612232685,
+          "data": {
+            "text": "What are.",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.2455480434000492,
+          "data": {
+            "text": "What are some good?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 1.8433395493775606,
+          "data": {
+            "text": "What are some good snacks?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 2.4605575874447823,
+          "data": {
+            "text": "What are some good snacks for weight loss?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 10.367235140874982,
+          "data": {
+            "text": "What are some good snacks for weight loss? Oh, can",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 10.981902163475752,
+          "data": {
+            "text": "What are some good snacks for weight loss? Oh, can we talk about?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 11.581591887399554,
+          "data": {
+            "text": "What are some good snacks for weight loss? Oh, can we talk about something else?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "start_tts",
+          "seconds": 12.102742571383715,
+          "data": {
+            "response_id": "9ccbc6026e844d8fb775d1669fd4d5ac"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 12.198614140972495,
+          "data": {
+            "text": "What are some good snacks for weight loss? Oh, can we talk about something else? How about some?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "stop_tts",
+          "seconds": 12.67711403220892,
+          "data": {
+            "response_id": "9ccbc6026e844d8fb775d1669fd4d5ac"
+          }
+        },
+        {
+          "action": "update_asr",
+          "seconds": 12.797949587926269,
+          "data": {
+            "text": "What are some good snacks for weight loss? Oh, can we talk about something else? How about some travel tips?",
+            "origin": "asr"
+          }
+        },
+        {
+          "action": "start_tts",
+          "seconds": 13.306092232465744,
+          "data": {
+            "response_id": "02b145ea5efc4bf88a16df1ab53ca4b2"
+          }
+        },
+        {
+          "action": "latency_metrics",
+          "seconds": 14.492032311856747,
+          "data": {
+            "network_latency_ms": 0,
+            "asr_latency_ms": 0,
+            "llm_first_token_ms": 0,
+            "llm_sentence_ms": 0,
+            "tts_first_chunk_ms": 2388
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 18.445518059656024,
+          "data": {
+            "response_id": "02b145ea5efc4bf88a16df1ab53ca4b2",
+            "text": "Absolutely"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 20.27297220379114,
+          "data": {
+            "response_id": "02b145ea5efc4bf88a16df1ab53ca4b2",
+            "text": "Absolutely!"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 22.494483260437846,
+          "data": {
+            "response_id": "02b145ea5efc4bf88a16df1ab53ca4b2",
+            "text": "Absolutely! Here"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 22.796517584472895,
+          "data": {
+            "response_id": "02b145ea5efc4bf88a16df1ab53ca4b2",
+            "text": "Absolutely! Here are"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 24.922866279259324,
+          "data": {
+            "response_id": "02b145ea5efc4bf88a16df1ab53ca4b2",
+            "text": "Absolutely! Here are some"
+          }
+        },
+        {
+          "action": "update_resp",
+          "seconds": 27.065269500017166,
+          "data": {
+            "response_id": "02b145ea5efc4bf88a16df1ab53ca4b2",
+            "text": "Absolutely! Here are some additional"
+          }
+        },
+        {
+          "action": "vad_speech_end",
+          "seconds": 28.417219407856464,
+          "round": 0
+        },
+        {
+          "action": "update_resp",
+          "seconds": 29.17808413133025,
+          "data": {
+            "response_id": "02b145ea5efc4bf88a16df1ab53ca4b2",
+            "text": "Absolutely! Here are some additional travel"
+          }
+        }
+      ],
+      "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/102/output.wav",
+      "output_sample_rate": 48000,
+      "session_id": "9d706d8f-43f2-43b4-8659-8feb9e5079e1",
+      "playback_mode": "paced_headless_ack",
+      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/102/input.wav",
+      "output": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/102/output.wav",
+      "sample_index": 4,
+      "timeline_path": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/9d706d8f-43f2-43b4-8659-8feb9e5079e1.jsonl",
+      "timeline": {
+        "records": 739,
+        "protocol_tokens": [
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user finish talking|>",
+          "<|user interruption|>",
+          "<|user finish talking|>"
+        ],
+        "raw_outputs": [
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user is talking|>",
+          "<|user finish talking|>",
+          "<|user interruption|>",
+          "<|user finish talking|>"
+        ],
+        "protocol_errors": [],
+        "event_counts": {
+          "asr.result_partial": 9,
+          "llm.first_chunk": 47,
+          "duplex.protocol_parsed": 21,
+          "duplex.micro_turn_ready": 47,
+          "tts.started": 2,
+          "turn.tts_delivery_start_requested": 2,
+          "turn.tts_start_requested": 2,
+          "llm_agent.response_update": 280,
+          "turn.tts_text_append_requested": 280,
+          "llm.sentence_ready": 2,
+          "tts.stopped": 2,
+          "turn.tts_stop_requested": 2,
+          "tts.response_closed": 1,
+          "tts.playback_stopped": 1,
+          "tts.chunk_ready": 34,
+          "response.update": 7
+        },
+        "response_ids": [
+          "02b145ea5efc4bf88a16df1ab53ca4b2",
+          "9ccbc6026e844d8fb775d1669fd4d5ac"
+        ],
+        "latencies": {
+          "llm_to_tts_started_seconds": 10.84207489527762,
+          "tts_to_first_played_text_seconds": 6.342744555324316,
+          "stop_request_to_tts_stopped_seconds": [
+            0.0003676246851682663,
+            0.00022802315652370453
+          ]
+        },
+        "interruption_events": [
+          {
+            "response_id": "9ccbc6026e844d8fb775d1669fd4d5ac",
+            "reason": "interruption",
+            "raw_output": "<|user interruption|>",
+            "monotonic_timestamp": 13757735.949865663
+          }
+        ],
+        "stopped_response_ids": [
+          "02b145ea5efc4bf88a16df1ab53ca4b2",
+          "9ccbc6026e844d8fb775d1669fd4d5ac"
+        ],
+        "interruption_stop_response_ids": [
+          "9ccbc6026e844d8fb775d1669fd4d5ac"
+        ],
+        "teardown_stop_response_ids": [
+          "02b145ea5efc4bf88a16df1ab53ca4b2"
+        ],
+        "played_text": {
+          "02b145ea5efc4bf88a16df1ab53ca4b2": [
+            "Absolutely",
+            "Absolutely!",
+            "Absolutely! Here",
+            "Absolutely! Here are",
+            "Absolutely! Here are some",
+            "Absolutely! Here are some additional",
+            "Absolutely! Here are some additional travel"
+          ]
+        },
+        "played_text_monotonic": true,
+        "unplayed_tail_excluded": true,
+        "asr_updates_during_playback": 2,
+        "playback_window": [
+          13757735.375373816,
+          13757752.69189945
+        ],
+        "system_backchannel_seen": false,
+        "direct_audio_seen": false
+      }
+    }
+  ],
+  "note": "Inference audio only; run official FDB ASR alignment and scoring separately."
+}

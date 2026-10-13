@@ -44,7 +44,7 @@
 
 回收报告核验：作业 Completed，运行路径为独立快照 xtalk/src/xtalk；report.source_sha256 与当前本地 xtalk/src/xtalk 的 Python 源码逐文件摘要一致。真实回答为 The capital of France is Paris.，原生播放结算的 heard 文本一致；状态序列含 user is talking、user finish talking 和 user is thinking。此单例没有覆盖真实模型的用户附和或打断质量，仍需 A4 场景验证。
 
-X-Talk 最新提交 `2f8a43343dd83153298c416d270a8843b023abc0` 包含 user backchannel 同一 micro-turn 续写和即时 interruption 处理；当前本地 X-Talk 138 项（135 PASS、3 skipped），A1 定向 35/35，A2/A3 行为 16/16，A4 驱动 8/8；InterClarify 根仓库当前 32 项。17fd22d55cc7 是此前已通过的官方模型 smoke 快照，不能代表当前提交的真实 ASR/MOSS/FDB 已复测。A4 新的远端入口和判据见 [xtalk_a4_remote_acceptance.md](xtalk_a4_remote_acceptance.md)。
+X-Talk 最新提交 `2f8a43343dd83153298c416d270a8843b023abc0` 包含 user backchannel 同一 micro-turn 续写；2026-10-13 的第二轮官方对齐把打断改为"播报窗口内 reset 未播音频 + 继续解码到 `<|im_end|>`"，assistant 历史改存 token id。当前本地 X-Talk 142 项（139 PASS、3 skipped），A1 定向 35/35，A2/A3 行为 34/34；InterClarify 根仓库 40 项。17fd22d55cc7 是此前已通过的官方模型 smoke 快照，不能代表当前提交的真实 ASR/MOSS/FDB 已复测。A4 新的远端入口和判据见 [xtalk_a4_remote_acceptance.md](xtalk_a4_remote_acceptance.md)。
 
 ## A4 入口
 

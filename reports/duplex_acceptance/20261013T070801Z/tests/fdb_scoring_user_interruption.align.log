@@ -1,0 +1,137 @@
+$ conda run --no-capture-output -n full-duplex-bench python /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb_llm_judge/fdb_repo/v1_v1.5/get_transcript/asr.py --root_dir /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption --task user_interruption --audio_name output.wav
+[NeMo W 2026-10-13 17:10:54 nemo_logging:405] Megatron num_microbatches_calculator not found, using Apex version.
+OneLogger: Setting error_handling_strategy to DISABLE_QUIETLY_AND_REPORT_METRIC_ERROR for rank (rank=0) with OneLogger disabled. To override: explicitly set error_handling_strategy parameter.
+No exporters were provided. This means that no telemetry data will be collected.
+[NeMo I 2026-10-13 17:11:00 nemo_logging:393] Tokenizer SentencePieceTokenizer initialized with 1024 tokens
+[NeMo W 2026-10-13 17:11:00 nemo_logging:405] If you intend to do training or fine-tuning, please call the ModelPT.setup_training_data() method and provide a valid configuration file to setup the train data loader.
+    Train config : 
+    use_lhotse: true
+    skip_missing_manifest_entries: true
+    input_cfg: null
+    tarred_audio_filepaths: null
+    manifest_filepath: null
+    sample_rate: 16000
+    shuffle: true
+    num_workers: 2
+    pin_memory: true
+    max_duration: 40.0
+    min_duration: 0.1
+    text_field: answer
+    batch_duration: null
+    use_bucketing: true
+    bucket_duration_bins: null
+    bucket_batch_size: null
+    num_buckets: 30
+    bucket_buffer_size: 20000
+    shuffle_buffer_size: 10000
+    
+[NeMo W 2026-10-13 17:11:00 nemo_logging:405] If you intend to do validation, please call the ModelPT.setup_validation_data() or ModelPT.setup_multiple_validation_data() method and provide a valid configuration file to setup the validation data loader(s). 
+    Validation config : 
+    use_lhotse: true
+    manifest_filepath: null
+    sample_rate: 16000
+    batch_size: 16
+    shuffle: false
+    max_duration: 40.0
+    min_duration: 0.1
+    num_workers: 2
+    pin_memory: true
+    text_field: answer
+    
+[NeMo I 2026-10-13 17:11:00 nemo_logging:393] PADDING: 0
+[NeMo I 2026-10-13 17:11:04 nemo_logging:393] Using RNNT Loss : tdt
+    Loss tdt_kwargs: {'fastemit_lambda': 0.0, 'clamp': -1.0, 'durations': [0, 1, 2, 3, 4], 'sigma': 0.02, 'omega': 0.1}
+[NeMo I 2026-10-13 17:11:04 nemo_logging:393] Using RNNT Loss : tdt
+    Loss tdt_kwargs: {'fastemit_lambda': 0.0, 'clamp': -1.0, 'durations': [0, 1, 2, 3, 4], 'sigma': 0.02, 'omega': 0.1}
+[NeMo W 2026-10-13 17:11:04 nemo_logging:405] No conditional node support for Cuda.
+    Cuda graphs with while loops are disabled, decoding speed will be slower
+    Reason: No `cuda-python` module. Please do `pip install cuda-python>=12.3`
+[NeMo I 2026-10-13 17:11:04 nemo_logging:393] Using RNNT Loss : tdt
+    Loss tdt_kwargs: {'fastemit_lambda': 0.0, 'clamp': -1.0, 'durations': [0, 1, 2, 3, 4], 'sigma': 0.02, 'omega': 0.1}
+[NeMo W 2026-10-13 17:11:04 nemo_logging:405] No conditional node support for Cuda.
+    Cuda graphs with while loops are disabled, decoding speed will be slower
+    Reason: No `cuda-python` module. Please do `pip install cuda-python>=12.3`
+[NeMo I 2026-10-13 17:11:07 nemo_logging:393] Model EncDecRNNTBPEModel was successfully restored from /hpc_stor03/sjtu_home/xuan.zhang/.cache/huggingface/hub/models--nvidia--parakeet-tdt-0.6b-v2/snapshots/ae9ad07059c7c739ffaf932226a8fe64ae2620b0/parakeet-tdt-0.6b-v2.nemo.
+
+  0%|          | 0/5 [00:00<?, ?it/s]/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/1/output.wav
+[NeMo I 2026-10-13 17:11:07 nemo_logging:393] Timestamps requested, setting decoding timestamps to True. Capture them in Hypothesis object,                         with output[0][idx].timestep['word'/'segment'/'char']
+[NeMo I 2026-10-13 17:11:08 nemo_logging:393] Using RNNT Loss : tdt
+    Loss tdt_kwargs: {'fastemit_lambda': 0.0, 'clamp': -1.0, 'durations': [0, 1, 2, 3, 4], 'sigma': 0.02, 'omega': 0.1}
+[NeMo W 2026-10-13 17:11:08 nemo_logging:405] No conditional node support for Cuda.
+    Cuda graphs with while loops are disabled, decoding speed will be slower
+    Reason: No `cuda-python` module. Please do `pip install cuda-python>=12.3`
+[NeMo W 2026-10-13 17:11:08 nemo_logging:405] The following configuration keys are ignored by Lhotse dataloader: use_start_end_token
+[NeMo W 2026-10-13 17:11:08 nemo_logging:405] You are using a non-tarred dataset and requested tokenization during data sampling (pretokenize=True). This will cause the tokenization to happen in the main (GPU) process,possibly impacting the training speed if your tokenizer is very large.If the impact is noticable, set pretokenize=False in dataloader config.(note: that will disable token-per-second filtering and 2D bucketing features)
+
+
+Transcribing: 0it [00:00, ?it/s][A
+
+Transcribing: 1it [00:01,  1.78s/it][A
+Transcribing: 1it [00:01,  1.79s/it]
+
+ 20%|██        | 1/5 [00:02<00:08,  2.16s/it]/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/10/output.wav
+[NeMo I 2026-10-13 17:11:10 nemo_logging:393] Timestamps requested, setting decoding timestamps to True. Capture them in Hypothesis object,                         with output[0][idx].timestep['word'/'segment'/'char']
+[NeMo I 2026-10-13 17:11:10 nemo_logging:393] Using RNNT Loss : tdt
+    Loss tdt_kwargs: {'fastemit_lambda': 0.0, 'clamp': -1.0, 'durations': [0, 1, 2, 3, 4], 'sigma': 0.02, 'omega': 0.1}
+[NeMo W 2026-10-13 17:11:10 nemo_logging:405] No conditional node support for Cuda.
+    Cuda graphs with while loops are disabled, decoding speed will be slower
+    Reason: No `cuda-python` module. Please do `pip install cuda-python>=12.3`
+[NeMo W 2026-10-13 17:11:10 nemo_logging:405] The following configuration keys are ignored by Lhotse dataloader: use_start_end_token
+[NeMo W 2026-10-13 17:11:10 nemo_logging:405] You are using a non-tarred dataset and requested tokenization during data sampling (pretokenize=True). This will cause the tokenization to happen in the main (GPU) process,possibly impacting the training speed if your tokenizer is very large.If the impact is noticable, set pretokenize=False in dataloader config.(note: that will disable token-per-second filtering and 2D bucketing features)
+
+
+Transcribing: 0it [00:00, ?it/s][A
+
+Transcribing: 1it [00:01,  1.06s/it][A
+Transcribing: 1it [00:01,  1.06s/it]
+
+ 40%|████      | 2/5 [00:03<00:04,  1.60s/it]/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/100/output.wav
+[NeMo I 2026-10-13 17:11:11 nemo_logging:393] Timestamps requested, setting decoding timestamps to True. Capture them in Hypothesis object,                         with output[0][idx].timestep['word'/'segment'/'char']
+[NeMo I 2026-10-13 17:11:11 nemo_logging:393] Using RNNT Loss : tdt
+    Loss tdt_kwargs: {'fastemit_lambda': 0.0, 'clamp': -1.0, 'durations': [0, 1, 2, 3, 4], 'sigma': 0.02, 'omega': 0.1}
+[NeMo W 2026-10-13 17:11:11 nemo_logging:405] No conditional node support for Cuda.
+    Cuda graphs with while loops are disabled, decoding speed will be slower
+    Reason: No `cuda-python` module. Please do `pip install cuda-python>=12.3`
+[NeMo W 2026-10-13 17:11:11 nemo_logging:405] The following configuration keys are ignored by Lhotse dataloader: use_start_end_token
+[NeMo W 2026-10-13 17:11:11 nemo_logging:405] You are using a non-tarred dataset and requested tokenization during data sampling (pretokenize=True). This will cause the tokenization to happen in the main (GPU) process,possibly impacting the training speed if your tokenizer is very large.If the impact is noticable, set pretokenize=False in dataloader config.(note: that will disable token-per-second filtering and 2D bucketing features)
+
+
+Transcribing: 0it [00:00, ?it/s][A
+
+Transcribing: 1it [00:01,  1.03s/it][A
+Transcribing: 1it [00:01,  1.03s/it]
+
+ 60%|██████    | 3/5 [00:04<00:02,  1.40s/it]/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/101/output.wav
+[NeMo I 2026-10-13 17:11:12 nemo_logging:393] Timestamps requested, setting decoding timestamps to True. Capture them in Hypothesis object,                         with output[0][idx].timestep['word'/'segment'/'char']
+[NeMo I 2026-10-13 17:11:12 nemo_logging:393] Using RNNT Loss : tdt
+    Loss tdt_kwargs: {'fastemit_lambda': 0.0, 'clamp': -1.0, 'durations': [0, 1, 2, 3, 4], 'sigma': 0.02, 'omega': 0.1}
+[NeMo W 2026-10-13 17:11:12 nemo_logging:405] No conditional node support for Cuda.
+    Cuda graphs with while loops are disabled, decoding speed will be slower
+    Reason: No `cuda-python` module. Please do `pip install cuda-python>=12.3`
+[NeMo W 2026-10-13 17:11:12 nemo_logging:405] The following configuration keys are ignored by Lhotse dataloader: use_start_end_token
+[NeMo W 2026-10-13 17:11:12 nemo_logging:405] You are using a non-tarred dataset and requested tokenization during data sampling (pretokenize=True). This will cause the tokenization to happen in the main (GPU) process,possibly impacting the training speed if your tokenizer is very large.If the impact is noticable, set pretokenize=False in dataloader config.(note: that will disable token-per-second filtering and 2D bucketing features)
+
+
+Transcribing: 0it [00:00, ?it/s][A
+
+Transcribing: 1it [00:01,  1.04s/it][A
+Transcribing: 1it [00:01,  1.04s/it]
+
+ 80%|████████  | 4/5 [00:05<00:01,  1.29s/it]/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption/102/output.wav
+[NeMo I 2026-10-13 17:11:13 nemo_logging:393] Timestamps requested, setting decoding timestamps to True. Capture them in Hypothesis object,                         with output[0][idx].timestep['word'/'segment'/'char']
+[NeMo I 2026-10-13 17:11:13 nemo_logging:393] Using RNNT Loss : tdt
+    Loss tdt_kwargs: {'fastemit_lambda': 0.0, 'clamp': -1.0, 'durations': [0, 1, 2, 3, 4], 'sigma': 0.02, 'omega': 0.1}
+[NeMo W 2026-10-13 17:11:13 nemo_logging:405] No conditional node support for Cuda.
+    Cuda graphs with while loops are disabled, decoding speed will be slower
+    Reason: No `cuda-python` module. Please do `pip install cuda-python>=12.3`
+[NeMo W 2026-10-13 17:11:13 nemo_logging:405] The following configuration keys are ignored by Lhotse dataloader: use_start_end_token
+[NeMo W 2026-10-13 17:11:13 nemo_logging:405] You are using a non-tarred dataset and requested tokenization during data sampling (pretokenize=True). This will cause the tokenization to happen in the main (GPU) process,possibly impacting the training speed if your tokenizer is very large.If the impact is noticable, set pretokenize=False in dataloader config.(note: that will disable token-per-second filtering and 2D bucketing features)
+
+
+Transcribing: 0it [00:00, ?it/s][A
+
+Transcribing: 1it [00:01,  1.02s/it][A
+Transcribing: 1it [00:01,  1.02s/it]
+
+100%|██████████| 5/5 [00:06<00:00,  1.23s/it]
+100%|██████████| 5/5 [00:06<00:00,  1.35s/it]

@@ -20,6 +20,9 @@ checkpoints/
 outputs/
 runs/
 logs/
+
+# Source manifest generated in place before a cluster job
+source_manifest.json
 *.ckpt
 *.safetensors
 *.pt
@@ -27,6 +30,12 @@ logs/
 
 # Cluster run evidence copied back from compute nodes (chain logs, reports)
 data/runs/
+
+# Runtime chat history database
+data/chat_history.sqlite3
+
+# Local benchmark data staged for A4 acceptance (FDB v1.0 samples, trial audio)
+benchmark/
 
 # Audio and transcript captures generated during experiments
 *.wav
@@ -55,6 +64,24 @@ image_use.md
 # Huggingface Token
 hf_token.txt
 
+# OpenAI Api
+openai_api.txt
+openai_use.example
+.env
+*.env
+
 # Independent X-Talk fork checkout. Its commits are tracked in its own repo;
 # InterClarify records the selected revision in configs and run manifests.
 /xtalk/
+
+# Stage A acceptance reports are curated evidence and stay tracked even though
+# they contain *.log and *.jsonl, which are ignored globally above.
+!reports/duplex_acceptance/
+!reports/duplex_acceptance/**
+!reports/duplex_acceptance/**/*.log
+!reports/duplex_acceptance/**/*.jsonl
+
+# DuplexCascade marker probe evidence, tracked for the same reason.
+!reports/duplex_marker_probe/
+!reports/duplex_marker_probe/**
+!reports/duplex_marker_probe/**/*.log

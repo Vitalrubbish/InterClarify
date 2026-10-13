@@ -15,6 +15,7 @@ InterClarify 研究全双工语音代理在**用户话轮内**主动澄清的时
 | 三类配置模板 | [configs/](configs/)（local / replay / cluster） |
 | 实验清单格式 | `manifest.json` / `resolved_config.yaml` / `events.jsonl`，见 [docs/src/interclarify/run.md](docs/src/interclarify/run.md) |
 | 当前远端复测入口 | [scripts/remote/submit_xtalk_round1_job.sh](scripts/remote/submit_xtalk_round1_job.sh) 与 [docs/scripts/remote/submit_xtalk_round1_job.md](docs/scripts/remote/submit_xtalk_round1_job.md) |
+| 阶段 A 全双工验收 | 任务单 [docs/xtalk_a4_remote_acceptance.md](docs/xtalk_a4_remote_acceptance.md)、入口 [scripts/remote/submit_xtalk_duplex_a4_job.sh](scripts/remote/submit_xtalk_duplex_a4_job.sh)、报告 [reports/duplex_acceptance/](reports/duplex_acceptance/) |
 
 ## 本地环境与验收
 
@@ -40,6 +41,7 @@ conda run -n interclarify-dev python -m pytest -q
 
 - 实现文档（按源码树镜像）：[docs/src/interclarify/](docs/src/interclarify/)、[docs/scripts/](docs/scripts/)、[docs/configs/](docs/configs/)
 - 研究设计：[docs/research_design.md](docs/research_design.md)；工程方案：[docs/engineering_implementation.md](docs/engineering_implementation.md)
+- 阶段 A 全双工验收任务单：[docs/xtalk_a4_remote_acceptance.md](docs/xtalk_a4_remote_acceptance.md)；验收证据：[reports/duplex_acceptance/](reports/duplex_acceptance/)
 - X-Talk 具体改造方案：[docs/xtalk_modification_plan.md](docs/xtalk_modification_plan.md)
 - 当前组件、复测证据与冻结边界：[docs/xtalk_baseline_stack.md](docs/xtalk_baseline_stack.md)
 - 首轮模型配置：[configs/xtalk_round1.yaml](configs/xtalk_round1.yaml)；运行配置：[configs/xtalk_round1_runtime.json](configs/xtalk_round1_runtime.json)
@@ -47,4 +49,6 @@ conda run -n interclarify-dev python -m pytest -q
 
 实现行为若与文档不一致，先更新文档并说明原因，再改代码。
 
-阶段 A 当前已在本地完成 A1–A3 门禁：X-Talk 138（3 skipped）、InterClarify 32，A1 定向 35/35、A2/A3 行为 16/16；A3 的 `<|user interruption|>` 会立即关闭模型流并结束当前 micro-turn。官方权重历史 smoke 和最新 A4 服务器入口见 [远端任务单](docs/xtalk_duplex_remote_task.md) 与 [A4 任务单](docs/xtalk_a4_remote_acceptance.md)。配置入口为 [xtalk_duplex_runtime.json](configs/xtalk_duplex_runtime.json)，原生连接基线保留作对照。
+阶段 A 当前已在本地完成 A1–A3 门禁：X-Talk 142（3 skipped）、InterClarify 40，A1 定向 35/35、A2/A3 行为 34/34；`<|user interruption|>` 在模型"正在播报"窗口内 reset 未播音频，生成继续解码到 `<|im_end|>`。官方权重历史 smoke 和最新 A4 服务器入口见 [远端任务单](docs/xtalk_duplex_remote_task.md) 与 [A4 任务单](docs/xtalk_a4_remote_acceptance.md)。配置入口为 [xtalk_duplex_runtime.json](configs/xtalk_duplex_runtime.json)，原生连接基线保留作对照。
+
+最新远端验收（tag `20261013T070801Z`）：5 个回放场景与 FDB 四轴推理全部 PASS，`failures=0`；FDB 语义评分（含 GPT judge）按本轮计划暂缓，因此汇总状态为 `INCOMPLETE`。证据见 [reports/duplex_acceptance/20261013T070801Z/](reports/duplex_acceptance/20261013T070801Z/)。

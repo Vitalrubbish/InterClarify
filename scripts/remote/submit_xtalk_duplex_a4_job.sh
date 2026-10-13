@@ -8,9 +8,9 @@ JOB_NAME="${DUPLEX_A4_JOB_NAME:-xtalk-duplex-a4}"
 GPUS="${DUPLEX_A4_GPUS:-3}"
 CPU="${DUPLEX_A4_CPU:-24}"
 MEM="${DUPLEX_A4_MEM:-96G}"
-ARTIFACT_ROOT="${DUPLEX_A4_ARTIFACT_ROOT:-$TASK_ROOT/artifacts/a4}"
-mkdir -p "$ARTIFACT_ROOT/submit_logs"
-LOG="$ARTIFACT_ROOT/submit_logs/submit.$(date -u +%Y%m%dT%H%M%SZ).log"
+LOG_ROOT="${DUPLEX_A4_SUBMIT_LOG_ROOT:-$TASK_ROOT/data/runs/submit_logs}"
+mkdir -p "$LOG_ROOT"
+LOG="$LOG_ROOT/submit.$(date -u +%Y%m%dT%H%M%SZ).log"
 
 printf -v NODE_COMMAND 'INTERCLARIFY_DUPLEX_ROOT=%q CONDA_SH=%q ' "$TASK_ROOT" "/opt/conda/etc/profile.d/conda.sh"
 for variable in $(compgen -e); do

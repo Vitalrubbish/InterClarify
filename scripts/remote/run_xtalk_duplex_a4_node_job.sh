@@ -18,19 +18,41 @@ MODEL_PORT="${DUPLEX_MODEL_PORT:-8006}"
 ASR_PORT="${DUPLEX_ASR_PORT:-8005}"
 TTS_PORT="${DUPLEX_TTS_PORT:-8004}"
 TAG="${DUPLEX_A4_TAG:-$(date -u +%Y%m%dT%H%M%SZ)}"
-ARTIFACT_ROOT="${DUPLEX_A4_ARTIFACT_ROOT:-$TASK_ROOT/artifacts/a4}"
-RUN_DIR="${DUPLEX_A4_OUTPUT:-$ARTIFACT_ROOT/$TAG}"
-INPUT_WAV="${DUPLEX_A4_INPUT:-$ROUND1_ROOT/audio/request.wav}"
-INTERRUPTION_WAV="${DUPLEX_A4_INTERRUPPTION_AUDIO:-$ROUND1_ROOT/audio/scenarios/barge_in_stop_02_barge_in.wav}"
+RUN_ROOT="${DUPLEX_A4_RUN_ROOT:-$TASK_ROOT/data/runs}"
+RUN_DIR="${DUPLEX_A4_OUTPUT:-$RUN_ROOT/$TAG}"
+REPORT_ROOT="${DUPLEX_A4_REPORT_ROOT:-$TASK_ROOT/reports/duplex_acceptance}"
+REPORT_DIR="${DUPLEX_A4_REPORT_DIR:-$REPORT_ROOT/$TAG}"
+NORMAL_AUDIO="${DUPLEX_A4_NORMAL_AUDIO:-${DUPLEX_A4_INPUT:-$ROUND1_ROOT/audio/scenarios/regular_answer_01_question.wav}}"
+# Interruption uses FDB v1.0 sample 106: a short-answer question plus a real interrupt.
+FDB_V1_ROOT="${DUPLEX_A4_FDB_V1_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0}"
+INTERRUPTION_SAMPLE_DIR="${DUPLEX_A4_INTERRUPTION_SAMPLE_DIR:-$FDB_V1_ROOT/synthetic_user_interruption/106}"
+INTERRUPTION_REQUEST_AUDIO="${DUPLEX_A4_INTERRUPTION_REQUEST_AUDIO:-$INTERRUPTION_SAMPLE_DIR/context.wav}"
+INTERRUPTION_WAV="${DUPLEX_A4_INTERRUPPTION_AUDIO:-$INTERRUPTION_SAMPLE_DIR/interrupt.wav}"
+PAUSE_FIRST_AUDIO="${DUPLEX_A4_PAUSE_FIRST_AUDIO:-$ROUND1_ROOT/audio/scenarios/pause_then_continue_01_part_one.wav}"
+PAUSE_SECOND_AUDIO="${DUPLEX_A4_PAUSE_SECOND_AUDIO:-$ROUND1_ROOT/audio/scenarios/pause_then_continue_02_part_two.wav}"
+MULTI_QUESTION_AUDIO="${DUPLEX_A4_MULTI_QUESTION_AUDIO:-$ROUND1_ROOT/audio/scenarios/continuous_two_questions_01_two_questions.wav}"
+LONG_SESSION_AUDIO="${DUPLEX_A4_LONG_SESSION_AUDIO:-$NORMAL_AUDIO}"
+SCENARIOS="${DUPLEX_A4_SCENARIOS:-normal interruption pause multi_question long_session}"
+BARGE_AFTER_SECONDS="${DUPLEX_A4_BARGE_AFTER_SECONDS:-0.6}"
+PAUSE_GAP_SECONDS="${DUPLEX_A4_PAUSE_GAP_SECONDS:-1.5}"
 REQUIRE_INTERRUPTION="${DUPLEX_A4_REQUIRE_INTERRUPTION:-0}"
 FDB_INPUT_ROOT="${DUPLEX_A4_FDB_INPUT_ROOT:-}"
 FDB_OUTPUT_ROOT="${DUPLEX_A4_FDB_OUTPUT_ROOT:-$RUN_DIR/fdb}"
 FDB_LIMIT="${DUPLEX_A4_FDB_LIMIT:-5}"
 FDB_REPO="${DUPLEX_A4_FDB_REPO:-}"
 FDB_ENV="${DUPLEX_A4_FDB_ENV:-full-duplex-bench}"
-FDB_TASK="${DUPLEX_A4_FDB_TASK:-}"
 FDB_COMMIT="${DUPLEX_A4_FDB_COMMIT:-3e799c45a045256f47d5f1c9cda90157e2d2ec9e}"
-LONG_ROUNDS="${DUPLEX_A4_ROUNDS:-3}"
+# Keep the official judge model so scores stay comparable with upstream; the
+# endpoint must serve it. Overriding triggers a substitution in the work copy.
+FDB_JUDGE_MODEL="${DUPLEX_A4_FDB_JUDGE_MODEL:-gpt-4-turbo}"
+FDB_SKIP_JUDGE="${DUPLEX_A4_FDB_SKIP_JUDGE:-0}"
+FDB_SCORING="${DUPLEX_A4_FDB_SCORING:-0}"
+FDB_JUDGE_BASE_URL="${DUPLEX_A4_FDB_BASE_URL:-https://api-2.xi-ai.cn/v1}"
+# Raw key file, read only inside the judge step. Kept outside the run tree so the
+# secret never reaches job logs, submit logs or archived evidence.
+FDB_JUDGE_KEY_FILE="${DUPLEX_A4_FDB_API_KEY_FILE:-/hpc_stor03/sjtu_home/xuan.zhang/openai_api.txt}"
+FDB_AXES="${DUPLEX_A4_FDB_AXES:-pause_handling:candor_pause_handling:default pause_handling:synthetic_pause_handling:default smooth_turn_taking:candor_turn_taking:default user_interruption:synthetic_user_interruption:user_interruption backchannel:icc_backchannel:default}"
+LONG_ROUNDS="${DUPLEX_A4_ROUNDS:-30}"
 REQUIRE_COMPLETE="${DUPLEX_A4_REQUIRE_COMPLETE:-0}"
 ROUND1_PY="$TASK_ROOT/scripts/remote/run_xtalk_round1.py"
 
@@ -40,7 +62,7 @@ if [ -e "$RUN_DIR" ]; then
   echo "A4 output directory already exists: $RUN_DIR" >&2
   exit 2
 fi
-mkdir -p "$RUN_DIR/logs" "$RUN_DIR/tests" "$RUN_DIR/services"
+mkdir -p "$RUN_DIR/logs" "$RUN_DIR/tests" "$RUN_DIR/services" "$REPORT_DIR"
 cd "$TASK_ROOT"
 export PYTHONPATH="$TASK_ROOT/xtalk/src:$TASK_ROOT"
 export PYTHONNOUSERSITE=1
@@ -58,7 +80,11 @@ FAILURES=0
 
 record_step() {
   local name="$1" status="$2" rc="$3" reason="${4:-}"
-  conda run -n "$CLIENT_ENV" python -c 'import json,sys; print(json.dumps({"step":sys.argv[1],"status":sys.argv[2],"rc":int(sys.argv[3]),"reason":sys.argv[4]}))' "$name" "$status" "$rc" "$reason" >> "$RUN_DIR/steps.jsonl"
+  # Command substitution strips trailing newlines so the file gets exactly one
+  # line per record regardless of how the local conda build buffers stdout.
+  local record
+  record="$(conda run -n "$CLIENT_ENV" python -c 'import json,sys; print(json.dumps({"step":sys.argv[1],"status":sys.argv[2],"rc":int(sys.argv[3]),"reason":sys.argv[4]}))' "$name" "$status" "$rc" "$reason")"
+  printf '%s\n' "$record" >> "$RUN_DIR/steps.jsonl"
   printf '[a4] step=%s status=%s rc=%s %s\n' "$name" "$status" "$rc" "$reason" | tee -a "$RUN_DIR/run.log"
   if [ "$status" = "FAIL" ]; then
     FAILURES=$((FAILURES + 1))
@@ -113,7 +139,10 @@ GPU_COUNT="$(nvidia-smi -L 2>/dev/null | wc -l)"
 [ "$RC" -eq 0 ] && record_step gpu_allocation PASS 0 || record_step gpu_allocation FAIL "$RC" "A4 requires three visible GPUs"
 
 RC=0
-for asset in "$CHECKPOINT" "$BASE_MODEL" "$MODEL_ROOT/models.lock.json" "$INPUT_WAV" "$INTERRUPTION_WAV" "$ROUND1_ROOT/audio/reference.wav"; do
+for asset in "$CHECKPOINT" "$BASE_MODEL" "$MODEL_ROOT/models.lock.json" \
+  "$NORMAL_AUDIO" "$INTERRUPTION_REQUEST_AUDIO" "$INTERRUPTION_WAV" \
+  "$PAUSE_FIRST_AUDIO" "$PAUSE_SECOND_AUDIO" "$MULTI_QUESTION_AUDIO" \
+  "$ROUND1_ROOT/audio/reference.wav"; do
   [ -e "$asset" ] || { printf 'missing asset: %s\n' "$asset" >> "$RUN_DIR/logs/assets.log"; RC=1; }
 done
 [ "$RC" -eq 0 ] && record_step assets PASS 0 || record_step assets FAIL "$RC" "required model or audio asset is missing"
@@ -141,6 +170,28 @@ conda run -n "$TOOLS_ENV" python -c 'import sys,yaml; source,target=sys.argv[1:3
 [ "$RC" -eq 0 ] && record_step runtime_config PASS 0 || record_step runtime_config FAIL "$RC"
 [ "$RC" -eq 0 ] || exit "$FAILURES"
 
+# Start all three services concurrently so every allocated GPU is used promptly;
+# sequential startup leaves idle GPUs, which the cluster kills as LowGpuUsage.
+CUDA_VISIBLE_DEVICES="${JOB_GPUS[0]}" setsid conda run --no-capture-output -p "$MODEL_ENV" \
+  python scripts/remote/duplex_model_service.py --checkpoint "$CHECKPOINT" \
+  --base-model "$BASE_MODEL" --port "$MODEL_PORT" \
+  > "$RUN_DIR/services/duplex_model.log" 2>&1 &
+MODEL_PID="$!"
+PIDS+=("$MODEL_PID")
+
+CUDA_VISIBLE_DEVICES="${JOB_GPUS[1]}" setsid conda run --no-capture-output -n "$TOOLS_ENV" \
+  python "$ROUND1_PY" --config "$ROUND1_CONFIG" --model-root "$MODEL_ROOT" serve asr --gpu-index 0 \
+  > "$RUN_DIR/services/asr.log" 2>&1 &
+ASR_PID="$!"
+PIDS+=("$ASR_PID")
+
+CUDA_VISIBLE_DEVICES="${JOB_GPUS[2]}" setsid conda run --no-capture-output -n "$TOOLS_ENV" \
+  python "$ROUND1_PY" --config "$ROUND1_CONFIG" --model-root "$MODEL_ROOT" serve tts --gpu-index 0 \
+  > "$RUN_DIR/services/tts.log" 2>&1 &
+TTS_PID="$!"
+PIDS+=("$TTS_PID")
+
+# Regression tests run while the services load, keeping the job productive.
 RC=0
 (cd "$TASK_ROOT/xtalk" && conda run -n "$CLIENT_ENV" env PYTHONPATH=src python -m unittest \
   tests.test_duplex_protocol tests.test_duplex_observability \
@@ -162,32 +213,32 @@ conda run -n "$CLIENT_ENV" env PYTHONPATH="$TASK_ROOT/xtalk/src:$TASK_ROOT" pyth
 [ "$RC" -eq 0 ] && record_step a4_driver_regression PASS 0 || record_step a4_driver_regression FAIL "$RC"
 [ "$FAILURES" -eq 0 ] || exit "$FAILURES"
 
-CUDA_VISIBLE_DEVICES="${JOB_GPUS[0]}" setsid conda run --no-capture-output -p "$MODEL_ENV" \
-  python scripts/remote/duplex_model_service.py --checkpoint "$CHECKPOINT" \
-  --base-model "$BASE_MODEL" --port "$MODEL_PORT" \
-  > "$RUN_DIR/services/duplex_model.log" 2>&1 &
-PIDS+=("$!")
 RC=0
-wait_http "http://127.0.0.1:$MODEL_PORT/health" 900 "$RUN_DIR/model_health.json" "$RUN_DIR/services/duplex_model.log" "${PIDS[-1]}" || RC=$?
+wait_http "http://127.0.0.1:$MODEL_PORT/health" 1800 "$RUN_DIR/model_health.json" "$RUN_DIR/services/duplex_model.log" "$MODEL_PID" || RC=$?
 [ "$RC" -eq 0 ] && record_step duplex_model_service PASS 0 || record_step duplex_model_service FAIL "$RC"
 [ "$RC" -eq 0 ] || exit "$FAILURES"
 
-CUDA_VISIBLE_DEVICES="${JOB_GPUS[1]}" setsid conda run --no-capture-output -n "$TOOLS_ENV" \
-  python "$ROUND1_PY" --config "$ROUND1_CONFIG" --model-root "$MODEL_ROOT" serve asr --gpu-index 0 \
-  > "$RUN_DIR/services/asr.log" 2>&1 &
-PIDS+=("$!")
 RC=0
-wait_http "http://127.0.0.1:$ASR_PORT/health" 1200 "$RUN_DIR/asr_health.json" "$RUN_DIR/services/asr.log" "${PIDS[-1]}" || RC=$?
+wait_http "http://127.0.0.1:$ASR_PORT/health" 1200 "$RUN_DIR/asr_health.json" "$RUN_DIR/services/asr.log" "$ASR_PID" || RC=$?
 [ "$RC" -eq 0 ] && record_step asr_service PASS 0 || record_step asr_service FAIL "$RC"
 
-CUDA_VISIBLE_DEVICES="${JOB_GPUS[2]}" setsid conda run --no-capture-output -n "$TOOLS_ENV" \
-  python "$ROUND1_PY" --config "$ROUND1_CONFIG" --model-root "$MODEL_ROOT" serve tts --gpu-index 0 \
-  > "$RUN_DIR/services/tts.log" 2>&1 &
-PIDS+=("$!")
 RC=0
-wait_http "http://127.0.0.1:$TTS_PORT/health" 1800 "$RUN_DIR/tts_health.json" "$RUN_DIR/services/tts.log" "${PIDS[-1]}" || RC=$?
+wait_http "http://127.0.0.1:$TTS_PORT/health" 1800 "$RUN_DIR/tts_health.json" "$RUN_DIR/services/tts.log" "$TTS_PID" || RC=$?
 [ "$RC" -eq 0 ] && record_step tts_service PASS 0 || record_step tts_service FAIL "$RC"
 [ "$FAILURES" -eq 0 ] || exit "$FAILURES"
+
+# Sample per-service RSS (process group) alongside the GPU sampler for trend evidence.
+{
+  echo "timestamp,pid,rss_kb"
+  while true; do
+    for pid in "${PIDS[@]}"; do
+      rss="$(ps -g "$pid" -o rss= 2>/dev/null | awk '{total+=$1} END {print total+0}')"
+      [ "${rss:-0}" -gt 0 ] && echo "$(date -u +%Y-%m-%dT%H:%M:%SZ),$pid,$rss"
+    done
+    sleep 5
+  done
+} > "$RUN_DIR/resource_samples.csv" 2>&1 &
+PIDS+=("$!")
 
 RC=0
 conda run --no-capture-output -n "$CLIENT_ENV" python scripts/remote/duplex_runtime_smoke.py \
@@ -205,10 +256,21 @@ conda run -n "$CLIENT_ENV" python -c 'import json,sys,pathlib; cfg=json.load(ope
 RC=0
 EXTRA=()
 [ "$REQUIRE_INTERRUPTION" = "1" ] && EXTRA+=(--require-interruption)
+SCENARIO_ARGS=()
+for scenario in $SCENARIOS; do SCENARIO_ARGS+=(--scenario "$scenario"); done
+AUDIO_ARGS=(
+  --scenario-audio "normal=$NORMAL_AUDIO"
+  --scenario-audio "interruption=$INTERRUPTION_REQUEST_AUDIO"
+  --scenario-audio "pause=$PAUSE_FIRST_AUDIO,$PAUSE_SECOND_AUDIO"
+  --scenario-audio "multi_question=$MULTI_QUESTION_AUDIO"
+  --scenario-audio "long_session=$LONG_SESSION_AUDIO"
+)
 conda run --no-capture-output -n "$CLIENT_ENV" env PYTHONPATH="$TASK_ROOT/xtalk/src:$TASK_ROOT" \
   python scripts/remote/duplex_a4_replay.py --config "$RUNTIME_CONFIG" \
-  --model-url "http://127.0.0.1:$MODEL_PORT" --audio "$INPUT_WAV" \
-  --interruption-audio "$INTERRUPTION_WAV" --out "$RUN_DIR/replay" --rounds "$LONG_ROUNDS" "${EXTRA[@]}" \
+  --model-url "http://127.0.0.1:$MODEL_PORT" --audio "$NORMAL_AUDIO" \
+  "${AUDIO_ARGS[@]}" --interruption-audio "$INTERRUPTION_WAV" \
+  --barge-after-seconds "$BARGE_AFTER_SECONDS" --pause-gap-seconds "$PAUSE_GAP_SECONDS" \
+  --out "$RUN_DIR/replay" --rounds "$LONG_ROUNDS" "${SCENARIO_ARGS[@]}" "${EXTRA[@]}" \
   > "$RUN_DIR/logs/replay.log" 2>&1 || RC=$?
 REPLAY_STATUS="$(conda run -n "$CLIENT_ENV" python -c 'import json,sys; print(json.load(open(sys.argv[1])).get("status","FAIL"))' "$RUN_DIR/replay/summary.json" 2>/dev/null || echo FAIL)"
 case "$REPLAY_STATUS" in
@@ -217,54 +279,177 @@ case "$REPLAY_STATUS" in
   *) record_step real_audio_replay FAIL "$RC" "inspect replay reports" ;;
 esac
 
+FDB_READY=0
+FDB_WORK_REPO="$RUN_DIR/fdb_repo"
 if [ -n "$FDB_INPUT_ROOT" ] && [ -d "$FDB_INPUT_ROOT" ]; then
+  FDB_READY=1
+  if [ -n "$FDB_REPO" ] && [ -d "$FDB_REPO/v1_v1.5" ]; then
+    # Only the official entry points are needed; skipping the rest avoids copying
+    # the upstream node_modules tree into every run directory.
+    mkdir -p "$FDB_WORK_REPO"
+    cp -r "$FDB_REPO/v1_v1.5/get_transcript" "$FDB_REPO/v1_v1.5/evaluation" "$FDB_WORK_REPO/"
+    if [ "$FDB_JUDGE_MODEL" != "gpt-4-turbo" ]; then
+      sed -i "s/gpt-4-turbo/$FDB_JUDGE_MODEL/g" "$FDB_WORK_REPO/evaluation/eval_user_interruption.py"
+    fi
+  fi
+fi
+
+if [ "$FDB_READY" = "1" ]; then
   RC=0
-  conda run --no-capture-output -n "$CLIENT_ENV" env PYTHONPATH="$TASK_ROOT/xtalk/src:$TASK_ROOT" \
-    python scripts/remote/duplex_a4_replay.py --config "$RUNTIME_CONFIG" \
-    --model-url "http://127.0.0.1:$MODEL_PORT" --out "$RUN_DIR/fdb_driver" \
-    --fdb-input-root "$FDB_INPUT_ROOT" --fdb-output-root "$FDB_OUTPUT_ROOT" \
-    --fdb-limit "$FDB_LIMIT" > "$RUN_DIR/logs/fdb_inference.log" 2>&1 || RC=$?
-  [ "$RC" -eq 0 ] && record_step fdb_inference PASS 0 || record_step fdb_inference FAIL "$RC" "inspect fdb_driver/fdb_summary.json"
+  for entry in $FDB_AXES; do
+    axis="${entry%%:*}"; rest="${entry#*:}"; subset="${rest%%:*}"
+    input="$FDB_INPUT_ROOT/$subset"
+    output="$FDB_OUTPUT_ROOT/$axis/$subset"
+    log="$RUN_DIR/logs/fdb_inference_${axis}_${subset}.log"
+    if [ ! -d "$input" ]; then
+      printf 'missing FDB subset: %s\n' "$input" >> "$RUN_DIR/logs/fdb_inference.log"
+      RC=1
+      continue
+    fi
+    conda run --no-capture-output -n "$CLIENT_ENV" env PYTHONPATH="$TASK_ROOT/xtalk/src:$TASK_ROOT" \
+      python scripts/remote/duplex_a4_replay.py --config "$RUNTIME_CONFIG" \
+      --model-url "http://127.0.0.1:$MODEL_PORT" --out "$RUN_DIR/fdb_driver/${axis}_${subset}" \
+      --fdb-input-root "$input" --fdb-output-root "$output" \
+      --fdb-limit "$FDB_LIMIT" > "$log" 2>&1 || RC=$?
+  done
+  [ "$RC" -eq 0 ] && record_step fdb_inference PASS 0 || record_step fdb_inference FAIL "$RC" "inspect logs/fdb_inference_*.log"
 else
-  record_step fdb_inference BLOCKED 0 "set DUPLEX_A4_FDB_INPUT_ROOT after staging FDB v1/v1.5"
+  record_step fdb_inference BLOCKED 0 "set DUPLEX_A4_FDB_INPUT_ROOT to the FDB v1.0 root"
 fi
 
 stop_services
 PIDS=()
 
-if [ -n "$FDB_REPO" ] && [ -d "$FDB_REPO/v1_v1.5" ] && [ -n "$FDB_TASK" ] && [ -d "$FDB_OUTPUT_ROOT" ]; then
-  RC=0
+FDB_SCORING_READY=0
+FDB_SCORING_BLOCKED=0
+if [ "$FDB_SCORING" != "1" ]; then
+  # Scoring keeps GPUs idle, which the cluster kills as LowGpuUsage; run it in a
+  # dedicated single-GPU job instead of the three-GPU model job.
+  record_step fdb_scoring SKIPPED 0 "scoring deferred (set DUPLEX_A4_FDB_SCORING=1)"
+  FDB_SCORING_READY=-1
+  FDB_SCORING_BLOCKED=1
+else
+  [ "$FDB_READY" = "1" ] && [ -n "$FDB_REPO" ] && [ -d "$FDB_WORK_REPO" ] && [ -d "$FDB_OUTPUT_ROOT" ] || FDB_SCORING_READY=-1
+  if [ "$FDB_SCORING_READY" = "0" ] && ! conda run -n "$FDB_ENV" python -c 'import nemo.collections.asr' >/dev/null 2>&1; then
+    record_step fdb_scoring BLOCKED 0 "conda env $FDB_ENV lacks NeMo alignment dependencies"
+    FDB_SCORING_READY=-1
+    FDB_SCORING_BLOCKED=1
+  fi
+fi
+
+if [ "$FDB_SCORING_READY" = "0" ]; then
   git -C "$FDB_REPO" rev-parse HEAD > "$RUN_DIR/fdb_commit.txt"
   if [ "$(cat "$RUN_DIR/fdb_commit.txt")" != "$FDB_COMMIT" ] || ! git -C "$FDB_REPO" diff --quiet HEAD; then
     record_step fdb_revision FAIL 1 "FDB checkout differs from fixed commit"
     exit "$FAILURES"
   fi
-  ASR_TASK=default
-  [ "$FDB_TASK" = "user_interruption" ] && ASR_TASK=user_interruption
-  conda run --no-capture-output -n "$FDB_ENV" python "$FDB_REPO/v1_v1.5/get_transcript/asr.py" \
-    --root_dir "$FDB_OUTPUT_ROOT" --task "$ASR_TASK" --audio_name output.wav \
-    > "$RUN_DIR/logs/fdb_alignment.log" 2>&1 || RC=$?
-  if find "$FDB_OUTPUT_ROOT" -name clean_output.wav -print -quit | grep -q .; then
-    conda run --no-capture-output -n "$FDB_ENV" python "$FDB_REPO/v1_v1.5/get_transcript/asr.py" \
-      --root_dir "$FDB_OUTPUT_ROOT" --task "$ASR_TASK" --audio_name clean_output.wav \
-      >> "$RUN_DIR/logs/fdb_alignment.log" 2>&1 || RC=$?
+  RC=0
+  JUDGE_DEFERRED=0
+  JUDGE_BLOCKED=0
+  # The official evaluate.py builds OpenAI(api_key=...) and reads OPENAI_BASE_URL
+  # from the environment. Only the source of the key is logged, never its value.
+  export OPENAI_BASE_URL="$FDB_JUDGE_BASE_URL"
+  if [ -z "${OPENAI_API_KEY:-}" ] && [ -r "$FDB_JUDGE_KEY_FILE" ] && [ -s "$FDB_JUDGE_KEY_FILE" ]; then
+    OPENAI_API_KEY="$(head -n 1 "$FDB_JUDGE_KEY_FILE" | tr -d '[:space:]')"
+    export OPENAI_API_KEY
   fi
-  if [ "$RC" -eq 0 ] && [ "$FDB_TASK" = "behavior" ]; then
-    conda run --no-capture-output -n "$FDB_ENV" python "$FDB_REPO/v1_v1.5/evaluation/get_timing.py" --root_dir "$FDB_OUTPUT_ROOT" > "$RUN_DIR/logs/fdb_timing.log" 2>&1 || RC=$?
+  if [ -n "${OPENAI_API_KEY:-}" ]; then
+    printf 'judge credentials loaded from %s for %s\n' "$FDB_JUDGE_KEY_FILE" "$OPENAI_BASE_URL" \
+      >> "$RUN_DIR/logs/fdb_scoring_credentials.log"
+  else
+    printf 'judge credentials missing (file: %s)\n' "$FDB_JUDGE_KEY_FILE" \
+      >> "$RUN_DIR/logs/fdb_scoring_credentials.log"
   fi
-  if [ "$RC" -eq 0 ]; then
+  for entry in $FDB_AXES; do
+    axis="${entry%%:*}"; rest="${entry#*:}"; subset="${rest%%:*}"; asr_task="${rest#*:}"
+    output="$FDB_OUTPUT_ROOT/$axis/$subset"
+    log="$RUN_DIR/logs/fdb_scoring_${axis}_${subset}.log"
+    if [ ! -d "$output" ]; then
+      printf 'missing FDB output: %s\n' "$output" >> "$RUN_DIR/logs/fdb_alignment.log"
+      RC=1
+      continue
+    fi
+    if ! conda run --no-capture-output -n "$FDB_ENV" python "$FDB_WORK_REPO/get_transcript/asr.py" \
+      --root_dir "$output" --task "$asr_task" --audio_name output.wav >> "$log" 2>&1; then
+      RC=1
+    fi
+    if find "$output" -name clean_output.wav -print -quit | grep -q .; then
+      conda run --no-capture-output -n "$FDB_ENV" python "$FDB_WORK_REPO/get_transcript/asr.py" \
+        --root_dir "$output" --task "$asr_task" --audio_name clean_output.wav >> "$log" 2>&1 || RC=1
+    fi
+    if [ "$axis" = "behavior" ]; then
+      conda run --no-capture-output -n "$FDB_ENV" python "$FDB_WORK_REPO/evaluation/get_timing.py" \
+        --root_dir "$output" >> "$log" 2>&1 || RC=1
+    fi
+    if [ "$axis" = "user_interruption" ] && [ "$FDB_SKIP_JUDGE" = "1" ]; then
+      printf 'GPT judge deferred for %s\n' "$output" >> "$RUN_DIR/logs/fdb_alignment.log"
+      JUDGE_DEFERRED=1
+      continue
+    fi
+    if [ "$axis" = "user_interruption" ] && [ -z "${OPENAI_API_KEY:-}" ]; then
+      printf 'no judge credentials for %s\n' "$output" >> "$RUN_DIR/logs/fdb_alignment.log"
+      JUDGE_BLOCKED=1
+      continue
+    fi
     (cd "$RUN_DIR" && conda run --no-capture-output -n "$FDB_ENV" \
-      python "$FDB_REPO/v1_v1.5/evaluation/evaluate.py" --task "$FDB_TASK" --root_dir "$FDB_OUTPUT_ROOT") \
-      > "$RUN_DIR/logs/fdb_evaluation.log" 2>&1 || RC=$?
-  fi
+      python "$FDB_WORK_REPO/evaluation/evaluate.py" --task "$axis" --root_dir "$output") >> "$log" 2>&1 || RC=1
+  done
   [ "$RC" -eq 0 ] && record_step fdb_scoring PASS 0 || record_step fdb_scoring FAIL "$RC" "official FDB alignment or evaluation failed"
-else
-  record_step fdb_scoring BLOCKED 0 "set DUPLEX_A4_FDB_REPO, DUPLEX_A4_FDB_TASK, and stage FDB outputs"
+  [ "$JUDGE_DEFERRED" = "1" ] && record_step fdb_judge BLOCKED 0 "GPT judge deferred (DUPLEX_A4_FDB_SKIP_JUDGE=1)"
+  [ "$JUDGE_BLOCKED" = "1" ] && record_step fdb_judge BLOCKED 0 "no OpenAI-compatible judge credentials"
+elif [ "$FDB_SCORING_BLOCKED" = "0" ]; then
+  record_step fdb_scoring BLOCKED 0 "set DUPLEX_A4_FDB_REPO and stage FDB v1.0 outputs"
 fi
 
-conda run -n "$CLIENT_ENV" python -c 'import json,pathlib,sys; p=pathlib.Path(sys.argv[1]); steps=[json.loads(x) for x in (p/"steps.jsonl").read_text().splitlines()]; replay=json.load(open(p/"replay/summary.json")) if (p/"replay/summary.json").exists() else None; status="FAIL" if any(x["status"]=="FAIL" for x in steps) else ("PASS" if all(x["status"]=="PASS" for x in steps) else "INCOMPLETE"); json.dump({"status":status,"steps":steps,"replay":replay,"note":"A4 requires PASS for FDB and all real semantic scenarios."},open(p/"a4_summary.json","w"),indent=2)' "$RUN_DIR"
+# Read steps.jsonl defensively: skip blank lines so a stray newline can never
+# abort summary generation, and always leave a summary file behind.
+conda run -n "$CLIENT_ENV" python -c '
+import json, pathlib, sys
+p = pathlib.Path(sys.argv[1])
+steps = []
+for line in (p / "steps.jsonl").read_text().splitlines():
+    line = line.strip()
+    if line:
+        steps.append(json.loads(line))
+replay_path = p / "replay" / "summary.json"
+replay = None
+if replay_path.exists():
+    raw_replay = json.load(open(replay_path))
+    replay = {"status": raw_replay.get("status"),
+              "scenarios": {s.get("scenario"): s.get("status") for s in raw_replay.get("scenarios", [])}}
+axes = {}
+for summary in sorted((p / "fdb_driver").glob("*/fdb_summary.json")):
+    axes[summary.parent.name] = json.load(open(summary)).get("status")
+if any(s["status"] == "FAIL" for s in steps):
+    status = "FAIL"
+elif steps and all(s["status"] == "PASS" for s in steps):
+    status = "PASS"
+else:
+    status = "INCOMPLETE"
+json.dump({"status": status, "steps": steps, "fdb_axes": axes, "replay": replay,
+           "note": "Stage A requires PASS for the FDB v1.0 axes and all real semantic scenarios."},
+          open(p / "a4_summary.json", "w"), indent=2)
+' "$RUN_DIR" || printf '{"status": "INCOMPLETE", "error": "failed to build a4_summary"}\n' > "$RUN_DIR/a4_summary.json"
 
-printf '[a4] output=%s failures=%s\n' "$RUN_DIR" "$FAILURES" | tee -a "$RUN_DIR/run.log"
+# Copy the key evidence into the tracked report directory, leaving heavy audio in data/runs.
+mkdir -p "$REPORT_DIR/replay" "$REPORT_DIR/tests"
+for report in source_check.json environment.txt git.txt model_health.json steps.jsonl \
+  a4_summary.json resource_samples.csv gpu.csv gpu_samples.csv; do
+  [ -f "$RUN_DIR/$report" ] && cp "$RUN_DIR/$report" "$REPORT_DIR/"
+done
+[ -f "$RUN_DIR/replay/summary.json" ] && cp "$RUN_DIR/replay/summary.json" "$REPORT_DIR/replay/"
+for scenario_report in "$RUN_DIR"/replay/*/report.json; do
+  [ -f "$scenario_report" ] || continue
+  cp "$scenario_report" "$REPORT_DIR/replay/$(basename "$(dirname "$scenario_report")")_report.json"
+done
+for driver_summary in "$RUN_DIR"/fdb_driver/*/fdb_summary.json; do
+  [ -f "$driver_summary" ] || continue
+  cp "$driver_summary" "$REPORT_DIR/$(basename "$(dirname "$driver_summary")")_fdb_summary.json"
+done
+cp "$RUN_DIR"/tests/*.log "$REPORT_DIR/tests/" 2>/dev/null || true
+cp "$RUN_DIR"/logs/fdb_scoring_*.log "$REPORT_DIR/tests/" 2>/dev/null || true
+
+printf '[a4] output=%s reports=%s failures=%s\n' "$RUN_DIR" "$REPORT_DIR" "$FAILURES" | tee -a "$RUN_DIR/run.log"
 if [ "$REQUIRE_COMPLETE" = "1" ]; then
   COMPLETE_STATUS="$(conda run -n "$CLIENT_ENV" python -c 'import json,sys; print(json.load(open(sys.argv[1]))["status"])' "$RUN_DIR/a4_summary.json")"
   if [ "$COMPLETE_STATUS" != "PASS" ]; then

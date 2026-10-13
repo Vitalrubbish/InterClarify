@@ -1,0 +1,24 @@
+5a1fbd7bc392c51a7289797d354c119a35efea3b
+## main...origin/main [ahead 12]
+ M docs/scripts/remote/duplex_a4_replay.md
+ M docs/scripts/remote/duplex_model_service.md
+ M docs/scripts/remote/run_xtalk_duplex_a4_node_job.md
+ M docs/xtalk_a4_remote_acceptance.md
+ M docs/xtalk_modification_plan.md
+ M requirements.txt
+ M scripts/remote/duplex_a4_replay.py
+ M scripts/remote/duplex_model_service.py
+ M scripts/remote/run_xtalk_duplex_a4_node_job.sh
+ M tests/test_duplex_a4_replay.py
+ M tests/test_duplex_model_service.py
+b071dd0eb6aac97365826fedadc8260750cca690
+## dev...origin/dev [ahead 3]
+ M docs/src/xtalk/duplex_control/model_client.md
+ M docs/src/xtalk/duplex_control/model_client.zh.md
+ M docs/src/xtalk/duplex_control/runtime_adapter.md
+ M docs/src/xtalk/duplex_control/runtime_adapter.zh.md
+ M docs/technical_reference/duplex_runtime.md
+ M docs/technical_reference/duplex_runtime.zh.md
+ M src/xtalk/duplex_control/model_client.py
+ M src/xtalk/duplex_control/runtime_adapter.py
+ M tests/test_duplex_runtime.py

@@ -8,6 +8,7 @@ import json
 import queue
 import re
 import threading
+import time
 from pathlib import Path
 from typing import Any, AsyncIterator
 
@@ -63,10 +64,18 @@ def normalize_state_dict(state: dict[str, Any], expected: set[str]) -> dict[str,
     return normalized
 
 
-class GenerateRequest(BaseModel):
-    """One complete official ChatML prompt and its system micro-turn budget."""
+class HistoryTurn(BaseModel):
+    """One prior micro-turn: user text or the assistant's generated token ids."""
 
-    prompt: str
+    role: str
+    text: str = ''
+    token_ids: list[int] = Field(default_factory=list)
+
+
+class GenerateRequest(BaseModel):
+    """One official micro-turn history and its system micro-turn budget."""
+
+    history: list[HistoryTurn] = Field(default_factory=list)
     max_new_tokens: int = Field(default=64, ge=1, le=256)
 
 
@@ -92,7 +101,9 @@ class OfficialDuplexModel:
         cfg = json.loads((checkpoint / 'train_cfg.json').read_text())['model']
         if cfg.get('use_lora') != 'qv' or cfg.get('name') != 'Qwen/Qwen2-7B-Instruct':
             raise ValueError('Expected official Qwen2-7B-Instruct q/v LoRA checkpoint')
-        self.tokenizer = AutoTokenizer.from_pretrained(str(checkpoint / 'tokenizer'), use_fast=False, local_files_only=True)
+        # The released tokenizer.json needs a recent `tokenizers` (>=0.20); the
+        # official server also loads it as a fast tokenizer.
+        self.tokenizer = AutoTokenizer.from_pretrained(str(checkpoint / 'tokenizer'), use_fast=True, local_files_only=True)
         self.token_ids = {}
         for marker in (*WIRE_TOKENS, '<|im_end|>'):
             ids = self.tokenizer.encode(marker, add_special_tokens=False)
@@ -120,6 +131,11 @@ class OfficialDuplexModel:
         self.model = adapted.to(device).eval()
         self.model.requires_grad_(False)
         self.device = device
+        # Official server.py builds the raw ChatML prompt from these id runs.
+        self.header_user_ids = self.tokenizer.encode('<|im_start|>user\n', add_special_tokens=False)
+        self.header_assist_ids = self.tokenizer.encode('<|im_start|>assistant\n', add_special_tokens=False)
+        self.im_end_nl_ids = self.tokenizer.encode('<|im_end|>\n', add_special_tokens=False)
+        self.no_voice_ids = self.tokenizer.encode('<|no voice|>', add_special_tokens=False)
         self.eos_id = self.token_ids['<|im_end|>']
         self.context_length = int(base.config.max_position_embeddings)
         self.info = {'checkpoint': str(checkpoint.resolve()), 'base_model': str(base_model.resolve()),
@@ -127,21 +143,59 @@ class OfficialDuplexModel:
                      'torch': torch.__version__, 'tokenizer_class': type(self.tokenizer).__name__,
                      'dtype': str(next(self.model.parameters()).dtype)}
 
+    def build_prompt_ids(self, history: list[HistoryTurn]) -> list[int]:
+        """Flatten one micro-turn history into the official raw ChatML id run.
+
+        Parameters
+        ----------
+        history : list[HistoryTurn]
+            Alternating user micro-turns and assistant generated ids. The final
+            turn must be the user micro-turn that triggered this inference.
+
+        Returns
+        -------
+        list[int]
+            Header, content and end-of-message ids ending with the assistant
+            header, exactly as the released server concatenates them.
+        """
+        if not history or history[-1].role != 'user':
+            raise ValueError('history must end with a user micro-turn')
+        ids: list[int] = []
+        for turn in history:
+            if turn.role not in ('user', 'assistant'):
+                raise ValueError(f'unknown history role: {turn.role!r}')
+            if turn.role == 'user':
+                ids.extend(self.header_user_ids)
+                if turn.text.strip():
+                    ids.extend(self.tokenizer.encode(turn.text, add_special_tokens=False))
+                else:
+                    ids.extend(self.no_voice_ids)
+                ids.extend(self.im_end_nl_ids)
+            else:
+                if not turn.token_ids:
+                    raise ValueError('assistant micro-turns require generated token ids')
+                ids.extend(self.header_assist_ids)
+                ids.extend(int(token_id) for token_id in turn.token_ids)
+        ids.extend(self.header_assist_ids)
+        return ids
+
     async def stream(self, request: GenerateRequest) -> AsyncIterator[dict[str, Any]]:
         """Yield decoded text and completion reason, cancelling disconnected clients.
 
         Parameters
         ----------
         request : GenerateRequest
-            Raw ChatML prompt and generation limit.
+            Raw micro-turn history and generation limit.
         """
         import torch
         from transformers import StoppingCriteria, StoppingCriteriaList
         from transformers.generation.streamers import BaseStreamer
 
-        ids = self.tokenizer.encode(request.prompt, add_special_tokens=False)
+        ids = self.build_prompt_ids(request.history)
         if len(ids) + request.max_new_tokens > self.context_length:
-            raise ValueError('Raw micro-turn history exceeds model context length')
+            raise ValueError(f'Raw micro-turn history exceeds model context length: '
+                             f'{len(ids)} prompt tokens + {request.max_new_tokens} new tokens '
+                             f'> {self.context_length}')
         tensor = torch.tensor([ids], dtype=torch.long, device=self.device)
         items: queue.Queue[dict[str, Any]] = queue.Queue()
         stop = threading.Event()
@@ -190,15 +244,30 @@ class OfficialDuplexModel:
         streamer = TokenStreamer()
 
         def generate():
-            """Run one official greedy generation outside the HTTP event loop."""
+            """Run one official greedy generation outside the HTTP event loop.
+
+            ``num_logits_to_keep=1`` keeps only the final position's LM head
+            output. The official server materializes logits for every prompt
+            position and slices the last one; both produce identical ids, while
+            the flag avoids the multi-gigabyte allocation that OOMed long
+            histories.
+            """
+            started = time.monotonic()
             try:
                 with torch.inference_mode():
                     self.model.generate(input_ids=tensor, attention_mask=torch.ones_like(tensor),
                         max_new_tokens=request.max_new_tokens, eos_token_id=eos_id,
                         pad_token_id=eos_id, do_sample=False, streamer=streamer,
+                        num_logits_to_keep=1,
                         stopping_criteria=StoppingCriteriaList([Cancellation()]))
                 reason = 'stop' if streamer.ids and streamer.ids[-1] == eos_id else 'length'
-                items.put({'finish_reason': reason})
+                peak = torch.cuda.max_memory_allocated() / 2 ** 30 if self.device.startswith('cuda') else 0.0
+                print(json.dumps({'duplex_request': {
+                    'prompt_tokens': len(ids), 'generated_tokens': len(streamer.ids),
+                    'finish_reason': reason, 'seconds': round(time.monotonic() - started, 3),
+                    'peak_gpu_gib': round(peak, 3)}}), flush=True)
+                items.put({'finish_reason': reason, 'token_ids': list(streamer.ids),
+                           'prompt_tokens': len(ids)})
             except Exception as exc:
                 items.put({'error': str(exc)})
             finally:
@@ -240,8 +309,8 @@ def create_app(model: OfficialDuplexModel) -> FastAPI:
     @app.post('/generate')
     async def generate(request: GenerateRequest):
         """Stream token-preserving NDJSON with explicit finish reasons."""
-        if not request.prompt.endswith('<|im_start|>assistant\n'):
-            raise HTTPException(400, 'Expected raw ChatML assistant header')
+        if not request.history or request.history[-1].role != 'user':
+            raise HTTPException(400, 'Expected history ending with a user micro-turn')
 
         async def rows():
             """Hold the shared model lock until generation or cancellation ends."""

@@ -6,9 +6,13 @@
 
 ## 类设计与核心方法
 
-OfficialDuplexModel 按 train_cfg.json 加载本地 Qwen2-7B-Instruct，resize token embedding，创建 q/v LoRA 与 embed_tokens/lm_head 保存层，装载官方 model_state.safetensors。共享模型 conda 的旧 fast tokenizer 无法读取官方 tokenizer.json，因此显式使用同目录 vocab/merges 的 Qwen2 slow tokenizer（use_fast=False），保留发布 added token ID 和 ChatML。核验 tokenizer token 单 ID 与权重键，normalize_state_dict 对发布 q_proj/v_proj 的 weight/bias 增加 PEFT base_layer 层级；只做键名迁移并核验映射无碰撞，缺失或不匹配直接失败；CUDA 使用 BF16（24GB 4090 部署参数，区别于官方 demo 未显式指定 dtype 的默认加载），冻结推理、do_sample=False，以实际 im_end ID 结束。
+OfficialDuplexModel 按 train_cfg.json 加载本地 Qwen2-7B-Instruct，resize token embedding，创建 q/v LoRA 与 embed_tokens/lm_head 保存层，装载官方 model_state.safetensors。tokenizer 与官方 server.py 一致使用 fast 实现（`use_fast=True`）：官方 tokenizer.json 含 `ignore_merges` 等字段，需要 `tokenizers>=0.20`，因此 `interclarify-dev` 已升级到 transformers 4.46.3 / tokenizers 0.20.3 / peft 0.13.2（torch 保持 2.4.1+cu121 未动）。升级前已记录 pip freeze 快照，且实测 fast 与 slow 在本权重上的分词结果完全一致。核验 tokenizer token 单 ID 与权重键，normalize_state_dict 对发布 q_proj/v_proj 的 weight/bias 增加 PEFT base_layer 层级；只做键名迁移并核验映射无碰撞，缺失或不匹配直接失败；CUDA 使用 BF16（24GB 4090 部署参数，区别于官方 demo 未显式指定 dtype 的默认加载），冻结推理、do_sample=False，以实际 im_end ID 结束。
 
-stream 保留模型 special token、stop/length 原因；客户端断开通过 stopping criteria 取消后台生成。服务全局串行锁避免多个会话同时占用模型。GET /health 登记模型目录、token IDs 与加载结果；POST /generate 接收原始 prompt 和 max_new_tokens，输出 NDJSON text、finish_reason 或 error。超过模型上下文时拒绝请求，禁止静默裁剪历史。
+stream 保留模型 special token、stop/length 原因；客户端断开通过 stopping criteria 取消后台生成。服务全局串行锁避免多个会话同时占用模型。GET /health 登记模型目录、token IDs 与加载结果；POST /generate 接收 micro-turn 历史（user 文本与 assistant token id 交替，末条必须是 user）和 max_new_tokens，由 `build_prompt_ids` 用官方 header/`<|im_end|>\n`/`<|no voice|>` 单 ID 展平为 raw ChatML，输出 NDJSON text、token_ids、prompt_tokens、finish_reason 或 error。历史形状非法返回 400；超过模型上下文时拒绝请求，并给出实际 token 数，禁止静默裁剪历史。
+
+历史采用 token id 而非纯文本的原因：实测解码文本无法反推模型实际生成的 id（3000 条随机 id 序列中 1564 条 re-encode 不一致，约 52%），保存 id 才能逐 token 复现官方续写 prompt。
+
+生成调用传入 `num_logits_to_keep=1`：官方 server.py 会为**全部 prompt 位置**materialize LM head logits 再取最后一位，长历史下该张量（约 3GiB）正是上一轮 CUDA OOM 的来源；只保留最后一位在数学上与官方等价（已实测输出 token id 完全一致），同时消除该分配。每次请求记录一行 JSON 日志（prompt_tokens、generated_tokens、finish_reason、耗时、峰值显存），用于事后核对 prompt 增长与显存占用。
 
 ## 远端启动
 

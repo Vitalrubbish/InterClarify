@@ -96,7 +96,7 @@ LLM 的输入是截至当前窗口已经到达的对话历史和 user micro-turn
 | `<user backchannel>` | 用户产生短附和 | 不创建新回答，保持当前回答流 |
 | `<user is thinking>` | 用户在系统回答结束后继续思考 | 结束当前系统 micro-turn，继续等待 |
 
-`<user finish speaking>` 后面跟系统回答文本；speaking 和 thinking 状态以 `<EOS>` 结束当前系统 micro-turn。`<user is interrupting>` 是例外：运行时一旦识别到完整 special token，立即将它作为当前 system micro-turn 的终止边界，停止未播放音频并关闭当前 DuplexCascade 流，不等待后续 `<EOS>`。为使下一次 raw ChatML prompt 保持完整，运行时只在内部历史中补入该 micro-turn 的 `<|im_end|>` 闭合符；协议事件仍保留模型实际输出的原始 interruption token。用户附和保持当前回答，在线路径允许实际 `<|user backchannel|>` 后继续回答文本，也允许直接 `<|im_end|>` 结束本窗口；原 A1 解析 API 保留旧格式约束。阶段 A 不把这些 token 压缩为 SILENCE/ANSWER 训练标签。统计日志可以额外记录粗粒度投影，但投影不能替代原始 token。
+`<user finish speaking>` 后面跟系统回答文本；speaking 和 thinking 状态以 `<EOS>` 结束当前系统 micro-turn。打断是听觉动作而非生成终止：运行时识别到完整 `<|user interruption|>` 后，仅在模型的"正在播报"窗口开启时停止未播放音频并重置 TTS 会话，同时继续消费模型输出直到 `<|im_end|>`，并把生成的 token id 原样写回历史；协议事件保留模型实际输出的原始 token。用户附和保持当前回答，在线路径允许实际 `<|user backchannel|>` 后继续回答文本，也允许直接 `<|im_end|>` 结束本窗口；原 A1 解析 API 保留旧格式约束。阶段 A 不把这些 token 压缩为 SILENCE/ANSWER 训练标签。统计日志可以额外记录粗粒度投影，但投影不能替代原始 token。
 
 ### 4.3 协议错误
 
@@ -224,7 +224,7 @@ src/xtalk/duplex_control/
 | state.py | 定义 PrefixSnapshot、response 生命周期和不可变关联字段 |
 | timeline.py | A1 的会话事件记录器，保留原始关联字段、单调时间戳、协议错误码和已播文本 |
 | micro_turn.py | 按 tick 和 ASR 事件组装 user micro-turn；插入 `<no voice>` |
-| runtime_adapter.py | 解析 LLM token，执行取消、TTS 请求、提交边界和安全降级；不判断语义 |
+| runtime_adapter.py | 解析 LLM token，执行打断 reset、TTS 请求、提交边界和安全降级；不判断语义 |
 | service.py | 将 assembler、adapter 和现有 X-Talk manager 注册到 session service |
 
 首轮允许对以下现有文件做最小补丁；A1 的交付关联字段跨越多个原生 manager，因此补充相应字段传递补丁：
@@ -303,7 +303,7 @@ A1 实现与双语文档提交为 9c131ed6399da66b66b001184cfa4005787b5f67，分
 - 正确处理 partial、pause、rewrite 和 final 的版本递增；
 - 验证窗口组装不阻塞音频接收和 TTS 播放。
 
-本地行为门禁包含首次输入、空窗口、修订、final 去重、慢模型串行化和 shutdown；与 A3 合计 16/16。
+本地行为门禁包含首次输入、空窗口、修订、final 去重、慢模型串行化和 shutdown；与 A3 合计 34/34。
 
 ### A3：LLM 协议执行（本地门禁与官方权重运行时冒烟已通过）
 
@@ -349,7 +349,7 @@ A1 实现与双语文档提交为 9c131ed6399da66b66b001184cfa4005787b5f67，分
 - response_id 在生成、TTS、播放和历史合并中保持一致；
 - TTSStarted 才打开 COMMITTED 边界；
 - 用户打断停止未播放尾部，已播文本保持不变；
-- interruption special token 到达后立即关闭当前模型流并结束 micro-turn；缺失 `<|im_end|>` 不构成该控制路径的协议错误；
+- user interruption / user is talking 在模型"正在播报"窗口内 reset 未播音频并继续解码到 `<|im_end|>`；窗口未开启时不改变播放，缺少 `<|im_end|>` 不构成该控制路径的协议错误；
 - 提前回答后 final 不重复生成；
 - 没有提前回答时 final 不独立触发，后续窗口由 LLM 决定回答；
 - shutdown 取消 assembler、LLM 和 TTS 相关任务。
@@ -377,18 +377,18 @@ A1 实现与双语文档提交为 9c131ed6399da66b66b001184cfa4005787b5f67，分
 
 ## 13. 官方推理对齐（2026-10-12）
 
-用户决定先使用远端已有的官方 DuplexCascade 权重。参考官方仓库 [server.py](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/server.py) 与 [model.py](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/model.py)，固定提交 42893024ca90c8de8ac3ed624467ebc123512ff8；本地参考 checkout 位于 /tmp/interclarify-duplexcascade-reference，运行时不依赖该目录。
+用户决定先使用远端已有的官方 DuplexCascade 权重。参考官方仓库 [server.py](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/server.py) 与 [model.py](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/model.py)，固定提交 42893024ca90c8de8ac3ed624467ebc123512ff8；本地参考 checkout 位于 `/hpc_stor03/sjtu_home/xuan.zhang/DuplexCascade`（2026-10-13 经 SSH 克隆，提交与固定值一致），运行时不依赖该目录。
 
 ### 13.1 说明性 token 与实际权重 token
 
 | 论文语义 | 官方 wire token | 操作 |
 | --- | --- | --- |
 | 用户静默 | <\|no voice\|> | 空窗口输入 |
-| 用户仍在说 | <\|user is talking\|> | 保持静默；官方 demo 在已有回答时也停止剩余输出 |
-| 用户说完 | <\|user finish talking\|> | 创建回答，流式文本送入现有 TTS |
-| 用户打断 | <\|user interruption\|> | 立即结束当前 system micro-turn、关闭当前模型流并停止剩余输出 |
+| 用户仍在说 | <\|user is talking\|> | 保持静默；仅当"正在播报"窗口开启时 reset 停播 |
+| 用户说完 | <\|user finish talking\|> | 打开"正在播报"窗口；回答已在进行时不重启 TTS |
+| 用户打断 | <\|user interruption\|> | 仅当"正在播报"窗口开启时 reset 停播；不终止生成，继续解码到 im_end |
 | 用户附和 | <\|user backchannel\|> | 保留当前回答与 TTS 连接，允许同一 micro-turn 续写 |
-| 用户思考 | <\|user is thinking\|> | 结束当前回答的 TTS 文本输入并等待 |
+| 用户思考 | <\|user is thinking\|> | 给 TTS 发 EOS（flush），关闭该回答的文本输入 |
 | micro-turn 结束 | <\|im_end\|> | 结束当前 ChatML 消息 |
 
 A1 的论文格式解析 API 保留。A2/A3 在线路径严格使用官方 tokenizer 的实际 token；控制事件同时记录原始输出，禁止系统附和。输入格式为 ChatML user header + 当前新增文本/静默 token + im_end + 换行，再添加 assistant header。历史包含用户和系统 micro-turn 的原始 token，结束标记不转换为普通文字 EOS。
@@ -397,16 +397,53 @@ A1 的论文格式解析 API 保留。A2/A3 在线路径严格使用官方 token
 
 官方 server.py 在首次收到 ASR Word 后启动时钟，默认 0.6 秒；每次消费新增识别文本，空窗口为 no voice。LLM 串行生成，do_sample=False，默认 max_new_tokens=64。下一次调用继续使用含上次模型输出的 micro-turn 历史，回答的后续系统 micro-turn 可以直接产生普通文本，无需重复 finish token。
 
-X-Talk 的 ASR 返回累计前缀，assembler 只发送新增后缀。尚未发出的修订覆盖缓冲；已经发出的前缀发生 REWRITE 时，在下个调用前修订相应 user 消息，保留系统输出和已播事实，递增 prefix_version 并记录 revision_kind。这是适配累计 ASR 的工程扩展，官方 Word 流没有相应修订行为。final 不独立触发生成，也不重发相同内容。生成期间到达的输入保留到下一次 micro-turn，与官方串行推理一致；无论用户输入是否新增，持续空窗口仍允许回答续写和思考判断。若模型流中出现完整 `<|user interruption|>`，该 token 立即终止本次调用：适配器关闭请求流，不再等待 `<|im_end|>`，并在内部 ChatML 历史补入闭合符后等待下一窗口。
+X-Talk 的 ASR 返回累计前缀，assembler 只发送新增后缀。尚未发出的修订覆盖缓冲；已经发出的前缀发生 REWRITE 时，在下个调用前修订相应 user 消息，保留系统输出和已播事实，递增 prefix_version 并记录 revision_kind。这是适配累计 ASR 的工程扩展，官方 Word 流没有相应修订行为。final 不独立触发生成，也不重发相同内容。生成期间到达的输入保留到下一次 micro-turn，与官方串行推理一致；无论用户输入是否新增，持续空窗口仍允许回答续写和思考判断。若模型流中出现完整 `<|user interruption|>`，官方仅重置 TTS 音频并继续解码到 `<|im_end|>`；适配器同样不再截断模型流，而是消费到结束并把生成的 token id 原样写回历史。
+
+2026-10-13 与官方 server.py 逐项核对后，在线 wire 路径改为照官方全面容错。官方对每个解码到的控制 token 都做出反应，并对其余文本一律送入 TTS，不校验消息结构；X-Talk 现在同样处理：
+
+- 一个 micro-turn 内的每个控制 token 都按到达顺序执行（`DuplexRuntimeAdapter._apply_control`），相邻、重复、乱序或 `backchannel` 与回答文本混排都不再是协议错误；
+- 等待态 token 之后的文本照常流式送入 TTS；
+- 无活跃回答时的前导文本作为续写语音；
+- 未知尖括号 spelling（例如 `<|assistant_backchannel|>`）作为普通文本；
+- 未出现 `<|im_end|>` 的片段不再判错，`finish` 只记录 stop/length。
+
+`WireMicroTurnParser.feed` 返回有序的 `WireControl`/`WireText` 事件，`WireText` 携带其前面的控制上下文。A1 论文格式解析器与稳定错误码保持严格，作为论文协议参照。`<|user interruption|>` 与 `<|user is talking|>` 仅在"正在播报"窗口开启时重置音频，且都不截断模型流；回放判定相应按打断后不再产生模型输出音频的声学证据检查。
 
 ### 13.3 权重加载与服务边界
 
-官方发布目录包含 train_cfg.json、tokenizer 和 model_state.safetensors，加载 Qwen2-7B-Instruct，resize embedding，创建 q/v LoRA（r=16、alpha=32），modules_to_save 为 embed_tokens/lm_head，然后装载发布 state dict。新增远端 conda HTTP 推理脚本复用该加载格式，保留 special token 输出；X-Talk adapter 发送 raw ChatML prompt，不经过普通聊天模板或 DefaultAgent。ASR/TTS/播放仍全部复用 X-Talk，duplex 模式持续接收音频并关闭 VAD/TurnSense 的语义动作旁路。
+官方发布目录包含 train_cfg.json、tokenizer 和 model_state.safetensors，加载 Qwen2-7B-Instruct，resize embedding，创建 q/v LoRA（r=16、alpha=32），modules_to_save 为 embed_tokens/lm_head，然后装载发布 state dict。新增远端 conda HTTP 推理脚本复用该加载格式，保留 special token 输出；X-Talk adapter 发送结构化 micro-turn 历史，由服务端用官方 header 展平为 raw ChatML，不经过普通聊天模板或 DefaultAgent。ASR/TTS/播放仍全部复用 X-Talk，duplex 模式持续接收音频并关闭 VAD/TurnSense 的语义动作旁路。
 
 远端模型绝对路径、基础模型目录和可用 conda 环境须实查；本地模拟回归不视为官方权重或 A4 验收。当前先交付在线组装、执行、配置和远端任务入口，训练留待后续决策。官方 state dict 完整装载，CUDA 推理采用 BF16 以适配 24GB 4090；此数值精度配置须写入 manifest，与官方 demo 默认 dtype 的差别不改变 micro-turn/token 协议。
 
 2026-10-12 本地验证：X-Talk unittest discovery 138 tests，3 skipped；InterClarify 24/24。A2/A3 行为测试 16/16，官方模型 HTTP/权重契约 3/3；X-Talk 实现提交为 a06dd57；源文件内容清单用于远端同步验证。
 
-远端首轮发现 interclarify-dev 的 fast tokenizer 不能解析发布 tokenizer.json，服务显式使用同发布目录 vocab/merges 的 Qwen2 slow tokenizer；实际 special token ID 与 added_tokens.json 一致并严格核验，health 记录 tokenizer 类和 dtype。该兼容变更单独登记，未来更新模型环境时可切回官方 fast 路径并做编码对照。
+远端首轮发现 interclarify-dev 的旧 fast tokenizer（tokenizers 0.19.1）不能解析发布 tokenizer.json（含 `ignore_merges` 等字段），服务当时退化为 slow tokenizer。2026-10-13 已按官方 server.py 恢复 fast 路径：`interclarify-dev` 升级到 transformers 4.46.3 / tokenizers 0.20.3 / peft 0.13.2（torch 保持 2.4.1+cu121），升级前留存 pip freeze 快照，实测 fast 与 slow 在本权重上的编码结果完全一致，且官方权重 strict 加载与 greedy 生成均通过。同时生成调用加入 `num_logits_to_keep=1`，等价地避免为整段 prompt 计算 LM head logits（官方 server.py 会 materialize 全部位置），消除 A4 观测到的长历史 CUDA OOM 根因。该兼容变更单独登记，health 记录 tokenizer 类和 dtype。
 
 2026-10-12 远端作业 job-179179566806951798391-xuan-zhang 在 4090 上完成官方权重运行时冒烟：12 个 micro-turn、errors=0、status=PASS；本地同步快照 17fd22d55cc7，160 文件校验通过。该任务使用真实 LLM、脚本 ASR 前缀和模拟 PCM；完整 ASR/MOSS、真实声卡、长会话与 FDB 继续属于 A4。
+
+### 13.4 状态机对齐（2026-10-13）
+
+逐个核对官方 `server.py` 后，第二轮对齐改动如下，全部落到 `runtime_adapter`、`model_client` 与模型服务：
+
+| 项 | 官方行为 | X-Talk 实现 |
+| --- | --- | --- |
+| assistant 轮结束符 | 生成 id 原样追加，无额外换行 | 历史保存 `token_ids`，不再补 `\n` |
+| assistant 历史 | 保存解码后的 token id | 线上历史传 `token_ids`，服务用官方 header 展平 |
+| 打断后生成 | 不 abort，读到 `finish_reason` | 移除 `stream.aclose()`，消费到 im_end |
+| 打断后历史 | 追加实际输出（无闭合补丁） | 移除 `_closed_interruption_history` |
+| 停播门控 | `tts_speaking_flag==1` 才 reset | `_speaking` 仅由 `<\|user finish talking\|>` 置 1，reset 后置 0 |
+| `thinking` | 给 TTS 发 EOS，连接保持 | flush + 结束回答；后续文本另起会话 |
+| 送 TTS 文本 | `filter_period_for_tts` 去 `.` | `_filter_for_tts` 去掉 ASCII `.`，展示/时间线保留 |
+
+两处已确认的等价实现（非行为偏差）：
+
+- **reset 语义**：官方 `reset()` 做两件事——给播放端发 stop、拆除并重建 TTS websocket。X-Talk 现有 `TurnTTSStopRequested` 链路恰好同构：`reset_tts()` 停流式合成并清空在途音频，`TTSStopped` 一路传到 output_gateway 停播；reset 后同一 micro-turn 的后续文本开新 response 与新 TTS 会话，与官方重连新连接一致。
+- **`thinking` 语义**：MOSS 客户端的 `flush()` 会发 `is_final` 并置 `_finalized=True`，之后拒绝 `append_text`，即 flush 具有终止性；官方"EOS 后同会话继续"在当前 TTS 客户端上无法表达，因此保留 flush+finish，后续文本开新会话。
+
+历史改存 token id 的依据：解码文本无法反推生成 id。实测在词表内随机采样 3000 条 id 序列，`encode(decode(ids)) == ids` 仅成立 1436 条（1564 条不一致，约 52%），因此仅保存文本会在下一次 prompt 中原样重现模型输出这一点上失真。
+
+服务请求体由 `prompt` 改为结构化 `history`（`role` 为 `user` 时带 `text`，为 `assistant` 时带 `token_ids`），`OfficialDuplexModel.build_prompt_ids` 用官方 header、`<|im_end|>\n` 与 `<|no voice|>` 的实际 id 展平；空文本用户轮映射为 `<|no voice|>`，末条必须是 user 轮，否则返回 400。
+
+本地门禁：X-Talk 全量 142 项（139 PASS、3 skipped），InterClarify root 40 项全部通过。interruption 回归新增两条——"窗口开启时 reset 但不截断流、id 原样进入下一条 prompt"与"窗口未开启时不 reset 音频"。回放驱动新增"打断原因 reset + reset 后音频冻结 1s"判据，并把 `interruption_stop_response_ids` 与 `teardown_stop_response_ids` 分开。
+
+远端复测（tag `20261013T070801Z`，作业 `job-179187528229476527799-xuan-zhang`）：`failures=0`，清单/GPU/资产/环境/三组回归/三服务/官方权重 smoke/5 个回放场景/FDB 四轴推理全部 PASS，仅 `fdb_scoring` 按计划 SKIPPED，故 `a4_summary.json` 为 `INCOMPLETE`。interruption 场景 `interrupted_audio_frozen=true`、reset 与收尾停止已分离；模型服务 883 次请求 prompt_tokens 最大 1403、峰值显存 16.5 GiB、OOM 与 model_service_error 计数为 0。详见 [A4 任务单 §9.1](xtalk_a4_remote_acceptance.md)。

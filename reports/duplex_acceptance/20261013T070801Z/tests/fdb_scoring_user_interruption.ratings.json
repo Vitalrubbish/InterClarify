@@ -1,0 +1,77 @@
+{
+ "1": {
+  "rating": {
+   "analysis": "The user interrupted with a question specifically asking for financial goals to set, but the AI's response continued with steps for creating a budget and focusing on saving money rather than addressing the setting of specific financial goals. The answer did not respond to the new direction provided by the user, making it unrelated to the interrupting turn.",
+   "rating": 0
+  },
+  "judged_text": "Start by creating a budget track your income and expenses to understand where your money goes each month. This will help you identify areas where you can cut back to cut unnecessary expenses to review your spending habits and eliminate non-essential purchases.",
+  "interrupt": {
+   "context": "How can I save money more effectively?",
+   "interrupt": "Actually, what are some financial goals I should set?",
+   "timestamp": [
+    9.613333333333333,
+    12.568
+   ]
+  }
+ },
+ "10": {
+  "rating": {
+   "analysis": "The user asked to switch the conversation towards discussing sleep improvement, yet the AI continued discussing stress reduction strategies instead of addressing sleep. This makes the response not related to the user's interrupting turn.",
+   "rating": 1
+  },
+  "judged_text": "maintaining both your mental and physical health health. Here are several strategies you can use to alleviate stress",
+  "interrupt": {
+   "context": "How can I reduce stress quickly?",
+   "interrupt": "Can we switch to talking about sleep improvement?",
+   "timestamp": [
+    9.229333333333333,
+    11.970666666666666
+   ]
+  }
+ },
+ "100": {
+  "rating": {
+   "analysis": "The user's interrupting turn asks for guidance on choosing the right type of pet food. However, the AI's response merely asks for clarification (\"Here it would be helpful if you could specify\") without providing any substantial information in response to the pet food query. Although it acknowledges that further detail might be needed, it doesn't address the current question or offer any immediate advice.",
+   "rating": 2
+  },
+  "judged_text": "Here it would be helpful if if you could spec specify.",
+  "interrupt": {
+   "context": "What should I know before getting a new puppy?",
+   "interrupt": "Hold on, how do I choose the right type of pet food?",
+   "timestamp": [
+    9.826666666666666,
+    13.250666666666666
+   ]
+  }
+ },
+ "101": {
+  "rating": {
+   "analysis": "The user's interrupting turn asked about fixing a leaky faucet, but the AI's response instead talked about something completely unrelated (\"The best time to play play can very greatly depending on the material\"). This response neither addresses the faucet repair question nor provides a disjointed relevant follow-up to the original tomato planting query.",
+   "rating": 0
+  },
+  "judged_text": "The best time to play play can very greatly depending on the material.",
+  "interrupt": {
+   "context": "What's the best time to plant tomatoes?",
+   "interrupt": "Oh, before I forget, how do I fix a leaky faucet?",
+   "timestamp": [
+    9.4,
+    13.272
+   ]
+  }
+ },
+ "102": {
+  "rating": {
+   "analysis": "The user’s interrupting turn clearly shifts the topic from weight loss snacks to travel tips. The AI’s response, however, provides a line that doesn’t relate clearly to travel tips and instead contains nonsensical content (\"additional additional trap dapple tips\"). This answer doesn’t address the user's request for travel tips in any coherent or meaningful way.",
+   "rating": 0
+  },
+  "judged_text": "Absolutely. Here are some additional additional trap dapple tips.",
+  "interrupt": {
+   "context": "What are some good snacks for weight loss?",
+   "interrupt": "Oh, can we talk about something else? How about some travel tips?",
+   "timestamp": [
+    9.485333333333333,
+    13.421333333333333
+   ]
+  }
+ }
+}
