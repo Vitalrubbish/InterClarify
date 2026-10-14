@@ -123,8 +123,14 @@ asr_streaming:
   sample_rate: 16000
   input_step_ms: 80
   chunk_size_sec: 0.6
-  unfixed_chunk_num: 2
+  # The decoder may re-decode the trailing ``unfixed_token_num`` tokens of its
+  # carried prefix. ``unfixed_chunk_num: 0`` keeps every chunk on that carried
+  # prefix, and ``emit_committed_prefix`` hides the still-revisable tail from the
+  # caller. Together they make the transcript append-only, which is the contract
+  # the released DuplexCascade server gets from Kyutai's finalized word stream.
+  unfixed_chunk_num: 0
   unfixed_token_num: 5
+  emit_committed_prefix: true
 
 runtime:
   integration_status: verified_remote_link

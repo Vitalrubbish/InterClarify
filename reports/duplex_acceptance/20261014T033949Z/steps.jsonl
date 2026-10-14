@@ -1,0 +1,15 @@
+{"step": "source_manifest", "status": "PASS", "rc": 0, "reason": ""}
+{"step": "gpu_allocation", "status": "PASS", "rc": 0, "reason": ""}
+{"step": "assets", "status": "PASS", "rc": 0, "reason": ""}
+{"step": "environment", "status": "PASS", "rc": 0, "reason": ""}
+{"step": "runtime_config", "status": "PASS", "rc": 0, "reason": ""}
+{"step": "a1_regression", "status": "PASS", "rc": 0, "reason": ""}
+{"step": "a2_a3_regression", "status": "PASS", "rc": 0, "reason": ""}
+{"step": "a4_driver_regression", "status": "PASS", "rc": 0, "reason": ""}
+{"step": "duplex_model_service", "status": "PASS", "rc": 0, "reason": ""}
+{"step": "asr_service", "status": "PASS", "rc": 0, "reason": ""}
+{"step": "tts_service", "status": "PASS", "rc": 0, "reason": ""}
+{"step": "official_model_smoke", "status": "PASS", "rc": 0, "reason": ""}
+{"step": "real_audio_replay", "status": "FAIL", "rc": 1, "reason": "inspect replay reports"}
+{"step": "fdb_inference", "status": "PASS", "rc": 0, "reason": ""}
+{"step": "fdb_scoring", "status": "SKIPPED", "rc": 0, "reason": "scoring deferred (set DUPLEX_A4_FDB_SCORING=1)"}

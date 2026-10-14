@@ -1,0 +1,43 @@
+$ conda run --no-capture-output -n full-duplex-bench python /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb_llm_judge/fdb_repo/v1_v1.5/evaluation/evaluate.py --task user_interruption --root_dir /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption
+
+  0%|          | 0/5 [00:00<?, ?it/s]
+ 20%|██        | 1/5 [00:04<00:19,  4.83s/it]
+ 60%|██████    | 3/5 [00:28<00:19,  9.90s/it]
+ 80%|████████  | 4/5 [00:31<00:07,  7.56s/it]
+100%|██████████| 5/5 [00:35<00:00,  6.57s/it]
+100%|██████████| 5/5 [00:35<00:00,  7.18s/it]
+Processing /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/1 ...
+Analysis: The user interrupted by asking for specific financial goals to set, yet the AI's response merely states that setting financial goals is crucial without offering any concrete examples or further elaboration. While the reply is generally related to the user's query about financial goals, it is not sufficient in addressing the specifics the user requested.
+
+I would rate the AI's response as 2.
+{'analysis': "The user interrupted by asking for specific financial goals to set, yet the AI's response merely states that setting financial goals is crucial without offering any concrete examples or further elaboration. While the reply is generally related to the user's query about financial goals, it is not sufficient in addressing the specifics the user requested.", 'rating': 2}
+Processing /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/10 ...
+Processing /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/100 ...
+Analysis: The user's interrupting turn specifically asked for guidance on choosing the right type of pet food. The AI’s response attempts to address this topic by mentioning “pet food” and “your animal,” but it is unclear, contains typographical errors, and fails to provide any concrete advice or details that would help answer the user's question. I would rate the AI's response as 2.
+{}
+Processing /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/100 ...
+Analysis: The user interrupt asked, "Hold on, how do I choose the right type of pet food?" The AI's response, "Choosing the right type of pet get food for for your animal," is aimed at addressing the pet food question, but the answer is garbled and lacks useful information. It merely repeats the topic without providing guidance or clarity. I would rate the AI's response as 2.
+{}
+Processing /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/100 ...
+Analysis: The user’s interrupt asked for advice on choosing the right type of pet food, but the AI’s response is muddled and grammatically incorrect, lacking clear guidance or detailed information. It does mention pet food but fails to provide any meaningful advice on how to choose it. I would rate the AI's response as 2.
+{}
+Processing /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/100 ...
+Analysis: The user’s interrupt requested specific advice on choosing pet food. The AI’s response only reiterates a vague version of the question in a misphrased way (“pet get food for for your animal”) without offering any actual guidance or further details. It is related to the question, but only in a superficial way and fails to address the core of the inquiry.
+I would rate the AI's response as 2.
+{'analysis': 'The user’s interrupt requested specific advice on choosing pet food. The AI’s response only reiterates a vague version of the question in a misphrased way (“pet get food for for your animal”) without offering any actual guidance or further details. It is related to the question, but only in a superficial way and fails to address the core of the inquiry.', 'rating': 2}
+Processing /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/101 ...
+Analysis: The user’s interrupting turn was a clear query regarding fixing a leaky faucet, and the AI’s response directly addresses that by beginning with an explanation on how to approach fixing a leaky faucet. This shows the AI acknowledged and shifted focus to answer the interrupting question.
+
+I would rate the AI's response as 5.
+{'analysis': 'The user’s interrupting turn was a clear query regarding fixing a leaky faucet, and the AI’s response directly addresses that by beginning with an explanation on how to approach fixing a leaky faucet. This shows the AI acknowledged and shifted focus to answer the interrupting question.', 'rating': 5}
+Processing /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/102 ...
+Analysis: The user’s interrupting turn clearly states a desire to change the conversation to travel tips, but the AI's response doesn’t address that request—instead, it continues with weight loss guidance in an unclear manner. The answer is completely off-topic in relation to the user’s latest instruction. 
+
+I would rate the AI's response as 0.
+{'analysis': "The user’s interrupting turn clearly states a desire to change the conversation to travel tips, but the AI's response doesn’t address that request—instead, it continues with weight loss guidance in an unclear manner. The answer is completely off-topic in relation to the user’s latest instruction.", 'rating': 0}
+---------------------------------------------------
+[Result]
+Average rating:  2.25
+Average take turn:  0.875
+Average latency:  4.100000000000001
+---------------------------------------------------

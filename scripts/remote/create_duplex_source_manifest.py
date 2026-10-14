@@ -37,8 +37,14 @@ def tracked_files(root: Path) -> list[Path]:
         "configs/xtalk_round1.yaml",
         "scripts/remote/create_duplex_source_manifest.py",
         "scripts/remote/submit_xtalk_duplex_a4_job.sh",
+        "scripts/remote/moss_tts_patch.py",
+        "scripts/remote/run_tts_throughput_ab_node_job.sh",
+        "scripts/remote/submit_tts_throughput_ab_job.sh",
+        "scripts/remote/summarize_tts_throughput.py",
         "tests/test_duplex_a4_replay.py",
         "tests/test_duplex_model_service.py",
+        "tests/test_qwen3_asr_service.py",
+        "tests/test_moss_tts_patch.py",
     )
     files: set[Path] = set()
     for pattern in patterns:

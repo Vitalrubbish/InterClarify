@@ -12,6 +12,7 @@ import sys
 import time
 import wave
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -173,20 +174,68 @@ def new_report_directory(output: Path, config_path: Path, model_root: Path) -> N
     (output / "models.lock.json").write_bytes(lock_bytes)
 
 
+def resample_to(audio: Any, rate: int, target_rate: int) -> tuple[Any, str]:
+    """Return mono audio resampled to ``target_rate`` and the backend used.
+
+    Parameters
+    ----------
+    audio : numpy.ndarray
+        Mono float32 samples.
+    rate : int
+        Sample rate of ``audio``.
+    target_rate : int
+        Sample rate the ASR expects (``asr_streaming.sample_rate``).
+
+    Returns
+    -------
+    tuple of (numpy.ndarray, str)
+        Resampled audio and the backend name (``none`` when no conversion ran).
+    """
+    if rate == target_rate:
+        return audio, "none"
+    try:
+        import soxr
+        return soxr.resample(audio, rate, target_rate), "soxr"
+    except ImportError:
+        import numpy as np
+        positions = np.linspace(0.0, len(audio) - 1, num=max(1, int(len(audio) * target_rate / rate)))
+        return np.interp(positions, np.arange(len(audio)), audio).astype(np.float32), "numpy-linear"
+
+
 def asr_smoke(config: dict, args: argparse.Namespace) -> None:
-    """Replay mono 16 kHz audio through the official stateful streaming API."""
+    """Replay mono audio through the official stateful streaming API.
+
+    ``--audio`` runs one file; ``--audio-dir`` walks every ``input.wav`` below a
+    directory so one model load can compare streaming configurations across a
+    whole FDB subset. Mono audio at any sample rate is accepted and resampled to
+    ``asr_streaming.sample_rate`` the way the runtime loader does. Each input
+    reports the raw transcript (``text``) and, when ``emit_committed_prefix`` is
+    on, the text the X-Talk runtime would actually see (``visible_text``),
+    together with how often each of them was rewritten.
+    """
     import numpy as np
     import soundfile as sf
     from qwen_asr import Qwen3ASRModel
 
-    audio, rate = sf.read(args.audio, dtype="float32", always_2d=False)
+    targets = [args.audio] if args.audio else sorted(args.audio_dir.rglob("input.wav"))
+    if not targets:
+        raise ValueError("no input.wav found under --audio-dir")
+    if args.limit:
+        targets = targets[: args.limit]
     stream = dict(config["asr_streaming"])
-    if rate != stream["sample_rate"] or audio.ndim != 1 or not audio.size:
-        raise ValueError("ASR input must be a nonempty mono 16 kHz WAV")
+    for path in targets:
+        if not path.is_file():
+            raise ValueError(f"missing ASR input: {path}")
     if args.chunk_seconds is not None:
         if args.chunk_seconds <= 0:
             raise ValueError("chunk-seconds must be positive")
         stream["chunk_size_sec"] = args.chunk_seconds
+    if args.unfixed_chunk_num is not None:
+        stream["unfixed_chunk_num"] = args.unfixed_chunk_num
+    if args.unfixed_token_num is not None:
+        stream["unfixed_token_num"] = args.unfixed_token_num
+    emit_committed_prefix = (stream.get("emit_committed_prefix", False)
+                            if args.emit_committed_prefix is None else args.emit_committed_prefix)
     new_report_directory(args.output, args.config, args.model_root)
     service = config["services"]["asr"]
     started = time.monotonic()
@@ -196,14 +245,10 @@ def asr_smoke(config: dict, args: argparse.Namespace) -> None:
         max_new_tokens=service["max_new_tokens"],
     )
     load_seconds = time.monotonic() - started
-    state = model.init_streaming_state(
-        chunk_size_sec=stream["chunk_size_sec"],
-        unfixed_chunk_num=stream["unfixed_chunk_num"],
-        unfixed_token_num=stream["unfixed_token_num"],
-    )
     # Warm up the streaming/decode path: the first call carries a one-off cost
     # (kernel/graph init) that otherwise dominates the reported first partial.
-    warm = np.zeros(int(rate * stream["chunk_size_sec"]), dtype=np.float32)
+    warm_rate = stream["sample_rate"]
+    warm = np.zeros(int(warm_rate * stream["chunk_size_sec"]), dtype=np.float32)
     warm_state = model.init_streaming_state(
         chunk_size_sec=stream["chunk_size_sec"],
         unfixed_chunk_num=stream["unfixed_chunk_num"],
@@ -211,14 +256,77 @@ def asr_smoke(config: dict, args: argparse.Namespace) -> None:
     )
     model.streaming_transcribe(warm, warm_state)
     model.streaming_transcribe(warm, warm_state)
+
+    reports = []
+    for path in targets:
+        report_output = args.output if args.audio else args.output / path.parent.name
+        reports.append(smoke_one_input(model, stream, path, emit_committed_prefix,
+                                       report_output, load_seconds))
+    write_json(args.output / "asr_smoke_summary.json", {
+        "streaming": stream, "emit_committed_prefix": emit_committed_prefix,
+        "model_load_seconds": load_seconds, "inputs": reports,
+        "note": "Model smoke only; correctness and X-Talk integration require separate acceptance.",
+    })
+    if not all(report["final_text"] for report in reports):
+        raise RuntimeError("ASR produced an empty final transcript; inspect the report")
+
+
+def smoke_one_input(model: object, stream: dict, audio_path: Path, emit_committed_prefix: bool,
+                    output: Path, load_seconds: float) -> dict:
+    """Replay one WAV and write its per-step and summary evidence.
+
+    Parameters
+    ----------
+    model : object
+        Loaded ``Qwen3ASRModel`` shared by every input.
+    stream : dict
+        Resolved ``asr_streaming`` configuration.
+    audio_path : Path
+        Mono 16 kHz WAV to replay.
+    emit_committed_prefix : bool
+        Hide the decoder's revision window, matching the service flag.
+    output : Path
+        Directory receiving ``asr_events.jsonl`` and ``asr_report.json``.
+    load_seconds : float
+        Model load time, recorded once per smoke run.
+
+    Returns
+    -------
+    dict
+        Compact per-input summary also embedded in ``asr_smoke_summary.json``.
+    """
+    import numpy as np
+    import soundfile as sf
+
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import qwen3_asr_service
+
+    audio, rate = sf.read(audio_path, dtype="float32", always_2d=False)
+    if audio.ndim > 1:
+        audio = audio.mean(axis=1)
+    if not audio.size:
+        raise ValueError(f"empty ASR input: {audio_path}")
+    source_rate = rate
+    audio, resampler = resample_to(audio, rate, int(stream["sample_rate"]))
+    rate = int(stream["sample_rate"])
+    output.mkdir(parents=True, exist_ok=True)
+    state = model.init_streaming_state(
+        chunk_size_sec=stream["chunk_size_sec"],
+        unfixed_chunk_num=stream["unfixed_chunk_num"],
+        unfixed_token_num=stream["unfixed_token_num"],
+    )
     step = int(rate * stream["input_step_ms"] / 1000)
     started = time.monotonic()
     previous = ""
+    previous_visible = ""
+    last_parsed = ""
+    visible = ""
     first_partial = None
     first_partial_audio = None
     decode_seconds = 0.0
     revisions = 0
-    with (args.output / "asr_events.jsonl").open("w", encoding="utf-8") as events:
+    visible_revisions = 0
+    with (output / "asr_events.jsonl").open("w", encoding="utf-8") as events:
         for offset in range(0, len(audio), step):
             chunk = np.asarray(audio[offset : offset + step], dtype=np.float32)
             end_seconds = (offset + len(chunk)) / rate
@@ -227,38 +335,55 @@ def asr_smoke(config: dict, args: argparse.Namespace) -> None:
             model.streaming_transcribe(chunk, state)
             decode_seconds += time.monotonic() - call_start
             text = state.text or ""
+            if emit_committed_prefix:
+                last_parsed, visible = qwen3_asr_service.advance_committed(
+                    model, state, int(stream["unfixed_token_num"]), last_parsed, visible)
+            else:
+                visible = text
             arrival = time.monotonic() - started
             rewritten = text != previous and not text.startswith(previous)
+            visible_rewritten = visible != previous_visible and not visible.startswith(previous_visible)
             revisions += int(rewritten)
+            visible_revisions += int(visible_rewritten)
             if text and first_partial is None:
                 first_partial = arrival
                 first_partial_audio = end_seconds
-            event = {
+            events.write(json.dumps({
                 "audio_seconds": end_seconds, "arrival_seconds": arrival,
                 "text": text, "rewritten": rewritten,
-            }
-            events.write(json.dumps(event, ensure_ascii=False) + "\n")
+                "visible_text": visible, "visible_rewritten": visible_rewritten,
+            }, ensure_ascii=False) + "\n")
             events.flush()
             previous = text
+            previous_visible = visible
         call_start = time.monotonic()
         model.finish_streaming_transcribe(state)
         decode_seconds += time.monotonic() - call_start
+        # ``is_final`` releases the whole transcript, including the hidden tail.
         events.write(json.dumps({"final": True, "arrival_seconds": time.monotonic() - started,
-                                 "text": state.text}, ensure_ascii=False) + "\n")
+                                 "text": state.text, "visible_text": state.text},
+                                ensure_ascii=False) + "\n")
     duration = len(audio) / rate
-    write_json(args.output / "asr_report.json", {
+    report = {
         "status": "COMPLETE" if state.text else "EMPTY_TRANSCRIPT",
         "streaming": stream, "audio_seconds": duration,
-        "audio_sha256": hashlib.sha256(args.audio.read_bytes()).hexdigest(),
+        "source_sample_rate": source_rate, "resampler": resampler,
+        "audio_sha256": hashlib.sha256(audio_path.read_bytes()).hexdigest(),
         "model_load_seconds": load_seconds, "first_partial_seconds": first_partial,
         "first_partial_audio_seconds": first_partial_audio,
-        "revisions": revisions, "decode_seconds": decode_seconds,
-        "decode_rtf": decode_seconds / duration,
+        "revisions": revisions, "visible_revisions": visible_revisions,
+        "visible_stream_hidden_tail": bool(emit_committed_prefix),
+        "decode_seconds": decode_seconds, "decode_rtf": decode_seconds / duration,
         "replay_wall_seconds": time.monotonic() - started, "final_text": state.text,
         "note": "Model smoke only; correctness and X-Talk integration require separate acceptance.",
-    })
-    if not state.text:
-        raise RuntimeError("ASR produced no final transcript; inspect the report")
+    }
+    write_json(output / "asr_report.json", report)
+    return {"input": str(audio_path), "output": str(output), "audio_seconds": duration,
+            "source_sample_rate": source_rate, "resampler": resampler,
+            "revisions": revisions, "visible_revisions": visible_revisions,
+            "final_text": state.text, "first_partial_seconds": first_partial,
+            "decode_rtf": report["decode_rtf"]}
+
 
 
 async def tts_smoke(config: dict, args: argparse.Namespace) -> None:
@@ -351,6 +476,8 @@ def serve(config: dict, args: argparse.Namespace) -> None:
                     "--chunk-size-sec", str(stream["chunk_size_sec"]),
                     "--unfixed-chunk-num", str(stream["unfixed_chunk_num"]),
                     "--unfixed-token-num", str(stream["unfixed_token_num"])]
+        if stream.get("emit_committed_prefix"):
+            command.append("--emit-committed-prefix")
     elif role == "llm":
         command += ["vllm", "serve", str(model_path(config, args.model_root, "llm")),
                     "--host", service["host"], "--port", str(service["port"]),
@@ -409,23 +536,33 @@ def serve(config: dict, args: argparse.Namespace) -> None:
             # real time.  Kept for debugging only.
             os.environ["TORCH_COMPILE_DISABLE"] = "1"
             os.environ["TORCHDYNAMO_DISABLE"] = "1"
-        elif torch_compile == "dynamic":
+        # Always ship a sitecustomize shim: it arms the throughput patch
+        # (`scripts/remote/moss_tts_patch.py`) before the service imports the
+        # upstream package, so the pinned checkout stays unmodified.  The patch
+        # is inert unless XTALK_TTS_LOCAL_COMPILE / XTALK_TTS_SAMPLE ask for it.
+        shim = [
+            "import moss_tts_patch as _xt_patch",
+            "_xt_patch.install()",
+        ]
+        if torch_compile == "dynamic":
             # Make dynamo treat shapes as dynamic so one compilation serves any
             # prefill length instead of recompiling per response length.
-            patch_dir = Path(os.environ.get("TMPDIR", "/tmp")) / "ic_moss_patch"
-            patch_dir.mkdir(parents=True, exist_ok=True)
-            (patch_dir / "sitecustomize.py").write_text(
-                "import torch._dynamo as _dynamo\n"
-                "_dynamo.config.assume_static_by_default = False\n"
-                "_dynamo.config.dynamic_shapes = True\n"
+            shim[0:0] = [
+                "import torch._dynamo as _dynamo",
+                "_dynamo.config.assume_static_by_default = False",
+                "_dynamo.config.dynamic_shapes = True",
                 "_dynamo.config.cache_size_limit = max("
-                "getattr(_dynamo.config, 'cache_size_limit', 64), 256)\n",
-                encoding="utf-8",
-            )
-            existing = os.environ.get("PYTHONPATH", "")
-            os.environ["PYTHONPATH"] = str(patch_dir) + (
-                os.pathsep + existing if existing else ""
-            )
+                "getattr(_dynamo.config, 'cache_size_limit', 64), 256)",
+            ]
+        patch_dir = Path(os.environ.get("TMPDIR", "/tmp")) / "ic_moss_patch"
+        patch_dir.mkdir(parents=True, exist_ok=True)
+        (patch_dir / "sitecustomize.py").write_text(
+            "\n".join(shim) + "\n", encoding="utf-8"
+        )
+        patch_modules = Path(__file__).resolve().parents[0]
+        existing = os.environ.get("PYTHONPATH", "")
+        prefix = os.pathsep.join([str(patch_dir), str(patch_modules)])
+        os.environ["PYTHONPATH"] = prefix + (os.pathsep + existing if existing else "")
         os.chdir(roots["moss_service"])
         tts = str(model_path(config, args.model_root, "tts"))
         command += ["python", str(entrypoint), "--host", service["host"],
@@ -445,9 +582,20 @@ def main() -> None:
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("download")
     asr = commands.add_parser("asr-smoke")
-    asr.add_argument("--audio", type=Path, required=True)
+    asr.add_argument("--audio", type=Path)
+    asr.add_argument("--audio-dir", type=Path,
+                     help="replay every input.wav below this directory with one model load")
+    asr.add_argument("--limit", type=int, default=0, help="cap the number of directory inputs")
     asr.add_argument("--output", type=Path, required=True)
     asr.add_argument("--chunk-seconds", type=float)
+    asr.add_argument("--unfixed-chunk-num", type=int)
+    asr.add_argument("--unfixed-token-num", type=int)
+    asr.add_argument("--emit-committed-prefix", dest="emit_committed_prefix",
+                     action="store_true", default=None,
+                     help="report the text the runtime sees when the revision window is hidden")
+    asr.add_argument("--no-emit-committed-prefix", dest="emit_committed_prefix",
+                     action="store_false",
+                     help="report the raw transcript, matching the historical contract")
     asr.add_argument("--gpu-index", type=int)
     tts = commands.add_parser("tts-smoke")
     tts.add_argument("--reference", type=Path, required=True)

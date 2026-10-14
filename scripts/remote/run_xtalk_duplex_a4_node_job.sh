@@ -208,7 +208,7 @@ RC=0
 
 RC=0
 conda run -n "$CLIENT_ENV" env PYTHONPATH="$TASK_ROOT/xtalk/src:$TASK_ROOT" python -m unittest \
-  tests.test_duplex_a4_replay tests.test_duplex_model_service \
+  tests.test_duplex_a4_replay tests.test_duplex_model_service tests.test_qwen3_asr_service \
   > "$RUN_DIR/tests/a4_driver.log" 2>&1 || RC=$?
 [ "$RC" -eq 0 ] && record_step a4_driver_regression PASS 0 || record_step a4_driver_regression FAIL "$RC"
 [ "$FAILURES" -eq 0 ] || exit "$FAILURES"

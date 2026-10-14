@@ -27,6 +27,7 @@
 | 四轴作业组织 | 一次作业内循环四个轴，各出独立子目录 |
 | 严格度 | `DUPLEX_A4_REQUIRE_INTERRUPTION=1`、`DUPLEX_A4_REQUIRE_COMPLETE=1` 同时开启 |
 | 播放与音质 | 自动证据（已播文本单调、未播尾部不计已播、播放期间 ASR 持续更新）+ 人工试听关键 WAV |
+| ASR 输入契约 | **2026-10-14 变更**：`asr_streaming.unfixed_chunk_num: 0` + `emit_committed_prefix: true`，只把解码器**已定稿**的文本交给模型（对齐官方只喂 Kyutai 定稿词的契约）；理由、证据与单调性证明见 §9.5 |
 | 产物留存 | 完整产物在 `data/runs/`；关键报告复制到 git 跟踪的 `reports/duplex_acceptance/<UTC-tag>/` |
 | manifest 门禁 | 保留：原地生成 `source_manifest.json`，作业内逐文件 SHA256 校验 |
 | 原生对照 | 本轮不做，后续在原生 LLM/TurnSense/ASR/MOSS 节点成对补测 |
@@ -185,7 +186,7 @@ judge 走 OpenAI 兼容端点 `https://api-2.xi-ai.cn/v1`。实测该端点直�
   - 单测结果日志
 - `reports/` 需在 `.gitignore` 中对 `*.jsonl`、`*.log` 加例外，确保这些报告被跟踪。
 
-### 9.1 本轮结果（2026-10-13，tag `20261013T070801Z`）
+### 9.1 上一轮结果（2026-10-13，旧 tag）
 
 作业 `job-179187528229476527799-xuan-zhang`（节点 `d6-hpc-gpu-052`），`failures=0`：
 
@@ -210,17 +211,17 @@ judge 走 OpenAI 兼容端点 `https://api-2.xi-ai.cn/v1`。实测该端点直�
 
 ### 9.2 独立评分结果：`user_interruption`（2026-10-13）
 
-**上游参照**：上游仓库自带 Full-Duplex-Bench 结果表，已归档为 `reports/duplex_acceptance/20261013T070801Z/reference/upstream_full_duplex_bench_table.png`（原图在 `/hpc_stor03/sjtu_home/xuan.zhang/DuplexCascade/assets/full-duplex-bench.png`）。DuplexCascade 在同一 `synthetic` 子集上的 User Interruption：TOR 0.955、GPT-4o 4.016、latency 1.225；其余三轴为 Pause Handling 0.058/0.222、Backchannel 0.218/0.009/0.949、Smooth Turn Taking 0.832/1.724。
+**上游参照**：上游仓库自带 Full-Duplex-Bench 结果表，已归档为 `reports/duplex_acceptance/reference/upstream_full_duplex_bench_table.png`（原图在 `/hpc_stor03/sjtu_home/xuan.zhang/DuplexCascade/assets/full-duplex-bench.png`）。DuplexCascade 在同一 `synthetic` 子集上的 User Interruption：TOR 0.955、GPT-4o 4.016、latency 1.225；其余三轴为 Pause Handling 0.058/0.222、Backchannel 0.218/0.009/0.949、Smooth Turn Taking 0.832/1.724。
 
 用 §7.1 的入口对本轮 5 个 `user_interruption` 样本跑官方对齐 + 官方默认 `gpt-4-turbo` judge：
 
 ```
 conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_llm_judge.py \
-  --root-dir data/runs/20261013T070801Z/fdb/user_interruption/synthetic_user_interruption \
-  --out data/runs/20261013T070801Z/fdb_llm_judge --task user_interruption --gpus 0
+  --root-dir <run>/fdb/user_interruption/synthetic_user_interruption \
+  --out <run>/fdb_llm_judge --task user_interruption --gpus 0
 ```
 
-`align_rc=0`、`judge_rc=0`，`llm_judge_summary.json`：`average_rating=0.6`、`average_take_turn=1.0`、`average_latency=1.536`。证据归档在 `reports/duplex_acceptance/20261013T070801Z/tests/fdb_scoring_user_interruption.{align,judge}.log`、`fdb_scoring_user_interruption.ratings.json`、`fdb_scoring_summary.json`。
+`align_rc=0`、`judge_rc=0`，`llm_judge_summary.json`：`average_rating=0.6`、`average_take_turn=1.0`、`average_latency=1.536`。该轮评分日志与逐样本 rating 随旧 tag 证据目录一并移除；同一口径在 §9.6.1 的复检里重跑，归档在 `reports/duplex_acceptance/20261014T033949Z/tests/`。
 
 | 样本 | rating | 打断结束 | 首词延迟 | 被判分的文本（打断后裁剪段） | 运行时事实 |
 | --- | --- | --- | --- | --- | --- |
@@ -236,7 +237,7 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 
 **归因（含实测）**：标记由上游权重自己生成，我们的 runtime 不注入也不压制；`build_prompt_ids` 的扁平 ChatML、`<|no voice|>` 静音标记、assistant 存 token id、0.6s tick（= 官方 `--overlap-window-s` 默认值）与 `do_sample=False` 贪心都与官方同构，所以不是结构性偏离。而"打断句被切成碎片、首片被判附和、模型沿用自己上一拍的标记"**是官方设计的固有性质**：官方 `server.py` 同样每 0.6s 一拍、把新增词作为一条 user 拍喂给模型、由模型 in-band 贪心生成标记，`<|user backchannel|>` 同样只 flush 不 reset（只有 `talking`/`interruption` 会 reset）。全轮次的标记分布也支持这点：`talking` 324 次、`finish talking` 24 次、`backchannel` 17 次、`interruption` 仅 4 次；样本 102 在用户沉默的 12 个空拍里仍连吐 18 次 `talking`。
 
-文本形态这条线已用 [DuplexCascade 标记探针任务单](xtalk_duplex_marker_probe.md) 实测判定：`raw` 变体复现了生产录制（10/100/102 逐标记一致，**含 10/100 的失败与 102 的成功**），说明探针可信；`strip` / `strip_lower` / `burst` 确实能确定性地翻转打断判定（重复实验证明同输入下解码稳定，非噪声），但**没有任何变体构成修复**——三种变体各只救一个样本且互相抵消（`burst` 弄丢 102 本可用的 interruption，`strip_lower` 让 100 退化成 19 连 `<|user is thinking|>`）；打断前的 `talking → finish talking` 在所有变体里都稳定，唯一致命的就是打断分类本身。
+文本形态这条线已用一次性标记探针（纯文本重放；脚本与产物已在 2026-10-14 清理中移除）实测判定：`raw` 变体复现了生产录制（10/100/102 逐标记一致，**含 10/100 的失败与 102 的成功**），说明探针可信；`strip` / `strip_lower` / `burst` 确实能确定性地翻转打断判定（重复实验证明同输入下解码稳定，非噪声），但**没有任何变体构成修复**——三种变体各只救一个样本且互相抵消（`burst` 弄丢 102 本可用的 interruption，`strip_lower` 让 100 退化成 19 连 `<|user is thinking|>`）；打断前的 `talking → finish talking` 在所有变体里都稳定，唯一致命的就是打断分类本身。
 
 **结论（2026-10-13 修正）**：本轴状态机对齐正确、文本归一化不构成修复，但**不能把低分归因于上游能力**。上游仓库自带的 Full-Duplex-Bench 结果表（`DuplexCascade/assets/full-duplex-bench.png`）显示同一 `synthetic` 子集上 DuplexCascade 的 User Interruption 为 **TOR 0.955 / GPT-4o 4.016 / latency 1.225**，而我们实测 1.0 / 0.6 / 1.536——模型在原版链路上能做出"让出话轮并回答新问题"的行为。因此差异来自我们这条输入链路，而按排除法**唯一未验证与原版一致的环节就是模型唯一的输入：ASR 文本流**（我们用 Qwen3-ASR-1.7B 的 0.6s 累积前缀＋标点，上游用 Kyutai `delayed-streams-modeling` 的逐词流）。探针只测了"对我们自己的 ASR 文本做变换"，结构上无法发现这一点，属已知方法盲区。
 
@@ -244,7 +245,7 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 
 附带观察：`icc_backchannel/11` 的 ASR 整段偏成西班牙语、模型回了 `¡`，说明这条 ASR 文本流本身可以严重偏轨。
 
-**机制定位（同日补）**：把探针 15 个"样本×变体"按"打断到达前模型**是否已经开口**"分组后，规律很干净——**打断前已生成答案文本（72–103 词）→ `backchannel`（10/11）**；**尚未开口（0 词）→ `talking`/`interruption`（3/3，其中 `102 raw` 走到 `interruption` ✓）**。即主导线索是**模型自身的说话状态**（"我在讲话时对方出声 = 附和"），而非用户文本的内容。样本 1/10/100/101 都在约 3s 就答完了上下文问题（`first_audio_seconds` 2.6–3.3s），而 FDB 的合成打断固定在 9.2–9.8s，必然落进"我正在说话"的窗口 → 该轴几乎结构性必挂；唯一成功的 102 是唯一"还没开口"的样本。详见 [探针任务单 §6](xtalk_duplex_marker_probe.md)。这也让"待验证路径"收敛为一条：**当模型已经开口时，什么条件能让它改判为夺轮**（官方链路能拿 4.016，说明存在我们尚未复刻的条件；官方 STT 的逐词流形态仍是最可疑者）。**补充**："ASR 比用户输入慢"已被量测排除——更新间隔中位数 0.61s（每拍一条）、末条文本距语音实际结束 −0.53~+0.95s、逐词延迟 0~0.6s 且不累积，即延迟就是"0.6s 分块+推理"的地板（详见 [探针任务单 §6](xtalk_duplex_marker_probe.md)）。
+**机制定位（同日补）**：把探针 15 个"样本×变体"按"打断到达前模型**是否已经开口**"分组后，规律很干净——**打断前已生成答案文本（72–103 词）→ `backchannel`（10/11）**；**尚未开口（0 词）→ `talking`/`interruption`（3/3，其中 `102 raw` 走到 `interruption` ✓）**。即主导线索是**模型自身的说话状态**（"我在讲话时对方出声 = 附和"），而非用户文本的内容。样本 1/10/100/101 都在约 3s 就答完了上下文问题（`first_audio_seconds` 2.6–3.3s），而 FDB 的合成打断固定在 9.2–9.8s，必然落进"我正在说话"的窗口 → 该轴几乎结构性必挂；唯一成功的 102 是唯一"还没开口"的样本。详见 探针记录 §6（已移除）。这也让"待验证路径"收敛为一条：**当模型已经开口时，什么条件能让它改判为夺轮**（官方链路能拿 4.016，说明存在我们尚未复刻的条件；官方 STT 的逐词流形态仍是最可疑者）。**补充**："ASR 比用户输入慢"已被量测排除——更新间隔中位数 0.61s（每拍一条）、末条文本距语音实际结束 −0.53~+0.95s、逐词延迟 0~0.6s 且不累积，即延迟就是"0.6s 分块+推理"的地板（详见 探针记录 §6（已移除））。
 
 ### 9.3 全量 FDB v1.0 运行的前置要求
 
@@ -253,11 +254,11 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 1. **保留逐拍证据**：`fdb_driver/*/timelines/` 或等价记录必须落盘，并在其中记录每拍的 micro-turn 文本（`delta_text`/`revision_kind`）与模型 raw output。上一轮为省空间删除 timelines，导致无法把协议 token 精确对齐到拍，只能靠 `services/duplex_model.log` 的 `prompt_tokens` 增量反推。
 2. **统计协议 token**：汇总各轴 `<|no voice|>`/`talking`/`finish talking`/`interruption`/`backchannel` 的出现次数与位置，作为"模型标记是否可信"的量化证据。
 3. **记录节奏指标**：复位后到首音频的延迟、已播文本的最大停顿（本轮 101 在裁剪边界处停了 3.18s，直接污染 latency）。
-4. **消融实验（已完成）**：见 [DuplexCascade 标记探针任务单](xtalk_duplex_marker_probe.md) §6。`raw`/`strip`/`strip_lower`/`burst` 都能确定性翻转打断判定，但没有一个变体是修复（各救一个样本且互相抵消），故不做文本归一化改动；标点/大小写这条线作废。
+4. **消融实验（已完成）**：见 §9.2 的探针结论（探针脚本与产物已在 2026-10-14 清理中移除）。`raw`/`strip`/`strip_lower`/`burst` 都能确定性翻转打断判定，但没有一个变体是修复（各救一个样本且互相抵消），故不做文本归一化改动；标点/大小写这条线作废。
 5. 复听让出话轮样本的 `output.wav`（本轮 102 的 `travel tips` 被官方 parakeet 转成 `trap dapple tips`）。
 6. **补足输入结束后的录制/续播窗口**：本轮 `_run_fdb` 在送完音频后只等 0.5s，导致 `output.wav` 与 `input.wav` 等长（tail = 0），三个非打断轴的回答落在窗口之外。全量跑前必须把窗口设为可配置且 ≥ 官方量级（≥5s），并在报告里记录 `post_input_seconds` 与实测 tail。
 
-### 9.4 其它三轴的作答统计与输入侧缺陷（2026-10-13，tag `20261013T070801Z`）
+### 9.4 其它三轴的作答统计与输入侧缺陷（2026-10-13，旧 tag）
 
 复核本轮 25 个样本的 `a4_report.json`（`events` 的 `update_asr` 文本、`timeline.protocol_tokens`、`response`、`tts_audio_bytes`）后发现两条与"标记判定"无关、且纯文本探针结构上测不到的输入侧事实。
 
@@ -281,9 +282,145 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 **输入侧缺陷**：
 
 1. **ASR 语言会跑飞**：`icc_backchannel/1` 的 `update_asr` 全程是德语（`ja also es ist wie ich war sitzend ...`），`/11` 全程是西班牙语（`yo no te dije que ...`）；而这两份 `input.wav` 按 FDB `transcription.json` 都是英语。原因在 `scripts/remote/qwen3_asr_service.py`：会话初始化只传了流式切块参数（`chunk_size_sec`/`unfixed_chunk_num`/`unfixed_token_num`），**没有传 `language`/`context`**；而 `qwen_asr` 的 `init_streaming_state(context="", language=None, ...)` 支持强制语言。属可直接修复项。
-2. **ASR 更新以"改写末尾"为主**：25 个样本的相邻 `update_asr` 中，真正"严格延长上一版"的比例只有 0–27%，其余 62–100% 会重写末尾若干个词（例：`checked before.` → `checked beforehand,`；`icc_backchannel/0` 为 1 次追加 / 26 次改写）。这来自流式配置 `unfixed_token_num: 5` / `unfixed_chunk_num: 2`（末尾 5 个 token / 2 个 chunk 视为未定），于是运行时几乎每拍都会走 `REWRITE` 修复路径，而官方 Kyutai 词流是单调追加的。是否收紧这两个参数属待评估项。
+2. **ASR 更新以"改写末尾"为主**：25 个样本的相邻 `update_asr` 中，真正"严格延长上一版"的比例只有 0–27%，其余 62–100% 会重写末尾若干个词（例：`checked before.` → `checked beforehand,`；`icc_backchannel/0` 为 1 次追加 / 26 次改写）。这来自流式配置 `unfixed_token_num: 5` / `unfixed_chunk_num: 2`（末尾 5 个 token / 2 个 chunk 视为未定），于是运行时几乎每拍都会走 `REWRITE` 修复路径，而官方 Kyutai 词流是单调追加的。**2026-10-14 复核已把这条从"待评估"升级为已定位的根因**：25 个样本共 **333 次改写**，且改写会真的让模型"答一个用户没说完的版本"，见 §9.5。
 
-**待办**：①先给 `_run_fdb` 加可配置的"输入结束后静音续播窗口"（对齐官方 ≥5s，并保留 tail 字段作为证据），再重跑三个非打断轴，用官方评分器（`pause_handling` / `smooth_turn_taking` 不需要 LLM judge，只需 `get_transcript/asr.py` + `evaluate.py`）与上游表逐轴对齐；②`user_interruption` 自带 15s 尾静音、不受该缺陷影响，可沿用 §9.2 结论无需重跑。③另见输入侧缺陷两条（ASR 语言、末尾改写为主）待评估。
+**待办**：①先给 `_run_fdb` 加可配置的"输入结束后静音续播窗口"（对齐官方 ≥5s，并保留 tail 字段作为证据），再重跑三个非打断轴，用官方评分器（`pause_handling` / `smooth_turn_taking` 不需要 LLM judge，只需 `get_transcript/asr.py` + `evaluate.py`）与上游表逐轴对齐；②`user_interruption` 自带 15s 尾静音、不受该缺陷影响，可沿用 §9.2 结论无需重跑。③输入侧缺陷第 2 条（末尾改写）已按 §9.5.4 方案 B 实现，待远端复检；第 1 条（ASR 语言跑飞）仍未改，留待独立复检以避免多变量混跑。
+
+### 9.5 prompt 与输入流的保真核查（2026-10-14）
+
+对照 `/hpc_stor03/sjtu_home/xuan.zhang/DuplexCascade/server.py` 逐项核对我们送进官方权重的输入，结论是：**prompt 本身没有漏 BOS，真正的偏离在输入端——官方只把"已定稿的词"交给模型，而我们把 ASR 的易变尾巴也交给了模型。**
+
+#### 9.5.1 BOS 与 prompt 展平（结论：一致，无需修改）
+
+官方 `prepare_llm_tokens()` 取 `self.bos_id = self.tokenizer.bos_token_id`，会话开始时 `if self.bos_id is not None: history_ids.append(int(self.bos_id))`。逐项核对后**我方没有漏 BOS**：
+
+| 项目 | 官方 `server.py` | 我方 `duplex_model_service.build_prompt_ids` | 判定 |
+| --- | --- | --- | --- |
+| BOS | `bos_token_id` 非空时前插 | 不插 | **一致**：checkpoint 自带 tokenizer 与 `Qwen/Qwen2-7B-Instruct` 的 `tokenizer_config.json` 均为 `"bos_token": null`，实测 `bos_token_id = None`，官方那一行是死代码 |
+| user 头 / 尾巴 | `<\|im_start\|>user\n` + 文本或 `<\|no voice\|>` + `<\|im_end\|>\n` | 同 | 一致 |
+| assistant 微轮 | `header_assist` + 逐个生成的 token id（含 `<\|im_end\|>` 与特殊标记） | 同 | 一致 |
+| 收尾 | 追加一次 `header_assist` | 同 | 一致 |
+| 生成预算 | `--max-new-tokens` 默认 **64** | `duplex_max_new_tokens: 64` | 一致 |
+| 微轮时钟 | `--overlap-window-s` 默认 **0.6** | `duplex_micro_turn_seconds: 0.6` | 一致 |
+
+实测记录：`python … transformers.AutoTokenizer.from_pretrained(<tokenizer>, use_fast=True)` → `bos_token = None`、`bos_token_id = None`、`eos_token_id = 151645`、`convert_tokens_to_ids('<|endoftext|>') = 151643`（两者相同）。核对方式：当时把重建的 prompt 逐拍与探针记录的 `prompt_tokens` 对账（该 trace 工具已在 2026-10-14 清理中移除），`user_interruption` 五样本 **223/223** 拍全部一致。
+
+#### 9.5.2 官方输入契约：只喂"已定稿的词"
+
+官方 `stt_receiver_task()` 只处理 `type == "Word"` 的消息并 append 进 `asr_buffer_words`，源码注释明确 `# ignore Step / EndWord / Marker for now`；`llm_tick_task` 每拍把该缓冲 `" ".join` 成 `delta_text` 后 `clear()`，只把增量拼进 `history_ids`。因此官方的输入流是：
+
+- **单调追加**：每个词只进历史一次，历史永不被回写；
+- **只见定稿**：Kyutai 的中间假设（Step 等）被直接丢弃，模型看不到任何"可能变"的尾巴。
+
+我方 `qwen_asr` 的流式解码每 0.6s 重喂全量音频，并把上一轮解码结果的**末尾 `unfixed_token_num=5` 个 token 回滚后重解**（`chunk_id < unfixed_chunk_num=2` 时甚至不带前缀独立解码），返回的 `state.text` 就包含了这段易变尾巴。
+
+#### 9.5.3 后果：答案会"答一个用户没说完的版本"（已复现到拍）
+
+当时的探针产物给出五样本逐拍 trace（每拍：ASR 累积文本、是否改写、是否回写历史、当时的完整 prompt、该拍模型输出；产物已随 2026-10-14 清理移除）。`synthetic_user_interruption/1` 的决定性两拍：
+
+| 拍 | 时钟 | ASR 可见文本 | 送给模型的 user 历史 | 模型输出 |
+| --- | --- | --- | --- | --- |
+| 0 | 1.227s | `How.` | `How.` | `<\|user is talking\|>` |
+| 1 | 1.827s | `How can I save my life?` | `How can I save my life?`（prompt 26 tokens，与录制一致） | `<\|user finish talking\|>Saving your life involves taking care of both your physical` |
+| 2 | 2.427s | `How can I save money?` | **`How can I save money?`**（同一槽位被回写）+ assistant `Saving your life …` | ` and mental health. Here are some tips to help` |
+
+即：1.25s 的 ASR 版本（`save my life`）已经让模型开口；1.84s 的改写（`save money`）落地时，`_append_user` 把**已经发出的** user 微轮原地改成新版本，但那条基于旧版本生成的 assistant 文本既留在历史里、也已经送进 TTS，于是最终播报的答案是缝合体：`Saving your life involves taking care of both your physical and mental health Here are some tips to help you save money effectively`。
+
+护栏式统计（当时对该轮 25 个样本的 `a4_report.json` 做词级审计，与时间戳无关、只看词；审计文件随旧 tag 移除）：
+
+| 轴 | 改写次数 | 答案里保留了"ASR 已撤回的词"的样本 |
+| --- | --- | --- |
+| `icc_backchannel` | 127/5 样本 | 0/5 |
+| `candor_pause_handling` + `synthetic_pause_handling` | 150/10 样本 | 1/10（`I have a check.` → `I have a checkup appointment.`，答案留下 check） |
+| `candor_turn_taking` | 31/5 样本 | 0/5 |
+| `synthetic_user_interruption` | 25/5 样本 | 2/5（`save my life`→`save money` 留下 life；`best time to play`→`best time to plant tomatoes` 留下 play） |
+
+`synthetic_user_interruption` 五样本各有 4–6 次改写，每次改写都同时触发一次"回写已发出的 user 微轮"。改写本身在"答案尚未开口"时无害（模型只会在当前文本上作答），但只要落在模型已经开口之后，就会同时污染语义与后续上下文。
+
+#### 9.5.4 修法选项与选定方案（2026-10-14 选定 B 并已实现）
+
+| 方案 | 做法 | 代价 |
+| --- | --- | --- |
+| A. 收紧流式参数 | `unfixed_token_num: 0`、`unfixed_chunk_num: 0`（纯配置） | 尾巴立刻定稿、不再回滚，ASR 失去边界纠正能力，尾部 WER 上升 |
+| **B. 只暴露定稿前缀（已实施）** | 关掉"前 N 个 chunk 独立解码"（`unfixed_chunk_num: 0`），并在 ASR 服务里让 `is_final=false` 只返回已定稿前缀（`_raw_decoded` 去掉末尾 K 个 token 再解析），`is_final=true` 释放完整文本 | 可见文本比 ASR 内部晚约 K 个 token（≈0.3–0.5s）；尾部纠正在用户下一次停顿时才可见 |
+| C. 运行时兜底 | `REWRITE` 时连 assistant 一起回滚重生成 | 与"已被听到的内容不可撤销"冲突，且官方无此语义 |
+
+单调性证明（B 为什么必须同时关掉 `unfixed_chunk_num`）：记第 n 拍的原始解码串为 `R_n`，其前缀 `P_n = truncate_K(R_{n-1})`（`unfixed_chunk_num > 0` 时前几个 chunk 的 `P_n` 为空、由音频独立解码，`R_n` 与 `R_{n-1}` 之间没有任何前缀约束）。因 `R_n = P_n + G_n` 且 `P_n` 是整 token 边界，故 `T_n := truncate_K(R_n)` 满足 `T_{n-1} = P_n ⊑ T_n`，即**逐拍单调追加**；这正是官方 `Word` 词流的性质。若保留 `unfixed_chunk_num=2`，前两拍的"定稿前缀"仍可能整体换掉，模型照样会看到改写。
+
+**已实现的改动**：
+
+| 文件 | 改动 |
+| --- | --- |
+| `scripts/remote/qwen3_asr_service.py` | 新增 `truncate_tokens` / `advance_committed` 与 `--emit-committed-prefix`：有新文本时只返回已定稿前缀，本次解码没有新增文本时释放被扣住的尾巴；`is_final=true` 释放全量且不重置推进基点。两者都保证只追加、不替换 |
+| `configs/xtalk_round1.yaml` | `asr_streaming.unfixed_chunk_num: 2 → 0`；新增 `emit_committed_prefix: true` |
+| `scripts/remote/run_xtalk_round1.py` | `serve asr` 透传 `--emit-committed-prefix`；`asr-smoke` 支持 `--audio-dir` 与流式契约覆盖，并额外报告 `visible_text`/`visible_revisions`；输入按运行时同一路径重采样 |
+| `tests/test_qwen3_asr_service.py` | 新增：改写不得缩短/替换已给出文本、隐藏窗口正好是 `unfixed_token_num`、静音必须释放尾巴、可见文本不得含语言标签、HTTP 生命周期、默认档位不变 |
+
+**第一次实现的缺陷与修正（2026-10-14）**：首版按**原始解码串** `_raw_decoded` 末尾截断，且只在"有新增文本"时更新可见文本，导致两个问题，并在 `20261014T025649Z` 的复检里暴露（该轮产物已作废，目录随清理移除）：
+
+| 缺陷 | 观测证据 | 修正 |
+| --- | --- | --- |
+| 截断点落在 `language English<asr_text>` 内部，把语言标签当用户文本交给模型 | `replay/normal` 场景全程 397 拍只有 `<|user is talking|>`、`response_ids` 为空（`normal` FAIL、`interruption` INCONCLUSIVE）；FDB 样本 `10`/`102` 的 `update_asr` 文本为 `language English` / `language` | 改为对**已解析转写** `state.text` 截断，标签不可能再进入结果 |
+| 句尾 K 个 token 永久扣住（只有继续出现新词才会释放） | `synthetic_user_interruption/1` 最后一拍停在 `… what are some financial`，`goals I should set?` 再未出现；问题语音结束后 15s 静音期间可见文本停在 `How can I`（8s） | 新增"本次解码没有新增文本即释放尾巴"，对应 Kyutai 提交词流的时机 |
+
+该轮 `fdb_inference` 虽为 PASS，但其 ASR 文本已被上述缺陷污染，故**不作为方案 B 的证据**，已作废重跑。
+
+**为什么这不违背"已被听到的内容不可撤销"**：修法只改变**模型能看到的文本**，不撤回任何已经生成/播报的音频；相反，它消除的正是"先按旧文本作答、再被回写"的那类语义污染。
+
+**远端验证**（两个一次性作业，脚本与产物已在 2026-10-14 清理中移除；判据与结论保留在 §9.6.1）：
+
+1. 单卡 before/after ASR 对比：同一批 FDB 输入跑前后两版契约，`after` 的 `visible_revisions` 必须为 0，并比对最终转写与参考转写的词级距离。
+2. 3 卡 `user_interruption` 复检：只重跑该轴 + 官方 judge，核对运行时 `update_asr` 流改写次数是否归零、rating 相对 §9.2 的 0.6 的变化。
+
+修法**不**包含另外两处已知输入侧问题：ASR 语言跑飞（§9.4 第 1 条）与 `_run_fdb` 的录制窗口（§9.3 第 6 条），它们各自独立验证，避免把多个变量混进同一次复检。
+
+### 9.6 复检结果与 TTS 交付瓶颈（2026-10-14）
+
+#### 9.6.1 方案 B 复检（tag `20261014T033949Z`）
+
+`data/runs/20261014T033949Z/`：单卡 ASR 契约 A/B + 3 卡 `user_interruption` 复跑，官方对齐与 judge 由 `run_fdb_llm_judge.py` 独立运行（作业内评分因节点 conda 看不到带 NeMo 的 `full-duplex-bench` 而 BLOCKED，改为独立脚本执行）。
+
+| 项 | 复检前（§9.2，旧 tag） | 复检后（`20261014T033949Z`） | 上游 DuplexCascade（仓库自带表） |
+| --- | --- | --- | --- |
+| `average_rating` | 0.6 | **2.25** | GPT-4o 4.016 |
+| `average_take_turn` | 1.0（含"旧答案音频仍在播"的假阳性） | 0.875（样本 `10` 无音频→TOR 0） | 0.955 |
+| `average_latency` | 1.536（同样被旧答案音频抬高） | **4.10** | 1.225 |
+
+- ASR 侧结论：`after` 的运行时可见改写 **0/0/0/0/0**，两模式最终转写逐词相同（当轮对比报告 `asr_stream_compare.md` 随清理移除）——append-only 契约成立且不损准确率；`user_interruption` 的作答质量因此明显回升（101 从 0→5，1 从 0→2）。
+- 遗留：latency 4.10s（4 个 TOR=1 样本：4.16 / 6.24 / 5.52 / 0.48）。样本 `102` 的 0.48s 是假数据——该样本没有发生 reset，被记为"首音频"的其实是旧答案尾音。
+
+#### 9.6.2 4–6s 延迟的四段分解（实测）
+
+按 FDB wav 时钟（`interrupt.json timestamp[1]` → 官方对齐的 `output.json chunks[0]`），四个环节：
+
+| 环节 | 实测 | 性质 |
+| --- | --- | --- |
+| 用户说完 → ASR 给出全量文本 | 0.13–0.84s | 方案 B 的设计代价：duplex runtime 无人发 `TurnASRPauseRequested`/`TurnASREndRequested`（唯一发布者 `turn_taking_manager` 被 `duplex_manager_classes` 替换），ASR 服务只能靠"下一拍解码无新增文本"释放尾巴 |
+| → runtime 起新 TTS（`tts.started`） | 1.13–1.17s（四样本几乎恒定） | 0.6s 节拍 + 模型多要一拍才输出 `<|user finish talking|>` |
+| → 首个 `tts.chunk_ready` | 0.96–1.12s | MOSS prefill（冷启动会话） |
+| → 对齐器认出的首个词 | **1.21 / 3.23 / 3.12s** | 主因，见下 |
+
+第四段的直接证据：样本 1 从首块到首个可识别词是 1.21s，其间只落了 1–2 个 100ms 块；对齐出的词表本身就是"一次突发一个词"（`Set [16.73]`、`playing [17.61]`、`financial [18.81]`、`goals [20.25]`…），样本 100/101 同形（首词 19.49 / 18.79）。不是对齐器或 prefill 的问题。
+
+同期实测交付率（`tts.chunk_ready` × 100ms，1s 滑窗）：4/5 样本中位数 **200–500 ms/s**，即整条链路只有约 **0.2–0.5 倍实时**；同一时间窗内 LLM 已推入 **169 词 ≈ 67.6s 语音（4.8 倍实时）**，故瓶颈在 LLM 之后。`output.wav` 里助手说话段的 speech/span 只有 0.10–0.32（旧 run 同样 0.12–0.33，属既有问题），答案也被 27.5s 录制窗口截断，judge 转写出现 `pet get food for for your animal` 这类碎片化误识。
+
+#### 9.6.3 机制：MOSS-TTS-Realtime 的每帧成本
+
+- 编解码帧率 24000/1920 = **12.5 Hz**，每帧 80ms 音频；每帧 = 1 次 backbone 前向 + **16 次 local transformer 前向**（`rvq=16` 逐码本串行）+ 每码本一次采样。
+- 上游只在非 flash-attention 路径编译该循环（`_should_compile_local_transformer = not _use_dynamic_local_cache`），我们的 `attn_impl=flash_attention_2` 部署是全 eager；采样默认 `do_sample=True` + top-k + **全词表 sort** 的 nucleus，每帧上百次张量算子。
+- 结论：单帧约 205ms（≈0.39 倍实时），瓶颈偏**每调用开销**而非算力——每帧 17 次前向 + 16 次采样的 Python/启动开销占主导。
+
+#### 9.6.4 已实现：运行时补丁 T1/T2 与 A/B 任务
+
+- `scripts/remote/moss_tts_patch.py`（T1 编译后端 / T2 采样头 / 每回合 `[tts-metric]`），经 `run_xtalk_round1.py serve tts` 的 `sitecustomize` 注入，上游 checkout 保持 `git diff` 干净。
+- `scripts/remote/run_tts_throughput_ab_node_job.sh` + `submit_tts_throughput_ab_job.sh` + `summarize_tts_throughput.py`：单卡 5 臂（`baseline`/`t2-greedy`/`t2-topk`/`t1-inductor`/`t1-cudagraph`），固定 75 词负载、每臂 cold+warm 各一次，产出 `reports/tts_throughput/<tag>/tts_throughput.{md,json}`。
+- 正确性：`tests/test_moss_tts_patch.py` 把重写后的 `_local_loop` 与**真实上游**循环在三组输入上逐 token 对拍（TTS 环境 9/9 通过，其它环境 skip）。
+
+**判据**：`steady_rtf = audio_s / (wall_s - first_audio_s) > 1` 才算追上实时；`t1-*` 需服务日志出现 `torch.compile(_local_loop) ready` 且无 `falling back to eager`；`t2-*` 改变音频内容，须试听后再决定。此后若吞吐达标，再用 `20261014T033949Z` 的同一流程重跑 `user_interruption` 轴，比较 latency 4.10 → ? 与 rating 2.25 → ?。
+
+其余待办不变：ASR 按静音即时释放（可再省 0.5–1.9s，§9.6.2 前两段）、`--post-input-seconds` 录制窗口（§9.3 第 6 条）、ASR 语言跑飞（§9.4 第 1 条）。
+
+
 
 ## 10. 阶段 A 最终审查项
 
@@ -315,9 +452,32 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 | `scripts/remote/setup_fdb_scoring_env.sh` | 固定评分环境：cu126 torch + NeMo 2.x；卸载 `cuda-bindings` 让 NeMo 走 `NO_WHILE_LOOPS` 回退，并设 `NUMBA_CUDA_USE_NVIDIA_BINDING=0` | ✅ 已实现 |
 | `scripts/remote/duplex_a4_replay.py` | FDB 场景的"输入结束后静音续播窗口"（`--post-input-seconds`，默认 ≥5s）与 `post_input_seconds`/tail 证据字段 | ⏳ 待实现（见 §5.6、§9.3.6、§9.4） |
 | `scripts/remote/run_fdb_llm_judge.py` | 对已有 FDB 输出树跑官方对齐 + judge；凭据从项目根 `openai_api.txt` 读，只经子进程环境传递 | ✅ 已实现 |
-| `scripts/remote/probe_duplex_markers.py`、`run_duplex_probe_node_job.sh`、`submit_duplex_probe_job.sh` | 纯文本重放探针：把已录制的 ASR 微轮重新喂给官方权重，隔离文本形态（标点/大小写/碎片粒度）对 interleave 标记的影响 | ✅ 已实现 |
+| （已移除）标记探针 3 件套 | 一次性诊断：把已录制的 ASR 微轮重放给官方权重，隔离文本形态（标点/大小写/碎片粒度）对 interleave 标记的影响 | 🗑 2026-10-14 清理移除（结论见 §9.2） |
+| （已移除）`micro_turn_trace.py` | 逐拍证据生成器：重建每拍 wire 历史与 prompt、统计 ASR 改写率 | 🗑 2026-10-14 清理移除（结论见 §9.5、§9.6.1） |
+| `scripts/remote/qwen3_asr_service.py`、`configs/xtalk_round1.yaml`、`scripts/remote/run_xtalk_round1.py`、`tests/test_qwen3_asr_service.py` | append-only 输入契约（§9.5.4 方案 B）：只暴露已定稿前缀、`unfixed_chunk_num: 0`、smoke 支持契约覆盖与 `visible_revisions`、新增单测 | ✅ 已实现，已远端复检（§9.6.1：可见改写 0、最终转写不变） |
+| （已移除）ASR before/after 对比作业 3 件套 | 单卡对比作业与汇总判据：`after` 可见改写必须为 0，并比对词级编辑距离 | 🗑 2026-10-14 清理移除（结论见 §9.6.1） |
+| （已移除）`submit_duplex_interruption_recheck_job.sh` | 只重跑 `user_interruption` 轴 + 官方 judge 的复检提交 | 🗑 2026-10-14 清理移除（结论见 §9.6.1） |
+| `scripts/remote/moss_tts_patch.py`、`tests/test_moss_tts_patch.py` | TTS 吞吐运行时补丁：T1 local transformer 编译/CUDA 图后端、T2 采样头（greedy/top-k nucleus）、每回合 `[tts-metric]`；与真实上游循环逐 token 对拍 | ✅ 已实现，待远端 A/B（§9.6.3–9.6.4） |
+| `scripts/remote/run_tts_throughput_ab_node_job.sh`、`submit_tts_throughput_ab_job.sh`、`summarize_tts_throughput.py` | 单卡 5 臂吞吐 A/B（baseline / t2-greedy / t2-topk / t1-inductor / t1-cudagraph）与汇总判据 | ⏳ 测量工具（拿到数字后随清理移除） |
+| `scripts/remote/run_xtalk_round1.py`（`serve tts`） | 启动期 `sitecustomize` 注入 `moss_tts_patch`（上游 checkout 不变；dynamo 动态形状补丁按 `torch_compile: dynamic` 保留） | ✅ 已实现 |
 | `scripts/remote/submit_xtalk_duplex_a4_job.sh` | 传递场景音频/FDB 四轴/judge 环境变量；提交日志改落 `data/runs/submit_logs` | ✅ 已实现 |
-| `.gitignore` | 允许 `reports/duplex_acceptance/` 下的 `*.jsonl`、`*.log` 跟踪 | ⬜ 待做 |
-| `README.md`、`docs/tests/`、`docs/scripts/remote/` | 与新行为同步 | ⬜ 部分待做 |
+| `.gitignore` | 允许 `reports/duplex_acceptance/` 下的 `*.jsonl`、`*.log` 跟踪 | ✅ 已实现（清理后只保留 A4 报告例外） |
+| `README.md`、`docs/tests/`、`docs/scripts/remote/` | 与新行为同步（ASR 契约、TTS 补丁、清理后的入口索引） | ✅ 已实现 |
+
+## 13. 仓库清理记录（2026-10-14）
+
+按"只保留原始 X-Talk 复现 + 阶段 A 最终实现"的口径做过一次清理：**结论与数字全部保留在本任务单**，移除的只是一次性脚本与它们的一次性产物。
+
+| 移除项 | 原用途 | 结论去向 |
+| --- | --- | --- |
+| 标记探针 3 件套、`docs/xtalk_duplex_marker_probe.md`、`reports/duplex_marker_probe/` | 纯文本重放诊断（标点 / 大小写 / 碎片粒度） | §9.2、§9.5："没有任何变体构成修复" |
+| `micro_turn_trace.py` 及其文档 | 逐拍 trace 重建与 ASR 改写率审计 | §9.5.3、§9.6.1（223/223 拍一致、可见改写 0/0/0/0/0） |
+| ASR before/after 对比作业 3 件套、`reports/duplex_asr_contract/` | 单卡契约 A/B | §9.6.1（可见改写 0、最终转写逐词不变） |
+| `submit_duplex_interruption_recheck_job.sh` | 一次性复检提交 | §9.6.1（rating 0.6→2.25、latency 1.536→4.10） |
+| `run_xtalk_duplex_node_job.sh`、`docs/xtalk_duplex_remote_task.md` | pre-A4 官方权重运行时冒烟 | 已被 A4 作业覆盖（§2、§3） |
+| `reports/duplex_acceptance/{20261013T024524Z,20261013T070801Z,20261014T025649Z}/` 与 `data/runs/` 中对应旧 run | 早期轮次与作废轮次证据 | §9.1–§9.4、§9.5.4；本目录只保留最新一轮 `20261014T033949Z` |
+| P0 脚手架（`src/interclarify/`、`configs/{base,local,replay,cluster}.yaml`、`docs/src/`、`scripts/run_p0_smoke.py`、`tests/test_p0_artifacts.py`） | P0 阶段的通用配置、清单与冒烟骨架 | 与当前集群链路无关；保留 `scripts/check_env.py`、`scripts/check_audio_io.py` 作环境自检 |
+
+保留的核心入口是原生 X-Talk 复现（§1 与 [基线栈](xtalk_baseline_stack.md)）与阶段 A 全双工实现（本任务单、[改造方案](xtalk_modification_plan.md)）。TTS 吞吐补丁 `scripts/remote/moss_tts_patch.py` 与其单测属最终实现；配套的吞吐 A/B 作业只是测量工具，拿到数字后同样移除。
 
 实现行为与本任务单不一致时，先更新本任务单并说明原因，再改代码。
