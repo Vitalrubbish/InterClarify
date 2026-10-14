@@ -444,12 +444,12 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 
 | 文件 | 改动 | 状态 |
 | --- | --- | --- |
-| `scripts/remote/duplex_a4_replay.py` | per-scenario 请求音频；新增 pause / multi_question 场景；播放自动证据字段（`played_text_monotonic`、`unplayed_tail_excluded`、`asr_updates_during_playback`、`playback_window`） | ✅ 已实现（`a59a542`） |
+| `scripts/remote/duplex_a4_replay.py` | per-scenario 请求音频；新增 pause / multi_question 场景；播放自动证据字段（`played_text_monotonic`、`unplayed_tail_excluded`、`asr_updates_during_playback`、`playback_window`） | ✅ 已实现（行为以当前文件与单测为准；早期独立提交 `a59a542` 已被后续重构取代，不在分支历史中） |
 | `scripts/remote/duplex_a4_replay.py` | 打断判定改为"打断原因 reset + reset 后音频冻结 1s"；新增 `interruption_stop_response_ids` / `teardown_stop_response_ids` 区分 reset 与收尾停止 | ✅ 已实现 |
 | `scripts/remote/duplex_model_service.py` | 请求体改为结构化 `history`（user 文本 + assistant token id），服务端按官方 header 展平为 raw ChatML；`use_fast=True`；`num_logits_to_keep=1` | ✅ 已实现 |
 | `xtalk/src/xtalk/duplex_control/runtime_adapter.py` | 历史存 token id；不截断模型流；`<\|user finish talking\|>` 打开播报窗口后才允许 reset；送 TTS 去句点 | ✅ 已实现 |
 | `xtalk/src/xtalk/duplex_control/model_client.py` | 发送结构化历史，`GenerationEnd` 携带生成 token id | ✅ 已实现 |
-| `xtalk/tests/test_duplex_runtime.py` | 新增并强化零旁路断言（剔除 `DirectAudioManager` 与原生语义 manager，保留 ASR/TTS/播放组件） | ✅ 已实现（X-Talk `8c11d6b`） |
+| `xtalk/tests/test_duplex_runtime.py` | 新增并强化零旁路断言（剔除 `DirectAudioManager` 与原生语义 manager，保留 ASR/TTS/播放组件） | ✅ 已实现（X-Talk dev `2f595f3` 的 `tests/test_duplex_runtime.py::test_duplex_mode_removes_every_bypass_manager`；早期独立提交 `8c11d6b` 已被该文件重写取代） |
 | `scripts/remote/run_xtalk_duplex_a4_node_job.sh` | 按场景传音频；interruption 默认用 FDB 样本 106；barge 延迟 0.6；pause gap；RSS 采样；FDB 四轴循环与评分；judge 凭据与默认 `gpt-4-turbo`；产物落 `data/runs` 与 `reports/duplex_acceptance`；末尾自动运行 `compact_a4_report.py` | ✅ 已实现 |
 | `scripts/remote/compact_a4_report.py`、`tests/test_compact_a4_report.py` | 提交前把 committed 证据紧凑化：逐拍数组折成计数、采样 CSV 折成摘要、长文本截断；原始流留在 `data/runs` | ✅ 已实现（`20261014T033949Z` 由 12.1k 行压到 1.3k 行） |
 | `scripts/remote/setup_fdb_scoring_env.sh` | 固定评分环境：cu126 torch + NeMo 2.x；卸载 `cuda-bindings` 让 NeMo 走 `NO_WHILE_LOOPS` 回退，并设 `NUMBA_CUDA_USE_NVIDIA_BINDING=0` | ✅ 已实现 |
