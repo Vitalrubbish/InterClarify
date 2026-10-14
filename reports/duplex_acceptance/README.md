@@ -43,6 +43,7 @@ reports/duplex_acceptance/
 
 - 本目录的 `*.log` 与 `*.jsonl` 由 `.gitignore` 显式加例外，覆盖全局忽略规则。
 - 请勿手工放入大文件（音频、模型权重）；只保留可供复核的文本证据。
+- **精简策略**：作业在复制证据后自动跑 `scripts/remote/compact_a4_report.py`，把逐拍数组（`events`、`timeline.played_text`、`raw_outputs`/`protocol_tokens`）折成计数与直方图、把 `*_samples.csv` 折成 `*_summary.json`、把超长文本截断。完整原始流留在 git-ignored 的 `data/runs/<tag>/`，本目录只保留判据：状态、错误、id、时延、字节数、标记计数与日志。规则见 [compact_a4_report.md](../../docs/scripts/remote/compact_a4_report.md)。
 
 ## `data/runs/` 保留策略
 

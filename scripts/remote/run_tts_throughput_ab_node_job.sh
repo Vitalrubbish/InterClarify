@@ -90,10 +90,11 @@ for ARM in $ARMS; do
   SERVICE_PID=$!
 
   if ! wait_http "http://127.0.0.1:$TTS_PORT/health" 2400 "$SERVICE_PID"; then
-    echo "[tts-ab] arm=$NAME service failed to become healthy"
+    echo "[tts-ab] arm=$NAME service failed to become healthy; aborting the sweep" \
+      "(every arm loads the same model, so this is a node/environment problem)"
     ARM_SUMMARY+=("$NAME FAILED")
     tail -20 "$RUN_DIR/logs/$NAME.service.log"
-    continue
+    break
   fi
   echo "[tts-ab] arm=$NAME service healthy $(date -u +%FT%TZ)"
   grep -aE "\[moss-patch\]" "$RUN_DIR/logs/$NAME.service.log" > "$RUN_DIR/metrics/$NAME.patch.log" || true

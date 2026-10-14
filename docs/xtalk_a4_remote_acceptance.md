@@ -418,6 +418,8 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 
 **判据**：`steady_rtf = audio_s / (wall_s - first_audio_s) > 1` 才算追上实时；`t1-*` 需服务日志出现 `torch.compile(_local_loop) ready` 且无 `falling back to eager`；`t2-*` 改变音频内容，须试听后再决定。此后若吞吐达标，再用 `20261014T033949Z` 的同一流程重跑 `user_interruption` 轴，比较 latency 4.10 → ? 与 rating 2.25 → ?。
 
+**测量节点**：A/B 可以在 `pdgpu-a10` 上跑（4090 队列常满，提交脚本用 `TTS_AB_PARTITION` 切换）。A10 比 4090 慢，**绝对值不可与 4090 直接比较**，该节点只用来判断 T1/T2 在*同一节点*上的相对倍率是否成立；全链路的全量测试仍等 4090 空出后进行。
+
 其余待办不变：ASR 按静音即时释放（可再省 0.5–1.9s，§9.6.2 前两段）、`--post-input-seconds` 录制窗口（§9.3 第 6 条）、ASR 语言跑飞（§9.4 第 1 条）。
 
 
@@ -448,7 +450,8 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 | `xtalk/src/xtalk/duplex_control/runtime_adapter.py` | 历史存 token id；不截断模型流；`<\|user finish talking\|>` 打开播报窗口后才允许 reset；送 TTS 去句点 | ✅ 已实现 |
 | `xtalk/src/xtalk/duplex_control/model_client.py` | 发送结构化历史，`GenerationEnd` 携带生成 token id | ✅ 已实现 |
 | `xtalk/tests/test_duplex_runtime.py` | 新增并强化零旁路断言（剔除 `DirectAudioManager` 与原生语义 manager，保留 ASR/TTS/播放组件） | ✅ 已实现（X-Talk `8c11d6b`） |
-| `scripts/remote/run_xtalk_duplex_a4_node_job.sh` | 按场景传音频；interruption 默认用 FDB 样本 106；barge 延迟 0.6；pause gap；RSS 采样；FDB 四轴循环与评分；judge 凭据与默认 `gpt-4-turbo`；产物落 `data/runs` 与 `reports/duplex_acceptance` | ✅ 已实现 |
+| `scripts/remote/run_xtalk_duplex_a4_node_job.sh` | 按场景传音频；interruption 默认用 FDB 样本 106；barge 延迟 0.6；pause gap；RSS 采样；FDB 四轴循环与评分；judge 凭据与默认 `gpt-4-turbo`；产物落 `data/runs` 与 `reports/duplex_acceptance`；末尾自动运行 `compact_a4_report.py` | ✅ 已实现 |
+| `scripts/remote/compact_a4_report.py`、`tests/test_compact_a4_report.py` | 提交前把 committed 证据紧凑化：逐拍数组折成计数、采样 CSV 折成摘要、长文本截断；原始流留在 `data/runs` | ✅ 已实现（`20261014T033949Z` 由 12.1k 行压到 1.3k 行） |
 | `scripts/remote/setup_fdb_scoring_env.sh` | 固定评分环境：cu126 torch + NeMo 2.x；卸载 `cuda-bindings` 让 NeMo 走 `NO_WHILE_LOOPS` 回退，并设 `NUMBA_CUDA_USE_NVIDIA_BINDING=0` | ✅ 已实现 |
 | `scripts/remote/duplex_a4_replay.py` | FDB 场景的"输入结束后静音续播窗口"（`--post-input-seconds`，默认 ≥5s）与 `post_input_seconds`/tail 证据字段 | ⏳ 待实现（见 §5.6、§9.3.6、§9.4） |
 | `scripts/remote/run_fdb_llm_judge.py` | 对已有 FDB 输出树跑官方对齐 + judge；凭据从项目根 `openai_api.txt` 读，只经子进程环境传递 | ✅ 已实现 |

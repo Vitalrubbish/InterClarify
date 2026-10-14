@@ -36,6 +36,7 @@ def tracked_files(root: Path) -> list[Path]:
         "xtalk/tests/**/*.py",
         "configs/xtalk_round1.yaml",
         "scripts/remote/create_duplex_source_manifest.py",
+        "scripts/remote/compact_a4_report.py",
         "scripts/remote/submit_xtalk_duplex_a4_job.sh",
         "scripts/remote/moss_tts_patch.py",
         "scripts/remote/run_tts_throughput_ab_node_job.sh",

@@ -1,1677 +1,640 @@
 {
-  "status": "PASS",
-  "input_root": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption",
-  "output_root": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption",
-  "samples": [
-    {
-      "status": "PASS",
-      "errors": [],
-      "scenario": "fdb",
-      "input_audio_seconds": 27.568,
-      "send_seconds": 27.55248257704079,
-      "response_ids": [
-        "ff34d48042e54b59ac7417457484ff63",
-        "3d1264735bda4fcab31b04b9d182f6f7"
-      ],
-      "finished_response_ids": [
-        "ff34d48042e54b59ac7417457484ff63"
-      ],
-      "asr_final": null,
-      "response": "Setting financial goals is crucial for managing your finances effectively and achieving",
-      "first_audio_seconds": 5.153717343695462,
-      "tts_audio_bytes": 855050,
-      "event_count": 37,
-      "events": [
-        {
-          "action": "session_attached",
-          "seconds": 7240257.403314998,
-          "data": {
-            "session_id": "bcb070d3-4e54-4144-902e-18413a94e006"
-          }
-        },
-        {
-          "action": "vad_speech_start",
-          "seconds": 0.00014881696552038193,
-          "round": 0
-        },
-        {
-          "action": "update_asr",
-          "seconds": 1.2588070752099156,
-          "data": {
-            "text": "How can",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 2.462174914777279,
-          "data": {
-            "text": "How can I",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 3.06136679276824,
-          "data": {
-            "text": "How can I save money more effectively?",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "start_tts",
-          "seconds": 4.33684397302568,
-          "data": {
-            "response_id": "ff34d48042e54b59ac7417457484ff63"
-          }
-        },
-        {
-          "action": "latency_metrics",
-          "seconds": 5.153822054155171,
-          "data": {
-            "network_latency_ms": 0,
-            "asr_latency_ms": 0,
-            "llm_first_token_ms": 0,
-            "llm_sentence_ms": 0,
-            "tts_first_chunk_ms": 816
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 6.819505212828517,
-          "data": {
-            "response_id": "ff34d48042e54b59ac7417457484ff63",
-            "text": "Saving"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 7.623867742717266,
-          "data": {
-            "response_id": "ff34d48042e54b59ac7417457484ff63",
-            "text": "Saving money"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 8.451798270456493,
-          "data": {
-            "response_id": "ff34d48042e54b59ac7417457484ff63",
-            "text": "Saving money effectively"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 9.17396318167448,
-          "data": {
-            "response_id": "ff34d48042e54b59ac7417457484ff63",
-            "text": "Saving money effectively involves"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 9.895676849409938,
-          "data": {
-            "response_id": "ff34d48042e54b59ac7417457484ff63",
-            "text": "Saving money effectively involves creating"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 10.279850703664124,
-          "data": {
-            "response_id": "ff34d48042e54b59ac7417457484ff63",
-            "text": "Saving money effectively involves creating a"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 11.025404170155525,
-          "data": {
-            "response_id": "ff34d48042e54b59ac7417457484ff63",
-            "text": "Saving money effectively involves creating a budget"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 11.10554945282638,
-          "data": {
-            "response_id": "ff34d48042e54b59ac7417457484ff63",
-            "text": "Saving money effectively involves creating a budget,"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 11.58603249117732,
-          "data": {
-            "text": "How can I save money more effectively? Actually",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 11.846853630617261,
-          "data": {
-            "response_id": "ff34d48042e54b59ac7417457484ff63",
-            "text": "Saving money effectively involves creating a budget, tracking"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 12.194172766059637,
-          "data": {
-            "text": "How can I save money more effectively? Actually, what",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 12.565958937630057,
-          "data": {
-            "response_id": "ff34d48042e54b59ac7417457484ff63",
-            "text": "Saving money effectively involves creating a budget, tracking your"
-          }
-        },
-        {
-          "action": "stop_tts",
-          "seconds": 12.714424793608487,
-          "data": {
-            "response_id": "ff34d48042e54b59ac7417457484ff63"
-          }
-        },
-        {
-          "action": "finish_resp",
-          "seconds": 12.71485068462789,
-          "data": {
-            "response_id": "ff34d48042e54b59ac7417457484ff63",
-            "text": "Saving money effectively involves creating a budget, tracking your"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 12.812862244434655,
-          "data": {
-            "text": "How can I save money more effectively? Actually, what are some financial",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 13.405696137808263,
-          "data": {
-            "text": "How can I save money more effectively? Actually, what are some financial goals I should set?",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "start_tts",
-          "seconds": 14.551554123871028,
-          "data": {
-            "response_id": "3d1264735bda4fcab31b04b9d182f6f7"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 17.97563551645726,
-          "data": {
-            "response_id": "3d1264735bda4fcab31b04b9d182f6f7",
-            "text": "Setting"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 19.215944374911487,
-          "data": {
-            "response_id": "3d1264735bda4fcab31b04b9d182f6f7",
-            "text": "Setting financial"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 20.56194627098739,
-          "data": {
-            "response_id": "3d1264735bda4fcab31b04b9d182f6f7",
-            "text": "Setting financial goals"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 21.79377641621977,
-          "data": {
-            "response_id": "3d1264735bda4fcab31b04b9d182f6f7",
-            "text": "Setting financial goals is"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 23.02797666285187,
-          "data": {
-            "response_id": "3d1264735bda4fcab31b04b9d182f6f7",
-            "text": "Setting financial goals is crucial"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 23.412111517973244,
-          "data": {
-            "response_id": "3d1264735bda4fcab31b04b9d182f6f7",
-            "text": "Setting financial goals is crucial for"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 24.662870300002396,
-          "data": {
-            "response_id": "3d1264735bda4fcab31b04b9d182f6f7",
-            "text": "Setting financial goals is crucial for managing"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 25.901625425554812,
-          "data": {
-            "response_id": "3d1264735bda4fcab31b04b9d182f6f7",
-            "text": "Setting financial goals is crucial for managing your"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 26.83253040444106,
-          "data": {
-            "response_id": "3d1264735bda4fcab31b04b9d182f6f7",
-            "text": "Setting financial goals is crucial for managing your finances"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 27.532503362745047,
-          "data": {
-            "response_id": "3d1264735bda4fcab31b04b9d182f6f7",
-            "text": "Setting financial goals is crucial for managing your finances effectively"
-          }
-        },
-        {
-          "action": "vad_speech_end",
-          "seconds": 27.55248991586268,
-          "round": 0
-        },
-        {
-          "action": "update_resp",
-          "seconds": 27.834990709088743,
-          "data": {
-            "response_id": "3d1264735bda4fcab31b04b9d182f6f7",
-            "text": "Setting financial goals is crucial for managing your finances effectively and"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 28.529583221301436,
-          "data": {
-            "response_id": "3d1264735bda4fcab31b04b9d182f6f7",
-            "text": "Setting financial goals is crucial for managing your finances effectively and achieving"
-          }
-        }
-      ],
-      "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/1/output.wav",
-      "output_sample_rate": 48000,
-      "session_id": "bcb070d3-4e54-4144-902e-18413a94e006",
-      "playback_mode": "paced_headless_ack",
-      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/1/input.wav",
-      "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/1/output.wav",
-      "sample_index": 0,
-      "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/bcb070d3-4e54-4144-902e-18413a94e006.jsonl",
-      "timeline": {
-        "records": 995,
-        "protocol_tokens": [
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>",
-          "<|user backchannel|>",
-          "<|user interruption|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>"
-        ],
-        "raw_outputs": [
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>",
-          "<|user backchannel|>",
-          "<|user interruption|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>"
-        ],
-        "protocol_errors": [],
-        "event_counts": {
-          "asr.result_partial": 7,
-          "llm.first_chunk": 45,
-          "duplex.protocol_parsed": 10,
-          "duplex.micro_turn_ready": 44,
-          "tts.started": 2,
-          "turn.tts_delivery_start_requested": 2,
-          "turn.tts_start_requested": 2,
-          "llm_agent.response_update": 377,
-          "turn.tts_text_append_requested": 377,
-          "llm.sentence_ready": 2,
-          "tts.chunk_ready": 98,
-          "response.update": 22,
-          "tts.stopped": 2,
-          "turn.tts_stop_requested": 2,
-          "response.finish": 1,
-          "tts.response_closed": 1,
-          "tts.playback_stopped": 1
-        },
-        "response_ids": [
-          "3d1264735bda4fcab31b04b9d182f6f7",
-          "ff34d48042e54b59ac7417457484ff63"
-        ],
-        "latencies": {
-          "llm_to_tts_started_seconds": 2.418645277619362,
-          "tts_to_first_played_text_seconds": 2.482691552489996,
-          "stop_request_to_tts_stopped_seconds": [
-            0.00039323698729276657,
-            0.00027453526854515076
-          ]
-        },
-        "interruption_events": [
-          {
-            "response_id": "ff34d48042e54b59ac7417457484ff63",
-            "reason": "interruption",
-            "raw_output": "<|user interruption|>",
-            "monotonic_timestamp": 7240272.097868478
-          }
-        ],
-        "stopped_response_ids": [
-          "3d1264735bda4fcab31b04b9d182f6f7",
-          "ff34d48042e54b59ac7417457484ff63"
-        ],
-        "interruption_stop_response_ids": [
-          "ff34d48042e54b59ac7417457484ff63"
-        ],
-        "teardown_stop_response_ids": [
-          "3d1264735bda4fcab31b04b9d182f6f7"
-        ],
-        "played_text": {
-          "ff34d48042e54b59ac7417457484ff63": [
-            "Saving",
-            "Saving money",
-            "Saving money effectively",
-            "Saving money effectively involves",
-            "Saving money effectively involves creating",
-            "Saving money effectively involves creating a",
-            "Saving money effectively involves creating a budget",
-            "Saving money effectively involves creating a budget,",
-            "Saving money effectively involves creating a budget, tracking",
-            "Saving money effectively involves creating a budget, tracking your"
-          ],
-          "3d1264735bda4fcab31b04b9d182f6f7": [
-            "Setting",
-            "Setting financial",
-            "Setting financial goals",
-            "Setting financial goals is",
-            "Setting financial goals is crucial",
-            "Setting financial goals is crucial for",
-            "Setting financial goals is crucial for managing",
-            "Setting financial goals is crucial for managing your",
-            "Setting financial goals is crucial for managing your finances",
-            "Setting financial goals is crucial for managing your finances effectively",
-            "Setting financial goals is crucial for managing your finances effectively and",
-            "Setting financial goals is crucial for managing your finances effectively and achieving"
-          ]
-        },
-        "played_text_monotonic": true,
-        "unplayed_tail_excluded": true,
-        "asr_updates_during_playback": 4,
-        "playback_window": [
-          7240263.720025619,
-          7240287.937949276
-        ],
-        "system_backchannel_seen": false,
-        "direct_audio_seen": false
-      }
+ "status": "PASS",
+ "input_root": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption",
+ "output_root": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption",
+ "samples": [
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_audio_seconds": 27.568,
+   "send_seconds": 27.55248257704079,
+   "response_ids": [
+    "ff34d48042e54b59ac7417457484ff63",
+    "3d1264735bda4fcab31b04b9d182f6f7"
+   ],
+   "finished_response_ids": [
+    "ff34d48042e54b59ac7417457484ff63"
+   ],
+   "asr_final": null,
+   "response": "Setting financial goals is crucial for managing your finances effectively and achieving",
+   "first_audio_seconds": 5.153717343695462,
+   "tts_audio_bytes": 855050,
+   "event_count": 37,
+   "events": {
+    "ticks": 37,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 1,
+     "session_attached": 1,
+     "start_tts": 2,
+     "stop_tts": 1,
+     "update_asr": 7,
+     "update_resp": 22,
+     "vad_speech_end": 1,
+     "vad_speech_start": 1
     },
-    {
-      "status": "PASS",
-      "errors": [],
-      "scenario": "fdb",
-      "input_audio_seconds": 26.9706875,
-      "send_seconds": 26.945121691562235,
-      "response_ids": [
-        "29d343292bc641b2a7bc6538cbf96a69",
-        "c752c7db0b0c4995be506150fdca7140"
-      ],
-      "finished_response_ids": [
-        "29d343292bc641b2a7bc6538cbf96a69"
-      ],
-      "asr_final": null,
-      "response": "Certainly! Improving your sleep quality",
-      "first_audio_seconds": 5.275355274789035,
-      "tts_audio_bytes": 433920,
-      "event_count": 25,
-      "events": [
-        {
-          "action": "session_attached",
-          "seconds": 7240288.536659278,
-          "data": {
-            "session_id": "1f8ad7c6-0ba1-49fa-9e34-0040fb5f36ef"
-          }
-        },
-        {
-          "action": "vad_speech_start",
-          "seconds": 0.0001308489590883255,
-          "round": 0
-        },
-        {
-          "action": "update_asr",
-          "seconds": 1.8578110057860613,
-          "data": {
-            "text": "How",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 2.458684179931879,
-          "data": {
-            "text": "How can",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 3.0600210102275014,
-          "data": {
-            "text": "How can I reduce stress quickly?",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "start_tts",
-          "seconds": 4.333487789146602,
-          "data": {
-            "response_id": "29d343292bc641b2a7bc6538cbf96a69"
-          }
-        },
-        {
-          "action": "latency_metrics",
-          "seconds": 5.275479723699391,
-          "data": {
-            "network_latency_ms": 0,
-            "asr_latency_ms": 0,
-            "llm_first_token_ms": 0,
-            "llm_sentence_ms": 0,
-            "tts_first_chunk_ms": 941
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 7.761921362020075,
-          "data": {
-            "response_id": "29d343292bc641b2a7bc6538cbf96a69",
-            "text": "Reduc"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 9.001213258132339,
-          "data": {
-            "response_id": "29d343292bc641b2a7bc6538cbf96a69",
-            "text": "Reducing"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 10.338338427245617,
-          "data": {
-            "response_id": "29d343292bc641b2a7bc6538cbf96a69",
-            "text": "Reducing stress"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 10.375809172168374,
-          "data": {
-            "text": "How can I reduce stress quickly? Can",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "stop_tts",
-          "seconds": 10.913177525624633,
-          "data": {
-            "response_id": "29d343292bc641b2a7bc6538cbf96a69"
-          }
-        },
-        {
-          "action": "finish_resp",
-          "seconds": 10.914126675575972,
-          "data": {
-            "response_id": "29d343292bc641b2a7bc6538cbf96a69",
-            "text": "Reducing stress"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 10.979967828840017,
-          "data": {
-            "text": "How can I reduce stress quickly? Can we switch",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 11.58514339569956,
-          "data": {
-            "text": "How can I reduce stress quickly? Can we switch to",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 12.187280814163387,
-          "data": {
-            "text": "How can I reduce stress quickly? Can we switch to talking about sleep improvement?",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "start_tts",
-          "seconds": 13.352630539797246,
-          "data": {
-            "response_id": "c752c7db0b0c4995be506150fdca7140"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 18.104184770025313,
-          "data": {
-            "response_id": "c752c7db0b0c4995be506150fdca7140",
-            "text": "Certainly"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 19.7442382061854,
-          "data": {
-            "response_id": "c752c7db0b0c4995be506150fdca7140",
-            "text": "Certainly!"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 21.771393472328782,
-          "data": {
-            "response_id": "c752c7db0b0c4995be506150fdca7140",
-            "text": "Certainly! Impro"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 22.073149086907506,
-          "data": {
-            "response_id": "c752c7db0b0c4995be506150fdca7140",
-            "text": "Certainly! Improving"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 23.974005069583654,
-          "data": {
-            "response_id": "c752c7db0b0c4995be506150fdca7140",
-            "text": "Certainly! Improving your"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 25.884603705257177,
-          "data": {
-            "response_id": "c752c7db0b0c4995be506150fdca7140",
-            "text": "Certainly! Improving your sleep"
-          }
-        },
-        {
-          "action": "vad_speech_end",
-          "seconds": 26.945130959153175,
-          "round": 0
-        },
-        {
-          "action": "update_resp",
-          "seconds": 27.78966451343149,
-          "data": {
-            "response_id": "c752c7db0b0c4995be506150fdca7140",
-            "text": "Certainly! Improving your sleep quality"
-          }
-        }
-      ],
-      "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/10/output.wav",
-      "output_sample_rate": 48000,
-      "session_id": "1f8ad7c6-0ba1-49fa-9e34-0040fb5f36ef",
-      "playback_mode": "paced_headless_ack",
-      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/10/input.wav",
-      "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/10/output.wav",
-      "sample_index": 1,
-      "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/1f8ad7c6-0ba1-49fa-9e34-0040fb5f36ef.jsonl",
-      "timeline": {
-        "records": 891,
-        "protocol_tokens": [
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>",
-          "<|user interruption|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>"
-        ],
-        "raw_outputs": [
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>",
-          "<|user interruption|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>"
-        ],
-        "protocol_errors": [],
-        "event_counts": {
-          "asr.result_partial": 7,
-          "llm.first_chunk": 43,
-          "duplex.protocol_parsed": 9,
-          "duplex.micro_turn_ready": 42,
-          "tts.started": 2,
-          "turn.tts_delivery_start_requested": 2,
-          "turn.tts_start_requested": 2,
-          "llm_agent.response_update": 356,
-          "turn.tts_text_append_requested": 356,
-          "llm.sentence_ready": 2,
-          "tts.chunk_ready": 53,
-          "response.update": 10,
-          "tts.stopped": 2,
-          "turn.tts_stop_requested": 2,
-          "response.finish": 1,
-          "tts.response_closed": 1,
-          "tts.playback_stopped": 1
-        },
-        "response_ids": [
-          "29d343292bc641b2a7bc6538cbf96a69",
-          "c752c7db0b0c4995be506150fdca7140"
-        ],
-        "latencies": {
-          "llm_to_tts_started_seconds": 1.836007846519351,
-          "tts_to_first_played_text_seconds": 3.428435504436493,
-          "stop_request_to_tts_stopped_seconds": [
-            0.0004612728953361511,
-            0.0002540741115808487
-          ]
-        },
-        "interruption_events": [
-          {
-            "response_id": "29d343292bc641b2a7bc6538cbf96a69",
-            "reason": "interruption",
-            "raw_output": "<|user interruption|>",
-            "monotonic_timestamp": 7240301.430074545
-          }
-        ],
-        "stopped_response_ids": [
-          "29d343292bc641b2a7bc6538cbf96a69",
-          "c752c7db0b0c4995be506150fdca7140"
-        ],
-        "interruption_stop_response_ids": [
-          "29d343292bc641b2a7bc6538cbf96a69"
-        ],
-        "teardown_stop_response_ids": [
-          "c752c7db0b0c4995be506150fdca7140"
-        ],
-        "played_text": {
-          "29d343292bc641b2a7bc6538cbf96a69": [
-            "Reduc",
-            "Reducing",
-            "Reducing stress"
-          ],
-          "c752c7db0b0c4995be506150fdca7140": [
-            "Certainly",
-            "Certainly!",
-            "Certainly! Impro",
-            "Certainly! Improving",
-            "Certainly! Improving your",
-            "Certainly! Improving your sleep",
-            "Certainly! Improving your sleep quality"
-          ]
-        },
-        "played_text_monotonic": true,
-        "unplayed_tail_excluded": true,
-        "asr_updates_during_playback": 4,
-        "playback_window": [
-          7240294.850064075,
-          7240318.464396081
-        ],
-        "system_backchannel_seen": false,
-        "direct_audio_seen": false
-      }
+    "span_seconds": 7240257.403
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/1/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "bcb070d3-4e54-4144-902e-18413a94e006",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/1/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/1/output.wav",
+   "sample_index": 0,
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/bcb070d3-4e54-4144-902e-18413a94e006.jsonl",
+   "timeline": {
+    "records": 995,
+    "protocol_tokens": {
+     "count": 10,
+     "tokens": {
+      "<|user backchannel|>": 1,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 6
+     }
     },
-    {
-      "status": "PASS",
-      "errors": [],
-      "scenario": "fdb",
-      "input_audio_seconds": 28.2506875,
-      "send_seconds": 28.224949355237186,
-      "response_ids": [
-        "ee39cc78df214a08891e8330e774b2a2",
-        "554aa1b940db4d339f92b198913eb755"
-      ],
-      "finished_response_ids": [
-        "ee39cc78df214a08891e8330e774b2a2"
-      ],
-      "asr_final": null,
-      "response": "Choosing the right type of pet",
-      "first_audio_seconds": 5.862982180900872,
-      "tts_audio_bytes": 460800,
-      "event_count": 26,
-      "events": [
-        {
-          "action": "session_attached",
-          "seconds": 7240319.063407492,
-          "data": {
-            "session_id": "51a90b1f-509e-4f5b-abac-797031702aa2"
-          }
-        },
-        {
-          "action": "vad_speech_start",
-          "seconds": 0.00012642331421375275,
-          "round": 0
-        },
-        {
-          "action": "update_asr",
-          "seconds": 1.8493333766236901,
-          "data": {
-            "text": "What",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 2.4583289567381144,
-          "data": {
-            "text": "What should",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 3.075689999386668,
-          "data": {
-            "text": "What should I know before",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 3.6696094386279583,
-          "data": {
-            "text": "What should I know before getting a new puppy?",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "start_tts",
-          "seconds": 4.929364890791476,
-          "data": {
-            "response_id": "ee39cc78df214a08891e8330e774b2a2"
-          }
-        },
-        {
-          "action": "latency_metrics",
-          "seconds": 5.863133231177926,
-          "data": {
-            "network_latency_ms": 0,
-            "asr_latency_ms": 0,
-            "llm_first_token_ms": 0,
-            "llm_sentence_ms": 0,
-            "tts_first_chunk_ms": 933
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 8.351157502271235,
-          "data": {
-            "response_id": "ee39cc78df214a08891e8330e774b2a2",
-            "text": "Getting"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 9.609674201346934,
-          "data": {
-            "response_id": "ee39cc78df214a08891e8330e774b2a2",
-            "text": "Getting a"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 10.955812976695597,
-          "data": {
-            "response_id": "ee39cc78df214a08891e8330e774b2a2",
-            "text": "Getting a new"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 11.577278902754188,
-          "data": {
-            "text": "What should I know before getting a new puppy? Hold on.",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 12.19920304697007,
-          "data": {
-            "response_id": "ee39cc78df214a08891e8330e774b2a2",
-            "text": "Getting a new puppy"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 12.808130087330937,
-          "data": {
-            "text": "What should I know before getting a new puppy? Hold on. How do I",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "stop_tts",
-          "seconds": 13.3046111818403,
-          "data": {
-            "response_id": "ee39cc78df214a08891e8330e774b2a2"
-          }
-        },
-        {
-          "action": "finish_resp",
-          "seconds": 13.305115799419582,
-          "data": {
-            "response_id": "ee39cc78df214a08891e8330e774b2a2",
-            "text": "Getting a new puppy"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 13.415381266735494,
-          "data": {
-            "text": "What should I know before getting a new puppy? Hold on. How do I choose the right",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 14.010644247755408,
-          "data": {
-            "text": "What should I know before getting a new puppy? Hold on. How do I choose the right type of pet food?",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "start_tts",
-          "seconds": 15.143238906748593,
-          "data": {
-            "response_id": "554aa1b940db4d339f92b198913eb755"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 19.810878980904818,
-          "data": {
-            "response_id": "554aa1b940db4d339f92b198913eb755",
-            "text": "Choosing"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 21.615022523328662,
-          "data": {
-            "response_id": "554aa1b940db4d339f92b198913eb755",
-            "text": "Choosing the"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 23.61354888509959,
-          "data": {
-            "response_id": "554aa1b940db4d339f92b198913eb755",
-            "text": "Choosing the right"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 25.496892772614956,
-          "data": {
-            "response_id": "554aa1b940db4d339f92b198913eb755",
-            "text": "Choosing the right type"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 27.381970958784223,
-          "data": {
-            "response_id": "554aa1b940db4d339f92b198913eb755",
-            "text": "Choosing the right type of"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 27.765850767493248,
-          "data": {
-            "response_id": "554aa1b940db4d339f92b198913eb755",
-            "text": "Choosing the right type of pet"
-          }
-        },
-        {
-          "action": "vad_speech_end",
-          "seconds": 28.224954893812537,
-          "round": 0
-        }
-      ],
-      "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/100/output.wav",
-      "output_sample_rate": 48000,
-      "session_id": "51a90b1f-509e-4f5b-abac-797031702aa2",
-      "playback_mode": "paced_headless_ack",
-      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/100/input.wav",
-      "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/100/output.wav",
-      "sample_index": 2,
-      "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/51a90b1f-509e-4f5b-abac-797031702aa2.jsonl",
-      "timeline": {
-        "records": 943,
-        "protocol_tokens": [
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>",
-          "<|user backchannel|>",
-          "<|user interruption|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>"
-        ],
-        "raw_outputs": [
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>",
-          "<|user backchannel|>",
-          "<|user interruption|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>"
-        ],
-        "protocol_errors": [],
-        "event_counts": {
-          "asr.result_partial": 8,
-          "llm.first_chunk": 45,
-          "duplex.protocol_parsed": 10,
-          "duplex.micro_turn_ready": 44,
-          "tts.started": 2,
-          "turn.tts_delivery_start_requested": 2,
-          "turn.tts_start_requested": 2,
-          "llm_agent.response_update": 379,
-          "turn.tts_text_append_requested": 379,
-          "llm.sentence_ready": 2,
-          "tts.chunk_ready": 53,
-          "response.update": 10,
-          "tts.stopped": 2,
-          "turn.tts_stop_requested": 2,
-          "response.finish": 1,
-          "tts.response_closed": 1,
-          "tts.playback_stopped": 1
-        },
-        "response_ids": [
-          "554aa1b940db4d339f92b198913eb755",
-          "ee39cc78df214a08891e8330e774b2a2"
-        ],
-        "latencies": {
-          "llm_to_tts_started_seconds": 2.441281638108194,
-          "tts_to_first_played_text_seconds": 3.4217914883047342,
-          "stop_request_to_tts_stopped_seconds": [
-            0.0003663022071123123,
-            0.00039629172533750534
-          ]
-        },
-        "interruption_events": [
-          {
-            "response_id": "ee39cc78df214a08891e8330e774b2a2",
-            "reason": "interruption",
-            "raw_output": "<|user interruption|>",
-            "monotonic_timestamp": 7240334.351185402
-          }
-        ],
-        "stopped_response_ids": [
-          "554aa1b940db4d339f92b198913eb755",
-          "ee39cc78df214a08891e8330e774b2a2"
-        ],
-        "interruption_stop_response_ids": [
-          "ee39cc78df214a08891e8330e774b2a2"
-        ],
-        "teardown_stop_response_ids": [
-          "554aa1b940db4d339f92b198913eb755"
-        ],
-        "played_text": {
-          "ee39cc78df214a08891e8330e774b2a2": [
-            "Getting",
-            "Getting a",
-            "Getting a new",
-            "Getting a new puppy"
-          ],
-          "554aa1b940db4d339f92b198913eb755": [
-            "Choosing",
-            "Choosing the",
-            "Choosing the right",
-            "Choosing the right type",
-            "Choosing the right type of",
-            "Choosing the right type of pet"
-          ]
-        },
-        "played_text_monotonic": true,
-        "unplayed_tail_excluded": true,
-        "asr_updates_during_playback": 4,
-        "playback_window": [
-          7240325.975656136,
-          7240350.273736778
-        ],
-        "system_backchannel_seen": false,
-        "direct_audio_seen": false
-      }
+    "raw_outputs": {
+     "count": 10,
+     "tokens": {
+      "<|user backchannel|>": 1,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 6
+     }
     },
-    {
-      "status": "PASS",
-      "errors": [],
-      "scenario": "fdb",
-      "input_audio_seconds": 28.272,
-      "send_seconds": 28.25684974435717,
-      "response_ids": [
-        "47d39a1d82ad48959093493a8c6ddacb",
-        "baf4a4e024034a3984404afe73631d97"
-      ],
-      "finished_response_ids": [
-        "47d39a1d82ad48959093493a8c6ddacb"
-      ],
-      "asr_final": null,
-      "response": "Fixing a leaky faucet typically",
-      "first_audio_seconds": 5.165661131031811,
-      "tts_audio_bytes": 414720,
-      "event_count": 24,
-      "events": [
-        {
-          "action": "session_attached",
-          "seconds": 7240350.888896267,
-          "data": {
-            "session_id": "1a340421-19a3-4ee5-84f1-7c3e9a4ff74f"
-          }
-        },
-        {
-          "action": "vad_speech_start",
-          "seconds": 0.00013051647692918777,
-          "round": 0
-        },
-        {
-          "action": "update_asr",
-          "seconds": 1.2499646367505193,
-          "data": {
-            "text": "What's the",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 1.8495250279083848,
-          "data": {
-            "text": "What's the best",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 2.453545466065407,
-          "data": {
-            "text": "What's the best time to plant tomatoes?",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "start_tts",
-          "seconds": 3.727287636138499,
-          "data": {
-            "response_id": "47d39a1d82ad48959093493a8c6ddacb"
-          }
-        },
-        {
-          "action": "latency_metrics",
-          "seconds": 5.165869251824915,
-          "data": {
-            "network_latency_ms": 0,
-            "asr_latency_ms": 0,
-            "llm_first_token_ms": 0,
-            "llm_sentence_ms": 0,
-            "tts_first_chunk_ms": 1437
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 10.648863720707595,
-          "data": {
-            "response_id": "47d39a1d82ad48959093493a8c6ddacb",
-            "text": "The"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 11.587649308145046,
-          "data": {
-            "text": "What's the best time to plant tomatoes? Oh",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 12.194939182139933,
-          "data": {
-            "text": "What's the best time to plant tomatoes? Oh, before",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 12.825954650528729,
-          "data": {
-            "text": "What's the best time to plant tomatoes? Oh, before I forget, how do I fix",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 13.116541858762503,
-          "data": {
-            "response_id": "47d39a1d82ad48959093493a8c6ddacb",
-            "text": "The best"
-          }
-        },
-        {
-          "action": "stop_tts",
-          "seconds": 13.305630132555962,
-          "data": {
-            "response_id": "47d39a1d82ad48959093493a8c6ddacb"
-          }
-        },
-        {
-          "action": "finish_resp",
-          "seconds": 13.305991789326072,
-          "data": {
-            "response_id": "47d39a1d82ad48959093493a8c6ddacb",
-            "text": "The best"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 13.401524992659688,
-          "data": {
-            "text": "What's the best time to plant tomatoes? Oh, before I forget, how do I fix a leaky faucet?",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "start_tts",
-          "seconds": 14.550204961560667,
-          "data": {
-            "response_id": "baf4a4e024034a3984404afe73631d97"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 19.12640173640102,
-          "data": {
-            "response_id": "baf4a4e024034a3984404afe73631d97",
-            "text": "Fix"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 20.918930718675256,
-          "data": {
-            "response_id": "baf4a4e024034a3984404afe73631d97",
-            "text": "Fixing"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 22.959391438402236,
-          "data": {
-            "response_id": "baf4a4e024034a3984404afe73631d97",
-            "text": "Fixing a"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 24.82568964920938,
-          "data": {
-            "response_id": "baf4a4e024034a3984404afe73631d97",
-            "text": "Fixing a leak"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 26.68519995547831,
-          "data": {
-            "response_id": "baf4a4e024034a3984404afe73631d97",
-            "text": "Fixing a leaky"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 27.068466529250145,
-          "data": {
-            "response_id": "baf4a4e024034a3984404afe73631d97",
-            "text": "Fixing a leaky faucet"
-          }
-        },
-        {
-          "action": "vad_speech_end",
-          "seconds": 28.256855498068035,
-          "round": 0
-        },
-        {
-          "action": "update_resp",
-          "seconds": 28.947564416565,
-          "data": {
-            "response_id": "baf4a4e024034a3984404afe73631d97",
-            "text": "Fixing a leaky faucet typically"
-          }
-        }
-      ],
-      "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/101/output.wav",
-      "output_sample_rate": 48000,
-      "session_id": "1a340421-19a3-4ee5-84f1-7c3e9a4ff74f",
-      "playback_mode": "paced_headless_ack",
-      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/101/input.wav",
-      "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/101/output.wav",
-      "sample_index": 3,
-      "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/1a340421-19a3-4ee5-84f1-7c3e9a4ff74f.jsonl",
-      "timeline": {
-        "records": 999,
-        "protocol_tokens": [
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>",
-          "<|user backchannel|>",
-          "<|user backchannel|>",
-          "<|user interruption|>",
-          "<|user is talking|>",
-          "<|user finish talking|>"
-        ],
-        "raw_outputs": [
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>",
-          "<|user backchannel|>",
-          "<|user backchannel|>",
-          "<|user interruption|>",
-          "<|user is talking|>",
-          "<|user finish talking|>"
-        ],
-        "protocol_errors": [],
-        "event_counts": {
-          "asr.result_partial": 7,
-          "llm.first_chunk": 46,
-          "duplex.protocol_parsed": 9,
-          "duplex.micro_turn_ready": 45,
-          "tts.started": 2,
-          "turn.tts_delivery_start_requested": 2,
-          "turn.tts_start_requested": 2,
-          "llm_agent.response_update": 410,
-          "turn.tts_text_append_requested": 410,
-          "llm.sentence_ready": 2,
-          "tts.chunk_ready": 48,
-          "response.update": 9,
-          "tts.stopped": 2,
-          "turn.tts_stop_requested": 2,
-          "response.finish": 1,
-          "tts.response_closed": 1,
-          "tts.playback_stopped": 1
-        },
-        "response_ids": [
-          "47d39a1d82ad48959093493a8c6ddacb",
-          "baf4a4e024034a3984404afe73631d97"
-        ],
-        "latencies": {
-          "llm_to_tts_started_seconds": 1.8375510787591338,
-          "tts_to_first_played_text_seconds": 6.921607842668891,
-          "stop_request_to_tts_stopped_seconds": [
-            0.00040647760033607483,
-            0.0003279121592640877
-          ]
-        },
-        "interruption_events": [
-          {
-            "response_id": "47d39a1d82ad48959093493a8c6ddacb",
-            "reason": "interruption",
-            "raw_output": "<|user interruption|>",
-            "monotonic_timestamp": 7240366.177610043
-          }
-        ],
-        "stopped_response_ids": [
-          "47d39a1d82ad48959093493a8c6ddacb",
-          "baf4a4e024034a3984404afe73631d97"
-        ],
-        "interruption_stop_response_ids": [
-          "47d39a1d82ad48959093493a8c6ddacb"
-        ],
-        "teardown_stop_response_ids": [
-          "baf4a4e024034a3984404afe73631d97"
-        ],
-        "played_text": {
-          "47d39a1d82ad48959093493a8c6ddacb": [
-            "The",
-            "The best"
-          ],
-          "baf4a4e024034a3984404afe73631d97": [
-            "Fix",
-            "Fixing",
-            "Fixing a",
-            "Fixing a leak",
-            "Fixing a leaky",
-            "Fixing a leaky faucet",
-            "Fixing a leaky faucet typically"
-          ]
-        },
-        "played_text_monotonic": true,
-        "unplayed_tail_excluded": true,
-        "asr_updates_during_playback": 4,
-        "playback_window": [
-          7240356.599022346,
-          7240382.131098459
-        ],
-        "system_backchannel_seen": false,
-        "direct_audio_seen": false
-      }
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 7,
+     "llm.first_chunk": 45,
+     "duplex.protocol_parsed": 10,
+     "duplex.micro_turn_ready": 44,
+     "tts.started": 2,
+     "turn.tts_delivery_start_requested": 2,
+     "turn.tts_start_requested": 2,
+     "llm_agent.response_update": 377,
+     "turn.tts_text_append_requested": 377,
+     "llm.sentence_ready": 2,
+     "tts.chunk_ready": 98,
+     "response.update": 22,
+     "tts.stopped": 2,
+     "turn.tts_stop_requested": 2,
+     "response.finish": 1,
+     "tts.response_closed": 1,
+     "tts.playback_stopped": 1
     },
-    {
-      "status": "PASS",
-      "errors": [],
-      "scenario": "fdb",
-      "input_audio_seconds": 28.4213125,
-      "send_seconds": 28.417169895023108,
-      "response_ids": [
-        "09f5c54f8c5248e394f2153efdb253ae"
-      ],
-      "finished_response_ids": [],
-      "asr_final": null,
-      "response": "When aiming for weight loss, it's",
-      "first_audio_seconds": 5.768371559679508,
-      "tts_audio_bytes": 299520,
-      "event_count": 21,
-      "events": [
-        {
-          "action": "session_attached",
-          "seconds": 7240382.734264309,
-          "data": {
-            "session_id": "6f89ccb2-ed00-49cf-aff4-beca09ba5d4c"
-          }
-        },
-        {
-          "action": "vad_speech_start",
-          "seconds": 0.00015579070895910263,
-          "round": 0
-        },
-        {
-          "action": "update_asr",
-          "seconds": 1.84989916626364,
-          "data": {
-            "text": "What",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 2.4670237377285957,
-          "data": {
-            "text": "What are some good",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 3.0638572182506323,
-          "data": {
-            "text": "What are some good snacks for weight loss?",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "start_tts",
-          "seconds": 4.323715684004128,
-          "data": {
-            "response_id": "09f5c54f8c5248e394f2153efdb253ae"
-          }
-        },
-        {
-          "action": "latency_metrics",
-          "seconds": 5.768462905660272,
-          "data": {
-            "network_latency_ms": 0,
-            "asr_latency_ms": 0,
-            "llm_first_token_ms": 0,
-            "llm_sentence_ms": 0,
-            "tts_first_chunk_ms": 1443
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 10.988493734039366,
-          "data": {
-            "text": "What are some good snacks for weight loss? Oh,",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 11.265136936679482,
-          "data": {
-            "response_id": "09f5c54f8c5248e394f2153efdb253ae",
-            "text": "When"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 11.586535667069256,
-          "data": {
-            "text": "What are some good snacks for weight loss? Oh, can we",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 12.203620741143823,
-          "data": {
-            "text": "What are some good snacks for weight loss? Oh, can we talk about something else",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 12.802665107883513,
-          "data": {
-            "text": "What are some good snacks for weight loss? Oh, can we talk about something else? How",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_asr",
-          "seconds": 13.402503347955644,
-          "data": {
-            "text": "What are some good snacks for weight loss? Oh, can we talk about something else? How about some travel tips?",
-            "origin": "asr"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 14.074006432667375,
-          "data": {
-            "response_id": "09f5c54f8c5248e394f2153efdb253ae",
-            "text": "When aiming"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 17.249192462302744,
-          "data": {
-            "response_id": "09f5c54f8c5248e394f2153efdb253ae",
-            "text": "When aiming for"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 20.316683568060398,
-          "data": {
-            "response_id": "09f5c54f8c5248e394f2153efdb253ae",
-            "text": "When aiming for weight"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 23.414867863990366,
-          "data": {
-            "response_id": "09f5c54f8c5248e394f2153efdb253ae",
-            "text": "When aiming for weight loss"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 23.516127699054778,
-          "data": {
-            "response_id": "09f5c54f8c5248e394f2153efdb253ae",
-            "text": "When aiming for weight loss,"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 26.584092933684587,
-          "data": {
-            "response_id": "09f5c54f8c5248e394f2153efdb253ae",
-            "text": "When aiming for weight loss, it"
-          }
-        },
-        {
-          "action": "update_resp",
-          "seconds": 26.966588582843542,
-          "data": {
-            "response_id": "09f5c54f8c5248e394f2153efdb253ae",
-            "text": "When aiming for weight loss, it's"
-          }
-        },
-        {
-          "action": "vad_speech_end",
-          "seconds": 28.417191955260932,
-          "round": 0
-        }
-      ],
-      "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/102/output.wav",
-      "output_sample_rate": 48000,
-      "session_id": "6f89ccb2-ed00-49cf-aff4-beca09ba5d4c",
-      "playback_mode": "paced_headless_ack",
-      "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/102/input.wav",
-      "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/102/output.wav",
-      "sample_index": 4,
-      "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/6f89ccb2-ed00-49cf-aff4-beca09ba5d4c.jsonl",
-      "timeline": {
-        "records": 995,
-        "protocol_tokens": [
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>",
-          "<|user backchannel|>",
-          "<|user backchannel|>",
-          "<|user backchannel|>",
-          "<|user backchannel|>",
-          "<|user backchannel|>"
-        ],
-        "raw_outputs": [
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user is talking|>",
-          "<|user finish talking|>",
-          "<|user backchannel|>",
-          "<|user backchannel|>",
-          "<|user backchannel|>",
-          "<|user backchannel|>",
-          "<|user backchannel|>"
-        ],
-        "protocol_errors": [],
-        "event_counts": {
-          "asr.result_partial": 8,
-          "llm.first_chunk": 45,
-          "duplex.protocol_parsed": 9,
-          "duplex.micro_turn_ready": 45,
-          "tts.started": 1,
-          "turn.tts_delivery_start_requested": 1,
-          "turn.tts_start_requested": 1,
-          "llm_agent.response_update": 420,
-          "turn.tts_text_append_requested": 420,
-          "llm.sentence_ready": 1,
-          "tts.chunk_ready": 34,
-          "response.update": 8,
-          "tts.stopped": 1,
-          "turn.tts_stop_requested": 1
-        },
-        "response_ids": [
-          "09f5c54f8c5248e394f2153efdb253ae"
-        ],
-        "latencies": {
-          "llm_to_tts_started_seconds": 1.8344078455120325,
-          "tts_to_first_played_text_seconds": 6.941457601264119,
-          "stop_request_to_tts_stopped_seconds": [
-            0.00048748496919870377
-          ]
-        },
-        "interruption_events": [],
-        "stopped_response_ids": [
-          "09f5c54f8c5248e394f2153efdb253ae"
-        ],
-        "interruption_stop_response_ids": [],
-        "teardown_stop_response_ids": [
-          "09f5c54f8c5248e394f2153efdb253ae"
-        ],
-        "played_text": {
-          "09f5c54f8c5248e394f2153efdb253ae": [
-            "When",
-            "When aiming",
-            "When aiming for",
-            "When aiming for weight",
-            "When aiming for weight loss",
-            "When aiming for weight loss,",
-            "When aiming for weight loss, it",
-            "When aiming for weight loss, it's"
-          ]
-        },
-        "played_text_monotonic": true,
-        "unplayed_tail_excluded": true,
-        "asr_updates_during_playback": 5,
-        "playback_window": [
-          7240389.037859805,
-          7240414.135019488
-        ],
-        "system_backchannel_seen": false,
-        "direct_audio_seen": false
-      }
-    }
-  ],
-  "note": "Inference audio only; run official FDB ASR alignment and scoring separately."
+    "response_ids": [
+     "3d1264735bda4fcab31b04b9d182f6f7",
+     "ff34d48042e54b59ac7417457484ff63"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 2.418645277619362,
+     "tts_to_first_played_text_seconds": 2.482691552489996,
+     "stop_request_to_tts_stopped_seconds": [
+      0.00039323698729276657,
+      0.00027453526854515076
+     ]
+    },
+    "interruption_events": [
+     {
+      "response_id": "ff34d48042e54b59ac7417457484ff63",
+      "reason": "interruption",
+      "raw_output": "<|user interruption|>",
+      "monotonic_timestamp": 7240272.097868478
+     }
+    ],
+    "stopped_response_ids": [
+     "3d1264735bda4fcab31b04b9d182f6f7",
+     "ff34d48042e54b59ac7417457484ff63"
+    ],
+    "interruption_stop_response_ids": [
+     "ff34d48042e54b59ac7417457484ff63"
+    ],
+    "teardown_stop_response_ids": [
+     "3d1264735bda4fcab31b04b9d182f6f7"
+    ],
+    "played_text": {
+     "ff34d48042e54b59ac7417457484ff63": {
+      "snapshots": 10,
+      "last": "Saving money effectively involves creating a budget, tracking your"
+     },
+     "3d1264735bda4fcab31b04b9d182f6f7": {
+      "snapshots": 12,
+      "last": "Setting financial goals is crucial for managing your finances effectively and achieving"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 4,
+    "playback_window": [
+     7240263.720025619,
+     7240287.937949276
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_audio_seconds": 26.9706875,
+   "send_seconds": 26.945121691562235,
+   "response_ids": [
+    "29d343292bc641b2a7bc6538cbf96a69",
+    "c752c7db0b0c4995be506150fdca7140"
+   ],
+   "finished_response_ids": [
+    "29d343292bc641b2a7bc6538cbf96a69"
+   ],
+   "asr_final": null,
+   "response": "Certainly! Improving your sleep quality",
+   "first_audio_seconds": 5.275355274789035,
+   "tts_audio_bytes": 433920,
+   "event_count": 25,
+   "events": {
+    "ticks": 25,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 1,
+     "session_attached": 1,
+     "start_tts": 2,
+     "stop_tts": 1,
+     "update_asr": 7,
+     "update_resp": 10,
+     "vad_speech_end": 1,
+     "vad_speech_start": 1
+    },
+    "span_seconds": 7240288.537
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/10/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "1f8ad7c6-0ba1-49fa-9e34-0040fb5f36ef",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/10/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/10/output.wav",
+   "sample_index": 1,
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/1f8ad7c6-0ba1-49fa-9e34-0040fb5f36ef.jsonl",
+   "timeline": {
+    "records": 891,
+    "protocol_tokens": {
+     "count": 9,
+     "tokens": {
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 6
+     }
+    },
+    "raw_outputs": {
+     "count": 9,
+     "tokens": {
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 6
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 7,
+     "llm.first_chunk": 43,
+     "duplex.protocol_parsed": 9,
+     "duplex.micro_turn_ready": 42,
+     "tts.started": 2,
+     "turn.tts_delivery_start_requested": 2,
+     "turn.tts_start_requested": 2,
+     "llm_agent.response_update": 356,
+     "turn.tts_text_append_requested": 356,
+     "llm.sentence_ready": 2,
+     "tts.chunk_ready": 53,
+     "response.update": 10,
+     "tts.stopped": 2,
+     "turn.tts_stop_requested": 2,
+     "response.finish": 1,
+     "tts.response_closed": 1,
+     "tts.playback_stopped": 1
+    },
+    "response_ids": [
+     "29d343292bc641b2a7bc6538cbf96a69",
+     "c752c7db0b0c4995be506150fdca7140"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 1.836007846519351,
+     "tts_to_first_played_text_seconds": 3.428435504436493,
+     "stop_request_to_tts_stopped_seconds": [
+      0.0004612728953361511,
+      0.0002540741115808487
+     ]
+    },
+    "interruption_events": [
+     {
+      "response_id": "29d343292bc641b2a7bc6538cbf96a69",
+      "reason": "interruption",
+      "raw_output": "<|user interruption|>",
+      "monotonic_timestamp": 7240301.430074545
+     }
+    ],
+    "stopped_response_ids": [
+     "29d343292bc641b2a7bc6538cbf96a69",
+     "c752c7db0b0c4995be506150fdca7140"
+    ],
+    "interruption_stop_response_ids": [
+     "29d343292bc641b2a7bc6538cbf96a69"
+    ],
+    "teardown_stop_response_ids": [
+     "c752c7db0b0c4995be506150fdca7140"
+    ],
+    "played_text": {
+     "29d343292bc641b2a7bc6538cbf96a69": {
+      "snapshots": 3,
+      "last": "Reducing stress"
+     },
+     "c752c7db0b0c4995be506150fdca7140": {
+      "snapshots": 7,
+      "last": "Certainly! Improving your sleep quality"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 4,
+    "playback_window": [
+     7240294.850064075,
+     7240318.464396081
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_audio_seconds": 28.2506875,
+   "send_seconds": 28.224949355237186,
+   "response_ids": [
+    "ee39cc78df214a08891e8330e774b2a2",
+    "554aa1b940db4d339f92b198913eb755"
+   ],
+   "finished_response_ids": [
+    "ee39cc78df214a08891e8330e774b2a2"
+   ],
+   "asr_final": null,
+   "response": "Choosing the right type of pet",
+   "first_audio_seconds": 5.862982180900872,
+   "tts_audio_bytes": 460800,
+   "event_count": 26,
+   "events": {
+    "ticks": 26,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 1,
+     "session_attached": 1,
+     "start_tts": 2,
+     "stop_tts": 1,
+     "update_asr": 8,
+     "update_resp": 10,
+     "vad_speech_end": 1,
+     "vad_speech_start": 1
+    },
+    "span_seconds": 7240319.063
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/100/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "51a90b1f-509e-4f5b-abac-797031702aa2",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/100/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/100/output.wav",
+   "sample_index": 2,
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/51a90b1f-509e-4f5b-abac-797031702aa2.jsonl",
+   "timeline": {
+    "records": 943,
+    "protocol_tokens": {
+     "count": 10,
+     "tokens": {
+      "<|user backchannel|>": 1,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 6
+     }
+    },
+    "raw_outputs": {
+     "count": 10,
+     "tokens": {
+      "<|user backchannel|>": 1,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 6
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 8,
+     "llm.first_chunk": 45,
+     "duplex.protocol_parsed": 10,
+     "duplex.micro_turn_ready": 44,
+     "tts.started": 2,
+     "turn.tts_delivery_start_requested": 2,
+     "turn.tts_start_requested": 2,
+     "llm_agent.response_update": 379,
+     "turn.tts_text_append_requested": 379,
+     "llm.sentence_ready": 2,
+     "tts.chunk_ready": 53,
+     "response.update": 10,
+     "tts.stopped": 2,
+     "turn.tts_stop_requested": 2,
+     "response.finish": 1,
+     "tts.response_closed": 1,
+     "tts.playback_stopped": 1
+    },
+    "response_ids": [
+     "554aa1b940db4d339f92b198913eb755",
+     "ee39cc78df214a08891e8330e774b2a2"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 2.441281638108194,
+     "tts_to_first_played_text_seconds": 3.4217914883047342,
+     "stop_request_to_tts_stopped_seconds": [
+      0.0003663022071123123,
+      0.00039629172533750534
+     ]
+    },
+    "interruption_events": [
+     {
+      "response_id": "ee39cc78df214a08891e8330e774b2a2",
+      "reason": "interruption",
+      "raw_output": "<|user interruption|>",
+      "monotonic_timestamp": 7240334.351185402
+     }
+    ],
+    "stopped_response_ids": [
+     "554aa1b940db4d339f92b198913eb755",
+     "ee39cc78df214a08891e8330e774b2a2"
+    ],
+    "interruption_stop_response_ids": [
+     "ee39cc78df214a08891e8330e774b2a2"
+    ],
+    "teardown_stop_response_ids": [
+     "554aa1b940db4d339f92b198913eb755"
+    ],
+    "played_text": {
+     "ee39cc78df214a08891e8330e774b2a2": {
+      "snapshots": 4,
+      "last": "Getting a new puppy"
+     },
+     "554aa1b940db4d339f92b198913eb755": {
+      "snapshots": 6,
+      "last": "Choosing the right type of pet"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 4,
+    "playback_window": [
+     7240325.975656136,
+     7240350.273736778
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_audio_seconds": 28.272,
+   "send_seconds": 28.25684974435717,
+   "response_ids": [
+    "47d39a1d82ad48959093493a8c6ddacb",
+    "baf4a4e024034a3984404afe73631d97"
+   ],
+   "finished_response_ids": [
+    "47d39a1d82ad48959093493a8c6ddacb"
+   ],
+   "asr_final": null,
+   "response": "Fixing a leaky faucet typically",
+   "first_audio_seconds": 5.165661131031811,
+   "tts_audio_bytes": 414720,
+   "event_count": 24,
+   "events": {
+    "ticks": 24,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 1,
+     "session_attached": 1,
+     "start_tts": 2,
+     "stop_tts": 1,
+     "update_asr": 7,
+     "update_resp": 9,
+     "vad_speech_end": 1,
+     "vad_speech_start": 1
+    },
+    "span_seconds": 7240350.889
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/101/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "1a340421-19a3-4ee5-84f1-7c3e9a4ff74f",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/101/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/101/output.wav",
+   "sample_index": 3,
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/1a340421-19a3-4ee5-84f1-7c3e9a4ff74f.jsonl",
+   "timeline": {
+    "records": 999,
+    "protocol_tokens": {
+     "count": 9,
+     "tokens": {
+      "<|user backchannel|>": 2,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 4
+     }
+    },
+    "raw_outputs": {
+     "count": 9,
+     "tokens": {
+      "<|user backchannel|>": 2,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 4
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 7,
+     "llm.first_chunk": 46,
+     "duplex.protocol_parsed": 9,
+     "duplex.micro_turn_ready": 45,
+     "tts.started": 2,
+     "turn.tts_delivery_start_requested": 2,
+     "turn.tts_start_requested": 2,
+     "llm_agent.response_update": 410,
+     "turn.tts_text_append_requested": 410,
+     "llm.sentence_ready": 2,
+     "tts.chunk_ready": 48,
+     "response.update": 9,
+     "tts.stopped": 2,
+     "turn.tts_stop_requested": 2,
+     "response.finish": 1,
+     "tts.response_closed": 1,
+     "tts.playback_stopped": 1
+    },
+    "response_ids": [
+     "47d39a1d82ad48959093493a8c6ddacb",
+     "baf4a4e024034a3984404afe73631d97"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 1.8375510787591338,
+     "tts_to_first_played_text_seconds": 6.921607842668891,
+     "stop_request_to_tts_stopped_seconds": [
+      0.00040647760033607483,
+      0.0003279121592640877
+     ]
+    },
+    "interruption_events": [
+     {
+      "response_id": "47d39a1d82ad48959093493a8c6ddacb",
+      "reason": "interruption",
+      "raw_output": "<|user interruption|>",
+      "monotonic_timestamp": 7240366.177610043
+     }
+    ],
+    "stopped_response_ids": [
+     "47d39a1d82ad48959093493a8c6ddacb",
+     "baf4a4e024034a3984404afe73631d97"
+    ],
+    "interruption_stop_response_ids": [
+     "47d39a1d82ad48959093493a8c6ddacb"
+    ],
+    "teardown_stop_response_ids": [
+     "baf4a4e024034a3984404afe73631d97"
+    ],
+    "played_text": {
+     "47d39a1d82ad48959093493a8c6ddacb": {
+      "snapshots": 2,
+      "last": "The best"
+     },
+     "baf4a4e024034a3984404afe73631d97": {
+      "snapshots": 7,
+      "last": "Fixing a leaky faucet typically"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 4,
+    "playback_window": [
+     7240356.599022346,
+     7240382.131098459
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_audio_seconds": 28.4213125,
+   "send_seconds": 28.417169895023108,
+   "response_ids": [
+    "09f5c54f8c5248e394f2153efdb253ae"
+   ],
+   "finished_response_ids": [],
+   "asr_final": null,
+   "response": "When aiming for weight loss, it's",
+   "first_audio_seconds": 5.768371559679508,
+   "tts_audio_bytes": 299520,
+   "event_count": 21,
+   "events": {
+    "ticks": 21,
+    "by_event": {
+     "latency_metrics": 1,
+     "session_attached": 1,
+     "start_tts": 1,
+     "update_asr": 8,
+     "update_resp": 8,
+     "vad_speech_end": 1,
+     "vad_speech_start": 1
+    },
+    "span_seconds": 7240382.734
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/102/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "6f89ccb2-ed00-49cf-aff4-beca09ba5d4c",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/102/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb/user_interruption/synthetic_user_interruption/102/output.wav",
+   "sample_index": 4,
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261014T033949Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/6f89ccb2-ed00-49cf-aff4-beca09ba5d4c.jsonl",
+   "timeline": {
+    "records": 995,
+    "protocol_tokens": {
+     "count": 9,
+     "tokens": {
+      "<|user backchannel|>": 5,
+      "<|user finish talking|>": 1,
+      "<|user is talking|>": 3
+     }
+    },
+    "raw_outputs": {
+     "count": 9,
+     "tokens": {
+      "<|user backchannel|>": 5,
+      "<|user finish talking|>": 1,
+      "<|user is talking|>": 3
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 8,
+     "llm.first_chunk": 45,
+     "duplex.protocol_parsed": 9,
+     "duplex.micro_turn_ready": 45,
+     "tts.started": 1,
+     "turn.tts_delivery_start_requested": 1,
+     "turn.tts_start_requested": 1,
+     "llm_agent.response_update": 420,
+     "turn.tts_text_append_requested": 420,
+     "llm.sentence_ready": 1,
+     "tts.chunk_ready": 34,
+     "response.update": 8,
+     "tts.stopped": 1,
+     "turn.tts_stop_requested": 1
+    },
+    "response_ids": [
+     "09f5c54f8c5248e394f2153efdb253ae"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 1.8344078455120325,
+     "tts_to_first_played_text_seconds": 6.941457601264119,
+     "stop_request_to_tts_stopped_seconds": [
+      0.00048748496919870377
+     ]
+    },
+    "interruption_events": [],
+    "stopped_response_ids": [
+     "09f5c54f8c5248e394f2153efdb253ae"
+    ],
+    "interruption_stop_response_ids": [],
+    "teardown_stop_response_ids": [
+     "09f5c54f8c5248e394f2153efdb253ae"
+    ],
+    "played_text": {
+     "09f5c54f8c5248e394f2153efdb253ae": {
+      "snapshots": 8,
+      "last": "When aiming for weight loss, it's"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 5,
+    "playback_window": [
+     7240389.037859805,
+     7240414.135019488
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  }
+ ],
+ "note": "Inference audio only; run official FDB ASR alignment and scoring separately."
 }

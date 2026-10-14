@@ -12,6 +12,9 @@ JOB_NAME="${TTS_AB_JOB_NAME:-xtalk-tts-throughput}"
 GPUS="${TTS_AB_GPUS:-1}"
 CPU="${TTS_AB_CPU:-8}"
 MEM="${TTS_AB_MEM:-32G}"
+# A10 is a fallback for a saturated 4090 queue: it is slower, so only the
+# relative speedup between arms is comparable across different partitions.
+PARTITION="${TTS_AB_PARTITION:-pdgpu-4090}"
 LOG_ROOT="${DUPLEX_A4_SUBMIT_LOG_ROOT:-$TASK_ROOT/data/runs/submit_logs}"
 mkdir -p "$LOG_ROOT"
 LOG="$LOG_ROOT/submit.tts_throughput.$(date -u +%Y%m%dT%H%M%SZ).log"
@@ -29,7 +32,7 @@ printf -v NODE_SCRIPT '%q' "$TASK_ROOT/scripts/remote/run_tts_throughput_ab_node
 NODE_COMMAND+="bash $NODE_SCRIPT"
 
 vc submit --image "$IMAGE" \
-  --partition pdgpu-4090 --job "$JOB_NAME" --num-task 1 \
+  --partition "$PARTITION" --job "$JOB_NAME" --num-task 1 \
   --cpu-per-task "$CPU" --mem-per-task "$MEM" --gpu-per-task "$GPUS" \
   JOB=1:1 "$LOG" \
   --cmd "$NODE_COMMAND"

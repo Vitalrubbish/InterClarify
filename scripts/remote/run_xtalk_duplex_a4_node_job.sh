@@ -449,6 +449,13 @@ done
 cp "$RUN_DIR"/tests/*.log "$REPORT_DIR/tests/" 2>/dev/null || true
 cp "$RUN_DIR"/logs/fdb_scoring_*.log "$REPORT_DIR/tests/" 2>/dev/null || true
 
+# Compact the tracked evidence: verdicts, ids, timings and per-token counts stay,
+# the per-tick arrays and sampler CSVs are summarized - the raw streams remain in
+# data/runs/<tag>/.  See docs/scripts/remote/compact_a4_report.md.
+conda run --no-capture-output -n "$CLIENT_ENV" \
+  python "$TASK_ROOT/scripts/remote/compact_a4_report.py" --report-dir "$REPORT_DIR" \
+  >> "$RUN_DIR/run.log" 2>&1 || true
+
 printf '[a4] output=%s reports=%s failures=%s\n' "$RUN_DIR" "$REPORT_DIR" "$FAILURES" | tee -a "$RUN_DIR/run.log"
 if [ "$REQUIRE_COMPLETE" = "1" ]; then
   COMPLETE_STATUS="$(conda run -n "$CLIENT_ENV" python -c 'import json,sys; print(json.load(open(sys.argv[1]))["status"])' "$RUN_DIR/a4_summary.json")"
