@@ -57,6 +57,6 @@
 
 ## 6. 阶段 A 官方权重接入（2026-10-12）
 
-用户指定先使用官方已训练 DuplexCascade 权重，后续再考虑训练。当前 X-Talk dev@a06dd57 的 A2/A3 运行时使用实际 wire token、raw ChatML 和首次非空 ASR 后的 0.6 秒串行 micro-turn；配置为 [xtalk_duplex_runtime.json](../configs/xtalk_duplex_runtime.json)，原生 round1 配置继续作为对照。远端 checkpoint、token IDs、conda 和任务判据见 [远端任务单](xtalk_duplex_remote_task.md)。此变更保留 X-Talk ASR/TTS/播放底座，只替换 Layer 1 模型及确定性执行；质量与 FDB 结论须重新测量。
+用户指定先使用官方已训练 DuplexCascade 权重，后续再考虑训练。当前 X-Talk dev@a06dd57 的 A2/A3 运行时使用实际 wire token、raw ChatML 和首次非空 ASR 后的 0.6 秒串行 micro-turn；配置为 [xtalk_duplex_runtime.json](../configs/xtalk_duplex_runtime.json)，原生 round1 配置继续作为对照。远端 checkpoint、token IDs、conda 和任务判据见 [阶段 A 全双工验收任务单](xtalk_a4_remote_acceptance.md)（pre-A4 的官方权重运行时冒烟脚本已在 2026-10-14 清理中移除，其步骤已被 A4 作业覆盖）。此变更保留 X-Talk ASR/TTS/播放底座，只替换 Layer 1 模型及确定性执行；质量与 FDB 结论须重新测量。
 
 官方权重远端运行时冒烟：job-179179566806951798391-xuan-zhang，源码快照 17fd22d55cc7，status=PASS、12 micro-turn、协议 errors=0。真实 LLM + 脚本前缀 + 模拟 PCM 验证了接入，尚未更新原生 ASR/MOSS 音频和 FDB 质量基线。

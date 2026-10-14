@@ -81,7 +81,6 @@ openai_use.example
 !reports/duplex_acceptance/**/*.log
 !reports/duplex_acceptance/**/*.jsonl
 
-# DuplexCascade marker probe evidence, tracked for the same reason.
-!reports/duplex_marker_probe/
-!reports/duplex_marker_probe/**
-!reports/duplex_marker_probe/**/*.log
+# Only the A4 acceptance reports keep their *.log / *.jsonl exceptions: the
+# one-off marker-probe and ASR before/after evidence directories were removed on
+# 2026-10-14 (their conclusions live in docs/xtalk_a4_remote_acceptance.md).

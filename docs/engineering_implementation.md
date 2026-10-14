@@ -24,6 +24,8 @@ A1 协议与可观测性补丁已提交至 X-Talk fork 的 dev 分支，提交�
 
 本次收缩依据用户决定：从当前改造范围移除 Layer 0 和系统附和输出，先建立更简单的无 System Backchannel 底座。论文第 4.1 节将无系统附和版称为 DuplexCascade，有系统附和版称为 DuplexCascade-β，见[原文](https://arxiv.org/html/2603.09180v1#S4.SS1)。用户附和识别仍属于保留能力。第一套组件候选及冻结门禁见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
 
+**2026-10-14 仓库清理**：按"只保留原生 X-Talk 复现 + 阶段 A 最终实现"的口径，移除了 P0 阶段建立的通用配置/清单骨架（`src/interclarify/`、`configs/{base,local,replay,cluster}.yaml`、`docs/src/`、`scripts/run_p0_smoke.py`、`tests/test_p0_artifacts.py`）与全部一次性诊断作业及其产物；环境自检脚本 `scripts/check_env.py`、`scripts/check_audio_io.py` 保留。第 4 节记录的 P0 工作项因此不再有对应实现，后续 P2 的数据/评测骨架从第 11 节的结构重新建立。清理明细与结论去向见 [A4 任务单](xtalk_a4_remote_acceptance.md) §13。
+
 ## 2. MVP 范围与不可破坏的边界
 
 ### 2.1 当前研究范围
@@ -106,7 +108,7 @@ P1 和 P2 是最早的两个强制门禁。A1–A3 已通过本地实现门禁�
 
 ### 4.2 工作项
 
-1. 在 `configs/base.yaml` 固定 X-Talk fork、官方 upstream、适配器提交和基座提交；当前来源和验收证据登记在 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
+1. 固定 X-Talk fork、官方 upstream、适配器提交和基座提交；当前来源和验收证据登记在 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)（原先用于固定的 `configs/base.yaml` 已随 2026-10-14 清理移除，来源改由该登记表与 [configs/xtalk_round1.yaml](../configs/xtalk_round1.yaml) 承担）。
 2. 明确集群镜像 `xtalk:v0.17` 与源码提交的对应关系；对应关系未证明前，不把镜像标签当作可复现版本。
 3. 用 conda 创建本地和远端环境；P1 选择具体 ASR、TTS、LLM agent 和 turn detector 后，再锁定相应 X-Talk extras。
 4. 保留 local / replay / cluster 三类配置、唯一运行目录和结构化事件日志。
@@ -329,7 +331,7 @@ Layer 2 结果必须同时满足会话、话轮、前缀版本、任务状态、
 
 ## 11. 建议仓库结构与文档映射
 
-P1 的 X-Talk Duplex 源码位于独立 fork，不出现在本仓库文件树中。以下结构从 P2 的 InterClarify 接入开始逐步建立，不创建空目录：
+P1 的 X-Talk Duplex 源码位于独立 fork，不出现在本仓库文件树中。以下结构从 P2 的 InterClarify 接入开始逐步建立，不创建空目录；P0 阶段曾建立的同类骨架已在 2026-10-14 清理中移除，当时只保留 X-Talk 复现与阶段 A 实现所需的 `configs/`、`scripts/remote/`、`tests/`、`docs/` 四类目录：
 
 ```text
 InterClarify/

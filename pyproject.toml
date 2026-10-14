@@ -1,12 +1,13 @@
-[build-system]
-requires = ["setuptools>=68"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "interclarify"
 version = "0.1.0"
 description = "Within-turn clarification policy for full-duplex voice agents"
-requires-python = ">=3.10,<3.12"
+requires-python = ">=3.10"
+# The repository is not distributed as an installable package: the cluster and
+# local runs use conda environments (environment.yml + requirements.txt), and the
+# former P0 `src/interclarify` scaffold was removed in the 2026-10-14 cleanup.
+# This file now only keeps project metadata, the dependency groups and pytest
+# settings.  See docs/engineering_implementation.md section 11.
 dependencies = [
     "PyYAML>=6.0",
 ]
@@ -26,12 +27,6 @@ runtime = [
 dev = [
     "pytest>=8.0",
 ]
-
-[tool.setuptools]
-package-dir = {"" = "src"}
-
-[tool.setuptools.packages.find]
-where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

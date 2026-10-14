@@ -4,51 +4,48 @@ InterClarify 研究全双工语音代理在**用户话轮内**主动澄清的时
 
 参考底座为独立维护的 [Vitalrubbish/xtalk](https://github.com/Vitalrubbish/xtalk) fork。第一阶段先跑通并冻结一套原生组件组合，再补齐 DuplexCascade 无 System Backchannel 版本的 micro-turn、Layer 1、提前回答、持续监听、用户附和识别和打断停播；当前移除 Layer 0，底座稳定后再接入 InterClarify Layer 2。InterClarify 不跟踪 X-Talk 源码或子模块，只记录实验使用的 fork 提交。
 
-**当前状态：A2/A3 已实现于 X-Talk dev 提交 `2f8a433`，官方权重历史运行时冒烟通过。** A1 提交为 9c131ed；真实模型完成 12 个 micro-turn、协议错误 0；完整 ASR/MOSS 音频、FDB 与 A4 验收仍待完成，Layer 2 尚未接入。
+**当前状态：阶段 A 全双工运行时已实现并完成验收。** A1–A3 与官方 DuplexCascade 权重运行时对齐（X-Talk fork `2f595f3`），A4 在远端 3 卡作业上跑通回放场景与 FDB 四轴；ASR append-only 输入契约（方案 B）复检后 `user_interruption` 的 `average_rating` 由 0.6 升到 2.25，剩余瓶颈是 MOSS-TTS 的合成产量（0.2–0.5 倍实时），已实现运行时补丁 `moss_tts_patch.py`（T1 local transformer 编译后端 / T2 采样头）。Layer 2 尚未接入。
 
 ## 当前基础设施
 
 | 交付物 | 位置 |
 | --- | --- |
-| 固定 conda 环境 | [environment.yml](environment.yml) + [requirements.txt](requirements.txt) |
-| 当前 X-Talk 组件与复测基线 | [docs/xtalk_baseline_stack.md](docs/xtalk_baseline_stack.md) |
-| 三类配置模板 | [configs/](configs/)（local / replay / cluster） |
-| 实验清单格式 | `manifest.json` / `resolved_config.yaml` / `events.jsonl`，见 [docs/src/interclarify/run.md](docs/src/interclarify/run.md) |
-| 当前远端复测入口 | [scripts/remote/submit_xtalk_round1_job.sh](scripts/remote/submit_xtalk_round1_job.sh) 与 [docs/scripts/remote/submit_xtalk_round1_job.md](docs/scripts/remote/submit_xtalk_round1_job.md) |
+| X-Talk fork 与复测基线 | [docs/xtalk_baseline_stack.md](docs/xtalk_baseline_stack.md) |
+| 原生组件配置 | [configs/xtalk_round1.yaml](configs/xtalk_round1.yaml)、[configs/xtalk_round1_runtime.json](configs/xtalk_round1_runtime.json) |
+| 阶段 A 全双工配置 | [configs/xtalk_duplex_runtime.json](configs/xtalk_duplex_runtime.json) |
+| 原生链路远端复测入口 | [scripts/remote/submit_xtalk_round1_job.sh](scripts/remote/submit_xtalk_round1_job.sh) → [docs/scripts/remote/xtalk_link_check.md](docs/scripts/remote/xtalk_link_check.md) |
 | 阶段 A 全双工验收 | 任务单 [docs/xtalk_a4_remote_acceptance.md](docs/xtalk_a4_remote_acceptance.md)、入口 [scripts/remote/submit_xtalk_duplex_a4_job.sh](scripts/remote/submit_xtalk_duplex_a4_job.sh)、报告 [reports/duplex_acceptance/](reports/duplex_acceptance/) |
+| TTS 吞吐补丁与测量 | [docs/scripts/remote/moss_tts_patch.md](docs/scripts/remote/moss_tts_patch.md)、[docs/scripts/remote/run_tts_throughput_ab_node_job.md](docs/scripts/remote/run_tts_throughput_ab_node_job.md) |
+| 集群镜像与 conda 环境 | [scripts/remote/Dockerfile.round1](scripts/remote/Dockerfile.round1)、[scripts/remote/setup_env.sh](scripts/remote/setup_env.sh)、[environment.yml](environment.yml)、[requirements.txt](requirements.txt) |
 
-## 本地环境与验收
+## 本地与远端运行
 
 ```bash
+# 建环境（本地用 conda，集群节点同样用 conda）
 conda env create -f environment.yml
 conda run -n interclarify-dev python -m pip install -r requirements.txt
 
-# 环境自检（无 GPU 时可省略 --require-gpu）
+# 环境自检（无 GPU 时可省略 --require-gpu）；headless 机器报告 NO_DEVICES 属预期
 conda run -n interclarify-dev python scripts/check_env.py --require-gpu
-# 音频设备探测（headless 机器报告 NO_DEVICES 属预期）
 conda run -n interclarify-dev python scripts/check_audio_io.py
 
-# 确定性离线冒烟：同一输入与配置应产生结构一致的日志
-conda run -n interclarify-dev python scripts/run_p0_smoke.py --profile replay
-
-# 单元测试
-conda run -n interclarify-dev python -m pytest -q
+# 单元测试（需要 xtalk fork 源码与客户端依赖；moss_tts_patch 的用例只在 TTS 环境实跑）
+PYTHONPATH=xtalk/src conda run -n xtalk-round1-client python -m unittest \
+  tests.test_qwen3_asr_service tests.test_xtalk_round1 tests.test_duplex_a4_replay \
+  tests.test_duplex_model_service tests.test_xtalk_link_check tests.test_moss_tts_patch
 ```
 
-当前模型链路复测使用 `bash scripts/remote/submit_xtalk_round1_job.sh link` 提交；它在远端 conda 环境中运行顺序两轮和插话续答检查。完整判据见 [docs/scripts/remote/xtalk_link_check.md](docs/scripts/remote/xtalk_link_check.md)。
+远端复测使用 `bash scripts/remote/submit_xtalk_round1_job.sh link`（原生组件组合）或 `bash scripts/remote/submit_xtalk_duplex_a4_job.sh`（阶段 A 全双工验收）；完整判据见各自的任务单。
 
 ## 文档索引
 
-- 实现文档（按源码树镜像）：[docs/src/interclarify/](docs/src/interclarify/)、[docs/scripts/](docs/scripts/)、[docs/configs/](docs/configs/)
 - 研究设计：[docs/research_design.md](docs/research_design.md)；工程方案：[docs/engineering_implementation.md](docs/engineering_implementation.md)
-- 阶段 A 全双工验收任务单：[docs/xtalk_a4_remote_acceptance.md](docs/xtalk_a4_remote_acceptance.md)；验收证据：[reports/duplex_acceptance/](reports/duplex_acceptance/)
-- X-Talk 具体改造方案：[docs/xtalk_modification_plan.md](docs/xtalk_modification_plan.md)
-- 当前组件、复测证据与冻结边界：[docs/xtalk_baseline_stack.md](docs/xtalk_baseline_stack.md)
-- 首轮模型配置：[configs/xtalk_round1.yaml](configs/xtalk_round1.yaml)；运行配置：[configs/xtalk_round1_runtime.json](configs/xtalk_round1_runtime.json)
-- 下一阶段方案：[docs/xtalk_modification_plan.md](docs/xtalk_modification_plan.md)（P1 控制层改造）
+- 阶段 A 全双工验收任务单：[docs/xtalk_a4_remote_acceptance.md](docs/xtalk_a4_remote_acceptance.md)；证据：[reports/duplex_acceptance/](reports/duplex_acceptance/)
+- X-Talk 具体改造方案：[docs/xtalk_modification_plan.md](docs/xtalk_modification_plan.md)；当前组件与冻结边界：[docs/xtalk_baseline_stack.md](docs/xtalk_baseline_stack.md)
+- 脚本与配置说明：[docs/scripts/](docs/scripts/)、[docs/configs/](docs/configs/)；单测说明：[docs/tests/](docs/tests/)
 
 实现行为若与文档不一致，先更新文档并说明原因，再改代码。
 
-阶段 A 当前已在本地完成 A1–A3 门禁：X-Talk 142（3 skipped）、InterClarify 40，A1 定向 35/35、A2/A3 行为 34/34；`<|user interruption|>` 在模型"正在播报"窗口内 reset 未播音频，生成继续解码到 `<|im_end|>`。官方权重历史 smoke 和最新 A4 服务器入口见 [远端任务单](docs/xtalk_duplex_remote_task.md) 与 [A4 任务单](docs/xtalk_a4_remote_acceptance.md)。配置入口为 [xtalk_duplex_runtime.json](configs/xtalk_duplex_runtime.json)，原生连接基线保留作对照。
+阶段 A 的门禁与证据链：A1–A3 实现于 X-Talk fork（历史提交 `9c131ed` / `2f8a433`，当前对齐到 `2f595f3`），A4 由 3 卡作业完成回放场景、FDB 四轴推理与官方 judge 复检；`reports/duplex_acceptance/20261014T033949Z/` 是当前保留的唯一一轮验收证据。原生连接基线（`20261011T054900Z`）作为对照保留在 [基线栈文档](docs/xtalk_baseline_stack.md) 里。
 
-最新远端验收（tag `20261013T070801Z`）：5 个回放场景与 FDB 四轴推理全部 PASS，`failures=0`；FDB 语义评分（含 GPT judge）按本轮计划暂缓，因此汇总状态为 `INCOMPLETE`。证据见 [reports/duplex_acceptance/20261013T070801Z/](reports/duplex_acceptance/20261013T070801Z/)。
+2026-10-14 做过一次仓库清理：只保留**原生 X-Talk 复现**与**阶段 A 最终实现**，一次性诊断作业（标记探针、逐拍 trace、ASR before/after 对比、pre-A4 运行时冒烟）及其产物已移除，结论与数字保留在 [A4 任务单](docs/xtalk_a4_remote_acceptance.md) §9 与 §13。
