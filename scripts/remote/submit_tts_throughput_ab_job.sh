@@ -21,6 +21,12 @@ LOG="$LOG_ROOT/submit.tts_throughput.$(date -u +%Y%m%dT%H%M%SZ).log"
 
 printf -v NODE_COMMAND 'INTERCLARIFY_ROOT=%q CONDA_SH=%q ' "$TASK_ROOT" "/opt/conda/etc/profile.d/conda.sh"
 for variable in $(compgen -e); do
+  # Never forward a name ending in JOB_NAME: `vc` rewrites the literal token
+  # JOB_NAME inside the node command, which would turn `X_JOB_NAME=...` into a
+  # bogus `X_=...` assignment and abort the job before it starts.
+  case "$variable" in
+    *JOB_NAME) continue ;;
+  esac
   case "$variable" in
     XTALK_*|TTS_AB_*|RUN_TAG|MOSS_ENV|CLIENT_ENV|TTS_PORT)
       printf -v assignment '%s=%q ' "$variable" "${!variable}"
