@@ -23,9 +23,14 @@ from pathlib import Path
 from typing import Any, Optional
 
 METRIC_RE = re.compile(
-    r"\[tts-metric\].*?reason=(\S+)\s+turn=(\d+)\s+frames=(\d+)\s+audio_s=([0-9.]+)\s+wall_s=([0-9.]+)\s+rtf=([0-9.]+)"
+    r"\[tts-metric\].*?reason=(\S+)\s+line=(\d+)\s+frames=(\d+)\s+audio_s=([0-9.]+)\s+"
+    r"wall_s=([0-9.]+)\s+rtf=([0-9.]+)"
+    r"(?:\s+local_s=([0-9.]+)\s+backbone_s=([0-9.]+))?"
 )
 PATCH_RE = re.compile(r"\[moss-patch\]\s+(.*)")
+PROFILE_RE = re.compile(
+    r"\[moss-patch\] profile frames=(\d+) device_s=([0-9.]+) cpu_s=([0-9.]+) top=(.*)$"
+)
 
 
 def load_json(path: Path) -> dict:
@@ -57,21 +62,47 @@ def summarize_arm(run_dir: Path, arm: str) -> dict[str, Any]:
         if match:
             result['warmup_seconds'] = float(match.group(1))
 
+    result['engaged'] = any('compiled path engaged' in line for line in patches)
+    result['profile'] = None
+    for line in patches:
+        match = PROFILE_RE.search(line)
+        if match:
+            result['profile'] = {
+                'frames': int(match.group(1)),
+                'device_seconds': float(match.group(2)),
+                'cpu_seconds': float(match.group(3)),
+                'top': match.group(4).strip(),
+            }
+
     metrics = []
     for line in read_lines(run_dir / 'metrics' / f'{arm}.metric.log'):
         match = METRIC_RE.search(line)
         if match:
             metrics.append({
                 'reason': match.group(1),
-                'turn': int(match.group(2)),
+                'line': int(match.group(2)),
                 'frames': int(match.group(3)),
                 'audio_seconds': float(match.group(4)),
                 'wall_seconds': float(match.group(5)),
                 'rtf': float(match.group(6)),
+                'local_seconds': float(match.group(7) or 0.0),
+                'backbone_seconds': float(match.group(8) or 0.0),
             })
     result['turns'] = metrics
-    result['service_rtf_max'] = max((item['rtf'] for item in metrics), default=None)
+    frames_total = sum(item['frames'] for item in metrics)
+    audio_total = sum(item['audio_seconds'] for item in metrics)
+    wall_total = sum(item['wall_seconds'] for item in metrics)
+    local_total = sum(item['local_seconds'] for item in metrics)
+    backbone_total = sum(item['backbone_seconds'] for item in metrics)
+    result['service_frames'] = frames_total
+    result['service_audio_seconds'] = audio_total
+    result['service_wall_seconds'] = wall_total
+    result['service_rtf'] = (audio_total / wall_total) if wall_total else None
     result['service_rtf_median'] = statistics.median([item['rtf'] for item in metrics]) if metrics else None
+    result['local_share'] = (local_total / wall_total) if wall_total else None
+    result['backbone_share'] = (backbone_total / wall_total) if wall_total else None
+    profile = run_dir / 'metrics' / f'{arm}.profile.txt'
+    result['profile_file'] = profile.name if profile.is_file() else None
 
     for phase in ('cold', 'warm'):
         report = load_json(run_dir / f'{arm}-{phase}' / 'tts_report.json')
@@ -103,6 +134,11 @@ def format_seconds(value: Optional[float], digits: int = 2) -> str:
 def format_ratio(value: Optional[float], digits: int = 1) -> str:
     """Render an optional speedup ratio."""
     return '-' if value is None else f'{value:.{digits}f}x'
+
+
+def format_percent(value: Optional[float]) -> str:
+    """Render an optional share of the wall clock as an integer percentage."""
+    return '-' if value is None else f'{100.0 * value:.0f}%'
 
 
 def main() -> int:
@@ -146,39 +182,87 @@ def main() -> int:
         '',
         f"- tag: `{args.tag}`",
         f'- run dir: `{args.run_dir}`',
-        '- 固定文本、`--stream-chunk-words 6 --gap-seconds 0.02`、同一张卡的同一份权重；每个 arm 重启服务，先跑 `cold` 再跑 `warm`。',
-        '- `steady rtf = audio_s / (wall_s - first_audio_s)`：剔除一次性的会话启动与 prefill，表示稳定态每秒产出多少秒音频；`baseline` = 未打补丁的上游路径。',
+        '- 固定文本、`--stream-chunk-words 6 --gap-seconds 0.02`、同一张卡的同一份权重；每个 arm 重启服务（各自独立端口），先跑 `cold` 再跑 `warm`。',
+        '- 每个 arm 只改一个变量：`t1-*` 只改本地码本循环的执行后端（采样保持 upstream），`t2-*` 只改采样头（编译保持 off）。',
+        '- `steady rtf = audio_s / (wall_s - first_audio_s)`：剔除一次性的会话启动与 prefill；`服务端 rtf` = `Σaudio_s/Σwall_s`（对所有 `[tts-metric]` 行求和，中位数另列），`local/backbone 占比` = 该 arm 的 CUDA event 累计秒数 ÷ 墙钟。',
         '',
-        '| arm | 编译 | cold 首包 s | warm 首包 s | warm 音频 s | warm 墙钟 s | steady rtf | 服务端 rtf(最大) | 相对 baseline | 状态 |',
-        '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
+        '| arm | 编译 | 生效 | cold 首包 s | warm 首包 s | warm 音频 s | warm 墙钟 s | steady rtf | 服务端 rtf | 服务端中位 | local 占比 | backbone 占比 | 相对 baseline | 状态 |',
+        '| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |',
     ]
     for item in summaries:
         cold, warm = item.get('cold', {}), item.get('warm', {})
-        status = 'FAILED' if not warm.get('audio_seconds') else (
-            'compile 回退' if item['fallback'] else ('compiled' if item['compiled'] else '上游路径'))
+        if not warm.get('audio_seconds'):
+            status = 'FAILED'
+        elif item['fallback']:
+            status = 'compile 回退'
+        elif item['compiled'] and not item['engaged']:
+            status = '编译未生效'
+        elif item['compiled']:
+            status = 'compiled'
+        else:
+            status = '上游路径'
         lines.append(
-            '| {arm} | {compile} | {cold} | {warm} | {audio} | {wall} | {rtf} | {srtf} | {speedup} | {status} |'.format(
+            '| {arm} | {compile} | {engaged} | {cold} | {warm} | {audio} | {wall} | {rtf} | {srtf} | {smed} | {local} | {backbone} | {speedup} | {status} |'.format(
                 arm=item['arm'],
                 compile='是' if item['compiled'] else '否',
+                engaged='是' if item['engaged'] else '否',
                 cold=format_seconds(cold.get('first_audio_seconds')),
                 warm=format_seconds(warm.get('first_audio_seconds')),
                 audio=format_seconds(warm.get('audio_seconds')),
                 wall=format_seconds(warm.get('wall_seconds')),
                 rtf=format_seconds(warm.get('steady_rtf'), 2),
-                srtf=format_seconds(item.get('service_rtf_max'), 2),
+                srtf=format_seconds(item.get('service_rtf'), 2),
+                smed=format_seconds(item.get('service_rtf_median'), 2),
+                local=format_percent(item.get('local_share')),
+                backbone=format_percent(item.get('backbone_share')),
                 speedup=format_ratio(item.get('speedup_vs_baseline')),
                 status=status,
             )
         )
+    profiled = [item for item in summaries if item.get('profile')]
+    if profiled:
+        lines += [
+            '',
+            '## profile（`torch.profiler`，每回合最初的若干帧）',
+            '',
+            '| arm | 剖析帧数 | device 合计 s | cpu 合计 s | device/帧 ms | top kernel（按 device 时间） |',
+            '| --- | --- | --- | --- | --- | --- |',
+        ]
+        for item in profiled:
+            profile = item['profile']
+            frames = max(1, profile['frames'])
+            lines.append(
+                '| {arm} | {frames} | {device} | {cpu} | {per} | {top} |'.format(
+                    arm=item['arm'],
+                    frames=profile['frames'],
+                    device=format_seconds(profile['device_seconds'], 3),
+                    cpu=format_seconds(profile['cpu_seconds'], 3),
+                    per=format_seconds(1000.0 * profile['device_seconds'] / frames, 1),
+                    top=profile['top'].replace('|', '/') or '-',
+                )
+            )
+        lines.append(
+            '- `device/帧` 是**实际执行的 kernel 时间**；拿它与同一 arm 的墙钟/帧对比，差值就是 GPU 等 CPU 发活的时间（eager 逐算子派发时通常占大头）。'
+        )
+        lines.append('- 剖析期间的墙钟被 profiler 拖慢，所以 profile 臂的 rtf 不可当读数，只看本表。')
+
     lines += ['', '## 说明', '']
     if baseline_rtf:
         lines.append(
             f"- baseline 稳定态 rtf = **{baseline_rtf:.2f}**（>1 才追得上实时；本轮 A4 实测交付率约 0.2–0.5）。"
         )
     if any(item['fallback'] for item in summaries):
-        lines.append('- 有 arm 的本地编译/图捕获失败并回退到 eager，见 `data/runs/.../metrics/<arm>.patch.log`。')
+        lines.append('- `compile 回退` = 本地编译或图捕获失败并退回 eager，原因与 traceback 见 `metrics/<arm>.patch.log`。')
+    if any(item['compiled'] and not item['engaged'] for item in summaries):
+        lines.append('- `编译未生效` = 编译产物建好了，但推理没走到编译路径（窗口未饱和或 warmup 失败），该 arm 的读数不是编译后的成绩。')
+    profiled = [item['arm'] for item in summaries if item.get('profile_file')]
+    if profiled:
+        lines.append(
+            '- profile 臂（%s）的逐 kernel 表在 `metrics/<arm>.profile.txt`，用来判断时间花在 codec 解码、backbone 前向还是本地码本循环上。'
+            % '、'.join(profiled)
+        )
     lines += [
-        '- 判据：`t1-*` 只有在 `torch.compile(_local_loop) ready` 且 `warm` rtf 明显提升时才算成立；',
+        '- 判据：`t1-*` 只有在 `编译=是` 且 `生效=是` 且 `warm` rtf 明显高于 baseline 时才算成立；',
         '- 采样档位（`t2-greedy`/`t2-topk`）会改变音频内容，质量需试听 `warm/tts.wav`，本报告只给吞吐。',
     ]
     (args.report_dir / 'tts_throughput.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')

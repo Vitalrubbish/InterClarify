@@ -7,7 +7,7 @@
 set -euo pipefail
 
 TASK_ROOT="${INTERCLARIFY_DUPLEX_ROOT:?set independent synced source directory}"
-IMAGE="${DUPLEX_A4_IMAGE:-docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.3}"
+IMAGE="${DUPLEX_A4_IMAGE:-docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4}"
 JOB_NAME="${TTS_AB_JOB_NAME:-xtalk-tts-throughput}"
 GPUS="${TTS_AB_GPUS:-1}"
 CPU="${TTS_AB_CPU:-8}"
