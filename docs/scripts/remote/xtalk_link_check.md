@@ -32,3 +32,11 @@ headless 客户端收到音频后立即回执属于模拟播放确认，只验�
 
 - 这是单会话回放；顺序场景各轮依次进行，插话场景是在播放中主动送第二段话（非自然声学全双工）。
 - 与 fork 的 `scripts/test.py` 相比，本脚本不含客户端 VAD 模型与延迟分析录音，只做最小连接证据。
+
+## 服务启动可观测性（2026-10-15 新增）
+
+`_serve` 现在把启动进度写进 `$XTALK_SERVE_LOG`（默认 `xtalk_serve.log`）：`start host/port` → `imports ok` → `app mounted` → `uvicorn returned`，并在失败时把完整 traceback 写进去。`_wait_for_server` 取代直接轮询端口：端口一直不开时，抛出的 `TimeoutError` 会带上**子进程是死了还是卡住**（`exited with code N` / `still alive (stalled before binding its port)`）以及该日志的尾部。
+
+背景：2026-10-15 的 A4 作业里回放与 5 个 FDB 批次都报 `X-Talk server did not start in time`，但日志里**只有父进程的超时 traceback**，完全看不出子进程到底发生了什么是崩了还是卡住了；同镜像同配置在本机容器内启动只要 1.8–1.9s，无法复现。加了这段埋点后，同样的故障会直接给出子进程退出码与其自己的 traceback。
+
+`duplex_a4_replay.py` 会把该日志指到 `<--out>/xtalk_serve.log`，因此回放产物目录里就有服务启动日志。

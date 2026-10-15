@@ -26,9 +26,12 @@ import argparse
 import asyncio
 import json
 import multiprocessing
+import os
 import socket
 import time
+import traceback
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import requests
@@ -61,15 +64,43 @@ def _pick_free_port() -> int:
 
 
 def _serve(config: dict, host: str, port: int) -> None:
-    """Run the X-Talk FastAPI app in a dedicated process."""
-    import uvicorn
-    from fastapi import FastAPI
+    """Run the X-Talk FastAPI app in a dedicated process.
 
-    from xtalk.api import Xtalk
+    Startup progress and failures also land in ``$XTALK_SERVE_LOG`` (default
+    ``xtalk_serve.log``): without it a server that dies or stalls before binding
+    its port leaves the caller with nothing but "server did not start in time"
+    and no way to tell a crash from a stall (observed 2026-10-15).
+    """
+    _note_serve(f"start host={host} port={port}")
+    try:
+        import uvicorn
+        from fastapi import FastAPI
 
-    app = FastAPI(title="xtalk-link-check")
-    Xtalk.from_config(config).mount_routes(app)
-    uvicorn.run(app, host=host, port=port, log_level="warning", lifespan="off")
+        from xtalk.api import Xtalk
+
+        _note_serve("imports ok")
+        app = FastAPI(title="xtalk-link-check")
+        Xtalk.from_config(config).mount_routes(app)
+        _note_serve("app mounted")
+        uvicorn.run(app, host=host, port=port, log_level="warning", lifespan="off")
+        _note_serve("uvicorn returned")
+    except BaseException:
+        _note_serve("FAILED:\n" + traceback.format_exc())
+        raise
+
+
+def _serve_log_path() -> Path:
+    """Return the file the spawned server process reports progress to."""
+    return Path(os.environ.get("XTALK_SERVE_LOG", "xtalk_serve.log"))
+
+
+def _note_serve(message: str) -> None:
+    """Append one startup note from the spawned server process."""
+    try:
+        with _serve_log_path().open("a", encoding="utf-8") as handle:
+            handle.write(f"[serve {os.getpid()}] {message}\n")
+    except OSError:
+        pass
 
 
 async def _wait(predicate, timeout: float) -> bool:
@@ -340,6 +371,26 @@ async def _poll_port(host: str, port: int, deadline: float) -> None:
                 return
         await asyncio.sleep(0.1)
     raise TimeoutError("X-Talk server did not start in time")
+
+
+def _server_failure_detail(server: Any) -> str:
+    """Describe how the spawned server process ended, or that it is stuck."""
+    if server.is_alive():
+        return f"server process {server.pid} is still alive (stalled before binding its port)"
+    return f"server process {server.pid} exited with code {server.exitcode}"
+
+
+async def _wait_for_server(server: Any, port: int, deadline: float) -> None:
+    """Wait for the spawned server, reporting its fate and log when it stalls."""
+    try:
+        await _poll_port("127.0.0.1", port, deadline)
+    except TimeoutError as error:
+        log_path = _serve_log_path()
+        tail = ""
+        if log_path.is_file():
+            text = log_path.read_text(encoding="utf-8", errors="replace")
+            tail = f"\n--- {log_path} (tail) ---\n{text[-2000:]}"
+        raise TimeoutError(f"{error}: {_server_failure_detail(server)}{tail}") from None
 
 
 def main() -> None:

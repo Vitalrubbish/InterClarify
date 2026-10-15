@@ -3,6 +3,9 @@
 import asyncio
 import importlib.util
 import json
+import os
+import tempfile
+import time
 import unittest
 from pathlib import Path
 
@@ -95,6 +98,57 @@ class LinkCheckTests(unittest.IsolatedAsyncioTestCase):
         await client._receive(Socket())
         self.assertEqual(client._errors, ["failed"])
         self.assertFalse(await client._wait_for(lambda: True, 0))
+
+
+class ServerStartupDiagnosticsTests(unittest.IsolatedAsyncioTestCase):
+    """A server that never binds its port must explain itself in the log."""
+
+    def setUp(self) -> None:
+        """Point the child log at a scratch file for the duration of a test."""
+        self.serve_log = Path(tempfile.mkdtemp()) / "xtalk_serve.log"
+        previous = os.environ.get("XTALK_SERVE_LOG")
+        os.environ["XTALK_SERVE_LOG"] = str(self.serve_log)
+
+        def restore() -> None:
+            if previous is None:
+                os.environ.pop("XTALK_SERVE_LOG", None)
+            else:
+                os.environ["XTALK_SERVE_LOG"] = previous
+
+        self.addCleanup(restore)
+
+    class Process:
+        """Minimal stand-in for a spawned process."""
+        pid = 4321
+
+        def __init__(self, alive: bool, exitcode: int | None) -> None:
+            self._alive = alive
+            self.exitcode = exitcode
+
+        def is_alive(self) -> bool:
+            """Report whether the process is still running."""
+            return self._alive
+
+    async def test_dead_child_reports_exit_code_and_log_tail(self) -> None:
+        """An exited child contributes its exit code and what it logged."""
+        self.serve_log.write_text(
+            "[serve 1] start host=127.0.0.1 port=5000\n"
+            "[serve 1] FAILED:\nRuntimeError: onnxruntime is required\n",
+            encoding="utf-8",
+        )
+        with self.assertRaises(TimeoutError) as caught:
+            await link._wait_for_server(self.Process(False, 3), 1, time.monotonic() - 1)
+        message = str(caught.exception)
+        self.assertIn("exited with code 3", message)
+        self.assertIn("RuntimeError: onnxruntime is required", message)
+
+    async def test_stalled_child_is_distinguished_from_a_crash(self) -> None:
+        """A child that is still alive means a stall, not a crash."""
+        with self.assertRaises(TimeoutError) as caught:
+            await link._wait_for_server(self.Process(True, None), 1, time.monotonic() - 1)
+        message = str(caught.exception)
+        self.assertIn("still alive", message)
+        self.assertIn("stalled before binding", message)
 
 
 if __name__ == "__main__":

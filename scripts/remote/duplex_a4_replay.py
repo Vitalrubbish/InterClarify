@@ -6,6 +6,7 @@ import argparse
 import asyncio
 import json
 import multiprocessing
+import os
 import shutil
 import sys
 import time
@@ -17,7 +18,13 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 if str(SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPT_DIR))
 
-from xtalk_link_check import LinkClient, _load_pcm16, _pick_free_port, _poll_port, _serve
+from xtalk_link_check import (
+    LinkClient,
+    _load_pcm16,
+    _pick_free_port,
+    _serve,
+    _wait_for_server,
+)
 
 SAMPLE_RATE = 16_000
 SCENARIOS = ("normal", "interruption", "long_session", "pause", "multi_question")
@@ -804,11 +811,12 @@ async def run_fdb_batch(args: argparse.Namespace) -> dict[str, Any]:
         raise ValueError(f"no FDB input WAV files found under {args.fdb_input_root}")
     port = _pick_free_port()
     context = multiprocessing.get_context("spawn")
+    os.environ["XTALK_SERVE_LOG"] = str(args.out / "xtalk_serve.log")
     server = context.Process(target=_serve, args=(config, "127.0.0.1", port))
     server.start()
     results: list[dict[str, Any]] = []
     try:
-        await _poll_port("127.0.0.1", port, time.monotonic() + args.server_timeout)
+        await _wait_for_server(server, port, time.monotonic() + args.server_timeout)
         for index, input_path in enumerate(inputs):
             relative = input_path.relative_to(args.fdb_input_root)
             sample_output = args.fdb_output_root / relative.parent
@@ -883,11 +891,12 @@ async def run(args: argparse.Namespace) -> dict[str, Any]:
     config = serve_config(args.config, args.out, args.model_url, args.native)
     port = _pick_free_port()
     context = multiprocessing.get_context("spawn")
+    os.environ["XTALK_SERVE_LOG"] = str(args.out / "xtalk_serve.log")
     server = context.Process(target=_serve, args=(config, "127.0.0.1", port))
     server.start()
     results = []
     try:
-        await _poll_port("127.0.0.1", port, time.monotonic() + args.server_timeout)
+        await _wait_for_server(server, port, time.monotonic() + args.server_timeout)
         for scenario in args.scenarios:
             scenario_out = args.out / scenario
             scenario_out.mkdir(parents=True, exist_ok=True)
