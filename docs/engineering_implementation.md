@@ -4,13 +4,11 @@
 
 本文把 [research_design.md](research_design.md) 中的研究构想转换为可执行、可验收和可停止的工程计划。
 
-## 当前状态（2026-10-12）
+## 当前状态（2026-10-15）
 
-P0 路线重置和首轮框架接通门禁已完成。远端在 X-Talk fork `d9303c819c96230e527ea5159e7c74f1b5841a3e` 上完成两轮顺序链路和一次播放中插话复测：8/8 steps PASS、两个报告均 `status=COMPLETE`、`errors=[]`。因此项目现在进入 P1 的 X-Talk Duplex 控制层实现；本仓库仍不实现第二套语音运行时或 Layer 2。
+当前处于**阶段 A 验收**：驱动/运行时/服务与 FDB 四轴推理都已跑通，四轴指标与读法见 [A4 任务单](xtalk_a4_remote_acceptance.md) §9.7。本仓库仍不实现第二套语音运行时或 Layer 2；原生链路的历史门禁与来源固定见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
 
-这项通过只证明 ASR→LLM→TTS→播放和插话生命周期已经接通，不等于正式基线冻结、FDB 对照、质量评测或 Layer 2 完成。固定来源和证据见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
-
-A1 协议与可观测性补丁已提交至 X-Talk fork 的 dev 分支，提交为 9c131ed6399da66b66b001184cfa4005787b5f67，并完成本地验证：包括完整片段解析、协议错误观测、关联字段传递、JSONL 时间线和 TTSStarted 交付边界。A2 micro-turn 调度和 A3 在线 token 执行已提交至 X-Talk dev 提交 `2f8a43343dd83153298c416d270a8843b023abc0`。2026-10-13 的第二轮官方对齐把打断改为"播报窗口内 reset 未播音频 + 继续解码到 `<|im_end|>`"，并把 assistant 历史改存 token id；本地记录为 X-Talk 142 项（3 skipped）、InterClarify 40 项、A1 定向 35/35、A2/A3 行为 34/34。官方权重历史 smoke 为 12 个 micro-turn、协议错误 0，源码快照 17fd22d55cc7；最新提交的真实 ASR/MOSS、FDB 和 A4 远端验收见 [A4 任务单](xtalk_a4_remote_acceptance.md)。
+阶段 A 的实现分布在 X-Talk fork 与 `scripts/remote/`：fork 提交与基线见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)，改动清单、逐轮验收数字与仍挂着的待办见 [A4 任务单](xtalk_a4_remote_acceptance.md)。本地门禁：X-Talk 全量 142 项（139 PASS、3 skipped）、InterClarify root 80 项。
 
 自 2026-10-09 起，项目不再直接复现、内嵌或改造 DuplexCascade 官方源码。新的工程路线是：
 
@@ -25,6 +23,8 @@ A1 协议与可观测性补丁已提交至 X-Talk fork 的 dev 分支，提交�
 本次收缩依据用户决定：从当前改造范围移除 Layer 0 和系统附和输出，先建立更简单的无 System Backchannel 底座。论文第 4.1 节将无系统附和版称为 DuplexCascade，有系统附和版称为 DuplexCascade-β，见[原文](https://arxiv.org/html/2603.09180v1#S4.SS1)。用户附和识别仍属于保留能力。第一套组件候选及冻结门禁见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
 
 **2026-10-14 仓库清理**：按"只保留原生 X-Talk 复现 + 阶段 A 最终实现"的口径，移除了 P0 阶段建立的通用配置/清单骨架（`src/interclarify/`、`configs/{base,local,replay,cluster}.yaml`、`docs/src/`、`scripts/run_p0_smoke.py`、`tests/test_p0_artifacts.py`）与全部一次性诊断作业及其产物；环境自检脚本 `scripts/check_env.py`、`scripts/check_audio_io.py` 保留。第 4 节记录的 P0 工作项因此不再有对应实现，后续 P2 的数据/评测骨架从第 11 节的结构重新建立。清理明细与结论去向见 [A4 任务单](xtalk_a4_remote_acceptance.md) §13。
+
+**2026-10-15 补充清理**：TTS 吞吐 A/B 三件套与 FDB 录制窗口方案按 §13.1 移除（数字保留在任务单）；ASR 流式契约对比工具**保留**为后续 ASR 改动的回归工具（§9.4 的语言跑飞仍待修）；任务单中 2026-10-13～10-14 的调试过程叙事已压缩为结论，`data/runs/` 只保留每轮原始产物与提交记录。
 
 ## 2. MVP 范围与不可破坏的边界
 

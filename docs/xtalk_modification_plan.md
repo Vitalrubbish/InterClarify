@@ -399,7 +399,7 @@ A1 的论文格式解析 API 保留。A2/A3 在线路径严格使用官方 token
 
 X-Talk 的 ASR 返回累计前缀，assembler 只发送新增后缀。尚未发出的修订覆盖缓冲；已经发出的前缀发生 REWRITE 时，在下个调用前修订相应 user 消息，保留系统输出和已播事实，递增 prefix_version 并记录 revision_kind。这是适配累计 ASR 的工程扩展，官方 Word 流没有相应修订行为。final 不独立触发生成，也不重发相同内容。生成期间到达的输入保留到下一次 micro-turn，与官方串行推理一致；无论用户输入是否新增，持续空窗口仍允许回答续写和思考判断。若模型流中出现完整 `<|user interruption|>`，官方仅重置 TTS 音频并继续解码到 `<|im_end|>`；适配器同样不再截断模型流，而是消费到结束并把生成的 token id 原样写回历史。
 
-2026-10-13 与官方 server.py 逐项核对后，在线 wire 路径改为照官方全面容错。官方对每个解码到的控制 token 都做出反应，并对其余文本一律送入 TTS，不校验消息结构；X-Talk 现在同样处理：
+在线 wire 路径照官方全面容错（逐项核对 `server.py` 后定稿）：对每个解码到的控制 token 都做出反应，其余文本一律送 TTS，不校验消息结构：
 
 - 一个 micro-turn 内的每个控制 token 都按到达顺序执行（`DuplexRuntimeAdapter._apply_control`），相邻、重复、乱序或 `backchannel` 与回答文本混排都不再是协议错误；
 - 等待态 token 之后的文本照常流式送入 TTS；
@@ -415,11 +415,7 @@ X-Talk 的 ASR 返回累计前缀，assembler 只发送新增后缀。尚未发�
 
 远端模型绝对路径、基础模型目录和可用 conda 环境须实查；本地模拟回归不视为官方权重或 A4 验收。当前先交付在线组装、执行、配置和远端任务入口，训练留待后续决策。官方 state dict 完整装载，CUDA 推理采用 BF16 以适配 24GB 4090；此数值精度配置须写入 manifest，与官方 demo 默认 dtype 的差别不改变 micro-turn/token 协议。
 
-2026-10-12 本地验证：X-Talk unittest discovery 138 tests，3 skipped；InterClarify 24/24。A2/A3 行为测试 16/16，官方模型 HTTP/权重契约 3/3；X-Talk 实现提交为 a06dd57；源文件内容清单用于远端同步验证。
-
-远端首轮发现 interclarify-dev 的旧 fast tokenizer（tokenizers 0.19.1）不能解析发布 tokenizer.json（含 `ignore_merges` 等字段），服务当时退化为 slow tokenizer。2026-10-13 已按官方 server.py 恢复 fast 路径：`interclarify-dev` 升级到 transformers 4.46.3 / tokenizers 0.20.3 / peft 0.13.2（torch 保持 2.4.1+cu121），升级前留存 pip freeze 快照，实测 fast 与 slow 在本权重上的编码结果完全一致，且官方权重 strict 加载与 greedy 生成均通过。同时生成调用加入 `num_logits_to_keep=1`，等价地避免为整段 prompt 计算 LM head logits（官方 server.py 会 materialize 全部位置），消除 A4 观测到的长历史 CUDA OOM 根因。该兼容变更单独登记，health 记录 tokenizer 类和 dtype。
-
-2026-10-12 远端作业 job-179179566806951798391-xuan-zhang 在 4090 上完成官方权重运行时冒烟：12 个 micro-turn、errors=0、status=PASS；本地同步快照 17fd22d55cc7，160 文件校验通过。该任务使用真实 LLM、脚本 ASR 前缀和模拟 PCM；完整 ASR/MOSS、真实声卡、长会话与 FDB 继续属于 A4。
+两处与官方权重加载相关的决定（2026-10-12/13 实测后固化）：① 发布 tokenizer 只能走 fast 路径，`interclarify-dev` 因此升到 transformers 4.46.3 / tokenizers 0.20.3 / peft 0.13.2（torch 2.4.1+cu121），实测 fast 与 slow 在本权重上编码一致；② 生成调用加 `num_logits_to_keep=1`，不为整段 prompt materialize LM head logits（官方 `server.py` 会 materialize 全部位置），这是长历史 CUDA OOM 的根因。health 记录 tokenizer 类与 dtype。
 
 ### 13.4 状态机对齐（2026-10-13）
 
@@ -446,4 +442,4 @@ X-Talk 的 ASR 返回累计前缀，assembler 只发送新增后缀。尚未发�
 
 本地门禁：X-Talk 全量 142 项（139 PASS、3 skipped），InterClarify root 40 项全部通过。interruption 回归新增两条——"窗口开启时 reset 但不截断流、id 原样进入下一条 prompt"与"窗口未开启时不 reset 音频"。回放驱动新增"打断原因 reset + reset 后音频冻结 1s"判据，并把 `interruption_stop_response_ids` 与 `teardown_stop_response_ids` 分开。
 
-远端复测（tag `20261013T070801Z`，作业 `job-179187528229476527799-xuan-zhang`）：`failures=0`，清单/GPU/资产/环境/三组回归/三服务/官方权重 smoke/5 个回放场景/FDB 四轴推理全部 PASS，仅 `fdb_scoring` 按计划 SKIPPED，故 `a4_summary.json` 为 `INCOMPLETE`。interruption 场景 `interrupted_audio_frozen=true`、reset 与收尾停止已分离；模型服务 883 次请求 prompt_tokens 最大 1403、峰值显存 16.5 GiB、OOM 与 model_service_error 计数为 0。详见 [A4 任务单 §9.1](xtalk_a4_remote_acceptance.md)。
+远端复测（tag `20261013T070801Z`）：`failures=0`，三组回归/三服务/官方权重 smoke/回放场景/FDB 四轴推理全部 PASS，仅 `fdb_scoring` 按计划 SKIPPED（`a4_summary.json` 因此为 `INCOMPLETE`）。结论与后续轮次见 [A4 任务单 §9.1](xtalk_a4_remote_acceptance.md)。
