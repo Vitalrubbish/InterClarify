@@ -1,0 +1,16 @@
+{
+ "source": "resource_samples.csv",
+ "rows": 616,
+ "columns": {
+  "pid": {
+   "min": 275.0,
+   "median": 302.5,
+   "max": 304.0
+  },
+  "rss_kb": {
+   "min": 20540.0,
+   "median": 1279032.0,
+   "max": 19856804.0
+  }
+ }
+}

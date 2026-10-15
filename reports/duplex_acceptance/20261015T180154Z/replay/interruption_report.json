@@ -1,0 +1,151 @@
+{
+ "status": "PASS",
+ "errors": [],
+ "scenario": "interruption",
+ "request_audio_seconds": 3.3813125,
+ "request_user_end_seconds": 3.361086269840598,
+ "interruption_audio_seconds": 4.4906875,
+ "interruption_user_end_seconds": 4.480915234424174,
+ "interruption_after_playback_seconds": 0.6,
+ "playback_started": true,
+ "interrupted_response_id": "623d8823d6554236bae41e2f3b46b427",
+ "interruption_stop_observed": true,
+ "interrupted_response_audio_bytes": 190626,
+ "interrupted_response_audio_after_stop": 0,
+ "interrupted_audio_frozen": true,
+ "played_audio_after_interruption_input": 167586,
+ "asr_final": null,
+ "response": "The frequency of visits",
+ "first_audio_seconds": 5.033086237497628,
+ "tts_audio_bytes": 190626,
+ "played_audio_by_response": {
+  "623d8823d6554236bae41e2f3b46b427": 190626
+ },
+ "event_count": 41,
+ "events": {
+  "ticks": 41,
+  "by_event": {
+   "finish_resp": 1,
+   "latency_metrics": 2,
+   "pcm_received": 1,
+   "playback_started": 1,
+   "session_attached": 1,
+   "start_tts": 2,
+   "stop_tts": 1,
+   "update_asr": 23,
+   "update_resp": 4,
+   "vad_speech_end": 2,
+   "vad_speech_start": 3
+  },
+  "span_seconds": 7378439.823
+ },
+ "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/replay/interruption/output.wav",
+ "output_sample_rate": 48000,
+ "session_id": "941b7127-1582-4ce0-9fab-55e345a7634b",
+ "playback_mode": "paced_headless_ack",
+ "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/replay/timelines/941b7127-1582-4ce0-9fab-55e345a7634b.jsonl",
+ "timeline": {
+  "records": 309,
+  "protocol_tokens": {
+   "count": 13,
+   "tokens": {
+    "<|user backchannel|>": 4,
+    "<|user finish talking|>": 2,
+    "<|user interruption|>": 1,
+    "<|user is talking|>": 6
+   }
+  },
+  "raw_outputs": {
+   "count": 13,
+   "tokens": {
+    "<|user backchannel|>": 4,
+    "<|user finish talking|>": 2,
+    "<|user interruption|>": 1,
+    "<|user is talking|>": 6
+   }
+  },
+  "protocol_errors": [],
+  "event_counts": {
+   "asr.result_partial": 23,
+   "duplex.micro_turn_ready": 17,
+   "llm.first_chunk": 17,
+   "duplex.protocol_parsed": 13,
+   "turn.tts_start_requested": 2,
+   "turn.tts_delivery_start_requested": 2,
+   "tts.started": 2,
+   "llm_agent.response_update": 98,
+   "turn.tts_text_append_requested": 98,
+   "llm.sentence_ready": 2,
+   "tts.chunk_ready": 24,
+   "response.update": 4,
+   "turn.tts_stop_requested": 2,
+   "tts.stopped": 2,
+   "tts.playback_stopped": 1,
+   "response.finish": 1,
+   "tts.response_closed": 1
+  },
+  "response_ids": [
+   "17b4fda97a144e97ad18439399100996",
+   "623d8823d6554236bae41e2f3b46b427"
+  ],
+  "latencies": {
+   "llm_to_tts_started_seconds": 0.03359281178563833,
+   "tts_to_first_played_text_seconds": 2.3761497559025884,
+   "stop_request_to_tts_stopped_seconds": [
+    0.000351903960108757,
+    0.0002765823155641556
+   ]
+  },
+  "response_latencies": [
+   {
+    "response_id": "623d8823d6554236bae41e2f3b46b427",
+    "request_id": "c6de0a56c03245d396000d5a8342a2d9",
+    "request_to_first_token_seconds": 0.03825514018535614,
+    "tts_started_to_first_chunk_seconds": 0.8375366758555174,
+    "llm_to_tts_started_seconds": 0.03359281178563833,
+    "tts_to_first_played_text_seconds": 2.3761497559025884
+   },
+   {
+    "response_id": "17b4fda97a144e97ad18439399100996",
+    "request_id": "21deb0b5509c42e4bb51939af86a8850",
+    "request_to_first_token_seconds": 0.05402813758701086,
+    "tts_started_to_first_chunk_seconds": null,
+    "llm_to_tts_started_seconds": 0.03328135143965483,
+    "tts_to_first_played_text_seconds": null
+   }
+  ],
+  "interruption_events": [
+   {
+    "response_id": "623d8823d6554236bae41e2f3b46b427",
+    "reason": "interruption",
+    "raw_output": "<|user interruption|>",
+    "monotonic_timestamp": 7378450.780506021
+   }
+  ],
+  "stopped_response_ids": [
+   "17b4fda97a144e97ad18439399100996",
+   "623d8823d6554236bae41e2f3b46b427"
+  ],
+  "interruption_stop_response_ids": [
+   "623d8823d6554236bae41e2f3b46b427"
+  ],
+  "teardown_stop_response_ids": [
+   "17b4fda97a144e97ad18439399100996"
+  ],
+  "played_text": {
+   "623d8823d6554236bae41e2f3b46b427": {
+    "snapshots": 4,
+    "last": "The frequency of visits"
+   }
+  },
+  "played_text_monotonic": true,
+  "unplayed_tail_excluded": true,
+  "asr_updates_during_playback": 14,
+  "playback_window": [
+   7378446.001633007,
+   7378453.60765042
+  ],
+  "system_backchannel_seen": false,
+  "direct_audio_seen": false
+ }
+}

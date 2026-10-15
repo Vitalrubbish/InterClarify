@@ -1,0 +1,114 @@
+{
+  "tag": "20261015T180154Z",
+  "interclarify_commit": "04536cf",
+  "xtalk_commit": "48c595243207bacf25667449bf784b7fa73d9dd3",
+  "previous_tag": "20261015T114708Z-r1",
+  "fdb_commit": "3e799c45a045256f47d5f1c9cda90157e2d2ec9e",
+  "scoring_env": "full-duplex-bench (torch 2.6.0+cu126, NeMo 2.6.2, NUMBA_CUDA_USE_NVIDIA_BINDING=0), debug node d6-hpc-debuggpu-001",
+  "asr_backend": "X2Streaming-ASR-4B (source 0aca805, weights 4c8df16b, env prefix xtalk-x2-asr)",
+  "axes": {
+    "pause_handling/candor_pause_handling": {
+      "average_take_turn": 0.0,
+      "direction": "TOR down",
+      "previous": {
+        "average_take_turn": 0.4
+      },
+      "answers": {
+        "samples": 5,
+        "with_audio": 0,
+        "tts_start_events": 1,
+        "protocol_errors": 0
+      },
+      "note": "TOR 0.0 is the best direction but is partly silence: 0/5 samples produced any TTS audio (one sample had a start_tts event whose audio fell outside the input-length output window).",
+      "source": "official evaluate.py"
+    },
+    "pause_handling/synthetic_pause_handling": {
+      "average_take_turn": 0.0,
+      "direction": "TOR down",
+      "previous": {
+        "average_take_turn": 0.0
+      },
+      "answers": {
+        "samples": 5,
+        "with_audio": 1,
+        "tts_start_events": 2,
+        "protocol_errors": 0
+      },
+      "note": "1/5 samples produced TTS audio; the same window truncation applies.",
+      "source": "official evaluate.py"
+    },
+    "smooth_turn_taking/candor_turn_taking": {
+      "average_take_turn": 0.4,
+      "average_latency": 2.99,
+      "direction": "TOR up, latency down",
+      "previous": {
+        "average_take_turn": 0.8,
+        "average_latency": 2.838
+      },
+      "answers": {
+        "samples": 5,
+        "with_audio": 3,
+        "tts_start_events": 3,
+        "protocol_errors": 0
+      },
+      "note": "Regression vs the Qwen round on both TOR and latency; 3/5 samples answered.",
+      "source": "official evaluate.py"
+    },
+    "backchannel/icc_backchannel": {
+      "tor": 0.0,
+      "frequency": 0.0,
+      "jsd": 1.0,
+      "direction": "TOR down, freq up, JSD down",
+      "previous": {
+        "tor": 0.0,
+        "frequency": 0.0048,
+        "jsd": 0.9545
+      },
+      "answers": {
+        "samples": 5,
+        "with_audio": 0,
+        "tts_start_events": 0,
+        "protocol_errors": 0
+      },
+      "note": "Phase A disables system backchannel, so the 'should backchannel' half stays structurally 0; 0/5 samples produced audio.",
+      "source": "official evaluate.py"
+    },
+    "user_interruption/synthetic_user_interruption": {
+      "status": "SCORED_WITH_SUBSTITUTE",
+      "judge_model": "gpt-6-sol",
+      "average_rating": 2.75,
+      "average_take_turn": 0.8,
+      "average_latency": 3.26,
+      "per_sample_rating": {
+        "10": 4,
+        "100": 3,
+        "101": 4,
+        "102": 0
+      },
+      "rated_samples": 4,
+      "aligned_samples": 5,
+      "previous": {
+        "average_rating": 3.6,
+        "average_take_turn": 1.0,
+        "average_latency": 2.384,
+        "judge_model": "gpt-4o"
+      },
+      "note": "The endpoint lost gpt-4-turbo and then gpt-4o (503 'no available channel'); on this key only gpt-6-sol answered, so the rating is not comparable with earlier rounds. TOR and latency are judge-independent: TOR 1.00 -> 0.80 (sample 1 never took the turn) and latency 2.384 -> 3.26s. 102 again kept the pre-interruption topic.",
+      "source": "run_fdb_llm_judge.py --judge-model gpt-6-sol --skip-align (official evaluate.py)"
+    }
+  },
+  "asr_evidence": {
+    "online_text_monotonic": true,
+    "sessions_with_emits": 28,
+    "emit_lag_growth_seconds": {
+      "median": -0.02,
+      "p95": 0.11,
+      "max": 2.39,
+      "definition": "delivered_monotonic span minus model time_s span between a session's first and last live_emit"
+    },
+    "first_session_stall": "the pause replay still delivered a 4.06s lump in the second request of the first real session (warmup reduced the earlier total-swallow case); all later sessions were a clean 0.09-0.10s per request",
+    "pause_hint_requests": 0,
+    "end_stream_requests": 0,
+    "tail_effect": "synthetic_pause_handling loses the last 1-2 words on 5/5 samples (input ends at speech end, the online stream is never flushed); candor inputs end with silence and keep the tail"
+  }
+}

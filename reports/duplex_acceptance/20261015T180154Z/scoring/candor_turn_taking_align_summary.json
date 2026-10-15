@@ -1,0 +1,19 @@
+{
+  "task": "smooth_turn_taking",
+  "root_dir": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/fdb/smooth_turn_taking/candor_turn_taking",
+  "fdb_repo": "/hpc_stor03/sjtu_home/xuan.zhang/Full-Duplex-Bench",
+  "fdb_commit": "3e799c45a045256f47d5f1c9cda90157e2d2ec9e",
+  "judge_model": null,
+  "judge_base_url": null,
+  "audio_name": "output.wav",
+  "align_task": "default",
+  "align_rc": 0,
+  "aligned_samples": [
+    "1",
+    "10",
+    "100",
+    "101",
+    "102"
+  ],
+  "ratings": []
+}

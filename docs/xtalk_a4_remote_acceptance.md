@@ -418,11 +418,23 @@ v1.0 公开表中同族模型的量级可作参照带：`PersonaPlex` 的 PH(syn
 
 证据：[`reports/duplex_acceptance/20261015T114708Z-r1/`](../reports/duplex_acceptance/20261015T114708Z-r1/)（`fdb_axes_summary.json`、`tests/fdb_scoring_*.log`、`scoring/*_align_summary.json`）；过程与评分脚本见 [ASR 复测](asr_measurement_retest.md)。
 
-### 9.9 X2Streaming-ASR 替换复测（进行中，`20261015T172109Z`）
+### 9.9 X2Streaming-ASR 替换复测（`20261015T172109Z` / `20261015T180154Z`）
 
-**作业**：`job-179208494223390610578-xuan-zhang`（`pdgpu-4090`，3 GPU），镜像 `round1:v0.4`，快照 InterClarify `a352751` / X-Talk `48c5952`。ASR 单变量替换为 X2Streaming-ASR-4B（独立 conda prefix `xtalk-x2-asr`，源码 `0aca805`、权重 `4c8df16b`），其余（官方 DuplexCascade、MOSS、0.6s micro-turn、后端 VAD、FDB v1.0 四轴各 5 例）与 `20261015T114708Z-r1` 相同；`DUPLEX_ASR_BACKEND=x2` 选择 `configs/xtalk_duplex_x2_runtime.json` 与 80 ms 输入。
+**作业**：首轮 `job-179208494223390610578-xuan-zhang`（快照 InterClarify `a352751` / X-Talk `48c5952`）除 `real_audio_replay` 外全部 PASS；`pause` 场景 FAIL——首个会话的一次性冷启动把整段语音压成一个请求，客户端拿不到在线文本。修复（服务启动预热）后以 `04536cf` 重跑：`job-179208736349843642489-xuan-zhang`（`20261015T180154Z`），17 步中除按配置 SKIPPED 的 `fdb_scoring` 外全部 PASS，回放三场景与 FDB 五轴推理均 PASS。
 
-环境、权重、任务范围、证据口径与提交记录见 [X2 复测任务单](x2streaming_asr_retest.md)。该轮结论尚待产物回填；不与 Qwen 轮次的 FDB 绝对分数做无条件比较。
+**FDB v1.0（作业外单跑，debug GPU 节点）**：
+
+| 轴 | 指标 | X2 `20261015T180154Z` | Qwen `20261015T114708Z-r1` |
+| --- | --- | --- | --- |
+| `smooth_turn_taking`（candor） | TOR ↑ / Latency ↓ | 0.40 / 2.990s | 0.80 / 2.838s |
+| `pause_handling`（synthetic） | TOR ↓ | 0.00 | 0.00 |
+| `pause_handling`（candor） | TOR ↓ | 0.00（0/5 有音频） | 0.40 |
+| `backchannel`（icc） | TOR ↓ / Freq ↑ / JSD ↓ | 0.00 / 0.0000 / 1.0000 | 0.00 / 0.0048 / 0.9545 |
+| `user_interruption` | GPT / TOR / Latency | 2.75 / 0.80 / 3.26s（`gpt-6-sol`） | 3.60 / 1.00 / 2.384s（`gpt-4o`） |
+
+`pause_handling` 两子集的 TOR=0.00 部分来自沉默（candor 0/5、synthetic 1/5 产出音频），不能读成停顿判断改善；STT 与 UI 两轴相对 Qwen 轮次退化。端点已先后下架 `gpt-4-turbo` 与 `gpt-4o`，本轮 UI rating 只能用 `gpt-6-sol`，**不与历史 rating 比较**；TOR/latency 与 judge 无关。ASR 侧在线文本单调（28 会话 0 次回写），交付滞后中位 -0.02 s、P95 0.11 s，但首个真实会话仍有 4 s 级冷启动堆积，且 `pause_hint`/`end_stream` 恒为 0（句尾 1–2 词在 synthetic 子集 5/5 丢失）。
+
+**结论**：门禁与推理可复现，但尚不能宣称替换成功。范围、证据口径、修复与遗留项见 [X2 复测任务单](x2streaming_asr_retest.md)（§8–§10）；证据在 `reports/duplex_acceptance/20261015T180154Z/`。
 
 ## 10. 阶段 A 最终审查项
 

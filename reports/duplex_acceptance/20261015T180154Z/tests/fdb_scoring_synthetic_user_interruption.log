@@ -1,0 +1,44 @@
+##### runner.log
+[llm_judge] step=align rc=0 log=/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/scoring/synthetic_user_interruption/align_user_interruption.log
+[llm_judge] step=judge rc=1 log=/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/scoring/synthetic_user_interruption/judge_user_interruption.log
+{"task": "user_interruption", "root_dir": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/fdb/user_interruption/synthetic_user_interruption", "fdb_repo": "/hpc_stor03/sjtu_home/xuan.zhang/Full-Duplex-Bench", "fdb_commit": "3e799c45a045256f47d5f1c9cda90157e2d2ec9e", "judge_model": "gpt-4o", "judge_base_url": "https://api-2.xi-ai.cn/v1", "audio_name": "output.wav", "align_task": "user_interruption", "align_rc": 0, "judge_rc": 1, "aligned_samples": ["1", "10", "100", "101", "102"]}
+ERROR conda.cli.main_run:execute(148): `conda run python /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/scripts/remote/run_fdb_llm_judge.py --fdb-repo /hpc_stor03/sjtu_home/xuan.zhang/Full-Duplex-Bench --root-dir /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/fdb/user_interruption/synthetic_user_interruption --out /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/scoring/synthetic_user_interruption --task user_interruption --key-file /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/openai_api.txt --judge-model gpt-4o` failed. (See above for error)
+
+##### judge_user_interruption.log
+$ conda run --no-capture-output -n full-duplex-bench python /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/scoring/synthetic_user_interruption/fdb_repo/v1_v1.5/evaluation/evaluate.py --task user_interruption --root_dir /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/fdb/user_interruption/synthetic_user_interruption
+
+  0%|          | 0/5 [00:00<?, ?it/s]
+ 40%|████      | 2/5 [00:07<00:10,  3.57s/it]
+ 60%|██████    | 3/5 [01:00<00:48, 24.25s/it]
+ 80%|████████  | 4/5 [04:17<01:28, 88.95s/it]
+100%|██████████| 5/5 [04:49<00:00, 69.09s/it]
+100%|██████████| 5/5 [04:49<00:00, 57.97s/it]
+Processing /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/fdb/user_interruption/synthetic_user_interruption/1 ...
+Processing /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/fdb/user_interruption/synthetic_user_interruption/10 ...
+Analysis: The user interrupts by changing the topic from quick stress reduction to sleep improvement. The AI appropriately acknowledges the new topic and begins providing relevant sleep advice, though the response is cut off and contains a confusing phrase, "Bullus 1 established a consistent."  
+I would rate the AI's response as 4.
+{'analysis': 'The user interrupts by changing the topic from quick stress reduction to sleep improvement. The AI appropriately acknowledges the new topic and begins providing relevant sleep advice, though the response is cut off and contains a confusing phrase, "Bullus 1 established a consistent."', 'rating': 4}
+Processing /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/fdb/user_interruption/synthetic_user_interruption/100 ...
+Analysis: The user interrupts the puppy discussion to ask how to choose the right type of pet food. The AI directly addresses that question and appropriately emphasizes the importance of nutrition, but it does not provide any actual guidance on how to choose the food, so the response is relevant but incomplete.
+I would rate the AI's response as 3.
+{'analysis': 'The user interrupts the puppy discussion to ask how to choose the right type of pet food. The AI directly addresses that question and appropriately emphasizes the importance of nutrition, but it does not provide any actual guidance on how to choose the food, so the response is relevant but incomplete.', 'rating': 3}
+Processing /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/fdb/user_interruption/synthetic_user_interruption/101 ...
+Analysis: The user interrupts with a new question about fixing a leaky faucet. The AI responds directly to that topic and appropriately begins giving a step-by-step repair explanation, although the response is incomplete. It is highly relevant to the interruption.
+
+I would rate the AI's response as 4.
+{'analysis': 'The user interrupts with a new question about fixing a leaky faucet. The AI responds directly to that topic and appropriately begins giving a step-by-step repair explanation, although the response is incomplete. It is highly relevant to the interruption.', 'rating': 4}
+Processing /mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/fdb/user_interruption/synthetic_user_interruption/102 ...
+Analysis: The user explicitly changed the topic from weight-loss snacks to travel tips, but the AI continued discussing fruits and vegetables for snacking. The response is unrelated to the interrupting request and also appears truncated or garbled.
+
+I would rate the AI's response as 0.
+{'analysis': 'The user explicitly changed the topic from weight-loss snacks to travel tips, but the AI continued discussing fruits and vegetables for snacking. The response is unrelated to the interrupting request and also appears truncated or garbled.', 'rating': 0}
+---------------------------------------------------
+[Result]
+Average rating:  2.75
+Average take turn:  0.8
+Average latency:  3.26
+---------------------------------------------------
+
+##### judge_rerun.log
+[llm_judge] step=judge rc=0 log=/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/scoring/synthetic_user_interruption/judge_user_interruption.log
+{"task": "user_interruption", "root_dir": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/fdb/user_interruption/synthetic_user_interruption", "fdb_repo": "/hpc_stor03/sjtu_home/xuan.zhang/Full-Duplex-Bench", "fdb_commit": "3e799c45a045256f47d5f1c9cda90157e2d2ec9e", "judge_model": "gpt-6-sol", "judge_base_url": "https://api-2.xi-ai.cn/v1", "audio_name": "output.wav", "align_task": "user_interruption", "align_rc": 0, "judge_rc": 0, "average_rating": 2.75, "average_take_turn": 0.8, "average_latency": 3.26, "aligned_samples": ["1", "10", "100", "101", "102"]}

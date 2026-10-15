@@ -109,4 +109,43 @@ export DUPLEX_X2_LANGUAGE=en
 - 快照：InterClarify `04536cf`（相对 `a352751` 只增加服务预热与其文档/回归）、X-Talk `48c5952`，位于 `/mnt/cloudstorfs/sjtu_home/xuan.zhang/interclarify-retests/20261015T180154Z`。
 - Manifest：183 个文件，snapshot `988ad7a00078ceaf736feddf9891a7942b725fa86bd9e29b339c6c584241d262`。
 - 作业：`job-179208736349843642489-xuan-zhang`（`pdgpu-4090`，3 GPU / 24 CPU / 96 GB），场景与 FDB 范围同 §2；提交日志 `data/runs/submit_logs/submit.20261015T180242Z.sh`。
-- 结果与读法待产物回填。
+
+**自动门禁全部 PASS**：17 个步骤中除 `fdb_scoring`（按配置 SKIPPED）外全部 PASS，`real_audio_replay` 的 `pause`/`normal`/`interruption` 三场景均 PASS，`fdb_inference` 五轴各 5 例 PASS，`a4_summary.json` 为 `INCOMPLETE`（仅因评分按设计延后）。
+
+`pause` 场景本轮的关键差别：ASR 文本在 5.99–7.04 s 逐词增长（`hi i have two quick things to ask you`），系统随后正常作答；修复前同一场景整段没有任何 ASR 文本。
+
+**FDB 官方对齐与评分**（debug GPU 节点单跑，`full-duplex-bench`，FDB `3e799c45`）：
+
+| 轴 | 指标 | 本轮 X2 `20261015T180154Z` | 上一轮 Qwen `20261015T114708Z-r1` |
+| --- | --- | --- | --- |
+| `pause_handling`（candor） | TOR ↓ | **0.00**（0/5 有音频） | 0.40 |
+| `pause_handling`（synthetic） | TOR ↓ | **0.00**（1/5 有音频） | 0.00 |
+| `smooth_turn_taking`（candor） | TOR ↑ / Latency ↓ | **0.40 / 2.990s** | 0.80 / 2.838s |
+| `backchannel`（icc） | TOR ↓ / Freq ↑ / JSD ↓ | **0.00 / 0.0000 / 1.0000** | 0.00 / 0.0048 / 0.9545 |
+| `user_interruption` | GPT / TOR / Latency | **2.75 / 0.80 / 3.26s**（`gpt-6-sol` 平替） | 3.60 / 1.00 / 2.384s（`gpt-4o` 平替） |
+
+**读法（含三处必须标注的口径）**：
+
+1. `pause_handling` 两子集 TOR=0.00 是该轴最好方向，但**部分来自沉默**：candor 0/5、synthetic 1/5 样本产出音频（candor 有 1 例已触发 `start_tts`，音频落在等长输出窗口之外）。因此不能读成"停顿判断变好"。
+2. `smooth_turn_taking` 与 `user_interruption` 相对 Qwen 轮次**退化**：STT 的 TOR 0.80→0.40、latency 2.838→2.990s；UI 的 TOR 1.00→0.80、latency 2.384→3.26s。UI 的 rating 换了 judge 模型（`gpt-4o`→`gpt-6-sol`），**不可与历史 rating 比较**；TOR 与 latency 与 judge 无关，属本轮实际结果。本轮 UI 逐样本 rating 为 10→4、100→3、101→4、102→0，样本 1 未接话所以无 rating；102 仍是"延续打断前话题"的老问题。
+3. `backchannel` 的 Freq=0.0000 / JSD=1.0000 是阶段 A 关闭系统附和的必然现象侧值，不作达标项。
+
+**judge 通道变更**：端点先下架 `gpt-4-turbo`（上一轮记录），本轮连 `gpt-4o` 也返回 503「无可用通道」；该 key 的分组里 `gpt-5.4*`/`gpt-6-luna`/`gpt-5.6-*` 均报无可用通道或上游饱和，**只有 `gpt-6-sol` 可用**，故本轮 UI rating 用 `gpt-6-sol` 并在证据里标注。
+
+**ASR 侧证据（`services/asr.log`）**：
+
+- 在线文本**单调追加**：28 个有 emit 的会话中回写违规 0；
+- 交付相对音频时间的滞后增长：中位 **-0.02 s**、P95 0.11 s、最大 2.39 s（首尾 emit 之间的 `delivered_monotonic` 跨度减模型 `time_s` 跨度），即模型整体跟得上实时；
+- 首个真实会话仍有 **4.06 s 的一次性堆积**（预热把上一轮"整段吞掉"收敛到 4 s 级），其余会话均为 0.09–0.10 s/请求稳定增量；
+- 4866+ 请求中 `pause_hint`、`end_stream` 仍为 0（见 §8 第 1 条）。**可量化的后果**：`synthetic_pause_handling` 5/5 样本都比参考转写少最后 1–2 个词（输入在语音结束处截断，而在线流从不 flush）；candor 输入带尾部静音，末词完整。
+
+**产物**：完整产物 `data/runs/20261015T180154Z/`；关键证据已复制到 `reports/duplex_acceptance/20261015T180154Z/`（`a4_summary.json`、`steps.jsonl`、逐场景 `report.json`、五轴 `*_fdb_summary.json`、`fdb_axes_summary.json`、`scoring/*_align_summary.json` 与 `tests/fdb_scoring_*.log`）。
+
+**结论边界**：本轮证明"换成 X2 后自动门禁与 FDB 推理可跑通、在线文本单调且跟得上实时"，但**不能据此宣称替换成功**：FDB 两个轴相对 Qwen 轮次退化，首个会话仍有秒级冷启动堆积，且流结束缺少真实 flush。下一步见 §10。
+
+## 10. 遗留项与建议
+
+1. **冷启动只被部分消除**。预热把首会话"整段吞掉"收敛为 4.06 s 堆积，但首个真实会话仍在一个请求里带走 4 s 音频。预热用的是静音，未覆盖首次 *decode/emit* 路径；建议在节点作业里增加一次**真实语音** ASR 预热（复用 `normal` 场景 wav，按 80 ms 增量喂入后关闭会话），与已有 `tts_warmup` 同形，属小改动但需一次作业验证。
+2. **流结束没有 flush**。`pause_hint` 与 `end_stream` 恒为 0：`continuous_audio` 让 `pause()` 直接返回，duplex 模式又没有 `TurnASREndRequested` 发布者。直接后果是句尾 1–2 词丢失（synthetic 子集 5/5 复现）。修法需要 X-Talk 侧给"真正说完"提供一个发布者并在流结束时调用 `finish_stream`（或让驱动在输入结束时发一个显式结束动作）；这属于 X-Talk 改动，需确认后再做。
+3. **语义退化需要归因**。STT/UI 两轴下降可能与 X2 转写风格（全小写、无标点、句尾截断）导致的 LLM 让轮判断有关，需在下一轮比较"X2 转写 + 句尾补全"与 Qwen 转写，区分"ASR 内容差异"与"时序/flush 缺陷"。
+4. **judge 口径漂移**：端点已无任何 GPT-4 系列模型，后续轮次须沿用同一平替模型（当前 `gpt-6-sol`）才能横向比较，并在证据中标注。

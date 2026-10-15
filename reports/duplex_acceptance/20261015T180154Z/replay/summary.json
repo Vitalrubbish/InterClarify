@@ -1,0 +1,407 @@
+{
+ "status": "PASS",
+ "scenarios": [
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "pause",
+   "first_audio_seconds": 8.719626157544553,
+   "second_audio_seconds": 2.72,
+   "first_send_seconds": 3.104529917240143,
+   "second_send_seconds": 2.689170212484896,
+   "pause_gap_seconds": 1.5,
+   "answered_before_continue": false,
+   "response_ids": [
+    "7f9eb0f16f8a40d198a1329610bf9704"
+   ],
+   "finished_response_ids": [
+    "7f9eb0f16f8a40d198a1329610bf9704"
+   ],
+   "response_finished": true,
+   "audio_received": true,
+   "asr_final": null,
+   "response": "Of course! Feel free to ask your questions Whether they're about general knowledge, specific topics, or anything else, I'm here to help Just let me know what you'd like to know more about!",
+   "tts_audio_bytes": 1052160,
+   "played_audio_by_response": {
+    "7f9eb0f16f8a40d198a1329610bf9704": 1052160
+   },
+   "event_count": 55,
+   "events": {
+    "ticks": 55,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 1,
+     "pcm_received": 1,
+     "playback_started": 1,
+     "session_attached": 1,
+     "start_tts": 1,
+     "tts_finished": 1,
+     "update_asr": 9,
+     "update_resp": 31,
+     "vad_speech_end": 4,
+     "vad_speech_start": 4
+    },
+    "span_seconds": 7378392.445
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/replay/pause/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "87a5bd1e-e5a2-485e-9e01-14f2156a1c7d",
+   "playback_mode": "paced_headless_ack",
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/replay/timelines/87a5bd1e-e5a2-485e-9e01-14f2156a1c7d.jsonl",
+   "timeline": {
+    "records": 284,
+    "protocol_tokens": {
+     "count": 8,
+     "tokens": {
+      "<|user finish talking|>": 1,
+      "<|user is talking|>": 2,
+      "<|user is thinking|>": 5
+     }
+    },
+    "raw_outputs": {
+     "count": 8,
+     "tokens": {
+      "<|user finish talking|>": 1,
+      "<|user is talking|>": 2,
+      "<|user is thinking|>": 5
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 9,
+     "duplex.micro_turn_ready": 12,
+     "llm.first_chunk": 12,
+     "duplex.protocol_parsed": 8,
+     "turn.tts_start_requested": 1,
+     "turn.tts_delivery_start_requested": 1,
+     "tts.started": 1,
+     "llm_agent.response_update": 43,
+     "turn.tts_text_append_requested": 43,
+     "llm.sentence_ready": 1,
+     "tts.chunk_ready": 116,
+     "response.update": 31,
+     "llm_agent.response_finish": 1,
+     "turn.tts_flush_requested": 1,
+     "tts.finished": 1,
+     "tts.playback_finished": 1,
+     "response.finish": 1,
+     "tts.response_closed": 1
+    },
+    "response_ids": [
+     "7f9eb0f16f8a40d198a1329610bf9704"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 0.03506389260292053,
+     "tts_to_first_played_text_seconds": 2.4090382736176252,
+     "stop_request_to_tts_stopped_seconds": []
+    },
+    "response_latencies": [
+     {
+      "response_id": "7f9eb0f16f8a40d198a1329610bf9704",
+      "request_id": "728e503220f243f39e6b37f20168cd9c",
+      "request_to_first_token_seconds": 0.03832769952714443,
+      "tts_started_to_first_chunk_seconds": 0.8600783916190267,
+      "llm_to_tts_started_seconds": 0.03506389260292053,
+      "tts_to_first_played_text_seconds": 2.4090382736176252
+     }
+    ],
+    "interruption_events": [],
+    "stopped_response_ids": [],
+    "interruption_stop_response_ids": [],
+    "teardown_stop_response_ids": [],
+    "played_text": {
+     "7f9eb0f16f8a40d198a1329610bf9704": {
+      "snapshots": 31,
+      "last": "Of course! Feel free to ask your questions Whether they're about general knowledge, specific topics, or anything else, I'm here to help Just let me know what you'd like to know more about!"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 0,
+    "playback_window": [
+     7378402.285007115,
+     7378417.277133309
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "rounds": [
+    {
+     "index": 0,
+     "audio_seconds": 2.96,
+     "user_end_seconds": 2.9448535051196814,
+     "response_id": "361d69d87bb844b0bc35b9afdaa5501c",
+     "response_finished": true,
+     "audio_received": true,
+     "audio_before_tts_finished": true,
+     "first_audio_seconds": 3.9187217075377703
+    }
+   ],
+   "asr_final": null,
+   "response": "Sure! Here's a classic one:\n\nWhy did the tomato turn red?\n\nBecause it saw the salad dressing!\n\nI hope you found that amusing! Let me know if you need another joke",
+   "first_audio_seconds": 3.9187217075377703,
+   "tts_audio_bytes": 1144320,
+   "played_audio_by_response": {
+    "361d69d87bb844b0bc35b9afdaa5501c": 1144320
+   },
+   "event_count": 53,
+   "events": {
+    "ticks": 53,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 1,
+     "pcm_received": 1,
+     "playback_started": 1,
+     "session_attached": 1,
+     "start_tts": 1,
+     "tts_finished": 1,
+     "update_asr": 8,
+     "update_resp": 34,
+     "vad_speech_end": 2,
+     "vad_speech_start": 2
+    },
+    "span_seconds": 7378418.05
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/replay/normal/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "dfa03991-677f-4a66-bbca-7faad89c0db0",
+   "playback_mode": "paced_headless_ack",
+   "scenario": "normal",
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/replay/timelines/dfa03991-677f-4a66-bbca-7faad89c0db0.jsonl",
+   "timeline": {
+    "records": 287,
+    "protocol_tokens": {
+     "count": 9,
+     "tokens": {
+      "<|user finish talking|>": 1,
+      "<|user is talking|>": 3,
+      "<|user is thinking|>": 5
+     }
+    },
+    "raw_outputs": {
+     "count": 9,
+     "tokens": {
+      "<|user finish talking|>": 1,
+      "<|user is talking|>": 3,
+      "<|user is thinking|>": 5
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 8,
+     "duplex.micro_turn_ready": 12,
+     "llm.first_chunk": 12,
+     "duplex.protocol_parsed": 9,
+     "turn.tts_start_requested": 1,
+     "turn.tts_delivery_start_requested": 1,
+     "tts.started": 1,
+     "llm_agent.response_update": 38,
+     "turn.tts_text_append_requested": 38,
+     "llm.sentence_ready": 1,
+     "tts.chunk_ready": 126,
+     "response.update": 34,
+     "llm_agent.response_finish": 1,
+     "turn.tts_flush_requested": 1,
+     "tts.finished": 1,
+     "tts.playback_finished": 1,
+     "response.finish": 1,
+     "tts.response_closed": 1
+    },
+    "response_ids": [
+     "361d69d87bb844b0bc35b9afdaa5501c"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 0.033918529748916626,
+     "tts_to_first_played_text_seconds": 2.3367143496870995,
+     "stop_request_to_tts_stopped_seconds": []
+    },
+    "response_latencies": [
+     {
+      "response_id": "361d69d87bb844b0bc35b9afdaa5501c",
+      "request_id": "552f8a21be6942a9b97f5b0ccab2c222",
+      "request_to_first_token_seconds": 0.03811283130198717,
+      "tts_started_to_first_chunk_seconds": 0.8031744062900543,
+      "llm_to_tts_started_seconds": 0.033918529748916626,
+      "tts_to_first_played_text_seconds": 2.3367143496870995
+     }
+    ],
+    "interruption_events": [],
+    "stopped_response_ids": [],
+    "interruption_stop_response_ids": [],
+    "teardown_stop_response_ids": [],
+    "played_text": {
+     "361d69d87bb844b0bc35b9afdaa5501c": {
+      "snapshots": 34,
+      "last": "Sure! Here's a classic one:\n\nWhy did the tomato turn red?\n\nBecause it saw the salad dressing!\n\nI hope you found that amusing! Let me know if you need another joke"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 0,
+    "playback_window": [
+     7378423.14616377,
+     7378439.030617034
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "interruption",
+   "request_audio_seconds": 3.3813125,
+   "request_user_end_seconds": 3.361086269840598,
+   "interruption_audio_seconds": 4.4906875,
+   "interruption_user_end_seconds": 4.480915234424174,
+   "interruption_after_playback_seconds": 0.6,
+   "playback_started": true,
+   "interrupted_response_id": "623d8823d6554236bae41e2f3b46b427",
+   "interruption_stop_observed": true,
+   "interrupted_response_audio_bytes": 190626,
+   "interrupted_response_audio_after_stop": 0,
+   "interrupted_audio_frozen": true,
+   "played_audio_after_interruption_input": 167586,
+   "asr_final": null,
+   "response": "The frequency of visits",
+   "first_audio_seconds": 5.033086237497628,
+   "tts_audio_bytes": 190626,
+   "played_audio_by_response": {
+    "623d8823d6554236bae41e2f3b46b427": 190626
+   },
+   "event_count": 41,
+   "events": {
+    "ticks": 41,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 2,
+     "pcm_received": 1,
+     "playback_started": 1,
+     "session_attached": 1,
+     "start_tts": 2,
+     "stop_tts": 1,
+     "update_asr": 23,
+     "update_resp": 4,
+     "vad_speech_end": 2,
+     "vad_speech_start": 3
+    },
+    "span_seconds": 7378439.823
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/replay/interruption/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "941b7127-1582-4ce0-9fab-55e345a7634b",
+   "playback_mode": "paced_headless_ack",
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/replay/timelines/941b7127-1582-4ce0-9fab-55e345a7634b.jsonl",
+   "timeline": {
+    "records": 309,
+    "protocol_tokens": {
+     "count": 13,
+     "tokens": {
+      "<|user backchannel|>": 4,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 6
+     }
+    },
+    "raw_outputs": {
+     "count": 13,
+     "tokens": {
+      "<|user backchannel|>": 4,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 6
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 23,
+     "duplex.micro_turn_ready": 17,
+     "llm.first_chunk": 17,
+     "duplex.protocol_parsed": 13,
+     "turn.tts_start_requested": 2,
+     "turn.tts_delivery_start_requested": 2,
+     "tts.started": 2,
+     "llm_agent.response_update": 98,
+     "turn.tts_text_append_requested": 98,
+     "llm.sentence_ready": 2,
+     "tts.chunk_ready": 24,
+     "response.update": 4,
+     "turn.tts_stop_requested": 2,
+     "tts.stopped": 2,
+     "tts.playback_stopped": 1,
+     "response.finish": 1,
+     "tts.response_closed": 1
+    },
+    "response_ids": [
+     "17b4fda97a144e97ad18439399100996",
+     "623d8823d6554236bae41e2f3b46b427"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 0.03359281178563833,
+     "tts_to_first_played_text_seconds": 2.3761497559025884,
+     "stop_request_to_tts_stopped_seconds": [
+      0.000351903960108757,
+      0.0002765823155641556
+     ]
+    },
+    "response_latencies": [
+     {
+      "response_id": "623d8823d6554236bae41e2f3b46b427",
+      "request_id": "c6de0a56c03245d396000d5a8342a2d9",
+      "request_to_first_token_seconds": 0.03825514018535614,
+      "tts_started_to_first_chunk_seconds": 0.8375366758555174,
+      "llm_to_tts_started_seconds": 0.03359281178563833,
+      "tts_to_first_played_text_seconds": 2.3761497559025884
+     },
+     {
+      "response_id": "17b4fda97a144e97ad18439399100996",
+      "request_id": "21deb0b5509c42e4bb51939af86a8850",
+      "request_to_first_token_seconds": 0.05402813758701086,
+      "tts_started_to_first_chunk_seconds": null,
+      "llm_to_tts_started_seconds": 0.03328135143965483,
+      "tts_to_first_played_text_seconds": null
+     }
+    ],
+    "interruption_events": [
+     {
+      "response_id": "623d8823d6554236bae41e2f3b46b427",
+      "reason": "interruption",
+      "raw_output": "<|user interruption|>",
+      "monotonic_timestamp": 7378450.780506021
+     }
+    ],
+    "stopped_response_ids": [
+     "17b4fda97a144e97ad18439399100996",
+     "623d8823d6554236bae41e2f3b46b427"
+    ],
+    "interruption_stop_response_ids": [
+     "623d8823d6554236bae41e2f3b46b427"
+    ],
+    "teardown_stop_response_ids": [
+     "17b4fda97a144e97ad18439399100996"
+    ],
+    "played_text": {
+     "623d8823d6554236bae41e2f3b46b427": {
+      "snapshots": 4,
+      "last": "The frequency of visits"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 14,
+    "playback_window": [
+     7378446.001633007,
+     7378453.60765042
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  }
+ ],
+ "config": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T180154Z/a4_runtime.json",
+ "model_url": "http://127.0.0.1:8006"
+}

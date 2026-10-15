@@ -6,7 +6,7 @@
 
 ## 当前状态（2026-10-15）
 
-当前处于**阶段 A 验收**：驱动/运行时/服务与 FDB 四轴推理都已跑通，四轴指标与读法见 [A4 任务单](xtalk_a4_remote_acceptance.md) §9.7。本仓库仍不实现第二套语音运行时或 Layer 2；原生链路的历史门禁与来源固定见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
+当前处于**阶段 A 验收**：驱动/运行时/服务与 FDB 四轴推理都已跑通；四轴指标与读法见 [A4 任务单](xtalk_a4_remote_acceptance.md) §9.7–§9.9，其中 §9.9 是 2026-10-16 的 X2Streaming-ASR 单变量替换复测（ASR 替换尚未达标，遗留项见 [X2 复测任务单](x2streaming_asr_retest.md) §10）。本仓库仍不实现第二套语音运行时或 Layer 2；原生链路的历史门禁与来源固定见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
 
 阶段 A 的实现分布在 X-Talk fork 与 `scripts/remote/`：fork 提交与基线见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)，改动清单、逐轮验收数字与仍挂着的待办见 [A4 任务单](xtalk_a4_remote_acceptance.md)。本地门禁：X-Talk 全量 142 项（139 PASS、3 skipped）、InterClarify root 80 项。
 
@@ -156,6 +156,8 @@ P1 和 P2 是最早的两个强制门禁。A1–A3 已通过本地实现门禁�
 客户端实现固定为 X-Talk `48c5952`；X2 源码 `0aca80597bb1399c0be4002de5bc62c0a779c542`、权重 `4c8df16b8d7f8b50c95590c4d7907436ebe4aa08`。本地 X-Talk 150 项测试通过（3 skipped），主仓库 35 项相关测试通过；真实模型质量与性能仍须远端复测。
 
 2026-10-15 远端准备：`scripts/remote/setup_x2_asr_env.sh` 在共享盘新建独立 conda prefix `xtalk-x2-asr`（官方 `torch==2.11.0+cu128` / `transformers==5.15.1`，与 Qwen/MOSS 环境隔离），稀疏检出固定源码提交并下载固定 revision 权重到 `interclarify-x2/`；A4 节点入口新增 `DUPLEX_ASR_BACKEND=x2` 分支、X2 资产前置校验与 X2 服务单测。对照复测的范围、口径与证据边界见 [X2 复测任务单](x2streaming_asr_retest.md)。
+
+2026-10-16 复测结果：首轮 `20261015T172109Z` 因首个会话冷启动吞掉整段 `pause` 语音而 FAIL；服务增加启动预热后用 `04536cf` 重跑 `20261015T180154Z`，自动门禁与 FDB 五轴推理全 PASS。FDB 官方评分显示 `pause_handling` 两子集 TOR=0.00（candor 0/5 有音频）、`smooth_turn_taking` TOR 0.80→0.40、`user_interruption` TOR 1.00→0.80、latency 2.384→3.26s；端点已无任何 GPT-4 系列 judge 模型（改用 `gpt-6-sol`，rating 不跨轮比较）。在线文本单调、交付滞后中位 -0.02s，但首会话仍有秒级堆积且流结束没有 flush（句尾 1–2 词在 synthetic 子集 5/5 丢失）。**因此 ASR 替换尚未达到可宣称成功的程度**，遗留项与建议见任务单 §10。
 
 新增短窗口调度器，首次非空 ASR 后启动，默认 0.6 秒；partial、停顿和 final 只更新缓冲，串行生成完成后才 flush 下一窗口，与官方推理一致。累计前缀以增量发送；修订、空窗口和 final 去重见改造计划第 13 节。
 
