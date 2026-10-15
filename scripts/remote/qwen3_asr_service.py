@@ -11,8 +11,12 @@ emitted. The released DuplexCascade server never sees that: it consumes Kyutai's
 finalized words only and ignores the streaming hypotheses. With
 ``--emit-committed-prefix`` this service reproduces that contract by returning
 only text the decoder has committed to, which makes consecutive transcripts
-strictly extend each other. ``is_final`` releases the remaining tail, and the
-next response continues from the released text.
+strictly extend each other. The committed stream is tracked as a *token* prefix:
+the raw transcript is re-decoded from scratch on every chunk, so its punctuation
+and spacing can differ from an earlier decode even when the words are unchanged,
+and comparing tokens is what keeps the stream advancing instead of stalling on
+the first such difference. ``is_final`` releases the remaining tail, and the next
+response continues from the released text.
 
 Protocol (HTTP/JSON):
   POST   /v1/session            -> {"session_id": str}
@@ -26,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import logging
 import threading
 import uuid
 
@@ -33,6 +38,8 @@ import numpy as np
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
 
 
 class RecognizeRequest(BaseModel):
@@ -49,89 +56,105 @@ class SessionState:
     def __init__(self, state: object) -> None:
         self.state = state
         self.lock = threading.Lock()
-        # Last parsed transcript the decoder produced, and the text already handed
-        # to the caller. The visible transcript may only ever extend the latter.
-        self.last_parsed = ""
+        # Token ids already handed to the caller, the text they decode to, and how
+        # often a decoder revision tried to change text that was already released.
+        self.committed_ids: list[int] = []
         self.visible_text = ""
+        self.stalls = 0
 
 
-def truncate_tokens(model: object, text: str, token_count: int) -> str:
-    """Drop the trailing tokens a streaming decoder may still revise.
+def committed_token_ids(model: object, text: str, token_count: int) -> list[int]:
+    """Return the token ids of ``text`` outside the decoder's revision window.
 
     ``qwen_asr`` re-decodes the last ``unfixed_token_num`` tokens of the carried
-    prefix on every chunk, so those tokens are the only ones that can still
-    change. Removing them leaves text the decoder has committed to.
+    prefix on every chunk, so only those can still change; everything before them
+    has been decided.
 
     Parameters
     ----------
     model : object
         ``Qwen3ASRModel`` instance owning the streaming processor.
     text : str
-        Parsed transcript (``state.text``). Truncating the parsed form rather
-        than the raw decode keeps the ``language X<asr_text>`` header out of the
-        result when the cut lands inside it.
+        Parsed transcript (``state.text``). The parsed form is used rather than the
+        raw decode so the ``language X<asr_text>`` header stays out of the result.
     token_count : int
         Number of trailing tokens that may still be revised.
 
     Returns
     -------
-    str
-        Committed prefix, or an empty string when nothing is committed yet.
+    list of int
+        Token ids the decoder has committed to, possibly empty.
     """
-    tokenizer = model.processor.tokenizer
-    ids = tokenizer.encode(text)
+    ids = list(model.processor.tokenizer.encode(text))
     end = len(ids) - int(token_count)
+    return ids[:end] if end > 0 else []
+
+
+def decode_token_prefix(model: object, ids: list[int]) -> str:
+    """Decode a token prefix, backing off a trailing partially decoded character."""
+    tokenizer = model.processor.tokenizer
+    end = len(ids)
     while end > 0:
-        prefix = tokenizer.decode(ids[:end])
-        if "\ufffd" not in prefix:
-            return prefix
+        text = tokenizer.decode(ids[:end])
+        if "\ufffd" not in text:
+            return text
         end -= 1
     return ""
 
 
 def advance_committed(
     model: object,
-    state: object,
+    text: str,
     token_count: int,
-    last_parsed: str,
+    committed_ids: list[int],
     visible_text: str,
-) -> tuple[str, str]:
-    """Return the next monotone visible ``(last_parsed, text)`` pair of one stream.
+) -> tuple[list[int], str, bool]:
+    """Return the next monotone ``(committed token ids, visible text)`` pair.
 
-    While the recognizer keeps producing new text, its last ``token_count`` tokens
-    may still be rewritten, so they are held back: that is what stops a micro-turn
-    from carrying a question the user is still in the middle of saying. A decode
-    step that adds no new transcript (a pause, silence, or the end of an utterance)
-    leaves nothing to revise, so the held-back tail is released -- the moment
-    Kyutai's word stream would have committed those words too. The visible text is
-    only ever extended, never replaced.
+    The committed stream is a *token* prefix, never a string prefix. The raw
+    transcript is re-decoded from scratch on every chunk, so its punctuation and
+    spacing can differ from a previous decode even when the words are unchanged;
+    a string comparison stalls forever on the first such difference, while a token
+    comparison keeps the stream advancing.
+
+    Only the trailing ``token_count`` tokens are held back, because those are the
+    only ones the decoder may still rewrite. The held-back tail is released by the
+    caller's *explicit* boundary (``is_final``), never by "the decode did not
+    change since the last call": a pause inside a sentence is not the end of the
+    user's segment, and releasing there is what used to hand the runtime a
+    truncated transcript it could never extend.
+
+    A revision deeper than the advertised window cannot be taken back, so the
+    already-visible text is kept untouched and the commit resumes once the decoder
+    agrees again; the returned flag reports that case for monitoring.
 
     Parameters
     ----------
     model : object
         ``Qwen3ASRModel`` instance owning the streaming processor.
-    state : object
-        ``ASRStreamingState`` of the current session.
+    text : str
+        Parsed transcript of the current decode (``state.text``).
     token_count : int
         Number of trailing tokens that may still be revised.
-    last_parsed : str
-        Transcript the decoder returned on the previous call.
+    committed_ids : list of int
+        Token ids already handed to the caller.
     visible_text : str
         Text already handed to the caller.
 
     Returns
     -------
-    tuple of (str, str)
-        Updated ``(last_parsed, visible_text)``.
+    tuple of (list of int, str, bool)
+        Updated ``(committed_ids, visible_text, stalled)``.
     """
-    parsed = state.text or ""
-    if parsed == last_parsed:
-        proposed = parsed
-    else:
-        proposed = truncate_tokens(model, parsed, token_count)
-    if not proposed.startswith(visible_text):
-        return parsed, visible_text
-    return parsed, proposed
+    proposed = committed_token_ids(model, text, token_count)
+    common = min(len(proposed), len(committed_ids))
+    if proposed[:common] != list(committed_ids)[:common]:
+        # The decoder revised a token that was already handed out. It cannot be
+        # taken back, so the released text stays untouched and the commit waits.
+        return committed_ids, visible_text, True
+    if len(proposed) <= len(committed_ids):
+        return committed_ids, visible_text, False
+    return proposed, decode_token_prefix(model, proposed), False
 
 
 
@@ -185,9 +208,9 @@ class ASRService:
 
         When ``emit_committed_prefix`` is enabled the response holds only text the
         streaming decoder has committed to, so consecutive responses can only
-        extend each other. A decode step that adds no new transcript releases the
-        held-back tail, and ``is_final`` releases the whole transcript; the next
-        response continues from the released text in both cases.
+        extend each other. Only the decoder's revision window (its trailing
+        ``unfixed_token_num`` tokens) is held back; ``is_final`` releases the whole
+        transcript, and the next response continues from the released text.
         """
         with self._lock:
             session = self._sessions.get(request.session_id)
@@ -204,12 +227,18 @@ class ASRService:
             if request.is_final:
                 self.model.finish_streaming_transcribe(session.state)
                 text = session.state.text or ""
-                session.last_parsed = text
                 session.visible_text = text
+                session.committed_ids = committed_token_ids(self.model, text, 0)
             elif self.emit_committed_prefix:
-                session.last_parsed, session.visible_text = advance_committed(
-                    self.model, session.state, self.hidden_token_num,
-                    session.last_parsed, session.visible_text)
+                session.committed_ids, session.visible_text, stalled = advance_committed(
+                    self.model, session.state.text or "", self.hidden_token_num,
+                    session.committed_ids, session.visible_text)
+                if stalled:
+                    session.stalls += 1
+                    if session.stalls == 1:
+                        logger.warning(
+                            "ASR revision reached text already released; the "
+                            "committed transcript holds its monotone prefix")
                 text = session.visible_text
             else:
                 text = session.state.text or ""

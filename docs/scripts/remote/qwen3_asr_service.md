@@ -16,10 +16,14 @@
 ## 类的设计
 
 - `RecognizeRequest`（pydantic）：一次增量识别请求体。
-- `SessionState`：一个会话的流式解码状态、串行锁，以及上一次的已解析转写 `last_parsed` 与已交给调用方的 `visible_text`。
-- `truncate_tokens(model, text, token_count)`：把已解析转写去掉末尾 `token_count` 个 token（并对 `\ufffd` 做与解码器一致的收缩），得到解码器**不会再改**的前缀。
-- `advance_committed(model, state, token_count, last_parsed, visible_text)`：有新文本时给出上述前缀；本次解码没有新增文本时给出完整转写（释放被扣住的尾巴）。两种情况都要求候选延长 `visible_text`，否则整拍保持不变。
-- `ASRService`：加载一次模型，维护 `session_id → SessionState`。`create_session` 用 `init_streaming_state` 建状态；`recognize` 把 base64 解码为 `float32` 交给 `streaming_transcribe`；`delete_session` 释放。
+- `SessionState`：一个会话的流式解码状态、串行锁，以及已交给调用方的 token 前缀 `committed_ids` 与其文本 `visible_text`，外加解码器回改到已交付 token 的次数 `stalls`。
+- `committed_token_ids(model, text, token_count)`：取已解析转写去掉末尾 `token_count` 个 token 的前缀 token ids（不足则空）。`qwen_asr` 只承诺末尾这些 token 可被回改，其余已定。
+- `decode_token_prefix(model, ids)`：把 token 前缀解码成文本，遇到 `\ufffd` 时从末尾逐 token 收缩（避免半个多字节字符）。
+- `advance_committed(model, text, token_count, committed_ids, visible_text)`：返回下一个单调的 `(committed_ids, visible_text, stalled)`。候选是当前解码的"去掉末尾 `token_count` 个 token"的前缀；与已交付 token 比较——
+  - 候选**延长**了已交付前缀：交付到候选；
+  - 候选在已交付区间内与已交付 token 不一致（解码器回改到了已交付内容）：**保持已交付文本不变**并返回 `stalled=True`；
+  - 候选没有更长：本拍不推进。
+- `ASRService`：加载一次模型，维护 `session_id → SessionState`。`create_session` 用 `init_streaming_state` 建状态；`recognize` 把 base64 解码为 `float32` 交给 `streaming_transcribe`；`delete_session` 释放。`is_final=true` 时调 `finish_streaming_transcribe` 并把全量转写作为新的交付基点。
 - `build_app(service)`：构建 FastAPI 应用，把四个端点绑定到服务。
 - `main`：解析参数（模型路径、host/port、显存占用、max_new_tokens、`chunk_size_sec`/`unfixed_chunk_num`/`unfixed_token_num`、`--emit-committed-prefix`），加载模型后 `uvicorn.run`。
 
@@ -32,17 +36,20 @@
 | 档位 | 触发方式 | `is_final=false` 返回 | `is_final=true` 返回 |
 | --- | --- | --- | --- |
 | 原始转写（历史行为） | 不加 `--emit-committed-prefix` | `state.text`（含易变尾巴） | `state.text` |
-| 定稿前缀（推荐） | `--emit-committed-prefix` | 见下方两条规则 | `state.text` 全量释放，并作为后续推进的基点 |
+| 定稿前缀（推荐） | `--emit-committed-prefix` | 已定 token 前缀（只增不改） | `state.text` 全量释放，并作为后续推进的基点 |
 
-定稿前缀下的两条规则：
+定稿前缀的规则：
 
-- **有新文本**：返回"已解析转写去掉末尾 `unfixed_token_num` 个 token"的前缀——这段是解码器承诺不会再改的部分，因此模型不会拿到"用户还没说完的版本"。
-- **本次解码没有新增文本**（停顿、静音、句子结束）：直接返回完整已解析转写，把上一拍扣住的尾巴**释放**。否则句尾那 2–3 个词会在用户说完后永久缺失（第一次实现就是如此：`synthetic_user_interruption/1` 的最后一拍只有 `… Actually, what are some financial`，`goals I should set?` 再没出现）。释放时机对应官方 Kyutai 词流提交这些词的时刻。
+- **交付单位是 token 前缀，不是字符串前缀**。原始转写每块都是从零重解，即使词没变，标点与空格也可能与上一拍不同；按字符串比较就会在第一次出现这种差异时**永久卡住**。实测（任务单 §9.5.4.1）：`candor_pause_handling/1` 释放出 `'I never like.'` 之后，raw 继续长到 127 个词，而可见文本冻在原地 **26.3 秒（330 拍）**；另一个样本冻在 `'Yeah.'` 9.7 秒。按 token 比较后这类差异不再影响推进。
+- **只扣住末尾 `unfixed_token_num` 个 token**，因为那是解码器唯一承诺可回改的部分。实测定稿前缀因此只落后原始转写 1–6 个词（词级回改深度：中位 1、99 分位 4）。**不再有"本次解码没有新增文本就释放尾巴"这条规则**：句内停顿不是用户片段结束，在那里释放正是第一次实现交出错乱文本的根因（当时释放出的 `'I never like.'` 永远无法再延长）。尾巴由调用方的**显式边界**释放，即 `is_final=true`（见下方"谁发 is_final"）。
+- **回改到已交付 token 时保持已交付文本不变**（已听到的内容不可撤销），并累计 `stalls`、首次发生时打一条 warning 日志。这种回改超出解码器承诺的窗口，实测在修好字符串比较后应接近 0；`stalls` 是它的回归监控量。
 
-无论哪条规则，返回的文本**只会变长**：候选不以上一次给出的文本为前缀就整拍保持不变。
+无论哪条规则，返回的文本**只会变长**。
 
 **截断作用于已解析转写（`state.text`），不是原始解码串（`state._raw_decoded`）**。这是必须写死的一条：原始串形如 `language English<asr_text>…`，若按 token 从**原始串**末尾截断，截断点落在 `<asr_text>` 之前时就会把 `language English` / `language` 当作用户文本交给模型——第一次实现正是如此，`replay` 的 normal 场景里模型连续 397 拍只输出 `<|user is talking|>`、`response_ids` 为空（模型看到"用户"在说 "language"）。`state.text` 已经去掉标签，因此不再可能泄漏。
 
-注意 `is_final=true` **不重置**已提交文本：它把 `last_parsed`/`visible_text` 直接设为全量转写，因此下一次响应仍然只会追加。这与运行时的语义一致——X-Talk 在用户停顿（`is_final_chunk`）时就会发 `is_final=true`，所以尾巴并不会被藏到会话结束。
+注意 `is_final=true` **不重置**已提交文本：它把 `committed_ids`/`visible_text` 直接设为全量转写，因此下一次响应仍然只会追加。
 
-配置入口：`configs/xtalk_round1.yaml` 的 `asr_streaming.emit_committed_prefix`（配合 `unfixed_chunk_num: 0`，让每个 chunk 都基于携带前缀，从而保证"已定稿前缀"本身单调）。契约与证据见 [阶段 A 任务单 §9.5](../../xtalk_a4_remote_acceptance.md)。
+**谁发 `is_final`**：X-Talk 的 `AudioConsumer.pause()/end()` 会带 `is_final_chunk=True` → 客户端 `is_final=true`。它们只由 `TurnASRPauseRequested`/`TurnASREndRequested` 触发，而 duplex 模式下这两个事件**没有发布者**（`MicroTurnAssembler` 只发 `TurnASRStartRequested`），所以运行时目前拿不到"用户片段结束"的释放——这是任务单 §9.5.4.1 里的待修项 ②，与本服务的 token 级提交（待修项 ①）是两件独立的事。
+
+配置入口：`configs/xtalk_round1.yaml` 的 `asr_streaming.emit_committed_prefix`（配合 `unfixed_chunk_num: 0`，让每个 chunk 都基于携带前缀，从而保证"已定稿前缀"本身单调；2026-10-15 的对比作业确认官方默认 `unfixed_chunk_num: 2` 在我们语料上既不改善最终转写也不改善提交延迟）。契约与证据见 [阶段 A 任务单 §9.5](../../xtalk_a4_remote_acceptance.md)。

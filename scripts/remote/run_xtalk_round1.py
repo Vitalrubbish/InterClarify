@@ -210,7 +210,8 @@ def asr_smoke(config: dict, args: argparse.Namespace) -> None:
     whole FDB subset. Mono audio at any sample rate is accepted and resampled to
     ``asr_streaming.sample_rate`` the way the runtime loader does. Each input
     reports the raw transcript (``text``) and, when ``emit_committed_prefix`` is
-    on, the text the X-Talk runtime would actually see (``visible_text``),
+    on, the text the X-Talk runtime would actually see (``visible_text``), the number of
+    times a decoder revision reached already-released text (``commit_stalls``),
     together with how often each of them was rewritten.
     """
     import numpy as np
@@ -319,7 +320,8 @@ def smoke_one_input(model: object, stream: dict, audio_path: Path, emit_committe
     started = time.monotonic()
     previous = ""
     previous_visible = ""
-    last_parsed = ""
+    committed_ids: list[int] = []
+    committed_stalls = 0
     visible = ""
     first_partial = None
     first_partial_audio = None
@@ -336,8 +338,9 @@ def smoke_one_input(model: object, stream: dict, audio_path: Path, emit_committe
             decode_seconds += time.monotonic() - call_start
             text = state.text or ""
             if emit_committed_prefix:
-                last_parsed, visible = qwen3_asr_service.advance_committed(
-                    model, state, int(stream["unfixed_token_num"]), last_parsed, visible)
+                committed_ids, visible, stalled = qwen3_asr_service.advance_committed(
+                    model, text, int(stream["unfixed_token_num"]), committed_ids, visible)
+                committed_stalls += int(stalled)
             else:
                 visible = text
             arrival = time.monotonic() - started
@@ -352,6 +355,7 @@ def smoke_one_input(model: object, stream: dict, audio_path: Path, emit_committe
                 "audio_seconds": end_seconds, "arrival_seconds": arrival,
                 "text": text, "rewritten": rewritten,
                 "visible_text": visible, "visible_rewritten": visible_rewritten,
+                "commit_stalls": committed_stalls,
             }, ensure_ascii=False) + "\n")
             events.flush()
             previous = text
@@ -372,6 +376,7 @@ def smoke_one_input(model: object, stream: dict, audio_path: Path, emit_committe
         "model_load_seconds": load_seconds, "first_partial_seconds": first_partial,
         "first_partial_audio_seconds": first_partial_audio,
         "revisions": revisions, "visible_revisions": visible_revisions,
+        "commit_stalls": committed_stalls,
         "visible_stream_hidden_tail": bool(emit_committed_prefix),
         "decode_seconds": decode_seconds, "decode_rtf": decode_seconds / duration,
         "replay_wall_seconds": time.monotonic() - started, "final_text": state.text,
@@ -381,6 +386,7 @@ def smoke_one_input(model: object, stream: dict, audio_path: Path, emit_committe
     return {"input": str(audio_path), "output": str(output), "audio_seconds": duration,
             "source_sample_rate": source_rate, "resampler": resampler,
             "revisions": revisions, "visible_revisions": visible_revisions,
+            "commit_stalls": committed_stalls,
             "final_text": state.text, "first_partial_seconds": first_partial,
             "decode_rtf": report["decode_rtf"]}
 
@@ -460,9 +466,15 @@ async def tts_smoke(config: dict, args: argparse.Namespace) -> None:
 
 
 def serve(config: dict, args: argparse.Namespace) -> None:
-    """Start one model service inside its configured conda environment."""
+    """Start one model service inside its configured conda environment.
+
+    ``--port`` overrides the configured port so callers that run several service
+    instances in sequence (the TTS throughput A/B restarts the service per arm)
+    never have to wait for a previous process to release the configured one.
+    """
     role = args.service
     service = config["services"][role]
+    port = service["port"] if args.port is None else args.port
     select_gpu(service["gpu_index"] if args.gpu_index is None else args.gpu_index)
     command = ["conda", "run", "--no-capture-output", "-n", config["environments"][role]]
     if role == "asr":
@@ -470,7 +482,7 @@ def serve(config: dict, args: argparse.Namespace) -> None:
         stream = config["asr_streaming"]
         command += ["python", str(script),
                     "--model", str(model_path(config, args.model_root, "asr")),
-                    "--host", service["host"], "--port", str(service["port"]),
+                    "--host", service["host"], "--port", str(port),
                     "--gpu-memory-utilization", str(service["gpu_memory_utilization"]),
                     "--max-new-tokens", str(service["max_new_tokens"]),
                     "--chunk-size-sec", str(stream["chunk_size_sec"]),
@@ -480,7 +492,7 @@ def serve(config: dict, args: argparse.Namespace) -> None:
             command.append("--emit-committed-prefix")
     elif role == "llm":
         command += ["vllm", "serve", str(model_path(config, args.model_root, "llm")),
-                    "--host", service["host"], "--port", str(service["port"]),
+                    "--host", service["host"], "--port", str(port),
                     "--served-model-name", service["served_model_name"],
                     "--max-model-len", str(service["max_model_len"]),
                     "--gpu-memory-utilization", str(service["gpu_memory_utilization"]),
@@ -508,7 +520,7 @@ def serve(config: dict, args: argparse.Namespace) -> None:
         python_override = os.environ.get("XTALK_TURNSENSE_PYTHON")
         command = [python_override] if python_override else command + ["python"]
         command += [str(source_dir / "service.py"),
-                    "--host", service["host"], "--port", str(service["port"]),
+                    "--host", service["host"], "--port", str(port),
                     "--onnx-path", str(onnx_path), "--cmvn-file", str(cmvn_path),
                     "--clip-mode", service.get("clip_mode", "tail"),
                     "--max-concurrency", str(service.get("max_concurrency", 8)),
@@ -563,10 +575,19 @@ def serve(config: dict, args: argparse.Namespace) -> None:
         existing = os.environ.get("PYTHONPATH", "")
         prefix = os.pathsep.join([str(patch_dir), str(patch_modules)])
         os.environ["PYTHONPATH"] = prefix + (os.pathsep + existing if existing else "")
+        # The measured throughput defaults live in the config, so no job has to
+        # remember them; an explicit XTALK_TTS_* in the environment still wins
+        # (the throughput A/B sweeps one lever per arm that way).
+        for name, configured in (
+            ("XTALK_TTS_LOCAL_ATTN", service.get("local_attn")),
+            ("XTALK_TTS_LOCAL_COMPILE", service.get("local_compile")),
+        ):
+            if configured and not os.environ.get(name):
+                os.environ[name] = str(configured)
         os.chdir(roots["moss_service"])
         tts = str(model_path(config, args.model_root, "tts"))
         command += ["python", str(entrypoint), "--host", service["host"],
-                    "--port", str(service["port"]), "--device", "cuda:0",
+                    "--port", str(port), "--device", "cuda:0",
                     "--attn_impl", service["attn_impl"],
                     "--target_sr", str(service["output_sample_rate"]),
                     "--model_path", tts, "--tokenizer_path", tts,
@@ -574,8 +595,8 @@ def serve(config: dict, args: argparse.Namespace) -> None:
     os.execvp(command[0], command)
 
 
-def main() -> None:
-    """Dispatch model preparation, independent smoke tests, or service launch."""
+def build_parser() -> argparse.ArgumentParser:
+    """Return the command line interface of the round-one driver."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--model-root", type=Path, required=True)
@@ -613,6 +634,15 @@ def main() -> None:
     server = commands.add_parser("serve")
     server.add_argument("service", choices=("asr", "llm", "turn_detector", "tts"))
     server.add_argument("--gpu-index", type=int)
+    server.add_argument(
+        "--port", type=int,
+        help="override the configured port (independent service instances per run)")
+    return parser
+
+
+def main() -> None:
+    """Dispatch model preparation, independent smoke tests, or service launch."""
+    parser = build_parser()
     args = parser.parse_args()
     args.config = args.config.resolve()
     args.model_root = args.model_root.resolve()
