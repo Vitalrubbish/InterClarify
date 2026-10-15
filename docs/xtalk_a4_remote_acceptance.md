@@ -403,7 +403,7 @@ v1.0 公开表中同族模型的量级可作参照带：`PersonaPlex` 的 PH(syn
 
 **修复主题**：ASR final 之后重建分段、不再复用冲突状态（InterClarify `304c62e`），并以 request/response ID 关联 FDB 延迟测量。
 
-**FDB 对齐与评分（debug GPU 节点单跑）**：官方 `asr.py`（NeMo parakeet-tdt-0.6b-v2）对五轴 25 例全部产出 `output.json`；官方 `evaluate.py` 评分非 judge 轴。`user_interruption` 的 GPT judge 固定官方 `gpt-4-turbo`；端点当前对该模型无可用通道，按"硬等"处理（不改用其它模型），对齐 5/5 已完成、分数待回填。
+**FDB 对齐与评分（debug GPU 节点单跑）**：官方 `asr.py`（NeMo parakeet-tdt-0.6b-v2）对五轴 25 例全部产出 `output.json`；官方 `evaluate.py` 评分非 judge 轴。`user_interruption` 的官方 judge 模型 `gpt-4-turbo` 已被端点下架（2026-10-14 13:55 与 2026-10-15 14:18 CST 仍可用，现返回「无可用通道」），本轮改用 **`gpt-4o` 平替**并在结果里标注 judge 模型；分数与 `gpt-4-turbo` 轮次不可直接相比。
 
 | 轴 | 指标 | `20261015T060611Z` | **`20261015T114708Z-r1`** |
 | --- | --- | --- | --- |
@@ -412,9 +412,9 @@ v1.0 公开表中同族模型的量级可作参照带：`PersonaPlex` 的 PH(syn
 | `pause_handling`（synthetic） | TOR ↓ | 0.00 | 0.00 |
 | `pause_handling`（candor） | TOR ↓ | 1.00 | **0.40** |
 | `backchannel`（icc） | TOR ↓ / Freq ↑ / JSD ↓ | 0.20 / 0.0000 / 1.0000 | 0.00 / 0.0048 / 0.9545 |
-| `user_interruption` | GPT / TOR / Latency | 4.60 / 1.00 / 2.848s | 待 judge |
+| `user_interruption` | GPT / TOR / Latency | 4.60 / 1.00 / 2.848s（`gpt-4-turbo`） | 3.60 / 1.00 / 2.384s（`gpt-4o` 平替） |
 
-**读法**：`candor_pause_handling` 的 TOR 从 1.00 降到 0.40，说明"final 后重建分段、以 600ms 声学停顿释放 ASR"确实减少了误接话；`synthetic_pause_handling` 与 `candor_turn_taking` 与上一轮持平。`backchannel` 的 TOR 归零、Freq/JSD 随之变化，但仍属"阶段 A 关闭系统附和"的设计边界，不作达标项。`user_interruption` 的解答质量分数在 judge 恢复前不下结论。
+**读法**：`candor_pause_handling` 的 TOR 从 1.00 降到 0.40，说明"final 后重建分段、以 600ms 声学停顿释放 ASR"确实减少了误接话；`synthetic_pause_handling` 与 `candor_turn_taking` 与上一轮持平。`backchannel` 的 TOR 归零、Freq/JSD 随之变化，但仍属"阶段 A 关闭系统附和"的设计边界，不作达标项。`user_interruption` 逐样本（`gpt-4o`）为 5/3/5/5/0：其中 102 在被打断后仍讲打断前话题、未切到用户要求的新话题，评 0 属内容事实且在上一轮为 5，是本轮需要复查的行为退化；其余样本的差异主要来自 judge 模型不同，不宜单独解读。
 
 证据：[`reports/duplex_acceptance/20261015T114708Z-r1/`](../reports/duplex_acceptance/20261015T114708Z-r1/)（`fdb_axes_summary.json`、`tests/fdb_scoring_*.log`、`scoring/*_align_summary.json`）；过程与评分脚本见 [ASR 复测](asr_measurement_retest.md)。
 

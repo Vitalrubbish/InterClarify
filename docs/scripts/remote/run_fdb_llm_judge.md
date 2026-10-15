@@ -59,4 +59,4 @@ conda run --no-capture-output -n full-duplex-bench python scripts/remote/run_fdb
 - 官方 `eval_user_interruption.py` 的 `__main__` 漏传 `client` 参数，因此必须经 `evaluate.py` 调用，脚本已按此实现。
 - **user site 必须启用**：`full-duplex-bench` 自身只装了 NeMo/torch/openai，`numpy`/`scipy`/`soundfile`/`tqdm`/`typing_extensions` 实际来自共享 user site（`~/.local/lib/python3.11/site-packages`）。节点镜像导出 `PYTHONNOUSERSITE=True` 会隐藏这些包，导致对齐（缺 `soundfile`）与评分（缺 `typing_extensions`）双双失败；调用方需 `unset PYTHONNOUSERSITE`，或按 setup 文档让环境自足。
 - **`eval_backchannel.py` 依赖相对路径**：它读取 `./icc_gt_distribution.json`，因此 `evaluate.py --task backchannel` 必须从工作副本的 `evaluation/` 目录运行（该文件随 `evaluation/` 一起被复制）。以运行目录或 `$RUN_DIR` 作 cwd 会 `FileNotFoundError`。
-- **judge 口径固定为官方 `gpt-4-turbo`**：端点无该模型通道时不要改用其它模型，应等待其恢复后补跑（`--judge-model` 只是显式入口，替换会改变评分口径）。`--skip-align` 可复用已生成的 `output.json` 只补跑 judge。
+- **judge 模型与口径**：官方 scorer 固定 `MODEL_NAME = "gpt-4-turbo"`（这也是默认）。端点若把它下架，可用 `--judge-model gpt-4o` 作平替——同为 GPT-4 系，且是上游 FDB 表对该列的命名；替换会改变评分口径，必须在结果里记录实际模型，且不与 `gpt-4-turbo` 轮次直接比较。`--skip-align` 复用已生成的 `output.json` 只补跑 judge；`gpt-4-turbo` 通道恢复后换回默认即可复现原口径。

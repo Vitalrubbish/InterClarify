@@ -1,0 +1,29 @@
+{
+  "task": "user_interruption",
+  "root_dir": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/user_interruption/synthetic_user_interruption",
+  "fdb_repo": "/hpc_stor03/sjtu_home/xuan.zhang/Full-Duplex-Bench",
+  "fdb_commit": "3e799c45a045256f47d5f1c9cda90157e2d2ec9e",
+  "judge_model": "gpt-4o",
+  "judge_base_url": "https://api-2.xi-ai.cn/v1",
+  "audio_name": "output.wav",
+  "align_task": "user_interruption",
+  "align_rc": 0,
+  "judge_rc": 0,
+  "average_rating": 3.6,
+  "average_take_turn": 1.0,
+  "average_latency": 2.3839999999999995,
+  "ratings": [
+    "1",
+    "10",
+    "100",
+    "101",
+    "102"
+  ],
+  "aligned_samples": [
+    "1",
+    "10",
+    "100",
+    "101",
+    "102"
+  ]
+}

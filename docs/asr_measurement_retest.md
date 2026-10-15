@@ -36,7 +36,7 @@
 - 环境：`full-duplex-bench`（torch 2.6.0+cu126、NeMo 2.6.2、`NUMBA_CUDA_USE_NVIDIA_BINDING=0`），上游 FDB 固定在 `3e799c45a045256f47d5f1c9cda90157e2d2ec9e`。
 - 对齐：官方 `get_transcript/asr.py`（NeMo `nvidia/parakeet-tdt-0.6b-v2`）对五轴各 5 例产出 `output.json`，**25/25 成功**；`user_interruption` 按 `interrupt.json` 先截断再转写。
 - 非 judge 轴评分：官方 `evaluation/evaluate.py`（`pause_handling` 两子集、`smooth_turn_taking`、`backchannel`）。
-- `user_interruption` 的 GPT judge 使用**官方固定模型 `gpt-4-turbo`**。当前 OpenAI 兼容端点（`https://api-2.xi-ai.cn/v1`）对该模型返回「无可用通道」（端点只剩 `gpt-5.x`/`gpt-6.x`）。为保持官方评分口径，**硬等** `gpt-4-turbo` 恢复，不改用其它模型；恢复后自动补跑并回填分数。
+- `user_interruption` 的官方 judge 模型是 `gpt-4-turbo`，但该端点已把它下架：它在 2026-10-14 13:55 与 2026-10-15 14:18（CST）还正常出分（`judge_model=gpt-4-turbo`、`judge_rc=0`），现在返回「无可用通道」，端点可用的是 `gpt-4o`/`gpt-4o-mini`/`gpt-4.1` 与部分 `gpt-5.x`。本轮改用 **`gpt-4o` 平替**（同为 GPT-4 系，且是上游 FDB 表对该列的命名），judge 结果里明确记录所用模型；**该分数与 `gpt-4-turbo` 轮次不可直接相比**。
 
 | 轴 | 指标 | 上一轮 `20261015T060611Z` | 本轮 `20261015T114708Z-r1` |
 | --- | --- | --- | --- |
@@ -45,13 +45,15 @@
 | `pause_handling`（synthetic） | TOR ↓ | 0.00 | 0.00 |
 | `pause_handling`（candor） | TOR ↓ | 1.00 | **0.40** |
 | `backchannel`（icc） | TOR ↓ / Freq ↑ / JSD ↓ | 0.20 / 0.0000 / 1.0000 | 0.00 / 0.0048 / 0.9545 |
-| `user_interruption` | GPT / TOR / Latency | 4.60 / 1.00 / 2.848s | 待 judge（对齐 5/5 已完成） |
+| `user_interruption` | GPT / TOR / Latency | 4.60 / 1.00 / 2.848s（`gpt-4-turbo`） | 3.60 / 1.00 / 2.384s（`gpt-4o` 平替） |
 
-结论边界：`candor_pause_handling` 的 TOR 由 1.00 降到 0.40，是"ASR final 后重建分段、不再复用冲突状态"修复后的直接收益；`synthetic_pause_handling` 维持 0.00。`backchannel` 仍属设计边界（阶段 A 关闭系统附和），TOR=0.00 只说明"不抢话"，Freq 0.0048 与 JSD 0.9545 是随之而来的现象值。`smooth_turn_taking` 与上一轮持平。`user_interruption` 的分数在 judge 恢复前不作任何结论。
+结论边界：`candor_pause_handling` 的 TOR 由 1.00 降到 0.40，是"ASR final 后重建分段、不再复用冲突状态"修复后的直接收益；`synthetic_pause_handling` 维持 0.00。`backchannel` 仍属设计边界（阶段 A 关闭系统附和），TOR=0.00 只说明"不抢话"，Freq 0.0048 与 JSD 0.9545 是随之而来的现象值。`smooth_turn_taking` 与上一轮持平。
+
+`user_interruption` 逐样本评分（`gpt-4o`）：1→5、10→3、100→5、101→5、102→0。其中 **102 的问题不在 judge 口径**：该回答在被打断后仍继续讲打断前的"减肥零食"话题，没有切到用户要求的旅行建议（可见文本停在 `... a few berries for extra flavor`），评 0 是内容事实；102 在 `20261015T060611Z` 得到 5，说明这一样本的行为在本次复测里退化了。其余样本（10 由 4 降 3、100 由 4 升 5）差异主要来自 judge 模型不同，不宜单独解读。TOR 仍为 1.00（五例都接话），latency 2.384s 是本次音频自身的结果。
 
 评分脚本（远端运行目录 `data/runs/20261015T114708Z-r1/` 下，属运行产物而非仓库代码）：
 
 - `score_fdb.sh`：五轴对齐 + 非 judge 轴评分。评估器一律从工作副本的 `evaluation/` 目录运行，以满足 `eval_backchannel.py` 对相对路径 `./icc_gt_distribution.json` 的依赖（节点作业内联评分路径用 `$RUN_DIR` 作 cwd，会在此处失败）。
-- `judge_fdb.sh`：每 300s 探测一次端点；`gpt-4-turbo` 可用后以 `--skip-align` 复用对齐结果补跑官方 judge，退出码与产物写入 `scoring/synthetic_user_interruption/`。
+- judge 单跑（平替）命令：`run_fdb_llm_judge.py --task user_interruption --judge-model gpt-4o --skip-align`，复用已生成的 `output.json`，产物写入 `scoring/synthetic_user_interruption/`。若 `gpt-4-turbo` 通道恢复，把 `--judge-model` 换回官方默认即可复现原口径。
 
 证据已复制到 `reports/duplex_acceptance/20261015T114708Z-r1/`：`fdb_axes_summary.json`、`tests/fdb_scoring_*.log` 与 `scoring/*_align_summary.json`。

@@ -7,11 +7,16 @@
   "scoring_env": "full-duplex-bench (torch 2.6.0+cu126, NeMo 2.6.2, NUMBA_CUDA_USE_NVIDIA_BINDING=0)",
   "axes": {
     "user_interruption/synthetic_user_interruption": {
-      "status": "PENDING_JUDGE",
+      "status": "SCORED_WITH_SUBSTITUTE",
+      "judge_model": "gpt-4o",
+      "average_rating": 3.6,
+      "average_take_turn": 1.0,
+      "average_latency": 2.384,
+      "per_sample_rating": {"1": 5, "10": 3, "100": 5, "101": 5, "102": 0},
       "aligned_samples": 5,
-      "previous": {"average_rating": 4.6, "average_take_turn": 1.0, "average_latency": 2.848},
-      "note": "NeMo alignment complete (5/5 output.json). Official GPT judge uses the fixed model gpt-4-turbo; the endpoint has no channel for it right now, so the judge is deferred with a hard wait (no model substitution). See scoring/synthetic_user_interruption/judge_wait.log.",
-      "source": "official get_transcript/asr.py (NeMo parakeet-tdt-0.6b-v2)"
+      "previous": {"average_rating": 4.6, "average_take_turn": 1.0, "average_latency": 2.848, "judge_model": "gpt-4-turbo"},
+      "note": "The official judge model gpt-4-turbo has no endpoint channel any more (it worked on 2026-10-14 13:55 and 2026-10-15 14:18 CST; the gateway now returns 'no available channels'). gpt-4o was used instead: same GPT-4 family and the name the upstream FDB table uses for this column. Scores are NOT directly comparable to the gpt-4-turbo rounds. Per-sample: 102 rates 0 because that response kept the pre-interruption topic (weight-loss snacks) instead of the requested switch to travel tips; the other samples differ mainly by judge variation.",
+      "source": "run_fdb_llm_judge.py --judge-model gpt-4o (official evaluate.py)"
     },
     "smooth_turn_taking/candor_turn_taking": {
       "average_take_turn": 0.8,
