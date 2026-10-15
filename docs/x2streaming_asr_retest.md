@@ -16,7 +16,7 @@
 
 | 项 | 值 |
 | --- | --- |
-| InterClarify 快照 | 提交见 §6 提交记录 |
+| InterClarify 快照 | `a352751d2e656f6a850df8e338111a78d7c8b75c` |
 | X-Talk | `48c5952`（`X2StreamingClient` + `continuous_audio` 生命周期） |
 | X2 源码 | `0aca80597bb1399c0be4002de5bc62c0a779c542` |
 | X2 权重 | `x-square-robot/X2Streaming-ASR-4B-1009` @ `4c8df16b8d7f8b50c95590c4d7907436ebe4aa08` |
@@ -75,7 +75,12 @@ export DUPLEX_X2_LANGUAGE=en
 
 ## 6. 提交记录
 
-（作业提交后填写：运行标识、快照提交、manifest snapshot、作业编号、提交日志、远端产物路径。）
+- 运行标识：`20261015T172109Z`。
+- 快照：InterClarify `a352751d2e656f6a850df8e338111a78d7c8b75c`、X-Talk `48c595243207bacf25667449bf784b7fa73d9dd3`，位于 `/mnt/cloudstorfs/sjtu_home/xuan.zhang/interclarify-retests/20261015T172109Z`。
+- Manifest：183 个文件，snapshot `91a58587b9525e2c58bc1ee26896ce7afd6b842ded577e993292fbb21ad114d2`；来源清单已覆盖 `x2_asr_service.py`、`setup_x2_asr_env.sh`、`configs/xtalk_duplex_x2_runtime.json`、`tests/test_x2_asr_service.py` 与 X-Talk 的 `x2_streaming_client.py`。
+- 环境与权重：`/hpc_stor03/sjtu_home/xuan.zhang/interclarify-x2`（`ready.txt` 记录源码、权重与环境 prefix）；提交前在登录节点用同一服务脚本对 `regular_answer_01_question.wav` 做过一次 80 ms 增量端到端冒烟，`/health` 正常、`end_stream` 后得到 `could you tell me a short joke please`。
+- 作业：`job-179208494223390610578-xuan-zhang`（`pdgpu-4090`，3 GPU / 24 CPU / 96 GB），提交日志 `data/runs/submit_logs/submit.20261015T172221Z.sh`。
+- 提交成功不等于测试通过；结果与读法在取得产物后回填。
 
 ## 7. 结果边界
 
