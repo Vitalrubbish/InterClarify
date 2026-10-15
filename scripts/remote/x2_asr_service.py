@@ -19,6 +19,8 @@ from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
+SAMPLE_RATE = 16000
+
 
 class RecognizeRequest(BaseModel):
     """Incremental PCM; is_final is a pause hint, end_stream is EOF."""
@@ -99,6 +101,29 @@ class X2Service:
                 "pause_hint": request.is_final, "end_stream": request.end_stream}))
             return text
 
+    def warmup(self, seconds: float = 1.0) -> None:
+        """Pay the first-session cost before any measured request.
+
+        The first ``AdaptiveSession`` on a fresh process absorbs GPU module
+        loading, kernel autotuning and the streaming left-pad prefill. In the
+        A4 retest that cost landed inside the first scenario: the X-Talk audio
+        consumer blocked on it while the whole utterance accumulated, and a
+        single request then carried the entire clip (so no online text ever
+        reached the runtime). Creating and closing one session here moves the
+        cost into startup, where the job already waits on ``/health``.
+        """
+        started = time.monotonic()
+        session_id = self.create()
+        samples = np.zeros(int(SAMPLE_RATE * seconds), dtype=np.int16)
+        try:
+            self.recognize(RecognizeRequest(
+                session_id=session_id,
+                audio=base64.b64encode(samples.tobytes()).decode()))
+        finally:
+            self.close(session_id)
+        logger.info(json.dumps({"event": "x2_warmup",
+            "seconds": round(time.monotonic() - started, 3), "audio_seconds": seconds}))
+
     def close(self, session_id: str) -> None:
         """Abort and release the matching session."""
         with self.lock:
@@ -176,7 +201,9 @@ def main() -> None:
             enable_live=True, enable_offline=False, listen_chunk_size=1, verbose=False)
 
     logger.info("X2 source=%s model=%s language=%s offline=false", commit, args.model, args.language)
-    uvicorn.run(create_app(X2Service(factory, args.language)), host=args.host, port=args.port)
+    service = X2Service(factory, args.language)
+    service.warmup()
+    uvicorn.run(create_app(service), host=args.host, port=args.port)
 
 
 if __name__ == "__main__":

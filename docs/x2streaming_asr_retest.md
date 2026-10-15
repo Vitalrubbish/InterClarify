@@ -88,3 +88,18 @@ export DUPLEX_X2_LANGUAGE=en
 - X2 在线硬提交不回写，但仍可能提前提交错误、漏字、重复或因不确定而等待；不回写不等于识别正确。
 - 未取得实际输出前，不宣称"停滞消除"或"延迟改善"。
 - 本轮不与 Qwen 轮次的 FDB 分数做无条件对比；单变量对照的读法见 §2。
+
+## 8. 首轮结果与冷启动修复（`20261015T172109Z`）
+
+**作业现状**：`job-179208494223390610578-xuan-zhang`，除 `real_audio_replay` 外全部 PASS——`source_manifest`、`gpu_allocation`、`assets`、`environment`、`runtime_config`、A1/A2/A3 回归、三个服务、`tts_warmup`、`official_model_smoke`、`runtime_build`、`fdb_inference`（五轴各 5 例）全部通过；`a4_summary.json` 为 `FAIL`（`failures=1`）。
+
+**`pause` 场景 FAIL 的根因（已定位）**：`pause` 是本轮第一个场景，其 ASR 会话在整个服务里也是第一个会话。`services/asr.log` 显示该会话只收到 **2 个请求**：第一个 0.096 s，第二个一次带走 **5.76 s**（≈两段之和），且整场没有任何 `live_emit`；其余所有会话均为 ~0.096 s 的稳定增量。原因是 X-Talk 的 ASR 消费者在首个 `recognize` 里阻塞于 X2 进程内第一个 `AdaptiveSession` 的一次性成本（CUDA 模块加载 / kernel autotune / 流式左填充 prefill），期间整段语音堆在消费者队列里，等解阻塞后一次取走；由于此后不再有新音频，累计文本再没有被客户端取回，driver 也没有看到 `update_asr`，于是判 FAIL（`response: ""`、`tts_audio_bytes: 0`）。`normal` 与 `interruption` 两个场景通过：转写准确（`could you tell me a short joke please`、`how often should i take my dog to the vet hold on can we discuss something else what's a good recipe for a quick dinner`），打断由模型自身的 `<|user interruption|>` 触发并冻结音频。
+
+**修复**：`scripts/remote/x2_asr_service.py` 在加载权重后、`uvicorn` 监听前执行一次 `warmup()`（创建会话 → 追加 1 s 静音 → 关闭），把首个会话成本挪到作业本来就在等待的 `/health` 之前。本地验证：预热耗时 0.435 s；预热后按真实时间喂 80 ms 增量，文本在 0.64 s / 0.72 s / … / 2.08 s 逐词在线增长（修复前同一 clip 只在 `end_stream` 才出整句）。对应回归见 `tests/test_x2_asr_service.py::test_warmup_uses_one_session_and_releases_it`，服务文档见 [x2_asr_service.md](../scripts/remote/x2_asr_service.md)。
+
+**同时记录的两项事实（本轮不修）**：
+
+1. `x2_online` 记录显示本轮 4866 个请求里 `pause_hint` 与 `end_stream` 均为 0：`continuous_audio` 使 `pause()` 直接返回（不产生暂停边界事件），而 duplex 模式下 `TurnASREndRequested` 没有发布者，所以在线流从未被 flush。结论只在"在线持续发射能覆盖句尾"这一点上成立；若后续发现句尾缺词，需要 X-Talk 侧补一个真实的流结束发布者。
+2. FDB 五轴推理的转写为 X2 风格（小写、无标点），且都产出了回答；语义分数仍以作业外的官方对齐与评分为准。
+
+修复后以新快照重跑，见 §9。

@@ -1,0 +1,138 @@
+{
+ "status": "PASS",
+ "errors": [],
+ "scenario": "interruption",
+ "request_audio_seconds": 3.3813125,
+ "request_user_end_seconds": 3.360838260501623,
+ "interruption_audio_seconds": 4.4906875,
+ "interruption_user_end_seconds": 4.481005687266588,
+ "interruption_after_playback_seconds": 0.6,
+ "playback_started": true,
+ "interrupted_response_id": "6f0b614263f043d0858ac8650141a111",
+ "interruption_stop_observed": true,
+ "interrupted_response_audio_bytes": 207360,
+ "interrupted_response_audio_after_stop": 0,
+ "interrupted_audio_frozen": true,
+ "played_audio_after_interruption_input": 184320,
+ "asr_final": null,
+ "response": "The frequency of visits",
+ "first_audio_seconds": 4.806800177320838,
+ "tts_audio_bytes": 207360,
+ "played_audio_by_response": {
+  "6f0b614263f043d0858ac8650141a111": 207360
+ },
+ "event_count": 40,
+ "events": {
+  "ticks": 40,
+  "by_event": {
+   "finish_resp": 1,
+   "latency_metrics": 2,
+   "pcm_received": 1,
+   "playback_started": 1,
+   "session_attached": 1,
+   "start_tts": 1,
+   "stop_tts": 1,
+   "update_asr": 23,
+   "update_resp": 4,
+   "vad_speech_end": 2,
+   "vad_speech_start": 3
+  },
+  "span_seconds": 9694753.722
+ },
+ "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/replay/interruption/output.wav",
+ "output_sample_rate": 48000,
+ "session_id": "7b1fe8bc-fde9-44f8-bfa4-43ceea72c35b",
+ "playback_mode": "paced_headless_ack",
+ "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/replay/timelines/7b1fe8bc-fde9-44f8-bfa4-43ceea72c35b.jsonl",
+ "timeline": {
+  "records": 265,
+  "protocol_tokens": {
+   "count": 13,
+   "tokens": {
+    "<|user backchannel|>": 4,
+    "<|user finish talking|>": 1,
+    "<|user interruption|>": 1,
+    "<|user is talking|>": 7
+   }
+  },
+  "raw_outputs": {
+   "count": 13,
+   "tokens": {
+    "<|user backchannel|>": 4,
+    "<|user finish talking|>": 1,
+    "<|user interruption|>": 1,
+    "<|user is talking|>": 7
+   }
+  },
+  "protocol_errors": [],
+  "event_counts": {
+   "asr.result_partial": 23,
+   "duplex.micro_turn_ready": 16,
+   "llm.first_chunk": 16,
+   "duplex.protocol_parsed": 13,
+   "turn.tts_start_requested": 1,
+   "turn.tts_delivery_start_requested": 1,
+   "tts.started": 1,
+   "llm_agent.response_update": 80,
+   "turn.tts_text_append_requested": 80,
+   "llm.sentence_ready": 1,
+   "tts.chunk_ready": 24,
+   "response.update": 4,
+   "turn.tts_stop_requested": 1,
+   "tts.stopped": 1,
+   "tts.playback_stopped": 1,
+   "response.finish": 1,
+   "tts.response_closed": 1
+  },
+  "response_ids": [
+   "6f0b614263f043d0858ac8650141a111"
+  ],
+  "latencies": {
+   "llm_to_tts_started_seconds": 0.03366883099079132,
+   "tts_to_first_played_text_seconds": 2.2929690834134817,
+   "stop_request_to_tts_stopped_seconds": [
+    0.0003361813724040985
+   ]
+  },
+  "response_latencies": [
+   {
+    "response_id": "6f0b614263f043d0858ac8650141a111",
+    "request_id": "ef5a0ef7c444413b89108104d325a217",
+    "request_to_first_token_seconds": 0.038127364590764046,
+    "tts_started_to_first_chunk_seconds": 0.8268832974135876,
+    "llm_to_tts_started_seconds": 0.03366883099079132,
+    "tts_to_first_played_text_seconds": 2.2929690834134817
+   }
+  ],
+  "interruption_events": [
+   {
+    "response_id": "6f0b614263f043d0858ac8650141a111",
+    "reason": "interruption",
+    "raw_output": "<|user interruption|>",
+    "monotonic_timestamp": 9694764.458699264
+   }
+  ],
+  "stopped_response_ids": [
+   "6f0b614263f043d0858ac8650141a111"
+  ],
+  "interruption_stop_response_ids": [
+   "6f0b614263f043d0858ac8650141a111"
+  ],
+  "teardown_stop_response_ids": [],
+  "played_text": {
+   "6f0b614263f043d0858ac8650141a111": {
+    "snapshots": 4,
+    "last": "The frequency of visits"
+   }
+  },
+  "played_text_monotonic": true,
+  "unplayed_tail_excluded": true,
+  "asr_updates_during_playback": 9,
+  "playback_window": [
+   9694759.686264263,
+   9694764.458968839
+  ],
+  "system_backchannel_seen": false,
+  "direct_audio_seen": false
+ }
+}

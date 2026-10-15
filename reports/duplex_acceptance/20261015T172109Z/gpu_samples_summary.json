@@ -1,0 +1,11 @@
+{
+ "source": "gpu_samples.csv",
+ "rows": 752,
+ "columns": {
+  " 0": {
+   "min": 0.0,
+   "median": 1.0,
+   "max": 2.0
+  }
+ }
+}

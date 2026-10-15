@@ -69,6 +69,19 @@ class X2ServiceTest(unittest.TestCase):
         service.close(sid)
         service.create()
 
+    def test_warmup_uses_one_session_and_releases_it(self):
+        engine = FakeOnline()
+        service = X2Service(lambda: engine, timeout=5)
+        service.warmup(seconds=0.08)
+        self.assertIsNone(service.session)
+        self.assertIsNone(service.session_id)
+        self.assertTrue(engine.aborted)
+        session_id = service.create()
+        # The fake keeps its text across sessions, so the warmup append is still counted.
+        self.assertEqual(service.recognize(
+            RecognizeRequest(session_id=session_id,
+                             audio=base64.b64encode(b"\x00\x00").decode())), " word word")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -51,6 +51,10 @@ python scripts/remote/x2_asr_service.py \
 
 启动时用 `git rev-parse HEAD` 校验源码是否等于固定提交 `0aca80597bb1399c0be4002de5bc62c0a779c542`，不等则直接失败；随后加载 `voxtral_asr` 权重（`adaptive_latency=True`、`language_tag.require_checkpoint_weights=True`）并 `eval()`。A4 节点作业在 `DUPLEX_ASR_BACKEND=x2` 时以 `conda run -p $DUPLEX_ASR_ENV` 启动本入口，日志写入 `services/asr.log`。
 
+## 启动预热
+
+模型加载后、`uvicorn` 监听之前，服务执行一次 `warmup()`：创建一个会话、追加 1 秒静音、再关闭，并记录 `x2_warmup` 日志（耗时与音频长度）。原因见 [复测任务单](../../x2streaming_asr_retest.md) 第 8 节：进程内**第一个** `AdaptiveSession` 要承担 CUDA 模块加载、kernel autotune 和流式左填充 prefill；这段成本若落在首个被测场景里，X-Talk 的 ASR 消费者会被阻塞整段语音，最后只发出一个整块请求，客户端拿不到任何在线文本（`20261015T172109Z` 的 `pause` 场景即如此）。预热把该成本挪到作业本来就在等待的 `/health` 之前；预热后第一个真实会话即按 80 ms 增量返回文本。`/health` 可用即代表模型与预热都已完成。
+
 ## 边界
 
 - 只服务单会话、单 GPU；不承担并发多路 ASR。

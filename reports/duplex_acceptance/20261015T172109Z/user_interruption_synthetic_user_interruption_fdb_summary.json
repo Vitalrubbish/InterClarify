@@ -1,0 +1,917 @@
+{
+ "status": "PASS",
+ "input_root": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption",
+ "output_root": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/user_interruption/synthetic_user_interruption",
+ "samples": [
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 6.254762411117554e-06,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 27.568,
+   "send_seconds": 27.552972838282585,
+   "response_ids": [
+    "b47ccbc92b2a485ea0b1cd63705a2d38"
+   ],
+   "finished_response_ids": [
+    "b47ccbc92b2a485ea0b1cd63705a2d38"
+   ],
+   "asr_final": null,
+   "response": "Saving money effectively involves creating a budget, tracking",
+   "first_audio_seconds": 4.739021813496947,
+   "tts_audio_bytes": 345600,
+   "played_audio_by_response": {
+    "b47ccbc92b2a485ea0b1cd63705a2d38": 345600
+   },
+   "event_count": 38,
+   "events": {
+    "ticks": 38,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 2,
+     "pcm_received": 1,
+     "playback_started": 1,
+     "session_attached": 1,
+     "start_tts": 1,
+     "stop_tts": 1,
+     "update_asr": 15,
+     "update_resp": 9,
+     "vad_speech_end": 3,
+     "vad_speech_start": 3
+    },
+    "span_seconds": 9695091.367
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/user_interruption/synthetic_user_interruption/1/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "9e5db49b-4425-42b0-8332-0ebf015b83e6",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/1/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/user_interruption/synthetic_user_interruption/1/output.wav",
+   "sample_index": 0,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/user_interruption_synthetic_user_interruption/diagnostics/1/output.wav",
+   "client_measurements": {
+    "responses": [
+     {
+      "response_id": "b47ccbc92b2a485ea0b1cd63705a2d38",
+      "start_tts_seconds": 3.908035496249795,
+      "pcm_received_seconds": 4.738980636000633,
+      "playback_started_seconds": 4.739016739651561,
+      "stop_tts_seconds": 11.084938475862145,
+      "played_audio_bytes": 345600,
+      "playback_started_in_tail": false
+     }
+    ],
+    "anchors": {
+     "interruption_start": 9.613333333333333,
+     "interruption_end": 12.568
+    },
+    "latencies": {
+     "interruption_end": {
+      "anchor_seconds": 12.568,
+      "response_id": null,
+      "to_pcm_received_seconds": null,
+      "to_playback_started_seconds": null
+     },
+     "interruption_stop": [
+      {
+       "response_id": "b47ccbc92b2a485ea0b1cd63705a2d38",
+       "seconds": 1.4716051425288121
+      }
+     ]
+    },
+    "no_played_audio": false,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/9e5db49b-4425-42b0-8332-0ebf015b83e6.jsonl",
+   "timeline": {
+    "records": 460,
+    "protocol_tokens": {
+     "count": 42,
+     "tokens": {
+      "<|user finish talking|>": 1,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 40
+     }
+    },
+    "raw_outputs": {
+     "count": 42,
+     "tokens": {
+      "<|user finish talking|>": 1,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 40
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 15,
+     "duplex.micro_turn_ready": 53,
+     "llm.first_chunk": 53,
+     "duplex.protocol_parsed": 42,
+     "turn.tts_start_requested": 1,
+     "turn.tts_delivery_start_requested": 1,
+     "tts.started": 1,
+     "llm_agent.response_update": 120,
+     "turn.tts_text_append_requested": 120,
+     "llm.sentence_ready": 1,
+     "tts.chunk_ready": 39,
+     "response.update": 9,
+     "turn.tts_stop_requested": 1,
+     "tts.stopped": 1,
+     "tts.playback_stopped": 1,
+     "response.finish": 1,
+     "tts.response_closed": 1
+    },
+    "response_ids": [
+     "b47ccbc92b2a485ea0b1cd63705a2d38"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 0.03398992121219635,
+     "tts_to_first_played_text_seconds": 2.307781295850873,
+     "stop_request_to_tts_stopped_seconds": [
+      0.00043368712067604065
+     ]
+    },
+    "response_latencies": [
+     {
+      "response_id": "b47ccbc92b2a485ea0b1cd63705a2d38",
+      "request_id": "69be85dbef024cdab631069a8ad35ba4",
+      "request_to_first_token_seconds": 0.03834276273846626,
+      "tts_started_to_first_chunk_seconds": 0.8308820389211178,
+      "llm_to_tts_started_seconds": 0.03398992121219635,
+      "tts_to_first_played_text_seconds": 2.307781295850873
+     }
+    ],
+    "interruption_events": [
+     {
+      "response_id": "b47ccbc92b2a485ea0b1cd63705a2d38",
+      "reason": "interruption",
+      "raw_output": "<|user interruption|>",
+      "monotonic_timestamp": 9695104.433373485
+     }
+    ],
+    "stopped_response_ids": [
+     "b47ccbc92b2a485ea0b1cd63705a2d38"
+    ],
+    "interruption_stop_response_ids": [
+     "b47ccbc92b2a485ea0b1cd63705a2d38"
+    ],
+    "teardown_stop_response_ids": [],
+    "played_text": {
+     "b47ccbc92b2a485ea0b1cd63705a2d38": {
+      "snapshots": 9,
+      "last": "Saving money effectively involves creating a budget, tracking"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 3,
+    "playback_window": [
+     9695097.256177625,
+     9695104.433630511
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 7.76723027229309e-06,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 26.9706875,
+   "send_seconds": 26.944643089547753,
+   "response_ids": [
+    "25401eacd6924423af7f911307137fb1",
+    "f5473f177d8746a0b4a2c587fbc5728f"
+   ],
+   "finished_response_ids": [
+    "25401eacd6924423af7f911307137fb1"
+   ],
+   "asr_final": null,
+   "response": "Certainly! Improving your sleep quality is crucial for overall health and well-being Here are some tips to help you get better sleep:\n\n### 1 Establish a Consistent Sleep Schedule\n- **Go to Bed and Wake Up",
+   "first_audio_seconds": 3.914006432518363,
+   "tts_audio_bytes": 1873922,
+   "played_audio_by_response": {
+    "25401eacd6924423af7f911307137fb1": 345600,
+    "f5473f177d8746a0b4a2c587fbc5728f": 1528322
+   },
+   "event_count": 80,
+   "events": {
+    "ticks": 80,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 2,
+     "pcm_received": 2,
+     "playback_started": 2,
+     "session_attached": 1,
+     "start_tts": 2,
+     "stop_tts": 1,
+     "update_asr": 13,
+     "update_resp": 50,
+     "vad_speech_end": 3,
+     "vad_speech_start": 3
+    },
+    "span_seconds": 9695127.026
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/user_interruption/synthetic_user_interruption/10/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "2e4be675-402c-411c-a31d-07f56f2eae75",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/10/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/user_interruption/synthetic_user_interruption/10/output.wav",
+   "sample_index": 1,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/user_interruption_synthetic_user_interruption/diagnostics/10/output.wav",
+   "client_measurements": {
+    "responses": [
+     {
+      "response_id": "25401eacd6924423af7f911307137fb1",
+      "start_tts_seconds": 3.0912435203790665,
+      "pcm_received_seconds": 3.9139778930693865,
+      "playback_started_seconds": 3.9140001125633717,
+      "stop_tts_seconds": 10.268712371587753,
+      "played_audio_bytes": 345600,
+      "playback_started_in_tail": false
+     },
+     {
+      "response_id": "f5473f177d8746a0b4a2c587fbc5728f",
+      "start_tts_seconds": 12.707393389195204,
+      "pcm_received_seconds": 13.70217403396964,
+      "playback_started_seconds": 13.702196625992656,
+      "played_audio_bytes": 1528322,
+      "playback_started_in_tail": false
+     }
+    ],
+    "anchors": {
+     "interruption_start": 9.229333333333333,
+     "interruption_end": 11.970666666666666
+    },
+    "latencies": {
+     "interruption_end": {
+      "anchor_seconds": 11.970666666666666,
+      "response_id": "f5473f177d8746a0b4a2c587fbc5728f",
+      "to_pcm_received_seconds": 1.7315073673029744,
+      "to_playback_started_seconds": 1.7315299593259894
+     },
+     "interruption_stop": [
+      {
+       "response_id": "25401eacd6924423af7f911307137fb1",
+       "seconds": 1.0393790382544204
+      }
+     ]
+    },
+    "no_played_audio": false,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/2e4be675-402c-411c-a31d-07f56f2eae75.jsonl",
+   "timeline": {
+    "records": 1298,
+    "protocol_tokens": {
+     "count": 8,
+     "tokens": {
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 5
+     }
+    },
+    "raw_outputs": {
+     "count": 8,
+     "tokens": {
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 5
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 13,
+     "duplex.micro_turn_ready": 51,
+     "llm.first_chunk": 51,
+     "duplex.protocol_parsed": 8,
+     "turn.tts_start_requested": 2,
+     "turn.tts_delivery_start_requested": 2,
+     "tts.started": 2,
+     "llm_agent.response_update": 450,
+     "turn.tts_text_append_requested": 450,
+     "llm.sentence_ready": 2,
+     "tts.chunk_ready": 210,
+     "response.update": 50,
+     "turn.tts_stop_requested": 2,
+     "tts.stopped": 2,
+     "tts.playback_stopped": 1,
+     "response.finish": 1,
+     "tts.response_closed": 1
+    },
+    "response_ids": [
+     "25401eacd6924423af7f911307137fb1",
+     "f5473f177d8746a0b4a2c587fbc5728f"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 0.033796997740864754,
+     "tts_to_first_played_text_seconds": 2.304533129557967,
+     "stop_request_to_tts_stopped_seconds": [
+      0.0003445073962211609,
+      0.00023869238793849945
+     ]
+    },
+    "response_latencies": [
+     {
+      "response_id": "25401eacd6924423af7f911307137fb1",
+      "request_id": "89f703279f3d4caab3de4dd30ff5310c",
+      "request_to_first_token_seconds": 0.03852284699678421,
+      "tts_started_to_first_chunk_seconds": 0.8226719349622726,
+      "llm_to_tts_started_seconds": 0.033796997740864754,
+      "tts_to_first_played_text_seconds": 2.304533129557967
+     },
+     {
+      "response_id": "f5473f177d8746a0b4a2c587fbc5728f",
+      "request_id": "418b286ea75f44d7b9d6c90fb3ea92d2",
+      "request_to_first_token_seconds": 0.054172931239008904,
+      "tts_started_to_first_chunk_seconds": 0.9944624472409487,
+      "llm_to_tts_started_seconds": 0.03424014896154404,
+      "tts_to_first_played_text_seconds": 2.547902012243867
+     }
+    ],
+    "interruption_events": [
+     {
+      "response_id": "25401eacd6924423af7f911307137fb1",
+      "reason": "interruption",
+      "raw_output": "<|user interruption|>",
+      "monotonic_timestamp": 9695139.275221808
+     }
+    ],
+    "stopped_response_ids": [
+     "25401eacd6924423af7f911307137fb1",
+     "f5473f177d8746a0b4a2c587fbc5728f"
+    ],
+    "interruption_stop_response_ids": [
+     "25401eacd6924423af7f911307137fb1"
+    ],
+    "teardown_stop_response_ids": [
+     "f5473f177d8746a0b4a2c587fbc5728f"
+    ],
+    "played_text": {
+     "25401eacd6924423af7f911307137fb1": {
+      "snapshots": 8,
+      "last": "Reducing stress quickly can be achieved through"
+     },
+     "f5473f177d8746a0b4a2c587fbc5728f": {
+      "snapshots": 42,
+      "last": "Certainly! Improving your sleep quality is crucial for overall health and well-being Here are some tips to help you get better sleep:\n\n### 1 Establish a Consistent Sleep Schedule\n- **Go to Bed and Wake Up"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 7,
+    "playback_window": [
+     9695132.097499818,
+     9695161.453953624
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 5.0533562898635864e-06,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 28.2506875,
+   "send_seconds": 28.224885184317827,
+   "response_ids": [
+    "4da1634f478f44c39254c4e82b7198ff",
+    "bfb9c28197b143cab8f23b9fbdd59fa4"
+   ],
+   "finished_response_ids": [
+    "4da1634f478f44c39254c4e82b7198ff"
+   ],
+   "asr_final": null,
+   "response": "Choosing the right type of pet food is crucial for maintaining your pet's health and ensuring they receive all the necessary nutrients Here are some factors to consider when selecting pet food:\n\n### 1 **Pet",
+   "first_audio_seconds": 4.832015892490745,
+   "tts_audio_bytes": 1867746,
+   "played_audio_by_response": {
+    "4da1634f478f44c39254c4e82b7198ff": 451646,
+    "bfb9c28197b143cab8f23b9fbdd59fa4": 1416100
+   },
+   "event_count": 89,
+   "events": {
+    "ticks": 89,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 3,
+     "pcm_received": 2,
+     "playback_started": 2,
+     "session_attached": 1,
+     "start_tts": 2,
+     "stop_tts": 1,
+     "update_asr": 19,
+     "update_resp": 50,
+     "vad_speech_end": 4,
+     "vad_speech_start": 4
+    },
+    "span_seconds": 9695162.088
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/user_interruption/synthetic_user_interruption/100/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "8e408113-e0f1-42cb-9336-179e838d26a2",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/100/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/user_interruption/synthetic_user_interruption/100/output.wav",
+   "sample_index": 2,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/user_interruption_synthetic_user_interruption/diagnostics/100/output.wav",
+   "client_measurements": {
+    "responses": [
+     {
+      "response_id": "4da1634f478f44c39254c4e82b7198ff",
+      "start_tts_seconds": 4.003026403486729,
+      "pcm_received_seconds": 4.831990608945489,
+      "playback_started_seconds": 4.832011574879289,
+      "stop_tts_seconds": 12.380258668214083,
+      "played_audio_bytes": 451646,
+      "playback_started_in_tail": false
+     },
+     {
+      "response_id": "bfb9c28197b143cab8f23b9fbdd59fa4",
+      "start_tts_seconds": 14.833593051880598,
+      "pcm_received_seconds": 15.814446592703462,
+      "playback_started_seconds": 15.814467664808035,
+      "played_audio_bytes": 1416100,
+      "playback_started_in_tail": false
+     }
+    ],
+    "anchors": {
+     "interruption_start": 9.826666666666666,
+     "interruption_end": 13.250666666666666
+    },
+    "latencies": {
+     "interruption_end": {
+      "anchor_seconds": 13.250666666666666,
+      "response_id": "bfb9c28197b143cab8f23b9fbdd59fa4",
+      "to_pcm_received_seconds": 2.563779926036796,
+      "to_playback_started_seconds": 2.563800998141369
+     },
+     "interruption_stop": [
+      {
+       "response_id": "4da1634f478f44c39254c4e82b7198ff",
+       "seconds": 2.5535920015474165
+      }
+     ]
+    },
+    "no_played_audio": false,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/8e408113-e0f1-42cb-9336-179e838d26a2.jsonl",
+   "timeline": {
+    "records": 1334,
+    "protocol_tokens": {
+     "count": 12,
+     "tokens": {
+      "<|user backchannel|>": 2,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 7
+     }
+    },
+    "raw_outputs": {
+     "count": 12,
+     "tokens": {
+      "<|user backchannel|>": 2,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 7
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 19,
+     "duplex.micro_turn_ready": 53,
+     "llm.first_chunk": 54,
+     "duplex.protocol_parsed": 12,
+     "turn.tts_start_requested": 2,
+     "turn.tts_delivery_start_requested": 2,
+     "tts.started": 2,
+     "llm_agent.response_update": 460,
+     "turn.tts_text_append_requested": 460,
+     "llm.sentence_ready": 2,
+     "tts.chunk_ready": 211,
+     "response.update": 50,
+     "turn.tts_stop_requested": 2,
+     "tts.stopped": 2,
+     "tts.playback_stopped": 1,
+     "response.finish": 1,
+     "tts.response_closed": 1
+    },
+    "response_ids": [
+     "4da1634f478f44c39254c4e82b7198ff",
+     "bfb9c28197b143cab8f23b9fbdd59fa4"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 0.033960135653615,
+     "tts_to_first_played_text_seconds": 2.3076697923243046,
+     "stop_request_to_tts_stopped_seconds": [
+      0.0002884604036808014,
+      0.0003830567002296448
+     ]
+    },
+    "response_latencies": [
+     {
+      "response_id": "4da1634f478f44c39254c4e82b7198ff",
+      "request_id": "41a29c00221d430589bf02a4d1c8955e",
+      "request_to_first_token_seconds": 0.03834233060479164,
+      "tts_started_to_first_chunk_seconds": 0.8289210181683302,
+      "llm_to_tts_started_seconds": 0.033960135653615,
+      "tts_to_first_played_text_seconds": 2.3076697923243046
+     },
+     {
+      "response_id": "bfb9c28197b143cab8f23b9fbdd59fa4",
+      "request_id": "8f95eddcc1cc4b4f8fc41ef77b1add7d",
+      "request_to_first_token_seconds": 0.06910679303109646,
+      "tts_started_to_first_chunk_seconds": 0.9806330054998398,
+      "llm_to_tts_started_seconds": 0.033968791365623474,
+      "tts_to_first_played_text_seconds": 2.8093517757952213
+     }
+    ],
+    "interruption_events": [
+     {
+      "response_id": "4da1634f478f44c39254c4e82b7198ff",
+      "reason": "interruption",
+      "raw_output": "<|user interruption|>",
+      "monotonic_timestamp": 9695176.449223643
+     }
+    ],
+    "stopped_response_ids": [
+     "4da1634f478f44c39254c4e82b7198ff",
+     "bfb9c28197b143cab8f23b9fbdd59fa4"
+    ],
+    "interruption_stop_response_ids": [
+     "4da1634f478f44c39254c4e82b7198ff"
+    ],
+    "teardown_stop_response_ids": [
+     "bfb9c28197b143cab8f23b9fbdd59fa4"
+    ],
+    "played_text": {
+     "4da1634f478f44c39254c4e82b7198ff": {
+      "snapshots": 12,
+      "last": "Getting a new puppy is an exciting and rewarding experience, but"
+     },
+     "bfb9c28197b143cab8f23b9fbdd59fa4": {
+      "snapshots": 38,
+      "last": "Choosing the right type of pet food is crucial for maintaining your pet's health and ensuring they receive all the necessary nutrients Here are some factors to consider when selecting pet food:\n\n### 1 **Pet"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 11,
+    "playback_window": [
+     9695168.071749628,
+     9695197.797399873
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 5.068257451057434e-06,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 28.272,
+   "send_seconds": 28.25680198892951,
+   "response_ids": [
+    "8cb1b077300a4a89a0a97f8698df61f0"
+   ],
+   "finished_response_ids": [],
+   "asr_final": null,
+   "response": "The best time to plant tomatoes depends on your specific climate and the type of tomatoes you're growing Here are some general guidelines:\n\n1 **Spring Planting**: For most regions, the best time to plant tomatoes is in late spring or early summer, after the last frost date This allows enough time for the plants to grow before the weather gets too hot In warmer",
+   "first_audio_seconds": 3.9376803301274776,
+   "tts_audio_bytes": 2568726,
+   "played_audio_by_response": {
+    "8cb1b077300a4a89a0a97f8698df61f0": 2568726
+   },
+   "event_count": 100,
+   "events": {
+    "ticks": 100,
+    "by_event": {
+     "latency_metrics": 2,
+     "pcm_received": 1,
+     "playback_started": 1,
+     "session_attached": 1,
+     "start_tts": 1,
+     "update_asr": 17,
+     "update_resp": 71,
+     "vad_speech_end": 3,
+     "vad_speech_start": 3
+    },
+    "span_seconds": 9695198.429
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/user_interruption/synthetic_user_interruption/101/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "2c32d40b-4288-4a83-88d1-e43e5b03fd5c",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/101/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/user_interruption/synthetic_user_interruption/101/output.wav",
+   "sample_index": 3,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/user_interruption_synthetic_user_interruption/diagnostics/101/output.wav",
+   "client_measurements": {
+    "responses": [
+     {
+      "response_id": "8cb1b077300a4a89a0a97f8698df61f0",
+      "start_tts_seconds": 3.116038763895631,
+      "pcm_received_seconds": 3.9376553650945425,
+      "playback_started_seconds": 3.9376762825995684,
+      "played_audio_bytes": 2568726,
+      "playback_started_in_tail": false
+     }
+    ],
+    "anchors": {
+     "interruption_start": 9.4,
+     "interruption_end": 13.272
+    },
+    "latencies": {
+     "interruption_end": {
+      "anchor_seconds": 13.272,
+      "response_id": null,
+      "to_pcm_received_seconds": null,
+      "to_playback_started_seconds": null
+     },
+     "interruption_stop": []
+    },
+    "no_played_audio": false,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/2c32d40b-4288-4a83-88d1-e43e5b03fd5c.jsonl",
+   "timeline": {
+    "records": 1089,
+    "protocol_tokens": {
+     "count": 9,
+     "tokens": {
+      "<|user backchannel|>": 5,
+      "<|user finish talking|>": 1,
+      "<|user is talking|>": 3
+     }
+    },
+    "raw_outputs": {
+     "count": 9,
+     "tokens": {
+      "<|user backchannel|>": 5,
+      "<|user finish talking|>": 1,
+      "<|user is talking|>": 3
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 17,
+     "duplex.micro_turn_ready": 35,
+     "llm.first_chunk": 36,
+     "duplex.protocol_parsed": 9,
+     "turn.tts_start_requested": 1,
+     "turn.tts_delivery_start_requested": 1,
+     "tts.started": 1,
+     "llm_agent.response_update": 315,
+     "turn.tts_text_append_requested": 315,
+     "llm.sentence_ready": 1,
+     "tts.chunk_ready": 283,
+     "response.update": 72,
+     "llm_agent.response_finish": 1,
+     "turn.tts_stop_requested": 1,
+     "tts.stopped": 1
+    },
+    "response_ids": [
+     "8cb1b077300a4a89a0a97f8698df61f0"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 0.033767735585570335,
+     "tts_to_first_played_text_seconds": 2.3014701046049595,
+     "stop_request_to_tts_stopped_seconds": [
+      0.00011973641812801361
+     ]
+    },
+    "response_latencies": [
+     {
+      "response_id": "8cb1b077300a4a89a0a97f8698df61f0",
+      "request_id": "3e2d82962d2047dd885e96da732010e5",
+      "request_to_first_token_seconds": 0.03833545185625553,
+      "tts_started_to_first_chunk_seconds": 0.8215854279696941,
+      "llm_to_tts_started_seconds": 0.033767735585570335,
+      "tts_to_first_played_text_seconds": 2.3014701046049595
+     }
+    ],
+    "interruption_events": [],
+    "stopped_response_ids": [
+     "8cb1b077300a4a89a0a97f8698df61f0"
+    ],
+    "interruption_stop_response_ids": [],
+    "teardown_stop_response_ids": [
+     "8cb1b077300a4a89a0a97f8698df61f0"
+    ],
+    "played_text": {
+     "8cb1b077300a4a89a0a97f8698df61f0": {
+      "snapshots": 72,
+      "last": "The best time to plant tomatoes depends on your specific climate and the type of tomatoes you're growing Here are some general guidelines:\n\n1 **Spring Planting**: For most regions, the best time to plant tomatoes is in late spring or early summer, after the last frost date This allows enough time for the plants to grow before the weather gets too hot In warmer climates, you might start planting earlier, while in cooler areas, you might wait until later\n\n2 **Container-Grown Tomatoes**: If you're using containers, you can start planting them indoors about 6-8 weeks before the last expected frost…[truncated 795 chars]"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 11,
+    "playback_window": [
+     9695203.52705412,
+     9695234.175818557
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 2.273358404636383e-05,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 28.4213125,
+   "send_seconds": 28.41697827912867,
+   "response_ids": [
+    "fe0072afa41046be959213cedf89f877"
+   ],
+   "finished_response_ids": [
+    "fe0072afa41046be959213cedf89f877"
+   ],
+   "asr_final": null,
+   "response": "Here are some healthy snack options",
+   "first_audio_seconds": 4.388968143612146,
+   "tts_audio_bytes": 253440,
+   "played_audio_by_response": {
+    "fe0072afa41046be959213cedf89f877": 253440
+   },
+   "event_count": 38,
+   "events": {
+    "ticks": 38,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 2,
+     "pcm_received": 1,
+     "playback_started": 1,
+     "session_attached": 1,
+     "start_tts": 1,
+     "stop_tts": 1,
+     "update_asr": 18,
+     "update_resp": 6,
+     "vad_speech_end": 3,
+     "vad_speech_start": 3
+    },
+    "span_seconds": 9695234.818
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/user_interruption/synthetic_user_interruption/102/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "b874a8e0-b6ee-46ca-b1b2-1b8226b25e04",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/102/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/user_interruption/synthetic_user_interruption/102/output.wav",
+   "sample_index": 4,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/user_interruption_synthetic_user_interruption/diagnostics/102/output.wav",
+   "client_measurements": {
+    "responses": [
+     {
+      "response_id": "fe0072afa41046be959213cedf89f877",
+      "start_tts_seconds": 3.4047197066247463,
+      "pcm_received_seconds": 4.388923525810242,
+      "playback_started_seconds": 4.388946242630482,
+      "stop_tts_seconds": 12.379858085885644,
+      "played_audio_bytes": 253440,
+      "playback_started_in_tail": false
+     }
+    ],
+    "anchors": {
+     "interruption_start": 9.485333333333333,
+     "interruption_end": 13.421333333333333
+    },
+    "latencies": {
+     "interruption_end": {
+      "anchor_seconds": 13.421333333333333,
+      "response_id": null,
+      "to_pcm_received_seconds": null,
+      "to_playback_started_seconds": null
+     },
+     "interruption_stop": [
+      {
+       "response_id": "fe0072afa41046be959213cedf89f877",
+       "seconds": 2.894524752552311
+      }
+     ]
+    },
+    "no_played_audio": false,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/user_interruption_synthetic_user_interruption/timelines/b874a8e0-b6ee-46ca-b1b2-1b8226b25e04.jsonl",
+   "timeline": {
+    "records": 513,
+    "protocol_tokens": {
+     "count": 43,
+     "tokens": {
+      "<|user backchannel|>": 3,
+      "<|user finish talking|>": 1,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 38
+     }
+    },
+    "raw_outputs": {
+     "count": 43,
+     "tokens": {
+      "<|user backchannel|>": 3,
+      "<|user finish talking|>": 1,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 38
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 18,
+     "duplex.micro_turn_ready": 54,
+     "llm.first_chunk": 54,
+     "duplex.protocol_parsed": 43,
+     "turn.tts_start_requested": 1,
+     "turn.tts_delivery_start_requested": 1,
+     "tts.started": 1,
+     "llm_agent.response_update": 150,
+     "turn.tts_text_append_requested": 150,
+     "llm.sentence_ready": 1,
+     "tts.chunk_ready": 29,
+     "response.update": 6,
+     "turn.tts_stop_requested": 1,
+     "tts.stopped": 1,
+     "tts.playback_stopped": 1,
+     "response.finish": 1,
+     "tts.response_closed": 1
+    },
+    "response_ids": [
+     "fe0072afa41046be959213cedf89f877"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 0.035007743164896965,
+     "tts_to_first_played_text_seconds": 3.396392995491624,
+     "stop_request_to_tts_stopped_seconds": [
+      0.00033026933670043945
+     ]
+    },
+    "response_latencies": [
+     {
+      "response_id": "fe0072afa41046be959213cedf89f877",
+      "request_id": "502623106cf14d35b4fe15574ad6b962",
+      "request_to_first_token_seconds": 0.038556575775146484,
+      "tts_started_to_first_chunk_seconds": 0.9838339108973742,
+      "llm_to_tts_started_seconds": 0.035007743164896965,
+      "tts_to_first_played_text_seconds": 3.396392995491624
+     }
+    ],
+    "interruption_events": [
+     {
+      "response_id": "fe0072afa41046be959213cedf89f877",
+      "reason": "interruption",
+      "raw_output": "<|user interruption|>",
+      "monotonic_timestamp": 9695249.180829588
+     }
+    ],
+    "stopped_response_ids": [
+     "fe0072afa41046be959213cedf89f877"
+    ],
+    "interruption_stop_response_ids": [
+     "fe0072afa41046be959213cedf89f877"
+    ],
+    "teardown_stop_response_ids": [],
+    "played_text": {
+     "fe0072afa41046be959213cedf89f877": {
+      "snapshots": 6,
+      "last": "Here are some healthy snack options"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 10,
+    "playback_window": [
+     9695240.205380436,
+     9695249.18103322
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  }
+ ],
+ "note": "Inference audio only; run official FDB ASR alignment and scoring separately."
+}

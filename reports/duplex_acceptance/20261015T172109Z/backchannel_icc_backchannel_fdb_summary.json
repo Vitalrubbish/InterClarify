@@ -1,0 +1,428 @@
+{
+ "status": "PASS",
+ "input_root": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/icc_backchannel",
+ "output_root": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/backchannel/icc_backchannel",
+ "samples": [
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 7.385388016700745e-06,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 21.952,
+   "send_seconds": 21.920469051226974,
+   "response_ids": [],
+   "finished_response_ids": [],
+   "asr_final": null,
+   "response": "",
+   "first_audio_seconds": null,
+   "tts_audio_bytes": 0,
+   "played_audio_by_response": {},
+   "event_count": 68,
+   "events": {
+    "ticks": 68,
+    "by_event": {
+     "session_attached": 1,
+     "update_asr": 61,
+     "vad_speech_end": 3,
+     "vad_speech_start": 3
+    },
+    "span_seconds": 9695275.495
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/backchannel/icc_backchannel/0/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "10d766fa-b819-4a56-ac98-02bf28157e55",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/icc_backchannel/0/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/backchannel/icc_backchannel/0/output.wav",
+   "sample_index": 0,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/backchannel_icc_backchannel/diagnostics/0/output.wav",
+   "client_measurements": {
+    "responses": [],
+    "anchors": {},
+    "latencies": {},
+    "no_played_audio": true,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/backchannel_icc_backchannel/timelines/10d766fa-b819-4a56-ac98-02bf28157e55.jsonl",
+   "timeline": {
+    "records": 181,
+    "protocol_tokens": {
+     "count": 40,
+     "tokens": {
+      "<|user is talking|>": 40
+     }
+    },
+    "raw_outputs": {
+     "count": 40,
+     "tokens": {
+      "<|user is talking|>": 40
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 61,
+     "duplex.micro_turn_ready": 40,
+     "llm.first_chunk": 40,
+     "duplex.protocol_parsed": 40
+    },
+    "response_ids": [],
+    "latencies": {
+     "stop_request_to_tts_stopped_seconds": []
+    },
+    "response_latencies": [],
+    "interruption_events": [],
+    "stopped_response_ids": [],
+    "interruption_stop_response_ids": [],
+    "teardown_stop_response_ids": [],
+    "played_text": {},
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 0,
+    "playback_window": null,
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 5.532056093215942e-06,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 27.471,
+   "send_seconds": 27.45632821507752,
+   "response_ids": [],
+   "finished_response_ids": [],
+   "asr_final": null,
+   "response": "",
+   "first_audio_seconds": null,
+   "tts_audio_bytes": 0,
+   "played_audio_by_response": {},
+   "event_count": 94,
+   "events": {
+    "ticks": 94,
+    "by_event": {
+     "session_attached": 1,
+     "update_asr": 83,
+     "vad_speech_end": 5,
+     "vad_speech_start": 5
+    },
+    "span_seconds": 9695305.504
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/backchannel/icc_backchannel/1/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "20b3f5bf-a394-4c07-bad8-344b2f80eb9b",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/icc_backchannel/1/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/backchannel/icc_backchannel/1/output.wav",
+   "sample_index": 1,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/backchannel_icc_backchannel/diagnostics/1/output.wav",
+   "client_measurements": {
+    "responses": [],
+    "anchors": {},
+    "latencies": {},
+    "no_played_audio": true,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/backchannel_icc_backchannel/timelines/20b3f5bf-a394-4c07-bad8-344b2f80eb9b.jsonl",
+   "timeline": {
+    "records": 233,
+    "protocol_tokens": {
+     "count": 50,
+     "tokens": {
+      "<|user is talking|>": 50
+     }
+    },
+    "raw_outputs": {
+     "count": 50,
+     "tokens": {
+      "<|user is talking|>": 50
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 83,
+     "duplex.micro_turn_ready": 50,
+     "llm.first_chunk": 50,
+     "duplex.protocol_parsed": 50
+    },
+    "response_ids": [],
+    "latencies": {
+     "stop_request_to_tts_stopped_seconds": []
+    },
+    "response_latencies": [],
+    "interruption_events": [],
+    "stopped_response_ids": [],
+    "interruption_stop_response_ids": [],
+    "teardown_stop_response_ids": [],
+    "played_text": {},
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 0,
+    "playback_window": null,
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 4.081055521965027e-06,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 22.081,
+   "send_seconds": 22.08031566441059,
+   "response_ids": [],
+   "finished_response_ids": [],
+   "asr_final": null,
+   "response": "",
+   "first_audio_seconds": null,
+   "tts_audio_bytes": 0,
+   "played_audio_by_response": {},
+   "event_count": 77,
+   "events": {
+    "ticks": 77,
+    "by_event": {
+     "session_attached": 1,
+     "update_asr": 72,
+     "vad_speech_end": 2,
+     "vad_speech_start": 2
+    },
+    "span_seconds": 9695341.042
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/backchannel/icc_backchannel/10/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "09d96925-0407-4ed5-b944-e14680aea3aa",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/icc_backchannel/10/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/backchannel/icc_backchannel/10/output.wav",
+   "sample_index": 2,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/backchannel_icc_backchannel/diagnostics/10/output.wav",
+   "client_measurements": {
+    "responses": [],
+    "anchors": {},
+    "latencies": {},
+    "no_played_audio": true,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/backchannel_icc_backchannel/timelines/09d96925-0407-4ed5-b944-e14680aea3aa.jsonl",
+   "timeline": {
+    "records": 195,
+    "protocol_tokens": {
+     "count": 41,
+     "tokens": {
+      "<|user is talking|>": 41
+     }
+    },
+    "raw_outputs": {
+     "count": 41,
+     "tokens": {
+      "<|user is talking|>": 41
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 72,
+     "duplex.micro_turn_ready": 41,
+     "llm.first_chunk": 41,
+     "duplex.protocol_parsed": 41
+    },
+    "response_ids": [],
+    "latencies": {
+     "stop_request_to_tts_stopped_seconds": []
+    },
+    "response_latencies": [],
+    "interruption_events": [],
+    "stopped_response_ids": [],
+    "interruption_stop_response_ids": [],
+    "teardown_stop_response_ids": [],
+    "played_text": {},
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 0,
+    "playback_window": null,
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 4.61190938949585e-06,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 23.64,
+   "send_seconds": 23.61665982566774,
+   "response_ids": [],
+   "finished_response_ids": [],
+   "asr_final": null,
+   "response": "",
+   "first_audio_seconds": null,
+   "tts_audio_bytes": 0,
+   "played_audio_by_response": {},
+   "event_count": 74,
+   "events": {
+    "ticks": 74,
+    "by_event": {
+     "session_attached": 1,
+     "update_asr": 65,
+     "vad_speech_end": 4,
+     "vad_speech_start": 4
+    },
+    "span_seconds": 9695371.203
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/backchannel/icc_backchannel/11/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "4ec7d93a-1f82-4615-a248-86d8719f2a4a",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/icc_backchannel/11/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/backchannel/icc_backchannel/11/output.wav",
+   "sample_index": 3,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/backchannel_icc_backchannel/diagnostics/11/output.wav",
+   "client_measurements": {
+    "responses": [],
+    "anchors": {},
+    "latencies": {},
+    "no_played_audio": true,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/backchannel_icc_backchannel/timelines/4ec7d93a-1f82-4615-a248-86d8719f2a4a.jsonl",
+   "timeline": {
+    "records": 185,
+    "protocol_tokens": {
+     "count": 40,
+     "tokens": {
+      "<|user is talking|>": 40
+     }
+    },
+    "raw_outputs": {
+     "count": 40,
+     "tokens": {
+      "<|user is talking|>": 40
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 65,
+     "duplex.micro_turn_ready": 40,
+     "llm.first_chunk": 40,
+     "duplex.protocol_parsed": 40
+    },
+    "response_ids": [],
+    "latencies": {
+     "stop_request_to_tts_stopped_seconds": []
+    },
+    "response_latencies": [],
+    "interruption_events": [],
+    "stopped_response_ids": [],
+    "interruption_stop_response_ids": [],
+    "teardown_stop_response_ids": [],
+    "played_text": {},
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 0,
+    "playback_window": null,
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 4.9639493227005005e-06,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 41.365,
+   "send_seconds": 41.344921100884676,
+   "response_ids": [],
+   "finished_response_ids": [],
+   "asr_final": null,
+   "response": "",
+   "first_audio_seconds": null,
+   "tts_audio_bytes": 0,
+   "played_audio_by_response": {},
+   "event_count": 117,
+   "events": {
+    "ticks": 117,
+    "by_event": {
+     "session_attached": 1,
+     "update_asr": 104,
+     "vad_speech_end": 6,
+     "vad_speech_start": 6
+    },
+    "span_seconds": 9695402.91
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/backchannel/icc_backchannel/12/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "c6150f81-6699-4092-bd1a-88a81b8fcedd",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/icc_backchannel/12/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb/backchannel/icc_backchannel/12/output.wav",
+   "sample_index": 4,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/backchannel_icc_backchannel/diagnostics/12/output.wav",
+   "client_measurements": {
+    "responses": [],
+    "anchors": {},
+    "latencies": {},
+    "no_played_audio": true,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T172109Z/fdb_driver/backchannel_icc_backchannel/timelines/c6150f81-6699-4092-bd1a-88a81b8fcedd.jsonl",
+   "timeline": {
+    "records": 323,
+    "protocol_tokens": {
+     "count": 73,
+     "tokens": {
+      "<|user is talking|>": 73
+     }
+    },
+    "raw_outputs": {
+     "count": 73,
+     "tokens": {
+      "<|user is talking|>": 73
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 104,
+     "duplex.micro_turn_ready": 73,
+     "llm.first_chunk": 73,
+     "duplex.protocol_parsed": 73
+    },
+    "response_ids": [],
+    "latencies": {
+     "stop_request_to_tts_stopped_seconds": []
+    },
+    "response_latencies": [],
+    "interruption_events": [],
+    "stopped_response_ids": [],
+    "interruption_stop_response_ids": [],
+    "teardown_stop_response_ids": [],
+    "played_text": {},
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 0,
+    "playback_window": null,
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  }
+ ],
+ "note": "Inference audio only; run official FDB ASR alignment and scoring separately."
+}
