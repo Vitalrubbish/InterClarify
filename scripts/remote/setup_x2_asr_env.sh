@@ -5,7 +5,6 @@ X2_ROOT="${INTERCLARIFY_X2_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/interclarify-x
 X2_SOURCE="$X2_ROOT/source-code"
 X2_PREFIX="${X2_CONDA_PREFIX:-/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/xtalk-x2-asr}"
 X2_CONDA="${X2_CONDA:-/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/bin/conda}"
-X2_SEED="${X2_SEED_ENV:-/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/xtalk-round1-client}"
 X2_COMMIT=0aca80597bb1399c0be4002de5bc62c0a779c542
 X2_REVISION=4c8df16b8d7f8b50c95590c4d7907436ebe4aa08
 mkdir -p "$X2_ROOT"
@@ -17,8 +16,11 @@ if [ ! -d "$X2_SOURCE/.git" ]; then
 fi
 git -C "$X2_SOURCE" sparse-checkout set models src demo data_pipeline configs tools
 git -C "$X2_SOURCE" checkout --detach "$X2_COMMIT"
+# A fresh python base is smaller and more reproducible than cloning a shared
+# runtime env: the official requirements pin torch/transformers and pull their
+# own CUDA wheels, so a torch-capable seed only adds unrelated packages.
 if [ ! -f "$X2_PREFIX/conda-meta/history" ]; then
-  "$X2_CONDA" create --offline -y --clone "$X2_SEED" -p "$X2_PREFIX"
+  "$X2_CONDA" create -y -p "$X2_PREFIX" python=3.12 pip
 fi
 "$X2_CONDA" run --no-capture-output -p "$X2_PREFIX" python -m pip install \
   -r "$X2_SOURCE/requirements.txt" 'fastapi>=0.115.0' 'uvicorn>=0.34.0'

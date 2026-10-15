@@ -155,6 +155,8 @@ P1 和 P2 是最早的两个强制门禁。A1–A3 已通过本地实现门禁�
 
 客户端实现固定为 X-Talk `48c5952`；X2 源码 `0aca80597bb1399c0be4002de5bc62c0a779c542`、权重 `4c8df16b8d7f8b50c95590c4d7907436ebe4aa08`。本地 X-Talk 150 项测试通过（3 skipped），主仓库 35 项相关测试通过；真实模型质量与性能仍须远端复测。
 
+2026-10-15 远端准备：`scripts/remote/setup_x2_asr_env.sh` 在共享盘新建独立 conda prefix `xtalk-x2-asr`（官方 `torch==2.11.0+cu128` / `transformers==5.15.1`，与 Qwen/MOSS 环境隔离），稀疏检出固定源码提交并下载固定 revision 权重到 `interclarify-x2/`；A4 节点入口新增 `DUPLEX_ASR_BACKEND=x2` 分支、X2 资产前置校验与 X2 服务单测。对照复测的范围、口径与证据边界见 [X2 复测任务单](x2streaming_asr_retest.md)。
+
 新增短窗口调度器，首次非空 ASR 后启动，默认 0.6 秒；partial、停顿和 final 只更新缓冲，串行生成完成后才 flush 下一窗口，与官方推理一致。累计前缀以增量发送；修订、空窗口和 final 去重见改造计划第 13 节。
 
 #### Layer 1 映射

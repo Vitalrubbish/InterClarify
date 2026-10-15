@@ -78,6 +78,13 @@ export XDG_CACHE_HOME="${XDG_CACHE_HOME:-/tmp/interclarify-a4-cache}"
 export TORCHINDUCTOR_CACHE_DIR="${TORCHINDUCTOR_CACHE_DIR:-$XDG_CACHE_HOME/torchinductor}"
 export TRITON_CACHE_DIR="${TRITON_CACHE_DIR:-$XDG_CACHE_HOME/triton}"
 mkdir -p "$XDG_CACHE_HOME" "$TORCHINDUCTOR_CACHE_DIR" "$TRITON_CACHE_DIR"
+# The container starts with an empty /tmp cache and cannot reach GitHub raw, so
+# seed the Silero VAD weight from the shared drive when the runtime VAD is on.
+VAD_CACHE_FILE="${DUPLEX_VAD_CACHE_FILE:-/hpc_stor03/sjtu_home/xuan.zhang/.cache/xtalk/models/silero_vad.onnx}"
+if [ -r "$VAD_CACHE_FILE" ]; then
+  mkdir -p "$XDG_CACHE_HOME/xtalk/models"
+  cp -n "$VAD_CACHE_FILE" "$XDG_CACHE_HOME/xtalk/models/silero_vad.onnx" 2>/dev/null || true
+fi
 
 IFS=',' read -r -a JOB_GPUS <<< "${CUDA_VISIBLE_DEVICES:-0,1,2}"
 PIDS=()
@@ -150,6 +157,12 @@ for asset in "$CHECKPOINT" "$BASE_MODEL" "$MODEL_ROOT/models.lock.json" \
   "$ROUND1_ROOT/audio/reference.wav"; do
   [ -e "$asset" ] || { printf 'missing asset: %s\n' "$asset" >> "$RUN_DIR/logs/assets.log"; RC=1; }
 done
+if [ "$ASR_BACKEND" = x2 ]; then
+  # Fail here, with the path in assets.log, instead of inside the ASR service.
+  for asset in "${DUPLEX_X2_SOURCE:?set X2 source}" "${DUPLEX_X2_MODEL:?set X2 weights}"; do
+    [ -e "$asset" ] || { printf 'missing asset: %s\n' "$asset" >> "$RUN_DIR/logs/assets.log"; RC=1; }
+  done
+fi
 [ "$RC" -eq 0 ] && record_step assets PASS 0 || record_step assets FAIL "$RC" "required model or audio asset is missing"
 
 cp "$MODEL_ROOT/models.lock.json" "$RUN_DIR/models.lock.json"
@@ -229,6 +242,7 @@ RC=0
 RC=0
 conda run -n "$CLIENT_ENV" env PYTHONPATH="$TASK_ROOT/xtalk/src:$TASK_ROOT" python -m unittest \
   tests.test_duplex_a4_replay tests.test_duplex_model_service tests.test_qwen3_asr_service \
+  tests.test_x2_asr_service \
   > "$RUN_DIR/tests/a4_driver.log" 2>&1 || RC=$?
 [ "$RC" -eq 0 ] && record_step a4_driver_regression PASS 0 || record_step a4_driver_regression FAIL "$RC"
 [ "$FAILURES" -eq 0 ] || exit "$FAILURES"
