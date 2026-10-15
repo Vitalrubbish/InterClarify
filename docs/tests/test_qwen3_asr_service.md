@@ -8,6 +8,8 @@
 
 ## 用例
 
+2026-10-15 新增分段回归：final 后恢复必须使用新解码器；重复空 final 幂等；final 冲突不回退；跨片段真实复述不能去重。这些假模型测试不代表真实识别质量。
+
 | 用例 | 断言 |
 | --- | --- |
 | `CommittedTokenIdsTests.test_drops_the_trailing_tokens` | `committed_token_ids` 按 **token 数**（不是字符数）截断、不足则空；`decode_token_prefix` 把前缀解码回文本 |

@@ -80,10 +80,14 @@ class A4ReplayClient(LinkClient):
         timeout: float,
         output_wav: Path,
         output_rate: int = 48_000,
+        fdb_tail_seconds: float = 5.0,
     ) -> None:
         super().__init__(http_base, ws_base, timeout)
         self.output_wav = output_wav
         self.output_rate = output_rate
+        self.fdb_tail_seconds = fdb_tail_seconds
+        self._pcm_received_ids: set[str] = set()
+        self._playback_started_ids: set[str] = set()
         self.session_id: str | None = None
         self._capture: TimedPcmCapture | None = None
         self._playback_queue: asyncio.Queue[tuple[str, bytes]] = asyncio.Queue()
@@ -179,6 +183,7 @@ class A4ReplayClient(LinkClient):
                 "response": self._response,
                 "first_audio_seconds": self._first_audio,
                 "tts_audio_bytes": self._audio_bytes,
+                "played_audio_by_response": dict(self._audio_by_response),
                 "event_count": len(self._events),
                 "events": self._events,
             }
@@ -196,6 +201,9 @@ class A4ReplayClient(LinkClient):
         report["output_sample_rate"] = self.output_rate
         report["session_id"] = self.session_id
         report["playback_mode"] = "paced_headless_ack"
+        report["tts_audio_bytes"] = self._audio_bytes
+        report["played_audio_by_response"] = dict(self._audio_by_response)
+        report["first_audio_seconds"] = self._first_audio
         return report
 
     async def _run_fdb(
@@ -205,9 +213,11 @@ class A4ReplayClient(LinkClient):
     ) -> tuple[dict[str, Any], bool]:
         """Stream one complete FDB input without requiring the system to answer."""
         started, ended = await self._send_turn_input(ws, audio_pcm, 0)
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(self.fdb_tail_seconds)
         result = {
             "scenario": "fdb",
+            "input_start_seconds": started - self._started,
+            "diagnostic_tail_seconds": self.fdb_tail_seconds,
             "input_audio_seconds": len(audio_pcm) / (2 * SAMPLE_RATE),
             "send_seconds": ended - started,
             "response_ids": list(self._start_resp_ids),
@@ -374,12 +384,21 @@ class A4ReplayClient(LinkClient):
                     continue
                 duration = len(pcm) / (2 * self.output_rate)
                 started = time.monotonic()
+                if response_id not in self._playback_started_ids:
+                    self._playback_started_ids.add(response_id)
+                    self._record("playback_started", None, {"response_id": response_id})
                 self._playing = (response_id, pcm, started)
                 self._stop_signal.clear()
                 try:
                     await asyncio.wait_for(self._stop_signal.wait(), timeout=duration)
                 except asyncio.TimeoutError:
                     pass
+                except asyncio.CancelledError:
+                    # Preserve the heard portion when the observation window ends.
+                    if response_id not in self._stopped_ids:
+                        frames = min(len(pcm) // 2, max(0, int((time.monotonic() - started) * self.output_rate)))
+                        self._capture_played(response_id, pcm[:frames * 2], started)
+                    raise
                 if response_id in self._stopped_ids:
                     continue
                 self._capture_played(response_id, pcm, started)
@@ -421,6 +440,9 @@ class A4ReplayClient(LinkClient):
                             "audio received without start_tts response ID"
                         )
                         continue
+                    if response_id not in self._pcm_received_ids:
+                        self._pcm_received_ids.add(response_id)
+                        self._record("pcm_received", None, {"response_id": response_id})
                     self._outstanding[response_id] = (
                         self._outstanding.get(response_id, 0) + 1
                     )
@@ -521,6 +543,7 @@ def read_timeline(
 
 def summarize_timeline(records: list[dict[str, Any]]) -> dict[str, Any]:
     """Extract protocol, lifecycle and latency evidence from JSONL."""
+    records = sorted(records, key=lambda r: float(r.get("monotonic_timestamp") or 0))
     parsed = [r for r in records if r.get("event_type") == "duplex.protocol_parsed"]
     errors = [r for r in records if r.get("event_type") == "duplex.protocol_error"]
     tokens = [r.get("state_token", "") for r in parsed if r.get("state_token")]
@@ -541,10 +564,36 @@ def summarize_timeline(records: list[dict[str, Any]]) -> dict[str, Any]:
         "interruption_token": next((float(r["monotonic_timestamp"]) for r in parsed if r.get("state_token") == "<|user interruption|>"), None),
     }
     latencies = {}
-    if anchors["llm_first_chunk"] is not None and anchors["tts_started"] is not None:
-        latencies["llm_to_tts_started_seconds"] = max(0.0, anchors["tts_started"] - anchors["llm_first_chunk"])
-    if anchors["tts_started"] is not None and anchors["response_update"] is not None:
-        latencies["tts_to_first_played_text_seconds"] = max(0.0, anchors["response_update"] - anchors["tts_started"])
+    response_latencies = []
+    for start in records:
+        if start.get("event_type") != "tts.started" or not start.get("response_id"):
+            continue
+        rid, request_id = start["response_id"], start.get("request_id")
+        # Some publishers carry the request only on the response start event.
+        if not request_id:
+            ids = {r.get("request_id") for r in records
+                   if r.get("response_id") == rid and r.get("request_id")}
+            request_id = next(iter(ids)) if len(ids) == 1 else None
+        chunks = [r["monotonic_timestamp"] for r in records
+                  if request_id and r.get("request_id") == request_id
+                  and r.get("event_type") == "llm.first_chunk"]
+        updates = [r["monotonic_timestamp"] for r in records
+                   if r.get("response_id") == rid and r.get("event_type") == "response.update"]
+        requests = [r["monotonic_timestamp"] for r in records
+                    if request_id and r.get("request_id") == request_id
+                    and r.get("event_type") == "duplex.micro_turn_ready"]
+        pcm = [r["monotonic_timestamp"] for r in records
+               if r.get("response_id") == rid and r.get("event_type") == "tts.chunk_ready"]
+        response_latencies.append({
+            "response_id": rid, "request_id": request_id,
+            "request_to_first_token_seconds": min(chunks) - min(requests) if chunks and requests else None,
+            "tts_started_to_first_chunk_seconds": min(pcm) - start["monotonic_timestamp"] if pcm else None,
+            "llm_to_tts_started_seconds": start["monotonic_timestamp"] - min(chunks) if chunks else None,
+            "tts_to_first_played_text_seconds": min(updates) - start["monotonic_timestamp"] if updates else None,
+        })
+    if response_latencies:
+        for key in ("llm_to_tts_started_seconds", "tts_to_first_played_text_seconds"):
+            latencies[key] = response_latencies[0][key]
     # ProtocolParsed is published after the stop action; it is not token arrival.
     stop_delays = []
     for request in records:
@@ -664,6 +713,7 @@ def summarize_timeline(records: list[dict[str, Any]]) -> dict[str, Any]:
         "event_counts": counts,
         "response_ids": sorted({str(r.get("response_id")) for r in records if r.get("response_id")}),
         "latencies": latencies,
+        "response_latencies": response_latencies,
         "interruption_events": interruption_events,
         "stopped_response_ids": stopped_response_ids,
         "interruption_stop_response_ids": interruption_stop_response_ids,
@@ -773,6 +823,58 @@ def normalize_wav_duration(path: Path, duration_seconds: float) -> None:
         output.writeframes(frames)
 
 
+def summarize_client_responses(report: dict[str, Any], sample: Path) -> dict[str, Any]:
+    """Measure each response in the client's input-relative clock."""
+    origin = report.get("input_start_seconds", 0.0)
+    duration = report["input_audio_seconds"]
+    responses: dict[str, dict[str, Any]] = {}
+    for event in report.get("events", []):
+        data = event.get("data")
+        rid = data.get("response_id") if isinstance(data, dict) else None
+        if not rid or event.get("action") not in {"start_tts", "stop_tts", "pcm_received", "playback_started"}:
+            continue
+        row = responses.setdefault(rid, {"response_id": rid})
+        row.setdefault(event["action"] + "_seconds", event["seconds"] - origin)
+    anchors = {}
+    for filename, fields in (("turn_taking.json", (("turn_taking", 0),)),
+                             ("interrupt.json", (("interruption_start", 0), ("interruption_end", 1)))):
+        path = sample / filename
+        if path.exists():
+            annotations = json.loads(path.read_text())
+            if annotations:
+                for name, index in fields:
+                    anchors[name] = float(annotations[0]["timestamp"][index])
+    for row in responses.values():
+        row["played_audio_bytes"] = report.get("played_audio_by_response", {}).get(row["response_id"], 0)
+        played = row.get("playback_started_seconds")
+        row["playback_started_in_tail"] = played is not None and played >= duration
+    metrics = {}
+    for name in ("turn_taking", "interruption_end"):
+        if name not in anchors:
+            continue
+        anchor = anchors[name]
+        # A response that opened before the anchor is the old answer, even if
+        # its first PCM arrived after the user's interruption ended.
+        candidates = [r for r in responses.values() if r.get("start_tts_seconds", -1) >= anchor]
+        answer = min(candidates, key=lambda r: r["start_tts_seconds"]) if candidates else None
+        metrics[name] = {"anchor_seconds": anchor,
+                         "response_id": answer["response_id"] if answer else None}
+        for action in ("pcm_received", "playback_started"):
+            value = answer.get(action + "_seconds") if answer else None
+            metrics[name]["to_" + action + "_seconds"] = value - anchor if value is not None else None
+    if "interruption_start" in anchors:
+        anchor = anchors["interruption_start"]
+        old = [r for r in responses.values() if r.get("start_tts_seconds", float("inf")) < anchor
+               and r.get("stop_tts_seconds", float("inf")) >= anchor]
+        metrics["interruption_stop"] = [
+            {"response_id": r["response_id"], "seconds": r["stop_tts_seconds"] - anchor}
+            for r in old if "stop_tts_seconds" in r]
+    return {"responses": list(responses.values()), "anchors": anchors, "latencies": metrics,
+            "no_played_audio": not bool(report.get("tts_audio_bytes")),
+            "aligned_first_word_seconds": None,
+            "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."}
+
+
 def copy_fdb_sample(source: Path, destination: Path) -> None:
     """Copy FDB inputs and annotations while leaving generated outputs fresh."""
     destination.mkdir(parents=True, exist_ok=True)
@@ -828,10 +930,14 @@ async def run_fdb_batch(args: argparse.Namespace) -> dict[str, Any]:
                 f"ws://127.0.0.1:{port}/ws",
                 args.timeout,
                 output_path,
+                fdb_tail_seconds=args.fdb_tail_seconds,
             )
             pcm = _load_pcm16(input_path)
             report = await client.run(pcm, 1, scenario="fdb")
             duration = len(pcm) / (2 * SAMPLE_RATE)
+            diagnostic_path = args.out / "diagnostics" / relative.parent / output_name
+            diagnostic_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(output_path, diagnostic_path)
             normalize_wav_duration(output_path, duration)
             await asyncio.sleep(0.5)
             timeline_path, records = read_timeline(
@@ -853,6 +959,10 @@ async def run_fdb_batch(args: argparse.Namespace) -> dict[str, Any]:
                 "input": str(input_path),
                 "output": str(output_path),
                 "sample_index": index,
+                "transport_status": "FAIL" if failed else "PASS",
+                "semantic_status": "PENDING_OFFICIAL_SCORING",
+                "diagnostic_output": str(diagnostic_path),
+                "client_measurements": summarize_client_responses(report, input_path.parent),
                 "timeline_path": str(timeline_path) if timeline_path else None,
                 "timeline": timeline,
             }
@@ -984,8 +1094,11 @@ def main() -> None:
     parser.add_argument("--fdb-input-root", type=Path)
     parser.add_argument("--fdb-output-root", type=Path)
     parser.add_argument("--fdb-limit", type=int, default=5)
+    parser.add_argument("--fdb-tail-seconds", type=float, default=5.0)
     parser.add_argument("--native", action="store_true", help="keep native semantic managers for FDB comparison")
     args = parser.parse_args()
+    if not 0 <= args.fdb_tail_seconds <= 60:
+        parser.error("--fdb-tail-seconds must be between 0 and 60")
     if args.native and args.fdb_input_root is None:
         parser.error("--native is supported only in FDB mode")
     args.config = args.config.resolve()

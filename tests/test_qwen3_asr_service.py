@@ -197,6 +197,48 @@ class AdvanceCommittedTests(unittest.TestCase):
 class OwnedServiceContractTests(unittest.TestCase):
     """HTTP exposes extensions and ``is_final`` releases the whole transcript."""
 
+    def test_pause_resume_uses_fresh_decoder_and_preserves_repetitions(self):
+        """Finalized punctuation cannot lock the following acoustic segment."""
+        class SegmentModel(FakeModel):
+            def finish_streaming_transcribe(self, state):
+                state.text += '.'
+
+        model = SegmentModel(['I know', 'I know people well'])
+        asr = make_service(model, True, hidden_token_num=1)
+        sid = asr.create_session()
+        pcm = base64.b64encode(make_pcm(600)).decode('ascii')
+        def recognize(audio='', final=False):
+            return asr.recognize(service.RecognizeRequest(
+                session_id=sid, audio=audio, is_final=final))[0]
+        first_state = asr._sessions[sid].state
+        self.assertEqual(recognize(pcm), 'I')
+        self.assertEqual(recognize(final=True), 'I know.')
+        self.assertIsNot(asr._sessions[sid].state, first_state)
+        self.assertEqual(recognize(final=True), 'I know.')
+        self.assertEqual(asr._sessions[sid].segment_index, 1)
+        self.assertEqual(recognize(pcm), 'I know. I know people')
+        self.assertEqual(recognize(final=True), 'I know. I know people well.')
+        self.assertEqual(model.calls, 2)
+
+    def test_final_cannot_rewrite_released_prefix(self):
+        """A final decode conflict is observable and cannot replace visible text."""
+        class ConflictingModel(FakeModel):
+            def finish_streaming_transcribe(self, state):
+                state.text = 'changed words completely'
+
+        asr = make_service(ConflictingModel(['old words tail']), True, hidden_token_num=1)
+        sid = asr.create_session()
+        pcm = base64.b64encode(make_pcm(600)).decode('ascii')
+        asr.recognize(service.RecognizeRequest(session_id=sid, audio=pcm))
+        with self.assertLogs(service.logger, level='WARNING'):
+            text, _ = asr.recognize(service.RecognizeRequest(session_id=sid, is_final=True))
+        self.assertEqual(text, 'old words')
+        self.assertEqual(asr._sessions[sid].stalls, 1)
+
+    def test_chinese_segment_join(self):
+        """Chinese boundaries do not insert ASCII word spaces."""
+        self.assertEqual(service.join_segments('你好。', '你好'), '你好。你好')
+
     def test_session_lifecycle(self):
         """Sessions can be created, updated, finalized and released."""
         model = FakeModel(['w1 w2 w3 w4 w5 w6 w7', 'w1 w2 w3 w4 w5 w6 w7 w8 w9'])

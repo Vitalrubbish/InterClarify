@@ -1,5 +1,7 @@
 # `scripts/remote/duplex_a4_replay.py`
 
+2026-10-15 测量修复：summarize_timeline 按 monotonic_timestamp 排序，response_latencies 按 response_id/request_id 匹配回答首 token，缺失关联留 null，不用全会话最早倾听事件代替。response.update 只是已播文本确认，不是首音频或首词。客户端新增带 response_id 的 pcm_received 和 playback_started。FDB 的 --fdb-tail-seconds 默认 5 秒，独立诊断 WAV 保留尾部，官方 WAV 仍严格输入等长。诊断输出存 driver 的 diagnostics 目录，避免被官方递归评分识别。传输成功不证明静默正确，semantic_status 需官方评分。
+
 在已启动的模型服务前创建 X-Talk WebSocket 会话，实时发送真实 WAV，保存播放确认下的 PCM 和 JSONL 摘要。复用 `xtalk_link_check.py` 的登录、服务启动、PCM 加载和输入传输；`A4ReplayClient` 扩展接收与播放模拟，并实现各语义场景。
 
 `TimedPcmCapture` 用静音填补会话时钟中的间隔；`A4ReplayClient._play_audio` 串行确认 PCM，停止时丢弃未播尾部。`_run_interruption` 用两层证据判定打断：事件层要求被打断的 response 收到由 `<|user interruption|>`/`<|user is talking|>` 触发的 reset（`turn.tts_stop_requested` 的 reason），声学层在 reset 后再等 `INTERRUPTION_SETTLE_SECONDS`（1s），要求该 response 的音频字节数不再增长（`interrupted_audio_frozen`）；它不要求同一场景另起回答。`_run_long_session` 在同一会话发送多个真实音频片段，保持累计 ASR；它是持续输入压力 smoke。`_run_pause` 先送第一段、停顿后再送第二段，并记录停顿期间是否已抢先回答；`_run_multi_question` 送入连续两问并等待回答结算。

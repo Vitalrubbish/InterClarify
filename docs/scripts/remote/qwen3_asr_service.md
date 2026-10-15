@@ -1,55 +1,23 @@
 # `scripts/remote/qwen3_asr_service.py`
 
-## 整体作用
+## 整体作用与协议
 
-在 ASR conda 环境（vLLM 0.14.0）内启动本地 Qwen3-ASR 流式 HTTP 服务，把官方 `Qwen3ASRModel.LLM` 的流式 API 暴露给 X-Talk 客户端适配器 `Qwen3ASRClient`。会话状态按 `session_id` 隔离，客户端只发送 16 kHz 单声道 PCM16 字节并读取累计文本，模型推理与 X-Talk 客户端环境保持隔离。
+在独立 ASR conda 环境中加载一次 Qwen3-ASR，接受 16 kHz mono PCM16，按 session 返回累计转写。`POST /v1/session` 创建会话；`POST /v1/recognize` 接收 session_id、base64 audio、is_final，返回 text/language；`DELETE /v1/session/{id}` 释放；`GET /health` 检查存活。启动入口与配置仍为 run_xtalk_round1.py serve asr 和 configs/xtalk_round1.yaml。
 
-## 协议
+## 类与核心方法
 
-| 方法 | 路径 | 请求 | 响应 |
-| --- | --- | --- | --- |
-| `GET` | `/health` | — | `{"status": "ok"}` |
-| `POST` | `/v1/session` | `{}` | `{"session_id": str}` |
-| `POST` | `/v1/recognize` | `{"session_id", "audio": base64(PCM16LE), "is_final": bool}` | `{"text": 累计文本, "language": str}` |
-| `DELETE` | `/v1/session/{id}` | — | `{"ok": true}` |
+`RecognizeRequest` 定义请求体。`SessionState` 保存当前片段解码器、串行锁、片段内 committed_ids/visible_text、已结束片段 completed_text、segment_index、audio_samples 与累计 stalls。
 
-## 类的设计
+`ASRService.recognize` 每个请求的音频只送入当前解码器一次。存在音频的片段收到 final 时先 flush，经过前缀检查后冻结当前可见文本，再用原流式参数新建解码状态。后续片段不携带上一段的 token，避免句末标点回写锁死后续续说。重复空 final 不 flush、不追加。HTTP session 保持不变，对外仍返回累计文本。声学暂停不是语义让轮，Layer 1 决策不变。
 
-- `RecognizeRequest`（pydantic）：一次增量识别请求体。
-- `SessionState`：一个会话的流式解码状态、串行锁，以及已交给调用方的 token 前缀 `committed_ids` 与其文本 `visible_text`，外加解码器回改到已交付 token 的次数 `stalls`。
-- `committed_token_ids(model, text, token_count)`：取已解析转写去掉末尾 `token_count` 个 token 的前缀 token ids（不足则空）。`qwen_asr` 只承诺末尾这些 token 可被回改，其余已定。
-- `decode_token_prefix(model, ids)`：把 token 前缀解码成文本，遇到 `\ufffd` 时从末尾逐 token 收缩（避免半个多字节字符）。
-- `advance_committed(model, text, token_count, committed_ids, visible_text)`：返回下一个单调的 `(committed_ids, visible_text, stalled)`。候选是当前解码的"去掉末尾 `token_count` 个 token"的前缀；与已交付 token 比较——
-  - 候选**延长**了已交付前缀：交付到候选；
-  - 候选在已交付区间内与已交付 token 不一致（解码器回改到了已交付内容）：**保持已交付文本不变**并返回 `stalled=True`；
-  - 候选没有更长：本拍不推进。
-- `ASRService`：加载一次模型，维护 `session_id → SessionState`。`create_session` 用 `init_streaming_state` 建状态；`recognize` 把 base64 解码为 `float32` 交给 `streaming_transcribe`；`delete_session` 释放。`is_final=true` 时调 `finish_streaming_transcribe` 并把全量转写作为新的交付基点。
-- `build_app(service)`：构建 FastAPI 应用，把四个端点绑定到服务。
-- `main`：解析参数（模型路径、host/port、显存占用、max_new_tokens、`chunk_size_sec`/`unfixed_chunk_num`/`unfixed_token_num`、`--emit-committed-prefix`），加载模型后 `uvicorn.run`。
+`committed_token_ids` 对已解析 state.text 重分词，扣住末尾 unfixed_token_num 个 token；不能处理带 language/asr_text 标签的原始串。重分词前缀不具备绝对稳定保证。`decode_token_prefix` 避免交付半个 Unicode 字符。`advance_committed` 同时校验 token 与字符串前缀，正常候选只延长可见文本；深层回改时保持原前缀并累计 stalls。final 同样不能绕过检查。段内深层回改仍可能停滞，必须查异常日志，不能声称所有 ASR 回改都已解决。
 
-由 `run_xtalk_round1.py serve asr` 在 ASR 环境内启动，参数取自首轮配置的 `services.asr` 与 `asr_streaming`。
+`join_segments` 在相邻 ASCII 片段间补空格，中文直接连接；不按重叠词去重，以免删除真实复述。不开 emit_committed_prefix 时允许片段内原始转写修订，但 final 后也开启新解码状态。
 
-## 两种返回语义
+`build_app` 绑定路由；`main` 解析模型、显存、chunk、unfixed 与 committed-prefix 参数并启动 uvicorn。每请求 asr_commit JSON 日志包含 session_id、segment_index、is_final、audio_samples、raw/committed token ids、raw/visible text、first_conflict_index、stalled。正常请求 INFO，冲突 WARNING。
 
-`qwen_asr` 的流式解码每块都会**回滚上一轮末尾 `unfixed_token_num` 个 token 后重解**，因此原始 `state.text` 可能替换已经发出过的文字。官方 DuplexCascade 从不面对这种情况（`server.py` 的 `stt_receiver_task` 只收 `type == "Word"`，注释写明 `# ignore Step / EndWord / Marker`），它拿到的是**已定稿的词流**。本服务因此提供两档：
+## 修复原因与验证边界
 
-| 档位 | 触发方式 | `is_final=false` 返回 | `is_final=true` 返回 |
-| --- | --- | --- | --- |
-| 原始转写（历史行为） | 不加 `--emit-committed-prefix` | `state.text`（含易变尾巴） | `state.text` |
-| 定稿前缀（推荐） | `--emit-committed-prefix` | 已定 token 前缀（只增不改） | `state.text` 全量释放，并作为后续推进的基点 |
+2026-10-15 的旧实现把 final 全文锁入 committed_ids 后继续复用已结束解码器，产生暂停恢复后多秒可见文本空档。仅由字符串改 token 比较不能消除这个问题。当前 duplex VAD pause 已能触发 ASR flush，旧文档“没有发布者”的说明已过期。历史证据见 [诊断](../../fdb_latency_diagnosis.md)。
 
-定稿前缀的规则：
-
-- **交付单位是 token 前缀，不是字符串前缀**。原始转写每块都是从零重解，即使词没变，标点与空格也可能与上一拍不同；按字符串比较就会在第一次出现这种差异时**永久卡住**。实测（任务单 §9.5.4.1）：`candor_pause_handling/1` 释放出 `'I never like.'` 之后，raw 继续长到 127 个词，而可见文本冻在原地 **26.3 秒（330 拍）**；另一个样本冻在 `'Yeah.'` 9.7 秒。按 token 比较后这类差异不再影响推进。
-- **只扣住末尾 `unfixed_token_num` 个 token**，因为那是解码器唯一承诺可回改的部分。实测定稿前缀因此只落后原始转写 1–6 个词（词级回改深度：中位 1、99 分位 4）。**不再有"本次解码没有新增文本就释放尾巴"这条规则**：句内停顿不是用户片段结束，在那里释放正是第一次实现交出错乱文本的根因（当时释放出的 `'I never like.'` 永远无法再延长）。尾巴由调用方的**显式边界**释放，即 `is_final=true`（见下方"谁发 is_final"）。
-- **回改到已交付 token 时保持已交付文本不变**（已听到的内容不可撤销），并累计 `stalls`、首次发生时打一条 warning 日志。这种回改超出解码器承诺的窗口，实测在修好字符串比较后应接近 0；`stalls` 是它的回归监控量。
-
-无论哪条规则，返回的文本**只会变长**。
-
-**截断作用于已解析转写（`state.text`），不是原始解码串（`state._raw_decoded`）**。这是必须写死的一条：原始串形如 `language English<asr_text>…`，若按 token 从**原始串**末尾截断，截断点落在 `<asr_text>` 之前时就会把 `language English` / `language` 当作用户文本交给模型——第一次实现正是如此，`replay` 的 normal 场景里模型连续 397 拍只输出 `<|user is talking|>`、`response_ids` 为空（模型看到"用户"在说 "language"）。`state.text` 已经去掉标签，因此不再可能泄漏。
-
-注意 `is_final=true` **不重置**已提交文本：它把 `committed_ids`/`visible_text` 直接设为全量转写，因此下一次响应仍然只会追加。
-
-**谁发 `is_final`**：X-Talk 的 `AudioConsumer.pause()/end()` 会带 `is_final_chunk=True` → 客户端 `is_final=true`。它们只由 `TurnASRPauseRequested`/`TurnASREndRequested` 触发，而 duplex 模式下这两个事件**没有发布者**（`MicroTurnAssembler` 只发 `TurnASRStartRequested`），所以运行时目前拿不到"用户片段结束"的释放——这是任务单 §9.5.4.1 里的待修项 ②，与本服务的 token 级提交（待修项 ①）是两件独立的事。
-
-配置入口：`configs/xtalk_round1.yaml` 的 `asr_streaming.emit_committed_prefix`（配合 `unfixed_chunk_num: 0`，让每个 chunk 都基于携带前缀，从而保证"已定稿前缀"本身单调；2026-10-15 的对比作业确认官方默认 `unfixed_chunk_num: 2` 在我们语料上既不改善最终转写也不改善提交延迟）。契约与证据见 [阶段 A 任务单 §9.5](../../xtalk_a4_remote_acceptance.md)。
+当前修复隔离了 final 前后的解码状态，但失去跨段声学上下文；词尾丢失、重复、英文空格及真实识别准确率必须在远端用 Candor 暂停续说验证。假模型单测只能验证状态生命周期与累计前缀契约。

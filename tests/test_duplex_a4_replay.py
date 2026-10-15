@@ -19,6 +19,35 @@ SPEC.loader.exec_module(MODULE)
 class A4ReplayTests(unittest.TestCase):
     """Protect A4 status distinctions and timeline extraction."""
 
+    def test_response_latency_ignores_listening_and_record_order(self):
+        """Only the matching answer request contributes its first token."""
+        records = [
+            {'event_type': 'llm.first_chunk', 'monotonic_timestamp': 1, 'request_id': 'listen'},
+            {'event_type': 'tts.started', 'monotonic_timestamp': 5.1, 'request_id': 'answer', 'response_id': 'r'},
+            {'event_type': 'llm.first_chunk', 'monotonic_timestamp': 5, 'request_id': 'answer'},
+            {'event_type': 'response.update', 'monotonic_timestamp': 6, 'response_id': 'r'},
+        ]
+        result = MODULE.summarize_timeline(records)
+        self.assertAlmostEqual(result['latencies']['llm_to_tts_started_seconds'], .1)
+        records[1].pop('request_id')
+        self.assertIsNone(MODULE.summarize_timeline(records)['response_latencies'][0]['llm_to_tts_started_seconds'])
+
+    def test_client_separates_old_answer_from_interruption_reply(self):
+        """A late old PCM cannot become the interruption reply."""
+        with tempfile.TemporaryDirectory() as tmp:
+            sample = Path(tmp)
+            (sample / 'interrupt.json').write_text(json.dumps([{'timestamp': [2, 4]}]))
+            events = [{'action': action, 'seconds': seconds + 10, 'data': {'response_id': rid}}
+                      for action, seconds, rid in [('start_tts', 1, 'old'), ('pcm_received', 4.1, 'old'),
+                                                  ('stop_tts', 4.2, 'old'), ('start_tts', 5, 'new'),
+                                                  ('pcm_received', 5.5, 'new'), ('playback_started', 5.6, 'new')]]
+            report = {'input_start_seconds': 10, 'input_audio_seconds': 5, 'events': events}
+            result = MODULE.summarize_client_responses(report, sample)
+            self.assertEqual(result['latencies']['interruption_end']['response_id'], 'new')
+            self.assertAlmostEqual(result['latencies']['interruption_end']['to_pcm_received_seconds'], 1.5)
+            self.assertAlmostEqual(result['latencies']['interruption_stop'][0]['seconds'], 2.2)
+            self.assertTrue(result['responses'][1]['playback_started_in_tail'])
+
     def timeline(self, token="<|user finish talking|>", stopped=False, stop_reason=None):
         records = [
             {"event_type": "llm.first_chunk", "monotonic_timestamp": 1.0},

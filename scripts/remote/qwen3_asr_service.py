@@ -15,8 +15,9 @@ strictly extend each other. The committed stream is tracked as a *token* prefix:
 the raw transcript is re-decoded from scratch on every chunk, so its punctuation
 and spacing can differ from an earlier decode even when the words are unchanged,
 and comparing tokens is what keeps the stream advancing instead of stalling on
-the first such difference. ``is_final`` releases the remaining tail, and the next
-response continues from the released text.
+the first such difference. ``is_final`` commits a segment through the same prefix
+checks, freezes its visible text and creates a fresh decoder for subsequent audio.
+Token comparison alone does not guarantee stability: deep revisions are logged.
 
 Protocol (HTTP/JSON):
   POST   /v1/session            -> {"session_id": str}
@@ -31,6 +32,7 @@ from __future__ import annotations
 import argparse
 import base64
 import logging
+import json
 import threading
 import uuid
 
@@ -61,6 +63,9 @@ class SessionState:
         self.committed_ids: list[int] = []
         self.visible_text = ""
         self.stalls = 0
+        self.completed_text = ""
+        self.segment_index = 0
+        self.audio_samples = 0
 
 
 def committed_token_ids(model: object, text: str, token_count: int) -> list[int]:
@@ -154,7 +159,10 @@ def advance_committed(
         return committed_ids, visible_text, True
     if len(proposed) <= len(committed_ids):
         return committed_ids, visible_text, False
-    return proposed, decode_token_prefix(model, proposed), False
+    decoded = decode_token_prefix(model, proposed)
+    if not decoded.startswith(visible_text):
+        return committed_ids, visible_text, True
+    return proposed, decoded, False
 
 
 
@@ -209,8 +217,8 @@ class ASRService:
         When ``emit_committed_prefix`` is enabled the response holds only text the
         streaming decoder has committed to, so consecutive responses can only
         extend each other. Only the decoder's revision window (its trailing
-        ``unfixed_token_num`` tokens) is held back; ``is_final`` releases the whole
-        transcript, and the next response continues from the released text.
+        ``unfixed_token_num`` tokens) is held back. Finalization attempts to release
+        the tail without revising visible text, then starts a fresh decoder.
         """
         with self._lock:
             session = self._sessions.get(request.session_id)
@@ -222,28 +230,62 @@ class ASRService:
         with session.lock:
             if samples.size:
                 self.model.streaming_transcribe(samples, session.state)
-            # is_final is a temporary boundary: flush the tail so the caller can
-            # read more text, but keep the session for further audio.
-            if request.is_final:
+            session.audio_samples += int(samples.size)
+            finalize = request.is_final and session.audio_samples > 0
+            if finalize:
                 self.model.finish_streaming_transcribe(session.state)
-                text = session.state.text or ""
-                session.visible_text = text
-                session.committed_ids = committed_token_ids(self.model, text, 0)
-            elif self.emit_committed_prefix:
+            raw = session.state.text or ""
+            raw_ids = committed_token_ids(self.model, raw, 0)
+            conflict = next((i for i, (old, new) in enumerate(zip(session.committed_ids, raw_ids))
+                             if old != new), None)
+            if conflict is None and len(raw_ids) < len(session.committed_ids):
+                conflict = len(raw_ids)
+            stalled = False
+            if self.emit_committed_prefix:
                 session.committed_ids, session.visible_text, stalled = advance_committed(
-                    self.model, session.state.text or "", self.hidden_token_num,
+                    self.model, raw, 0 if finalize else self.hidden_token_num,
                     session.committed_ids, session.visible_text)
                 if stalled:
                     session.stalls += 1
-                    if session.stalls == 1:
-                        logger.warning(
-                            "ASR revision reached text already released; the "
-                            "committed transcript holds its monotone prefix")
-                text = session.visible_text
             else:
-                text = session.state.text or ""
-            language = getattr(session.state, "language", "") or ""
+                session.visible_text = raw
+            text = join_segments(session.completed_text, session.visible_text)
+            language = session.state.language or ""
+            logger.log(logging.WARNING if stalled else logging.INFO, "%s", json.dumps({
+                "event": "asr_commit", "session_id": request.session_id,
+                "segment_index": session.segment_index, "is_final": request.is_final,
+                "audio_samples": int(samples.size), "raw_token_ids": raw_ids,
+                "committed_token_ids": session.committed_ids, "raw_text": raw,
+                "visible_text": text, "first_conflict_index": conflict, "stalled": stalled,
+            }, ensure_ascii=False))
+            if finalize:
+                session.completed_text = text
+                session.state = self.model.init_streaming_state(**self.streaming_kwargs)
+                session.segment_index += 1
+                session.audio_samples = 0
+                session.committed_ids = []
+                session.visible_text = ""
         return text, language
+
+
+def join_segments(prefix: str, segment: str) -> str:
+    """Join segments without deleting genuine repetitions.
+
+    Parameters
+    ----------
+    prefix, segment : str
+        Released prefix and current segment.
+
+    Returns
+    -------
+    str
+        Cumulative text, separating adjacent ASCII segments with a space.
+    """
+    if not prefix or not segment:
+        return prefix or segment
+    separator = " " if prefix[-1].isascii() and segment[0].isascii() and not (
+        prefix[-1].isspace() or segment[0].isspace()) else ""
+    return prefix + separator + segment
 
 
 def build_app(service: ASRService) -> FastAPI:
@@ -299,6 +341,7 @@ def main() -> None:
         unfixed_token_num=args.unfixed_token_num,
         emit_committed_prefix=args.emit_committed_prefix,
     )
+    logging.basicConfig(level=logging.INFO)
     uvicorn.run(build_app(service), host=args.host, port=args.port)
 
 

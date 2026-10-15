@@ -155,6 +155,8 @@ P1 和 P2 是最早的两个强制门禁。A1–A3 已通过本地实现门禁�
 
 #### Layer 1 映射
 
+2026-10-15 修复契约：声学暂停只释放 ASR 尾部，不代表语义让轮。Qwen final 后新建片段解码状态，由服务拼接已释放前缀；重复空 final 幂等，final 同样不能覆盖已交付前缀。每请求记录 session、片段、raw/committed token 与冲突位置。分段失去跨段声学上下文，真实词尾质量必须远端复核。延迟按发生时刻和 request_id/response_id 关联，缺失关联留空。FDB 官方 WAV 保持输入等长，诊断长尾录音独立保存，不参与官方评分；传输成功与语义得分分开报告。
+
 - DuplexCascade LLM 根据当前可见 micro-turn 输出 `<user is speaking>`、`<user finish speaking>`、`<user is interrupting>`、`<user backchannel>` 或 `<user is thinking>`；输入侧使用 `<no voice>` 和 `<EOS>`。
 - `DuplexRuntimeAdapter` 只解析状态 token，执行等待、回答、停止剩余输出或保持当前回答，并记录原始 token；收到完整 `<|user interruption|>` 时，它立即结束当前 system micro-turn、关闭当前模型流并停止未播放音频，不等待 `<|im_end|>`。它不输出规则状态，也不把 `SILENCE`/`ANSWER` 当作训练协议。
 - 不实现 Layer 0；显式关闭原生 Agent 的系统 backchannel 配置。
