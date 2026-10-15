@@ -1,0 +1,21 @@
+evaluate: 0it [00:00, ?it/s]evaluate: 5it [00:00, 134.39it/s]
+/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/smooth_turn_taking/candor_turn_taking/1/output.json
+the TOR is 0
+the latency is None
+/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/smooth_turn_taking/candor_turn_taking/10/output.json
+the TOR is 1
+the latency is 2.809999999999982
+/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/smooth_turn_taking/candor_turn_taking/101/output.json
+the TOR is 1
+the latency is 1.2500000000000364
+/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/smooth_turn_taking/candor_turn_taking/100/output.json
+the TOR is 1
+the latency is 4.530000000000072
+/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/smooth_turn_taking/candor_turn_taking/102/output.json
+the TOR is 1
+the latency is 2.7600000000000176
+---------------------------------------------------
+[Result]
+Average take turn:  0.8
+Average latency:  2.837500000000027
+---------------------------------------------------

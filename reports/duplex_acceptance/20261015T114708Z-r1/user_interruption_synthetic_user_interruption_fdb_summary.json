@@ -1,0 +1,973 @@
+{
+ "status": "PASS",
+ "input_root": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption",
+ "output_root": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/user_interruption/synthetic_user_interruption",
+ "samples": [
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 1.0825693607330322e-05,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 27.568,
+   "send_seconds": 27.552578572183847,
+   "response_ids": [
+    "9e728c10500e446e96c062152cb44570",
+    "8b4fdaf757c447b2be954cf5e8f3b309"
+   ],
+   "finished_response_ids": [
+    "9e728c10500e446e96c062152cb44570"
+   ],
+   "asr_final": null,
+   "response": "Setting financial goals is crucial for managing your finances effectively and achieving long-term financial security Here are several types of financial goals you might consider setting:\n\n### 1 **Emergency Fund**\n   - **Goal**: Aim to save enough money to cover ",
+   "first_audio_seconds": 5.03509633615613,
+   "tts_audio_bytes": 2366828,
+   "played_audio_by_response": {
+    "9e728c10500e446e96c062152cb44570": 702314,
+    "8b4fdaf757c447b2be954cf5e8f3b309": 1664514
+   },
+   "event_count": 89,
+   "events": {
+    "ticks": 89,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 2,
+     "pcm_received": 2,
+     "playback_started": 2,
+     "session_attached": 1,
+     "start_tts": 2,
+     "stop_tts": 1,
+     "update_asr": 8,
+     "update_resp": 64,
+     "vad_speech_end": 3,
+     "vad_speech_start": 3
+    },
+    "span_seconds": 16259012.841
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/user_interruption/synthetic_user_interruption/1/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "6026131b-3895-490d-a087-8de0055f7118",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/1/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/user_interruption/synthetic_user_interruption/1/output.wav",
+   "sample_index": 0,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb_driver/user_interruption_synthetic_user_interruption/diagnostics/1/output.wav",
+   "client_measurements": {
+    "responses": [
+     {
+      "response_id": "9e728c10500e446e96c062152cb44570",
+      "start_tts_seconds": 4.307900466024876,
+      "pcm_received_seconds": 5.034999242052436,
+      "playback_started_seconds": 5.035086991265416,
+      "stop_tts_seconds": 12.704148881137371,
+      "played_audio_bytes": 702314,
+      "playback_started_in_tail": false
+     },
+     {
+      "response_id": "8b4fdaf757c447b2be954cf5e8f3b309",
+      "start_tts_seconds": 14.532847302034497,
+      "pcm_received_seconds": 15.271154470741749,
+      "playback_started_seconds": 15.271184111014009,
+      "played_audio_bytes": 1664514,
+      "playback_started_in_tail": false
+     }
+    ],
+    "anchors": {
+     "interruption_start": 9.613333333333333,
+     "interruption_end": 12.568
+    },
+    "latencies": {
+     "interruption_end": {
+      "anchor_seconds": 12.568,
+      "response_id": "8b4fdaf757c447b2be954cf5e8f3b309",
+      "to_pcm_received_seconds": 2.703154470741749,
+      "to_playback_started_seconds": 2.703184111014009
+     },
+     "interruption_stop": [
+      {
+       "response_id": "9e728c10500e446e96c062152cb44570",
+       "seconds": 3.0908155478040378
+      }
+     ]
+    },
+    "no_played_audio": false,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb_driver/user_interruption_synthetic_user_interruption/timelines/6026131b-3895-490d-a087-8de0055f7118.jsonl",
+   "timeline": {
+    "records": 1370,
+    "protocol_tokens": {
+     "count": 11,
+     "tokens": {
+      "<|user backchannel|>": 2,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 6
+     }
+    },
+    "raw_outputs": {
+     "count": 11,
+     "tokens": {
+      "<|user backchannel|>": 2,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 6
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 8,
+     "duplex.micro_turn_ready": 52,
+     "llm.first_chunk": 52,
+     "duplex.protocol_parsed": 11,
+     "turn.tts_start_requested": 2,
+     "turn.tts_delivery_start_requested": 2,
+     "tts.started": 2,
+     "llm_agent.response_update": 451,
+     "turn.tts_text_append_requested": 451,
+     "llm.sentence_ready": 2,
+     "tts.chunk_ready": 266,
+     "response.update": 64,
+     "turn.tts_stop_requested": 2,
+     "tts.stopped": 2,
+     "tts.playback_stopped": 1,
+     "response.finish": 1,
+     "tts.response_closed": 1
+    },
+    "response_ids": [
+     "8b4fdaf757c447b2be954cf5e8f3b309",
+     "9e728c10500e446e96c062152cb44570"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 0.024665819481015205,
+     "tts_to_first_played_text_seconds": 1.6369590014219284,
+     "stop_request_to_tts_stopped_seconds": [
+      0.00031298771500587463,
+      0.00031475722789764404
+     ]
+    },
+    "response_latencies": [
+     {
+      "response_id": "9e728c10500e446e96c062152cb44570",
+      "request_id": "39039f314ff2462597524904c551bc05",
+      "request_to_first_token_seconds": 0.028530150651931763,
+      "tts_started_to_first_chunk_seconds": 0.7271044123917818,
+      "llm_to_tts_started_seconds": 0.024665819481015205,
+      "tts_to_first_played_text_seconds": 1.6369590014219284
+     },
+     {
+      "response_id": "8b4fdaf757c447b2be954cf5e8f3b309",
+      "request_id": "3786dc51fa2a4ed28f1ed4747ac97fa4",
+      "request_to_first_token_seconds": 0.05453996919095516,
+      "tts_started_to_first_chunk_seconds": 0.7382944747805595,
+      "llm_to_tts_started_seconds": 0.023823026567697525,
+      "tts_to_first_played_text_seconds": 1.6484720688313246
+     }
+    ],
+    "interruption_events": [
+     {
+      "response_id": "9e728c10500e446e96c062152cb44570",
+      "reason": "interruption",
+      "raw_output": "<|user interruption|>",
+      "monotonic_timestamp": 16259027.502510585
+     }
+    ],
+    "stopped_response_ids": [
+     "8b4fdaf757c447b2be954cf5e8f3b309",
+     "9e728c10500e446e96c062152cb44570"
+    ],
+    "interruption_stop_response_ids": [
+     "9e728c10500e446e96c062152cb44570"
+    ],
+    "teardown_stop_response_ids": [
+     "8b4fdaf757c447b2be954cf5e8f3b309"
+    ],
+    "played_text": {
+     "9e728c10500e446e96c062152cb44570": {
+      "snapshots": 19,
+      "last": "Saving money effectively involves creating a budget, tracking your expenses, and making strategic decisions about where to"
+     },
+     "8b4fdaf757c447b2be954cf5e8f3b309": {
+      "snapshots": 45,
+      "last": "Setting financial goals is crucial for managing your finances effectively and achieving long-term financial security Here are several types of financial goals you might consider setting:\n\n### 1 **Emergency Fund**\n   - **Goal**: Aim to save enough money to cover "
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 5,
+    "playback_window": [
+     16259019.1059894,
+     16259047.853964558
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 8.657574653625488e-06,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 26.9706875,
+   "send_seconds": 26.9446024261415,
+   "response_ids": [
+    "4dde1cff880e49c5bb137b55bb509de8",
+    "f3f0d8b0fb4e4539a1f5c7b8faefd0c5"
+   ],
+   "finished_response_ids": [
+    "4dde1cff880e49c5bb137b55bb509de8"
+   ],
+   "asr_final": null,
+   "response": "Certainly! Improving your sleep quality is crucial for overall health and well-being Here are some tips to help you get better sleep:\n\n### 1 Establish a Consistent Sleep Schedule\n- **Go to Bed and Wake Up at the Same Time Every",
+   "first_audio_seconds": 4.436773683875799,
+   "tts_audio_bytes": 2364124,
+   "played_audio_by_response": {
+    "4dde1cff880e49c5bb137b55bb509de8": 644348,
+    "f3f0d8b0fb4e4539a1f5c7b8faefd0c5": 1719776
+   },
+   "event_count": 87,
+   "events": {
+    "ticks": 87,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 2,
+     "pcm_received": 2,
+     "playback_started": 2,
+     "session_attached": 1,
+     "start_tts": 2,
+     "stop_tts": 1,
+     "update_asr": 7,
+     "update_resp": 63,
+     "vad_speech_end": 3,
+     "vad_speech_start": 3
+    },
+    "span_seconds": 16259048.573
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/user_interruption/synthetic_user_interruption/10/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "16bf1615-4b78-4177-930a-d251281bfc6f",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/10/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/user_interruption/synthetic_user_interruption/10/output.wav",
+   "sample_index": 1,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb_driver/user_interruption_synthetic_user_interruption/diagnostics/10/output.wav",
+   "client_measurements": {
+    "responses": [
+     {
+      "response_id": "4dde1cff880e49c5bb137b55bb509de8",
+      "start_tts_seconds": 3.702834142372012,
+      "pcm_received_seconds": 4.436735333874822,
+      "playback_started_seconds": 4.436766033992171,
+      "stop_tts_seconds": 11.499587154015899,
+      "played_audio_bytes": 644348,
+      "playback_started_in_tail": false
+     },
+     {
+      "response_id": "f3f0d8b0fb4e4539a1f5c7b8faefd0c5",
+      "start_tts_seconds": 13.328007575124502,
+      "pcm_received_seconds": 14.059543285518885,
+      "playback_started_seconds": 14.059572758153081,
+      "played_audio_bytes": 1719776,
+      "playback_started_in_tail": false
+     }
+    ],
+    "anchors": {
+     "interruption_start": 9.229333333333333,
+     "interruption_end": 11.970666666666666
+    },
+    "latencies": {
+     "interruption_end": {
+      "anchor_seconds": 11.970666666666666,
+      "response_id": "f3f0d8b0fb4e4539a1f5c7b8faefd0c5",
+      "to_pcm_received_seconds": 2.0888766188522183,
+      "to_playback_started_seconds": 2.0889060914864146
+     },
+     "interruption_stop": [
+      {
+       "response_id": "4dde1cff880e49c5bb137b55bb509de8",
+       "seconds": 2.2702538206825658
+      }
+     ]
+    },
+    "no_played_audio": false,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb_driver/user_interruption_synthetic_user_interruption/timelines/16bf1615-4b78-4177-930a-d251281bfc6f.jsonl",
+   "timeline": {
+    "records": 1358,
+    "protocol_tokens": {
+     "count": 7,
+     "tokens": {
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 4
+     }
+    },
+    "raw_outputs": {
+     "count": 7,
+     "tokens": {
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 4
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 7,
+     "duplex.micro_turn_ready": 50,
+     "llm.first_chunk": 50,
+     "duplex.protocol_parsed": 7,
+     "turn.tts_start_requested": 2,
+     "turn.tts_delivery_start_requested": 2,
+     "tts.started": 2,
+     "llm_agent.response_update": 450,
+     "turn.tts_text_append_requested": 450,
+     "llm.sentence_ready": 2,
+     "tts.chunk_ready": 266,
+     "response.update": 63,
+     "turn.tts_stop_requested": 2,
+     "tts.stopped": 2,
+     "tts.playback_stopped": 1,
+     "response.finish": 1,
+     "tts.response_closed": 1
+    },
+    "response_ids": [
+     "4dde1cff880e49c5bb137b55bb509de8",
+     "f3f0d8b0fb4e4539a1f5c7b8faefd0c5"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 0.024289414286613464,
+     "tts_to_first_played_text_seconds": 1.6524814572185278,
+     "stop_request_to_tts_stopped_seconds": [
+      0.00029104389250278473,
+      0.0003413315862417221
+     ]
+    },
+    "response_latencies": [
+     {
+      "response_id": "4dde1cff880e49c5bb137b55bb509de8",
+      "request_id": "69fea332512847f38dc53d10f0fda678",
+      "request_to_first_token_seconds": 0.027924872934818268,
+      "tts_started_to_first_chunk_seconds": 0.7338809091597795,
+      "llm_to_tts_started_seconds": 0.024289414286613464,
+      "tts_to_first_played_text_seconds": 1.6524814572185278
+     },
+     {
+      "response_id": "f3f0d8b0fb4e4539a1f5c7b8faefd0c5",
+      "request_id": "71d4a06689f34a08942cd032913ee22f",
+      "request_to_first_token_seconds": 0.05416998267173767,
+      "tts_started_to_first_chunk_seconds": 0.7315074522048235,
+      "llm_to_tts_started_seconds": 0.02326490357518196,
+      "tts_to_first_played_text_seconds": 1.6493491884320974
+     }
+    ],
+    "interruption_events": [
+     {
+      "response_id": "4dde1cff880e49c5bb137b55bb509de8",
+      "reason": "interruption",
+      "raw_output": "<|user interruption|>",
+      "monotonic_timestamp": 16259062.019919857
+     }
+    ],
+    "stopped_response_ids": [
+     "4dde1cff880e49c5bb137b55bb509de8",
+     "f3f0d8b0fb4e4539a1f5c7b8faefd0c5"
+    ],
+    "interruption_stop_response_ids": [
+     "4dde1cff880e49c5bb137b55bb509de8"
+    ],
+    "teardown_stop_response_ids": [
+     "f3f0d8b0fb4e4539a1f5c7b8faefd0c5"
+    ],
+    "played_text": {
+     "4dde1cff880e49c5bb137b55bb509de8": {
+      "snapshots": 16,
+      "last": "Reducing stress quickly can be achieved through various methods that target both your mind and"
+     },
+     "f3f0d8b0fb4e4539a1f5c7b8faefd0c5": {
+      "snapshots": 47,
+      "last": "Certainly! Improving your sleep quality is crucial for overall health and well-being Here are some tips to help you get better sleep:\n\n### 1 Establish a Consistent Sleep Schedule\n- **Go to Bed and Wake Up at the Same Time Every"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 4,
+    "playback_window": [
+     16259054.222930359,
+     16259082.967703898
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 8.519738912582397e-06,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 28.2506875,
+   "send_seconds": 28.22459774836898,
+   "response_ids": [
+    "6baecaca421841e1851050ece23399a0",
+    "024c3d6f6d1b41a49dffc5caa647f37c"
+   ],
+   "finished_response_ids": [
+    "6baecaca421841e1851050ece23399a0"
+   ],
+   "asr_final": null,
+   "response": "Choosing the right type of pet food involves considering several factors to ensure your pet receives balanced nutrition tailored to their specific needs Here’s a step-by-step guide to help you make an informed decision:\n\n### 1 **Identify Your Pet",
+   "first_audio_seconds": 5.052240202203393,
+   "tts_audio_bytes": 2376014,
+   "played_audio_by_response": {
+    "6baecaca421841e1851050ece23399a0": 700016,
+    "024c3d6f6d1b41a49dffc5caa647f37c": 1675998
+   },
+   "event_count": 91,
+   "events": {
+    "ticks": 91,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 3,
+     "pcm_received": 2,
+     "playback_started": 2,
+     "session_attached": 1,
+     "start_tts": 2,
+     "stop_tts": 1,
+     "update_asr": 8,
+     "update_resp": 63,
+     "vad_speech_end": 4,
+     "vad_speech_start": 4
+    },
+    "span_seconds": 16259083.711
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/user_interruption/synthetic_user_interruption/100/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "a46dea38-d9ea-46ee-b718-2f2119ab1333",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/100/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/user_interruption/synthetic_user_interruption/100/output.wav",
+   "sample_index": 2,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb_driver/user_interruption_synthetic_user_interruption/diagnostics/100/output.wav",
+   "client_measurements": {
+    "responses": [
+     {
+      "response_id": "6baecaca421841e1851050ece23399a0",
+      "start_tts_seconds": 4.296629099175334,
+      "pcm_received_seconds": 5.052165234461427,
+      "playback_started_seconds": 5.052232893183827,
+      "stop_tts_seconds": 12.69390258193016,
+      "played_audio_bytes": 700016,
+      "playback_started_in_tail": false
+     },
+     {
+      "response_id": "024c3d6f6d1b41a49dffc5caa647f37c",
+      "start_tts_seconds": 15.133309939876199,
+      "pcm_received_seconds": 15.859842084348202,
+      "playback_started_seconds": 15.859997034072876,
+      "played_audio_bytes": 1675998,
+      "playback_started_in_tail": false
+     }
+    ],
+    "anchors": {
+     "interruption_start": 9.826666666666666,
+     "interruption_end": 13.250666666666666
+    },
+    "latencies": {
+     "interruption_end": {
+      "anchor_seconds": 13.250666666666666,
+      "response_id": "024c3d6f6d1b41a49dffc5caa647f37c",
+      "to_pcm_received_seconds": 2.609175417681536,
+      "to_playback_started_seconds": 2.6093303674062103
+     },
+     "interruption_stop": [
+      {
+       "response_id": "6baecaca421841e1851050ece23399a0",
+       "seconds": 2.8672359152634943
+      }
+     ]
+    },
+    "no_played_audio": false,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb_driver/user_interruption_synthetic_user_interruption/timelines/a46dea38-d9ea-46ee-b718-2f2119ab1333.jsonl",
+   "timeline": {
+    "records": 1368,
+    "protocol_tokens": {
+     "count": 10,
+     "tokens": {
+      "<|user backchannel|>": 1,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 6
+     }
+    },
+    "raw_outputs": {
+     "count": 10,
+     "tokens": {
+      "<|user backchannel|>": 1,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 6
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 8,
+     "duplex.micro_turn_ready": 52,
+     "llm.first_chunk": 52,
+     "duplex.protocol_parsed": 10,
+     "turn.tts_start_requested": 2,
+     "turn.tts_delivery_start_requested": 2,
+     "tts.started": 2,
+     "llm_agent.response_update": 450,
+     "turn.tts_text_append_requested": 450,
+     "llm.sentence_ready": 2,
+     "tts.chunk_ready": 268,
+     "response.update": 63,
+     "turn.tts_stop_requested": 2,
+     "tts.stopped": 2,
+     "tts.playback_stopped": 1,
+     "response.finish": 1,
+     "tts.response_closed": 1
+    },
+    "response_ids": [
+     "024c3d6f6d1b41a49dffc5caa647f37c",
+     "6baecaca421841e1851050ece23399a0"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 0.024204758927226067,
+     "tts_to_first_played_text_seconds": 1.6669486928731203,
+     "stop_request_to_tts_stopped_seconds": [
+      0.00029752030968666077,
+      0.0002282559871673584
+     ]
+    },
+    "response_latencies": [
+     {
+      "response_id": "6baecaca421841e1851050ece23399a0",
+      "request_id": "d9fec9951593409ea0b3fa342fecd0ae",
+      "request_to_first_token_seconds": 0.02849382534623146,
+      "tts_started_to_first_chunk_seconds": 0.7554748486727476,
+      "llm_to_tts_started_seconds": 0.024204758927226067,
+      "tts_to_first_played_text_seconds": 1.6669486928731203
+     },
+     {
+      "response_id": "024c3d6f6d1b41a49dffc5caa647f37c",
+      "request_id": "fd230de0549e42e78bb2fe39482252b9",
+      "request_to_first_token_seconds": 0.0647309385240078,
+      "tts_started_to_first_chunk_seconds": 0.7261708844453096,
+      "llm_to_tts_started_seconds": 0.023631827905774117,
+      "tts_to_first_played_text_seconds": 1.6277983877807856
+     }
+    ],
+    "interruption_events": [
+     {
+      "response_id": "6baecaca421841e1851050ece23399a0",
+      "reason": "interruption",
+      "raw_output": "<|user interruption|>",
+      "monotonic_timestamp": 16259098.362801908
+     }
+    ],
+    "stopped_response_ids": [
+     "024c3d6f6d1b41a49dffc5caa647f37c",
+     "6baecaca421841e1851050ece23399a0"
+    ],
+    "interruption_stop_response_ids": [
+     "6baecaca421841e1851050ece23399a0"
+    ],
+    "teardown_stop_response_ids": [
+     "024c3d6f6d1b41a49dffc5caa647f37c"
+    ],
+    "played_text": {
+     "6baecaca421841e1851050ece23399a0": {
+      "snapshots": 18,
+      "last": "Getting a new puppy is an exciting yet challenging experience Here are some key things to consider and"
+     },
+     "024c3d6f6d1b41a49dffc5caa647f37c": {
+      "snapshots": 45,
+      "last": "Choosing the right type of pet food involves considering several factors to ensure your pet receives balanced nutrition tailored to their specific needs Here’s a step-by-step guide to help you make an informed decision:\n\n### 1 **Identify Your Pet"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 4,
+    "playback_window": [
+     16259089.965287471,
+     16259119.396476395
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 7.100403308868408e-06,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 28.272,
+   "send_seconds": 28.256981937214732,
+   "response_ids": [
+    "6e46a24bc7704bacad50f98988bf7696",
+    "f7e924126bab4491b9d1624da68b82db"
+   ],
+   "finished_response_ids": [
+    "6e46a24bc7704bacad50f98988bf7696"
+   ],
+   "asr_final": null,
+   "response": "Fixing a leaky faucet typically involves identifying the type of leak and then following a series of steps to repair it Here’s a general guide on how to fix a common type of leaky faucet, which is a compression faucet",
+   "first_audio_seconds": 4.437769705429673,
+   "tts_audio_bytes": 2492312,
+   "played_audio_by_response": {
+    "6e46a24bc7704bacad50f98988bf7696": 816026,
+    "f7e924126bab4491b9d1624da68b82db": 1676286
+   },
+   "event_count": 92,
+   "events": {
+    "ticks": 92,
+    "by_event": {
+     "finish_resp": 1,
+     "latency_metrics": 2,
+     "pcm_received": 2,
+     "playback_started": 2,
+     "session_attached": 1,
+     "start_tts": 2,
+     "stop_tts": 1,
+     "update_asr": 7,
+     "update_resp": 68,
+     "vad_speech_end": 3,
+     "vad_speech_start": 3
+    },
+    "span_seconds": 16259120.117
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/user_interruption/synthetic_user_interruption/101/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "6fbf062f-1e2c-49b3-99d2-d6c77e2b2235",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/101/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/user_interruption/synthetic_user_interruption/101/output.wav",
+   "sample_index": 3,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb_driver/user_interruption_synthetic_user_interruption/diagnostics/101/output.wav",
+   "client_measurements": {
+    "responses": [
+     {
+      "response_id": "6e46a24bc7704bacad50f98988bf7696",
+      "start_tts_seconds": 3.6989091150462627,
+      "pcm_received_seconds": 4.437699779868126,
+      "playback_started_seconds": 4.437763515859842,
+      "stop_tts_seconds": 13.29616978392005,
+      "played_audio_bytes": 816026,
+      "playback_started_in_tail": false
+     },
+     {
+      "response_id": "f7e924126bab4491b9d1624da68b82db",
+      "start_tts_seconds": 15.135804560035467,
+      "pcm_received_seconds": 15.863038590177894,
+      "playback_started_seconds": 15.863064140081406,
+      "played_audio_bytes": 1676286,
+      "playback_started_in_tail": false
+     }
+    ],
+    "anchors": {
+     "interruption_start": 9.4,
+     "interruption_end": 13.272
+    },
+    "latencies": {
+     "interruption_end": {
+      "anchor_seconds": 13.272,
+      "response_id": "f7e924126bab4491b9d1624da68b82db",
+      "to_pcm_received_seconds": 2.5910385901778934,
+      "to_playback_started_seconds": 2.5910641400814054
+     },
+     "interruption_stop": [
+      {
+       "response_id": "6e46a24bc7704bacad50f98988bf7696",
+       "seconds": 3.8961697839200493
+      }
+     ]
+    },
+    "no_played_audio": false,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb_driver/user_interruption_synthetic_user_interruption/timelines/6fbf062f-1e2c-49b3-99d2-d6c77e2b2235.jsonl",
+   "timeline": {
+    "records": 1424,
+    "protocol_tokens": {
+     "count": 9,
+     "tokens": {
+      "<|user backchannel|>": 1,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 5
+     }
+    },
+    "raw_outputs": {
+     "count": 9,
+     "tokens": {
+      "<|user backchannel|>": 1,
+      "<|user finish talking|>": 2,
+      "<|user interruption|>": 1,
+      "<|user is talking|>": 5
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 7,
+     "duplex.micro_turn_ready": 53,
+     "llm.first_chunk": 53,
+     "duplex.protocol_parsed": 9,
+     "turn.tts_start_requested": 2,
+     "turn.tts_delivery_start_requested": 2,
+     "tts.started": 2,
+     "llm_agent.response_update": 470,
+     "turn.tts_text_append_requested": 470,
+     "llm.sentence_ready": 2,
+     "tts.chunk_ready": 279,
+     "response.update": 68,
+     "turn.tts_stop_requested": 2,
+     "tts.stopped": 2,
+     "tts.playback_stopped": 1,
+     "response.finish": 1,
+     "tts.response_closed": 1
+    },
+    "response_ids": [
+     "6e46a24bc7704bacad50f98988bf7696",
+     "f7e924126bab4491b9d1624da68b82db"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 0.02404528483748436,
+     "tts_to_first_played_text_seconds": 1.6437605451792479,
+     "stop_request_to_tts_stopped_seconds": [
+      0.000277739018201828,
+      0.00025431253015995026
+     ]
+    },
+    "response_latencies": [
+     {
+      "response_id": "6e46a24bc7704bacad50f98988bf7696",
+      "request_id": "34ef1c263c294e23b23a7d4d246a3f4d",
+      "request_to_first_token_seconds": 0.028560908511281013,
+      "tts_started_to_first_chunk_seconds": 0.7387309297919273,
+      "llm_to_tts_started_seconds": 0.02404528483748436,
+      "tts_to_first_played_text_seconds": 1.6437605451792479
+     },
+     {
+      "response_id": "f7e924126bab4491b9d1624da68b82db",
+      "request_id": "e54a0054d3c44b73ae5340aff2ec5343",
+      "request_to_first_token_seconds": 0.07034561038017273,
+      "tts_started_to_first_chunk_seconds": 0.7272066734731197,
+      "llm_to_tts_started_seconds": 0.01883978210389614,
+      "tts_to_first_played_text_seconds": 1.6340476050972939
+     }
+    ],
+    "interruption_events": [
+     {
+      "response_id": "6e46a24bc7704bacad50f98988bf7696",
+      "reason": "interruption",
+      "raw_output": "<|user interruption|>",
+      "monotonic_timestamp": 16259135.370849382
+     }
+    ],
+    "stopped_response_ids": [
+     "6e46a24bc7704bacad50f98988bf7696",
+     "f7e924126bab4491b9d1624da68b82db"
+    ],
+    "interruption_stop_response_ids": [
+     "6e46a24bc7704bacad50f98988bf7696"
+    ],
+    "teardown_stop_response_ids": [
+     "f7e924126bab4491b9d1624da68b82db"
+    ],
+    "played_text": {
+     "6e46a24bc7704bacad50f98988bf7696": {
+      "snapshots": 23,
+      "last": "The best time to plant tomatoes depends on several factors, including your location, climate, and the specific variety of tomato"
+     },
+     "f7e924126bab4491b9d1624da68b82db": {
+      "snapshots": 45,
+      "last": "Fixing a leaky faucet typically involves identifying the type of leak and then following a series of steps to repair it Here’s a general guide on how to fix a common type of leaky faucet, which is a compression faucet"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 4,
+    "playback_window": [
+     16259125.7733684,
+     16259155.834161056
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  },
+  {
+   "status": "PASS",
+   "errors": [],
+   "scenario": "fdb",
+   "input_start_seconds": 7.295981049537659e-06,
+   "diagnostic_tail_seconds": 5.0,
+   "input_audio_seconds": 28.4213125,
+   "send_seconds": 28.416608348488808,
+   "response_ids": [
+    "825e73cb98c74bb9842ac5f4919359d7"
+   ],
+   "finished_response_ids": [],
+   "asr_final": null,
+   "response": "When aiming for weight loss, it's important to choose snacks that are not only satisfying but also nutrient-dense and low in calories Here are some excellent snack options that can help support your weight loss goals:\n\n1 **Greek Yogurt**: High in protein and low in calories, Greek yogurt can help keep you feeling full Add a sprinkle of nuts or a few berries for extra flavor",
+   "first_audio_seconds": 5.02970140427351,
+   "tts_audio_bytes": 2719550,
+   "played_audio_by_response": {
+    "825e73cb98c74bb9842ac5f4919359d7": 2719550
+   },
+   "event_count": 95,
+   "events": {
+    "ticks": 95,
+    "by_event": {
+     "latency_metrics": 2,
+     "pcm_received": 1,
+     "playback_started": 1,
+     "session_attached": 1,
+     "start_tts": 1,
+     "update_asr": 8,
+     "update_resp": 75,
+     "vad_speech_end": 3,
+     "vad_speech_start": 3
+    },
+    "span_seconds": 16259156.637
+   },
+   "output_wav": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/user_interruption/synthetic_user_interruption/102/output.wav",
+   "output_sample_rate": 48000,
+   "session_id": "0c737395-0c88-4f6a-ad8b-d74c0f61a579",
+   "playback_mode": "paced_headless_ack",
+   "input": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption/102/input.wav",
+   "output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb/user_interruption/synthetic_user_interruption/102/output.wav",
+   "sample_index": 4,
+   "transport_status": "PASS",
+   "semantic_status": "PENDING_OFFICIAL_SCORING",
+   "diagnostic_output": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb_driver/user_interruption_synthetic_user_interruption/diagnostics/102/output.wav",
+   "client_measurements": {
+    "responses": [
+     {
+      "response_id": "825e73cb98c74bb9842ac5f4919359d7",
+      "start_tts_seconds": 4.295679053291678,
+      "pcm_received_seconds": 5.029620427638292,
+      "playback_started_seconds": 5.029695255681872,
+      "played_audio_bytes": 2719550,
+      "playback_started_in_tail": false
+     }
+    ],
+    "anchors": {
+     "interruption_start": 9.485333333333333,
+     "interruption_end": 13.421333333333333
+    },
+    "latencies": {
+     "interruption_end": {
+      "anchor_seconds": 13.421333333333333,
+      "response_id": null,
+      "to_pcm_received_seconds": null,
+      "to_playback_started_seconds": null
+     },
+     "interruption_stop": []
+    },
+    "no_played_audio": false,
+    "aligned_first_word_seconds": null,
+    "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+   },
+   "timeline_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z-r1/fdb_driver/user_interruption_synthetic_user_interruption/timelines/0c737395-0c88-4f6a-ad8b-d74c0f61a579.jsonl",
+   "timeline": {
+    "records": 1431,
+    "protocol_tokens": {
+     "count": 9,
+     "tokens": {
+      "<|user backchannel|>": 5,
+      "<|user finish talking|>": 1,
+      "<|user is talking|>": 3
+     }
+    },
+    "raw_outputs": {
+     "count": 9,
+     "tokens": {
+      "<|user backchannel|>": 5,
+      "<|user finish talking|>": 1,
+      "<|user is talking|>": 3
+     }
+    },
+    "protocol_errors": [],
+    "event_counts": {
+     "asr.result_partial": 8,
+     "duplex.micro_turn_ready": 50,
+     "llm.first_chunk": 51,
+     "duplex.protocol_parsed": 9,
+     "turn.tts_start_requested": 1,
+     "turn.tts_delivery_start_requested": 1,
+     "tts.started": 1,
+     "llm_agent.response_update": 465,
+     "turn.tts_text_append_requested": 465,
+     "llm.sentence_ready": 1,
+     "tts.chunk_ready": 300,
+     "response.update": 76,
+     "llm_agent.response_finish": 1,
+     "turn.tts_stop_requested": 1,
+     "tts.stopped": 1
+    },
+    "response_ids": [
+     "825e73cb98c74bb9842ac5f4919359d7"
+    ],
+    "latencies": {
+     "llm_to_tts_started_seconds": 0.024231290444731712,
+     "tts_to_first_played_text_seconds": 1.6423385180532932,
+     "stop_request_to_tts_stopped_seconds": [
+      6.487034261226654e-05
+     ]
+    },
+    "response_latencies": [
+     {
+      "response_id": "825e73cb98c74bb9842ac5f4919359d7",
+      "request_id": "eff851015b8e491cbd8fc2d09db54e06",
+      "request_to_first_token_seconds": 0.029148124158382416,
+      "tts_started_to_first_chunk_seconds": 0.7338977437466383,
+      "llm_to_tts_started_seconds": 0.024231290444731712,
+      "tts_to_first_played_text_seconds": 1.6423385180532932
+     }
+    ],
+    "interruption_events": [],
+    "stopped_response_ids": [
+     "825e73cb98c74bb9842ac5f4919359d7"
+    ],
+    "interruption_stop_response_ids": [],
+    "teardown_stop_response_ids": [
+     "825e73cb98c74bb9842ac5f4919359d7"
+    ],
+    "played_text": {
+     "825e73cb98c74bb9842ac5f4919359d7": {
+      "snapshots": 76,
+      "last": "When aiming for weight loss, it's important to choose snacks that are not only satisfying but also nutrient-dense and low in calories Here are some excellent snack options that can help support your weight loss goals:\n\n1 **Greek Yogurt**: High in protein and low in calories, Greek yogurt can help keep you feeling full Add a sprinkle of nuts or a few berries for extra flavor and nutrients\n\n2 **Fruit**: Fruits like apples, bananas, and berries are naturally sweet and high in fiber, which can aid in digestion and keep you feeling full Avoid adding sugar or honey\n\n3 **Vegetables with Hummus**: Car…[truncated 960 chars]"
+     }
+    },
+    "played_text_monotonic": true,
+    "unplayed_tail_excluded": true,
+    "asr_updates_during_playback": 5,
+    "playback_window": [
+     16259162.892715735,
+     16259192.519703258
+    ],
+    "system_backchannel_seen": false,
+    "direct_audio_seen": false
+   }
+  }
+ ],
+ "note": "Inference audio only; run official FDB ASR alignment and scoring separately."
+}

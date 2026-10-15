@@ -13,6 +13,14 @@
 
 脚本不下载模型权重、不跑推理；权重由 `get_transcript/asr.py` 首次运行时从 Hugging Face 取（本机已有 `nvidia/parakeet-tdt-0.6b-v2` 缓存）。
 
+## 已知缺口：环境尚未完全自足（2026-10-15）
+
+当前 `full-duplex-bench` 的 `site-packages` 里只有 NeMo、torch、openai、numba 等，`numpy`、`scipy`、`soundfile`、`tqdm`、`typing_extensions` 并不在其中——它们由共享 user site（`~/.local/lib/python3.11/site-packages`）提供。原因是上次安装时 user site 处于启用状态，pip 认为这些依赖"已满足"而跳过写进环境。
+
+后果：节点作业/容器导出 `PYTHONNOUSERSITE=True`，user site 被隐藏，官方 `asr.py` 因缺 `soundfile`、官方 `evaluate.py` 因缺 `typing_extensions`（经 `openai` 间接导入）直接失败。评分入口因此必须保持 user site 启用（`unset PYTHONNOUSERSITE`），见 [run_fdb_llm_judge.py](run_fdb_llm_judge.md)。
+
+彻底修法是重装环境时在脚本开头 `export PYTHONNOUSERSITE=1` 再装依赖，使这些包落入环境自身；本轮未重装以免扰动已验证的 NeMo/torch 组合，记为后续清理项。
+
 ## 关键步骤
 
 1. 落 `pip freeze` 快照到 `FDB_PIPFREEZE_SNAPSHOT`（默认 `/hpc_stor03/sjtu_home/xuan.zhang/<env>.pipfreeze.<UTC 日期>.txt`），保留回滚依据。

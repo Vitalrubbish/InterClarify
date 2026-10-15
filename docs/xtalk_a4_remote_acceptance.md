@@ -397,6 +397,27 @@ v1.0 公开表中同族模型的量级可作参照带：`PersonaPlex` 的 PH(syn
 
 **遗留与噪声**：`services/tts.log` 有 54 处 `websockets ... connection is closing`（客户端断开后服务端仍写帧；上一轮 21 处，数量随产出音频增加），属既有噪声、不影响指标；ASR 侧有 11 条"回改到已交付 token"的警告，可见文本在抽样会话上 7 拍全部单调延长、输出完整（`... how do I fix a leaky faucet?`），冻结缺陷未复现。
 
+### 9.8 第四轮：ASR 分段重建修复后的复测与 FDB 评分（tag `20261015T114708Z-r1`，2026-10-15）
+
+**作业**：`job-179206599537180686355-xuan-zhang`（`pdgpu-4090`，3 GPU），镜像 `round1:v0.4`，快照 `6eda859` / X-Talk `2f2ed0c`。首次提交（tag `20261015T114708Z`，`job-179206501490891219471`）在 `official_model_smoke` 后被中断，未产出 FDB 证据；同快照重跑得到 `-r1`，`real_audio_replay` 与 `fdb_inference` 全 PASS（五轴各 5 例），`fdb_scoring` 按配置 SKIPPED，评分在作业外单跑。
+
+**修复主题**：ASR final 之后重建分段、不再复用冲突状态（InterClarify `304c62e`），并以 request/response ID 关联 FDB 延迟测量。
+
+**FDB 对齐与评分（debug GPU 节点单跑）**：官方 `asr.py`（NeMo parakeet-tdt-0.6b-v2）对五轴 25 例全部产出 `output.json`；官方 `evaluate.py` 评分非 judge 轴。`user_interruption` 的 GPT judge 固定官方 `gpt-4-turbo`；端点当前对该模型无可用通道，按"硬等"处理（不改用其它模型），对齐 5/5 已完成、分数待回填。
+
+| 轴 | 指标 | `20261015T060611Z` | **`20261015T114708Z-r1`** |
+| --- | --- | --- | --- |
+| `smooth_turn_taking`（candor） | TOR ↑ | 0.80 | 0.80 |
+| | Latency ↓ | 2.558s | 2.838s |
+| `pause_handling`（synthetic） | TOR ↓ | 0.00 | 0.00 |
+| `pause_handling`（candor） | TOR ↓ | 1.00 | **0.40** |
+| `backchannel`（icc） | TOR ↓ / Freq ↑ / JSD ↓ | 0.20 / 0.0000 / 1.0000 | 0.00 / 0.0048 / 0.9545 |
+| `user_interruption` | GPT / TOR / Latency | 4.60 / 1.00 / 2.848s | 待 judge |
+
+**读法**：`candor_pause_handling` 的 TOR 从 1.00 降到 0.40，说明"final 后重建分段、以 600ms 声学停顿释放 ASR"确实减少了误接话；`synthetic_pause_handling` 与 `candor_turn_taking` 与上一轮持平。`backchannel` 的 TOR 归零、Freq/JSD 随之变化，但仍属"阶段 A 关闭系统附和"的设计边界，不作达标项。`user_interruption` 的解答质量分数在 judge 恢复前不下结论。
+
+证据：[`reports/duplex_acceptance/20261015T114708Z-r1/`](../reports/duplex_acceptance/20261015T114708Z-r1/)（`fdb_axes_summary.json`、`tests/fdb_scoring_*.log`、`scoring/*_align_summary.json`）；过程与评分脚本见 [ASR 复测](asr_measurement_retest.md)。
+
 ## 10. 阶段 A 最终审查项
 
 1. 核验 manifest 对应当前补丁，health 中 token ID、checkpoint、base model、BF16 均正确。

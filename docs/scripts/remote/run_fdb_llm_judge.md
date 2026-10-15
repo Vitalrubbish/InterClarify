@@ -57,3 +57,6 @@ conda run --no-capture-output -n full-duplex-bench python scripts/remote/run_fdb
 - 环境须先用 [setup_fdb_scoring_env.sh](setup_fdb_scoring_env.md) 固定到 CUDA 12.x torch + NeMo 2.x，否则官方对齐脚本无法加载 parakeet 归档。
 - 对齐需要 GPU；judge 只需网络与凭据。
 - 官方 `eval_user_interruption.py` 的 `__main__` 漏传 `client` 参数，因此必须经 `evaluate.py` 调用，脚本已按此实现。
+- **user site 必须启用**：`full-duplex-bench` 自身只装了 NeMo/torch/openai，`numpy`/`scipy`/`soundfile`/`tqdm`/`typing_extensions` 实际来自共享 user site（`~/.local/lib/python3.11/site-packages`）。节点镜像导出 `PYTHONNOUSERSITE=True` 会隐藏这些包，导致对齐（缺 `soundfile`）与评分（缺 `typing_extensions`）双双失败；调用方需 `unset PYTHONNOUSERSITE`，或按 setup 文档让环境自足。
+- **`eval_backchannel.py` 依赖相对路径**：它读取 `./icc_gt_distribution.json`，因此 `evaluate.py --task backchannel` 必须从工作副本的 `evaluation/` 目录运行（该文件随 `evaluation/` 一起被复制）。以运行目录或 `$RUN_DIR` 作 cwd 会 `FileNotFoundError`。
+- **judge 口径固定为官方 `gpt-4-turbo`**：端点无该模型通道时不要改用其它模型，应等待其恢复后补跑（`--judge-model` 只是显式入口，替换会改变评分口径）。`--skip-align` 可复用已生成的 `output.json` 只补跑 judge。

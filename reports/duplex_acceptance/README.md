@@ -2,7 +2,7 @@
 
 本目录保存阶段 A 全双工运行时验收的**关键证据**，纳入 git 跟踪；体积较大的原始产物（逐场景 WAV、服务原始日志）留在 `data/runs/`，不进入仓库。
 
-本目录只保留**最新一轮**验收证据（当前为 `20261015T060611Z`，后端 VAD 生效后的四轴复跑，见任务单 §9.7）：更早的轮次（`20261013T024524Z`、`20261013T070801Z`、`20261014T025649Z`、`20261014T033949Z`、`20261015T030514Z`、`20261015T032348Z`、`20261015T040437Z`）已随仓库清理移除，其结论与数字分别记录在任务单 §9.1–§9.7。
+本目录保留**当前与上一轮**验收证据：`20261015T114708Z-r1`（ASR 分段重建修复后的复测，FDB 评分进行中，见 [ASR 复测](../../docs/asr_measurement_retest.md)）与 `20261015T060611Z`（后端 VAD 生效后的四轴复跑，见任务单 §9.7）。更早的轮次（`20261013T024524Z`、`20261013T070801Z`、`20261014T025649Z`、`20261014T033949Z`、`20261015T030514Z`、`20261015T032348Z`、`20261015T040437Z`）已随仓库清理移除，其结论与数字分别记录在任务单 §9.1–§9.7。`20261015T114708Z` 是同一快照首次提交的作业目录，在 `official_model_smoke` 后被中断，未产出 FDB 证据，空目录不保留。
 
 ## 目录结构
 
@@ -24,13 +24,15 @@ reports/duplex_acceptance/
     ├── replay/
     │   ├── summary.json         # 真实音频回放总览
     │   └── <scenario>_report.json
-    ├── fdb_axes_summary.json    # 四轴官方指标汇总（评分口径与方向）
+    ├── fdb_axes_summary.json    # 五轴官方指标汇总（评分口径、方向与上一轮对照）
     ├── <axis>_*_fdb_summary.json # 各 FDB 轴推理汇总
+    ├── scoring/
+    │   └── *_align_summary.json # 各轴官方对齐结果（run_fdb_llm_judge.py 输出）
     └── tests/
         ├── a1.log               # A1 回归
         ├── a2_a3.log            # A2/A3 回归
         ├── a4_driver.log        # 驱动与模型服务测试
-        ├── fdb_scoring_*.log    # FDB 对齐与评分日志
+        ├── fdb_scoring_*.log    # FDB 对齐与评分日志（含 judge 等待记录）
         └── fdb_scoring_*.json   # 评分汇总与逐样本 rating
 ```
 
@@ -64,3 +66,5 @@ reports/duplex_acceptance/
 | `20261013T024524Z` | job-…-xuan-zhang | 4/5 PASS（normal、interruption FAIL） | 4/5 轴 PASS | SKIPPED | FAIL | 打断判据误把收尾停止当证据；长历史触发 CUDA OOM。证据已移除 |
 | `20261013T070801Z` | job-179187528229476527799-xuan-zhang | 5/5 PASS | 5/5 轴 PASS | 作业内 SKIPPED；独立入口补跑 `user_interruption`（rating 0.6 / TOR 1.0 / latency 1.536s） | INCOMPLETE | 完成官方状态机对齐；`interrupted_audio_frozen=true`；OOM 与 model_service_error 计数为 0；评分归因见任务单 §9.2。证据已移除 |
 | `20261014T033949Z` | job-179196172460056683595-xuan-zhang | 5/5 PASS | 5/5 轴 PASS | `user_interruption` 独立补跑：rating 2.25 / TOR 0.875 / latency 4.10s | INCOMPLETE（含一条设计上非 PASS 的 `real_audio_replay` 判据） | 方案 B（append-only ASR 输入契约）复检；交付瓶颈定位到 MOSS-TTS 产量，见任务单 §9.6 |
+| `20261015T060611Z` | job-179204437243541659063-xuan-zhang | 5/5 PASS | 5/5 轴 PASS | 作业内 SKIPPED；作业外四轴评分：UI 4.60 / STT 0.80 / PH 1.00·0.00 / BC 0.20·0.00·1.00 | INCOMPLETE | 后端 VAD 生效；`user_interruption` 超过官方 DuplexCascade 报告值，见任务单 §9.7 |
+| `20261015T114708Z-r1` | job-179206599537180686355-xuan-zhang | 3/3 PASS | 5/5 轴 PASS | 作业内 SKIPPED；作业外对齐 25/25 + 非 judge 轴评分；`user_interruption` judge 硬等 `gpt-4-turbo` | INCOMPLETE | ASR final 后重建分段的修复复测：PH（candor）TOR 1.00→0.40，见 [ASR 复测](../../docs/asr_measurement_retest.md) |
