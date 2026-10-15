@@ -19,3 +19,12 @@
 延迟按 request/response ID 关联，分别观察模型首 token、TTS 首 PCM、客户端首播放及旧回答停止。缺失关联保留空值。官方词级延迟由对齐器单独产生，PCM 不代替词起点。另比较评分窗口内无音频与窗口外迟到回答。
 
 产物写远端主仓库 `data/runs/<tag>/` 与 `reports/duplex_acceptance/<tag>/`；独立源码位于远端 `interclarify-retests/<tag>/`。作业编号、manifest 和提交日志在启动后记录。未取得实际输出前，不宣称停滞消除或延迟改善。
+
+## 提交记录
+
+- 运行标识：`20261015T114708Z`。
+- 推理作业：`job-179206501490891219471-xuan-zhang`，4090 分区，3 GPU / 24 CPU / 96 GB。
+- 快照主仓库：`6eda859`（相对 `304c62e` 只增加任务单）；X-Talk：`2f2ed0c`。
+- Manifest：177 个文件，SHA256 `8c7495e17eed60a9e7491af94c932f08aab14ce0ce5d2e5ada94e558b60b6a25`。
+- 远端原始产物：`/mnt/cloudstorfs/sjtu_home/xuan.zhang/InterClarify/data/runs/20261015T114708Z/`。
+- 提交成功不等于测试通过；官方对齐评分尚未提交。
