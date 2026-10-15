@@ -11,7 +11,7 @@
 | 项目 | 当前固定值 | 说明 |
 | --- | --- | --- |
 | X-Talk fork | `Vitalrubbish/xtalk`，`feature/qwen3-asr-adapter@d9303c819c96230e527ea5159e7c74f1b5841a3e` | 当前联调提交；上游基座为 `5f0d9959edf1026588246efbed827b078cbb114c` |
-| 远端镜像 | `sjtu_yukai-xuanzhang-xtalk-round1:v0.3`，digest `sha256:a8eb99d8cafadc7f906ae6b24378f6686ce0c52ab8ac063b9c4f59de8ed47d23` | 已用于本次复测；镜像标签不能替代 fork 提交 |
+| 远端镜像 | `sjtu_yukai-xuanzhang-xtalk-round1:v0.4`，digest `sha256:2034787bbe2ad943fae449cba89932555cf797df1afb2e5df3e9c4dcc0026a2d` | v0.4 = v0.3 + client 环境显式声明 `silero-vad` extra（`onnxruntime==1.31.0`，从 wheelhouse 离线装），以增量层发布（`OVERLAY=1`）；v0.3 实际已含同版本 onnxruntime，故两者内容等价，见任务单 §9.5.4.2。镜像标签不能替代 fork 提交 |
 | ASR | `Qwen/Qwen3-ASR-1.7B` + `Qwen3ASRClient` | 独立 ASR conda 环境和 HTTP 服务；返回累计文本，支持修订、临时 flush、`reset` 与 `clone` |
 | LLM | `Qwen/Qwen3-8B-AWQ` + `DefaultAgent` | vLLM 服务；`enable_thinking=false` |
 | TTS | `OpenMOSS-Team/MOSS-TTS-Realtime` + `MOSS-Audio-Tokenizer` | 唯一 TTS/播放链路；使用 `flash_attention_2` |

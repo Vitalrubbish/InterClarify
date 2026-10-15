@@ -11,7 +11,7 @@
 | 主题 | 决定 |
 | --- | --- |
 | 开发与同步 | 直接在服务器共享盘工作树原地开发；无本地/远端同步。提交前原地生成 manifest，作业内校验 |
-| 集群镜像与资源 | `sjtu_yukai-xuanzhang-xtalk-round1:v0.3`，`pdgpu-4090`，3 GPU / 24 CPU / 96G |
+| 集群镜像与资源 | `sjtu_yukai-xuanzhang-xtalk-round1:v0.4`，`pdgpu-4090`，3 GPU / 24 CPU / 96G |
 | GPU 分卡 | 官方模型 GPU0、Qwen3-ASR GPU1、MOSS GPU2；FDB 对齐/评分与模型服务分阶段，避免共占显存 |
 | normal 请求音频 | `regular_answer_01_question.wav` |
 | interruption 请求/打断 | 请求 FDB v1.0 样本 106 的 `context.wav`（短答问题），打断同目录 `interrupt.wav`，`--barge-after-seconds` 调小（0.6s，自首个音频包起算） |
@@ -94,7 +94,7 @@ conda run -n paratalker-dev python scripts/remote/create_duplex_source_manifest.
 3. 新增 `multi_question` 场景：一次送入连续两问，断言系统依次产生回答、音频与协议正常。
 4. 播放自动证据：从 timeline 与播放回执提取"已播文本单调、未播尾部不计已播、播放期间 `update_asr` 持续"的可量化字段，供 `classify` 与报告使用。
 5. 保留原有 interruption / long_session / FDB 判定，`classify` 继续严格区分 PASS/FAIL/INCONCLUSIVE。
-6. **FDB 场景增加"输入结束后静音续播窗口"**（`--post-input-seconds`，默认对齐官方 ≥5s）：送完 `input.wav` 后继续喂静音并保持会话，使模型在用户说完之后产生的回答能被录进 `output.wav`；报告记录 `post_input_seconds` 与实测 tail，作为"回答是否被录到"的判据。本轮 `_run_fdb` 只 `sleep(0.5)`，是 §9.4 口径问题的直接原因。
+6. ~~FDB 场景增加"输入结束后静音续播窗口"（`--post-input-seconds`）~~：**2026-10-15 撤销**。官方 `model_inference/*/inference_*.py` 用 `SynchronizedRecorder(out_sr, target_sec=输入时长, outfile)` 写 `output.wav`（"Uses wall-clock timing to ensure output matches input timeline"），即官方口径就是**输出时长 == 输入时长**，我们回放器的 `normalize_wav_duration` 正是照此裁剪/补零。所以录在输入之外的音频一定被丢弃，加窗口救不回回答：要让回答进入打分，它必须落在**输入自身的时间轴内**。真正的杠杆是在输入内尽早释放用户文本（§9.5.4.2 的后端 VAD）。
 
 ## 6. 集群运行
 
@@ -113,14 +113,14 @@ export INTERCLARIFY_DUPLEX_ROOT="$PWD"
 bash scripts/remote/submit_xtalk_duplex_a4_job.sh
 ```
 
-关键环境变量（脚本已内置下列默认值，可按需覆盖）：
+关键环境变量。（**FDB 四轴才是本作业的核心**：`DUPLEX_A4_FDB_INPUT_ROOT`、`DUPLEX_A4_FDB_REPO` 与 `DUPLEX_A4_FDB_SCORING=1` 必须由入口传入，否则 `fdb_inference` 记为 `BLOCKED`、`fdb_scoring` 记为 `SKIPPED`；judge 凭据默认取仓库根的 `openai_api.txt`。回放默认只跑 `normal` 与 `interruption` 两个场景。）
 
 ```bash
 export DUPLEX_A4_REQUIRE_INTERRUPTION=1
 export DUPLEX_A4_REQUIRE_COMPLETE=1
 export DUPLEX_A4_ROUNDS=30
 export DUPLEX_A4_BARGE_AFTER_SECONDS=0.6
-export DUPLEX_A4_SCENARIOS="normal interruption pause multi_question long_session"
+export DUPLEX_A4_SCENARIOS="normal interruption"   # 回放只跑这两个场景（默认已改为这两个）
 ```
 
 节点脚本按语义配对向回放器传 `--scenario-audio`（normal/interruption/pause/multi_question/long_session 各用各自请求音频），并每 5s 采集各服务进程组 RSS 到 `resource_samples.csv`，与 `gpu_samples.csv` 合并分析。
@@ -221,7 +221,7 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
   --out <run>/fdb_llm_judge --task user_interruption --gpus 0
 ```
 
-`align_rc=0`、`judge_rc=0`，`llm_judge_summary.json`：`average_rating=0.6`、`average_take_turn=1.0`、`average_latency=1.536`。该轮评分日志与逐样本 rating 随旧 tag 证据目录一并移除；同一口径在 §9.6.1 的复检里重跑，归档在 `reports/duplex_acceptance/20261014T033949Z/tests/`。
+`align_rc=0`、`judge_rc=0`，`llm_judge_summary.json`：`average_rating=0.6`、`average_take_turn=1.0`、`average_latency=1.536`。该轮评分日志与逐样本 rating 随旧 tag 证据目录一并移除；同一口径在 §9.6.1 的复检里重跑，数字记录在该小节（按 `reports/duplex_acceptance` 的约定，原始目录只保留最新一轮，见该目录 README）。
 
 | 样本 | rating | 打断结束 | 首词延迟 | 被判分的文本（打断后裁剪段） | 运行时事实 |
 | --- | --- | --- | --- | --- | --- |
@@ -256,7 +256,7 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 3. **记录节奏指标**：复位后到首音频的延迟、已播文本的最大停顿（本轮 101 在裁剪边界处停了 3.18s，直接污染 latency）。
 4. **消融实验（已完成）**：见 §9.2 的探针结论（探针脚本与产物已在 2026-10-14 清理中移除）。`raw`/`strip`/`strip_lower`/`burst` 都能确定性翻转打断判定，但没有一个变体是修复（各救一个样本且互相抵消），故不做文本归一化改动；标点/大小写这条线作废。
 5. 复听让出话轮样本的 `output.wav`（本轮 102 的 `travel tips` 被官方 parakeet 转成 `trap dapple tips`）。
-6. **补足输入结束后的录制/续播窗口**：本轮 `_run_fdb` 在送完音频后只等 0.5s，导致 `output.wav` 与 `input.wav` 等长（tail = 0），三个非打断轴的回答落在窗口之外。全量跑前必须把窗口设为可配置且 ≥ 官方量级（≥5s），并在报告里记录 `post_input_seconds` 与实测 tail。
+6. ~~补足输入结束后的录制/续播窗口~~：**2026-10-15 撤销**，理由见 §9.3 第 6 条（官方 `SynchronizedRecorder` 同样把 `output.wav` 写成输入时长，延长录制没有意义）。三个非打断轴的正确修法是在输入内尽早释放用户文本（§9.5.4.2）。
 
 ### 9.4 其它三轴的作答统计与输入侧缺陷（2026-10-13，旧 tag）
 
@@ -274,6 +274,8 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 
 **口径修正（同日）**：`output.wav` 与 `input.wav` 时长在 **25/25** 个样本上完全相等（tail = 0）。原因是 `scripts/remote/duplex_a4_replay.py` 的 `_run_fdb` 在送完音频后只 `sleep(0.5)` 就收尾，而官方 `model_inference` 脚本送完音频会再等一段（`gemini/inference_gemini25_native.py` 的 `timeout=5.0`，`sonic/inference.py` 亦有 `listener_task` 超时）。同时，三个非打断轴的**用户最后一个词都落在文件结尾前 0.02–0.15s**（由 `transcription.json` 的末词时间戳算出）：用户话一说完录音就断，输入之后产生的回答必然录不到。因此上表"无音频/作答很短"在这些子集上**不能当作模型没作答的证据**；`synthetic_user_interruption` 是唯一在数据里自带 15.00s 尾静音、因而能完整录到回答的轴——这正是它可被 judge 打分的前提。
 
+**2026-10-15 复核官方代码后的修正**：官方推理脚本 `SynchronizedRecorder(out_sr, target_sec=输入时长, outfile)` 也是按输入时长写 `output.wav`，所以"输出 == 输入时长"是**官方口径**而非我们独有的取舍（此前把等长归因于"只 `sleep(0.5)`"只对了一半：等长来自裁剪，而裁剪本身与官方一致）。由此"补录制窗口"的方向应当放弃：非打断三轴要拿分，模型必须在输入文件自身的时间轴内说话（在其内部停顿处接话），这也正是该三轴的设计意图。
+
 **不受该口径缺陷影响的两条**：
 
 1. **`candor_turn_taking` 的 3/5 沉默是真失败**：`turn_taking.json` 的 `[TURN-TAKING]` 标记在文件中部（5.63 / 4.23 / 4.83 / 5.79 / 6.52s，而文件长 10.90 / 9.60 / 9.91 / 10.79 / 11.80s），让轮之后仍有余量——1 / 101 / 102 在各自约 5s 余量内零输出，10 / 100 则分别在让轮后 **0.80s / 1.39s** 作答。该轴官方要求 TOR↑（上游 0.832），故这 3 个样本是与 `user_interruption` 同向的真实失败，是目前唯一可确认的"第二处异常"。
@@ -284,7 +286,7 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 1. **ASR 语言会跑飞**：`icc_backchannel/1` 的 `update_asr` 全程是德语（`ja also es ist wie ich war sitzend ...`），`/11` 全程是西班牙语（`yo no te dije que ...`）；而这两份 `input.wav` 按 FDB `transcription.json` 都是英语。原因在 `scripts/remote/qwen3_asr_service.py`：会话初始化只传了流式切块参数（`chunk_size_sec`/`unfixed_chunk_num`/`unfixed_token_num`），**没有传 `language`/`context`**；而 `qwen_asr` 的 `init_streaming_state(context="", language=None, ...)` 支持强制语言。属可直接修复项。
 2. **ASR 更新以"改写末尾"为主**：25 个样本的相邻 `update_asr` 中，真正"严格延长上一版"的比例只有 0–27%，其余 62–100% 会重写末尾若干个词（例：`checked before.` → `checked beforehand,`；`icc_backchannel/0` 为 1 次追加 / 26 次改写）。这来自流式配置 `unfixed_token_num: 5` / `unfixed_chunk_num: 2`（末尾 5 个 token / 2 个 chunk 视为未定），于是运行时几乎每拍都会走 `REWRITE` 修复路径，而官方 Kyutai 词流是单调追加的。**2026-10-14 复核已把这条从"待评估"升级为已定位的根因**：25 个样本共 **333 次改写**，且改写会真的让模型"答一个用户没说完的版本"，见 §9.5。
 
-**待办**：①先给 `_run_fdb` 加可配置的"输入结束后静音续播窗口"（对齐官方 ≥5s，并保留 tail 字段作为证据），再重跑三个非打断轴，用官方评分器（`pause_handling` / `smooth_turn_taking` 不需要 LLM judge，只需 `get_transcript/asr.py` + `evaluate.py`）与上游表逐轴对齐；②`user_interruption` 自带 15s 尾静音、不受该缺陷影响，可沿用 §9.2 结论无需重跑。③输入侧缺陷第 2 条（末尾改写）已按 §9.5.4 方案 B 实现，待远端复检；第 1 条（ASR 语言跑飞）仍未改，留待独立复检以避免多变量混跑。
+**待办**：①先让声学边界真的可达（§9.5.4.2 的后端 VAD + `vad_redemption_ms`；原先设想的"输入结束后续播窗口"已按 §9.3 第 6 条撤销），再重跑四轴，用官方评分器（`pause_handling` / `smooth_turn_taking` 不需要 LLM judge，只需 `get_transcript/asr.py` + `evaluate.py`）与上游表逐轴对齐；②`user_interruption` 自带 15s 尾静音、不受该缺陷影响，可沿用 §9.2 结论无需重跑。③输入侧缺陷第 2 条（末尾改写）已按 §9.5.4 方案 B 实现，待远端复检；第 1 条（ASR 语言跑飞）仍未改，留待独立复检以避免多变量混跑。
 
 ### 9.5 prompt 与输入流的保真核查（2026-10-14）
 
@@ -342,16 +344,34 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 | 方案 | 做法 | 代价 |
 | --- | --- | --- |
 | A. 收紧流式参数 | `unfixed_token_num: 0`、`unfixed_chunk_num: 0`（纯配置） | 尾巴立刻定稿、不再回滚，ASR 失去边界纠正能力，尾部 WER 上升 |
-| **B. 只暴露定稿前缀（已实施）** | 关掉"前 N 个 chunk 独立解码"（`unfixed_chunk_num: 0`），并在 ASR 服务里让 `is_final=false` 只返回已定稿前缀（`_raw_decoded` 去掉末尾 K 个 token 再解析），`is_final=true` 释放完整文本 | 可见文本比 ASR 内部晚约 K 个 token（≈0.3–0.5s）；尾部纠正在用户下一次停顿时才可见 |
+| **B. 只暴露定稿前缀（已实施）** | 关掉"前 N 个 chunk 独立解码"（`unfixed_chunk_num: 0`），并在 ASR 服务里让 `is_final=false` 只返回已定稿前缀（`state.text` 去掉末尾 K 个 token），`is_final=true` 释放完整文本 | 可见文本比 ASR 内部晚约 K 个 token（实测词级 1–6 词）；尾部由调用方的显式边界 `is_final` 释放（**不是**"停顿即释放"，见 §9.5.4.1） |
 | C. 运行时兜底 | `REWRITE` 时连 assistant 一起回滚重生成 | 与"已被听到的内容不可撤销"冲突，且官方无此语义 |
 
 单调性证明（B 为什么必须同时关掉 `unfixed_chunk_num`）：记第 n 拍的原始解码串为 `R_n`，其前缀 `P_n = truncate_K(R_{n-1})`（`unfixed_chunk_num > 0` 时前几个 chunk 的 `P_n` 为空、由音频独立解码，`R_n` 与 `R_{n-1}` 之间没有任何前缀约束）。因 `R_n = P_n + G_n` 且 `P_n` 是整 token 边界，故 `T_n := truncate_K(R_n)` 满足 `T_{n-1} = P_n ⊑ T_n`，即**逐拍单调追加**；这正是官方 `Word` 词流的性质。若保留 `unfixed_chunk_num=2`，前两拍的"定稿前缀"仍可能整体换掉，模型照样会看到改写。
+
+#### 9.5.4.1 对比的副产物：契约实现里有两个真 bug（2026-10-15 实测，待修）
+
+`run_asr_contract_ab_node_job.sh` 的第一轮结果（40 样本 / 729s 音频，两臂各 40）本身支持"保持 `unfixed_chunk_num: 0`"：两臂最终转写**逐词相同**（词级距离中位数 0.0）、提交延迟相同（中位 0.96s）、可见改写都是 0，raw 改写 532（window-0）vs 539（window-2）。但它同时暴露了两个更严重的问题：
+
+1. **可见文本会被永久冻结**（`scripts/remote/qwen3_asr_service.py` 的 `advance_committed`）。它用**字符串** `proposed.startswith(visible_text)` 保证单调，而模型再解码时常把句末标点/空格改掉（例如 `'I never like.'` → `'I never like I know…'`），一旦已释放的可见文本里含这种字符，此后**任何**延长都会被 `startswith` 拒绝，可见文本就停在原地。实测：`candor_pause_handling/1` 在 t=0.72s 释放 `'I never like.'`（当时 raw 也只有这 3 个词），之后 raw 长到 127 词，可见文本**冻住 26.3s（330 拍）**；另一个样本冻在 `'Yeah.'` 9.7s。40 样本上"raw 比可见多出的词数（每样本取中位）"的中位数是 **15 词**、最大 62 词。
+2. **duplex 运行时从不释放被扣住的尾巴**。`AudioConsumer.pause()/end()` 才带 `is_final_chunk=True`，而它们在 `ASRManager` 里只由 `TurnASRPauseRequested`/`TurnASREndRequested` 触发；duplex 模式下只有 `MicroTurnAssembler` 发 `TurnASRStartRequested`（`duplex_control/micro_turn.py:58`），暂停/结束请求**没有发布者**（原发布者 `turn_taking_manager`/`TurnDetectorManager` 已被 `duplex_manager_classes` 移出）。于是服务在整个会话里拿不到 `is_final=true`，扣住的尾巴永远不释放。
+
+**含义**：之前 A4/FDB 各轮的运行时看到的是"用户在整段话里只有开头几个词、且被冻结"的文本，这也解释了实测里出现的抢话/答案缝合/低分现象；**这些 FDB 数字需要在修好之后重跑**（与 §9.6.7 的 TTS 默认配置一起重跑最经济）。
+
+**修法**：
+
+- ① **已实施（2026-10-15，服务侧）**：`advance_committed` 改为 **token 级**单调推进——交付单位是 token 前缀（`committed_token_ids` / `decode_token_prefix`），只扣住末尾 `unfixed_token_num` 个 token，只在候选延长已交付前缀时推进；解码器回改到已交付 token 时保持已交付文本、累计 `stalls` 并打一条 warning；**删除了"本次解码无新增文本就释放尾巴"这条规则**（句内停顿不是片段结束，正是它把 `'I never like.'` 交了出去，见上）。`SessionState` 用 `committed_ids` 取代 `last_parsed`，`asr-smoke` 同步记录 `commit_stalls`，汇总器新增「冻结」（前缀落后 raw 超过 8 个词的最长连续时长）与「提交停滞」两列。单测：`tests/test_qwen3_asr_service.py` 9 个（含 `'I never like.'` 回归用例）、`tests/test_summarize_asr_contract.py` 8 个。
+- ② **已实施（2026-10-15，运行时侧）**：`duplex_control/micro_turn.py` 现在订阅声学 `VADSpeechEnd`/`VADSpeechStart`——前者发 `TurnASRPauseRequested`（保留 ASR 状态、只触发一次识别，正是官方 `TurnTakingManager` 在配置了端点检测时的做法），后者发 `TurnASRStartRequested` 恢复采集（否则音频只进 1s 预缓冲、会丢话）。触发点选 VAD 而非 micro-turn 收口：改动最小、不干扰 in-band 轮次判定，也不把一句长话切碎。单元测试：`tests/test_duplex_runtime.py` 新增 3 例（声学结束只发一次 pause、合成文本输入不发 pause、消费者未启动不发 pause），`tests/test_asr_finalization.py` 新增链路测试（`VADSpeechEnd` → `TurnASRPauseRequested` → `AudioConsumer.pause()` → ASR 客户端真的收到 `is_final=True`，并发布一个 `speech_pause=True` 的 partial）。**已知未做**：硬回合结束（`TurnASREndRequested`，会重置 ASR 状态）仍无发布者，因此 ASR 文本跨回合累积；官方 duplex 是否就该如此（其在线 STT 是一路连续流）需要专门验证，故本轮不动。
+
+① 的效果需要用同一套对比工具复测（预期"挂起的词"降到 1–4 词、`commit_stalls`/「冻结」为 0）。
+
+**`unfixed_chunk_num` 是否与官方对齐（2026-10-15 起测）**：官方默认是 `unfixed_chunk_num: 2`，我们配的是 `0`。由于 `advance_committed` 守卫只让可见文本单调增长，对齐官方**不会**破坏 append-only；真正的差别是解码器是否用最近 2 个 chunk 重解码（边界纠正能力）以及由此带来的提交点后移。用 [run_asr_contract_ab_node_job.sh](scripts/remote/run_asr_contract_ab_node_job.sh)（单卡、进程内驱动官方流式 API、FDB 语料按子集均衡取样）量 `window-0` 与 `window-2` 的 raw/可见改写次数、尾部释放延迟与最终转写词级距离后再定。
 
 **已实现的改动**：
 
 | 文件 | 改动 |
 | --- | --- |
-| `scripts/remote/qwen3_asr_service.py` | 新增 `truncate_tokens` / `advance_committed` 与 `--emit-committed-prefix`：有新文本时只返回已定稿前缀，本次解码没有新增文本时释放被扣住的尾巴；`is_final=true` 释放全量且不重置推进基点。两者都保证只追加、不替换 |
+| `scripts/remote/qwen3_asr_service.py` | `--emit-committed-prefix` 的 append-only 契约：**token 级**单调推进（`committed_token_ids`/`decode_token_prefix`/`advance_committed`），只扣住末尾 `unfixed_token_num` 个 token，`is_final=true` 释放全量且不重置推进基点；回改到已交付 token 时保持已交付文本并计数（`stalls`）。2026-10-15 修掉"字符串比较导致可见文本永久冻结"与"停顿即释放"两个缺陷（§9.5.4.1） |
 | `configs/xtalk_round1.yaml` | `asr_streaming.unfixed_chunk_num: 2 → 0`；新增 `emit_committed_prefix: true` |
 | `scripts/remote/run_xtalk_round1.py` | `serve asr` 透传 `--emit-committed-prefix`；`asr-smoke` 支持 `--audio-dir` 与流式契约覆盖，并额外报告 `visible_text`/`visible_revisions`；输入按运行时同一路径重采样 |
 | `tests/test_qwen3_asr_service.py` | 新增：改写不得缩短/替换已给出文本、隐藏窗口正好是 `unfixed_token_num`、静音必须释放尾巴、可见文本不得含语言标签、HTTP 生命周期、默认档位不变 |
@@ -361,7 +381,7 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 | 缺陷 | 观测证据 | 修正 |
 | --- | --- | --- |
 | 截断点落在 `language English<asr_text>` 内部，把语言标签当用户文本交给模型 | `replay/normal` 场景全程 397 拍只有 `<|user is talking|>`、`response_ids` 为空（`normal` FAIL、`interruption` INCONCLUSIVE）；FDB 样本 `10`/`102` 的 `update_asr` 文本为 `language English` / `language` | 改为对**已解析转写** `state.text` 截断，标签不可能再进入结果 |
-| 句尾 K 个 token 永久扣住（只有继续出现新词才会释放） | `synthetic_user_interruption/1` 最后一拍停在 `… what are some financial`，`goals I should set?` 再未出现；问题语音结束后 15s 静音期间可见文本停在 `How can I`（8s） | 新增"本次解码没有新增文本即释放尾巴"，对应 Kyutai 提交词流的时机 |
+| 句尾 K 个 token 永久扣住（只有继续出现新词才会释放） | `synthetic_user_interruption/1` 最后一拍停在 `… what are some financial`，`goals I should set?` 再未出现；问题语音结束后 15s 静音期间可见文本停在 `How can I`（8s） | 当时新增了"本次解码没有新增文本即释放尾巴"；**该规则已于 2026-10-15 撤销**（句内停顿不是片段结束，它正是可见文本被永久冻结的根因），尾巴改由显式边界 `is_final` 释放，详见 §9.5.4.1 |
 
 该轮 `fdb_inference` 虽为 PASS，但其 ASR 文本已被上述缺陷污染，故**不作为方案 B 的证据**，已作废重跑。
 
@@ -373,6 +393,39 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 2. 3 卡 `user_interruption` 复检：只重跑该轴 + 官方 judge，核对运行时 `update_asr` 流改写次数是否归零、rating 相对 §9.2 的 0.6 的变化。
 
 修法**不**包含另外两处已知输入侧问题：ASR 语言跑飞（§9.4 第 1 条）与 `_run_fdb` 的录制窗口（§9.3 第 6 条），它们各自独立验证，避免把多个变量混进同一次复检。
+
+#### 9.5.4.2 后端 VAD：让声学边界真的到达 ASR（2026-10-15）
+
+**问题（第二轮 A4，tag `20261015T032348Z`）**：运行时进程**没有加载后端 VAD**——`VADManager` 首行即 `if self.vad is None: return`，整条声学状态机不工作。于是唯一的 `vad_speech_end` 是 input gateway 在**音频流边界**代发的那个，§9.5.4.1 ② 接好的释放链路被推迟到文件结束：`synthetic_user_interruption/101`（28.27s，语音 13.0s 结束，其后 15.27s 数字静音、RMS=0）里 `speech_pause=True` 直到 27.13s 才出现，模型 27.09s 才开口，所以该轮多数样本 `response: ''`、`tts_audio_bytes: 0`，数字不可用。
+
+**修法（配置一处；依赖只在配方里显式声明）**：
+
+| 位置 | 改动 | 说明 |
+| --- | --- | --- |
+| `configs/xtalk_duplex_runtime.json` | 新增 `vad` 槽位 `{"type": "SileroVAD", "params": {"threshold": 0.5}}` | 这是 `VADManager` 唯一的开关；模型取 `~/.cache/xtalk/models/silero_vad.onnx`（共享盘已缓存，不联网下载） |
+| 同文件 `service_config` | `vad_redemption_ms: 600` | 最后一个语音帧之后积累 600ms 静音才发 `VADSpeechEnd` |
+| `Dockerfile.round1` + 镜像 **v0.4** | client 环境显式装 `xtalk[example,dev,silero-vad]` 并钉 `onnxruntime==1.31.0`（离线取自 wheelhouse） | 把"运行时需要 onnxruntime"写进配方、避免它随依赖变动悄悄消失。**就本故障而言 v0.4 与 v0.3 内容等价**（见下），v0.4 只是以增量层发布（`Dockerfile.round1.overlay` + `OVERLAY=1`：几分钟/几百 MB，而从零重建要 1 小时/十几 GB） |
+
+**为什么是 600ms 而不是 500ms**：ASR 客户端的节奏是 `chunk_ms: 600`，停顿判定不能早于"句尾那一段已经交给 ASR"的那一刻；否则 pause 的 flush 会漏掉最后一段，那段音频只能躺在 1s 预缓冲里等下一次 `VADSpeechStart`——用户不再说话就永远不被识别。600ms 与 chunk 对齐使 flush 带上句尾（代价是释放点晚 100ms）。若复测仍见句尾丢词，可上调到 700–800ms，结构不变。
+
+**依赖核查（2026-10-15 更正：先前的归因是错的）**：最初把 tag `20261015T040437Z` 的失败归因于"client 环境没有 `onnxruntime`"。**该结论不成立**：
+
+- 直接在 v0.3 镜像里查 `/opt/conda/envs/xtalk-round1-client` 可见 `onnxruntime 1.31.0` 早已存在，v0.4 增量层构建也打印 `Requirement already satisfied: onnxruntime==1.31.0`；
+- 用**同一镜像 + 同一运行配置**在本机容器内跑，`Xtalk.from_config` 加 uvicorn 绑定端口只需 **1.9s**（onnxruntime import 0.10s、构造模型 1.89s，而 `--server-timeout` 默认 60s）；带 GPU、带作业同款线程环境变量复测同样是 1.8s。
+
+因此后端 VAD 配置本身与这次失败无关，v0.4 也不是修复。
+
+**这次真正暴露的是可观测性缺陷**：作业里回放与 5 个 FDB 批次都只留下父进程的超时 traceback，子进程是崩了还是卡住无从判断。修法：
+
+- `_serve` 把启动进度写入 `$XTALK_SERVE_LOG`（`start` → `imports ok` → `app mounted` → `uvicorn returned`），失败时写完整 traceback；
+- `_wait_for_server` 在端口不开时报告子进程状态（`exited with code N` 或 `still alive (stalled before binding its port)`）并附该日志尾部；回放器把日志指到 `<--out>/xtalk_serve.log`，随产物留存；
+- 节点脚本新增 **`runtime_build`** 前置步骤：启动服务前用 client 环境按运行时配置真正构造一遍模型集合并要求 `models.get(VAD)` 非空，把这类问题从"超时后翻日志"变成一条明确失败。
+
+`20261015T040437Z` 的**成因仍未确定**（本机无法复现，作业现场日志不足）；重跑时上述埋点会直接给出结论。
+
+**测试**：`tests/test_xtalk_link_check.py` 新增两条（子进程退出码 + 子进程日志尾部进入报错；存活子进程被判定为"卡住"而非崩溃）；`xtalk/tests/test_asr_finalization.py` 新增全链用例——8 个语音帧开启片段、15 个静音帧（480ms）**不发** end（窗口被遵守），再过 5 帧越过 600ms 后 `VADSpeechEnd` → `TurnASRPauseRequested` → `AudioConsumer.pause()` → ASR 客户端真的收到 `is_final=True`。
+
+**顺带修掉的评分阻塞**：`fdb_scoring BLOCKED` 是环境导入问题而非缺 NeMo——该镜像上 `nemo.collections.asr` 需要 `NUMBA_CUDA_USE_NVIDIA_BINDING=0` 才能导入，该变量已在节点脚本打分段 export。三卡作业内仍默认跳过评分（对齐阶段 GPU 空转会被集群按 LowGpuUsage 杀掉），评分继续用 [run_fdb_llm_judge.py](scripts/remote/run_fdb_llm_judge.md) 对已有产物树单跑。
 
 ### 9.6 复检结果与 TTS 交付瓶颈（2026-10-14）
 
@@ -408,21 +461,127 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 
 - 编解码帧率 24000/1920 = **12.5 Hz**，每帧 80ms 音频；每帧 = 1 次 backbone 前向 + **16 次 local transformer 前向**（`rvq=16` 逐码本串行）+ 每码本一次采样。
 - 上游只在非 flash-attention 路径编译该循环（`_should_compile_local_transformer = not _use_dynamic_local_cache`），我们的 `attn_impl=flash_attention_2` 部署是全 eager；采样默认 `do_sample=True` + top-k + **全词表 sort** 的 nucleus，每帧上百次张量算子。
-- 结论：单帧约 205ms（≈0.39 倍实时），瓶颈偏**每调用开销**而非算力——每帧 17 次前向 + 16 次采样的 Python/启动开销占主导。
+- 结论：链路交付约 0.2–0.5 倍实时（§9.6.2），瓶颈在"每帧 17 次前向 + 16 次采样"的**每调用开销**而非算力；但精确到"哪一段占多少"仍需 §9.6.5 的 profile 臂给出，先前的"单帧约 205ms"是把客户端墙钟除以帧数得到的粗估。
 
 #### 9.6.4 已实现：运行时补丁 T1/T2 与 A/B 任务
 
-- `scripts/remote/moss_tts_patch.py`（T1 编译后端 / T2 采样头 / 每回合 `[tts-metric]`），经 `run_xtalk_round1.py serve tts` 的 `sitecustomize` 注入，上游 checkout 保持 `git diff` 干净。
-- `scripts/remote/run_tts_throughput_ab_node_job.sh` + `submit_tts_throughput_ab_job.sh` + `summarize_tts_throughput.py`：单卡 5 臂（`baseline`/`t2-greedy`/`t2-topk`/`t1-inductor`/`t1-cudagraph`），固定 75 词负载、每臂 cold+warm 各一次，产出 `reports/tts_throughput/<tag>/tts_throughput.{md,json}`。
-- 正确性：`tests/test_moss_tts_patch.py` 把重写后的 `_local_loop` 与**真实上游**循环在三组输入上逐 token 对拍（TTS 环境 9/9 通过，其它环境 skip）。
+- `scripts/remote/moss_tts_patch.py`（T1 编译后端 / T2 采样头 / 限速 `[tts-metric]` 切片 / `XTALK_TTS_PROFILE` kernel 剖析），经 `run_xtalk_round1.py serve tts` 的 `sitecustomize` 注入，上游 checkout 保持 `git diff` 干净。
+- `scripts/remote/run_tts_throughput_ab_node_job.sh` + `submit_tts_throughput_ab_job.sh` + `summarize_tts_throughput.py`：单卡多臂、固定 75 词负载、每臂 cold+warm（`warm-only` 跳过 cold），产出 `reports/tts_throughput/<tag>/tts_throughput.{md,json}`。第二轮用的是 6 臂（`baseline`/`t2-greedy`/`t2-topk`/`t1-inductor`/`t1-cudagraph`/`profile`，§9.6.6）；默认臂表已按瓶颈改为 5 臂（`baseline`/`t1-sdpa`/`t1-sdpa-cudagraph`/`t1-sdpa-inductor`/`t1-sdpa-profile`）。
+- 正确性：`tests/test_moss_tts_patch.py` 把重写后的 `_local_loop` 与**真实上游**循环逐 token 对拍（含经 `sample_token` 派发一例），另覆盖 `_attach` 字段完整性、注意力/cache 切换、饱和门、event 记账、限速指标与 profiler 摘要（TTS 环境 24/24 通过，其它环境 skip）。
 
-**判据**：`steady_rtf = audio_s / (wall_s - first_audio_s) > 1` 才算追上实时；`t1-*` 需服务日志出现 `torch.compile(_local_loop) ready` 且无 `falling back to eager`；`t2-*` 改变音频内容，须试听后再决定。此后若吞吐达标，再用 `20261014T033949Z` 的同一流程重跑 `user_interruption` 轴，比较 latency 4.10 → ? 与 rating 2.25 → ?。
+**判据**：`steady_rtf = audio_s / (wall_s - first_audio_s) > 1` 才算追上实时；`t1-*` 需服务日志**同时**出现 `torch.compile(_local_loop) ready`（图建好）、`compiled path engaged`（推理真的走了编译路径）、无 `falling back to eager`，且 warm rtf 明显高于 baseline；`t2-*` 改变音频内容，须试听后再决定。此后若吞吐达标，再用 `20261014T033949Z` 的同一流程重跑 `user_interruption` 轴，比较 latency 4.10 → ? 与 rating 2.25 → ?。
 
 **测量节点**：A/B 可以在 `pdgpu-a10` 上跑（4090 队列常满，提交脚本用 `TTS_AB_PARTITION` 切换）。A10 比 4090 慢，**绝对值不可与 4090 直接比较**，该节点只用来判断 T1/T2 在*同一节点*上的相对倍率是否成立；全链路的全量测试仍等 4090 空出后进行。
 
-其余待办不变：ASR 按静音即时释放（可再省 0.5–1.9s，§9.6.2 前两段）、`--post-input-seconds` 录制窗口（§9.3 第 6 条）、ASR 语言跑飞（§9.4 第 1 条）。
+#### 9.6.5 首轮吞吐测量作废与修正（2026-10-14）
+
+首轮 A/B（tag `20261014T100302Z`，A10）**不作为 T1/T2 证据**，四条原因与修正：
+
+| 现象 | 证据 | 根因 | 修正 |
+| --- | --- | --- | --- |
+| 两个 arm 白跑（`t2-greedy`/`t1-inductor`） | 控制台里其 `service healthy` 用时 **0s**（正常 arm 35s），随后 smoke 报 `Cannot connect to host 127.0.0.1:8004` | `stop_service` 后立刻起下一个 arm，上一 arm 的服务仍在监听；新进程 bind 失败退出，健康探针打到了旧服务 | 每个 arm 独立端口（`serve tts --port`）+ 健康判定要求"进程存活 + 日志 `[warmup] Backend loaded` + 端口连续两次应答" |
+| `t1-cudagraph` 的编译从未生效 | 日志有 `torch.compile(_local_loop) ready`，紧接 `compiled warmup failed, falling back to eager: Logger not supported for non-export cases`，traceback 指向 `transformers/modeling_flash_attention_utils.py:465` 的 `logger.warning_once` | warmup 用 `torch.float32` 造 hidden state，触发 flash-attn 的 fp32 回铸告警；`fullgraph=True` 遇到 logger 调用直接失败；此外饱和门读的 `_xt_window` **从未定义** | warmup 改用该帧真实 hidden state 与采样标量；`relax_dynamo_logging()` 把 `Logger.warning_once` 等加入 `ignore_logger_methods`；饱和门改为 `min(capacity, repetition_window)`，并新增 `compiled path engaged` 作为"真的生效"的证据 |
+| 服务端数字不可读 | 报告"服务端 rtf(最大)"列出现 `151231.24` | 服务每帧调用一次 `finish`，而指标按"每次调用一行"打印，被逐帧刷屏 | 指标改为限速切片（≥6 帧或 ≥1s 墙钟一行），汇总改为 `Σaudio/Σwall` 与中位数 |
+| T1/T2 变量混淆 | `t1-*` 臂当时用 greedy 采样 | 一个臂同时改了"编译"和"采样头"，差值无法归因 | 每臂只改一个变量：`t1-*` 采样保持 `upstream`；新增 `profile` 臂（`torch.profiler` 逐 kernel，同时覆盖模型与 codec 解码） |
+
+首轮唯一可用结论：A10 上上游 eager 路径稳定态合成速率 ≈ **0.62× 实时**（客户端与服务端 `[tts-metric]` 相互印证），采样换头（top-k nucleus）在同一节点无可测收益。
+
+#### 9.6.6 第二轮（4090，tag `20261014T141920Z`）：瓶颈定位到"launch 次数"
+
+修复后 6 个 arm 全部跑通（`baseline / t2-greedy / t2-topk / t1-inductor / t1-cudagraph / profile`），结论：
+
+| 观测 | 数值 | 含义 |
+| --- | --- | --- |
+| `baseline` warm steady rtf | **1.06**（`t2-greedy` 1.13、`t2-topk` 1.07） | 4090 上上游 eager 路径**刚好实时**；A10 的 0.62 是节点差异，A4 链路 0.2–0.5 倍是**链路侧**而非模型原始上限 |
+| 每帧墙钟（baseline） | ≈82.6ms（89 帧 7.12s 音频 / 7.35s 墙钟） | 12.5Hz 下每帧只该 80ms |
+| 每帧 **device** 时间（`profile` 臂 kernel 表） | **≈24ms**（60 帧合计 1.437s） | GPU 只忙了 ~30%，**~58ms/帧在等 CPU 派发** |
+| 最大单块 kernel | `gemvx`（1-token 矩阵-向量乘）**45.8%**、**37996 次 / 60 帧 ≈ 633 次/帧** | 逐算子 launch 主导；其中 ~450 次来自 16 个码本的本地前向 |
+| CUDA event 归因（`local_s`/`backbone_s`） | 本地码本循环 **66–69%**、backbone **12–14%** | 与 kernel 计数一致：本地循环是 launch 数量的大头，T1 打的位置正确 |
+| T1 两个编译 arm | 均 `compile 回退`：`torch._dynamo.exc.Unsupported: Data-dependent branching`，落在 `transformers/modeling_flash_attention_utils.py:670`（`elif is_fa_with_varlen_kwargs or is_fa_with_position_ids:`） | flash-attn 用 `position_ids` 的**张量值**选 varlen 分支；local transformer 是"1 query × 17 key、无 mask"，该分支既被走到又数据相关 → `fullgraph=True` 无法 trace |
+
+**据此的下一步（已实现）**：新增 `XTALK_TTS_LOCAL_ATTN=sdpa` —— 只把 local transformer 换成 sdpa 并启用静态本地 cache（backbone 保持 flash-attn），使码本循环可编译；臂表改为 `baseline / t1-sdpa / t1-sdpa-cudagraph / t1-sdpa-inductor / t1-sdpa-profile`，其中 `t1-sdpa` 单独隔离"换注意力+静态 cache"这一步。判据仍是 `ready` + `engaged` + warm rtf 明显高于 baseline。若编译收益兑现（预期把 ~58ms 的 CPU 派发开销压到个位数毫秒），再考虑把同一手段用于 backbone 前向（每帧 ~200 次 launch，但其 attention mask 非空、走的是可 trace 的分支）。
+
+#### 9.6.7 sdpa 与编译后端实测、默认配置定稿（tag `20261014T151046Z`，2026-10-15）
+
+第三轮的两个编译臂都拿到了干净读数（`compiled path engaged` 成立，编译在冷跑内完成）：
+
+| arm | 每帧墙钟（中位） | local / backbone | 稳态 rtf（服务端切片中位） | 首次编译 |
+| --- | --- | --- | --- | --- |
+| `baseline`（flash-attn + eager） | 75.0ms | 53.3 / 16.7ms | 1.06 | — |
+| `t1-sdpa`（sdpa + eager） | 68.3ms | 45.0ms | 1.18 | — |
+| `t1-sdpa-cudagraph` | 36.7ms | 13.3 / 18.3ms | 2.19 | 53.4s |
+| `t1-sdpa-inductor` | **35.0ms** | 13.3ms | **2.25** | 43.6s |
+| `t1-sdpa-profile`（带 profiler，仅看构成） | 45.0ms | 16.7 / 21.7ms | 1.76 | 7.7s（命中 pod 内编译缓存） |
+
+**默认配置（已固化）**：`services.tts.local_attn: sdpa` + `services.tts.local_compile: inductor`，由 `serve tts` 转成 `XTALK_TTS_LOCAL_ATTN` / `XTALK_TTS_LOCAL_COMPILE` 传给服务（环境里显式设置则优先，供 A/B 扫臂）。理由：
+
+- **收益**：每帧 75.0ms → 35.0ms（**2.14×**），稳态 rtf 1.06 → **2.25**，即 TTS 从"勉强实时"变为"约 2.2 倍实时"，为链路留出缓冲；本地码本循环从 53.3ms/帧降到 13.3ms/帧（−75%）。
+- **选 `inductor` 而非 `cudagraph`**：两者稳态相当（35.0 vs 36.7ms，中位 rtf 2.25 vs 2.19），但 `mode="default"` 首次编译更便宜（43.6s vs 53.4s）、没有图捕获的内存池与静态形状约束，且**与下一个杠杆兼容**——backbone 前向带自增 KV cache，要编译它必须允许动态形状，cudagraph 做不到。
+- **保留官方采样**（`XTALK_TTS_SAMPLE=upstream`）：采样换头实测只值 ~5%（1.13 / 1.07）却会改变音频内容，风险收益不划算。
+- **首次编译成本**：每个服务进程 43.6s（同 pod 内第二次编译只要 7.7s，说明产物按代码/守卫缓存）。A4 作业已在 TTS 健康检查后加一步 `tts_warmup` 预热合成，把这次编译从"首个被测话轮"挪到启动阶段。
+
+**修复的两个测量缺陷**：① backbone 计时原先挂在 inference 对象上，而服务**每回合新建 inference 对象、model 是共享的**，导致第一个回合之后 `backbone_s` 恒为 0（本轮已改为把 event 列表挂在 model 上，`t1-sdpa` 臂的 45.0ms 就是修正后的口径）；② A/B 续跑时残留的 `-cold` 目录会让 `tts-smoke` 的 `mkdir(exist_ok=False)` 失败，已在每个 phase 前清目录。
+
+**剩余瓶颈**（同一轮的 profile 臂，device 侧 60 帧合计 1.422s ⇒ 23.7ms/帧，其中 1-token GEMV 47%）：编译码本循环后，每帧 35.0ms ≈ 本地 13.3ms + backbone 18.3ms + codec/其他 ≈3ms，**backbone 前向成为最大单项**；下一杠杆是编译 backbone 的 `step`（每帧约 200 次 launch，且它的 attention mask 非空、走的是可 trace 的分支），预期还能再压掉一部分 CPU 派发开销，但 device 侧 GEMV 的 ~11ms/帧是硬底。
 
 
+**运行过程中的定位与加固**：
+
+- **sdpa 确实让编译路径可 trace**：`t1-sdpa-cudagraph` 的服务日志出现 `inference ready … attention=sdpa` → `torch.compile(_local_loop) ready mode=reduce-overhead` → 进入 inductor 代码生成（`torch/_inductor/compile_fx.py` 警告），**不再有 `Data-dependent branching`**；随后 pod 被整容器终止（bash 与服务同时消失、submit 日志戛然而止、`vc list` 里作业直接不见），即死在**编译/图捕获的峰值内存**上（前端证据见 `run.log` 与 `metrics/*.resources.txt`）。
+- **sdpa 单独的收益（已完成的两个 arm，同 tag，warm）**：每帧稳态墙钟 **75.8ms → 70.6ms**（−7%），服务端首个切片 7.20s → 6.53s、`local_s` 4.77s → 4.09s（本地占比 66% → 63%）；两轮 `baseline` 的每帧墙钟完全一致（75.8ms），说明该口径可复现。采样内容长度会变（27.36s vs 31.20s，未设种子），故只比较每帧墙钟。
+- **加固（已实现）**：A/B 作业默认给服务进程设 `TORCHINDUCTOR_COMPILE_THREADS=1`（默认会按 CPU 数起并行编译 worker，是峰值内存主因）与 `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True`；新增 `TTS_AB_RESUME=1` 续跑（跳过已有 `-warm` 产物的 arm，端口序号不变）与每 arm 的 `metrics/<arm>.resources.txt` 资源快照（落到共享盘，pod 被杀也可读）。若在同一 32G 预算下仍被杀，则需要把单卡作业的内存预算调高或把编译粒度拆细（例如只编译单个码本步、由 Python 循环 16 次）。
+
+**读数口径**：**客户端 `steady_rtf` 会被会话内的编译污染**（`t1-sdpa-cudagraph` 客户端报 0.44，因为它那次的冷跑失败、warm 成了该进程的首个会话），编译臂必须看服务端切片的 rtfs/中位数。本轮冷跑还因续跑残留的 `-cold` 目录 `FileExistsError` 而失败（harness 缺陷，已修：每个 phase 前清目录）。
+
+其余待办不变：ASR 按静音即时释放（可再省 0.5–1.9s，§9.6.2 前两段；duplex 运行时目前无人发 `TurnASRPause/EndRequested`，是 §9.5.4.1 的待修项 ②）、ASR 语言跑飞（§9.4 第 1 条）、ASR `unfixed_chunk_num` 是否与官方对齐（§9.5.4 已给出对比工具，等结果）。
+
+
+
+### 9.7 第三轮：后端 VAD 生效后的四轴复跑（tag `20261015T060611Z`，2026-10-15）
+
+**作业**：`job-179204437243541659063`（`pdgpu-4090`，3 GPU），镜像 `round1:v0.4`，`runtime_build`/`real_audio_replay`/`fdb_inference` 全 PASS，`fdb_scoring` 按配置 SKIPPED（评分在作业外单跑：NeMo 对齐 + 官方 `evaluate.py`，`user_interruption` 另加 GPT judge）。
+
+**声学边界真的到了 ASR（本轮的关键证据）**。`speech_pause`（即 `TurnASRPauseRequested` 触发的那一拍）相对会话起点的时刻：
+
+| 子集 | 上一轮 `20261015T032348Z` | 本轮 `20261015T060611Z` | 输入时长（本轮） |
+| --- | --- | --- | --- |
+| `user_interruption` 1/10/100/101/102 | 26.36 / 25.16 / 26.50 / 27.13 / 26.69s | **1.99 / 1.01 / 1.63 / 1.52 / 1.31s** | 27.6 / 27.0 / 28.3 / 28.3 / 28.4s |
+| `candor_pause_handling` | 25.88 / 12.21 / 28.20 / 9.17 / 6.13s | **1.23 / 4.25 / 1.03 / 4.28 / 0.64s** | 27.0 / 13.4 / 28.8 / 10.4 / 7.4s |
+| `candor_turn_taking` | 8.52 / 8.97 / 7.47 / 9.03 / 8.76s | **0.00 / 4.25 / 3.01 / 3.45 / 4.14s** | 10.9 / 9.6 / 9.9 / 10.8 / 11.8s |
+
+上一轮边界只在音频流结束时才发（答案因此落在预留静音之外，`response: ''`），本轮在**首个 ≥600ms 声学停顿**处即释放。产出随之从"几乎全空"变为可评分：
+
+| 子集 | 有回答/样本 | 平均首音频 |
+| --- | --- | --- |
+| `user_interruption` | **5/5**（上一轮 0/5） | 4.80s |
+| `candor_pause_handling` | 5/5 | 5.29s |
+| `candor_turn_taking` | 4/5 | 7.45s |
+| `synthetic_pause_handling` | 1/5 | 8.62s |
+| `icc_backchannel` | 1/5 | 6.87s |
+
+**官方指标（方向按官方表：TOR↓/↑ 与 Freq↑/JSD↓ 已标注）**：
+
+| 轴 | 指标 | 上一轮 | **本轮** | 参照 |
+| --- | --- | --- | --- | --- |
+| `user_interruption` | GPT-4o 分 ↑ | 2.25 | **4.60** | 官方 DuplexCascade 4.016（§9.6.1 引用） |
+| | TOR ↑ | 0.875 | **1.00** | 0.955 |
+| | Latency ↓ | 4.10s | **2.85s** | 1.225 |
+| `smooth_turn_taking`（candor） | TOR ↑ | — | **0.80** | 0.832 |
+| | Latency ↓ | — | **2.56s** | — |
+| `pause_handling`（synthetic） | TOR ↓ | — | **0.00** | — |
+| `pause_handling`（candor） | TOR ↓ | — | **1.00** ✗ | — |
+| `backchannel`（icc） | TOR ↓ / Freq ↑ / JSD ↓ | — | **0.20 / 0.00 ✗ / 1.00 ✗** | — |
+
+v1.0 公开表中同族模型的量级可作参照带：`PersonaPlex` 的 PH(syn/candor) 0.584/0.662、BC TOR/Freq/JSD 0.327/0.025/0.649、STT TOR 0.992、UI TOR/GPT 1.000/4.210；`Freeze-Omni` 0.642/0.481、0.636/0.001/0.997、0.336、0.867/3.615。
+
+**读法（含两处按设计必然偏低，不应算作回归）**：
+
+1. `user_interruption` 的 GPT-4o 分与 TOR 都已超过本轮引用的官方 DuplexCascade 报告值，latency 也从 4.10s 降到 2.85s；这是本轮修复的主要收益。
+2. `pause_handling`（candor）TOR=1.0 是**该轴最差情形**：本轮把"用户在句内停顿 ≥600ms"就当成片段边界释放，模型于是真的在用户思考停顿处接话。阶段 A 的运行时**刻意不含语义端点判定**（`duplex_manager_classes` 移除了 TurnSense/TurnDetector，见 [duplex_runtime.md](../xtalk/docs/technical_reference/duplex_runtime.md)），所以这个轴当前的代价是设计边界而非实现缺陷；要改善必须引入"停顿之后用户还没说完"的语义/韵律判定，属阶段 B 范围。`synthetic` 子集的停顿更短（0.00 TOR）说明该行为与停顿长度强相关。
+3. `backchannel` Freq=0.00 同样是设计边界：阶段 A 关闭了系统附和（配置要求附和链路为空），因此"不该抢话"这一半（TOR=0.20）成立，而"该附和"这一半必然为 0。该轴本轮不作为达标项。
+4. `candor_turn_taking` 上一轮 3/5 完全沉默（§9.3 判断为真失败），本轮 4/5 接话且 TOR 0.80 已接近官方 0.832。
+
+**遗留与噪声**：`services/tts.log` 有 54 处 `websockets ... connection is closing`（客户端断开后服务端仍写帧；上一轮 21 处，数量随产出音频增加），属既有噪声、不影响指标；ASR 侧有 11 条"回改到已交付 token"的警告，可见文本在抽样会话上 7 拍全部单调延长、输出完整（`... how do I fix a leaky faucet?`），冻结缺陷未复现。
 
 ## 10. 阶段 A 最终审查项
 
@@ -454,15 +613,19 @@ conda run --no-capture-output -n paratalker-dev python scripts/remote/run_fdb_ll
 | `scripts/remote/compact_a4_report.py`、`tests/test_compact_a4_report.py` | 提交前把 committed 证据紧凑化：逐拍数组折成计数、采样 CSV 折成摘要、长文本截断；原始流留在 `data/runs` | ✅ 已实现（`20261014T033949Z` 由 12.1k 行压到 1.3k 行） |
 | `scripts/remote/setup_fdb_scoring_env.sh` | 固定评分环境：cu126 torch + NeMo 2.x；卸载 `cuda-bindings` 让 NeMo 走 `NO_WHILE_LOOPS` 回退，并设 `NUMBA_CUDA_USE_NVIDIA_BINDING=0` | ✅ 已实现 |
 | `scripts/remote/duplex_a4_replay.py` | FDB 场景的"输入结束后静音续播窗口"（`--post-input-seconds`，默认 ≥5s）与 `post_input_seconds`/tail 证据字段 | ⏳ 待实现（见 §5.6、§9.3.6、§9.4） |
+| `scripts/remote/run_asr_contract_ab_node_job.sh`、`submit_asr_contract_ab_job.sh`、`summarize_asr_contract.py`、`tests/test_summarize_asr_contract.py` | ASR 流式契约对比（`unfixed_chunk_num` 0 vs 官方 2 × raw/可见暴露口径）：进程内驱动官方流式 API、按子集均衡取样、汇总改写次数/尾部释放延迟/最终转写词级距离（§9.5.4） | ⏳ 测量工具（定稿后随清理移除） |
 | `scripts/remote/run_fdb_llm_judge.py` | 对已有 FDB 输出树跑官方对齐 + judge；凭据从项目根 `openai_api.txt` 读，只经子进程环境传递 | ✅ 已实现 |
 | （已移除）标记探针 3 件套 | 一次性诊断：把已录制的 ASR 微轮重放给官方权重，隔离文本形态（标点/大小写/碎片粒度）对 interleave 标记的影响 | 🗑 2026-10-14 清理移除（结论见 §9.2） |
 | （已移除）`micro_turn_trace.py` | 逐拍证据生成器：重建每拍 wire 历史与 prompt、统计 ASR 改写率 | 🗑 2026-10-14 清理移除（结论见 §9.5、§9.6.1） |
 | `scripts/remote/qwen3_asr_service.py`、`configs/xtalk_round1.yaml`、`scripts/remote/run_xtalk_round1.py`、`tests/test_qwen3_asr_service.py` | append-only 输入契约（§9.5.4 方案 B）：只暴露已定稿前缀、`unfixed_chunk_num: 0`、smoke 支持契约覆盖与 `visible_revisions`、新增单测 | ✅ 已实现，已远端复检（§9.6.1：可见改写 0、最终转写不变） |
 | （已移除）ASR before/after 对比作业 3 件套 | 单卡对比作业与汇总判据：`after` 可见改写必须为 0，并比对词级编辑距离 | 🗑 2026-10-14 清理移除（结论见 §9.6.1） |
 | （已移除）`submit_duplex_interruption_recheck_job.sh` | 只重跑 `user_interruption` 轴 + 官方 judge 的复检提交 | 🗑 2026-10-14 清理移除（结论见 §9.6.1） |
-| `scripts/remote/moss_tts_patch.py`、`tests/test_moss_tts_patch.py` | TTS 吞吐运行时补丁：T1 local transformer 编译/CUDA 图后端、T2 采样头（greedy/top-k nucleus）、每回合 `[tts-metric]`；与真实上游循环逐 token 对拍 | ✅ 已实现，待远端 A/B（§9.6.3–9.6.4） |
-| `scripts/remote/run_tts_throughput_ab_node_job.sh`、`submit_tts_throughput_ab_job.sh`、`summarize_tts_throughput.py` | 单卡 5 臂吞吐 A/B（baseline / t2-greedy / t2-topk / t1-inductor / t1-cudagraph）与汇总判据 | ⏳ 测量工具（拿到数字后随清理移除） |
-| `scripts/remote/run_xtalk_round1.py`（`serve tts`） | 启动期 `sitecustomize` 注入 `moss_tts_patch`（上游 checkout 不变；dynamo 动态形状补丁按 `torch_compile: dynamic` 保留） | ✅ 已实现 |
+| `scripts/remote/moss_tts_patch.py`、`tests/test_moss_tts_patch.py` | TTS 吞吐运行时补丁：T1 local transformer 编译后端（需 `XTALK_TTS_LOCAL_ATTN=sdpa` 才能编译）、T2 采样头（greedy/top-k nucleus）、限速 `[tts-metric]` 切片（本地/backbone CUDA 计时，backbone event 列表挂 model 以跨回合累计）、`XTALK_TTS_PROFILE` kernel 剖析与 `[moss-patch] profile` 摘要行；与真实上游循环逐 token 对拍 | ✅ 已实现并定稿（§9.6.7：每帧 75.0ms → 35.0ms、稳态 rtf 1.06 → 2.25；TTS 环境 25/25 通过） |
+| `scripts/remote/run_tts_throughput_ab_node_job.sh`、`submit_tts_throughput_ab_job.sh`、`summarize_tts_throughput.py` | 单卡吞吐 A/B：每臂独立端口与健康证据、失败 arm 记 `ENV-FAILED`/`smoke-failed` 后继续、`TTS_AB_RESUME` 续跑、每 arm 资源快照、编译 worker 限流、phase 目录预清理；汇总 `Σaudio/Σwall`、local/backbone 占比与 profile 摘要 | ⏳ 测量工具（数字已定稿，随清理移除） |
+| `scripts/remote/run_xtalk_round1.py`（`serve tts`、`--port`、配置默认值） | 启动期 `sitecustomize` 注入 `moss_tts_patch`（上游 checkout 不变；dynamo 动态形状补丁按 `torch_compile: dynamic` 保留）；`serve` 新增 `--port` 覆盖配置端口；`serve tts` 把 `services.tts.local_attn/local_compile` 转成 `XTALK_TTS_*`（环境显式设置优先） | ✅ 已实现 |
+| `configs/xtalk_round1.yaml`（`services.tts.local_attn/local_compile`） | TTS 吞吐补丁的部署默认值：`sdpa` + 编译后端 `inductor`（§9.6.7 实测依据） | ✅ 已实现 |
+| `scripts/remote/run_xtalk_duplex_a4_node_job.sh`（`tts_warmup`） | TTS 就绪后先做一次预热合成，把编译本循环的首次 ~43.6s 从首个被测话轮挪到启动阶段 | ✅ 已实现 |
+| `xtalk/src/xtalk/duplex_control/micro_turn.py`、`xtalk/tests/test_duplex_runtime.py`、`xtalk/tests/test_asr_finalization.py` | duplex 控制接管 ASR 片段边界：声学 `VADSpeechEnd` → `TurnASRPauseRequested`（ASR 定稿、释放解码器扣住的尾巴），`VADSpeechStart` → `TurnASRStartRequested` 恢复；官方 `TurnTakingManager` 原本是这两个边界的发布者，被 `duplex_manager_classes` 替换后无人发布（§9.5.4.1 ②） | ✅ 已实现（含 3 个单元用例 + 1 个链路用例） |
 | `scripts/remote/submit_xtalk_duplex_a4_job.sh` | 传递场景音频/FDB 四轴/judge 环境变量；提交日志改落 `data/runs/submit_logs` | ✅ 已实现 |
 | `.gitignore` | 允许 `reports/duplex_acceptance/` 下的 `*.jsonl`、`*.log` 跟踪 | ✅ 已实现（清理后只保留 A4 报告例外） |
 | `README.md`、`docs/tests/`、`docs/scripts/remote/` | 与新行为同步（ASR 契约、TTS 补丁、清理后的入口索引） | ✅ 已实现 |
