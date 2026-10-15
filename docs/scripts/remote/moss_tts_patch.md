@@ -22,7 +22,7 @@ MOSS-TTS-Realtime 的**运行时吞吐补丁**。上游 checkout 被 `configs/xt
 
 ## 部署默认值
 
-补丁自身三个开关默认全关（对上游零影响、可随时关闭）。**产品化默认值在配置里**：`configs/xtalk_round1.yaml` 的 `services.tts.local_attn: sdpa` + `local_compile: inductor`，`serve tts` 启动 TTS 服务时把它们转成上面的环境变量（环境中已显式设置则以环境为准，吞吐 A/B 正是靠这一点逐臂改一个变量）。2026-10-15 在 4090 上的实测：每帧 75.0ms → 35.0ms（2.14×），稳态 rtf 1.06 → 2.25；首次编译 43.6s，A4 作业在 TTS 健康检查后用 `tts_warmup` 预热把它挪到启动阶段（见任务单 §9.6.7）。
+补丁自身三个开关默认全关（对上游零影响、可随时关闭）。**产品化默认值在配置里**：`configs/xtalk_round1.yaml` 的 `services.tts.local_attn: sdpa` + `local_compile: inductor`，`serve tts` 启动 TTS 服务时把它们转成上面的环境变量（环境中已显式设置则以环境为准；已清理的单卡吞吐 A/B 正是靠这一点逐臂改一个变量）。2026-10-15 在 4090 上的实测：每帧 75.0ms → 35.0ms（2.14×），稳态 rtf 1.06 → 2.25；首次编译 43.6s，A4 作业在 TTS 健康检查后用 `tts_warmup` 预热把它挪到启动阶段（见任务单 §9.6.7）。
 
 ## 结构
 
@@ -41,7 +41,7 @@ MOSS-TTS-Realtime 的**运行时吞吐补丁**。上游 checkout 被 `configs/xt
 
 ## 用法
 
-由 `scripts/remote/run_xtalk_round1.py` 的 `serve tts` 自动注入；A/B 由 `run_tts_throughput_ab_node_job.sh` 驱动。手工验证：
+由 `scripts/remote/run_xtalk_round1.py` 的 `serve tts` 自动注入；原单卡吞吐 A/B（已随 2026-10-15 清理移除，数字见任务单 §9.6.7）按 arm 逐个覆盖环境变量。手工验证：
 
 ```bash
 XTALK_TTS_LOCAL_COMPILE=cudagraph XTALK_TTS_SAMPLE=greedy XTALK_TTS_METRICS=1 \

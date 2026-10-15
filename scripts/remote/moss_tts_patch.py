@@ -13,10 +13,10 @@ only buffers text and delegates ``prefill`` / ``step`` / ``finish`` to it.  Ever
 audio frame costs one backbone forward plus 16 serial local-transformer forwards
 (one per RVQ codebook, ``rvq=16``) plus sampling.
 
-Two independent levers, both measured by
-``scripts/remote/run_tts_throughput_ab_node_job.sh``.  They are independent
-variables: an arm must change exactly one of them, otherwise the report cannot
-attribute the difference.
+Two independent levers, both measured by a single-card throughput A/B job that
+was retired on 2026-10-15 (its numbers are recorded in the A4 task document).
+They are independent variables: an arm must change exactly one of them,
+otherwise the report cannot attribute the difference.
 
 **T1 - local transformer execution backend.**  Upstream compiles the codebook loop
 only on the non-flash-attention path (``_should_compile_local_transformer =
