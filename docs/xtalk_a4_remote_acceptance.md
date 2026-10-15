@@ -418,6 +418,12 @@ v1.0 公开表中同族模型的量级可作参照带：`PersonaPlex` 的 PH(syn
 
 证据：[`reports/duplex_acceptance/20261015T114708Z-r1/`](../reports/duplex_acceptance/20261015T114708Z-r1/)（`fdb_axes_summary.json`、`tests/fdb_scoring_*.log`、`scoring/*_align_summary.json`）；过程与评分脚本见 [ASR 复测](asr_measurement_retest.md)。
 
+### 9.9 X2Streaming-ASR 替换复测（进行中，`20261015T172109Z`）
+
+**作业**：`job-179208494223390610578-xuan-zhang`（`pdgpu-4090`，3 GPU），镜像 `round1:v0.4`，快照 InterClarify `a352751` / X-Talk `48c5952`。ASR 单变量替换为 X2Streaming-ASR-4B（独立 conda prefix `xtalk-x2-asr`，源码 `0aca805`、权重 `4c8df16b`），其余（官方 DuplexCascade、MOSS、0.6s micro-turn、后端 VAD、FDB v1.0 四轴各 5 例）与 `20261015T114708Z-r1` 相同；`DUPLEX_ASR_BACKEND=x2` 选择 `configs/xtalk_duplex_x2_runtime.json` 与 80 ms 输入。
+
+环境、权重、任务范围、证据口径与提交记录见 [X2 复测任务单](x2streaming_asr_retest.md)。该轮结论尚待产物回填；不与 Qwen 轮次的 FDB 绝对分数做无条件比较。
+
 ## 10. 阶段 A 最终审查项
 
 1. 核验 manifest 对应当前补丁，health 中 token ID、checkpoint、base model、BF16 均正确。
