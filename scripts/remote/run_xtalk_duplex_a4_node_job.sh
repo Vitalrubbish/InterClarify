@@ -13,6 +13,11 @@ MODEL_ENV="${DUPLEX_MODEL_ENV:-/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/
 CLIENT_ENV="${DUPLEX_CLIENT_ENV:-xtalk-round1-client}"
 TOOLS_ENV="${DUPLEX_TOOLS_ENV:-xtalk-round1-tools}"
 ASR_ENV="${DUPLEX_ASR_ENV:-xtalk-round1-asr}"
+ASR_BACKEND="${DUPLEX_ASR_BACKEND:-qwen}"
+if [ "$ASR_BACKEND" != qwen ] && [ "$ASR_BACKEND" != x2 ]; then
+  echo "unsupported ASR backend: $ASR_BACKEND" >&2
+  exit 2
+fi
 MOSS_ENV="${DUPLEX_MOSS_ENV:-xtalk-round1-moss}"
 MODEL_PORT="${DUPLEX_MODEL_PORT:-8006}"
 ASR_PORT="${DUPLEX_ASR_PORT:-8005}"
@@ -148,10 +153,18 @@ done
 [ "$RC" -eq 0 ] && record_step assets PASS 0 || record_step assets FAIL "$RC" "required model or audio asset is missing"
 
 cp "$MODEL_ROOT/models.lock.json" "$RUN_DIR/models.lock.json"
+if [ "$ASR_BACKEND" = x2 ]; then
+  conda run -n "$CLIENT_ENV" python -c 'import json,sys; p=sys.argv[1]; d=json.load(open(p)); d["models"]["asr"]={"model_id":"x-square-robot/X2Streaming-ASR-4B-1009","revision":"4c8df16b8d7f8b50c95590c4d7907436ebe4aa08","snapshot_path":sys.argv[2],"source_commit":"0aca80597bb1399c0be4002de5bc62c0a779c542"}; json.dump(d,open(p,"w"),indent=2)' \
+    "$RUN_DIR/models.lock.json" "${DUPLEX_X2_MODEL:?set X2 weights}"
+fi
 RC=0
 {
   if ! conda run -p "$MODEL_ENV" python -c 'import torch,transformers,peft; print("model",torch.__version__,transformers.__version__,peft.__version__)'; then RC=1; fi
-  if ! conda run -n "$ASR_ENV" python -c 'import qwen_asr,transformers; print("asr",transformers.__version__)'; then RC=1; fi
+  if [ "$ASR_BACKEND" = x2 ]; then
+    if ! conda run -p "$ASR_ENV" python -c 'import torch,transformers; print("x2",torch.__version__,transformers.__version__)'; then RC=1; fi
+  else
+    if ! conda run -n "$ASR_ENV" python -c 'import qwen_asr,transformers; print("asr",transformers.__version__)'; then RC=1; fi
+  fi
   if ! conda run -n "$MOSS_ENV" python -c 'import torch,transformers; print("tts",torch.__version__,transformers.__version__)'; then RC=1; fi
   if ! conda run -n "$CLIENT_ENV" python -c 'import xtalk; print("client",xtalk.__file__)'; then RC=1; fi
 } > "$RUN_DIR/environment.txt" 2>&1
@@ -179,9 +192,16 @@ CUDA_VISIBLE_DEVICES="${JOB_GPUS[0]}" setsid conda run --no-capture-output -p "$
 MODEL_PID="$!"
 PIDS+=("$MODEL_PID")
 
+if [ "$ASR_BACKEND" = x2 ]; then
+CUDA_VISIBLE_DEVICES="${JOB_GPUS[1]}" setsid conda run --no-capture-output -p "$ASR_ENV" \
+  python scripts/remote/x2_asr_service.py --source-root "${DUPLEX_X2_SOURCE:?set X2 source}" \
+  --model "${DUPLEX_X2_MODEL:?set X2 weights}" --language "${DUPLEX_X2_LANGUAGE:-en}" --port "$ASR_PORT" \
+  > "$RUN_DIR/services/asr.log" 2>&1 &
+else
 CUDA_VISIBLE_DEVICES="${JOB_GPUS[1]}" setsid conda run --no-capture-output -n "$TOOLS_ENV" \
   python "$ROUND1_PY" --config "$ROUND1_CONFIG" --model-root "$MODEL_ROOT" serve asr --gpu-index 0 \
   > "$RUN_DIR/services/asr.log" 2>&1 &
+fi
 ASR_PID="$!"
 PIDS+=("$ASR_PID")
 
@@ -263,7 +283,7 @@ conda run --no-capture-output -n "$CLIENT_ENV" python scripts/remote/duplex_runt
 RUNTIME_CONFIG="$RUN_DIR/a4_runtime.json"
 RC=0
 conda run -n "$CLIENT_ENV" python -c 'import json,sys,pathlib; cfg=json.load(open(sys.argv[1])); cfg["asr"]["params"]["base_url"]="http://127.0.0.1:"+sys.argv[3]; cfg["tts"]["params"]["base_url"]="http://127.0.0.1:"+sys.argv[4]; cfg["tts"]["params"]["voices"][0]["path"]=sys.argv[5]; sc=cfg.setdefault("service_config",{}); sc["duplex_model_url"]="http://127.0.0.1:"+sys.argv[2]; json.dump(cfg,open(sys.argv[6],"w"),indent=2)' \
-  configs/xtalk_duplex_runtime.json "$MODEL_PORT" "$ASR_PORT" "$TTS_PORT" \
+  "$([ "$ASR_BACKEND" = x2 ] && echo configs/xtalk_duplex_x2_runtime.json || echo configs/xtalk_duplex_runtime.json)" "$MODEL_PORT" "$ASR_PORT" "$TTS_PORT" \
   "$ROUND1_ROOT/audio/reference.wav" "$RUNTIME_CONFIG" || RC=$?
 [ "$RC" -eq 0 ] || { record_step runtime_json FAIL "$RC"; exit "$FAILURES"; }
 

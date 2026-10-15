@@ -53,3 +53,6 @@ backchannel:icc_backchannel:default
 ## 用法
 
 必填 `INTERCLARIFY_DUPLEX_ROOT`；默认共享路径、环境、服务端口见脚本开头。`DUPLEX_A4_REQUIRE_INTERRUPTION=1` 要求真实 interruption 覆盖，`DUPLEX_A4_REQUIRE_COMPLETE=1` 要求所有自动步骤 PASS；输出目录重复使用会拒绝启动。提交包装器把这些 `DUPLEX_*` 变量传入节点。完整用法见 [任务单](../../xtalk_a4_remote_acceptance.md)。
+# X2 对照入口
+
+`DUPLEX_ASR_BACKEND=x2` 使用 X2 服务；需传 X2 源码和权重路径，环境为独立 conda prefix。运行时选择 X2StreamingClient、80 ms 输入，保持 micro-turn 不变。
