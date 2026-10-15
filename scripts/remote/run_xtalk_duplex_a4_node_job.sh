@@ -253,7 +253,7 @@ wait_http "http://127.0.0.1:$MODEL_PORT/health" 1800 "$RUN_DIR/model_health.json
 [ "$RC" -eq 0 ] || exit "$FAILURES"
 
 RC=0
-wait_http "http://127.0.0.1:$ASR_PORT/health" 1200 "$RUN_DIR/asr_health.json" "$RUN_DIR/services/asr.log" "$ASR_PID" || RC=$?
+wait_http "http://127.0.0.1:$ASR_PORT/health" 1800 "$RUN_DIR/asr_health.json" "$RUN_DIR/services/asr.log" "$ASR_PID" || RC=$?
 [ "$RC" -eq 0 ] && record_step asr_service PASS 0 || record_step asr_service FAIL "$RC"
 
 RC=0

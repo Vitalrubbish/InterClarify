@@ -65,6 +65,8 @@ export DUPLEX_X2_LANGUAGE=en
 - `event=x2_online` 请求记录：累计音频秒数、在线累计文本、`pause_hint`、`end_stream`；
 - 可见文本必须**单调追加**：本轮应不出现 Qwen 轮次里的"提交停滞/冻结"与 `final` 后分段重建；出现提前提交错误、漏字或重复时按识别错误记录，不能等同回写。
 
+**X2 的暂停/结束语义与 Qwen 不同，读日志时必须区分**：`continuous_audio` 的 `pause()` 直接返回、不停止也不发布 partial，因此暂停不再产生 `speech_pause=True` 的边界事件，`x2_online` 的 `pause_hint` 正常情况恒为 `false`——停顿释放完全由 X2 自己的 Wait/Emit 逻辑决定。`end()` 才会调用 `finish_stream`（`end_stream=true`），而 duplex 模式下 `TurnASREndRequested` 目前没有发布者，所以要在时序上确认输入结束前的最后若干词是否已经在 `live_text` 里；若观察到句尾缺词，属于需要单独处理的问题，不在本轮自动判 PASS 范围内。
+
 **运行时侧**：时间线里 `TurnASRPauseRequested` 后的新文本更新时间、播放期间的 `update_asr`、打断 `reset` 与已播文本单调性；与 [A4 任务单](xtalk_a4_remote_acceptance.md) 第 10 节同一套核验口径。
 
 **FDB**：官方 `get_transcript/asr.py`（NeMo parakeet）对齐 + `evaluation/evaluate.py` 评分；`user_interruption` 的 judge 模型在端点可用性允许时优先用官方默认，若不可用则记录平替模型，分数不与历史 judge 口径混用。
