@@ -2,7 +2,7 @@
 
 阶段 A 节点执行入口：校验清单、资产和三张 GPU，检查 conda 依赖，执行 X-Talk A1–A3 回归和根仓库驱动测试，启动官方 DuplexCascade/Qwen3-ASR/MOSS，运行官方模型 smoke、真实音频回放和 FDB v1.0 四轴推理与评分。
 
-`record_step` 追加逐步 JSONL，并通过命令替换去掉多余换行，保证每条记录只占一行；`wait_http` 检查服务 health、日志及启动进程；`stop_services` 仅清理本作业进程组。失败、阻塞和未覆盖状态进入 `a4_summary.json`；自动 PASS 只表示本次自动检查通过，完整验收仍需任务单列出的额外证据。
+`runtime_build` 步骤在启动服务前用 client 环境按运行时配置真正构造一遍模型集合（含后端 VAD），把"缺可选依赖导致回放服务进程起不来"这类问题从 30s 超时变成一条明确失败；`record_step` 追加逐步 JSONL，并通过命令替换去掉多余换行，保证每条记录只占一行；`wait_http` 检查服务 health、日志及启动进程；`stop_services` 仅清理本作业进程组。失败、阻塞和未覆盖状态进入 `a4_summary.json`；自动 PASS 只表示本次自动检查通过，完整验收仍需任务单列出的额外证据。TTS 服务健康后再做一次 `tts_warmup` 预热合成：运行时补丁的码本编译发生在服务进程看到的第一帧上（首次约 43.6s），这一步把它挪到启动阶段，避免由首个被测话轮支付。
 
 `a4_summary.json` 汇总三部分：`steps`（逐步状态，读取 `steps.jsonl` 时跳过空行，避免个别环境的多余换行中断生成）、`fdb_axes`（各 FDB 轴汇总状态）与 `replay`（回放总体与逐场景状态的紧凑概览，不嵌入完整事件）。整体状态取 `FAIL`（有任一步骤 FAIL）、`PASS`（全部步骤 PASS）或 `INCOMPLETE`（其余）；生成失败时兜底写入 `INCOMPLETE` 摘要，确保汇总文件始终存在。
 

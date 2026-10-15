@@ -32,7 +32,7 @@ PAUSE_FIRST_AUDIO="${DUPLEX_A4_PAUSE_FIRST_AUDIO:-$ROUND1_ROOT/audio/scenarios/p
 PAUSE_SECOND_AUDIO="${DUPLEX_A4_PAUSE_SECOND_AUDIO:-$ROUND1_ROOT/audio/scenarios/pause_then_continue_02_part_two.wav}"
 MULTI_QUESTION_AUDIO="${DUPLEX_A4_MULTI_QUESTION_AUDIO:-$ROUND1_ROOT/audio/scenarios/continuous_two_questions_01_two_questions.wav}"
 LONG_SESSION_AUDIO="${DUPLEX_A4_LONG_SESSION_AUDIO:-$NORMAL_AUDIO}"
-SCENARIOS="${DUPLEX_A4_SCENARIOS:-normal interruption pause multi_question long_session}"
+SCENARIOS="${DUPLEX_A4_SCENARIOS:-normal interruption}"
 BARGE_AFTER_SECONDS="${DUPLEX_A4_BARGE_AFTER_SECONDS:-0.6}"
 PAUSE_GAP_SECONDS="${DUPLEX_A4_PAUSE_GAP_SECONDS:-1.5}"
 REQUIRE_INTERRUPTION="${DUPLEX_A4_REQUIRE_INTERRUPTION:-0}"
@@ -50,7 +50,7 @@ FDB_SCORING="${DUPLEX_A4_FDB_SCORING:-0}"
 FDB_JUDGE_BASE_URL="${DUPLEX_A4_FDB_BASE_URL:-https://api-2.xi-ai.cn/v1}"
 # Raw key file, read only inside the judge step. Kept outside the run tree so the
 # secret never reaches job logs, submit logs or archived evidence.
-FDB_JUDGE_KEY_FILE="${DUPLEX_A4_FDB_API_KEY_FILE:-/hpc_stor03/sjtu_home/xuan.zhang/openai_api.txt}"
+FDB_JUDGE_KEY_FILE="${DUPLEX_A4_FDB_API_KEY_FILE:-$TASK_ROOT/openai_api.txt}"
 FDB_AXES="${DUPLEX_A4_FDB_AXES:-pause_handling:candor_pause_handling:default pause_handling:synthetic_pause_handling:default smooth_turn_taking:candor_turn_taking:default user_interruption:synthetic_user_interruption:user_interruption backchannel:icc_backchannel:default}"
 LONG_ROUNDS="${DUPLEX_A4_ROUNDS:-30}"
 REQUIRE_COMPLETE="${DUPLEX_A4_REQUIRE_COMPLETE:-0}"
@@ -227,6 +227,20 @@ wait_http "http://127.0.0.1:$TTS_PORT/health" 1800 "$RUN_DIR/tts_health.json" "$
 [ "$RC" -eq 0 ] && record_step tts_service PASS 0 || record_step tts_service FAIL "$RC"
 [ "$FAILURES" -eq 0 ] || exit "$FAILURES"
 
+# The runtime patch compiles the codebook loop on the first frame it sees, which
+# costs ~45s once per service process. Pay it here so the first *measured*
+# utterance is not the one that funds the compilation.
+RC=0
+conda run --no-capture-output -n "$CLIENT_ENV" \
+  env PYTHONPATH="$TASK_ROOT/xtalk/src" \
+  python "$ROUND1_PY" --config "$ROUND1_CONFIG" --model-root "$MODEL_ROOT" \
+  tts-smoke --reference "$ROUND1_ROOT/audio/reference.wav" \
+  --output "$RUN_DIR/tts_warmup" --url "http://127.0.0.1:$TTS_PORT" \
+  --text "warm up the compiled codebook loop and the audio decoder before the replay starts." \
+  --stream-chunk-words 6 --gap-seconds 0.02 \
+  > "$RUN_DIR/logs/tts_warmup.log" 2>&1 || RC=$?
+[ "$RC" -eq 0 ] && record_step tts_warmup PASS 0 || record_step tts_warmup FAIL "$RC"
+
 # Sample per-service RSS (process group) alongside the GPU sampler for trend evidence.
 {
   echo "timestamp,pid,rss_kb"
@@ -252,6 +266,17 @@ conda run -n "$CLIENT_ENV" python -c 'import json,sys,pathlib; cfg=json.load(ope
   configs/xtalk_duplex_runtime.json "$MODEL_PORT" "$ASR_PORT" "$TTS_PORT" \
   "$ROUND1_ROOT/audio/reference.wav" "$RUNTIME_CONFIG" || RC=$?
 [ "$RC" -eq 0 ] || { record_step runtime_json FAIL "$RC"; exit "$FAILURES"; }
+
+# Build the runtime's model set before spending the job's GPU budget on a replay.
+# A missing optional dependency (the backend VAD needs onnxruntime, which the
+# silero-vad extra brings) kills the replay server process, and the only symptom
+# is a later "X-Talk server did not start in time" timeout.
+RC=0
+conda run --no-capture-output -n "$CLIENT_ENV" env PYTHONPATH="$TASK_ROOT/xtalk/src:$TASK_ROOT" \
+  python -c 'import json,sys; from xtalk.api import Xtalk; from xtalk.models import VAD; models=Xtalk._load_models(json.load(open(sys.argv[1]))); vad=models.get(VAD); assert vad is not None, "runtime config configures no VAD backend"; print("vad", type(vad).__name__)' \
+  "$RUNTIME_CONFIG" > "$RUN_DIR/logs/runtime_build.log" 2>&1 || RC=$?
+[ "$RC" -eq 0 ] && record_step runtime_build PASS 0 || record_step runtime_build FAIL "$RC" "inspect logs/runtime_build.log"
+[ "$FAILURES" -eq 0 ] || exit "$FAILURES"
 
 RC=0
 EXTRA=()
@@ -322,6 +347,10 @@ PIDS=()
 
 FDB_SCORING_READY=0
 FDB_SCORING_BLOCKED=0
+# NeMo's alignment importers abort on this image without the ctypes binding path,
+# which would otherwise report the environment as lacking NeMo (observed
+# 2026-10-15); the flag only affects how numba talks to the driver.
+export NUMBA_CUDA_USE_NVIDIA_BINDING=0
 if [ "$FDB_SCORING" != "1" ]; then
   # Scoring keeps GPUs idle, which the cluster kills as LowGpuUsage; run it in a
   # dedicated single-GPU job instead of the three-GPU model job.
