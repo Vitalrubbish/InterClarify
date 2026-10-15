@@ -391,7 +391,7 @@ v1.0 公开表中同族模型的量级可作参照带：`PersonaPlex` 的 PH(syn
 **读法（含两处按设计必然偏低，不应算作回归）**：
 
 1. `user_interruption` 的 GPT-4o 分与 TOR 都已超过本轮引用的官方 DuplexCascade 报告值，latency 也从 4.10s 降到 2.85s；这是本轮修复的主要收益。
-2. `pause_handling`（candor）TOR=1.0 是**该轴最差情形**：本轮把"用户在句内停顿 ≥600ms"就当成片段边界释放，模型于是真的在用户思考停顿处接话。阶段 A 的运行时**刻意不含语义端点判定**（`duplex_manager_classes` 移除了 TurnSense/TurnDetector，见 [duplex_runtime.md](../xtalk/docs/technical_reference/duplex_runtime.md)），所以这个轴当前的代价是设计边界而非实现缺陷；要改善必须引入"停顿之后用户还没说完"的语义/韵律判定，属阶段 B 范围。`synthetic` 子集的停顿更短（0.00 TOR）说明该行为与停顿长度强相关。
+2. `pause_handling`（candor）TOR=1.0 是**该轴最差情形**。2026-10-15 原始时间线复核更正：声学停顿只释放 ASR，接话仍由 Layer 1 模型 token 决定，并非 VAD 直接强制回答。Candor 多个样本在恢复发声后出现数秒至二十余秒的可见文本更新空档，模型误收空增量；ASR final 后继续复用状态与提交前缀冲突是需远端复现的重点。synthetic 五条输出转写全空，其中一条已触发 TTS 却接近文件末尾，TOR=0 还受裁剪影响，不能证明停顿判断正确。修复输入交付属于阶段 A，无须等待 Layer 2；逐样本证据见 [停顿与延迟诊断](fdb_latency_diagnosis.md)。
 3. `backchannel` Freq=0.00 同样是设计边界：阶段 A 关闭了系统附和（配置要求附和链路为空），因此"不该抢话"这一半（TOR=0.20）成立，而"该附和"这一半必然为 0。该轴本轮不作为达标项。
 4. `candor_turn_taking` 上一轮 3/5 完全沉默（§9.3 判断为真失败），本轮 4/5 接话且 TOR 0.80 已接近官方 0.832。
 

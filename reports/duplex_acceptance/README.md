@@ -36,6 +36,8 @@ reports/duplex_acceptance/
 
 ## 判据
 
+2026-10-15 对当前轮次补充了 [停顿与延迟诊断](../../docs/fdb_latency_diagnosis.md) 与 [逐样本分解](20261015T060611Z/latency_diagnosis.json)：解释 Pause Handling TOR 的输出窗口影响，按回答 request/response 分解 STT/UI 延迟，并单列插话停播延迟。原始证据从远端运行目录读取，未重新运行模型。
+
 - `PASS`：该步骤门禁通过；`FAIL`：执行或协议失败；`INCONCLUSIVE`：语义场景未覆盖；`BLOCKED`：所需资产或评分环境缺失。
 - `a4_summary.json` 只有在所有步骤 `PASS` 时才为 `PASS`；`DUPLEX_A4_REQUIRE_COMPLETE=1` 时非 `PASS` 会返回非零。
 - 自动步骤全通过也不等于完整验收：人工试听、资源趋势与原生对照等仍见 [任务单](../../docs/xtalk_a4_remote_acceptance.md)。

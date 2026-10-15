@@ -23,7 +23,7 @@
     "pause_handling/candor_pause_handling": {
       "average_take_turn": 1.0,
       "direction": "TOR down",
-      "note": "worst case; eager acoustic release without semantic endpointing",
+      "note": "worst case; acoustic release does not force a turn; post-pause ASR visibility stalls need investigation; see docs/fdb_latency_diagnosis.md",
       "source": "official evaluate.py"
     },
     "backchannel/icc_backchannel": {
