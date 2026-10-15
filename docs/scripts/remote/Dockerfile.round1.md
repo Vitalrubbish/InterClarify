@@ -20,9 +20,9 @@ DOCKER_BUILDKIT=1 docker build -f scripts/remote/Dockerfile.round1 \
   --build-context qwen-asr=/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/qwen-asr \
   --build-context moss-source=/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/moss-source \
   --build-context xtalk=/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/xtalk \
-  -t docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.3 \
+  -t docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4 \
   /hpc_stor03/sjtu_home/xuan.zhang/InterClarify
-docker push docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.3
+docker push docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4
 ```
 
 ## 设计要点
@@ -30,11 +30,16 @@ docker push docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.3
 - **精简基座与层数**：`FROM .../xtalk-lean:v0.1`（压平 + 剔除无用栈，约 22 GB / 单层；见 [build_xtalk_lean_base.sh](build_xtalk_lean_base.md)），把三份固定源码树合并成一个 `COPY` 层；wheelhouse 与源码树都通过 named context 提供，`wheels/` 仅以 `RUN --mount=type=bind` 挂载参与构建，约 6 GB wheel 不会进入镜像层。
 - **基座环境复用**：LLM（Qwen3-8B-AWQ）直接使用镜像 base 环境自带的 **vLLM 0.16.0 + torch 2.9.1+cu128**，不再单独建 `xtalk-round1-vllm` 环境。
 - **TurnSense 独立环境（ONNX）**：自 2026-10-11 起 turn detector 改用音频式 TurnSense。它不依赖 torch/vLLM，单独建 `xtalk-round1-turnsense`（`numpy`/`librosa`/`soundfile`/`kaldi-native-fbank`/`fastapi`/`uvicorn`/`python-multipart`/`onnxruntime`/`PyYAML`），并把 vendored 的 `scripts/remote/turnsense` 复制到 `/opt/src/xtalk-TurnSense`。模型资产不进镜像，运行时从 `$XTALK_ROUND1_MODEL_ROOT/turnsense/` 读取。
+- **client 环境含后端 VAD 依赖（v0.4）**：阶段 A 的运行时进程（`xtalk-round1-client`）要自己跑 silero VAD 来判断声学语音结束，这需要 `onnxruntime`，而它只由 `xtalk[silero-vad]`（或 `[fast-enhancer]`）extra 提供。v0.3 只装了 `xtalk[example,dev]`，运行时构造 VAD 会直接抛 `RuntimeError`，`_serve` 子进程随之死掉，表面症状只有回放器报 "X-Talk server did not start in time"。v0.4 把 extra 补进 client 环境并把 `onnxruntime` 钉到 1.31.0（取自 wheelhouse，与本机 client 环境同版本；`pypi.org` 在这个 17MB wheel 上会卡死，2026-10-15 实测两次）。
 - **ASR 独立环境（vLLM 0.14.0）**：`qwen_asr` 的多模态 processor 仍覆写 `BaseMultiModalProcessor._get_data_parser`，该接口在 vLLM 0.16 已迁移到 `BaseProcessingInfo.build_data_parser`，实测在 base 环境直接报错，因此 ASR 必须保留 vLLM 0.14.0 + transformers 4.57.6 的独立环境。环境名与共享存储版相同（`xtalk-round1-*`），作业脚本无需区分。
 - **MOSS 环境（torch 2.9.1 + 预编译 flash-attn）**：MOSS 需要 `flash-attn` 才能走 `attn_impl=flash_attention_2` 的 DynamicCache 免编译路径。官方 `v2.8.3` release 提供了匹配 torch 2.9 的 `flash_attn-2.8.3+cu12torch2.9cxx11abiTRUE-cp312-cp312-linux_x86_64.whl`（源码编译极其吃内存，曾把共享调试机 OOM，因此坚持用预编译）。MOSS 环境保持上游 `torch-runtime` extra 的 **torch 2.9.1+cu128 / torchaudio 2.9.1+cu128 / transformers 5.0.0 / torchcodec 0.8.1** 钉版，并额外从 wheelhouse 安装 `flash-attn==2.8.3`（无编译）。这相比把 torch 降到 2.8 的方案不偏离上游 pin。base / ASR / client 环境不受影响。
 - **wheelhouse 作为本地缓存**：构建先 `--find-links /wheelhouse` 命中已下载的大 wheel（torch cu128、vllm、transformers），其余依赖从 `pypi.org` 拉取（阿里云镜像对个别 wheel 会卡死）；安装后的真实版本与镜像 digest 一并记录在组件基线。
 - **editable 源码打入镜像**：qwen-asr、moss-source、xtalk 以 editable 方式安装自 `/opt/src/`，其固定提交与配置 `sources` 一致；`--no-build-isolation` 保证不额外拉取构建后端，`setuptools` 先显式安装。
 - conda 环境创建走清华 tuna anaconda 镜像加速；构建结束后 `conda clean`，不留冗余层。
+
+## 增量层约定
+
+自 v0.4 起，**只新增依赖**的改动不再改这里、也不从零重建，而是写进 [Dockerfile.round1.overlay](Dockerfile.round1.overlay.md) 并以 `OVERLAY=1` 发布：从零重建那层五环境 `RUN` 约 1 小时（缓存键含 6 GB wheelhouse 挂载，wheelhouse 一变就失效）+ 推十几 GB，增量层只需几分钟 + 几百 MB。两处必须同步——本文件描述每个 tag **应该**包含什么，增量层负责把当前 tag 变成下一个 tag；增量层积累过多时，按本文件从零重建一次并提升 base。
 
 ## 作业侧配合
 

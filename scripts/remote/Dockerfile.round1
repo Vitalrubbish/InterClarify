@@ -63,7 +63,11 @@ RUN --mount=type=bind,from=wheels,target=/wheelhouse,ro \
     PY xtalk-round1-moss setuptools; \
     PY xtalk-round1-moss --no-build-isolation -e "/opt/src/moss-source[torch-runtime]" "torch==2.9.1+cu128" "torchaudio==2.9.1+cu128" transformers==5.0.0 fastapi uvicorn requests soxr websockets "flash-attn==2.8.3"; \
     PY xtalk-round1-client setuptools; \
-    PY xtalk-round1-client --no-build-isolation -e "/opt/src/xtalk[example,dev]" PyYAML==6.0.3 aiohttp soundfile soxr; \
+    # silero-vad brings onnxruntime: the duplex runtime loads the backend VAD
+    # in the client process, and VADManager disables itself when no VAD model is
+    # configured, which silently delays the ASR segment boundary to the end of
+    # the audio stream.  Pin the version the turn-detector env already uses.
+    PY xtalk-round1-client --no-build-isolation -e "/opt/src/xtalk[example,dev,silero-vad]" "onnxruntime==1.31.0" PyYAML==6.0.3 aiohttp soundfile soxr; \
     PY xtalk-round1-turnsense "numpy==2.2.6" "librosa==0.11.0" "soundfile==0.13.1" "kaldi-native-fbank==1.22.3" "fastapi==0.116.1" "uvicorn[standard]==0.35.0" "python-multipart==0.0.20" "onnxruntime==1.23.2" "PyYAML==6.0.3"; \
     "$CONDA" clean -afy
 

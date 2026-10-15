@@ -1,0 +1,40 @@
+# Incremental layer on top of the last published round-one acceptance image.
+#
+# Why this exists instead of rebuilding `Dockerfile.round1`: the
+# five-environment RUN there takes about an hour to rebuild (it is one layer
+# for all five conda envs, and its cache key includes the ~6 GB wheelhouse bind
+# mount, so a changed wheelhouse invalidates it), and pushing the rebuilt copy
+# moves a fresh ~15 GB layer.  Refinements that only add or change a dependency
+# therefore ship as a layer on top of the published tag.
+#
+# `Dockerfile.round1` stays the from-scratch recipe and the authoritative
+# description of what every published tag contains; keep both files consistent
+# when a delta graduates into the base (then rebuild from scratch once).
+#
+# Usage (wrapped by build_xtalk_round1_image.sh OVERLAY=1):
+#   DOCKER_BUILDKIT=1 docker build -f scripts/remote/Dockerfile.round1.overlay \
+#     --build-arg "BASE_IMAGE=.../xtalk-round1:v0.3" \
+#     -t ".../xtalk-round1:v0.4" .
+#
+# v0.4 = v0.3 + onnxruntime in the client environment.  The duplex runtime loads
+# the silero VAD inside the client process, and `VADManager` disables itself
+# whenever no VAD model is configured, which delays the ASR segment boundary to
+# the end of the audio stream (see docs/xtalk_a4_remote_acceptance.md §9.5.4.2).
+# onnxruntime only arrives with the `silero-vad` extra, which `Dockerfile.round1`
+# now installs; here it is installed as a single dependency, because re-resolving
+# the whole `xtalk[example,dev,silero-vad]` set makes this delta a minutes-long
+# resolver backtrack with no smaller footprint.
+#
+# The install is fully offline from the staged wheelhouse: `pypi.org` stalls on
+# this 17 MB wheel (observed twice, 2026-10-15), and the wheelhouse copy is the
+# exact version the local client environment runs, so local and cluster stay in
+# parity.  `coloredlogs`/`humanfriendly` were added to the wheelhouse for this.
+ARG BASE_IMAGE=docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.3
+FROM ${BASE_IMAGE}
+
+RUN --mount=type=bind,from=wheels,target=/wheelhouse,ro \
+    set -eux; \
+    PY=/opt/conda/envs/xtalk-round1-client/bin/python; \
+    "$PY" -m pip install --no-cache-dir --no-index --find-links /wheelhouse \
+        "onnxruntime==1.31.0"; \
+    "$PY" -c "import onnxruntime; print('onnxruntime', onnxruntime.__version__)"

@@ -4,7 +4,7 @@
 
 把首轮验收作业提交到 SJTU 集群 `pdgpu-4090` 队列的薄封装，使用由 [build_xtalk_round1_image.md](build_xtalk_round1_image.md) 对应脚本构建、基于已有 `xtalk:v0.17` 的首轮镜像（CUDA 12.8.1 + conda + ffmpeg + vLLM 0.16.0）。
 
-默认镜像为 `sjtu_yukai-xuanzhang-xtalk-round1:v0.3`，与当前 `flash_attention_2` 配置一致（v0.3 在 MOSS 环境加入 flash-attn wheel；v0.2 不含，会导致 TTS 依赖检查失败）。`XTALK_ROUND1_IMAGE` 仍可覆盖。
+默认镜像为 `sjtu_yukai-xuanzhang-xtalk-round1:v0.4`，与当前 `flash_attention_2` 配置一致（v0.3 在 MOSS 环境加入 flash-attn wheel；v0.2 不含，会导致 TTS 依赖检查失败；v0.4 在此基础上给 client 环境补上 `silero-vad` extra，使运行时进程能加载后端 VAD）。`XTALK_ROUND1_IMAGE` 仍可覆盖。
 
 ## 用法与资源
 
