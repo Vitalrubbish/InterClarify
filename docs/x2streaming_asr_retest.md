@@ -103,3 +103,10 @@ export DUPLEX_X2_LANGUAGE=en
 2. FDB 五轴推理的转写为 X2 风格（小写、无标点），且都产出了回答；语义分数仍以作业外的官方对齐与评分为准。
 
 修复后以新快照重跑，见 §9。
+
+## 9. 修复复跑（`20261015T180154Z`）
+
+- 快照：InterClarify `04536cf`（相对 `a352751` 只增加服务预热与其文档/回归）、X-Talk `48c5952`，位于 `/mnt/cloudstorfs/sjtu_home/xuan.zhang/interclarify-retests/20261015T180154Z`。
+- Manifest：183 个文件，snapshot `988ad7a00078ceaf736feddf9891a7942b725fa86bd9e29b339c6c584241d262`。
+- 作业：`job-179208736349843642489-xuan-zhang`（`pdgpu-4090`，3 GPU / 24 CPU / 96 GB），场景与 FDB 范围同 §2；提交日志 `data/runs/submit_logs/submit.20261015T180242Z.sh`。
+- 结果与读法待产物回填。
