@@ -105,18 +105,75 @@ class X2ServiceTest(unittest.TestCase):
         service.close(sid)
         service.create()
 
-    def test_warmup_uses_one_session_and_releases_it(self):
-        engine = FakeOnline()
-        service = X2Service(lambda: engine, timeout=5)
-        service.warmup(seconds=0.08)
+    def test_warmup_decodes_speech_drains_and_isolates_the_next_session(self):
+        """Real decode and EOF finish before a fresh measurement session."""
+        engines = []
+
+        def factory():
+            """Allocate independent online state for every session."""
+            engine = FakeOnline()
+            engines.append(engine)
+            return engine
+
+        service = X2Service(factory, timeout=1)
+        service.warmup(b"\x01\x00" * 2560)
         self.assertIsNone(service.session)
         self.assertIsNone(service.session_id)
+        self.assertEqual(engines[0].finished, 1)
+        self.assertTrue(engines[0].aborted)
+        self.assertEqual(engines[0].append_count, 3)
+        sid = service.create()
+        self.addCleanup(service.close, sid)
+        self.assertEqual(service.read(sid), "")
+
+    def test_warmup_waits_for_async_online_text(self):
+        """Input enqueue alone cannot complete the startup warmup."""
+        engine = DeferredOnline()
+        service = X2Service(lambda: engine, timeout=1)
+        timer = threading.Timer(0.03, engine.release.set)
+        timer.start()
+        try:
+            service.warmup(b"\x01\x00" * 1280)
+        finally:
+            timer.join()
+        self.assertTrue(engine.emitted.is_set())
+        self.assertEqual(engine.finished, 1)
         self.assertTrue(engine.aborted)
-        session_id = service.create()
-        # The fake keeps its text across sessions, so the warmup append is still counted.
-        self.assertEqual(service.recognize(
-            RecognizeRequest(session_id=session_id,
-                             audio=base64.b64encode(b"\x00\x00").decode())), " word word")
+
+    def test_warmup_failure_releases_the_session(self):
+        """Empty output, worker errors and unfinished EOF prevent readiness."""
+        class NoText(FakeOnline):
+            """Accept audio without emitting text."""
+
+            def append_pcm(self, audio):
+                """Keep all output pending."""
+                pass
+
+        class Broken(FakeOnline):
+            """Report a background decoder error."""
+
+            def append_pcm(self, audio):
+                """Expose an asynchronous worker failure."""
+                self.error = "decoder failed"
+
+        class StuckEOF(FakeOnline):
+            """Keep the EOF worker running past the deadline."""
+
+            def finish_async(self):
+                """Return a worker that cannot complete."""
+                return SimpleNamespace(join=lambda timeout: None, is_alive=lambda: True)
+
+        for factory in (NoText, Broken, StuckEOF):
+            with self.subTest(factory=factory):
+                engine = factory()
+                service = X2Service(lambda: engine, timeout=0.02)
+                with self.assertRaises(RuntimeError):
+                    service.warmup(b"\x01\x00" * 1280)
+                self.assertTrue(engine.aborted)
+                self.assertIsNone(service.session)
+        for pcm in (b"", b"x", b"\x00\x00" * 1280):
+            with self.assertRaises(ValueError):
+                X2Service(FakeOnline).warmup(pcm)
 
     def test_read_delivers_late_emit_without_more_audio_or_eof(self):
         """A micro-turn can fetch already completed output after input stops."""

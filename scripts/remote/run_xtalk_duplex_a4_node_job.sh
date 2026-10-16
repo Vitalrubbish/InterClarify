@@ -159,7 +159,7 @@ for asset in "$CHECKPOINT" "$BASE_MODEL" "$MODEL_ROOT/models.lock.json" \
 done
 if [ "$ASR_BACKEND" = x2 ]; then
   # Fail here, with the path in assets.log, instead of inside the ASR service.
-  for asset in "${DUPLEX_X2_SOURCE:?set X2 source}" "${DUPLEX_X2_MODEL:?set X2 weights}"; do
+  for asset in "${DUPLEX_X2_SOURCE:?set X2 source}" "${DUPLEX_X2_MODEL:?set X2 weights}" "${DUPLEX_X2_WARMUP_AUDIO:-$NORMAL_AUDIO}"; do
     [ -e "$asset" ] || { printf 'missing asset: %s\n' "$asset" >> "$RUN_DIR/logs/assets.log"; RC=1; }
   done
 fi
@@ -208,6 +208,7 @@ PIDS+=("$MODEL_PID")
 if [ "$ASR_BACKEND" = x2 ]; then
 CUDA_VISIBLE_DEVICES="${JOB_GPUS[1]}" setsid conda run --no-capture-output -p "$ASR_ENV" \
   python scripts/remote/x2_asr_service.py --source-root "${DUPLEX_X2_SOURCE:?set X2 source}" \
+  --warmup-audio "${DUPLEX_X2_WARMUP_AUDIO:-$NORMAL_AUDIO}" \
   --model "${DUPLEX_X2_MODEL:?set X2 weights}" --language "${DUPLEX_X2_LANGUAGE:-en}" --port "$ASR_PORT" \
   > "$RUN_DIR/services/asr.log" 2>&1 &
 else

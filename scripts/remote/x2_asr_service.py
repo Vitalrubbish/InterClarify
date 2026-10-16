@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import base64
 import json
+import hashlib
 import logging
 import queue
 import subprocess
@@ -11,6 +12,7 @@ import sys
 import threading
 import time
 import uuid
+import wave
 from pathlib import Path
 
 import numpy as np
@@ -123,28 +125,51 @@ class X2Service:
                     "delivered_monotonic": time.monotonic(), **event}))
         return self.session.live_text
 
-    def warmup(self, seconds: float = 1.0) -> None:
-        """Pay the first-session cost before any measured request.
+    def warmup(self, pcm: bytes) -> None:
+        """Complete speech decode and online EOF before measured sessions.
 
-        The first ``AdaptiveSession`` on a fresh process absorbs GPU module
-        loading, kernel autotuning and the streaming left-pad prefill. In the
-        A4 retest that cost landed inside the first scenario: the X-Talk audio
-        consumer blocked on it while the whole utterance accumulated, and a
-        single request then carried the entire clip (so no online text ever
-        reached the runtime). Creating and closing one session here moves the
-        cost into startup, where the job already waits on ``/health``.
+        Parameters
+        ----------
+        pcm : bytes
+            Fixed non-silent mono PCM16 speech at 16 kHz, outside the FDB set.
+
+        Raises
+        ------
+        ValueError
+            If the waveform is empty, malformed or entirely silent.
+        RuntimeError
+            If online text or EOF completion fails before the deadline.
         """
+        if not pcm or len(pcm) % 2 or not np.any(np.frombuffer(pcm, dtype="<i2")):
+            raise ValueError("warmup requires non-silent PCM16 speech")
         started = time.monotonic()
         session_id = self.create()
-        samples = np.zeros(int(SAMPLE_RATE * seconds), dtype=np.int16)
+        created = time.monotonic()
         try:
-            self.recognize(RecognizeRequest(
-                session_id=session_id,
-                audio=base64.b64encode(samples.tobytes()).decode()))
+            chunk_bytes = SAMPLE_RATE * 2 * 80 // 1000
+            for offset in range(0, len(pcm), chunk_bytes):
+                self.recognize(RecognizeRequest(
+                    session_id=session_id,
+                    audio=base64.b64encode(pcm[offset:offset + chunk_bytes]).decode()))
+            deadline = time.monotonic() + self.timeout
+            while not self.read(session_id).strip():
+                if time.monotonic() >= deadline:
+                    raise RuntimeError("X2 warmup online text timeout")
+                time.sleep(0.01)
+            first_text = time.monotonic()
+            text = self.recognize(RecognizeRequest(session_id=session_id, end_stream=True))
+            if not text.strip():
+                raise RuntimeError("X2 warmup final online text is empty")
+            drained = time.monotonic()
         finally:
             self.close(session_id)
-        logger.info(json.dumps({"event": "x2_warmup",
-            "seconds": round(time.monotonic() - started, 3), "audio_seconds": seconds}))
+        logger.info(json.dumps({"event": "x2_warmup", "status": "complete",
+            "seconds": time.monotonic() - started,
+            "audio_seconds": len(pcm) / (2 * SAMPLE_RATE),
+            "audio_sha256": hashlib.sha256(pcm).hexdigest(),
+            "create_seconds": created - started,
+            "first_text_seconds": first_text - started,
+            "eof_seconds": drained - first_text, "text": text}))
 
     def close(self, session_id: str) -> None:
         """Abort and release the matching session."""
@@ -219,6 +244,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", type=Path, required=True)
     parser.add_argument("--model", required=True)
+    parser.add_argument("--warmup-audio", type=Path, required=True)
     parser.add_argument("--language", choices=("en", "zh", "cs"), default="en")
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8005)
@@ -245,7 +271,11 @@ def main() -> None:
 
     logger.info("X2 source=%s model=%s language=%s offline=false", commit, args.model, args.language)
     service = X2Service(factory, args.language)
-    service.warmup()
+    with wave.open(str(args.warmup_audio), "rb") as audio:
+        if (audio.getframerate(), audio.getnchannels(), audio.getsampwidth()) != (16000, 1, 2):
+            raise ValueError("warmup WAV must be 16 kHz mono PCM16")
+        pcm = audio.readframes(audio.getnframes())
+    service.warmup(pcm)
     uvicorn.run(create_app(service), host=args.host, port=args.port)
 
 

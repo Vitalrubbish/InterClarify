@@ -208,3 +208,10 @@ cd xtalk
   -n xtalk-round1-client env PYTHONPATH=src:. python -m unittest \
   tests.test_x2_streaming_client tests.test_duplex_runtime tests.test_asr_finalization -q
 ```
+
+
+## 11. 完整预热后的复测（2026-10-16）
+
+本轮使用 F1 每拍读取、X2 无声学 VAD 路径和 F3 完整预热；不把变化归因为某个单一修复。预热用固定非 FDB 真实语音，等待非空在线输出及 EOF 排空后关闭会话，失败则不进入测量。其 SHA256、首文本和排空耗时写入服务日志。
+
+保持 X2 源码/权重、DuplexCascade、MOSS、600 ms、三 GPU 以及历史五轴各 5 样本。推理作业先生成 WAV/原始日志，官方评分继续按独立步骤执行。延迟比较优先逐样本对齐历史 X2 与 Qwen：输入首帧到首次 ASR 文本（含原录音静音及模型所需语境，不冒充逐词识别延迟）、文本交付到回答决策、首 PCM；同时检查首会话块大小、积压和最终文本覆盖。历史 lag growth 不能充当绝对 ASR 延迟。只有 ASR 交付明显改善且缺词、停顿和打断行为不退化后，才依据用户授权删除 Qwen 路线；结果前保留。

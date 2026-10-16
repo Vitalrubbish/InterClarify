@@ -50,14 +50,16 @@ F1 使用原有 micro-turn 时钟读取结果，不新增轮询时钟；只读�
 ```bash
 python scripts/remote/x2_asr_service.py \
   --source-root <X2 源码> --model <X2 权重目录> \
-  --language en --host 127.0.0.1 --port 8005
+  --warmup-audio <固定真实语音.wav> --language en --host 127.0.0.1 --port 8005
 ```
 
 启动时用 `git rev-parse HEAD` 校验源码是否等于固定提交 `0aca80597bb1399c0be4002de5bc62c0a779c542`，不等则直接失败；随后加载 `voxtral_asr` 权重（`adaptive_latency=True`、`language_tag.require_checkpoint_weights=True`）并 `eval()`。A4 节点作业在 `DUPLEX_ASR_BACKEND=x2` 时以 `conda run -p $DUPLEX_ASR_ENV` 启动本入口，日志写入 `services/asr.log`。
 
 ## 启动预热
 
-模型加载后、`uvicorn` 监听之前，服务执行一次 `warmup()`：创建一个会话、追加 1 秒静音、再关闭，并记录 `x2_warmup` 日志（耗时与音频长度）。原因见 [复测任务单](../../x2streaming_asr_retest.md) 第 8 节：进程内**第一个** `AdaptiveSession` 要承担 CUDA 模块加载、kernel autotune 和流式左填充 prefill；这段成本若落在首个被测场景里，X-Talk 的 ASR 消费者会被阻塞整段语音，最后只发出一个整块请求，客户端拿不到任何在线文本（`20261015T172109Z` 的 `pause` 场景即如此）。预热把该成本挪到作业本来就在等待的 `/health` 之前；预热后第一个真实会话即按 80 ms 增量返回文本。`/health` 可用即代表模型与预热都已完成。
+模型加载后、`uvicorn` 监听之前，`warmup(pcm)` 使用由 `--warmup-audio` 指定的固定真实语音（16 kHz、单声道 PCM16），按 80 ms 提交。非空在线转写出现后，发送实际 EOF，等待最终在线输出，再关闭独立会话。没有文字、后台异常或超时均阻止服务就绪。此 EOF 仅结束启动预热会话，不改变正常 duplex 输入生命周期。
+
+`x2_warmup` 日志记录总耗时、音频长度与 SHA256、会话创建时间、首文本时间、EOF 排空时间以及最终转写。启动预热只是完成路径的证据，首个真实测量会话是否仍有堆积必须由远端结果判断，不能由 `/health` 成功推断延迟已改善。
 
 ## 边界
 

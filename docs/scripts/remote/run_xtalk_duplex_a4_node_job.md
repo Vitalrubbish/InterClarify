@@ -61,3 +61,5 @@ backchannel:icc_backchannel:default
 
 
 X2 duplex 运行配置不加载 VAD，runtime_build 校验连续 ASR 对应无 VAD；Qwen 对照仍要求 VAD。两条路径均实际加载模型，加载异常仍使预检失败。
+
+完整 X2 预热：节点入口传入 `DUPLEX_X2_WARMUP_AUDIO`（缺省为固定场景 `NORMAL_AUDIO`，非 FDB 测量样本），在 assets 阶段检查文件。服务必须完成真实语音在线出字、EOF 排空及会话释放后才监听 HTTP。
