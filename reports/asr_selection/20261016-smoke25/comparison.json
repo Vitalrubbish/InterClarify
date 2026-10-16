@@ -1,0 +1,238 @@
+{
+  "run": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs/smoke25-5e6db38",
+  "expected_samples_per_repeat": 25,
+  "expected_repeats": 1,
+  "complete": true,
+  "configurations": {
+    "nemotron_en-160": {
+      "complete": true,
+      "processes": [
+        {
+          "repeat": 0,
+          "exit_code": 0,
+          "reported_samples": 25
+        }
+      ],
+      "summary": {
+        "samples": 25,
+        "failures": 0,
+        "reference_words": 549,
+        "word_errors": 28,
+        "wer": 0.051001821493624776,
+        "rewrites": 0,
+        "online_punctuation_samples": 14,
+        "online_terminal_punctuation_samples": 0,
+        "final_terminal_punctuation_samples": 0,
+        "eof_only_terminal_punctuation_samples": 0,
+        "punctuation_tp": 24,
+        "punctuation_fp": 3,
+        "punctuation_fn": 33,
+        "punctuation_precision": 0.8888888888888888,
+        "punctuation_recall": 0.42105263157894735,
+        "punctuation_f1": 0.5714285714285714,
+        "first_text_seconds": {
+          "count": 25,
+          "p50": 1.4717195928096771,
+          "p95": 2.2400681413710113
+        },
+        "estimated_word_latency_seconds": {
+          "count": 320,
+          "p50": 0.3953493862971662,
+          "p95": 0.6747270214296874
+        },
+        "aligned_reference_words": 334,
+        "correct_words": 526,
+        "last_text_relative_to_eof_seconds": {
+          "count": 25,
+          "p50": -1.0626568827778105,
+          "p95": -0.22162800948321867
+        }
+      },
+      "peak_allocated_gib": 2.35355806350708
+    },
+    "nemotron_en-560": {
+      "complete": true,
+      "processes": [
+        {
+          "repeat": 0,
+          "exit_code": 0,
+          "reported_samples": 25
+        }
+      ],
+      "summary": {
+        "samples": 25,
+        "failures": 0,
+        "reference_words": 549,
+        "word_errors": 28,
+        "wer": 0.051001821493624776,
+        "rewrites": 0,
+        "online_punctuation_samples": 16,
+        "online_terminal_punctuation_samples": 0,
+        "final_terminal_punctuation_samples": 0,
+        "eof_only_terminal_punctuation_samples": 0,
+        "punctuation_tp": 25,
+        "punctuation_fp": 4,
+        "punctuation_fn": 32,
+        "punctuation_precision": 0.8620689655172413,
+        "punctuation_recall": 0.43859649122807015,
+        "punctuation_f1": 0.5813953488372093,
+        "first_text_seconds": {
+          "count": 25,
+          "p50": 1.7129361666738987,
+          "p95": 2.273398518562317
+        },
+        "estimated_word_latency_seconds": {
+          "count": 320,
+          "p50": 0.56861139100045,
+          "p95": 0.9330657894313324
+        },
+        "aligned_reference_words": 334,
+        "correct_words": 527,
+        "last_text_relative_to_eof_seconds": {
+          "count": 25,
+          "p50": -0.7314654756337404,
+          "p95": -0.04447973154485221
+        }
+      },
+      "peak_allocated_gib": 2.354495048522949
+    },
+    "nemotron_multi-320": {
+      "complete": true,
+      "processes": [
+        {
+          "repeat": 0,
+          "exit_code": 0,
+          "reported_samples": 25
+        }
+      ],
+      "summary": {
+        "samples": 25,
+        "failures": 0,
+        "reference_words": 549,
+        "word_errors": 49,
+        "wer": 0.08925318761384335,
+        "rewrites": 0,
+        "online_punctuation_samples": 15,
+        "online_terminal_punctuation_samples": 1,
+        "final_terminal_punctuation_samples": 1,
+        "eof_only_terminal_punctuation_samples": 0,
+        "punctuation_tp": 22,
+        "punctuation_fp": 6,
+        "punctuation_fn": 35,
+        "punctuation_precision": 0.7857142857142857,
+        "punctuation_recall": 0.38596491228070173,
+        "punctuation_f1": 0.5176470588235295,
+        "first_text_seconds": {
+          "count": 25,
+          "p50": 1.6310613937675953,
+          "p95": 2.526482291519641
+        },
+        "estimated_word_latency_seconds": {
+          "count": 308,
+          "p50": 0.5331766613200306,
+          "p95": 0.8052470512911675
+        },
+        "aligned_reference_words": 334,
+        "correct_words": 511,
+        "last_text_relative_to_eof_seconds": {
+          "count": 25,
+          "p50": -0.8080275993794199,
+          "p95": 0.05199517853558013
+        }
+      },
+      "peak_allocated_gib": 2.425723075866699
+    },
+    "nemotron_multi-560": {
+      "complete": true,
+      "processes": [
+        {
+          "repeat": 0,
+          "exit_code": 0,
+          "reported_samples": 25
+        }
+      ],
+      "summary": {
+        "samples": 25,
+        "failures": 0,
+        "reference_words": 549,
+        "word_errors": 49,
+        "wer": 0.08925318761384335,
+        "rewrites": 0,
+        "online_punctuation_samples": 15,
+        "online_terminal_punctuation_samples": 0,
+        "final_terminal_punctuation_samples": 1,
+        "eof_only_terminal_punctuation_samples": 1,
+        "punctuation_tp": 20,
+        "punctuation_fp": 8,
+        "punctuation_fn": 37,
+        "punctuation_precision": 0.7142857142857143,
+        "punctuation_recall": 0.3508771929824561,
+        "punctuation_f1": 0.47058823529411764,
+        "first_text_seconds": {
+          "count": 25,
+          "p50": 1.7127499505877495,
+          "p95": 2.7212785314768535
+        },
+        "estimated_word_latency_seconds": {
+          "count": 306,
+          "p50": 0.6206816243752837,
+          "p95": 0.973865089043975
+        },
+        "aligned_reference_words": 334,
+        "correct_words": 509,
+        "last_text_relative_to_eof_seconds": {
+          "count": 25,
+          "p50": -0.7207566971331838,
+          "p95": 1.0528758092522588
+        }
+      },
+      "peak_allocated_gib": 2.4262752532958984
+    },
+    "kyutai-500": {
+      "complete": true,
+      "processes": [
+        {
+          "repeat": 0,
+          "exit_code": 0,
+          "reported_samples": 25
+        }
+      ],
+      "summary": {
+        "samples": 25,
+        "failures": 0,
+        "reference_words": 549,
+        "word_errors": 101,
+        "wer": 0.18397085610200364,
+        "rewrites": 0,
+        "online_punctuation_samples": 20,
+        "online_terminal_punctuation_samples": 18,
+        "final_terminal_punctuation_samples": 23,
+        "eof_only_terminal_punctuation_samples": 5,
+        "punctuation_tp": 36,
+        "punctuation_fp": 23,
+        "punctuation_fn": 21,
+        "punctuation_precision": 0.6101694915254238,
+        "punctuation_recall": 0.631578947368421,
+        "punctuation_f1": 0.6206896551724138,
+        "first_text_seconds": {
+          "count": 25,
+          "p50": 1.6124149765819311,
+          "p95": 2.3005074925720685
+        },
+        "estimated_word_latency_seconds": {
+          "count": 274,
+          "p50": 0.7122934735193848,
+          "p95": 0.9393659562878303
+        },
+        "aligned_reference_words": 334,
+        "correct_words": 475,
+        "last_text_relative_to_eof_seconds": {
+          "count": 25,
+          "p50": -0.5276918891817335,
+          "p95": 0.2684698274582622
+        }
+      },
+      "peak_allocated_gib": 2.427919864654541
+    }
+  }
+}
