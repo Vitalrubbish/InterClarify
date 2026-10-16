@@ -45,3 +45,5 @@
 已核对两份 MOSS checkout 的完整提交和 `git diff HEAD` 干净。模型锁记录 TTS revision `75682787d8e2fcc73faca37ba2931453ca9c4022`、codec revision `3cd226ba2947efa357ef453bcad111b6eafba782`，实际 snapshot 为共享 `paratalker-p0-models` 路径；音色为 `xtalk-round1/audio/reference.wav`。原 X-Talk 客户端来自 `xtalk-round1/xtalk@5f0d9959edf1026588246efbed827b078cbb114c`，仅用于组件 smoke，不能当作当前双工 fork 的集成验收。
 
 本轮创建独立 `interclarify-tts-latency-20261017` checkout。新增[节点入口](scripts/remote/run_tts_latency_node_job.md)与[提交入口](scripts/remote/submit_tts_latency_job.md)，先在分配节点检查固定依赖、真实上游等价性，再通过 cold/warm 探针和原客户端 smoke 才运行正式基线。`--probe` 是显式接入检查模式，不替代正式数量门禁；新增理由是必须先确认真实 adapter 接通再投入完整矩阵。脚本按本文已核对路径构造，实际作业结果另记。
+
+首次作业 `job-179219320938398545631-xuan-zhang` 在 `d6-hpc-gpu-068` 上完成依赖核验（torch 2.9.1+cu128 / transformers 5.0.0 / flash-attn 2.8.3），但 42 项组件测试有 1 项失败：作业 `XTALK_TTS_METRICS=1` 污染“无开关时静默”用例。已修正节点脚本，仅在单测子进程显式关闭实验开关，不放宽测试，使用新输出目录重提。首轮无模型性能样本。

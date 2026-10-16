@@ -62,6 +62,8 @@ cp "$MODEL_ROOT/models.lock.json" "$OUTPUT/models.lock.json"
 cp configs/xtalk_round1.yaml "$OUTPUT/config.yaml"
 conda run --no-capture-output -n "$MOSS_ENV" python scripts/remote/run_xtalk_round1.py --model-root "$MODEL_ROOT" check-deps --role tts > "$OUTPUT/dependencies.json" 2>&1
 # The pinned upstream package is needed for the existing loop-equivalence cases.
+XTALK_TTS_METRICS=0 XTALK_TTS_TRACE= XTALK_TTS_LOCAL_COMPILE=off XTALK_TTS_LOCAL_ATTN=upstream \
+XTALK_TTS_EARLY_COMPILE=0 XTALK_TTS_GENERATION_BATCH_FRAMES=0 \
 PYTHONPATH="$XTALK_MOSS_SOURCE_ROOT/moss_tts_realtime:$PYTHONPATH" \
   conda run --no-capture-output -n "$MOSS_ENV" python -m unittest discover -s tests -p 'test_*tts*.py' -q > "$OUTPUT/component_tests.log" 2>&1
 nvidia-smi --query-gpu=timestamp,uuid,name,memory.used,utilization.gpu --format=csv -l 1 > "$OUTPUT/gpu.csv" 2>&1 &
