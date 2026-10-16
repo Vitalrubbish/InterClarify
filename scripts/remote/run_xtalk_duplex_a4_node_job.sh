@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run Stage A4 acceptance with official DuplexCascade, Qwen3-ASR, and MOSS-TTS.
+# Run Stage A4 acceptance with official DuplexCascade, explicit X2 ASR, and MOSS-TTS.
 set -uo pipefail
 
 TASK_ROOT="${INTERCLARIFY_DUPLEX_ROOT:?set independent synced source directory}"
@@ -12,9 +12,9 @@ CONDA_SH="${CONDA_SH:-/opt/conda/etc/profile.d/conda.sh}"
 MODEL_ENV="${DUPLEX_MODEL_ENV:-/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/interclarify-dev}"
 CLIENT_ENV="${DUPLEX_CLIENT_ENV:-xtalk-round1-client}"
 TOOLS_ENV="${DUPLEX_TOOLS_ENV:-xtalk-round1-tools}"
-ASR_ENV="${DUPLEX_ASR_ENV:-xtalk-round1-asr}"
-ASR_BACKEND="${DUPLEX_ASR_BACKEND:-qwen}"
-if [ "$ASR_BACKEND" != qwen ] && [ "$ASR_BACKEND" != x2 ]; then
+ASR_ENV="${DUPLEX_ASR_ENV:?set independent X2 conda prefix}"
+ASR_BACKEND="${DUPLEX_ASR_BACKEND:?set x2 for diagnostic replay}"
+if [ "$ASR_BACKEND" != x2 ]; then
   echo "unsupported ASR backend: $ASR_BACKEND" >&2
   exit 2
 fi
@@ -173,11 +173,7 @@ fi
 RC=0
 {
   if ! conda run -p "$MODEL_ENV" python -c 'import torch,transformers,peft; print("model",torch.__version__,transformers.__version__,peft.__version__)'; then RC=1; fi
-  if [ "$ASR_BACKEND" = x2 ]; then
-    if ! conda run -p "$ASR_ENV" python -c 'import torch,transformers; print("x2",torch.__version__,transformers.__version__)'; then RC=1; fi
-  else
-    if ! conda run -n "$ASR_ENV" python -c 'import qwen_asr,transformers; print("asr",transformers.__version__)'; then RC=1; fi
-  fi
+  if ! conda run -p "$ASR_ENV" python -c 'import torch,transformers; print("x2",torch.__version__,transformers.__version__)'; then RC=1; fi
   if ! conda run -n "$MOSS_ENV" python -c 'import torch,transformers; print("tts",torch.__version__,transformers.__version__)'; then RC=1; fi
   if ! conda run -n "$CLIENT_ENV" python -c 'import xtalk; print("client",xtalk.__file__)'; then RC=1; fi
 } > "$RUN_DIR/environment.txt" 2>&1
@@ -190,7 +186,7 @@ PIDS+=("$!")
 
 ROUND1_CONFIG="$RUN_DIR/xtalk_round1.yaml"
 RC=0
-conda run -n "$TOOLS_ENV" python -c 'import sys,yaml; source,target=sys.argv[1:3]; cfg=yaml.safe_load(open(source)); cfg["services"]["asr"]["port"]=int(sys.argv[3]); cfg["services"]["tts"]["port"]=int(sys.argv[4]); yaml.safe_dump(cfg,open(target,"w"),sort_keys=False)' \
+conda run -n "$TOOLS_ENV" python -c 'import sys,yaml; source,target=sys.argv[1:3]; cfg=yaml.safe_load(open(source)); cfg["services"]["tts"]["port"]=int(sys.argv[4]); yaml.safe_dump(cfg,open(target,"w"),sort_keys=False)' \
   configs/xtalk_round1.yaml "$ROUND1_CONFIG" "$ASR_PORT" "$TTS_PORT" \
   > "$RUN_DIR/logs/round1_config.log" 2>&1 || RC=$?
 [ "$RC" -eq 0 ] && record_step runtime_config PASS 0 || record_step runtime_config FAIL "$RC"
@@ -211,10 +207,7 @@ CUDA_VISIBLE_DEVICES="${JOB_GPUS[1]}" setsid conda run --no-capture-output -p "$
   --warmup-audio "${DUPLEX_X2_WARMUP_AUDIO:-$NORMAL_AUDIO}" \
   --model "${DUPLEX_X2_MODEL:?set X2 weights}" --language "${DUPLEX_X2_LANGUAGE:-en}" --port "$ASR_PORT" \
   > "$RUN_DIR/services/asr.log" 2>&1 &
-else
-CUDA_VISIBLE_DEVICES="${JOB_GPUS[1]}" setsid conda run --no-capture-output -n "$TOOLS_ENV" \
-  python "$ROUND1_PY" --config "$ROUND1_CONFIG" --model-root "$MODEL_ROOT" serve asr --gpu-index 0 \
-  > "$RUN_DIR/services/asr.log" 2>&1 &
+
 fi
 ASR_PID="$!"
 PIDS+=("$ASR_PID")
@@ -243,7 +236,7 @@ RC=0
 
 RC=0
 conda run -n "$CLIENT_ENV" env PYTHONPATH="$TASK_ROOT/xtalk/src:$TASK_ROOT" python -m unittest \
-  tests.test_duplex_a4_replay tests.test_duplex_model_service tests.test_qwen3_asr_service \
+  tests.test_duplex_a4_replay tests.test_duplex_model_service \
   tests.test_x2_asr_service \
   > "$RUN_DIR/tests/a4_driver.log" 2>&1 || RC=$?
 [ "$RC" -eq 0 ] && record_step a4_driver_regression PASS 0 || record_step a4_driver_regression FAIL "$RC"
@@ -299,7 +292,7 @@ conda run --no-capture-output -n "$CLIENT_ENV" python scripts/remote/duplex_runt
 RUNTIME_CONFIG="$RUN_DIR/a4_runtime.json"
 RC=0
 conda run -n "$CLIENT_ENV" python -c 'import json,sys,pathlib; cfg=json.load(open(sys.argv[1])); cfg["asr"]["params"]["base_url"]="http://127.0.0.1:"+sys.argv[3]; cfg["tts"]["params"]["base_url"]="http://127.0.0.1:"+sys.argv[4]; cfg["tts"]["params"]["voices"][0]["path"]=sys.argv[5]; sc=cfg.setdefault("service_config",{}); sc["duplex_model_url"]="http://127.0.0.1:"+sys.argv[2]; json.dump(cfg,open(sys.argv[6],"w"),indent=2)' \
-  "$([ "$ASR_BACKEND" = x2 ] && echo configs/xtalk_duplex_x2_runtime.json || echo configs/xtalk_duplex_runtime.json)" "$MODEL_PORT" "$ASR_PORT" "$TTS_PORT" \
+  configs/xtalk_duplex_x2_runtime.json "$MODEL_PORT" "$ASR_PORT" "$TTS_PORT" \
   "$ROUND1_ROOT/audio/reference.wav" "$RUNTIME_CONFIG" || RC=$?
 [ "$RC" -eq 0 ] || { record_step runtime_json FAIL "$RC"; exit "$FAILURES"; }
 

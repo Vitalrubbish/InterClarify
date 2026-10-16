@@ -9,3 +9,5 @@ conda run -n paratalker-dev python scripts/remote/create_duplex_source_manifest.
 
 生成后同步完整目录和清单；服务器节点只校验该清单。未提交补丁由内容摘要识别，不能将其归入 HEAD 提交。生成文件属于运行资产，不提交 Git。
 Manifest 同时覆盖 X2 服务与对照配置，X-Talk 客户端由既有递归源码选择覆盖。
+
+2026-10-16 清理：移除 Qwen 服务、旧 Qwen 运行配置和一次性 ASR 契约工具的清单项；保留 X2 诊断配置及相关服务和测试。`tracked_files` 不再选择退役文件；`build_manifest` 的摘要和来源语义不变。

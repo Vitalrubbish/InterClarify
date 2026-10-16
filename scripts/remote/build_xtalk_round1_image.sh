@@ -29,13 +29,12 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 ROUND1_ROOT="${XTALK_ROUND1_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1}"
-IMAGE="${XTALK_ROUND1_IMAGE:-docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4}"
+IMAGE="${XTALK_ROUND1_IMAGE:?set a new unused image tag}"
 PUSH="${PUSH:-0}"
 OVERLAY="${OVERLAY:-0}"
 OVERLAY_BASE="${OVERLAY_BASE:-docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.3}"
 
 WHEELS="$ROUND1_ROOT/wheels"
-QWEN_ASR="$ROUND1_ROOT/qwen-asr"
 MOSS_SOURCE="$ROUND1_ROOT/moss-source"
 XTALK="$ROUND1_ROOT/xtalk"
 
@@ -75,7 +74,7 @@ if [ "$OVERLAY" = "1" ]; then
   exit 0
 fi
 
-for path in "$WHEELS" "$QWEN_ASR" "$MOSS_SOURCE" "$XTALK"; do
+for path in "$WHEELS" "$MOSS_SOURCE" "$XTALK"; do
   if [ ! -d "$path" ]; then
     echo "[build] missing build context: $path" >&2
     exit 2
@@ -110,7 +109,7 @@ if [[ "$(basename "$FLASH_WHEEL")" == *"+"* ]]; then
 fi
 
 echo "[build] image=$IMAGE"
-echo "[build] contexts: wheels=$WHEELS qwen-asr=$QWEN_ASR moss-source=$MOSS_SOURCE xtalk=$XTALK"
+echo "[build] contexts: wheels=$WHEELS moss-source=$MOSS_SOURCE xtalk=$XTALK"
 echo "[build] flash-attn wheel: $FLASH_WHEEL"
 
 # This host's docker CLI returns exit code 0 even when BuildKit reports
@@ -121,7 +120,6 @@ BUILD_LOG="$(mktemp -t build_round1.XXXXXX.log)"
 set +e
 DOCKER_BUILDKIT=1 docker build -f "$REPO_ROOT/scripts/remote/Dockerfile.round1" \
   --build-context "wheels=$WHEELS" \
-  --build-context "qwen-asr=$QWEN_ASR" \
   --build-context "moss-source=$MOSS_SOURCE" \
   --build-context "xtalk=$XTALK" \
   -t "$IMAGE" \

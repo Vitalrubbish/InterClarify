@@ -24,12 +24,10 @@ def git_value(root: Path, *args: str) -> str | None:
 def tracked_files(root: Path) -> list[Path]:
     """Select runtime, test, and configuration files used by A4."""
     patterns = (
-        "configs/xtalk_duplex_runtime.json",
         "scripts/remote/duplex_model_service.py",
         "scripts/remote/duplex_runtime_smoke.py",
         "scripts/remote/duplex_a4_replay.py",
         "scripts/remote/xtalk_link_check.py",
-        "scripts/remote/qwen3_asr_service.py",
         "scripts/remote/x2_asr_service.py",
         "scripts/remote/setup_x2_asr_env.sh",
         "configs/xtalk_duplex_x2_runtime.json",
@@ -43,13 +41,8 @@ def tracked_files(root: Path) -> list[Path]:
         "scripts/remote/compact_a4_report.py",
         "scripts/remote/submit_xtalk_duplex_a4_job.sh",
         "scripts/remote/moss_tts_patch.py",
-        "scripts/remote/run_asr_contract_ab_node_job.sh",
-        "scripts/remote/submit_asr_contract_ab_job.sh",
-        "scripts/remote/summarize_asr_contract.py",
-        "tests/test_summarize_asr_contract.py",
         "tests/test_duplex_a4_replay.py",
         "tests/test_duplex_model_service.py",
-        "tests/test_qwen3_asr_service.py",
         "tests/test_moss_tts_patch.py",
     )
     files: set[Path] = set()

@@ -28,7 +28,7 @@ class RoundOneTest(unittest.TestCase):
             root = Path(temporary)
             lock = {"models": {name: {"model_id": name} for name in ("asr", "llm", "tts", "codec")}}
             (root / "models.lock.json").write_text(json.dumps(lock))
-            for role, expected in (("tts", {"tts", "codec"}), ("asr", {"asr"})):
+            for role, expected in (("tts", {"tts", "codec"}),):
                 output = root / role
                 round1.new_report_directory(output, round1.DEFAULT_CONFIG, root, role)
                 saved = json.loads((output / "models.lock.json").read_text())

@@ -4,7 +4,11 @@
 
 本文把 [research_design.md](research_design.md) 中的研究构想转换为可执行、可验收和可停止的工程计划。
 
-## 当前状态（2026-10-15）
+## 当前状态（2026-10-16 清理后）
+
+ASR 比较实验已经结束，保留 `reports/` 的全部结果与 [选型决定](asr_selection_decision.md)，移除一次性下载、评测、对齐、日志诊断、接话重放工具及其测试和镜像说明。Qwen3-ASR 的修订窗口与已提交前缀冲突会导致不可接受的交付停滞，按用户要求退役其服务、配置、旧联调作业与镜像依赖，不再作为失败回退。历史验收记录只用于解释结果，不再代表可执行任务。
+
+Nemotron EN 160ms 是后续英文主线，尚未完成运行时接入与 Layer 1 验收；现有 X2 链路仅保留作回归诊断，运行 A4 时必须显式选择 `DUPLEX_ASR_BACKEND=x2` 并提供其独立 conda prefix、源码和权重。通用 MOSS、官方控制服务、FDB 驱动和播放链路保留。清理范围及历史源码恢复位置见 [清理记录](asr_cleanup.md)。以下分阶段与历史执行记录中的 Qwen 保留要求被本段取代，Layer 边界和研究范围不变。
 
 当前处于**阶段 A 验收**：驱动/运行时/服务与 FDB 四轴推理都已跑通；四轴指标与读法见 [A4 任务单](xtalk_a4_remote_acceptance.md) §9.7–§9.9，其中 §9.9 是 2026-10-16 的 X2Streaming-ASR 单变量替换复测（ASR 替换尚未达标，遗留项见 [X2 复测任务单](x2streaming_asr_retest.md) §10）。本仓库仍不实现第二套语音运行时或 Layer 2；原生链路的历史门禁与来源固定见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)。
 
@@ -28,7 +32,7 @@
 
 ## 2. MVP 范围与不可破坏的边界
 
-2026-10-16 ASR 选型实验：用户授权在远端下载并比较 Nemotron 英语版、Nemotron 3.5 和 Kyutai 1B。新增离线评测入口仅用于按真实时间送入音频及记录输出，不建设第二套产品运行时。统一使用 FLEURS `en_us/test` 的确定性子集，独立 conda 环境；用户随后允许多个独占 GPU 作业并行，并澄清标点是为官方 DuplexCascade 及时回复服务的诊断因素，而非硬性门禁。因此扩展测试按五个分片并行、轮次间轮换配置，并补充官方权重对真实 ASR 文本轨迹的接话验证；测试协议、指标限制及版本见 [任务单](asr_selection_benchmark.md)。现役 ASR 和双工策略保持冻结，实验后再决定替换。
+2026-10-16 ASR 选型实验：用户授权在远端下载并比较 Nemotron 英语版、Nemotron 3.5 和 Kyutai 1B。新增离线评测入口仅用于按真实时间送入音频及记录输出，不建设第二套产品运行时。统一使用 FLEURS `en_us/test` 的确定性子集，独立 conda 环境；用户随后允许多个独占 GPU 作业并行，并澄清标点是为官方 DuplexCascade 及时回复服务的诊断因素，而非硬性门禁。因此扩展测试按五个分片并行、轮次间轮换配置，并补充官方权重对真实 ASR 文本轨迹的接话验证；测试协议、指标限制及版本见 [任务单](https://github.com/Vitalrubbish/InterClarify/blob/6c75f38d659998d6f149923085d82c0d7db267c5/docs/asr_selection_benchmark.md)。现役 ASR 和双工策略保持冻结，实验后再决定替换。
 
 2026-10-16 后续路线：根据实测及用户提出的去标点训练方向，后续英文主线选择 Nemotron EN 0.6B/160ms，Kyutai 留作官方控制权重对照。EN 与未适配官方权重的接话尚未达标，不能直接宣布替换完成。允许规划以现有 Layer 1 q/v LoRA 为对象的小规模标点鲁棒性对照，先做数据盘点和资源短跑，不提前开展大规模训练；细节和回归条件见 [选型决策](asr_selection_decision.md)。这项底座适配不改变 Layer 2 的研究范围，也不新增运行时、仲裁器或播放路径。
 

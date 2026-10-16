@@ -1,5 +1,7 @@
 # 第一套 X-Talk 组件组合与连接基线
 
+> 2026-10-16 状态：本文保留历史测试结果与诊断证据，文中的旧任务步骤不再作为当前执行指令。Qwen3-ASR 已退役；英文后续主线为 Nemotron EN 160ms，尚未验收接入。清理范围与历史源码见 [清理记录](asr_cleanup.md)。
+
 ## 1. 文档作用
 
 本文是当前 X-Talk 运行底座的唯一长期登记：固定已验证的来源、组件、运行配置和连接验收结论。它替代已完成的模型准备、适配器设计、轮次检测迁移和框架接通任务单；这些历史过程仍可从 Git 历史追溯，但不再作为当前执行入口。
@@ -18,7 +20,7 @@
 | 轮次检测 | TurnSense ONNX 服务 | 音频式 complete/incomplete/invalid 判断，不使用 XTurnix |
 | 系统附和 | `backchannel_model=null`，`backchannel_source_dir=null` | System Backchannel 和 Layer 0 均关闭 |
 
-具体模型来源、端口、依赖版本、GPU 分配和流式参数见 [configs/xtalk_round1.yaml](../configs/xtalk_round1.yaml)。可直接由 `Xtalk.from_config` 实例化的组件配置见 [configs/xtalk_round1_runtime.json](../configs/xtalk_round1_runtime.json)。
+具体模型来源、端口、依赖版本、GPU 分配和流式参数见 [configs/xtalk_round1.yaml](../configs/xtalk_round1.yaml)。可直接由 `Xtalk.from_config` 实例化的组件配置见 [configs/xtalk_round1_runtime.json](https://github.com/Vitalrubbish/InterClarify/blob/6c75f38d659998d6f149923085d82c0d7db267c5/configs/xtalk_round1_runtime.json)。
 
 ## 3. 已通过的连接门禁
 
@@ -30,12 +32,12 @@
 
 远端产物保存于 `…/xtalk-round1/artifacts/link/20261011T054900Z/`，并复制到被 Git 忽略的 `data/runs/20261011T054900Z/`。headless 客户端的音频回执只验证交付、停止和响应生命周期，不代表声卡播放质量。
 
-## 4. 当前保留的远端入口
+## 4. 历史远端入口（已退役路径指向 Git 快照）
 
 - [run_xtalk_round1.py](scripts/remote/run_xtalk_round1.md)：模型锁、依赖检查与服务启动；
-- [run_xtalk_round1_node_job.sh](scripts/remote/run_xtalk_round1_node_job.md)：集群节点中的 `asr`、`services`、`chain`、`link` 执行；
-- [submit_xtalk_round1_job.sh](scripts/remote/submit_xtalk_round1_job.md)：提交远端作业；
-- [qwen3_asr_service.py](scripts/remote/qwen3_asr_service.md)、[TurnSense 服务](scripts/remote/turnsense/README.md) 和 [xtalk_link_check.py](scripts/remote/xtalk_link_check.md)：当前连接链路的服务与验收驱动。
+- [run_xtalk_round1_node_job.sh](https://github.com/Vitalrubbish/InterClarify/blob/6c75f38d659998d6f149923085d82c0d7db267c5/docs/scripts/remote/run_xtalk_round1_node_job.md)：集群节点中的 `asr`、`services`、`chain`、`link` 执行；
+- [submit_xtalk_round1_job.sh](https://github.com/Vitalrubbish/InterClarify/blob/6c75f38d659998d6f149923085d82c0d7db267c5/docs/scripts/remote/submit_xtalk_round1_job.md)：提交远端作业；
+- [qwen3_asr_service.py](https://github.com/Vitalrubbish/InterClarify/blob/6c75f38d659998d6f149923085d82c0d7db267c5/docs/scripts/remote/qwen3_asr_service.md)、[TurnSense 服务](scripts/remote/turnsense/README.md) 和 [xtalk_link_check.py](scripts/remote/xtalk_link_check.md)：当前连接链路的服务与验收驱动。
 
 运行前后均使用 conda 环境。若更换此表中的 X-Talk 提交、模型、轮次检测器或播放链路，必须重新运行 `link` 的顺序和插话检查。当前脚本未自动核验 fork 提交；下一阶段先补齐来源检查，防止把未提交适配器当作固定底座。
 
@@ -57,6 +59,6 @@
 
 ## 6. 阶段 A 官方权重接入（2026-10-12）
 
-用户指定先使用官方已训练 DuplexCascade 权重，后续再考虑训练。当前 X-Talk dev@a06dd57 的 A2/A3 运行时使用实际 wire token、raw ChatML 和首次非空 ASR 后的 0.6 秒串行 micro-turn；配置为 [xtalk_duplex_runtime.json](../configs/xtalk_duplex_runtime.json)，原生 round1 配置继续作为对照。远端 checkpoint、token IDs、conda 和任务判据见 [阶段 A 全双工验收任务单](xtalk_a4_remote_acceptance.md)（pre-A4 的官方权重运行时冒烟脚本已在 2026-10-14 清理中移除，其步骤已被 A4 作业覆盖）。此变更保留 X-Talk ASR/TTS/播放底座，只替换 Layer 1 模型及确定性执行；质量与 FDB 结论须重新测量。
+用户指定先使用官方已训练 DuplexCascade 权重，后续再考虑训练。当前 X-Talk dev@a06dd57 的 A2/A3 运行时使用实际 wire token、raw ChatML 和首次非空 ASR 后的 0.6 秒串行 micro-turn；配置为 [xtalk_duplex_runtime.json](https://github.com/Vitalrubbish/InterClarify/blob/6c75f38d659998d6f149923085d82c0d7db267c5/configs/xtalk_duplex_runtime.json)，原生 round1 配置继续作为对照。远端 checkpoint、token IDs、conda 和任务判据见 [阶段 A 全双工验收任务单](xtalk_a4_remote_acceptance.md)（pre-A4 的官方权重运行时冒烟脚本已在 2026-10-14 清理中移除，其步骤已被 A4 作业覆盖）。此变更保留 X-Talk ASR/TTS/播放底座，只替换 Layer 1 模型及确定性执行；质量与 FDB 结论须重新测量。
 
 官方权重远端运行时冒烟：job-179179566806951798391-xuan-zhang，源码快照 17fd22d55cc7，status=PASS、12 micro-turn、协议 errors=0。真实 LLM + 脚本前缀 + 模拟 PCM 验证了接入，尚未更新原生 ASR/MOSS 音频和 FDB 质量基线。

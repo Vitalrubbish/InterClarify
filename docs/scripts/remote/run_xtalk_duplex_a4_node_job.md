@@ -1,6 +1,6 @@
 # `scripts/remote/run_xtalk_duplex_a4_node_job.sh`
 
-阶段 A 节点执行入口：校验清单、资产和三张 GPU，检查 conda 依赖，执行 X-Talk A1–A3 回归和根仓库驱动测试，启动官方 DuplexCascade、ASR（默认 Qwen3-ASR，`DUPLEX_ASR_BACKEND=x2` 时改 X2Streaming-ASR）与 MOSS，运行官方模型 smoke、真实音频回放和 FDB v1.0 四轴推理与评分。
+阶段 A 节点执行入口：校验清单、资产和三张 GPU，检查 conda 依赖，执行 X-Talk A1–A3 回归和根仓库驱动测试，启动官方 DuplexCascade、显式选择的 X2Streaming-ASR 诊断服务与 MOSS，运行官方模型 smoke、真实音频回放和 FDB v1.0 四轴推理与评分。
 
 `assets` 步骤在 `DUPLEX_ASR_BACKEND=x2` 时额外校验 `DUPLEX_X2_SOURCE` / `DUPLEX_X2_MODEL` 存在，把缺权重从服务日志里的启动崩溃变成一条明确失败。启动前脚本把共享盘上的 Silero VAD 权重（`DUPLEX_VAD_CACHE_FILE`，默认 `/hpc_stor03/sjtu_home/xuan.zhang/.cache/xtalk/models/silero_vad.onnx`）复制进 `$XDG_CACHE_HOME/xtalk/models/`：容器内 `/tmp` 缓存为空且无法访问 GitHub raw，缺这一步会由 VAD 下载失败而非明确报错终止。`runtime_build` 步骤在启动服务前用 client 环境按运行时配置真正构造一遍模型集合（含后端 VAD），把"缺可选依赖导致回放服务进程起不来"这类问题从 30s 超时变成一条明确失败；ASR 服务健康检查超时与模型/TTS 一致取 1800s：X2 权重约 9 GB，需与另外两个服务并发从共享盘读入，20 分钟窗口偏紧。`record_step` 追加逐步 JSONL，并通过命令替换去掉多余换行，保证每条记录只占一行；`wait_http` 检查服务 health、日志及启动进程；`stop_services` 仅清理本作业进程组。失败、阻塞和未覆盖状态进入 `a4_summary.json`；自动 PASS 只表示本次自动检查通过，完整验收仍需任务单列出的额外证据。TTS 服务健康后再做一次 `tts_warmup` 预热合成：运行时补丁的码本编译发生在服务进程看到的第一帧上（首次约 43.6s），这一步把它挪到启动阶段，避免由首个被测话轮支付。
 
@@ -8,7 +8,7 @@
 
 ## 调度约束（LowGpuUsage）
 
-集群会在**任一被分配 GPU 连续约 6 分钟接近 0% 利用率**时中断作业。因此模型、Qwen3-ASR、MOSS 三个服务改为**并发启动**，A1–A3 与驱动回归测试放在服务加载期间执行，保证三张卡尽早持续工作；顺序启动会让后启动的 GPU 空转超时被杀。
+集群会在**任一被分配 GPU 连续约 6 分钟接近 0% 利用率**时中断作业。因此模型、X2-ASR、MOSS 三个服务改为**并发启动**，A1–A3 与驱动回归测试放在服务加载期间执行，保证三张卡尽早持续工作；顺序启动会让后启动的 GPU 空转超时被杀。
 
 FDB 对齐与评分阶段会使 GPU 空转，故默认不在三卡作业内执行：`DUPLEX_A4_FDB_SCORING` 默认 `0`，记 `fdb_scoring SKIPPED`，评分应另起**单 GPU** 作业完成。
 
@@ -52,7 +52,7 @@ backchannel:icc_backchannel:default
 
 ## 用法
 
-必填 `INTERCLARIFY_DUPLEX_ROOT`；默认共享路径、环境、服务端口见脚本开头。`DUPLEX_A4_REQUIRE_INTERRUPTION=1` 要求真实 interruption 覆盖，`DUPLEX_A4_REQUIRE_COMPLETE=1` 要求所有自动步骤 PASS；输出目录重复使用会拒绝启动。提交包装器把这些 `DUPLEX_*` 变量传入节点。完整用法见 [任务单](../../xtalk_a4_remote_acceptance.md)。
+必填 `INTERCLARIFY_DUPLEX_ROOT`、`DUPLEX_ASR_BACKEND=x2`、`DUPLEX_ASR_ENV`（独立 X2 conda prefix）、`DUPLEX_X2_SOURCE` 和 `DUPLEX_X2_MODEL`；默认共享路径、环境、服务端口见脚本开头。`DUPLEX_A4_REQUIRE_INTERRUPTION=1` 要求真实 interruption 覆盖，`DUPLEX_A4_REQUIRE_COMPLETE=1` 要求所有自动步骤 PASS；输出目录重复使用会拒绝启动。提交包装器把这些 `DUPLEX_*` 变量传入节点。完整用法见 [任务单](../../xtalk_a4_remote_acceptance.md)。
 `DUPLEX_ASR_BACKEND=qwen`（默认）使用 X-Talk 原生 Qwen3-ASR 服务；`DUPLEX_ASR_BACKEND=x2` 改用 X2 在线服务，并选择 `configs/xtalk_duplex_x2_runtime.json`。
 
 ## X2 对照入口
@@ -63,3 +63,5 @@ backchannel:icc_backchannel:default
 X2 duplex 运行配置不加载 VAD，runtime_build 校验连续 ASR 对应无 VAD；Qwen 对照仍要求 VAD。两条路径均实际加载模型，加载异常仍使预检失败。
 
 完整 X2 预热：节点入口传入 `DUPLEX_X2_WARMUP_AUDIO`（缺省为固定场景 `NORMAL_AUDIO`，非 FDB 测量样本），在 assets 阶段检查文件。服务必须完成真实语音在线出字、EOF 排空及会话释放后才监听 HTTP。
+
+2026-10-16：Qwen 启动、导入检查、驱动单测和配置选择分支已经移除；通用配置只修改 TTS 端口。无默认 ASR 后端，缺显式选择或传入非 X2 后端时立即失败。该入口保留作既有链路回归，不表示 X2 成为主线或 Nemotron 已接入。脚本没有类，核心过程为 `record_step`、`wait_http`、`stop_services` 与顺序门禁。

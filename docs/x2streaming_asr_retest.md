@@ -1,5 +1,7 @@
 # X2Streaming ASR 替换复测任务单
 
+> 2026-10-16 状态：本文保留历史测试结果与诊断证据，文中的旧任务步骤不再作为当前执行指令。Qwen3-ASR 已退役；英文后续主线为 Nemotron EN 160ms，尚未验收接入。清理范围与历史源码见 [清理记录](asr_cleanup.md)。
+
 ## 1. 目标与范围
 
 本轮在**相同底座**上做 ASR 单变量对照：把 Qwen3-ASR-1.7B 换成 X2Streaming-ASR-4B，其余全部保持上一轮 `20261015T114708Z-r1` 的配置——官方 DuplexCascade 权重、MOSS-TTS 播放链、0.6s micro-turn、后端 Silero VAD、FDB v1.0 五轴各 5 例。

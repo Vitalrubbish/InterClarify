@@ -268,7 +268,7 @@ class A4ReplayTests(unittest.TestCase):
             (root / "configs").mkdir()
             (root / "scripts/remote").mkdir(parents=True)
             (root / "xtalk/src/xtalk/duplex_control").mkdir(parents=True)
-            (root / "configs/xtalk_duplex_runtime.json").write_text("{}")
+            (root / "configs/xtalk_duplex_x2_runtime.json").write_text("{}")
             (root / "scripts/remote/duplex_model_service.py").write_text("x")
             (root / "xtalk/src/xtalk/duplex_control/runtime.py").write_text("x")
             spec = importlib.util.spec_from_file_location("manifest", Path(__file__).resolve().parents[1] / "scripts/remote/create_duplex_source_manifest.py")
