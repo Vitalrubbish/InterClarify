@@ -194,6 +194,40 @@ class LoopEquivalenceTests(unittest.TestCase):
 
 
 @_NEEDS_TORCH
+class MaskedLoopTests(unittest.TestCase):
+    """The fixed-shape path must preserve every codebook token."""
+
+    def test_masked_loop_matches_sliced_history(self):
+        hidden = torch.ones(1, 1, 4)
+        history = torch.randint(0, 7, (1, 128, 16))
+        for filled in (0, 1, 49, 50, 51, 128):
+            for penalty in (0., 1., 1.1):
+                args = [FakeModel(), object(), torch.zeros(1, dtype=torch.long),
+                        hidden, torch.empty(1, 16, dtype=torch.long), history,
+                        filled, penalty, 50, .8, .6, 30, False,
+                        lambda logits, **kwargs: logits.argmax(dim=-1), 'upstream']
+                expected = patch._local_loop(*args).clone()
+                args[6] = 128
+                actual = patch._local_loop(*args, valid_length=torch.tensor(filled))
+                self.assertTrue(torch.equal(actual, expected), (filled, penalty))
+
+    def test_warmup_preserves_sampling_rng(self):
+        inferencer = types.SimpleNamespace()
+        patch._attach(inferencer)
+        inferencer._xt_runner = lambda *args: torch.rand(30)
+        inferencer._build_local_past_key_values = lambda: object()
+        inferencer.model = FakeModel()
+        from unittest.mock import patch as mock_patch
+        with mock_patch.dict(os.environ, {'XTALK_TTS_EARLY_COMPILE': '1'}):
+            warmup = {'hidden_states': torch.ones(1, 1, 4), 'penalty': 0.,
+                      'configured_penalty': 1.1, 'window': 50, 'temperature': .8,
+                      'top_p': .6, 'top_k': 30, 'do_sample': True, 'sample_token': None}
+            before = torch.random.get_rng_state().clone()
+            patch._warmup_runner(inferencer, warmup)
+            self.assertTrue(torch.equal(before, torch.random.get_rng_state()))
+
+
+@_NEEDS_TORCH
 class SamplingTests(unittest.TestCase):
     """Cheaper sampling heads keep the upstream contract."""
 
@@ -378,8 +412,12 @@ class CompileSupportTests(unittest.TestCase):
         """``Logger.warning_once`` must not abort a full graph trace."""
         import torch._dynamo
 
+        original = torch._dynamo.config.ignore_logger_methods.copy()
+        self.addCleanup(setattr, torch._dynamo.config, "ignore_logger_methods", original)
         patch.relax_dynamo_logging()
-        self.assertIn(logging.Logger.warning_once, torch._dynamo.config.ignore_logger_methods)
+        if hasattr(logging.Logger, "warning_once"):
+            self.assertIn(logging.Logger.warning_once, torch._dynamo.config.ignore_logger_methods)
+        self.assertIn(logging.Logger.warning, torch._dynamo.config.ignore_logger_methods)
 
     def test_backbone_event_list_is_shared_across_turns(self):
         """The service builds one inference object per turn, the model lives on."""

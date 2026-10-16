@@ -11,3 +11,7 @@
 - `build_parser` / `main`：提供 `download`、`tts-smoke`、`check-deps` 与 `serve`，角色仅为 `llm`、`turn_detector`、`tts`。
 
 下载在准备环境进行，TTS smoke 在具备 X-Talk 客户端依赖的 conda 环境进行，真实服务在远端运行。每次 smoke 使用新输出目录，旧 Qwen 测试通过 Git 历史复核。
+
+## TTS 延迟实验入口
+
+`serve_service` 仅在设置 `XTALK_TTS_TRACE` 或非零 `XTALK_TTS_GENERATION_BATCH_FRAMES` 时，将固定 adapter 交给显式 `moss_tts_service_patch.py` 运行；仍先检查两个上游提交和干净工作树。批次值在启动前校验。默认服务命令和配置保持原样，实验文件与 sitecustomize 补丁通过相同 PYTHONPATH 提供。早期编译开关由原 inference 补丁读取。

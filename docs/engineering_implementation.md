@@ -14,6 +14,8 @@ Nemotron EN 160ms 是后续英文主线，尚未完成运行时接入与 Layer 1
 
 阶段 A 的实现分布在 X-Talk fork 与 `scripts/remote/`：fork 提交与基线见 [xtalk_baseline_stack.md](xtalk_baseline_stack.md)，改动清单、逐轮验收数字与仍挂着的待办见 [A4 任务单](xtalk_a4_remote_acceptance.md)。本地门禁：X-Talk 全量 142 项（139 PASS、3 skipped）、InterClarify root 80 项。
 
+2026-10-17 TTS 优化规划：在 `feature/tts-latency-optimization` 分支按 [TTS 优化 issues](issues/tts_001_latency_instrumentation.md) 依次补齐计时、降低批量生成的帧数、覆盖每轮开头的编译路径，再按实测占比优化 prefill、codec 或 backbone。保留批量交付，以供音连续和自然度约束批次大小，不默认逐帧发送；不更换 ASR/LLM、不改变话轮策略，不新增播放所有者。已实现测量工具及默认关闭的批次/开头编译实验路径，本地逻辑验证通过；远端基线、音质和集成验收未执行，见 [远端任务单](tts_latency_remote_tasks.md)。
+
 自 2026-10-09 起，项目不再直接复现、内嵌或改造 DuplexCascade 官方源码。新的工程路线是：
 
 1. 以独立维护的 [Vitalrubbish/xtalk](https://github.com/Vitalrubbish/xtalk) fork 为唯一运行底座；
@@ -424,3 +426,7 @@ artifacts/
 10. 只有得到 go 结论后，才扩展正式数据、训练和完整测试。
 
 这条路线把工程重点从“复现另一个完整系统”转为“在可维护的 X-Talk 模块化底座上实现并验证所需行为”，同时保持研究问题、动作边界和评测严谨性不变。
+
+## 2026-10-17 TTS 实验实现边界
+
+为推进四项 issue，先准备默认关闭的批次/开头编译路径及确定性测试，原因是远端基线尚未建立，不能把本地逻辑验证当作性能门禁。实验执行仍严格依次为基线、批次、开头编译、剩余瓶颈；未通过前一步不选用下一步产品配置。新增显式服务包装器和固定文本组件回放，源码与镜像文档同步。不更换 ASR/LLM、音色、采样、codec 配置或播放所有权。TTS-004 只分析实测完整性与候选瓶颈，没有证据时不实施 KV/codec/backbone 优化。

@@ -30,3 +30,7 @@ PYTHONPATH=/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/moss-source/moss_tts_re
 # 其它环境：整文件 skip（torch 缺失）
 conda run -n xtalk-round1-client python -m unittest tests.test_moss_tts_patch
 ```
+
+2026-10-17：logger 兼容测试在 transformers 尚未注入 `warning_once` 的 CPU 环境中只检查已有 logger 方法；服务环境仍检查 `warning_once`。生产补丁同样仅注册已存在的方法，避免测试和编译初始化被可选扩展阻塞。新增历史掩码数学与图数量测试见 `test_tts_latency.md`。
+
+`MaskedLoopTests` 在无真实权重环境也执行完整 16 码本对照：有效长度 0/1/49/50/51/128、惩罚 0/1/1.1，与旧切片路径逐 token 一致；另验证编译 warmup 不消耗响应的 CPU RNG。logger 测试恢复 Dynamo 全局配置，避免影响后续图数量测试。GPU RNG 与真实 kernel 数值另在远端验证。

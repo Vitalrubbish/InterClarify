@@ -372,7 +372,14 @@ def serve(config: dict, args: argparse.Namespace) -> None:
                 os.environ[name] = str(configured)
         os.chdir(roots["moss_service"])
         tts = str(model_path(config, args.model_root, "tts"))
-        command += ["python", str(entrypoint), "--host", service["host"],
+        experimental = bool(os.environ.get("XTALK_TTS_TRACE")) or os.environ.get(
+            "XTALK_TTS_GENERATION_BATCH_FRAMES", "0") != "0"
+        entry_command = ["python"]
+        if experimental:
+            from moss_tts_service_patch import generation_batch_frames
+            generation_batch_frames()
+            entry_command.append(str(patch_modules / "moss_tts_service_patch.py"))
+        command += entry_command + [str(entrypoint), "--host", service["host"],
                     "--port", str(port), "--device", "cuda:0",
                     "--attn_impl", service["attn_impl"],
                     "--target_sr", str(service["output_sample_rate"]),

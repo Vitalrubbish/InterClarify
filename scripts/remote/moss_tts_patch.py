@@ -99,7 +99,7 @@ _PENDING_EVENT_LIMIT = 4096
 
 _METRICS_ATTR = "_xt_metrics"
 _INSTALLED = False
-_COMPILED: dict[str, Any] = {}
+_COMPILED: dict[tuple[str, bool], Any] = {}
 
 
 def _env_value(name: str, default: str = "") -> str:
@@ -197,7 +197,6 @@ def relax_dynamo_logging() -> None:
         import torch
 
         methods = {
-            _logging.Logger.warning_once,
             _logging.Logger.debug,
             _logging.Logger.info,
             _logging.Logger.warning,
@@ -206,6 +205,9 @@ def relax_dynamo_logging() -> None:
             _logging.Logger.critical,
             _logging.Logger.log,
         }
+        warning_once = getattr(_logging.Logger, "warning_once", None)
+        if warning_once is not None:
+            methods.add(warning_once)
         torch._dynamo.config.ignore_logger_methods.update(methods)
         logger.info(
             "[moss-patch] dynamo ignores %d logger methods for compile", len(methods)
@@ -238,6 +240,26 @@ def _sample_topk(logits: Any, temperature: float, top_p: float, top_k: int) -> A
     return chosen.view(*logits.shape[:-1])
 
 
+def early_compile_enabled() -> bool:
+    """Return whether the unaccepted early-frame experiment is enabled."""
+    return _env_value("XTALK_TTS_EARLY_COMPILE", "0") in {"1", "true", "yes", "on"}
+
+
+def _apply_history_penalty(logits, history, valid_length, codebook, penalty, window):
+    """Penalize only tokens present in valid, right-aligned history rows."""
+    import torch
+
+    capacity = history.shape[1]
+    rows = torch.arange(capacity, device=history.device)
+    count = valid_length.clamp(max=window) if window > 0 else valid_length
+    valid = rows >= capacity - count
+    codes = history[:, :, codebook]
+    counts = torch.zeros_like(logits, dtype=torch.int32)
+    counts.scatter_add_(1, codes, valid.to(torch.int32).expand_as(codes))
+    adjusted = torch.where(logits < 0, logits * penalty, logits / penalty)
+    return torch.where(counts > 0, adjusted, logits)
+
+
 def _local_loop(
     model: Any,
     past_key_values: Any,
@@ -254,6 +276,7 @@ def _local_loop(
     do_sample: bool,
     sample_token: Any,
     mode: str,
+    valid_length: Any = None,
 ) -> Any:
     """Fill ``output_token`` with one audio frame of ``channels`` codebooks.
 
@@ -311,7 +334,10 @@ def _local_loop(
             logits_to_keep=1,
         )
         logits = outputs.logits[:, -1, :]
-        if history_filled > 0 and repetition_penalty and repetition_penalty != 1.0:
+        if valid_length is not None and repetition_penalty and repetition_penalty != 1.0:
+            logits = _apply_history_penalty(
+                logits, history, valid_length, codebook, repetition_penalty, repetition_window)
+        elif history_filled > 0 and repetition_penalty and repetition_penalty != 1.0:
             rows = history_filled
             if repetition_window > 0:
                 rows = min(rows, repetition_window)
@@ -623,6 +649,10 @@ def _attach(inferencer: Any) -> None:
     """Add the patch state to a freshly created inference object."""
     inferencer._xt_history = None
     inferencer._xt_history_filled = 0
+    inferencer._xt_valid_length = None
+    inferencer._xt_eager_frames = 0
+    inferencer._xt_compiled_frames = 0
+    inferencer._xt_turn_started = None
     inferencer._xt_capacity = _HISTORY_CAPACITY
     inferencer._xt_channels = int(getattr(inferencer, "channels", 16))
     inferencer._xt_cache_positions = None
@@ -691,6 +721,13 @@ def _log_metrics(inferencer: Any, reason: str, force: bool = False) -> None:
     audio = frames * FRAME_SECONDS
     local_seconds = _consume_events(inferencer._xt_local_events)
     backbone_seconds = _consume_events(inferencer._xt_backbone_events)
+    if os.environ.get("XTALK_TTS_TRACE"):
+        from tts_latency_trace import emit
+
+        emit("gpu.slice", attribution="completed_event_slice_backbone_shared_across_turns",
+             local_seconds=local_seconds, backbone_seconds=backbone_seconds,
+             pending_local=len(inferencer._xt_local_events),
+             pending_backbone=len(inferencer._xt_backbone_events))
     metrics["lines"] += 1
     metrics["frames"] = 0
     metrics["started"] = None
@@ -720,7 +757,24 @@ def _reset_metrics(inferencer: Any) -> None:
     if getattr(inferencer, "_xt_profiler", None) is not None:
         _dump_profile(inferencer, "turn_end")
     inferencer._xt_turn_frames = 0
+    inferencer._xt_eager_frames = 0
+    inferencer._xt_compiled_frames = 0
     inferencer._xt_turns += 1
+
+
+def _log_early_frame(inferencer):
+    """Report the cost of the prefix of each response, including prefill."""
+    if os.environ.get("XTALK_TTS_TRACE"):
+        from tts_latency_trace import emit
+
+        emit("model.frame_summary", frame=inferencer._xt_turn_frames,
+             wall_seconds=time.perf_counter() - inferencer._xt_turn_started,
+             eager=inferencer._xt_eager_frames, compiled=inferencer._xt_compiled_frames)
+    if metrics_enabled() and inferencer._xt_turn_frames in (1, 5, 10, 50):
+        logger.info("[tts-early] frames=%d wall_s=%.6f eager=%d compiled=%d",
+                    inferencer._xt_turn_frames,
+                    time.perf_counter() - inferencer._xt_turn_started,
+                    inferencer._xt_eager_frames, inferencer._xt_compiled_frames)
 
 
 def _push_history(inferencer: Any, audio_tokens: Any) -> None:
@@ -748,8 +802,9 @@ def _compile_local_loop(mode: str) -> Optional[Any]:
     """Compile :func:`_local_loop` once per backend, returning ``None`` on failure."""
     import torch
 
-    if mode in _COMPILED:
-        return _COMPILED[mode]
+    key = (mode, early_compile_enabled())
+    if key in _COMPILED:
+        return _COMPILED[key]
     compiled = None
     try:
         compiled = torch.compile(_local_loop, fullgraph=True, dynamic=False, mode=mode)
@@ -761,7 +816,7 @@ def _compile_local_loop(mode: str) -> Optional[Any]:
             error,
             traceback.format_exc(),
         )
-    _COMPILED[mode] = compiled
+    _COMPILED[key] = compiled
     return compiled
 
 
@@ -819,23 +874,22 @@ def _warmup_runner(inferencer: Any, warmup: dict) -> None:
     cache_positions = torch.zeros(1, dtype=torch.long, device=device)
     output = torch.empty(batch_size, inferencer._xt_channels, dtype=torch.long, device=device)
     started = time.perf_counter()
-    inferencer._xt_runner(
-        inferencer.model,
-        inferencer._build_local_past_key_values(),
-        cache_positions,
-        warmup["hidden_states"],
-        output,
-        history,
-        inferencer._xt_capacity,
-        warmup["penalty"],
-        warmup["window"],
-        warmup["temperature"],
-        warmup["top_p"],
-        warmup["top_k"],
-        warmup["do_sample"],
-        warmup["sample_token"],
-        sample_mode(),
-    )
+    devices = [device] if device.type == "cuda" else []
+    # Compilation warmup must not consume the response's sampling RNG stream.
+    with torch.random.fork_rng(devices=devices):
+        variants = [(warmup["penalty"], None)]
+        if early_compile_enabled():
+            variants = [(0.0, torch.zeros((), dtype=torch.long, device=device)),
+                        (warmup["configured_penalty"], torch.ones((), dtype=torch.long, device=device))]
+        for penalty, valid_length in variants:
+            inferencer._xt_runner(
+                inferencer.model, inferencer._build_local_past_key_values(),
+                cache_positions, warmup["hidden_states"], output, history,
+                inferencer._xt_capacity, penalty, warmup["window"],
+                warmup["temperature"], warmup["top_p"], warmup["top_k"],
+                warmup["do_sample"], warmup["sample_token"], sample_mode(),
+                valid_length,
+            )
     logger.info("[moss-patch] compiled warmup done in %.1fs", time.perf_counter() - started)
 
 
@@ -892,6 +946,7 @@ def apply_patch(module: Any) -> None:
                 "hidden_states": hidden_states,
                 "penalty": penalty,
                 "window": window,
+                "configured_penalty": getattr(self, "_xt_configured_penalty", penalty),
                 "temperature": float(temperature),
                 "top_p": float(top_p),
                 "top_k": int(top_k),
@@ -899,12 +954,17 @@ def apply_patch(module: Any) -> None:
                 "sample_token": self.sample_token,
             },
         )
+        if early_compile_enabled() and self._xt_history is None:
+            self._xt_history = torch.zeros(
+                (hidden_states.shape[0], self._xt_capacity, self._xt_channels),
+                dtype=torch.long, device=hidden_states.device)
         use_compiled = (
             runner is not None
             and self._xt_history is not None
-            and (not penalty_active or self._xt_history_filled >= target)
+            and (early_compile_enabled() or not penalty_active or self._xt_history_filled >= target)
         )
         if not use_compiled:
+            self._xt_eager_frames += 1
             return _timed_call(
                 self._xt_local_events,
                 original_generate,
@@ -919,6 +979,7 @@ def apply_patch(module: Any) -> None:
                 generated_tokens=generated_tokens,
                 gen_step=gen_step,
             )
+        self._xt_compiled_frames += 1
         if not self._xt_runner_used:
             self._xt_runner_used = True
             logger.info(
@@ -938,6 +999,10 @@ def apply_patch(module: Any) -> None:
         output_token = torch.empty(
             hidden_states.shape[0], self._xt_channels, dtype=torch.long, device=hidden_states.device
         )
+        if early_compile_enabled():
+            if self._xt_valid_length is None:
+                self._xt_valid_length = torch.zeros((), dtype=torch.long, device=hidden_states.device)
+            self._xt_valid_length.fill_(self._xt_history_filled)
         return _timed_call(
             self._xt_local_events,
             runner,
@@ -956,6 +1021,7 @@ def apply_patch(module: Any) -> None:
             bool(do_sample),
             self.sample_token,
             sample_mode(),
+            self._xt_valid_length if early_compile_enabled() else None,
         )
 
     def patched_prefill(self, *args, **kwargs):
@@ -966,14 +1032,17 @@ def apply_patch(module: Any) -> None:
         self._xt_history = None
         self._xt_history_filled = 0
         _reset_metrics(self)
+        self._xt_turn_started = time.perf_counter()
         result = original_prefill(self, *args, **kwargs)
         _push_history(self, result)
+        _log_early_frame(self)
         return result
 
     def patched_step(self, *args, **kwargs):
         """Run upstream step and extend the sliding window with the new frame."""
         result = original_step(self, *args, **kwargs)
         _push_history(self, result)
+        _log_early_frame(self)
         return result
 
     def patched_finish(self, *args, **kwargs):
@@ -1002,6 +1071,14 @@ def apply_patch(module: Any) -> None:
     # The session ends a turn through end_text/drain; report metrics there too so
     # a turn that generated frames without a finish() call is still accounted.
     if session_cls is not None and not getattr(session_cls, "_xt_patched", False):
+        original_session_init = session_cls.__init__
+
+        def patched_session_init(self, *args, **kwargs):
+            """Expose the actual session penalty to the first-frame warmup."""
+            original_session_init(self, *args, **kwargs)
+            self.inferencer._xt_configured_penalty = self.repetition_penalty
+
+        session_cls.__init__ = patched_session_init
         original_end_text = session_cls.end_text
         original_drain = session_cls.drain
 

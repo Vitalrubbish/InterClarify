@@ -57,3 +57,13 @@ XTALK_TTS_LOCAL_COMPILE=cudagraph XTALK_TTS_SAMPLE=greedy XTALK_TTS_METRICS=1 \
 - 服务每帧调用一次 `finish`（`drain(max_steps=1)`），因此指标行必须按"行内增量"读、跨行求和；单行 `rtf` 会高度抖动。
 - profiler 只剖析每回合最初的固定帧数，会略微拖慢这些帧；请只把它当作时间构成证据，不要拿它的绝对吞吐当读数。
 - `local_s`/`backbone_s` 是 CUDA event 之间的**墙钟**（含"CPU 发不出活导致 GPU 空转"的空隙），不是 kernel 执行时间；两者都能对上时说明这几段占了整帧墙钟的大头，真正的 device 时间要看 profile 臂的 `device_s`/`device/帧`。2026-10-14 在 4090 上实测：baseline 每帧墙钟 ≈75ms、device ≈24ms（其中 1-token GEMV 47%、633 次 kernel/帧），即约七成帧时间在等 CPU 派发；启用 sdpa + 编译码本循环后每帧降到 ≈35ms（本地 13.3ms + backbone 18.3ms + codec/其他 ≈3ms）。
+
+## 2026-10-17 开头编译实验准备
+
+新增 `XTALK_TTS_EARLY_COMPILE=1`，默认关闭。`_apply_history_penalty` 使用固定形状窗口与设备上的有效长度，按词表计数掩码施加惩罚；无效填充不会惩罚 token 0，重复 token 不会多次叠加惩罚。`_local_loop` 增加可选有效长度张量，旧调用保持原逻辑。实验路径覆盖首帧与未满窗口，逻辑历史每轮复位。编译缓存按后端与实验开关分隔；warmup 覆盖无惩罚和带掩码两条路径，并保存/恢复采样 RNG。记录 eager/compiled 帧数和前 1/5/10/50 帧墙钟。编译失败可观测地回退。尚未通过远端数值、性能与音质验收，默认路径不变。
+
+`relax_dynamo_logging` 仅加入实际存在的 `warning_once` 扩展，兼容没有导入 transformers 的 CPU 检查。trace 开启时，`_log_early_frame` 逐帧记录关联的 eager/compiled 计数；该 CPU 时间包含预热，应与独立 warmup/热态结果区分。
+
+原 CUDA event 切片在 trace 开启时同步输出 `gpu.slice` 关联事件（仍仅消费已完成 event，不执行全局同步）；pending 数量保留，末尾尚未完成的时间不伪装为零开销。
+
+失败边界：构建 runner 与 warmup 失败会记录 traceback 并回退 eager；正式帧执行若失败则由原服务记为响应失败，不盲目重放可能已推进的 RNG/KV。运行期重编译检测与此类错误的恢复仍需远端验证，不视为 TTS-003 已验收。
