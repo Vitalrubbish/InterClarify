@@ -432,9 +432,9 @@ v1.0 公开表中同族模型的量级可作参照带：`PersonaPlex` 的 PH(syn
 | `backchannel`（icc） | TOR ↓ / Freq ↑ / JSD ↓ | 0.00 / 0.0000 / 1.0000 | 0.00 / 0.0048 / 0.9545 |
 | `user_interruption` | GPT / TOR / Latency | 2.75 / 0.80 / 3.26s（`gpt-6-sol`） | 3.60 / 1.00 / 2.384s（`gpt-4o`） |
 
-`pause_handling` 两子集的 TOR=0.00 部分来自沉默（candor 0/5、synthetic 1/5 产出音频），不能读成停顿判断改善；STT 与 UI 两轴相对 Qwen 轮次退化。端点已先后下架 `gpt-4-turbo` 与 `gpt-4o`，本轮 UI rating 只能用 `gpt-6-sol`，**不与历史 rating 比较**；TOR/latency 与 judge 无关。ASR 侧在线文本单调（28 会话 0 次回写），交付滞后中位 -0.02 s、P95 0.11 s，但首个真实会话仍有 4 s 级冷启动堆积，且 `pause_hint`/`end_stream` 恒为 0（句尾 1–2 词在 synthetic 子集 5/5 丢失）。
+**Candor Pause Handling 预期系统保持沉默**：candor 0/5 有音频、TOR 0.40→0.00 符合预期，不列为漏答；synthetic TOR=0.00、1/5 产出音频。STT 与 UI 两轴相对 Qwen 轮次退化。UI 官方 TOR=0.8 不等于成功切换话题：只有 10/100/101 三例启动新回答，1 停播后未接话，102 延续旧回答。端点已先后下架 `gpt-4-turbo` 与 `gpt-4o`，本轮 UI rating 用 `gpt-6-sol`，**不与历史 rating 比较**；TOR/latency 与 judge 无关。ASR 侧在线文本单调（28 会话 0 次回写），滞后**增长量**中位 -0.02 s、P95 0.11 s，这不是绝对识别延迟；首个真实会话仍有 4 s 级冷启动堆积。原始日志共 4897 条请求，`pause_hint`/`end_stream` 均为 0，synthetic pause 五例均缺参考末词；异步结果交付与真实 EOF 收尾需分别修复和验证。
 
-**结论**：门禁与推理可复现，但尚不能宣称替换成功。范围、证据口径、修复与遗留项见 [X2 复测任务单](x2streaming_asr_retest.md)（§8–§10）；证据在 `reports/duplex_acceptance/20261015T180154Z/`。
+**结论**：门禁与推理可复现，但尚不能宣称替换成功。范围和证据口径见 [X2 复测任务单](x2streaming_asr_retest.md) §8–§9；**统一修复清单、优先级、延迟分解与验收条件见该文档 §10**：先修异步交付、真实 EOF、完整预热与测量，再定位 micro-turn 等待、轮次模型误判和 TTS 首音。证据在 `reports/duplex_acceptance/20261015T180154Z/`。
 
 ## 10. 阶段 A 最终审查项
 

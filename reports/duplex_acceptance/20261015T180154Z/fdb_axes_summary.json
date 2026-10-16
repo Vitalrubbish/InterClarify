@@ -19,7 +19,7 @@
         "tts_start_events": 1,
         "protocol_errors": 0
       },
-      "note": "TOR 0.0 is the best direction but is partly silence: 0/5 samples produced any TTS audio (one sample had a start_tts event whose audio fell outside the input-length output window).",
+      "note": "Silence is expected for Candor Pause Handling. TOR 0.40 -> 0.00 and 0/5 samples with audio are a positive result, not missed answers. Timeline review corrected the earlier window-truncation claim: sample 1 started TTS at about 2.707s and cancelled it at about 3.274s before any playback audio arrived.",
       "source": "official evaluate.py"
     },
     "pause_handling/synthetic_pause_handling": {
@@ -34,7 +34,7 @@
         "tts_start_events": 2,
         "protocol_errors": 0
       },
-      "note": "1/5 samples produced TTS audio; the same window truncation applies.",
+      "note": "1/5 samples produced TTS audio; TOR is evaluated within the official annotated pause windows.",
       "source": "official evaluate.py"
     },
     "smooth_turn_taking/candor_turn_taking": {
@@ -93,7 +93,7 @@
         "average_latency": 2.384,
         "judge_model": "gpt-4o"
       },
-      "note": "The endpoint lost gpt-4-turbo and then gpt-4o (503 'no available channel'); on this key only gpt-6-sol answered, so the rating is not comparable with earlier rounds. TOR and latency are judge-independent: TOR 1.00 -> 0.80 (sample 1 never took the turn) and latency 2.384 -> 3.26s. 102 again kept the pre-interruption topic.",
+      "note": "The endpoint lost gpt-4-turbo and then gpt-4o (503 'no available channel'); on this key only gpt-6-sol answered, so the rating is not comparable with earlier rounds. TOR and latency are judge-independent: TOR 1.00 -> 0.80 and latency 2.384 -> 3.26s. Only samples 10, 100 and 101 started a new response after interruption (3/5); sample 1 stopped its old response but never started a new one, and 102 continued the old response without an interruption stop. Official TOR must not be interpreted as new-response success.",
       "source": "run_fdb_llm_judge.py --judge-model gpt-6-sol --skip-align (official evaluate.py)"
     }
   },
@@ -104,11 +104,11 @@
       "median": -0.02,
       "p95": 0.11,
       "max": 2.39,
-      "definition": "delivered_monotonic span minus model time_s span between a session's first and last live_emit"
+      "definition": "delivered_monotonic span minus model time_s span between a session's first and last live_emit; this measures lag growth, not absolute ASR latency, and delivered_monotonic is the service event-queue read time"
     },
     "first_session_stall": "the pause replay still delivered a 4.06s lump in the second request of the first real session (warmup reduced the earlier total-swallow case); all later sessions were a clean 0.09-0.10s per request",
     "pause_hint_requests": 0,
     "end_stream_requests": 0,
-    "tail_effect": "synthetic_pause_handling loses the last 1-2 words on 5/5 samples (input ends at speech end, the online stream is never flushed); candor inputs end with silence and keep the tail"
+    "tail_effect": "All 5 synthetic_pause_handling samples miss the last reference word: hobby, Thursday, information, cost, cybersecurity. Input EOF is never flushed and asynchronous results have no independent receiver; their respective contributions require a repaired comparison. Reference words are not a manual verification of spoken content. Candor inputs include trailing silence."
   }
 }

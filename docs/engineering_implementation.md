@@ -157,7 +157,7 @@ P1 和 P2 是最早的两个强制门禁。A1–A3 已通过本地实现门禁�
 
 2026-10-15 远端准备：`scripts/remote/setup_x2_asr_env.sh` 在共享盘新建独立 conda prefix `xtalk-x2-asr`（官方 `torch==2.11.0+cu128` / `transformers==5.15.1`，与 Qwen/MOSS 环境隔离），稀疏检出固定源码提交并下载固定 revision 权重到 `interclarify-x2/`；A4 节点入口新增 `DUPLEX_ASR_BACKEND=x2` 分支、X2 资产前置校验与 X2 服务单测。对照复测的范围、口径与证据边界见 [X2 复测任务单](x2streaming_asr_retest.md)。
 
-2026-10-16 复测结果：首轮 `20261015T172109Z` 因首个会话冷启动吞掉整段 `pause` 语音而 FAIL；服务增加启动预热后用 `04536cf` 重跑 `20261015T180154Z`，自动门禁与 FDB 五轴推理全 PASS。FDB 官方评分显示 `pause_handling` 两子集 TOR=0.00（candor 0/5 有音频）、`smooth_turn_taking` TOR 0.80→0.40、`user_interruption` TOR 1.00→0.80、latency 2.384→3.26s；端点已无任何 GPT-4 系列 judge 模型（改用 `gpt-6-sol`，rating 不跨轮比较）。在线文本单调、交付滞后中位 -0.02s，但首会话仍有秒级堆积且流结束没有 flush（句尾 1–2 词在 synthetic 子集 5/5 丢失）。**因此 ASR 替换尚未达到可宣称成功的程度**，遗留项与建议见任务单 §10。
+2026-10-16 复测结果：首轮 `20261015T172109Z` 因首个会话冷启动吞掉整段 `pause` 语音而 FAIL；服务增加启动预热后用 `04536cf` 重跑 `20261015T180154Z`，自动门禁与 FDB 五轴推理全 PASS。FDB 官方评分显示 `pause_handling` 两子集 TOR=0.00；**Candor Pause Handling 的沉默符合预期，TOR 0.40→0.00 是正向结果**。`smooth_turn_taking` TOR 0.80→0.40、`user_interruption` TOR 1.00→0.80、latency 2.384→3.26s；UI 真正启动新回答为 3/5，不能用官方 TOR 代替该指标。本轮 judge 改用 `gpt-6-sol`，rating 不跨轮比较。在线文本单调；滞后增长量中位 -0.02s 不是绝对识别延迟。首会话仍有秒级堆积，异步末次输出缺少独立接收，真实输入结束没有 flush，synthetic pause 五例均缺参考末词。**ASR 替换尚未达到可宣称成功的程度**。后续以 [X2 复测任务单](x2streaming_asr_retest.md) §10 为统一清单：先修结果交付、真实 EOF、完整预热和测量，再定位 micro-turn 等待、轮次误判与 TTS 首音延迟；保持阶段 A 范围及单一播放所有权。
 
 新增短窗口调度器，首次非空 ASR 后启动，默认 0.6 秒；partial、停顿和 final 只更新缓冲，串行生成完成后才 flush 下一窗口，与官方推理一致。累计前缀以增量发送；修订、空窗口和 final 去重见改造计划第 13 节。
 
