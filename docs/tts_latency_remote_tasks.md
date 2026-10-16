@@ -65,3 +65,11 @@
 - 正式计划：cold/warm 探针与原客户端 smoke 通过后，35 条文本 × 2 种输入模式 × 3 轮 = 210 条正式响应。当前无最终基线或音质结论；002/003/004 不自动启动。
 
 远端 GitHub HTTPS 在本轮出现 Empty reply/连接超时；已用 GitHub SSH 443（`ssh://git@ssh.github.com:443/Vitalrubbish/InterClarify.git`）fetch 并 fast-forward 到指定提交，仍遵循从 GitHub 同步，不复制本地源码或改动固定上游 checkout。
+
+### 已确认正式回放启动
+
+上述作业 cold、warm_one、warm_two 两种模式探针均成功、无空音频；原 X-Talk 客户端 smoke `COMPLETE`，生成 4.4 秒音频、12 个 chunk，参考音色 SHA256 `88cb0b9378829cb398cdaf04cd1e040c1ebce07177e928e788e08bdca7dcfca0`。正式矩阵已写入前 2 条响应，均无失败；尚未生成最终 summary，`exit_code.txt` 未出现，作业仍运行。
+
+预热覆盖问题须单独分析：长句 cold whole 首 PCM 71.722 秒，随后首次短句 warm_one whole 61.068 秒，而第二轮同短句 warm_two whole 0.267 秒、incremental 0.245 秒。每模式仅 1 条探针，且首 PCM 不等于有声起点；这些数值只证明接入与预热行为，不能作为 p95 或优化达标证据。首次换短文本仍有较大图编译/预热开销，提示需要进一步核对输入形状和重编译，尚未证实具体 guard 原因。正式矩阵第一轮可能继续触发新形状编译，必须按轮次与事件区分，不能统称“正式热态”。
+
+查看进展可用 `vc list --job job-179219430342742386259-xuan-zhang`，正式逐响应结果位于 `baseline/responses.jsonl`，最终报告位于 `baseline/summary.json`。当前只启动 001 基线；002/003 的 A/B 与 004 的选择仍待完整结果和质量核验。
