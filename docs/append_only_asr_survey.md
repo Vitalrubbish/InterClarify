@@ -1,5 +1,46 @@
 # 无回写流式 ASR 候选普查（含标点判据）
 
+## 2026-10-16 本轮复核：以下结论取代旧排序
+
+本轮用户明确要求“没有回写机制”，因此进一步区分原生连续发射与内部可修订、仅对外冻结前缀。**建议首轮测试 Nemotron 英语版、Nemotron 3.5 多语言版和 Kyutai 1B。** 后文原始普查保留作为调研记录，排序和排除理由以本节为准；后续服务器执行按 [选型测试任务单](asr_selection_benchmark.md)。本轮未下载权重或运行新推理。
+
+| 优先级 | 模型 | 原生标点证据 | 延迟配置，非端到端实测 | 结论 |
+| --- | --- | --- | --- | --- |
+| 1 | `nvidia/nemotron-speech-streaming-en-0.6b` | 官方明确标点及大小写 | 80/160/560/1120ms chunk | 英文主场景第一候选 |
+| 2 | `nvidia/nemotron-3.5-asr-streaming-0.6b` | 官方明确标点及大小写 | 80/160/320/560/1120ms chunk | 多语言对照候选 |
+| 3 | `kyutai/stt-1b-en_fr` | 官方明确标点及大小写 | 约 500ms 文本流偏移 | DSM 结构参照候选 |
+| 有条件 | Confucius4-R2T2 | 在线句末标点待验证 | 自报平均 200–600ms，口径不同 | 默认含未固定 token 回滚窗口，不直接满足严格条件 |
+
+### 英语版 Nemotron 的补充证据
+
+[官方模型卡](https://huggingface.co/nvidia/nemotron-speech-streaming-en-0.6b) 明确：600M、Cache-aware FastConformer-RNNT、原生标点及大小写。需固定更新后的 checkpoint，避免混用 2026 年 1 月旧版本。官方去标点／大小写后的 WER 如下：
+
+| chunk | 多数据集平均 WER | LibriSpeech test-clean | AMI |
+| --- | --- | --- | --- |
+| 80ms | 8.43% | 2.80% | 18.29% |
+| 160ms | 7.67% | 2.56% | 14.71% |
+| 560ms | 7.07% | 2.46% | 11.88% |
+| 1120ms | 6.93% | 2.32% | 11.73% |
+
+先测试 160ms 与 560ms，观察额外等待能否换取本项目准确率提升。英语版不支持中文，许可按 NVIDIA Open Model License 登记。RNNT 必须采用携带状态的连续贪心解码；beam search 的临时最优假设不天然保证稳定。原生结构可单调生成，也不等于服务实现已经通过零回写检查。
+
+多语言版 [官方模型卡](https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b) 的 FLEURS 英文 LangID WER 在 160/560/1120ms 下分别为 8.88%/7.99%/7.91%。该表与英语版的多数据集平均不是同口径，不能直接横比。首轮固定英文语言条件；中文需要时单独测 CER。
+
+### 对旧文的纠正
+
+1. **R2T2 不能标为只有标点待验证。** [README](https://github.com/netease-youdao/Confucius4-R2T2) 在宣称稳定前缀只追加的同时，将 `UNFIXED_TOKEN_NUM=1` 定义为尾部 token 回滚窗口。对外不可回写与内部完全没有回滚是两种条件。严格按本轮需求暂不进入首轮；若后续接受未提交尾部可变，再核查实际提交接口和等待成本，不能直接用外层扣留 token 宣布满足条件。
+2. **Kyutai 并非只能 Rust 集成。** [模型卡](https://huggingface.co/kyutai/stt-1b-en_fr) 还链接官方 [Transformers checkpoint](https://huggingface.co/kyutai/stt-1b-en_fr-trfs)。后续优先验证 Python 的真实流式输入路径，框架变体须分别固定版本；官方组合也不保证本项目接话效果。
+3. **撤回通过 X2 推断 Voxtral 无标点的理由。** 微调后代无标点不能证明基座无标点。[Voxtral 模型卡](https://huggingface.co/mistralai/Voxtral-Mini-4B-Realtime-2602) 的标点契约尚待独立确认，因此状态是待验证，而非已证不满足。
+4. **不再对整个 Zipformer/Paraformer 或云 API 家族作无标点／必回写断言。** 应按具体 checkpoint 和协议判断；本轮优先自部署、原生带标点候选。额外标点恢复器暂不进入首轮比较。
+5. [Parakeet Realtime EOU 120M](https://huggingface.co/nvidia/parakeet_realtime_eou_120m-v1) 官方明确输出不含标点及大小写；其 EOU token 不能代替自然标点，也不能越过 Layer 1 强制让轮。
+6. **标点出现率不代表正确率。** 需测误加／漏加句末标点和到达时间；整文件输入后 TextIteratorStreamer 只证明文本增量输出，不能直接用作真实流式延迟证据。
+
+后续选择依据同数据、同硬件的 WER、实体错误、正确词及句末标点的 P50/P95 交付延迟。当前没有任何新候选已通过本项目服务器验收。
+
+---
+
+## 原始普查记录（旧排序已被上节取代）
+
 调研日期：2026-10-16。本次只阅读官方模型卡、论文、README 与许可证原文，未下载权重、未执行推理、未改现有配置与代码。结论是候选排序与待验证清单，不是已通过本项目验收的结果。本文不改变 [engineering_implementation.md](engineering_implementation.md) 的任何实现边界。
 
 **判据修订（2026-10-16）**：用户澄清从未要求 ASR 必须支持中文。中文由排除条件降级为加分项；准确率主口径改为英文（FDB 为现有验收主场景）。
