@@ -120,6 +120,7 @@ class EventSink:
         self.tokens = []
         self.stream = path.open("w")
         self.buffered = buffered
+        self.persistence_seconds = []
 
     def emit(self, text, token=None):
         now = time.monotonic()
@@ -128,7 +129,7 @@ class EventSink:
         if text == self.text:
             return
         elapsed = now - self.source.started
-        event = {"arrival_seconds": elapsed, "text": text, "token": token,
+        event = {"arrival_seconds": elapsed, "wall_time_unix": time.time(), "text": text, "token": token,
                  "rewritten": not text.startswith(self.text),
                  "received_audio_seconds": min(self.source.available, self.source.original_length) / self.source.sample_rate,
                  "consumed_audio_seconds": min(self.source.consumed, self.source.original_length) / self.source.sample_rate,
@@ -136,8 +137,10 @@ class EventSink:
         self.events.append(event)
         self.text = text
         if not self.buffered:
+            persistence_started = time.monotonic()
             self.stream.write(json.dumps(event, ensure_ascii=False) + "\n")
             self.stream.flush()
+            self.persistence_seconds.append(time.monotonic() - persistence_started)
 
     def close(self):
         if self.buffered:
@@ -337,6 +340,8 @@ def score_sample(row, sink, error=None, acoustic_alignment=None):
             "alignment_usable": bool(alignment_usable),
             "alignment_error": acoustic_alignment.get("error") if acoustic_alignment else "not available",
             "sentence_punctuation_latency_seconds": None,
+            "event_persistence_max_seconds": max(getattr(sink, "persistence_seconds", []), default=0),
+            "event_persistence_total_seconds": sum(getattr(sink, "persistence_seconds", [])),
             "max_input_scheduling_delay_seconds": max((p["released_seconds"] - p["scheduled_seconds"] for p in sink.source.packets), default=None)}
 
 

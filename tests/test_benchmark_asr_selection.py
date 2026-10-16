@@ -145,6 +145,16 @@ class BenchmarkTests(unittest.TestCase):
             self.assertEqual(event["text"], "hello")
             self.assertEqual(event["arrival_seconds"], captured)
 
+    def test_slow_persistence_cost_is_measured(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = benchmark.RealtimeAudio(np.zeros(1280, dtype=np.float32), 16000)
+            source.started = time.monotonic()
+            sink = benchmark.EventSink(Path(directory) / "events.jsonl", source)
+            with patch.object(sink.stream, "flush", side_effect=lambda: time.sleep(0.02)):
+                sink.emit("hello")
+            sink.close()
+            self.assertGreaterEqual(sink.persistence_seconds[0], 0.015)
+
 
 if __name__ == "__main__":
     unittest.main()
