@@ -224,3 +224,25 @@ cd xtalk
 - 原始产物：`InterClarify/data/runs/20261016T044445Z/`；报告：`reports/duplex_acceptance/20261016T044445Z/`。
 - 预热音频：`xtalk-round1/audio/scenarios/regular_answer_01_question.wav`，16 kHz 单声道 PCM16，2.96 秒。启动实现的 7 项服务契约测试本地/远端均通过；本地主仓库 93 项回归通过（20 skipped）。
 - 启动范围：pause / normal / interruption 场景与 FDB 五轴各 5 例，三张 4090；官方对齐评分独立后置。本轮延迟和质量尚未产生结论，不删除 Qwen。
+
+
+## 12. 本轮结果与延迟复评（2026-10-16）
+
+原推理作业已完成，所有推理/传输门禁通过；这些 PASS 不代表接话成功。独立单 GPU 官方对齐评分作业 `job-179212751644038373585-xuan-zhang` 已执行。逐例证据和计时定义见 [latency_review.json](../reports/duplex_acceptance/20261016T044445Z/latency_review.json)。
+
+| 指标 | Qwen `114708Z-r1` | 上轮 X2 `180154Z` | 本轮 X2 `044445Z` |
+| --- | --- | --- | --- |
+| STT 首 ASR 交付中位数 | 1.847s | 0.931s | 0.931s |
+| STT 实际产生 PCM | 5/5 | 3/5 | **0/5** |
+| UI 首 ASR 交付中位数 | 1.842s | 0.836s | 0.931s |
+| UI 打断后启动新回答 | 4/5 | 3/5 | **1/5** |
+
+首文本交付包含录音前导静音与模型所需语境，不等同逐词识别延迟。相对上轮 X2，本轮并无可宣称的 ASR 显著改善；相对 Qwen 的首字优势不能抵消严重接话退化。
+
+STT 的最后 ASR 到携带该文本的 micro-turn 分别为：1/10/100/101/102 = 0.454/0.309/0.526/0.117/0.404s。文字已经送达，之后仍连续 17–20 拍只返回 user-is-talking，观察时长距最后 ASR 为 10.18–11.57s。样本 1 在输入约 1.67s 时提前启动回答，2.239s 被下一拍 user-is-talking 取消，持续约 0.569s，尚无 PCM。其余四例从未启动 TTS。最终文本与上轮 X2 相同，不能归因为本轮新出现的文本缺失。每例起始有 4–5 个空拍；新增前导 no-voice 历史、分块时机和 X2 无标点的文本分布应分别做固定文本重放，尚未证明谁是根因。
+
+UI：1、10 停止旧回答后不再答；100、102 继续旧的 puppy/snacks 话题；仅 101 生成新回答，但 GPT-6-sol 给 2/5，回答没有具体解决水龙头漏水。101 的边界到首 PCM 2.044s，可分为末次 ASR +0.328s、到回答快照 0.600s、LLM 首 token 0.069s、到 TTS 启动 0.034s、到首音频块 1.012s（网络和事件投递差额约 1ms）。这一例不能代替整组平均值。
+
+官方评分的失败/分母必须显式保留：STT 五例无有效回答，上游在空 latency_list 上发生 ZeroDivisionError；复评将覆盖率记 0/5、延迟记 null。UI 上游仅对有输出的 100/101/102 三例评分，报告 TOR=2/3、latency=1.547s、rating=0.667；1/10 被排除。强制保留原五例分母的诊断 TOR/rating 为 0.4/0.4，不冒充上游原始结果；其中 TOR 还包含旧回答继续播放，不能当作新回答成功率。两种 Pause Handling TOR 均为 0，Candor 沉默符合预期；backchannel TOR/frequency=0、JSD=1，系统附和仍在范围外。
+
+TTS 证据修复 `126b1f1`：未来 probe 按角色保存清单；本轮旧 config/lock 已备份到原始运行目录 `provenance_corrections/original_tts_warmup/`，修正后 tts_warmup 清单仅有 tts/codec，原/新 SHA256 另记 correction JSON。音频、时间线和推理快照保持原始证据。当前保留 Qwen 路线，优先定位控制模型对微轮文本历史的响应退化。
