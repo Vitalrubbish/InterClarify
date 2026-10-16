@@ -47,3 +47,5 @@
 本轮创建独立 `interclarify-tts-latency-20261017` checkout。新增[节点入口](scripts/remote/run_tts_latency_node_job.md)与[提交入口](scripts/remote/submit_tts_latency_job.md)，先在分配节点检查固定依赖、真实上游等价性，再通过 cold/warm 探针和原客户端 smoke 才运行正式基线。`--probe` 是显式接入检查模式，不替代正式数量门禁；新增理由是必须先确认真实 adapter 接通再投入完整矩阵。脚本按本文已核对路径构造，实际作业结果另记。
 
 首次作业 `job-179219320938398545631-xuan-zhang` 在 `d6-hpc-gpu-068` 上完成依赖核验（torch 2.9.1+cu128 / transformers 5.0.0 / flash-attn 2.8.3），但 42 项组件测试有 1 项失败：作业 `XTALK_TTS_METRICS=1` 污染“无开关时静默”用例。已修正节点脚本，仅在单测子进程显式关闭实验开关，不放宽测试，使用新输出目录重提。首轮无模型性能样本。
+
+第二次作业 `job-179219331247515443792-xuan-zhang` 通过 42/42 组件测试与依赖门禁，MOSS/codec 权重读取完成后启动停滞，180 秒 health 超时，尚无音频样本。补充有界清理和可关闭的 Python 栈诊断，先定位原因，不将此轮作为热态基线。正式汇总另修正为按响应 ID 排除 cold/warm 探针及 smoke，避免启动开销混入阶段分布。

@@ -13,3 +13,5 @@ CLI 的 `--prepare-corpus` 生成 30 条短答/澄清及 5 条边界文本，每
 `manifest` 记录本仓库、显式提供的 X-Talk/MOSS 路径之提交与工作树状态、客户端 conda/dependency 版本、实验环境变量和补丁摘要。服务 trace 另记实际 TTS 环境、加载文件摘要和原始音色摘要；模型 revision 仍须核对锁文件，不能用客户端包版本代替服务端版本。
 
 `--probe` 只用于提交后的真实服务接入检查：运行指定 corpus 首条、whole/incremental 各一例并标为 probe，绕过正式矩阵的数量门槛。正式模式保持至少 30 条、3 轮，不能把 probe 纳入热态分布。
+
+`analyze_server_trace` 接受正式响应 ID 集合，正式汇总排除 cold/warm 探针、客户端 smoke 和 warmup，避免编译启动开销混入阶段分布。原始服务 trace 仍完整保留。

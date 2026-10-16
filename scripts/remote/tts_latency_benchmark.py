@@ -155,8 +155,10 @@ def first_pcm_stages(events):
     return result
 
 
-def analyze_server_trace(events):
+def analyze_server_trace(events, response_ids=None):
     """Aggregate complete CPU spans only within one response and process clock."""
+    if response_ids is not None:
+        events = [row for row in events if row.get("response_id") in response_ids]
     pending, durations = {}, {}
     for row in events:
         event = row['event']
@@ -336,7 +338,9 @@ async def run(args):
     report = {'warmup': warm, 'modes': summarize(rows), 'physical_playback': None,
               'quality_listening': 'pending', 'fdb_integration': 'pending'}
     if args.server_trace:
-        report['server'] = analyze_server_trace([json.loads(line) for line in args.server_trace.read_text().splitlines()])
+        report['server'] = analyze_server_trace(
+            [json.loads(line) for line in args.server_trace.read_text().splitlines()],
+            response_ids={row['response_id'] for row in rows})
     (args.output / 'summary.json').write_text(json.dumps(report, indent=2))
     return 1 if warm['error'] or any(r['error'] or not r['samples'] for r in rows) else 0
 

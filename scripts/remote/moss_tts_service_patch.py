@@ -239,6 +239,9 @@ def apply_service_patch(module):
 
 def main():
     """Load the fixed adapter and patch its explicit upstream load boundary."""
+    if os.environ.get("XTALK_TTS_STACK_DIAGNOSTIC") == "1":
+        import faulthandler
+        faulthandler.dump_traceback_later(60, repeat=True)
     entrypoint = Path(sys.argv.pop(1)).resolve()
     spec = importlib.util.spec_from_file_location('_xt_moss_adapter', entrypoint)
     module = importlib.util.module_from_spec(spec)

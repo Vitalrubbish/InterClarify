@@ -20,6 +20,7 @@ export XTALK_MOSS_SERVICE_ROOT="${XTALK_MOSS_SERVICE_ROOT:-$ROUND1/moss-service}
 export XTALK_MOSS_SOURCE_ROOT="${XTALK_MOSS_SOURCE_ROOT:-$ROUND1/moss-source}"
 export XTALK_TTS_TRACE="$OUTPUT/server.jsonl"
 export XTALK_TTS_METRICS=1 XTALK_TTS_SEED=17
+export XTALK_TTS_STACK_DIAGNOSTIC="${TTS_STACK_DIAGNOSTIC:-0}"
 export XTALK_TTS_GENERATION_BATCH_FRAMES="${TTS_BATCH_FRAMES:-0}"
 export XTALK_TTS_EARLY_COMPILE="${TTS_EARLY_COMPILE:-0}"
 export XTALK_TTS_LOCAL_ATTN=sdpa XTALK_TTS_LOCAL_COMPILE=inductor XTALK_TTS_SAMPLE=upstream
@@ -32,6 +33,11 @@ cleanup() {
   trap - EXIT INT TERM
   if [ -n "$SERVER_PID" ]; then
     kill -TERM -- "-$SERVER_PID" 2>/dev/null || true
+    for _ in {1..20}; do
+      kill -0 -- "-$SERVER_PID" 2>/dev/null || break
+      sleep 1
+    done
+    kill -KILL -- "-$SERVER_PID" 2>/dev/null || true
     wait "$SERVER_PID" 2>/dev/null || true
   fi
   if [ -n "$SAMPLER_PID" ]; then
@@ -72,13 +78,13 @@ SAMPLER_PID=$!
 setsid conda run --no-capture-output -n "$CLIENT_ENV" python scripts/remote/run_xtalk_round1.py \
   --model-root "$MODEL_ROOT" serve tts --gpu-index 0 --port "$PORT" > "$OUTPUT/service.log" 2>&1 &
 SERVER_PID=$!
-conda run --no-capture-output -n "$CLIENT_ENV" python - "$PORT" "$SERVER_PID" <<'PY'
+conda run --no-capture-output -n "$CLIENT_ENV" python - "$PORT" "$SERVER_PID" "${TTS_HEALTH_TIMEOUT:-600}" <<'PY'
 import os
 import sys
 import time
 import urllib.request
-port, pid = map(int, sys.argv[1:])
-for _ in range(180):
+port, pid, timeout = map(int, sys.argv[1:])
+for _ in range(timeout):
     os.kill(pid, 0)
     try:
         with urllib.request.urlopen(f'http://127.0.0.1:{port}/health', timeout=2) as response:

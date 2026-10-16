@@ -250,6 +250,15 @@ class MeasurementTests(unittest.TestCase):
         self.assertAlmostEqual(row['seconds']['overlapping_spans'], .01)
         self.assertAlmostEqual(sum(row['fractions'].values()), 1.)
 
+    def test_formal_trace_excludes_warmup_responses(self):
+        events = [{'response_id': response, 'clock_domain': 'p',
+                   'event': event, 'monotonic_ns': stamp}
+                  for response, end in [('cold', 10000000000), ('formal', 200000000)]
+                  for event, stamp in [('model.prefill.start', 0), ('model.prefill.end', end)]]
+        result = benchmark.analyze_server_trace(events, response_ids={'formal'})
+        self.assertEqual(result['cpu_span_seconds']['model.prefill']['n'], 1)
+        self.assertAlmostEqual(result['cpu_span_seconds']['model.prefill']['mean'], .2)
+
     def test_corpus_and_cross_process_spans(self):
         rows = benchmark.corpus()
         self.assertGreaterEqual(sum(r['category'] == 'short' for r in rows), 30)
