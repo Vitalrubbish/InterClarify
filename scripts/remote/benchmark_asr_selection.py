@@ -112,13 +112,14 @@ class RealtimeAudio:
 class EventSink:
     """Record the unmodified transcript and check prefix monotonicity."""
 
-    def __init__(self, path, source):
+    def __init__(self, path, source, buffered=False):
         self.path = path
         self.source = source
         self.events = []
         self.text = ""
         self.tokens = []
         self.stream = path.open("w")
+        self.buffered = buffered
 
     def emit(self, text, token=None):
         now = time.monotonic()
@@ -134,10 +135,13 @@ class EventSink:
                  "eof": elapsed >= self.source.duration}
         self.events.append(event)
         self.text = text
-        self.stream.write(json.dumps(event, ensure_ascii=False) + "\n")
-        self.stream.flush()
+        if not self.buffered:
+            self.stream.write(json.dumps(event, ensure_ascii=False) + "\n")
+            self.stream.flush()
 
     def close(self):
+        if self.buffered:
+            self.stream.writelines(json.dumps(event, ensure_ascii=False) + "\n" for event in self.events)
         self.stream.close()
         self.path.with_suffix(".input.json").write_text(json.dumps(self.source.packets))
         self.path.with_suffix(".tokens.json").write_text(json.dumps(self.tokens))
@@ -375,6 +379,7 @@ def main():
     parser.add_argument("--limit", type=int, default=100)
     parser.add_argument("--drain-seconds", type=float, default=2.0)
     parser.add_argument("--manifest", type=Path)
+    parser.add_argument("--buffer-events", action="store_true")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     torch.set_num_threads(4)
@@ -400,7 +405,8 @@ def main():
         if rate != 16000 or audio.ndim != 1:
             raise ValueError("Expected mono 16 kHz FLEURS input")
         source = RealtimeAudio(audio, rate, drain_seconds=args.drain_seconds)
-        sink = EventSink(args.output / (f"warmup-{index}.jsonl" if is_warmup else f"sample-{sample_index:04d}.jsonl"), source)
+        sink = EventSink(args.output / (f"warmup-{index}.jsonl" if is_warmup else f"sample-{sample_index:04d}.jsonl"), source,
+                         buffered=args.buffer_events)
         error = None
         try:
             if args.candidate != "kyutai":
@@ -432,6 +438,7 @@ def main():
               "peak_allocated_bytes": torch.cuda.max_memory_allocated(),
               "peak_reserved_bytes": torch.cuda.max_memory_reserved(), "drain_seconds": args.drain_seconds,
               "normalizer": "whisper-normalizer==0.1.12 EnglishTextNormalizer",
+              "event_persistence": "after decode" if args.buffer_events else "synchronous per event",
               "summary": summarize(rows), "samples": rows}
     (args.output / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2))
     print(json.dumps(report["summary"], indent=2), flush=True)

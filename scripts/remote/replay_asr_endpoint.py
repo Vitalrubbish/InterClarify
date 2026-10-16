@@ -70,6 +70,23 @@ class OfficialBridge:
                 yield GenerationEnd(item["finish_reason"], tuple(record["generated_ids"]))
 
 
+class HTTPModelProxy:
+    """Keep the model environment separate from the installed X-Talk client environment."""
+
+    def __init__(self, url, info):
+        self.url = url.rstrip("/")
+        self.info = info
+
+    async def stream(self, request):
+        import aiohttp
+        timeout = aiohttp.ClientTimeout(total=120)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            async with session.post(self.url + "/generate", json=request.model_dump()) as response:
+                response.raise_for_status()
+                async for line in response.content:
+                    yield json.loads(line)
+
+
 async def replay_one(model, row, trace, variant, output, observation_seconds=12.0):
     from xtalk.duplex_control.micro_turn import MicroTurnAssembler
     from xtalk.duplex_control.runtime_adapter import DuplexRuntimeAdapter
@@ -159,15 +176,27 @@ async def replay_one(model, row, trace, variant, output, observation_seconds=12.
 
 async def run(args):
     import inspect
-    import torch
-    from duplex_model_service import OfficialDuplexModel, GenerateRequest, HistoryTurn
+    from duplex_model_service import GenerateRequest, HistoryTurn
     from xtalk.duplex_control.micro_turn import MicroTurnAssembler
     from xtalk.duplex_control.runtime_adapter import DuplexRuntimeAdapter
 
-    torch.set_num_threads(4)
-    files = [Path(inspect.getfile(cls)) for cls in (OfficialDuplexModel, MicroTurnAssembler, DuplexRuntimeAdapter)]
+    files = [Path(__file__).with_name("duplex_model_service.py")]
+    files += [Path(inspect.getfile(cls)) for cls in (MicroTurnAssembler, DuplexRuntimeAdapter)]
     hashes = {str(path): hashlib.sha256(path.read_bytes()).hexdigest() for path in files}
-    model = OfficialDuplexModel(args.checkpoint, args.base_model)
+    if args.model_url:
+        import aiohttp
+        async with aiohttp.ClientSession() as session:
+            async with session.get(args.model_url.rstrip("/") + "/health") as response:
+                response.raise_for_status()
+                info = await response.json()
+        if Path(info["checkpoint"]).resolve() != args.checkpoint.resolve() or Path(info["base_model"]).resolve() != args.base_model.resolve():
+            raise ValueError("Model service assets do not match the fixed official checkpoint")
+        model = HTTPModelProxy(args.model_url, info)
+    else:
+        import torch
+        from duplex_model_service import OfficialDuplexModel
+        torch.set_num_threads(4)
+        model = OfficialDuplexModel(args.checkpoint, args.base_model)
     async for _ in model.stream(GenerateRequest(history=[HistoryTurn(role="user", text="What is two plus two?")], max_new_tokens=8)):
         pass
     manifest = json.loads(args.manifest.read_text())
@@ -175,7 +204,8 @@ async def run(args):
     results = []
     args.output.mkdir(parents=True, exist_ok=True)
     metadata = {"model": model.info, "source_sha256": hashes, "interval_seconds": 0.6,
-                "note": "Existing X-Talk runtime, real-time trace replay, in-process model, no TTS"}
+                "note": "Existing X-Talk runtime, real-time trace replay, HTTP model" if args.model_url else "Existing X-Talk runtime, in-process model",
+                "tts": False}
     (args.output / "metadata.json").write_text(json.dumps(metadata, indent=2))
     for config in CONFIGS:
         for variant in ("original", "without_punctuation"):
@@ -213,6 +243,7 @@ def main():
     parser.add_argument("--asr-run", type=Path, required=True)
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--base-model", type=Path, required=True)
+    parser.add_argument("--model-url")
     parser.add_argument("--output", type=Path, required=True)
     asyncio.run(run(parser.parse_args()))
 

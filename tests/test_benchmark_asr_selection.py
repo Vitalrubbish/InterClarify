@@ -23,10 +23,6 @@ ALIGN_SPEC.loader.exec_module(aligner)
 
 
 class BenchmarkTests(unittest.TestCase):
-    def test_parallel_rotation_covers_every_configuration_once_per_repeat(self):
-        for repeat in range(3):
-            self.assertEqual(sorted((shard + repeat) % 5 for shard in range(5)), list(range(5)))
-
     def test_duplicate_shard_results_are_rejected(self):
         spec = importlib.util.spec_from_file_location("asr_selection_summary", PATH.with_name("summarize_asr_selection.py"))
         module = importlib.util.module_from_spec(spec)
@@ -134,6 +130,20 @@ class BenchmarkTests(unittest.TestCase):
             self.assertEqual(sink.events[-1]["text"], "help")
             saved = [json.loads(line) for line in sink.path.read_text().splitlines()]
             self.assertEqual(saved[-1]["text"], "help")
+
+    def test_buffered_events_do_not_write_during_decode(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = benchmark.RealtimeAudio(np.zeros(1280, dtype=np.float32), 16000)
+            source.started = time.monotonic()
+            sink = benchmark.EventSink(Path(directory) / "events.jsonl", source, buffered=True)
+            with patch.object(sink.stream, "write", side_effect=AssertionError("write in decoder")), \
+                 patch.object(sink.stream, "flush", side_effect=AssertionError("flush in decoder")):
+                sink.emit("hello")
+            captured = sink.events[0]["arrival_seconds"]
+            sink.close()
+            event = json.loads(sink.path.read_text())
+            self.assertEqual(event["text"], "hello")
+            self.assertEqual(event["arrival_seconds"], captured)
 
 
 if __name__ == "__main__":
