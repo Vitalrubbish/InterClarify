@@ -73,6 +73,18 @@ class BenchmarkTests(unittest.TestCase):
         self.assertEqual(summary["failures"], 1)
         self.assertEqual(summary["estimated_word_latency_seconds"]["count"], 0)
 
+    def test_internal_comma_is_not_terminal_punctuation(self):
+        sink = SimpleNamespace(text="hello, there.", source=SimpleNamespace(packets=[]), events=[
+            {"text": "hello, there", "arrival_seconds": 0.4, "eof": False, "rewritten": False},
+            {"text": "hello, there.", "arrival_seconds": 1.3, "eof": True, "rewritten": False}])
+        row = {"sample_id": "sample", "reference": "hello, there.", "duration_seconds": 1.0}
+        with patch.object(benchmark, "NORMALIZE", lambda text: text.lower(), create=True):
+            result = benchmark.score_sample(row, sink)
+        summary = benchmark.summarize([result])
+        self.assertEqual(summary["online_punctuation_samples"], 1)
+        self.assertEqual(summary["online_terminal_punctuation_samples"], 0)
+        self.assertEqual(summary["eof_only_terminal_punctuation_samples"], 1)
+
     def test_audio_is_unavailable_before_its_packet_time(self):
         source = benchmark.RealtimeAudio(np.ones(1280, dtype=np.float32), 16000, drain_seconds=0)
         source.start()

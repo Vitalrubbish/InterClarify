@@ -336,10 +336,15 @@ def summarize(rows):
     errors = sum(r["substitute"] + r["delete"] + r["insert"] for r in rows)
     words = sum(r["reference_words"] for r in rows)
     tp, fp, fn = (sum(r["punctuation_" + field] for r in rows) for field in ("tp", "fp", "fn"))
+    def ends_with_sentence_mark(text):
+        return bool(re.search(r'''[.!?]["'”’)]*\s*$''', text))
     return {"samples": len(rows), "failures": sum(r["error"] is not None for r in rows),
             "reference_words": words, "word_errors": errors, "wer": errors / words if words else None,
             "rewrites": sum(r["rewrites"] for r in rows),
             "online_punctuation_samples": sum(r["online_punctuation"] for r in rows),
+            "online_terminal_punctuation_samples": sum(ends_with_sentence_mark(r["online_text"]) for r in rows),
+            "final_terminal_punctuation_samples": sum(ends_with_sentence_mark(r["text"]) for r in rows),
+            "eof_only_terminal_punctuation_samples": sum(ends_with_sentence_mark(r["text"]) and not ends_with_sentence_mark(r["online_text"]) for r in rows),
             "punctuation_tp": tp, "punctuation_fp": fp, "punctuation_fn": fn,
             "punctuation_precision": tp / (tp + fp) if tp + fp else None,
             "punctuation_recall": tp / (tp + fn) if tp + fn else None,

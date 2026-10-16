@@ -6,10 +6,15 @@ ASR_SOURCE="${ASR_SELECTION_SOURCE:-$ASR_ROOT/source}"
 ASR_RUN="${ASR_SELECTION_RUN:?set ASR_SELECTION_RUN}"
 ASR_LIMIT="${ASR_SELECTION_LIMIT:-100}"
 ASR_REPEATS="${ASR_SELECTION_REPEATS:-3}"
+ASR_TIMEOUT="${ASR_SELECTION_TIMEOUT_SECONDS:-3600}"
 mkdir -p "$ASR_RUN"
 exec > >(tee -a "$ASR_RUN/run.log") 2>&1
 export PYTHONNOUSERSITE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 export TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=4
+if [ ! -f "$ASR_SOURCE.sha256" ] || ! sha256sum -c "$ASR_SOURCE.sha256" > "$ASR_RUN/source_check.txt" 2>&1; then
+  echo "Source snapshot verification failed"
+  exit 2
+fi
 nvidia-smi --query-gpu=name,uuid,driver_version,memory.total --format=csv > "$ASR_RUN/gpu.csv"
 sha256sum "$ASR_SOURCE/benchmark_asr_selection.py" "$ASR_ROOT/models.lock.json" \
   "$ASR_ROOT/dataset/manifest.json" > "$ASR_RUN/input.sha256"
@@ -29,7 +34,7 @@ for ((repeat=0; repeat<ASR_REPEATS; repeat++)); do
     out="$ASR_RUN/repeat-$repeat/$candidate-$chunk"
     mkdir -p "$out"
     echo "START repeat=$repeat config=$config utc=$(date -u +%FT%TZ)"
-    "$ASR_ROOT/envs/$candidate/bin/python" -u "$ASR_SOURCE/benchmark_asr_selection.py" \
+    timeout "$ASR_TIMEOUT" "$ASR_ROOT/envs/$candidate/bin/python" -u "$ASR_SOURCE/benchmark_asr_selection.py" \
       --root "$ASR_ROOT" --candidate "$candidate" --chunk-ms "$chunk" \
       --limit "$ASR_LIMIT" --output "$out" > "$out/process.log" 2>&1
     code=$?
