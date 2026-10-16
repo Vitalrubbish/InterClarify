@@ -1,6 +1,6 @@
 # TTS 延迟优化远端任务单
 
-日期：2026-10-17。状态：实验工具已准备，GPU 作业未提交。已通过交互 PTY 登录 JumpServer：使用现有 `js-hpc` SSH 配置和会话 key，等待菜单后输入 `p`，选择资产编号 `1`（`d6-hpc-debuggpu-001`，`10.24.19.254`），成功进入 `xuan.zhang` 的 shell。直接搜索 `guizhou` 返回“没有资产”；它是用户使用的集群名称，当前堡垒机资产名称不同。必须保持交互 stdin，不能在菜单出现前一次性管道发送多条命令。
+日期：2026-10-17。状态：远端基线作业已提交并通过组件门禁，正在进行真实模型探针与基线回放。已通过交互 PTY 登录 JumpServer：使用现有 `js-hpc` SSH 配置和会话 key，等待菜单后输入 `p`，选择资产编号 `1`（`d6-hpc-debuggpu-001`，`10.24.19.254`），成功进入 `xuan.zhang` 的 shell。直接搜索 `guizhou` 返回“没有资产”；它是用户使用的集群名称，当前堡垒机资产名称不同。必须保持交互 stdin，不能在菜单出现前一次性管道发送多条命令。
 
 已只读确认 `/usr/bin/vc`、共享 `miniconda3/bin/conda`、`xtalk-round1-moss`/`xtalk-round1-client` 环境及 `xtalk-round1/{models,moss-source,moss-service}` 目录存在。远端 `InterClarify` 在 main 且包含未跟踪的历史报告，后续使用独立 checkout，不覆盖现有目录。登录成功不代表 GPU 资源或性能验收已完成。
 
@@ -53,3 +53,15 @@
 第三次诊断作业 `job-179219357903821135118-xuan-zhang` 取得 Python 和 native 栈：codec 在 `transformers._initialize_missing_keys → _init_weights → torch._weight_norm → GOMP_parallel` 停滞，GPU 空闲。相同节点的隔离 CPU 微基准，单线程 codec 加载 2.123 秒完成，8 线程 25 秒超时（rc=124），仍停留在相同路径；另一个普通 1024×1024 weight_norm 微基准正常，不能泛称所有 OpenMP 运算损坏。
 
 据此新增仅覆盖 codec 加载阶段的独立单线程开关，成功/失败后恢复原推理线程数；不升级依赖、不跳过初始化、不修改权重。这是启动兼容处理，不算首音性能收益。诊断作业不作正式基线，清理后以新目录关闭栈诊断重提。
+
+
+## 当前作业：20261017-baseline-04
+
+- 作业：`job-179219430342742386259-xuan-zhang`，`pdgpu-4090`，1 GPU / 8 CPU / 32G，源码 `931746b`。
+- 实验目录：`/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-runs/20261017-baseline-04`。提交日志在同级 `submit_logs/20261017-baseline-04.log`。
+- GPU：RTX 4090，UUID `GPU-0c478b82-e50c-7691-2b0a-85113ac35ac1`。
+- 设置：batch=0、early=0、官方采样、seed=17、local SDPA + inductor；`TTS_CODEC_LOAD_THREADS=1`，诊断关闭。trace 确认 codec 加载约 9.34 秒（含 `.to(device)`），加载后恢复为 8 线程；此前 2.123 秒为独立 CPU 微基准，二者口径不同。
+- 依赖检查通过，真实 MOSS 环境 44/44 组件测试通过；health 200，冷启动长句已生成前 50 帧，编译路径在第 51 帧接管。首次图预热 67.5 秒，属于 cold，不纳入正式热态分布。
+- 正式计划：cold/warm 探针与原客户端 smoke 通过后，35 条文本 × 2 种输入模式 × 3 轮 = 210 条正式响应。当前无最终基线或音质结论；002/003/004 不自动启动。
+
+远端 GitHub HTTPS 在本轮出现 Empty reply/连接超时；已用 GitHub SSH 443（`ssh://git@ssh.github.com:443/Vitalrubbish/InterClarify.git`）fetch 并 fast-forward 到指定提交，仍遵循从 GitHub 同步，不复制本地源码或改动固定上游 checkout。
