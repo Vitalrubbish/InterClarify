@@ -266,3 +266,15 @@ TTS 证据修复 `126b1f1`：未来 probe 按角色保存清单；本轮旧 conf
 官方 `server.py` 的 `llm_tick_task` 在 `first_text_received_event.wait()` 后启动时钟；当前 MicroTurnAssembler 在 LLMAgentLoop 中启动 ASR 的同时启动时钟，是明确的工程差异。持续监听不要求在第一段转写之前调用 LLM：可以保持 ASR 从会话建立开始接收音频，仅把模型时钟启动恢复到首段非空文字，之后继续无条件按拍发送增量或 no-voice，不接入 VAD。
 
 另外两例说明启动历史不能解释全部失败。样本 101 末段是 ` steam on`：原样及跳过前导空拍都持续等待；仅改为 ` steam on.` 后，下一空拍就输出 finish-talking 和回答。句号对这五个固定文本轨迹有效，支持控制模型对文本句末形式敏感；不能据此证明训练数据的具体分布，或直接给在线每个增量补句号。实际系统不知道哪段是最后一段，硬补标点或静默若干拍后强制接话会改变停顿处理。后续先恢复官方启动边界并复测，再核查 X2 的标点输出能力与完整词提交契约；未验证前不引入新的 VAD、强制话轮结束或复杂反回写逻辑。
+
+### 12.2 X2 标点能力核查（2026-10-16）
+
+核查对象是当前部署的源码 `0aca80597bb1399c0be4002de5bc62c0a779c542`、权重 `X2Streaming-ASR-4B-1009@4c8df16b8d7f8b50c95590c4d7907436ebe4aa08`，不能泛化到其他 X2-ASR/X2-Turn 发布模型。
+
+- [论文 v1](https://arxiv.org/html/2609.08672v1) §2 介绍 LISTEN/DECODE、逐段 EOS 和三阶段训练，§3 评测中文字符识别率与提交延迟；没有声明标点恢复能力、标点评分或句末标点到达延迟。公开仓库仅提供推理代码，因此无法从训练实现确认是否清洗了监督文本标点。论文中的每段 EOS 是结束当前解码并回到监听，不是给下游发送的句号或用户话轮结束信号。
+- [发布模型卡](https://huggingface.co/x-square-robot/X2Streaming-ASR-4B-1009/blob/4c8df16b8d7f8b50c95590c4d7907436ebe4aa08/README.md) 未声明标点能力；网络访问失败后读取了服务器已下载版本。`tekken.json` 普通词表包含 `.,!?` 和 `。，！？` 等项，结构上允许生成标点；`generation_config.json` 没有标点抑制参数。但有词表不等于权重已经学会可靠标点恢复。
+- [`demo/engine_adaptive.py`](https://github.com/X-Square-Robot/X2Streaming-ASR/blob/0aca80597bb1399c0be4002de5bc62c0a779c542/demo/engine_adaptive.py#L1344) 的在线 DECODE 直接 argmax；只过滤 PAD/WORD/BOS，EOS 用于返回 LISTEN；对普通文本执行 `decode(..., skip_special_tokens=True).strip()`。[`data_pipeline/join_emit.py`](https://github.com/X-Square-Robot/X2Streaming-ASR/blob/0aca80597bb1399c0be4002de5bc62c0a779c542/data_pipeline/join_emit.py#L46) 只去首尾空白及拼接，不删除标点。本地直接调用验证 `hello.` 与 `how are you?` 拼接为 `hello. how are you?`，中文标点也保留。未找到受支持的标点开关或标点恢复模块。
+- 我们的 X2Service 直接返回 `session.live_text`；X2StreamingClient 校验类型后原样返回，MicroTurnAssembler 截取累计文本后缀，未发现删除句读标点的步骤。
+- 本轮 `services/asr.log` 的 29 个会话共 1,022 条 `kind=live_emit` 原始提交中，含 `[.,!?;:，。！？；：]` 的提交数为 **0**；该统计不把英文撇号当作句读标点。唯一完成真实 EOF 的启动预热输出为 `could you tell me a short joke please`，仍没有问号。1,022 条是增量提交数量，不是 1,022 个独立句子；其余会话未执行完整 EOF，不据此断言其 EOF 输出必然无标点。
+
+结论：当前部署链路没有因标点过滤而损失信息；这版权重在已观察英语在线输入中未提供句读标点，不能当作具备可靠句末标点能力的 ASR 使用。尚不足以断言权重在任何输入/语言/离线模式下都不会生成标点，也没有证据能通过一个现成配置开启它。无标点与控制模型持续等待的因果证据见 §12.1；后续若保留 X2，需要单独验证标点恢复或控制模型对无标点输入的适配，不能把每段解码 EOS 当成句末。
