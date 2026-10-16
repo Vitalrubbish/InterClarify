@@ -166,12 +166,36 @@ def download_models(config: dict, root: Path) -> None:
         print(f"[download] {role}: {entry['model_id']}@{entry['revision']}", flush=True)
 
 
-def new_report_directory(output: Path, config_path: Path, model_root: Path) -> None:
-    """Create fresh evidence with the configuration and immutable model lock."""
-    lock_bytes = (model_root / "models.lock.json").read_bytes()
+def new_report_directory(output: Path, config_path: Path, model_root: Path, role: str) -> None:
+    """Save only the models and configuration used by one independent probe.
+
+    Parameters
+    ----------
+    output : Path
+        New evidence directory.
+    config_path : Path
+        Source preparation configuration.
+    model_root : Path
+        Asset directory containing the immutable model lock.
+    role : str
+        ASR or TTS probe role; TTS also uses its audio codec.
+    """
+    roles = {"tts": ("tts", "codec"), "asr": ("asr",)}[role]
+    config = read_config(config_path)
+    lock = json.loads((model_root / "models.lock.json").read_text())
+    scoped = {"schema_version": config["schema_version"], "probe_role": role,
+              "models": {name: config["models"][name] for name in roles},
+              "services": {role: config["services"][role]},
+              "sources": {name: value for name, value in config.get("sources", {}).items()
+                          if name == "xtalk" or name.startswith("moss_" if role == "tts" else "qwen_asr")}}
+    if role == "asr":
+        scoped["asr_streaming"] = config["asr_streaming"]
     output.mkdir(parents=True, exist_ok=False)
-    (output / "config.yaml").write_bytes(config_path.read_bytes())
-    (output / "models.lock.json").write_bytes(lock_bytes)
+    (output / "config.yaml").write_text(yaml.safe_dump(scoped, sort_keys=False))
+    write_json(output / "models.lock.json", {
+        "probe_role": role,
+        "models": {name: value for name, value in lock["models"].items() if name in roles},
+    })
 
 
 def resample_to(audio: Any, rate: int, target_rate: int) -> tuple[Any, str]:
@@ -237,7 +261,7 @@ def asr_smoke(config: dict, args: argparse.Namespace) -> None:
         stream["unfixed_token_num"] = args.unfixed_token_num
     emit_committed_prefix = (stream.get("emit_committed_prefix", False)
                             if args.emit_committed_prefix is None else args.emit_committed_prefix)
-    new_report_directory(args.output, args.config, args.model_root)
+    new_report_directory(args.output, args.config, args.model_root, "asr")
     service = config["services"]["asr"]
     started = time.monotonic()
     model = Qwen3ASRModel.LLM(
@@ -398,7 +422,7 @@ async def tts_smoke(config: dict, args: argparse.Namespace) -> None:
 
     if not args.reference.is_file() or args.gap_seconds <= 0:
         raise ValueError("Reference audio must exist and gap-seconds must be positive")
-    new_report_directory(args.output, args.config, args.model_root)
+    new_report_directory(args.output, args.config, args.model_root, "tts")
     service = config["services"]["tts"]
     client = MossTTSRealtime(
         base_url=args.url or f"http://{service['host']}:{service['port']}",

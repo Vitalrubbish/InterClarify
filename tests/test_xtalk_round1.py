@@ -22,6 +22,24 @@ SPEC.loader.exec_module(round1)
 class RoundOneTest(unittest.TestCase):
     """Protect immutable model locks, allocated GPUs, and duplex collection."""
 
+    def test_probe_provenance_contains_only_active_models(self) -> None:
+        """TTS evidence cannot misreport an unrelated ASR or LLM as active."""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            lock = {"models": {name: {"model_id": name} for name in ("asr", "llm", "tts", "codec")}}
+            (root / "models.lock.json").write_text(json.dumps(lock))
+            for role, expected in (("tts", {"tts", "codec"}), ("asr", {"asr"})):
+                output = root / role
+                round1.new_report_directory(output, round1.DEFAULT_CONFIG, root, role)
+                saved = json.loads((output / "models.lock.json").read_text())
+                self.assertEqual(set(saved["models"]), expected)
+                config = round1.read_config(output / "config.yaml")
+                self.assertEqual(set(config["models"]), expected)
+                self.assertEqual(set(config["services"]), {role})
+                if role == "tts":
+                    self.assertNotIn("qwen_asr", config["sources"])
+                    self.assertNotIn("Qwen", (output / "config.yaml").read_text())
+
     def test_gpu_mapping_stays_within_allocation(self) -> None:
         """Logical indices resolve to the job's visible IDs, including UUIDs."""
         with patch.dict("os.environ", {"CUDA_VISIBLE_DEVICES": "GPU-one,GPU-two"}):
