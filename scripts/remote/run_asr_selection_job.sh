@@ -18,7 +18,7 @@ if [ -f "$ASR_ROOT/dataset/alignments.json" ]; then
   cp "$ASR_ROOT/dataset/alignments.json" "$ASR_RUN/"
   sha256sum "$ASR_ROOT/dataset/alignments.json" >> "$ASR_RUN/input.sha256"
 fi
-configurations=(nemotron_en:160 nemotron_en:560 nemotron_multi:160 nemotron_multi:560 kyutai:500)
+configurations=(nemotron_en:160 nemotron_en:560 nemotron_multi:320 nemotron_multi:560 kyutai:500)
 failures=0
 for ((repeat=0; repeat<ASR_REPEATS; repeat++)); do
   for ((offset=0; offset<5; offset++)); do

@@ -151,7 +151,7 @@ class NemotronBackend:
     def __init__(self, model_path, chunk_ms):
         from transformers import AutoModelForRNNT, AutoProcessor
         self.processor = AutoProcessor.from_pretrained(model_path, local_files_only=True)
-        self.lookahead = {160: 1, 560: 6}[chunk_ms]
+        self.lookahead = {160: 1, 320: 3, 560: 6}[chunk_ms]
         self.processor.set_num_lookahead_tokens(self.lookahead)
         self.multilingual = "nemotron3_5" in self.processor.__class__.__name__.lower() or "multi" in str(model_path)
         self.model = AutoModelForRNNT.from_pretrained(model_path, local_files_only=True,

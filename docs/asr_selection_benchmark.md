@@ -2,13 +2,36 @@
 
 ## 1. 状态与范围
 
-2026-10-16：调研和测试协议已准备，尚未下载本轮候选、提交 GPU 作业或取得新实测结果。来源与限制见 [调研复核](append_only_asr_survey.md)。本轮准备后续执行任务；候选适配器和提交脚本在实际测试阶段实现，并在 `docs/scripts/remote/` 镜像记录文件功能、类和核心方法。
+### 实际执行记录（2026-10-16）
+
+远端根目录：`/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection`。VPN 恢复后已完成三模型、配套 Mimi、离线对齐器和数据下载；三个独立 conda 环境已建立。FLEURS revision 为 `70bb2e84b976b7e960aa89f1c648e09c59f894dd`，manifest 包含 100 条 test 和 1 条 dev。
+
+| 资产 | 固定 revision |
+| --- | --- |
+| Nemotron EN | `ebe59e5a817142986528bbbee5dba8db7b38ed50` |
+| Nemotron 3.5 | `ea30d66debe3740a08b573244286791d423d6b3e` |
+| Kyutai 1B（含 Mimi） | `1c34c6b4f7e9299bb61985f145052ff131005dde` |
+| Wav2Vec2 对齐器 | `22aad52d435eb6dbaf354bdad9b0da84ce7d6156` |
+
+文件 SHA256 记录在远端 `models.lock.json`；各环境 pip freeze 位于 `logs/`。Nemotron 使用 Transformers 5.15.1、PyTorch 2.11.0+cu128；Kyutai 使用 Moshi 0.2.11。当前 Moshi 在新框架环境下可导入，但其包声明的若干依赖范围与实际环境不一致，先做真实 GPU 探针；若失败，独立调整 Kyutai 环境，不修改其他候选环境。
+
+已执行作业：
+
+- 英语版单样本冷启动探针 `job-179215089384180866088-xuan-zhang`：完整预热转写 WER=0，但 7.8s 录音首文本在 12.892s 才出现，故在线预热门禁拒绝继续。该数据不进入候选性能比较；据此固定两遍独立语音预热。
+- 独立对齐 `job-179215195826261552740-xuan-zhang`：100 条均处理，76 条产生参考词时间，24 条因字符词表不支持而保留失败；还需按固定置信阈值筛选可测词。
+- 五配置单样本探针 `job-179215236596840551086-xuan-zhang`：代码 `2254d12`，独立源码目录 `source-2254d12`，原始产物 `runs/probe-five-2254d12/`，正在执行。不得将单样本探针作为选型结论。
+
+本地评测契约测试 9 项通过；覆盖音频因果顺序、原始回写、CTC 重复字符、空输出分母与延迟覆盖率。
+
+本任务最初用于准备后续下载和测试；当前执行状态以上方记录为准。来源与限制见 [调研复核](append_only_asr_survey.md)。候选适配器与提交脚本已实现，并在 `docs/scripts/remote/` 镜像记录文件功能、类和核心方法。
 
 遵循 [工程方案](engineering_implementation.md) 和 [研究范围](research_design.md)：先测 ASR，再经现有 X-Talk 做单组件替换。保持 Layer 边界及唯一播放所有权，不增加 VAD 让轮规则或第二套运行时。真实模型测试在远端 4090 调度节点执行，各候选独立 conda 环境，不修改现役环境。
 
 ## 2. 下载与配置清单
 
 ### 本轮执行设置
+
+**实际配置修订**：五配置探针中 Nemotron EN 160/560、Nemotron 3.5 560、Kyutai 500 已成功完成；Nemotron 3.5 160 被固定权重的 processor 拒绝，其 `supported_num_lookahead_tokens=[3,0,6,13]`，与模型卡含 160ms 的描述不一致。后续按实际发布配置将多语言低延迟档改为 **320ms**（lookahead=3），保留 560ms 共同对照档，不修改权重配置来绕过限制。以下早期 160ms 计划以此修订为准。
 
 用户已授权实际下载和测试。固定 FLEURS `en_us/test`，按文件名 SHA256 排序选择前 100 条；独立取 dev 首条用于预热。模型／数据下载时解析不可变 revision，manifest 记录原始带标点转写、规范化参考及音频摘要。该集以朗读为主，本轮不能代表 FDB 自然对话表现。
 
