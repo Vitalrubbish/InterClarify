@@ -145,13 +145,13 @@ export DUPLEX_X2_LANGUAGE=en
 
 ## 10. 修复与诊断清单（2026-10-16 复核）
 
-本节是后续工作的统一清单，**均尚未实施**。前四项是明确的工程缺口或测量修正，后三项需要先定位再确定实现方案。Candor Pause Handling 的沉默符合预期，不列为待修问题。继续保留 X2 原生追加输出与在线缓存，不对 X2 加入 Qwen 的反回写、冲突冻结或分段重建逻辑。
+本节是后续工作的统一清单。**F1 已按用户确认的 micro-turn 读取方案完成实现与本地契约回归，真实模型/FDB 效果待远端复测；其余项目尚未实施**。前四项是明确的工程缺口或测量修正，后三项需要先定位再确定实现方案。Candor Pause Handling 的沉默符合预期，不列为待修问题。继续保留 X2 原生追加输出与在线缓存，不对 X2 加入 Qwen 的反回写、冲突冻结或分段重建逻辑。
 
 ### 10.1 优先修复的工程项目
 
 | 编号 / 优先级 | 证据与问题 | 涉及实现及处理方向 | 验收条件 |
 | --- | --- | --- | --- |
-| F1 / 高：异步结果交付 | `X2Service.recognize()` 追加 PCM 后立即读取 `live_text`，模型后台稍后产生的结果需下一次请求才能取回；`AudioConsumer` 没有新音频便不再请求。因此输入暂时停止也可能漏交付已生成的文字。 | `scripts/remote/x2_asr_service.py`、X-Talk 的 `models/asr/x2_streaming_client.py`、`serving/modules/asr_manager.py`：建立独立于新音频到达的结果接收机制。轮询、长轮询或推送的选择留到实现时确定；关闭与取消时释放接收任务。 | 异步假引擎在最后一次音频请求返回后才 emit，且没有后续音频，运行时仍能收到该文本；无重复音频提交；关闭后无过期发布与遗留任务。 |
+| F1 / 高：异步结果交付 | `X2Service.recognize()` 追加 PCM 后立即读取 `live_text`，模型后台稍后产生的结果需下一次请求才能取回；`AudioConsumer` 没有新音频便不再请求。因此输入暂时停止也可能漏交付已生成的文字。 | 每个 micro-turn 在组装快照前读取 X2 最新累计文本，随后沿用增量计算与 `<|no voice|>` 包装；会话启动即开时钟。复用现有 ASR 接口的空音频读取和事件链，不增加独立轮询任务。 | 最后一包请求返回后才 emit、且无后续音频时，下一拍仍能读到新增文本；首条结果前也有 no-voice 拍；无新增不重复文本；不追加或丢弃 PCM，不触发 EOF，取消后不发布过期结果。 |
 | F2 / 高：真实 EOF 收尾 | 本轮 4897 条请求 `end_stream=0`，synthetic pause 五例均缺参考末词。驱动发完输入只等待，duplex 链路没有实际触发 `finish_stream`。 | X-Talk 的输入网关、ASR 生命周期及 `scripts/remote/duplex_a4_replay.py`：对有限音频输入提供显式 EOF，排空队列并取得最终在线输出。**声学暂停继续保留流与缓存**，不得用 VAD 停顿推断真实 EOF，也不得借参考转写或隐藏让轮标记触发收尾。麦克风持续输入不按每个话轮重建 X2。 | EOF 前已接收音频全部处理；在线尾部交付后再释放会话；重复 EOF 幂等；暂停恢复仍使用原流；远端逐例检查五条尾词，仍缺失时另记识别错误。官方 WAV 保持输入等长，EOF 后诊断输出单独记录。 |
 | F3 / 高：完整预热 | `warmup()` 追加 1s 静音后直接 `abort()`，未等待实际 decode/emit 完成；本轮首个真实会话请求音频量为 0.096s、4.064s、随后约 0.096s，仍有一次性堆积。 | `scripts/remote/x2_asr_service.py` 或节点作业预热入口：使用固定真实语音，等待非空在线输出、在线 EOF 排空和资源释放，再进入就绪状态。不得仅以请求成功或静音已入队作为完成条件。 | 在新服务进程上验证，首个测量会话能逐步出字且不再出现本轮 4s 级首批积压；记录预热与会话创建耗时、实际请求块大小、首文本时间；预热内容不进入测量会话。 |
 | F4 / 高：指标与验收口径 | 官方 UI TOR=0.8，但只有 10/100/101 启动新回答；1 停旧回答后未接话，102 持续旧回答。ASR 的 -0.02s 是滞后增长量。candor/1 的无音频来自播放前取消，原文窗口外归因错误。 | `scripts/remote/duplex_a4_replay.py`、X-Talk 的 `duplex_control/timeline.py` 与汇总报告：保留官方评分，补充旧回答停止、新回答启动、首 PCM、对齐语音起点、ASR 输入/计算/交付时刻。按 request_id/response_id 关联；缺失就留空。后续 judge 固定同一模型；需要比较 rating 时用相同 judge 重评旧轮次。 | 官方分数与诊断指标分开；102 不计为新回答成功；Candor Pause Handling 无回答不计漏答；绝对延迟与滞后增长不混用；不把播放确认后的文本更新当作声音起点。 |
@@ -185,3 +185,26 @@ export DUPLEX_X2_LANGUAGE=en
 先完成 F1/F2 的输出与流生命周期，再完成 F3/F4，随后对 D1/D2/D3 分别定位与优化。先做覆盖异步末次输出、EOF 幂等和取消的本地契约验证；真实模型、首会话预热及 FDB 复测均在远端 conda 环境执行。
 
 下一轮继续冻结控制模型、MOSS-TTS、600ms 窗口和相同 FDB 样本，先验证工程修复，再单独消融调度与组件参数。有限输入 EOF、输出等长裁剪及额外诊断窗口均须记录；如果对照轮缺少同样输入生命周期，补跑对照后再归因。继续维持阶段 A 范围、唯一运行底座与唯一 TTS 播放所有权。
+
+### 10.5 F1 的 micro-turn 读取方案
+
+已撤回未提交的独立 80ms 轮询实现，回到主仓库 `7b33fcc`、X-Talk `48c5952` 后收敛。连续音频仍按原块大小送 X2；唯一 micro-turn 时钟从会话启动开始。每一拍先通过 `TurnASRReadRequested` 请求读取现有会话结果，等待前缀更新后再生成快照。X2 的 `recognize_stream(b"", is_final=False)` 对应只读 `GET /v1/session/{id}/result`；尚未创建解码会话时返回空文本，不隐式建流。其他 ASR 不进行额外读取。
+
+例：本拍累计文本为 `how can i improve`，上拍已提交 `how can`，则本拍 user 内容为 ` i improve`；下一拍累计文本未变，则 user 内容为空，由现有模型服务编码为 `<|no voice|>`。包装仍为 `<|im_start|>user\n内容<|im_end|>\n<|im_start|>assistant\n`，assistant 历史保留原生成 token IDs。首条文本到达前也输入 no-voice，LLM 调用保持串行，不积压过期快照。
+
+只读请求取得模型已经产出的文本，不等待下一次 emit，不 final、不 EOF、不补静音。音频提交、读取及结果发布在原 ASR consumer 中串行化，reset/close 等待已开始的 HTTP 请求，并以原代际检查屏蔽取消后的结果。验证覆盖同拍新结果、首次空拍、重复结果、短音频块保留及取消；F2 的真正流结束排空另行实现。
+
+实现对应 X-Talk `19db7f1`。本地 conda `paratalker-dev` 验证：X-Talk 156 项中 153 PASS、3 skipped；根仓库 90 项中 70 PASS、20 skipped。F1 定向测试为 X-Talk `tests.test_x2_streaming_client` 9/9、根仓库 `tests.test_x2_asr_service` 5/5；既有 `test_duplex_model_service` 继续检查空 user 内容转成真正的 no-voice token ID，ChatML 与 assistant token ID 历史不变。节点作业 A2/A3 已纳入 F1 客户端回归。以上均为契约测试，不宣称 FDB 质量或延迟已改善。
+
+远端同步后可先在 client conda 环境执行契约回归（不加载真实模型、不启动下载或完整 FDB）：
+
+```bash
+cd /hpc_stor03/sjtu_home/xuan.zhang/InterClarify
+/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/bin/conda run --no-capture-output \
+  -n xtalk-round1-client env PYTHONPATH=xtalk/src:. python -m unittest \
+  tests.test_x2_asr_service tests.test_duplex_model_service -q
+cd xtalk
+/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/bin/conda run --no-capture-output \
+  -n xtalk-round1-client env PYTHONPATH=src:. python -m unittest \
+  tests.test_x2_streaming_client tests.test_duplex_runtime tests.test_asr_finalization -q
+```

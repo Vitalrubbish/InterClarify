@@ -3,10 +3,13 @@ from __future__ import annotations
 
 import base64
 import queue
+import threading
 import unittest
 from types import SimpleNamespace
 
-from scripts.remote.x2_asr_service import X2Service, RecognizeRequest
+from fastapi.testclient import TestClient
+
+from scripts.remote.x2_asr_service import X2Service, RecognizeRequest, create_app
 
 
 class FakeOnline:
@@ -19,6 +22,7 @@ class FakeOnline:
         self.finished = 0
         self.aborted = False
         self._event_q = queue.Queue()
+        self.append_count = 0
 
     def set_language_id(self, language):
         self.language = language
@@ -27,6 +31,7 @@ class FakeOnline:
         pass
 
     def append_pcm(self, audio):
+        self.append_count += 1
         if len(audio):
             self.live_text += " word"
 
@@ -37,6 +42,37 @@ class FakeOnline:
 
     def abort(self):
         self.aborted = True
+
+
+class DeferredOnline(FakeOnline):
+    """Commit online text only after the audio request has already returned."""
+
+    def __init__(self):
+        super().__init__()
+        self.release = threading.Event()
+        self.emitted = threading.Event()
+        self.worker = None
+
+    def append_pcm(self, audio):
+        """Start a background emit controlled by the test."""
+        self.append_count += 1
+
+        def emit():
+            """Simulate delayed model completion without another audio request."""
+            if self.release.wait(2):
+                self.live_text = "Wednesday or Thursday"
+                self._event_q.put({"kind": "live_emit", "text": self.live_text})
+                self.emitted.set()
+
+        self.worker = threading.Thread(target=emit)
+        self.worker.start()
+
+    def abort(self):
+        """Release and join the fake model worker."""
+        self.aborted = True
+        self.release.set()
+        if self.worker is not None:
+            self.worker.join(2)
 
 
 class X2ServiceTest(unittest.TestCase):
@@ -81,6 +117,45 @@ class X2ServiceTest(unittest.TestCase):
         self.assertEqual(service.recognize(
             RecognizeRequest(session_id=session_id,
                              audio=base64.b64encode(b"\x00\x00").decode())), " word word")
+
+    def test_read_delivers_late_emit_without_more_audio_or_eof(self):
+        """A micro-turn can fetch already completed output after input stops."""
+        engine = DeferredOnline()
+        service = X2Service(lambda: engine)
+        sid = service.create()
+        self.addCleanup(service.close, sid)
+        text = service.recognize(RecognizeRequest(
+            session_id=sid, audio=base64.b64encode(b"\x00\x00").decode()))
+        self.assertEqual(text, "")
+        self.assertEqual(service.read(sid), "")
+        engine.release.set()
+        self.assertTrue(engine.emitted.wait(1))
+        for _ in range(2):
+            self.assertEqual(service.read(sid), "Wednesday or Thursday")
+        self.assertEqual(engine.append_count, 1)
+        self.assertEqual(engine.finished, 0)
+        self.assertEqual(service.audio_samples, 1)
+        service.close(sid)
+        with self.assertRaises(KeyError):
+            service.read(sid)
+
+    def test_read_route_validates_session_and_reports_worker_errors(self):
+        """Read-only HTTP requests preserve input and expose model failures."""
+        engine = FakeOnline()
+        service = X2Service(lambda: engine)
+        with TestClient(create_app(service)) as client:
+            self.assertEqual(client.get('/v1/session/missing/result').status_code, 404)
+            sid = client.post('/v1/session').json()['session_id']
+            engine.live_text = 'late text'
+            response = client.get(f'/v1/session/{sid}/result')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json(), {'text': 'late text', 'language': 'en'})
+            self.assertEqual(engine.append_count, 0)
+            self.assertEqual(engine.finished, 0)
+            engine.error = 'decoder failed'
+            self.assertEqual(client.get(f'/v1/session/{sid}/result').status_code, 500)
+            client.delete(f'/v1/session/{sid}')
+            self.assertEqual(client.get(f'/v1/session/{sid}/result').status_code, 404)
 
 
 if __name__ == "__main__":

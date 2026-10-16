@@ -85,21 +85,43 @@ class X2Service:
                 if worker.is_alive():
                     raise RuntimeError("X2 online EOF timeout")
                 self.ended = True
-            if self.session.error:
-                raise RuntimeError(self.session.error)
-            while True:
-                try:
-                    event = self.session._event_q.get_nowait()
-                except queue.Empty:
-                    break
-                if event and event["kind"] in ("live_emit", "live_done"):
-                    logger.info(json.dumps({"session_id": self.session_id,
-                        "delivered_monotonic": time.monotonic(), **event}))
-            text = self.session.live_text
+            text = self._read_text_locked()
             logger.info(json.dumps({"event": "x2_online", "session_id": self.session_id,
                 "audio_seconds": self.audio_samples / 16000, "text": text,
                 "pause_hint": request.is_final, "end_stream": request.end_stream}))
             return text
+
+    def read(self, session_id: str) -> str:
+        """Read completed online output without appending or finalizing audio.
+
+        Parameters
+        ----------
+        session_id : str
+            Existing decoder session identity.
+
+        Returns
+        -------
+        str
+            Current cumulative online transcript.
+        """
+        with self.lock:
+            if self.session is None or session_id != self.session_id:
+                raise KeyError(session_id)
+            return self._read_text_locked()
+
+    def _read_text_locked(self) -> str:
+        """Record pending model events and read text under the session lock."""
+        if self.session.error:
+            raise RuntimeError(self.session.error)
+        while True:
+            try:
+                event = self.session._event_q.get_nowait()
+            except queue.Empty:
+                break
+            if event and event["kind"] in ("live_emit", "live_done"):
+                logger.info(json.dumps({"session_id": self.session_id,
+                    "delivered_monotonic": time.monotonic(), **event}))
+        return self.session.live_text
 
     def warmup(self, seconds: float = 1.0) -> None:
         """Pay the first-session cost before any measured request.
@@ -159,6 +181,27 @@ def create_app(service: X2Service) -> FastAPI:
             raise HTTPException(404, "unknown session") from exc
         except ValueError as exc:
             raise HTTPException(400, str(exc)) from exc
+        except RuntimeError as exc:
+            raise HTTPException(500, str(exc)) from exc
+
+    @app.get("/v1/session/{session_id}/result")
+    def read(session_id: str):
+        """Read the current transcript without changing the input stream.
+
+        Parameters
+        ----------
+        session_id : str
+            Existing decoder session identity.
+
+        Returns
+        -------
+        dict
+            Current cumulative transcript and configured language.
+        """
+        try:
+            return {"text": service.read(session_id), "language": service.language}
+        except KeyError as exc:
+            raise HTTPException(404, "unknown session") from exc
         except RuntimeError as exc:
             raise HTTPException(500, str(exc)) from exc
 

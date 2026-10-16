@@ -113,7 +113,7 @@ LLM 的输入是截至当前窗口已经到达的对话历史和 user micro-turn
 
 - 默认窗口从 0.6 秒开始，作为实验参数而不是固定研究结论；
 - 定时 tick 产生窗口，即使当前没有新文本也要发送 `<no voice>`；
-- 与官方推理一致：首次非空 ASR 后启动时钟，partial、pause 和 final 只更新可见前缀，不提前触发 LLM；
+- 按 2026-10-16 用户确认的 F1 方案，会话启动即开启唯一时钟；每拍先读取已产出的最新 ASR，再组装增量，首词前的空拍也输入 `<|no voice|>`。partial、pause 和 final 只更新可见前缀，不提前触发 LLM；
 - 上一系统 micro-turn 完成后才能开始下一次生成；延迟时聚合截至下一次实际调用的新文本，保持串行且不积压过时快照；
 - 同一窗口只发送当时已经到达的 ASR 前缀；
 - ASR revision 以新的 prefix_version 表示，不能覆盖已经提交或已经播放的 response；
@@ -298,7 +298,7 @@ A1 实现与双语文档提交为 9c131ed6399da66b66b001184cfa4005787b5f67，分
 
 ### A2：Micro-turn 组装（本地实现与测试已完成）
 
-- 首次非空 ASR 启动 0.6 秒 tick；ASR 事件更新缓冲，在串行 LLM 调用边界 flush；
+- 会话启动 0.6 秒 tick，每拍先通过 `TurnASRReadRequested` 取得连续 ASR 的最新结果，再在串行 LLM 调用边界 flush；未启动音频会话的文本注入仍可由首次文本开时钟；
 - 无新增文本时发送 `<no voice>`；
 - 正确处理 partial、pause、rewrite 和 final 的版本递增；
 - 验证窗口组装不阻塞音频接收和 TTS 播放。
@@ -338,7 +338,7 @@ A1 实现与双语文档提交为 9c131ed6399da66b66b001184cfa4005787b5f67，分
 
 ### Micro-turn 测试
 
-- 首次非空输入启动、固定 tick、partial/pause/final 缓冲更新和串行 flush；
+- 会话启动即有空拍、每拍读取延迟产生的首条/新增结果、固定 tick、partial/pause/final 缓冲更新和串行 flush；
 - 空窗口仍发送 `<no voice>`；
 - append、rewrite、pause、final 的 prefix_version 单调递增；
 - 旧版本 response 不覆盖新版本上下文；

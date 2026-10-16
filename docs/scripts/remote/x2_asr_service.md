@@ -15,6 +15,7 @@ X2 的官方推理是 `AdaptiveSession`：**在线**路径逐帧（约 80 ms）�
 | `__init__(session_factory, language="en", timeout=60)` | 保存会话工厂、显式语言与超时；单进程只允许一个活动会话 |
 | `create()` | 新建一个 `AdaptiveSession`，设置语言、`start()`，轮询 `warmup_done` 直到预热完成；预热期间出错或超时即 `abort()` |
 | `recognize(request)` | 追加一段 PCM16、返回在线累计文本；`end_stream` 时调用 `finish_async()` 并等待；把模型的 `live_emit/live_done` 事件写入日志 |
+| `read(session_id)` | 读取后台已经产出的累计文本；不追加音频、不创建或结束会话；复用 `_read_text_locked` 记录在线事件 |
 | `close(session_id)` | `abort()` 并释放匹配会话 |
 
 设计约束：
@@ -32,9 +33,12 @@ X2 的官方推理是 `AdaptiveSession`：**在线**路径逐帧（约 80 ms）�
 | GET | `/health` | `{"status":"ok","backend":"x2","offline":false}`；进程在权重加载完成后才监听端口，所以健康即代表模型已就绪 |
 | POST | `/v1/session` | 分配一个独立解码会话，返回 `session_id` |
 | POST | `/v1/recognize` | 追加增量 PCM16，返回当前在线累计文本与语言 |
+| GET | `/v1/session/{session_id}/result` | 在 micro-turn 边界只读当前累计文本与语言；未知会话返回 404，后台模型错误返回 500 |
 | DELETE | `/v1/session/{session_id}` | 中止并释放会话 |
 
 请求体字段：`session_id`、`audio`（base64 PCM16）、`is_final`（声学暂停提示）、`end_stream`（真正流尾）。
+
+F1 使用原有 micro-turn 时钟读取结果，不新增轮询时钟；只读接口与提交/关闭共享服务锁，不等待模型生成新文本。客户端每拍读到已产出的累计文本后，沿用既有增量和 no-voice 包装。
 
 ## 日志
 
@@ -60,4 +64,4 @@ python scripts/remote/x2_asr_service.py \
 - 只服务单会话、单 GPU；不承担并发多路 ASR。
 - 不返回离线重识别文本；不回写已交付的在线前缀。
 - 语言必须显式传入（FDB 为 `en`），不依赖模型默认语言。
-- 本服务的单元测试见 [test_x2_asr_service.md](../tests/test_x2_asr_service.md)。
+- 本服务的单元测试见 [test_x2_asr_service.md](../../tests/test_x2_asr_service.md)。

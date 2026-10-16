@@ -235,7 +235,8 @@ RC=0
 [ "$RC" -eq 0 ] && record_step a1_regression PASS 0 || record_step a1_regression FAIL "$RC"
 
 RC=0
-(cd "$TASK_ROOT/xtalk" && conda run -n "$CLIENT_ENV" env PYTHONPATH=src python -m unittest tests.test_duplex_runtime) \
+(cd "$TASK_ROOT/xtalk" && conda run -n "$CLIENT_ENV" env PYTHONPATH=src python -m unittest \
+  tests.test_duplex_runtime tests.test_x2_streaming_client) \
   > "$RUN_DIR/tests/a2_a3.log" 2>&1 || RC=$?
 [ "$RC" -eq 0 ] && record_step a2_a3_regression PASS 0 || record_step a2_a3_regression FAIL "$RC"
 
