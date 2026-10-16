@@ -23,6 +23,32 @@ class LinkCheckTests(unittest.IsolatedAsyncioTestCase):
         """Build a driver whose deterministic waits time out immediately."""
         return link.LinkClient("http://localhost", "ws://localhost", 0)
 
+    async def test_vad_free_handshake_sends_only_pcm(self):
+        """Negotiated continuous input carries no synthetic speech boundaries."""
+        client = self.make_client()
+        sent = []
+
+        class Socket:
+            """Replay a capability handshake and capture input frames."""
+
+            def __aiter__(self):
+                async def messages():
+                    yield json.dumps({'action': 'session_attached', 'data': {
+                        'session_id': 's', 'acoustic_vad_enabled': False}})
+                return messages()
+
+            async def send(self, message):
+                """Capture raw PCM and JSON controls."""
+                sent.append(message)
+
+        socket = Socket()
+        await client._receive(socket)
+        self.assertFalse(client._acoustic_vad_enabled)
+        await client._send_turn_input(socket, b'\x00\x00' * 1280, 0)
+        self.assertTrue(sent)
+        self.assertTrue(all(isinstance(item, bytes) for item in sent))
+        self.assertEqual(client._events[-1]['action'], 'audio_input_end')
+
     async def test_sequential_timeout_is_not_complete(self):
         """A missing finish event leaves the turn unsuccessful."""
         client = self.make_client()

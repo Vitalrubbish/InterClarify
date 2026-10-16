@@ -308,7 +308,7 @@ conda run -n "$CLIENT_ENV" python -c 'import json,sys,pathlib; cfg=json.load(ope
 # is a later "X-Talk server did not start in time" timeout.
 RC=0
 conda run --no-capture-output -n "$CLIENT_ENV" env PYTHONPATH="$TASK_ROOT/xtalk/src:$TASK_ROOT" \
-  python -c 'import json,sys; from xtalk.api import Xtalk; from xtalk.models import VAD; models=Xtalk._load_models(json.load(open(sys.argv[1]))); vad=models.get(VAD); assert vad is not None, "runtime config configures no VAD backend"; print("vad", type(vad).__name__)' \
+  python -c 'import json,sys; from xtalk.api import Xtalk; from xtalk.models import ASR,VAD; models=Xtalk._load_models(json.load(open(sys.argv[1]))); vad=models.get(VAD); asr=models.require(ASR); assert (vad is None) if asr.continuous_audio else (vad is not None), "runtime VAD does not match ASR lifecycle"; print("vad", type(vad).__name__)' \
   "$RUNTIME_CONFIG" > "$RUN_DIR/logs/runtime_build.log" 2>&1 || RC=$?
 [ "$RC" -eq 0 ] && record_step runtime_build PASS 0 || record_step runtime_build FAIL "$RC" "inspect logs/runtime_build.log"
 [ "$FAILURES" -eq 0 ] || exit "$FAILURES"

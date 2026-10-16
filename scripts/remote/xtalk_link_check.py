@@ -136,6 +136,8 @@ class LinkClient:
         self._tts_finished_ids: set[str] = set()
         self._errors: list[str] = []
         self._receiver: asyncio.Task | None = None
+        self._acoustic_vad_enabled = True
+        self._session_attached = asyncio.Event()
 
     async def run(
         self,
@@ -156,6 +158,7 @@ class LinkClient:
             receiver = asyncio.create_task(self._receive(ws))
             self._receiver = receiver
             await ws.send(json.dumps({"action": "attach_session", "session_id": None}))
+            await asyncio.wait_for(self._session_attached.wait(), self._timeout)
             await asyncio.sleep(2.0)
             self._started = time.monotonic()
             if barge_pcm is not None:
@@ -212,10 +215,11 @@ class LinkClient:
         audio_pcm: bytes,
         index: int,
     ) -> tuple[float, float]:
-        """Send one VAD-delimited utterance; return (start, user_end) seconds."""
+        """Stream PCM using negotiated VAD capability; return input timestamps."""
         started = time.monotonic()
-        await ws.send(json.dumps({"action": "vad_speech_start"}))
-        self._record("vad_speech_start", index)
+        if self._acoustic_vad_enabled:
+            await ws.send(json.dumps({"action": "vad_speech_start"}))
+        self._record("vad_speech_start" if self._acoustic_vad_enabled else "audio_input_start", index)
         frames = [
             audio_pcm[i : i + FRAME_BYTES]
             for i in range(0, len(audio_pcm), FRAME_BYTES)
@@ -228,9 +232,10 @@ class LinkClient:
             if len(frame) < FRAME_BYTES:
                 frame = frame + b"\x00" * (FRAME_BYTES - len(frame))
             await ws.send(frame)
-        await ws.send(json.dumps({"action": "vad_speech_end"}))
+        if self._acoustic_vad_enabled:
+            await ws.send(json.dumps({"action": "vad_speech_end"}))
         user_end = time.monotonic()
-        self._record("vad_speech_end", index)
+        self._record("vad_speech_end" if self._acoustic_vad_enabled else "audio_input_end", index)
         return started, user_end
 
     async def _run_turn(
@@ -321,6 +326,9 @@ class LinkClient:
             payload = json.loads(message)
             action = payload.get("action")
             data = payload.get("data")
+            if action == "session_attached" and isinstance(data, dict):
+                self._acoustic_vad_enabled = data.get("acoustic_vad_enabled", True)
+                self._session_attached.set()
             self._record(action, None, data)
             if action == "finish_asr" and isinstance(data, dict):
                 self._asr_final = data.get("text")

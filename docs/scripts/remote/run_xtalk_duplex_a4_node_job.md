@@ -58,3 +58,6 @@ backchannel:icc_backchannel:default
 ## X2 对照入口
 
 `DUPLEX_ASR_BACKEND=x2` 时，`ASR_ENV` 是独立 conda **prefix**（不是环境名），由 `DUPLEX_ASR_ENV` 指定；必须同时给出 `DUPLEX_X2_SOURCE`（X2 源码根）与 `DUPLEX_X2_MODEL`（权重目录），可选 `DUPLEX_X2_LANGUAGE`（默认 `en`）。环境准备见 [setup_x2_asr_env.md](setup_x2_asr_env.md)，服务实现见 [x2_asr_service.md](x2_asr_service.md)。运行时选择 `X2StreamingClient`、80 ms 输入、600 ms micro-turn，模型协议与 MOSS 播放链不变。F1 后 micro-turn 从会话启动开始，每拍先读最新 ASR，再发送增量或 no-voice。A2/A3 回归同时执行 X-Talk 的 `tests.test_x2_streaming_client`，覆盖延迟结果交付与取消；根仓库驱动回归执行 `tests/test_x2_asr_service.py` 验证只读服务接口。
+
+
+X2 duplex 运行配置不加载 VAD，runtime_build 校验连续 ASR 对应无 VAD；Qwen 对照仍要求 VAD。两条路径均实际加载模型，加载异常仍使预检失败。

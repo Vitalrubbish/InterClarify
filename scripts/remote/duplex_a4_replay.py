@@ -134,6 +134,7 @@ class A4ReplayClient(LinkClient):
                 await ws.send(
                     json.dumps({"action": "attach_session", "session_id": None})
                 )
+                await asyncio.wait_for(self._session_attached.wait(), self._timeout)
                 await asyncio.sleep(2.0)
                 self._started = time.monotonic()
                 if scenario == "interruption":
@@ -455,6 +456,8 @@ class A4ReplayClient(LinkClient):
                 self._record(action, None, data)
                 if action == "session_attached" and isinstance(data, dict):
                     self.session_id = str(data.get("session_id") or "") or None
+                    self._acoustic_vad_enabled = data.get("acoustic_vad_enabled", True)
+                    self._session_attached.set()
                 elif action == "finish_asr" and isinstance(data, dict):
                     self._asr_final = data.get("text")
                 elif action == "update_resp" and isinstance(data, dict):
