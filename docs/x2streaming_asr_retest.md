@@ -215,3 +215,12 @@ cd xtalk
 本轮使用 F1 每拍读取、X2 无声学 VAD 路径和 F3 完整预热；不把变化归因为某个单一修复。预热用固定非 FDB 真实语音，等待非空在线输出及 EOF 排空后关闭会话，失败则不进入测量。其 SHA256、首文本和排空耗时写入服务日志。
 
 保持 X2 源码/权重、DuplexCascade、MOSS、600 ms、三 GPU 以及历史五轴各 5 样本。推理作业先生成 WAV/原始日志，官方评分继续按独立步骤执行。延迟比较优先逐样本对齐历史 X2 与 Qwen：输入首帧到首次 ASR 文本（含原录音静音及模型所需语境，不冒充逐词识别延迟）、文本交付到回答决策、首 PCM；同时检查首会话块大小、积压和最终文本覆盖。历史 lag growth 不能充当绝对 ASR 延迟。只有 ASR 交付明显改善且缺词、停顿和打断行为不退化后，才依据用户授权删除 Qwen 路线；结果前保留。
+
+提交记录：
+
+- 运行标识：`20261016T044445Z`；作业：`job-179212601900076820769-xuan-zhang`。
+- 源码：InterClarify `9d43e7e`、X-Talk `c68d81a`；独立快照 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-retests/20261016T044445Z`。
+- Manifest：183 文件，摘要 `9ebae9d0735a1d5925d5228374166df84e057bbf45bca142d4abfdd9bffe85ff`。
+- 原始产物：`InterClarify/data/runs/20261016T044445Z/`；报告：`reports/duplex_acceptance/20261016T044445Z/`。
+- 预热音频：`xtalk-round1/audio/scenarios/regular_answer_01_question.wav`，16 kHz 单声道 PCM16，2.96 秒。启动实现的 7 项服务契约测试本地/远端均通过；本地主仓库 93 项回归通过（20 skipped）。
+- 启动范围：pause / normal / interruption 场景与 FDB 五轴各 5 例，三张 4090；官方对齐评分独立后置。本轮延迟和质量尚未产生结论，不删除 Qwen。
