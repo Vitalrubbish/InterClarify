@@ -7,6 +7,11 @@ ASR_RUN="${ASR_SELECTION_RUN:?set ASR_SELECTION_RUN}"
 ASR_LIMIT="${ASR_SELECTION_LIMIT:-100}"
 ASR_REPEATS="${ASR_SELECTION_REPEATS:-3}"
 ASR_TIMEOUT="${ASR_SELECTION_TIMEOUT_SECONDS:-3600}"
+ASR_SHARD="${ASR_SELECTION_SHARD_INDEX:-}"
+if [ -n "$ASR_SHARD" ] && ! [[ "$ASR_SHARD" =~ ^[0-4]$ ]]; then
+  echo "ASR_SELECTION_SHARD_INDEX must be in 0..4"
+  exit 2
+fi
 mkdir -p "$ASR_RUN"
 exec > >(tee -a "$ASR_RUN/run.log") 2>&1
 export PYTHONNOUSERSITE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
@@ -26,8 +31,10 @@ fi
 configurations=(nemotron_en:160 nemotron_en:560 nemotron_multi:320 nemotron_multi:560 kyutai:500)
 failures=0
 for ((repeat=0; repeat<ASR_REPEATS; repeat++)); do
-  for ((offset=0; offset<5; offset++)); do
-    index=$(( (offset + repeat) % 5 ))
+  steps=5
+  [ -n "$ASR_SHARD" ] && steps=1
+  for ((offset=0; offset<steps; offset++)); do
+    index=$(( (offset + repeat + ${ASR_SHARD:-0}) % 5 ))
     config="${configurations[$index]}"
     candidate="${config%:*}"
     chunk="${config#*:}"

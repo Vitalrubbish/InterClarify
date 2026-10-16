@@ -12,25 +12,39 @@ from benchmark_asr_selection import summarize
 CONFIGS = ["nemotron_en-160", "nemotron_en-560", "nemotron_multi-320", "nemotron_multi-560", "kyutai-500"]
 
 
+def collect_process(run, config, repeat, sharded=False):
+    """Reject missing or duplicate shard results instead of choosing one silently."""
+    directories = (sorted(run.glob(f"shard-*/repeat-{repeat}/{config}")) if sharded
+                   else [run / f"repeat-{repeat}" / config])
+    if len(directories) != 1:
+        return None, {"repeat": repeat, "exit_code": None, "reported_samples": 0,
+                      "error": "missing" if not directories else "duplicate",
+                      "directories": [str(d) for d in directories]}
+    directory = directories[0]
+    path = directory / "report.json"
+    report = json.loads(path.read_text()) if path.exists() else None
+    status_path = directory / "exit_code.txt"
+    status = int(status_path.read_text()) if status_path.exists() else None
+    return report, {"repeat": repeat, "exit_code": status,
+                    "reported_samples": len(report["samples"]) if report else 0,
+                    "directory": str(directory), "gpu_metadata": str(directory.parents[1] / "gpu.csv")}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--repeats", type=int, required=True)
     parser.add_argument("--samples", type=int, required=True)
+    parser.add_argument("--sharded", action="store_true")
     args = parser.parse_args()
     results = {}
     for config in CONFIGS:
         rows, processes = [], []
         memory = []
         for repeat in range(args.repeats):
-            directory = args.run / f"repeat-{repeat}" / config
-            path = directory / "report.json"
-            report = json.loads(path.read_text()) if path.exists() else None
-            status_path = directory / "exit_code.txt"
-            status = int(status_path.read_text()) if status_path.exists() else None
-            processes.append({"repeat": repeat, "exit_code": status,
-                              "reported_samples": len(report["samples"]) if report else 0})
+            report, process = collect_process(args.run, config, repeat, args.sharded)
+            processes.append(process)
             if report:
                 rows.extend(report["samples"])
                 memory.append(report["peak_allocated_bytes"])
@@ -41,6 +55,7 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     payload = {"run": str(args.run), "expected_samples_per_repeat": args.samples,
                "expected_repeats": args.repeats, "complete": all(r["complete"] for r in results.values()),
+               "sharded": args.sharded,
                "configurations": results}
     (args.output / "comparison.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2))
     lines = ["# 流式 ASR 同集对比", "", f"原始目录：`{args.run}`。",
@@ -68,6 +83,7 @@ def main():
                   "首文本延迟含前导静音和上下文等待。标点 F1 使用表面词边界匹配，原始 TP/FP/FN 及失败数见 JSON。",
                   "句末列只检查在线累计文本末尾为 .!?（可跟引号）；内部逗号不计，不能将此出现次数直接当作句末标点正确率。EOF 才补齐的数量在 JSON 单列。",
                   "Nemotron 为 FP32，Kyutai 为 BF16；朗读子集表现不能替代全双工自然对话回归。",
+                  "标点为诊断维度，不是淘汰条件；最终结合官方 DuplexCascade 的正文回复启动行为。",
                   "任一配置缺少结果时，本表只表示当前可见证据，不表示已完成最终选型。", ""])
     (args.output / "comparison.md").write_text("\n".join(lines))
     print("\n".join(lines))

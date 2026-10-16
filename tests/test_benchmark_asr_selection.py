@@ -4,6 +4,7 @@ import importlib.util
 import json
 import tempfile
 import time
+import sys
 import unittest
 from unittest.mock import patch
 from types import SimpleNamespace
@@ -22,6 +23,23 @@ ALIGN_SPEC.loader.exec_module(aligner)
 
 
 class BenchmarkTests(unittest.TestCase):
+    def test_parallel_rotation_covers_every_configuration_once_per_repeat(self):
+        for repeat in range(3):
+            self.assertEqual(sorted((shard + repeat) % 5 for shard in range(5)), list(range(5)))
+
+    def test_duplicate_shard_results_are_rejected(self):
+        spec = importlib.util.spec_from_file_location("asr_selection_summary", PATH.with_name("summarize_asr_selection.py"))
+        module = importlib.util.module_from_spec(spec)
+        with patch.dict(sys.modules, {"benchmark_asr_selection": benchmark}):
+            spec.loader.exec_module(module)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for shard in range(2):
+                (root / f"shard-{shard}/repeat-0/nemotron_en-160").mkdir(parents=True)
+            report, process = module.collect_process(root, "nemotron_en-160", 0, True)
+            self.assertIsNone(report)
+            self.assertEqual(process["error"], "duplicate")
+
     def test_ctc_repeated_character_requires_blank(self):
         probabilities = np.log(np.array([[0.01, 0.99], [0.99, 0.01], [0.01, 0.99]]))
         path, expanded = aligner.ctc_path(probabilities, [1, 1])
