@@ -1,6 +1,8 @@
 # TTS 延迟优化远端任务单
 
-日期：2026-10-17。状态：实验工具已准备，GPU 作业未提交。现有 key 通过 JumpServer 连接后仅返回菜单或断开，尚未取得集群 shell；不把登录菜单当作远端执行成功。后续需要可用资产登录方式。
+日期：2026-10-17。状态：实验工具已准备，GPU 作业未提交。已通过交互 PTY 登录 JumpServer：使用现有 `js-hpc` SSH 配置和会话 key，等待菜单后输入 `p`，选择资产编号 `1`（`d6-hpc-debuggpu-001`，`10.24.19.254`），成功进入 `xuan.zhang` 的 shell。直接搜索 `guizhou` 返回“没有资产”；它是用户使用的集群名称，当前堡垒机资产名称不同。必须保持交互 stdin，不能在菜单出现前一次性管道发送多条命令。
+
+已只读确认 `/usr/bin/vc`、共享 `miniconda3/bin/conda`、`xtalk-round1-moss`/`xtalk-round1-client` 环境及 `xtalk-round1/{models,moss-source,moss-service}` 目录存在。远端 `InterClarify` 在 main 且包含未跟踪的历史报告，后续使用独立 checkout，不覆盖现有目录。登录成功不代表 GPU 资源或性能验收已完成。
 
 ## 已验证的工具入口
 
