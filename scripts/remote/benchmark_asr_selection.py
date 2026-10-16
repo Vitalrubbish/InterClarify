@@ -292,6 +292,8 @@ def score_sample(row, sink, error=None, acoustic_alignment=None):
     aligned = align_words(reference, hypothesis)
     counts = {kind: sum(p[2] == kind for p in aligned)
               for kind in ("equal", "substitute", "delete", "insert")}
+    if not reference:
+        counts = {kind: 0 for kind in counts}
     ref_words, ref_marks = punctuated_words(row["reference"])
     hyp_words, hyp_marks = punctuated_words(sink.text)
     surface_alignment = align_words(ref_words, hyp_words)
@@ -299,6 +301,8 @@ def score_sample(row, sink, error=None, acoustic_alignment=None):
     expected = {(index, mark) for index, marks in ref_marks.items() for mark in marks}
     predicted = {(matches.get(index, f"unmatched-{index}"), mark)
                  for index, marks in hyp_marks.items() for mark in marks}
+    if not reference:
+        expected, predicted = set(), set()
     online = [e for e in sink.events if not e["eof"]]
     first = next((e for e in sink.events if e["text"].strip()), None)
     word_latencies = []
@@ -318,7 +322,7 @@ def score_sample(row, sink, error=None, acoustic_alignment=None):
             "reference": row["reference"], "text": sink.text,
             "online_text": online[-1]["text"] if online else "", "error": error,
             "reference_words": len(reference), **counts,
-            "wer": (counts["substitute"] + counts["delete"] + counts["insert"]) / len(reference),
+            "wer": (counts["substitute"] + counts["delete"] + counts["insert"]) / len(reference) if reference else None,
             "rewrites": sum(e["rewritten"] for e in sink.events),
             "first_text_seconds": first["arrival_seconds"] if first else None,
             "last_text_relative_to_eof_seconds": sink.events[-1]["arrival_seconds"] - row["duration_seconds"] if sink.events else None,
@@ -370,11 +374,13 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--limit", type=int, default=100)
     parser.add_argument("--drain-seconds", type=float, default=2.0)
+    parser.add_argument("--manifest", type=Path)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     torch.set_num_threads(4)
     torch.manual_seed(0)
-    manifest = json.loads((args.root / "dataset/manifest.json").read_text())
+    manifest_path = args.manifest or args.root / "dataset/manifest.json"
+    manifest = json.loads(manifest_path.read_text())
     alignment_path = args.root / "dataset/alignments.json"
     alignments = json.loads(alignment_path.read_text())["samples"] if alignment_path.exists() else {}
     model_path = args.root / "models" / args.candidate

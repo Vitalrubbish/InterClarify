@@ -91,6 +91,14 @@ class BenchmarkTests(unittest.TestCase):
         self.assertEqual(summary["failures"], 1)
         self.assertEqual(summary["estimated_word_latency_seconds"]["count"], 0)
 
+    def test_unavailable_reference_does_not_invent_wer(self):
+        sink = SimpleNamespace(text="hello", events=[], source=SimpleNamespace(packets=[]))
+        row = {"sample_id": "fdb", "reference": "", "duration_seconds": 2.0}
+        with patch.object(benchmark, "NORMALIZE", lambda text: text.lower(), create=True):
+            result = benchmark.score_sample(row, sink)
+        self.assertIsNone(result["wer"])
+        self.assertIsNone(benchmark.summarize([result])["wer"])
+
     def test_internal_comma_is_not_terminal_punctuation(self):
         sink = SimpleNamespace(text="hello, there.", source=SimpleNamespace(packets=[]), events=[
             {"text": "hello, there", "arrival_seconds": 0.4, "eof": False, "rewritten": False},
