@@ -302,7 +302,7 @@ def manifest():
 async def run(args):
     """Run warmup separately and alternate the two fixed input modes."""
     items = [json.loads(line) for line in args.corpus.read_text().splitlines() if line.strip()]
-    if len(items) < 30 or args.repeats < 3:
+    if not args.probe and (len(items) < 30 or args.repeats < 3):
         raise ValueError('Use at least 30 texts and 3 measured repeats')
     ids = [item['id'] for item in items]
     if len(ids) != len(set(ids)) or any(not value.replace('_', '').replace('-', '').isalnum() for value in ids):
@@ -318,6 +318,11 @@ async def run(args):
         'corpus_sha256': hashlib.sha256(args.corpus.read_bytes()).hexdigest(),
         'playback': 'headless immediate consumption estimate; not speaker measurement',
         'manifest': manifest()}, indent=2))
+    if args.probe:
+        rows = [await run_case(args, items[0], mode, 'probe', args.output)
+                for mode in ('whole', 'incremental')]
+        (args.output / 'summary.json').write_text(json.dumps({'kind': 'probe', 'modes': summarize(rows)}, indent=2))
+        return 1 if any(r['error'] or not r['samples'] for r in rows) else 0
     warm = await run_case(args, items[-1], 'whole', 'warmup', args.output)
     rows = []
     for repeat in range(args.repeats):
@@ -347,6 +352,7 @@ def main():
     parser.add_argument('--repeats', type=int, default=3)
     parser.add_argument('--timeout', type=float, default=90)
     parser.add_argument('--server-trace', type=Path)
+    parser.add_argument('--probe', action='store_true', help='Run only the first text in both modes; not a performance matrix')
     args = parser.parse_args()
     if args.prepare_corpus:
         with args.prepare_corpus.open('x') as handle:

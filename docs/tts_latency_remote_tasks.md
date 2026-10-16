@@ -39,3 +39,9 @@
 取消验收须在真实 X-Talk 唯一播放链路覆盖生成中、codec 前后、PCM 已入缓冲及 EOS 附近；本地只验证未提交帧/PCM 的丢弃，不声称覆盖已入客户端缓冲或重复完成事件。组件通过后，冻结 ASR/LLM 做 FDB 小子集；Nemotron 尚未接通、X2 仅供诊断，沉默不得记为优化通过。
 
 没有远端基线与盲试听前，不切换批次默认值，不宣布四项关闭，不启动 KV 复用、codec 编译或 backbone 编译。
+
+## 2026-10-17 远端启动准备
+
+已核对两份 MOSS checkout 的完整提交和 `git diff HEAD` 干净。模型锁记录 TTS revision `75682787d8e2fcc73faca37ba2931453ca9c4022`、codec revision `3cd226ba2947efa357ef453bcad111b6eafba782`，实际 snapshot 为共享 `paratalker-p0-models` 路径；音色为 `xtalk-round1/audio/reference.wav`。原 X-Talk 客户端来自 `xtalk-round1/xtalk@5f0d9959edf1026588246efbed827b078cbb114c`，仅用于组件 smoke，不能当作当前双工 fork 的集成验收。
+
+本轮创建独立 `interclarify-tts-latency-20261017` checkout。新增[节点入口](scripts/remote/run_tts_latency_node_job.md)与[提交入口](scripts/remote/submit_tts_latency_job.md)，先在分配节点检查固定依赖、真实上游等价性，再通过 cold/warm 探针和原客户端 smoke 才运行正式基线。`--probe` 是显式接入检查模式，不替代正式数量门禁；新增理由是必须先确认真实 adapter 接通再投入完整矩阵。脚本按本文已核对路径构造，实际作业结果另记。
