@@ -47,4 +47,7 @@ for ((repeat=0; repeat<ASR_REPEATS; repeat++)); do
   done
 done
 printf '%s\n' "$failures" > "$ASR_RUN/failed_configurations.txt"
+"$ASR_ROOT/envs/nemotron_en/bin/python" "$ASR_SOURCE/summarize_asr_selection.py" \
+  --run "$ASR_RUN" --output "$ASR_RUN/report" \
+  --repeats "$ASR_REPEATS" --samples "$ASR_LIMIT" || failures=$((failures+1))
 exit "$(( failures > 0 ))"

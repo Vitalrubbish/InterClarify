@@ -7,3 +7,5 @@
 五配置为英语版 160/560ms、多语言版 320/560ms、Kyutai 500ms。多语言 160ms 已在探针中被实际发布 processor 拒绝，详见任务单，不能直接篡改支持列表。
 
 正式执行前必须通过相邻的 `<source-directory>.sha256` 校验；缺失或不匹配立即退出。单配置默认 3600 秒超时，`ASR_SELECTION_TIMEOUT_SECONDS` 可显式调整；超时保留 exit code 与已有日志。
+
+五配置全部结束后自动调用 `summarize_asr_selection.py`，在运行目录的 `report/` 写中文对比表和 JSON。汇总失败也使作业返回非零，原始逐配置日志保留。
