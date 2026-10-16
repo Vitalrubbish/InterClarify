@@ -369,6 +369,7 @@ def main():
     parser.add_argument("--chunk-ms", type=int, default=160)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--limit", type=int, default=100)
+    parser.add_argument("--drain-seconds", type=float, default=2.0)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     torch.set_num_threads(4)
@@ -392,7 +393,7 @@ def main():
         audio, rate = sf.read(audio_path, dtype="float32")
         if rate != 16000 or audio.ndim != 1:
             raise ValueError("Expected mono 16 kHz FLEURS input")
-        source = RealtimeAudio(audio, rate)
+        source = RealtimeAudio(audio, rate, drain_seconds=args.drain_seconds)
         sink = EventSink(args.output / (f"warmup-{index}.jsonl" if is_warmup else f"sample-{sample_index:04d}.jsonl"), source)
         error = None
         try:
@@ -423,7 +424,7 @@ def main():
     report = {"candidate": args.candidate, "chunk_ms": args.chunk_ms if args.candidate != "kyutai" else None,
               "dataset_revision": manifest["revision"], "model_load_seconds": load_seconds,
               "peak_allocated_bytes": torch.cuda.max_memory_allocated(),
-              "peak_reserved_bytes": torch.cuda.max_memory_reserved(), "drain_seconds": 2.0,
+              "peak_reserved_bytes": torch.cuda.max_memory_reserved(), "drain_seconds": args.drain_seconds,
               "normalizer": "whisper-normalizer==0.1.12 EnglishTextNormalizer",
               "summary": summarize(rows), "samples": rows}
     (args.output / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2))
