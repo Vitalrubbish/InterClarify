@@ -49,3 +49,7 @@
 首次作业 `job-179219320938398545631-xuan-zhang` 在 `d6-hpc-gpu-068` 上完成依赖核验（torch 2.9.1+cu128 / transformers 5.0.0 / flash-attn 2.8.3），但 42 项组件测试有 1 项失败：作业 `XTALK_TTS_METRICS=1` 污染“无开关时静默”用例。已修正节点脚本，仅在单测子进程显式关闭实验开关，不放宽测试，使用新输出目录重提。首轮无模型性能样本。
 
 第二次作业 `job-179219331247515443792-xuan-zhang` 通过 42/42 组件测试与依赖门禁，MOSS/codec 权重读取完成后启动停滞，180 秒 health 超时，尚无音频样本。补充有界清理和可关闭的 Python 栈诊断，先定位原因，不将此轮作为热态基线。正式汇总另修正为按响应 ID 排除 cold/warm 探针及 smoke，避免启动开销混入阶段分布。
+
+第三次诊断作业 `job-179219357903821135118-xuan-zhang` 取得 Python 和 native 栈：codec 在 `transformers._initialize_missing_keys → _init_weights → torch._weight_norm → GOMP_parallel` 停滞，GPU 空闲。相同节点的隔离 CPU 微基准，单线程 codec 加载 2.123 秒完成，8 线程 25 秒超时（rc=124），仍停留在相同路径；另一个普通 1024×1024 weight_norm 微基准正常，不能泛称所有 OpenMP 运算损坏。
+
+据此新增仅覆盖 codec 加载阶段的独立单线程开关，成功/失败后恢复原推理线程数；不升级依赖、不跳过初始化、不修改权重。这是启动兼容处理，不算首音性能收益。诊断作业不作正式基线，清理后以新目录关闭栈诊断重提。

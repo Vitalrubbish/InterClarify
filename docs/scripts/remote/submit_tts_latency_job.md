@@ -5,3 +5,5 @@
 提交成功只说明调度器接受；须继续检查 job 状态、依赖报告、组件测试及 cold/warm smoke，确认真实推理开始后才能报告“测试运行中”。完整基线结束以 `baseline/summary.json` 和 `exit_code.txt=0` 为准。
 
 可显式传递 `TTS_HEALTH_TIMEOUT` 和 `TTS_STACK_DIAGNOSTIC`，用于排障作业；诊断结果与正式测量分开保存。
+
+`TTS_CODEC_LOAD_THREADS` 可显式转发到节点，仅控制 codec 启动加载，不改变热态推理线程数。

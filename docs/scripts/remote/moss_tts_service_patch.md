@@ -11,3 +11,5 @@
 worker 包装器在退出时清理仍打开的 codec streaming context；正常 finish 已关闭时不重复关闭，close/异常退出也不会遗留共享 codec 状态。取消与 PCM 入队由同一提交锁串行化；等待供音后重新检查取消。已经进入客户端播放缓冲的数据仍须由原播放所有者丢弃，服务补丁不能撤回已交付音频。
 
 节点诊断可用 `XTALK_TTS_STACK_DIAGNOSTIC=1` 每 60 秒将 Python 栈写入服务日志，用于定位启动或推理停滞；它不属于正式性能测量，排障后关闭再跑基线。不打印请求内容或环境秘密。
+
+`load_codec` 提供独立的启动排障开关 `XTALK_TTS_CODEC_LOAD_THREADS=1`（默认 0，沿用原线程数）。仅在 `_load_codec` 调用期间将 torch CPU 线程设为 1，成功或异常后都恢复原线程数；不改模型、采样、推理线程、codec streaming 状态或现役 conda。记录切换前后线程数和加载 span。原因是远端原 8 线程 codec 初始化在 `weight_norm` 的 OpenMP 并行区长期停滞，而同节点单线程加载约 2.1 秒完成；该处理只解决启动，不能计作首音优化收益。

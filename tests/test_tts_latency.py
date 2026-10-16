@@ -173,6 +173,23 @@ class ServicePatchTests(unittest.TestCase):
 
 @unittest.skipIf(torch is None, 'CPU torch required for numerical comparison')
 class MaskTests(unittest.TestCase):
+    def test_codec_loading_restores_inference_threads_on_success_and_error(self):
+        before = torch.get_num_threads()
+        observed = []
+        def loader():
+            observed.append(torch.get_num_threads())
+            return 'codec'
+        with patch.dict(os.environ, {'XTALK_TTS_CODEC_LOAD_THREADS': '1'}):
+            self.assertEqual(service.load_codec(loader), 'codec')
+            self.assertEqual(observed, [1])
+            self.assertEqual(torch.get_num_threads(), before)
+            def failed_loader():
+                self.assertEqual(torch.get_num_threads(), 1)
+                raise RuntimeError('fixture')
+            with self.assertRaises(RuntimeError):
+                service.load_codec(failed_loader)
+            self.assertEqual(torch.get_num_threads(), before)
+
     def test_mask_matches_valid_slice_including_zero_and_negative_logits(self):
         torch.manual_seed(17)
         history = torch.randint(0, 7, (1, 128, 2))

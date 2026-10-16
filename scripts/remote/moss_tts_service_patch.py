@@ -71,9 +71,31 @@ class ObservedQueue(queue.Queue):
         return item
 
 
+def load_codec(loader, *args, **kwargs):
+    """Optionally bound CPU loading threads, restoring them before inference."""
+    threads = int(os.environ.get('XTALK_TTS_CODEC_LOAD_THREADS', '0'))
+    if threads not in (0, 1):
+        raise ValueError('XTALK_TTS_CODEC_LOAD_THREADS must be 0 or 1')
+    if not threads:
+        return loader(*args, **kwargs)
+    import torch
+
+    previous = torch.get_num_threads()
+    torch.set_num_threads(threads)
+    try:
+        with span('codec.load', threads=threads, inference_threads=previous):
+            return loader(*args, **kwargs)
+    finally:
+        torch.set_num_threads(previous)
+        emit('codec.load.threads_restored', threads=previous)
+
+
 def apply_service_patch(module):
     """Wrap the pinned service without touching its source checkout."""
     limit = generation_batch_frames()
+    original_load_codec = getattr(module, '_load_codec', None)
+    if original_load_codec is not None:
+        module._load_codec = functools.partial(load_codec, original_load_codec)
     manager = module.SessionManager
     original_start = manager._start_worker
 
