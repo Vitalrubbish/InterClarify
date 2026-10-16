@@ -1,0 +1,28 @@
+{
+  "model": {
+    "status": "ok",
+    "checkpoint": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/sbintuitions--DuplexCascade/c3dd51ce9a5a7d27f810ffd5dab309f132a94d28",
+    "base_model": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/Qwen--Qwen2-7B-Instruct/8dce1f8a2d3286a7adf09b977e661350ad67e40a",
+    "token_ids": {
+      "<|no voice|>": 151646,
+      "<|user is talking|>": 151647,
+      "<|user finish talking|>": 151648,
+      "<|user is thinking|>": 151649,
+      "<|user interruption|>": 151650,
+      "<|user backchannel|>": 151651,
+      "<|im_end|>": 151645
+    },
+    "context_length": 32768,
+    "torch": "2.4.1+cu121",
+    "tokenizer_class": "Qwen2TokenizerFast",
+    "dtype": "torch.bfloat16"
+  },
+  "source_sha256": {
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-1ea0969/duplex_model_service.py": "c145a11828472fe51f621d4f81dde8280983e63d3428bd8812e64486c14dbb8e",
+    "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/xtalk/src/xtalk/duplex_control/micro_turn.py": "29203030c1c4723c7bd8ed23c7a3bdda1e89d6419f46c227da79da5842758c4a",
+    "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/xtalk/src/xtalk/duplex_control/runtime_adapter.py": "6ae467aaa618654b52a56e1825bf6d1fd0424f553fdba07f3a2ce10f768db54a"
+  },
+  "interval_seconds": 0.6,
+  "note": "Existing X-Talk runtime, real-time trace replay, HTTP model",
+  "tts": false
+}

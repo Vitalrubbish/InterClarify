@@ -1,0 +1,1130 @@
+[
+  {
+    "sample_id": "fdb/candor_turn_taking/1",
+    "variant": "original",
+    "boundary_seconds": 5.899999999999864,
+    "boundary_interval": [
+      5.629999999999882,
+      5.899999999999864
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [
+      "ab3f350b30894c6484772bb6b1bf4ab0"
+    ],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [
+      "ab3f350b30894c6484772bb6b1bf4ab0"
+    ],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-160"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/10",
+    "variant": "original",
+    "boundary_seconds": 4.600000000000136,
+    "boundary_interval": [
+      4.230000000000018,
+      4.600000000000136
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-160"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/100",
+    "variant": "original",
+    "boundary_seconds": 4.910000000000082,
+    "boundary_interval": [
+      4.829999999999927,
+      4.910000000000082
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": 0.7803889626263754,
+    "first_new_response_id": "3b6af79c6bb14f5e9a89e8fbe0a59624",
+    "new_reply_within_2s": true,
+    "new_reply_within_5s": true,
+    "new_reply_within_12s": true,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-160"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/101",
+    "variant": "original",
+    "boundary_seconds": 5.789999999999964,
+    "boundary_interval": [
+      5.789999999999964,
+      5.789999999999964
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-160"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/102",
+    "variant": "original",
+    "boundary_seconds": 6.7999999999999545,
+    "boundary_interval": [
+      6.519999999999982,
+      6.7999999999999545
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-160"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/1",
+    "variant": "without_punctuation",
+    "boundary_seconds": 5.899999999999864,
+    "boundary_interval": [
+      5.629999999999882,
+      5.899999999999864
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [
+      "8cb4c13689e74b3a87308236aa92d732"
+    ],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [
+      "8cb4c13689e74b3a87308236aa92d732"
+    ],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-160"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/10",
+    "variant": "without_punctuation",
+    "boundary_seconds": 4.600000000000136,
+    "boundary_interval": [
+      4.230000000000018,
+      4.600000000000136
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-160"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/100",
+    "variant": "without_punctuation",
+    "boundary_seconds": 4.910000000000082,
+    "boundary_interval": [
+      4.829999999999927,
+      4.910000000000082
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": 0.7820609157531635,
+    "first_new_response_id": "5f4040b347854d6ebdc231c798a7e37d",
+    "new_reply_within_2s": true,
+    "new_reply_within_5s": true,
+    "new_reply_within_12s": true,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-160"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/101",
+    "variant": "without_punctuation",
+    "boundary_seconds": 5.789999999999964,
+    "boundary_interval": [
+      5.789999999999964,
+      5.789999999999964
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-160"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/102",
+    "variant": "without_punctuation",
+    "boundary_seconds": 6.7999999999999545,
+    "boundary_interval": [
+      6.519999999999982,
+      6.7999999999999545
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-160"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/1",
+    "variant": "original",
+    "boundary_seconds": 5.899999999999864,
+    "boundary_interval": [
+      5.629999999999882,
+      5.899999999999864
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [
+      "9c7852f3b7034239a6c4301f2a95fae4"
+    ],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [
+      "9c7852f3b7034239a6c4301f2a95fae4"
+    ],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/10",
+    "variant": "original",
+    "boundary_seconds": 4.600000000000136,
+    "boundary_interval": [
+      4.230000000000018,
+      4.600000000000136
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/100",
+    "variant": "original",
+    "boundary_seconds": 4.910000000000082,
+    "boundary_interval": [
+      4.829999999999927,
+      4.910000000000082
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/101",
+    "variant": "original",
+    "boundary_seconds": 5.789999999999964,
+    "boundary_interval": [
+      5.789999999999964,
+      5.789999999999964
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/102",
+    "variant": "original",
+    "boundary_seconds": 6.7999999999999545,
+    "boundary_interval": [
+      6.519999999999982,
+      6.7999999999999545
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/1",
+    "variant": "without_punctuation",
+    "boundary_seconds": 5.899999999999864,
+    "boundary_interval": [
+      5.629999999999882,
+      5.899999999999864
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [
+      "4a5662e5d3514669b7bb28893993b8b6"
+    ],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [
+      "4a5662e5d3514669b7bb28893993b8b6"
+    ],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/10",
+    "variant": "without_punctuation",
+    "boundary_seconds": 4.600000000000136,
+    "boundary_interval": [
+      4.230000000000018,
+      4.600000000000136
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/100",
+    "variant": "without_punctuation",
+    "boundary_seconds": 4.910000000000082,
+    "boundary_interval": [
+      4.829999999999927,
+      4.910000000000082
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/101",
+    "variant": "without_punctuation",
+    "boundary_seconds": 5.789999999999964,
+    "boundary_interval": [
+      5.789999999999964,
+      5.789999999999964
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/102",
+    "variant": "without_punctuation",
+    "boundary_seconds": 6.7999999999999545,
+    "boundary_interval": [
+      6.519999999999982,
+      6.7999999999999545
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_en-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/1",
+    "variant": "original",
+    "boundary_seconds": 5.899999999999864,
+    "boundary_interval": [
+      5.629999999999882,
+      5.899999999999864
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [
+      "931e06abdd0f4bc9964b2be7b9d39f36"
+    ],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [
+      "931e06abdd0f4bc9964b2be7b9d39f36"
+    ],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-320"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/10",
+    "variant": "original",
+    "boundary_seconds": 4.600000000000136,
+    "boundary_interval": [
+      4.230000000000018,
+      4.600000000000136
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-320"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/100",
+    "variant": "original",
+    "boundary_seconds": 4.910000000000082,
+    "boundary_interval": [
+      4.829999999999927,
+      4.910000000000082
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-320"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/101",
+    "variant": "original",
+    "boundary_seconds": 5.789999999999964,
+    "boundary_interval": [
+      5.789999999999964,
+      5.789999999999964
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-320"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/102",
+    "variant": "original",
+    "boundary_seconds": 6.7999999999999545,
+    "boundary_interval": [
+      6.519999999999982,
+      6.7999999999999545
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-320"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/1",
+    "variant": "without_punctuation",
+    "boundary_seconds": 5.899999999999864,
+    "boundary_interval": [
+      5.629999999999882,
+      5.899999999999864
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [
+      "270eacf8652444cfb503332012647bb2"
+    ],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [
+      "270eacf8652444cfb503332012647bb2"
+    ],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-320"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/10",
+    "variant": "without_punctuation",
+    "boundary_seconds": 4.600000000000136,
+    "boundary_interval": [
+      4.230000000000018,
+      4.600000000000136
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-320"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/100",
+    "variant": "without_punctuation",
+    "boundary_seconds": 4.910000000000082,
+    "boundary_interval": [
+      4.829999999999927,
+      4.910000000000082
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-320"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/101",
+    "variant": "without_punctuation",
+    "boundary_seconds": 5.789999999999964,
+    "boundary_interval": [
+      5.789999999999964,
+      5.789999999999964
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-320"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/102",
+    "variant": "without_punctuation",
+    "boundary_seconds": 6.7999999999999545,
+    "boundary_interval": [
+      6.519999999999982,
+      6.7999999999999545
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-320"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/1",
+    "variant": "original",
+    "boundary_seconds": 5.899999999999864,
+    "boundary_interval": [
+      5.629999999999882,
+      5.899999999999864
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": 0.8164148837329321,
+    "first_new_response_id": "313e04cde4e64861ab2be5d35385f007",
+    "new_reply_within_2s": true,
+    "new_reply_within_5s": true,
+    "new_reply_within_12s": true,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/10",
+    "variant": "original",
+    "boundary_seconds": 4.600000000000136,
+    "boundary_interval": [
+      4.230000000000018,
+      4.600000000000136
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/100",
+    "variant": "original",
+    "boundary_seconds": 4.910000000000082,
+    "boundary_interval": [
+      4.829999999999927,
+      4.910000000000082
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/101",
+    "variant": "original",
+    "boundary_seconds": 5.789999999999964,
+    "boundary_interval": [
+      5.789999999999964,
+      5.789999999999964
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/102",
+    "variant": "original",
+    "boundary_seconds": 6.7999999999999545,
+    "boundary_interval": [
+      6.519999999999982,
+      6.7999999999999545
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/1",
+    "variant": "without_punctuation",
+    "boundary_seconds": 5.899999999999864,
+    "boundary_interval": [
+      5.629999999999882,
+      5.899999999999864
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": 0.8195692900569611,
+    "first_new_response_id": "ed8fb3b2a520444583e65d3550962a9e",
+    "new_reply_within_2s": true,
+    "new_reply_within_5s": true,
+    "new_reply_within_12s": true,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/10",
+    "variant": "without_punctuation",
+    "boundary_seconds": 4.600000000000136,
+    "boundary_interval": [
+      4.230000000000018,
+      4.600000000000136
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/100",
+    "variant": "without_punctuation",
+    "boundary_seconds": 4.910000000000082,
+    "boundary_interval": [
+      4.829999999999927,
+      4.910000000000082
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/101",
+    "variant": "without_punctuation",
+    "boundary_seconds": 5.789999999999964,
+    "boundary_interval": [
+      5.789999999999964,
+      5.789999999999964
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/102",
+    "variant": "without_punctuation",
+    "boundary_seconds": 6.7999999999999545,
+    "boundary_interval": [
+      6.519999999999982,
+      6.7999999999999545
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "nemotron_multi-560"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/1",
+    "variant": "original",
+    "boundary_seconds": 5.899999999999864,
+    "boundary_interval": [
+      5.629999999999882,
+      5.899999999999864
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": 0.9319589644671851,
+    "first_new_response_id": "9437939740744f02876ffc0a0231bd1c",
+    "new_reply_within_2s": true,
+    "new_reply_within_5s": true,
+    "new_reply_within_12s": true,
+    "premature_response_ids": [
+      "af2deabd756141c58ce3c082db6650f0"
+    ],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [
+      "af2deabd756141c58ce3c082db6650f0"
+    ],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "kyutai-500"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/10",
+    "variant": "original",
+    "boundary_seconds": 4.600000000000136,
+    "boundary_interval": [
+      4.230000000000018,
+      4.600000000000136
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": 1.3918685480950899,
+    "first_new_response_id": "e617e6f71cd743169ea041aaa3328991",
+    "new_reply_within_2s": true,
+    "new_reply_within_5s": true,
+    "new_reply_within_12s": true,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "kyutai-500"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/100",
+    "variant": "original",
+    "boundary_seconds": 4.910000000000082,
+    "boundary_interval": [
+      4.829999999999927,
+      4.910000000000082
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": 1.434219643622555,
+    "first_new_response_id": "acf9ced023914b89b0d08a9f664a3e97",
+    "new_reply_within_2s": true,
+    "new_reply_within_5s": true,
+    "new_reply_within_12s": true,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "kyutai-500"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/101",
+    "variant": "original",
+    "boundary_seconds": 5.789999999999964,
+    "boundary_interval": [
+      5.789999999999964,
+      5.789999999999964
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": 0.19510608635846438,
+    "first_new_response_id": "dc40bfaf7bab4fa6a4e1ae20bb18f04f",
+    "new_reply_within_2s": true,
+    "new_reply_within_5s": true,
+    "new_reply_within_12s": true,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "kyutai-500"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/102",
+    "variant": "original",
+    "boundary_seconds": 6.7999999999999545,
+    "boundary_interval": [
+      6.519999999999982,
+      6.7999999999999545
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": 1.4880930658430316,
+    "first_new_response_id": "90b0945f3afc43298ae30e079027f423",
+    "new_reply_within_2s": true,
+    "new_reply_within_5s": true,
+    "new_reply_within_12s": true,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "kyutai-500"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/1",
+    "variant": "without_punctuation",
+    "boundary_seconds": 5.899999999999864,
+    "boundary_interval": [
+      5.629999999999882,
+      5.899999999999864
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": 0.9250816352666789,
+    "first_new_response_id": "3ea25aea8bb649a3b082b6d6b28f6fed",
+    "new_reply_within_2s": true,
+    "new_reply_within_5s": true,
+    "new_reply_within_12s": true,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "kyutai-500"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/10",
+    "variant": "without_punctuation",
+    "boundary_seconds": 4.600000000000136,
+    "boundary_interval": [
+      4.230000000000018,
+      4.600000000000136
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": 1.3915050193666048,
+    "first_new_response_id": "5412113db48345f3becaf2d3965dae88",
+    "new_reply_within_2s": true,
+    "new_reply_within_5s": true,
+    "new_reply_within_12s": true,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "kyutai-500"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/100",
+    "variant": "without_punctuation",
+    "boundary_seconds": 4.910000000000082,
+    "boundary_interval": [
+      4.829999999999927,
+      4.910000000000082
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "kyutai-500"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/101",
+    "variant": "without_punctuation",
+    "boundary_seconds": 5.789999999999964,
+    "boundary_interval": [
+      5.789999999999964,
+      5.789999999999964
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "kyutai-500"
+  },
+  {
+    "sample_id": "fdb/candor_turn_taking/102",
+    "variant": "without_punctuation",
+    "boundary_seconds": 6.7999999999999545,
+    "boundary_interval": [
+      6.519999999999982,
+      6.7999999999999545
+    ],
+    "observation_seconds": 12.0,
+    "error": null,
+    "first_new_reply_seconds": null,
+    "first_new_response_id": null,
+    "new_reply_within_2s": false,
+    "new_reply_within_5s": false,
+    "new_reply_within_12s": false,
+    "premature_response_ids": [],
+    "cross_boundary_continuation_ids": [],
+    "cancelled_response_ids": [],
+    "first_new_reply_later_cancelled": false,
+    "protocol_errors": 0,
+    "config": "kyutai-500"
+  }
+]

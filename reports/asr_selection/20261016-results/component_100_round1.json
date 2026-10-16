@@ -1,0 +1,249 @@
+{
+  "run": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs/full100-parallel-13a846d",
+  "expected_samples_per_repeat": 100,
+  "expected_repeats": 1,
+  "complete": true,
+  "sharded": true,
+  "configurations": {
+    "nemotron_en-160": {
+      "complete": true,
+      "processes": [
+        {
+          "repeat": 0,
+          "exit_code": 0,
+          "reported_samples": 100,
+          "directory": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs/full100-parallel-13a846d/shard-0/repeat-0/nemotron_en-160",
+          "gpu_metadata": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs/full100-parallel-13a846d/shard-0/gpu.csv"
+        }
+      ],
+      "summary": {
+        "samples": 100,
+        "failures": 0,
+        "reference_words": 2162,
+        "word_errors": 166,
+        "wer": 0.07678075855689177,
+        "rewrites": 0,
+        "online_punctuation_samples": 61,
+        "online_terminal_punctuation_samples": 0,
+        "final_terminal_punctuation_samples": 1,
+        "eof_only_terminal_punctuation_samples": 1,
+        "punctuation_tp": 99,
+        "punctuation_fp": 35,
+        "punctuation_fn": 168,
+        "punctuation_precision": 0.7388059701492538,
+        "punctuation_recall": 0.3707865168539326,
+        "punctuation_f1": 0.4937655860349127,
+        "first_text_seconds": {
+          "count": 100,
+          "p50": 1.3918796256184578,
+          "p95": 2.4969640158116815
+        },
+        "estimated_word_latency_seconds": {
+          "count": 1534,
+          "p50": 0.41524944234639416,
+          "p95": 3.4954461663216323
+        },
+        "aligned_reference_words": 1616,
+        "correct_words": 2059,
+        "last_text_relative_to_eof_seconds": {
+          "count": 100,
+          "p50": -0.7559436235576866,
+          "p95": 5.7433086608909
+        }
+      },
+      "peak_allocated_gib": 2.353577136993408
+    },
+    "nemotron_en-560": {
+      "complete": true,
+      "processes": [
+        {
+          "repeat": 0,
+          "exit_code": 0,
+          "reported_samples": 100,
+          "directory": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs/full100-parallel-13a846d/shard-1/repeat-0/nemotron_en-560",
+          "gpu_metadata": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs/full100-parallel-13a846d/shard-1/gpu.csv"
+        }
+      ],
+      "summary": {
+        "samples": 100,
+        "failures": 0,
+        "reference_words": 2162,
+        "word_errors": 164,
+        "wer": 0.07585568917668825,
+        "rewrites": 0,
+        "online_punctuation_samples": 63,
+        "online_terminal_punctuation_samples": 0,
+        "final_terminal_punctuation_samples": 1,
+        "eof_only_terminal_punctuation_samples": 1,
+        "punctuation_tp": 103,
+        "punctuation_fp": 37,
+        "punctuation_fn": 164,
+        "punctuation_precision": 0.7357142857142858,
+        "punctuation_recall": 0.3857677902621723,
+        "punctuation_f1": 0.5061425061425061,
+        "first_text_seconds": {
+          "count": 100,
+          "p50": 1.7116770707070827,
+          "p95": 2.8323874129913746
+        },
+        "estimated_word_latency_seconds": {
+          "count": 1538,
+          "p50": 0.600640501268208,
+          "p95": 6.13054655544459
+        },
+        "aligned_reference_words": 1616,
+        "correct_words": 2062,
+        "last_text_relative_to_eof_seconds": {
+          "count": 100,
+          "p50": -0.6955230714753275,
+          "p95": 13.814194653179493
+        }
+      },
+      "peak_allocated_gib": 2.3545122146606445
+    },
+    "nemotron_multi-320": {
+      "complete": true,
+      "processes": [
+        {
+          "repeat": 0,
+          "exit_code": 0,
+          "reported_samples": 100,
+          "directory": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs/full100-parallel-13a846d/shard-2/repeat-0/nemotron_multi-320",
+          "gpu_metadata": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs/full100-parallel-13a846d/shard-2/gpu.csv"
+        }
+      ],
+      "summary": {
+        "samples": 100,
+        "failures": 0,
+        "reference_words": 2162,
+        "word_errors": 210,
+        "wer": 0.0971322849213691,
+        "rewrites": 0,
+        "online_punctuation_samples": 61,
+        "online_terminal_punctuation_samples": 2,
+        "final_terminal_punctuation_samples": 2,
+        "eof_only_terminal_punctuation_samples": 0,
+        "punctuation_tp": 94,
+        "punctuation_fp": 37,
+        "punctuation_fn": 173,
+        "punctuation_precision": 0.7175572519083969,
+        "punctuation_recall": 0.352059925093633,
+        "punctuation_f1": 0.4723618090452261,
+        "first_text_seconds": {
+          "count": 100,
+          "p50": 1.63211724255234,
+          "p95": 2.609876992739736
+        },
+        "estimated_word_latency_seconds": {
+          "count": 1498,
+          "p50": 0.5381825570762155,
+          "p95": 3.558466893341379
+        },
+        "aligned_reference_words": 1616,
+        "correct_words": 2014,
+        "last_text_relative_to_eof_seconds": {
+          "count": 100,
+          "p50": -0.7222788624837997,
+          "p95": 0.9549057254865746
+        }
+      },
+      "peak_allocated_gib": 2.425723075866699
+    },
+    "nemotron_multi-560": {
+      "complete": true,
+      "processes": [
+        {
+          "repeat": 0,
+          "exit_code": 0,
+          "reported_samples": 100,
+          "directory": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs/full100-parallel-13a846d/shard-3/repeat-0/nemotron_multi-560",
+          "gpu_metadata": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs/full100-parallel-13a846d/shard-3/gpu.csv"
+        }
+      ],
+      "summary": {
+        "samples": 100,
+        "failures": 0,
+        "reference_words": 2162,
+        "word_errors": 209,
+        "wer": 0.09666975023126735,
+        "rewrites": 0,
+        "online_punctuation_samples": 59,
+        "online_terminal_punctuation_samples": 1,
+        "final_terminal_punctuation_samples": 3,
+        "eof_only_terminal_punctuation_samples": 2,
+        "punctuation_tp": 93,
+        "punctuation_fp": 40,
+        "punctuation_fn": 174,
+        "punctuation_precision": 0.6992481203007519,
+        "punctuation_recall": 0.34831460674157305,
+        "punctuation_f1": 0.465,
+        "first_text_seconds": {
+          "count": 100,
+          "p50": 1.7130272667855024,
+          "p95": 7.329268380533904
+        },
+        "estimated_word_latency_seconds": {
+          "count": 1495,
+          "p50": 0.6554832053929567,
+          "p95": 5.265751430980859
+        },
+        "aligned_reference_words": 1616,
+        "correct_words": 2014,
+        "last_text_relative_to_eof_seconds": {
+          "count": 100,
+          "p50": -0.572670967765152,
+          "p95": 7.219467746343457
+        }
+      },
+      "peak_allocated_gib": 2.4262752532958984
+    },
+    "kyutai-500": {
+      "complete": true,
+      "processes": [
+        {
+          "repeat": 0,
+          "exit_code": 0,
+          "reported_samples": 100,
+          "directory": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs/full100-parallel-13a846d/shard-4/repeat-0/kyutai-500",
+          "gpu_metadata": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs/full100-parallel-13a846d/shard-4/gpu.csv"
+        }
+      ],
+      "summary": {
+        "samples": 100,
+        "failures": 0,
+        "reference_words": 2162,
+        "word_errors": 475,
+        "wer": 0.21970397779833487,
+        "rewrites": 0,
+        "online_punctuation_samples": 84,
+        "online_terminal_punctuation_samples": 64,
+        "final_terminal_punctuation_samples": 94,
+        "eof_only_terminal_punctuation_samples": 30,
+        "punctuation_tp": 166,
+        "punctuation_fp": 107,
+        "punctuation_fn": 101,
+        "punctuation_precision": 0.608058608058608,
+        "punctuation_recall": 0.6217228464419475,
+        "punctuation_f1": 0.6148148148148148,
+        "first_text_seconds": {
+          "count": 98,
+          "p50": 1.5357903894037008,
+          "p95": 2.33268933435902
+        },
+        "estimated_word_latency_seconds": {
+          "count": 1358,
+          "p50": 0.7126629374176263,
+          "p95": 0.9726573472060264
+        },
+        "aligned_reference_words": 1616,
+        "correct_words": 1810,
+        "last_text_relative_to_eof_seconds": {
+          "count": 98,
+          "p50": -0.31713473930954894,
+          "p95": 0.3788213135004043
+        }
+      },
+      "peak_allocated_gib": 2.427919864654541
+    }
+  }
+}

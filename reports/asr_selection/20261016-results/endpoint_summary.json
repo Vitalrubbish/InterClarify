@@ -1,0 +1,129 @@
+{
+  "nemotron_en-160": {
+    "original": {
+      "samples": 5,
+      "errors": 0,
+      "reply_within_2s": 1,
+      "reply_within_5s": 1,
+      "reply_within_12s": 1,
+      "new_reply_later_cancelled": 0,
+      "cross_boundary_continuations": 0,
+      "latencies_seconds": [
+        0.7803889626263754
+      ]
+    },
+    "without_punctuation": {
+      "samples": 5,
+      "errors": 0,
+      "reply_within_2s": 1,
+      "reply_within_5s": 1,
+      "reply_within_12s": 1,
+      "new_reply_later_cancelled": 0,
+      "cross_boundary_continuations": 0,
+      "latencies_seconds": [
+        0.7820609157531635
+      ]
+    }
+  },
+  "nemotron_en-560": {
+    "original": {
+      "samples": 5,
+      "errors": 0,
+      "reply_within_2s": 0,
+      "reply_within_5s": 0,
+      "reply_within_12s": 0,
+      "new_reply_later_cancelled": 0,
+      "cross_boundary_continuations": 0,
+      "latencies_seconds": []
+    },
+    "without_punctuation": {
+      "samples": 5,
+      "errors": 0,
+      "reply_within_2s": 0,
+      "reply_within_5s": 0,
+      "reply_within_12s": 0,
+      "new_reply_later_cancelled": 0,
+      "cross_boundary_continuations": 0,
+      "latencies_seconds": []
+    }
+  },
+  "nemotron_multi-320": {
+    "original": {
+      "samples": 5,
+      "errors": 0,
+      "reply_within_2s": 0,
+      "reply_within_5s": 0,
+      "reply_within_12s": 0,
+      "new_reply_later_cancelled": 0,
+      "cross_boundary_continuations": 0,
+      "latencies_seconds": []
+    },
+    "without_punctuation": {
+      "samples": 5,
+      "errors": 0,
+      "reply_within_2s": 0,
+      "reply_within_5s": 0,
+      "reply_within_12s": 0,
+      "new_reply_later_cancelled": 0,
+      "cross_boundary_continuations": 0,
+      "latencies_seconds": []
+    }
+  },
+  "nemotron_multi-560": {
+    "original": {
+      "samples": 5,
+      "errors": 0,
+      "reply_within_2s": 1,
+      "reply_within_5s": 1,
+      "reply_within_12s": 1,
+      "new_reply_later_cancelled": 0,
+      "cross_boundary_continuations": 0,
+      "latencies_seconds": [
+        0.8164148837329321
+      ]
+    },
+    "without_punctuation": {
+      "samples": 5,
+      "errors": 0,
+      "reply_within_2s": 1,
+      "reply_within_5s": 1,
+      "reply_within_12s": 1,
+      "new_reply_later_cancelled": 0,
+      "cross_boundary_continuations": 0,
+      "latencies_seconds": [
+        0.8195692900569611
+      ]
+    }
+  },
+  "kyutai-500": {
+    "original": {
+      "samples": 5,
+      "errors": 0,
+      "reply_within_2s": 5,
+      "reply_within_5s": 5,
+      "reply_within_12s": 5,
+      "new_reply_later_cancelled": 0,
+      "cross_boundary_continuations": 0,
+      "latencies_seconds": [
+        0.9319589644671851,
+        1.3918685480950899,
+        1.434219643622555,
+        0.19510608635846438,
+        1.4880930658430316
+      ]
+    },
+    "without_punctuation": {
+      "samples": 5,
+      "errors": 0,
+      "reply_within_2s": 2,
+      "reply_within_5s": 2,
+      "reply_within_12s": 2,
+      "new_reply_later_cancelled": 0,
+      "cross_boundary_continuations": 0,
+      "latencies_seconds": [
+        0.9250816352666789,
+        1.3915050193666048
+      ]
+    }
+  }
+}

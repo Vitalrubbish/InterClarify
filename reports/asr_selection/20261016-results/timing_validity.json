@@ -1,0 +1,27 @@
+{
+  "nemotron_en-560": {
+    "samples": 100,
+    "producer_delay_over_80ms": 5,
+    "max_producer_delay_seconds": 36.08498463727534
+  },
+  "kyutai-500": {
+    "samples": 100,
+    "producer_delay_over_80ms": 3,
+    "max_producer_delay_seconds": 12.573589379042387
+  },
+  "nemotron_en-160": {
+    "samples": 100,
+    "producer_delay_over_80ms": 6,
+    "max_producer_delay_seconds": 38.07881416358054
+  },
+  "nemotron_multi-320": {
+    "samples": 100,
+    "producer_delay_over_80ms": 5,
+    "max_producer_delay_seconds": 10.205279887095093
+  },
+  "nemotron_multi-560": {
+    "samples": 100,
+    "producer_delay_over_80ms": 6,
+    "max_producer_delay_seconds": 15.12744572788477
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "nemotron_en-160": {
+    "sample_runs": 200,
+    "producer_delay_over_80ms": 10,
+    "max_producer_delay_seconds": 38.07881416358054,
+    "matched_word_p99_seconds": 12.735271766541832,
+    "matched_word_max_seconds": 78.28051014848053,
+    "note": "Unfiltered raw timings; cause of extreme stalls not established"
+  },
+  "nemotron_en-560": {
+    "sample_runs": 300,
+    "producer_delay_over_80ms": 9,
+    "max_producer_delay_seconds": 36.08498463727534,
+    "matched_word_p99_seconds": 10.444635071469083,
+    "matched_word_max_seconds": 37.40589736141264,
+    "note": "Unfiltered raw timings; cause of extreme stalls not established"
+  },
+  "nemotron_multi-320": {
+    "sample_runs": 300,
+    "producer_delay_over_80ms": 9,
+    "max_producer_delay_seconds": 10.205279887095093,
+    "matched_word_p99_seconds": 7.275581108530608,
+    "matched_word_max_seconds": 38.73960547298193,
+    "note": "Unfiltered raw timings; cause of extreme stalls not established"
+  },
+  "nemotron_multi-560": {
+    "sample_runs": 300,
+    "producer_delay_over_80ms": 16,
+    "max_producer_delay_seconds": 37.95567456319928,
+    "matched_word_p99_seconds": 27.819636933684308,
+    "matched_word_max_seconds": 65.81473467238247,
+    "note": "Unfiltered raw timings; cause of extreme stalls not established"
+  },
+  "kyutai-500": {
+    "sample_runs": 300,
+    "producer_delay_over_80ms": 10,
+    "max_producer_delay_seconds": 35.27546796984971,
+    "matched_word_p99_seconds": 10.346043133801219,
+    "matched_word_max_seconds": 36.159290286302564,
+    "note": "Unfiltered raw timings; cause of extreme stalls not established"
+  }
+}
