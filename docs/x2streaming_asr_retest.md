@@ -246,3 +246,23 @@ UI：1、10 停止旧回答后不再答；100、102 继续旧的 puppy/snacks �
 官方评分的失败/分母必须显式保留：STT 五例无有效回答，上游在空 latency_list 上发生 ZeroDivisionError；复评将覆盖率记 0/5、延迟记 null。UI 上游仅对有输出的 100/101/102 三例评分，报告 TOR=2/3、latency=1.547s、rating=0.667；1/10 被排除。强制保留原五例分母的诊断 TOR/rating 为 0.4/0.4，不冒充上游原始结果；其中 TOR 还包含旧回答继续播放，不能当作新回答成功率。两种 Pause Handling TOR 均为 0，Candor 沉默符合预期；backchannel TOR/frequency=0、JSD=1，系统附和仍在范围外。
 
 TTS 证据修复 `126b1f1`：未来 probe 按角色保存清单；本轮旧 config/lock 已备份到原始运行目录 `provenance_corrections/original_tts_warmup/`，修正后 tts_warmup 清单仅有 tts/codec，原/新 SHA256 另记 correction JSON。音频、时间线和推理快照保持原始证据。当前保留 Qwen 路线，优先定位控制模型对微轮文本历史的响应退化。
+
+### 12.1 持续等待的工程对照任务（2026-10-16）
+
+先核对官方 `sbintuitions/DuplexCascade/server.py` 的逐词增量、ChatML 拼接、原始 assistant ID 历史、贪心生成及控制 token 执行，再在集群单 GPU 上重放本轮五个 STT 样本的实际 micro-turn 文本。固定模型权重、BF16、64 token 上限和原始窗口序列；分别对照原样输入、去掉每拍文本首尾空白、移除前导空拍、两者同时，以及仅给最后文本添加句号的诊断条件。最后一种使用离线已知末尾，只用于区分输入分布问题，不作为在线实现方案。各条件重新生成自己的 assistant 历史，原样条件须先核对真实控制序列能否重现；记录每拍输入、输出 ID 和 prompt 一致性。此任务不启动 ASR/TTS、不修改运行时行为，也不将模型接话代替真实音频评测。
+
+**对照结果**：单 GPU 作业 `job-179212977748410350976-xuan-zhang` 已结束；官方源码固定到 `42893024ca90c8de8ac3ed624467ebc123512ff8`。证据见 [control_replay.json](../reports/duplex_acceptance/20261016T044445Z/control_replay.json)，远端一次性脚本与日志在 `data/runs/x2_control_replay_20261016/`。五例原样重放共 147 拍，控制序列全部与原始 timeline 一致；25 组共 691 次 prompt 构造与独立拼接的官方 ChatML 布局逐 ID 一致，tokenizer 的 BOS 为 null。没有发现空拍编码错误、assistant ID 丢失或控制解析凭空产生 talking。末尾实际窗口间隔 0.598–0.602s，不是串行模型调用阻塞了时钟。
+
+| 固定文本重放条件 | 末段文本之后产生接话 token | 样本 |
+| --- | --- | --- |
+| 原样 | 0/5 | 全部继续 talking |
+| 仅去每拍首尾空白 | 0/5 | 全部继续 talking |
+| 仅跳过最前面的空拍 | 3/5 | 1、10、100 恢复；101、102 继续等待 |
+| 去空白并跳过前导空拍 | 3/5 | 同上 |
+| 保留前导空拍，仅末段补句号 | 5/5 | 全部在紧接着的空拍产生 finish-talking 并开始正文 |
+
+这里的“接话”只统计模型在末段文字后的输出，不是有声覆盖或 FDB TOR；样本 1 原样曾提前产生正文后被取消，与该口径不矛盾。跳过前导空拍仍沿用原始后续文本分组，没有重建官方首段文字到达后再等 600ms 的时钟相位。因此已证实前导历史对三例有因果影响，尚不能把 3/5 当成恢复官方时钟后的完整复测结果。
+
+官方 `server.py` 的 `llm_tick_task` 在 `first_text_received_event.wait()` 后启动时钟；当前 MicroTurnAssembler 在 LLMAgentLoop 中启动 ASR 的同时启动时钟，是明确的工程差异。持续监听不要求在第一段转写之前调用 LLM：可以保持 ASR 从会话建立开始接收音频，仅把模型时钟启动恢复到首段非空文字，之后继续无条件按拍发送增量或 no-voice，不接入 VAD。
+
+另外两例说明启动历史不能解释全部失败。样本 101 末段是 ` steam on`：原样及跳过前导空拍都持续等待；仅改为 ` steam on.` 后，下一空拍就输出 finish-talking 和回答。句号对这五个固定文本轨迹有效，支持控制模型对文本句末形式敏感；不能据此证明训练数据的具体分布，或直接给在线每个增量补句号。实际系统不知道哪段是最后一段，硬补标点或静默若干拍后强制接话会改变停顿处理。后续先恢复官方启动边界并复测，再核查 X2 的标点输出能力与完整词提交契约；未验证前不引入新的 VAD、强制话轮结束或复杂反回写逻辑。
