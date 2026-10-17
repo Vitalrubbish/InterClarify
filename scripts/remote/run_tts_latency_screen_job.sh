@@ -27,7 +27,7 @@ if [ -n "${TTS_ONLY_ARMS:-}" ]; then
 fi
 set +e
 conda run --no-capture-output -n xtalk-round1-client python scripts/remote/tts_latency_experiments.py \
-  --task-root "$TASK_ROOT" --output "$OUTPUT" --round1-root "$ROUND1" \
+  --suite "${TTS_EXPERIMENT_SUITE:-screening}" --task-root "$TASK_ROOT" --output "$OUTPUT" --round1-root "$ROUND1" \
   --model-root "$ROUND1/models" --reference "$ROUND1/audio/reference.wav" "${ONLY_ARGS[@]}"
 rc=$?
 if [ -d "$OUTPUT" ]; then

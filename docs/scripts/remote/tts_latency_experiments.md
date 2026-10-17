@@ -11,3 +11,5 @@
 启动参数 `--task-root`、`--output`、`--round1-root`、`--model-root`、`--reference` 必须为真实路径；`--client-env` 是当前 conda，`--port` 默认 18004。依赖/组件测试由节点 shell 在 driver 前执行。时间线的 sparse token 数来自服务，不能假定每个双词片段等于 2 token。报告与测试镜像同步更新。
 
 `--only batch4 early_batch4` 支持独立修复复测，两个 arm 在同一新分配卡上配对；缺席的 control 不跨卡借用，subset 的首个 arm 标为无前置 control。原失败作业和原始日志保持冻结，不在运行中替换其服务源码。
+
+`--suite combination` 运行独立的 81 条组合筛选：control_start / combined / control_end，各三文本×三模式×三轮。combined 显式 batch=4、early=1、tokens=4、wait_ms=0；control 保持原参数。不与默认 screening 的单变量设计混合，组合收益只归给整个配置。`--suite` 默认 screening，不改变既有作业；参数校验禁止请求不属于 suite 的 arm。

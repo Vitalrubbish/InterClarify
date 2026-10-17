@@ -18,10 +18,17 @@ from types import SimpleNamespace
 import tts_latency_benchmark as bench
 
 
-def arms():
+def arms(suite="screening"):
     """Declare the control for each candidate without enabling product defaults."""
     modes = ['whole', 'incremental', 'sparse']
     common = {'batch': 0, 'early': 0, 'tokens': 12, 'wait_ms': 0}
+    if suite == 'combination':
+        return [dict(common, name='control_start', control=None, modes=modes),
+                dict(common, name='combined', batch=4, early=1, tokens=4,
+                     control='control_start', modes=modes),
+                dict(common, name='control_end', control='control_start', modes=modes)]
+    if suite != 'screening':
+        raise ValueError(f'Unknown suite: {suite}')
     return [
         dict(common, name='control_start', control=None, modes=modes),
         dict(common, name='batch4', batch=4, control='control_start', modes=modes[:2]),
@@ -145,7 +152,7 @@ async def run(args):
         try:
             sampler = subprocess.Popen(['nvidia-smi', '--query-gpu=timestamp,uuid,name,memory.used,utilization.gpu',
                 '--format=csv', '-l', '1'], stdout=gpu_log, stderr=subprocess.STDOUT, start_new_session=True)
-            selected = [arm for arm in arms() if not args.only or arm['name'] in args.only]
+            selected = [arm for arm in arms(args.suite) if not args.only or arm['name'] in args.only]
             selected_names = {arm['name'] for arm in selected}
             for arm in selected:
                 if arm['control'] not in selected_names:
@@ -173,8 +180,11 @@ def main():
     for name in ('task-root', 'output', 'round1-root', 'model-root', 'reference'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--port', type=int, default=18004)
-    parser.add_argument('--only', nargs='+', choices=[arm['name'] for arm in arms()], help='Explicit subset for an isolated retest')
+    parser.add_argument('--suite', choices=('screening', 'combination'), default='screening')
+    parser.add_argument('--only', nargs='+', choices=sorted({arm['name'] for suite in ('screening', 'combination') for arm in arms(suite)}), help='Explicit subset for an isolated retest')
     args = parser.parse_args()
+    if args.only and set(args.only) - {arm['name'] for arm in arms(args.suite)}:
+        parser.error('--only contains arms outside the selected suite')
     for name in ('task_root', 'output', 'round1_root', 'model_root', 'reference'):
         setattr(args, name, getattr(args, name).resolve())
     signal.signal(signal.SIGTERM, lambda signum, frame: sys.exit(128 + signum))

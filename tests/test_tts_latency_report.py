@@ -20,6 +20,16 @@ class ExperimentContractTests(unittest.TestCase):
             self.assertEqual(len(changed), 0 if arm['name'] == 'control_end' else 1)
         self.assertEqual(sum(len(arm['modes']) * 3 * 3 for arm in values.values()), 117)
 
+    def test_combination_is_an_explicit_separate_suite(self):
+        values = experiment.arms('combination')
+        self.assertEqual([v['name'] for v in values], ['control_start', 'combined', 'control_end'])
+        self.assertEqual(sum(len(v['modes']) * 3 * 3 for v in values), 81)
+        for v in (values[0], values[2]):
+            self.assertEqual((v['batch'], v['early'], v['tokens'], v['wait_ms']), (0, 0, 12, 0))
+        self.assertEqual(tuple(values[1][key] for key in ('batch','early','tokens','wait_ms')), (4,1,4,0))
+        with self.assertRaises(ValueError):
+            experiment.arms('invalid')
+
     def test_missing_outputs_do_not_claim_complete(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

@@ -5,3 +5,5 @@
 `TTS_SCREEN_JOB=1` 使现有提交包装器选择此入口，并把任务描述改为 tts-latency-screen；默认仍提交原 baseline 入口。资源保持单 GPU / 8 CPU / 32G。各 arm 在同一分配卡顺序运行，不并发加载服务或触碰原基线 checkout。
 
 `TTS_ONLY_ARMS='batch4 early_batch4'` 仅转为 driver 的显式 `--only` 参数数组，用于独立复测，不作为 shell 命令解释。
+
+`TTS_EXPERIMENT_SUITE=combination` 显式选择组合 suite，默认 screening。它只传给 argparse 的枚举参数，不作为脚本路径或任意命令解释。
