@@ -968,9 +968,10 @@ def apply_patch(module: Any) -> None:
             },
         )
         if early_compile_enabled() and self._xt_history is None:
-            self._xt_history = torch.zeros(
-                (hidden_states.shape[0], self._xt_capacity, self._xt_channels),
-                dtype=torch.long, device=hidden_states.device)
+            with torch.inference_mode(False):
+                self._xt_history = torch.zeros(
+                    (hidden_states.shape[0], self._xt_capacity, self._xt_channels),
+                    dtype=torch.long, device=hidden_states.device)
         use_compiled = (
             runner is not None
             and self._xt_history is not None
@@ -1006,15 +1007,17 @@ def apply_patch(module: Any) -> None:
             self._xt_cache_positions is None
             or self._xt_cache_positions.device != hidden_states.device
         ):
-            self._xt_cache_positions = torch.zeros(
-                1, dtype=torch.long, device=hidden_states.device
-            )
+            with torch.inference_mode(False):
+                self._xt_cache_positions = torch.zeros(
+                    1, dtype=torch.long, device=hidden_states.device
+                )
         output_token = torch.empty(
             hidden_states.shape[0], self._xt_channels, dtype=torch.long, device=hidden_states.device
         )
         if early_compile_enabled():
             if self._xt_valid_length is None:
-                self._xt_valid_length = torch.zeros((), dtype=torch.long, device=hidden_states.device)
+                with torch.inference_mode(False):
+                    self._xt_valid_length = torch.zeros((), dtype=torch.long, device=hidden_states.device)
             self._xt_valid_length.fill_(self._xt_history_filled)
         return _timed_call(
             self._xt_local_events,

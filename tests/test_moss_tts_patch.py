@@ -211,6 +211,49 @@ class MaskedLoopTests(unittest.TestCase):
                 actual = patch._local_loop(*args, valid_length=torch.tensor(filled))
                 self.assertTrue(torch.equal(actual, expected), (filled, penalty))
 
+    def test_persistent_history_can_be_updated_after_inference_mode_returns(self):
+        from unittest.mock import patch as mock_patch
+
+        class Inference:
+            def __init__(self):
+                self.model = FakeModel()
+                self.channels = 16
+            def _build_local_past_key_values(self):
+                return object()
+            def sample_token(self, logits, **kwargs):
+                return logits.argmax(dim=-1)
+            def generate_local_transformer(self, **kwargs):
+                return torch.zeros(1, 16, dtype=torch.long)
+            @torch.inference_mode()
+            def prefill(self):
+                return self.generate_local_transformer(
+                    hidden_states=torch.ones(1, 1, 4), temperature=.8, top_p=.6,
+                    top_k=30, do_sample=False, repetition_penalty=None,
+                    repetition_window=50, generated_tokens=None, gen_step=0)
+            @torch.inference_mode()
+            def step(self):
+                return self.generate_local_transformer(
+                    hidden_states=torch.ones(1, 1, 4), temperature=.8, top_p=.6,
+                    top_k=30, do_sample=False, repetition_penalty=1.1,
+                    repetition_window=50, generated_tokens=None, gen_step=1)
+            def finish(self):
+                return []
+
+        module = types.SimpleNamespace(MossTTSRealtimeInference=Inference)
+        with mock_patch.dict(os.environ, {'XTALK_TTS_EARLY_COMPILE': '1',
+                'XTALK_TTS_LOCAL_COMPILE': 'off', 'XTALK_TTS_METRICS': '0', 'XTALK_TTS_TRACE': ''}), \
+                mock_patch.object(patch, '_ensure_runner', return_value=patch._local_loop):
+            patch.apply_patch(module)
+            inferencer = Inference()
+            inferencer.prefill()
+            self.assertFalse(inferencer._xt_history.is_inference())
+            self.assertFalse(inferencer._xt_valid_length.is_inference())
+            self.assertEqual(inferencer._xt_history_filled, 1)
+            inferencer.step()
+            self.assertEqual(inferencer._xt_history_filled, 2)
+            inferencer.prefill()
+            self.assertEqual(inferencer._xt_history_filled, 1)
+
     def test_warmup_preserves_sampling_rng(self):
         inferencer = types.SimpleNamespace()
         patch._attach(inferencer)

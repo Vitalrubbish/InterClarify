@@ -71,3 +71,5 @@ XTALK_TTS_LOCAL_COMPILE=cudagraph XTALK_TTS_SAMPLE=greedy XTALK_TTS_METRICS=1 \
 开头编译候选还将 local loop 输入 hidden state 克隆为标准连续布局，消除长度为 1 的维度携带不同 prefill stride 而产生的图特化；只有早期编译开关开启时生效，数据值不变。trace 增加进程级 `unique_graphs`（Dynamo 累积计数，不清零），结合响应边界区分新图与热态；不能把进程总数当作单次响应编译数。
 
 prefill 前记录 `compile.state`，逐帧记录累积图数量，以计算同一响应的图增量。只有响应 ID 和进程时钟域匹配才允许求差。
+
+远端首轮 early 候选暴露持久缓冲区的 inference tensor 生命周期错误：在原 prefill 的 `torch.inference_mode()` 内分配历史，返回后 `_push_history` 在外部更新会报错。修复为持久历史、位置和有效长度缓冲显式在 `torch.inference_mode(False)` 中创建普通 tensor；不改变值、惩罚、token 顺序或每轮逻辑复位。CPU 回归必须模拟原 prefill/step 的 inference-mode 装饰器，不能只比较循环数学。

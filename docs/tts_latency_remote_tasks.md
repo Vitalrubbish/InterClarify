@@ -83,3 +83,7 @@
 同卡筛选作业已提交：`job-179219646950494824830-xuan-zhang`，源码 `d4056dc`，输出 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-runs/20261017-screen-01`。独立 checkout 为 `interclarify-tts-screen-20261017`；真实 MOSS 环境 50/50 组件测试通过，control_start 正在按输入预热。驱动顺序与单变量关系见镜像文档。报告生成器另在独立分析 worktree 中运行，不在作业运行中修改其源码。
 
 筛选完成后追加一次独立的 TTS WAV 可懂度诊断：复用远端现有 `interclarify-asr-selection/envs/nemotron_en` 环境（torch 2.11.0+cu128、transformers 5.15.1）和锁定的 `nvidia/nemotron-speech-streaming-en-0.6b@ebe59e5a817142986528bbbee5dba8db7b38ed50` 本地权重，不接入或替换在线 ASR、不安装依赖。模型输入接口依据现有固定权重 README 的 transformers pipeline 用法。另申请单卡作业处理保存的 WAV；作用仅为辅助检查漏词/重复，不能替代隐藏配置名试听或 FDB。
+
+首轮筛选中 `batch4` 完成 18 条，均与配对 control 的 PCM 完全相同；`early_batch4` 首次真实 prefill 因持久历史 buffer 是 inference tensor、返回后在 inference mode 外更新而失败，无音频。保留失败，不视为优化通过。已增加模拟上游 inference-mode 装饰器的完整挂载回归，并修复普通持久 buffer 的创建方式。后续使用独立 checkout / 同卡 batch4 + early_batch4 两臂复测，不修改正在进行的原门槛实验。
+
+离线 ASR 接入探针 `job-179219748134739540386-xuan-zhang` 已完成当时可读的 30 个 WAV（27 control + 3 batch4），无识别服务失败；control 的 sparse 长句转写尾部少 3 词，其输入 token 余量为 0。该现象需要保留用于质量核查，不能仅凭输入 token 完整就宣布生成语音无漏词。最终 ASR 将在全部作业结束后重新覆盖全部正式筛选 WAV。

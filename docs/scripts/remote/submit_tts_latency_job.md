@@ -9,3 +9,5 @@
 `TTS_CODEC_LOAD_THREADS` 可显式转发到节点，仅控制 codec 启动加载，不改变热态推理线程数。
 
 `TTS_SCREEN_JOB=1` 选择筛选节点入口，任务描述为 `tts-latency-screen`；其他设置与原基线相同。此开关由提交端选择脚本，不转发任意命令到节点。
+
+可转发 `TTS_ONLY_ARMS` 作为经过 shell 转义的字符串；节点端只按数组参数交给 argparse 的枚举校验。

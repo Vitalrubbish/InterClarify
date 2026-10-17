@@ -145,7 +145,11 @@ async def run(args):
         try:
             sampler = subprocess.Popen(['nvidia-smi', '--query-gpu=timestamp,uuid,name,memory.used,utilization.gpu',
                 '--format=csv', '-l', '1'], stdout=gpu_log, stderr=subprocess.STDOUT, start_new_session=True)
-            for arm in arms():
+            selected = [arm for arm in arms() if not args.only or arm['name'] in args.only]
+            selected_names = {arm['name'] for arm in selected}
+            for arm in selected:
+                if arm['control'] not in selected_names:
+                    arm['control'] = None
                 progress.update(current_arm=arm['name'], phase='startup')
                 write_json(args.output / 'progress.json', progress)
                 try:
@@ -169,6 +173,7 @@ def main():
     for name in ('task-root', 'output', 'round1-root', 'model-root', 'reference'):
         parser.add_argument('--' + name, type=Path, required=True)
     parser.add_argument('--port', type=int, default=18004)
+    parser.add_argument('--only', nargs='+', choices=[arm['name'] for arm in arms()], help='Explicit subset for an isolated retest')
     args = parser.parse_args()
     for name in ('task_root', 'output', 'round1_root', 'model_root', 'reference'):
         setattr(args, name, getattr(args, name).resolve())

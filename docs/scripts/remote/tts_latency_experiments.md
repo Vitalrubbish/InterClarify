@@ -9,3 +9,5 @@
 `run` 登记源码/环境/GPU/模型锁，完成一个 arm 就写 `progress.json`，异常保留失败并继续能独立执行的 arm。每个 arm 的真实 WAV、逐响应 JSON、时间线和 summary 留在共享输出目录。`stop_process` 先 TERM，20 秒后 KILL，仅清理本任务进程组。最终 `experiment_summary.json` 保留各 arm 状态，非全部完成则非零退出。
 
 启动参数 `--task-root`、`--output`、`--round1-root`、`--model-root`、`--reference` 必须为真实路径；`--client-env` 是当前 conda，`--port` 默认 18004。依赖/组件测试由节点 shell 在 driver 前执行。时间线的 sparse token 数来自服务，不能假定每个双词片段等于 2 token。报告与测试镜像同步更新。
+
+`--only batch4 early_batch4` 支持独立修复复测，两个 arm 在同一新分配卡上配对；缺席的 control 不跨卡借用，subset 的首个 arm 标为无前置 control。原失败作业和原始日志保持冻结，不在运行中替换其服务源码。

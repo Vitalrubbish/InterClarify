@@ -20,10 +20,15 @@ conda run --no-capture-output -n xtalk-round1-moss python scripts/remote/run_xta
 PYTHONPATH="$ROUND1/moss-source/moss_tts_realtime:$PYTHONPATH" \
   conda run --no-capture-output -n xtalk-round1-moss python -m unittest discover -s tests -p 'test_*tts*.py' -q \
   > "${OUTPUT}.preflight/component_tests.log" 2>&1
+ONLY_ARGS=()
+if [ -n "${TTS_ONLY_ARMS:-}" ]; then
+  read -r -a SELECTED <<< "$TTS_ONLY_ARMS"
+  ONLY_ARGS=(--only "${SELECTED[@]}")
+fi
 set +e
 conda run --no-capture-output -n xtalk-round1-client python scripts/remote/tts_latency_experiments.py \
   --task-root "$TASK_ROOT" --output "$OUTPUT" --round1-root "$ROUND1" \
-  --model-root "$ROUND1/models" --reference "$ROUND1/audio/reference.wav"
+  --model-root "$ROUND1/models" --reference "$ROUND1/audio/reference.wav" "${ONLY_ARGS[@]}"
 rc=$?
 if [ -d "$OUTPUT" ]; then
   cp "${OUTPUT}.preflight/dependencies.json" "${OUTPUT}.preflight/component_tests.log" "$OUTPUT/"
