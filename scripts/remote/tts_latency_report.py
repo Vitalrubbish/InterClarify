@@ -123,10 +123,15 @@ def diagnostics(directory):
     """Report compiled fallback evidence, not merely a compile-ready log line."""
     path = directory / 'service.log'
     text = path.read_text(errors='replace') if path.is_file() else ''
+    configuration = read_json(directory / 'arm.json', {})
+    requested = configuration.get('service_environment', {}).get('TORCH_LOGS', '')
+    recompile_logging = 'recompiles' in requested or '__recompiles' in text
     return {'fallbacks': text.count('falling back to eager'),
+            'recompile_logging_enabled': recompile_logging,
             'compiled_engaged': text.count('compiled path engaged'),
-            'recompile_log_entries': text.count('Recompiling function'),
+            'recompile_log_entries': text.count('Recompiling function') if recompile_logging else None,
             'warmup_seconds': [float(value) for value in re.findall(r'compiled warmup done in ([0-9.]+)s', text)],
+            'recompile_limit_fallbacks': len(re.findall(r'falling back to eager: recompile_limit', text)),
             'worker_errors': len(re.findall(r'\[session_worker_error\]', text))}
 
 
@@ -168,7 +173,7 @@ def gpu_summary(path):
             'samples': len(memory), 'gpu_uuids': sorted(identities)}
 
 
-def build_report(baseline, screen):
+def build_report(baseline, screen, intelligibility=None):
     """Keep acceptance limitations explicit even when a candidate is faster."""
     report = {'baseline_root': str(baseline), 'screen_root': str(screen),
               'baseline_exit': (baseline / 'exit_code.txt').read_text().strip() if (baseline / 'exit_code.txt').exists() else None,
@@ -180,11 +185,17 @@ def build_report(baseline, screen):
               'screen_progress': read_json(screen / 'progress.json'),
               'models': read_json(baseline / 'models.lock.json'),
               'arms': {}, 'comparisons': {},
+              'intelligibility': read_json(intelligibility or screen / 'intelligibility/summary.json'),
               'quality_listening': 'not_performed', 'physical_playback': 'not_measured',
               'fdb_integration': 'not_run', 'product_defaults_changed': False}
     for arm in arms():
         root = screen / arm['name']
         result = summarize_run(root / 'measured', root / 'server.jsonl')
+        failures = (report.get('screen_progress') or {}).get('failed', [])
+        failure = next((item for item in failures if item['arm'] == arm['name']), None)
+        if failure is not None:
+            result['status'] = 'failed'
+            result['error'] = failure['error']
         result['configuration'] = read_json(root / 'arm.json', {'configuration': arm})
         result['diagnostics'] = diagnostics(root)
         report['arms'][arm['name']] = result
@@ -192,8 +203,11 @@ def build_report(baseline, screen):
         if arm['control']:
             report['comparisons'][arm['name']] = compare_runs(report['arms'][arm['control']],
                 report['arms'][arm['name']], require_pcm=arm['name'] == 'batch4')
-    report['complete'] = (report['baseline_exit'] == '0' and report['screen_exit'] == '0'
-                          and all(value['status'] == 'complete' for value in report['arms'].values()))
+    report['complete'] = (report['baseline_exit'] is not None and report['screen_exit'] is not None
+                          and (report.get('screen_progress') or {}).get('phase') == 'finished'
+                          and all(value['status'] in ('complete', 'failed') for value in report['arms'].values()))
+    report['all_runs_successful'] = (report['baseline_exit'] == '0' and report['screen_exit'] == '0'
+                                   and all(value['status'] == 'complete' for value in report['arms'].values()))
     return report
 
 
@@ -218,7 +232,7 @@ def latency_table(modes):
 def render_markdown(report):
     """Write a self-contained report distinguishing measured gains from acceptance."""
     lines = ['# TTS 端延迟优化报告', '', '日期：2026-10-17。'
-             + ('本轮基线和候选筛选均已完成。' if report['complete'] else '部分作业尚未完成或存在失败，见下文。'), '',
+             + ('本轮作业均已结束，候选通过与否见结果。' if report['complete'] else '部分作业尚未完成或缺少终态证据，见下文。'), '',
              '## 结论与使用边界', '',
              '本轮固定 MOSS 权重、音色与官方采样，保留唯一 TTS/播放所有权。'
              '实现了批次上限、开头编译和稀疏文本局部 prefill 的可关闭候选路径。'
@@ -232,7 +246,8 @@ def render_markdown(report):
              '基线为 35 条非 FDB 文本 × whole/incremental × 3 轮，共 210 条。'
              '筛选只含原集合中的短答、澄清与长句三条，每模式三轮；不同候选共 117 条，属于小集合初筛，不能外推可靠的 p95。'
              'whole 一次推送，incremental 每三个词间隔 100ms，sparse 每两个词间隔 600ms、末块后 600ms 才真实结束。'
-             '实际 TTS token 数由服务记录，与单词数或 LLM token 数不同。', '',
+             '实际 TTS token 数由服务记录，与单词数或 LLM token 数不同。'
+             'sparse 是构造的压力输入，并非真实 LLM 流的发生频率估计。', '',
              '固定来源：MOSS `58b20a0d5fcc6766658d50967a90a9d890009a46`，adapter '
              '`b3306b97f8a64c1a2f25b9803c070ff32ecff6b1`；依赖 torch 2.9.1+cu128、transformers 5.0.0、flash-attn 2.8.3。'
              '模型 revision 与路径详见 JSON 摘要中的 models，独立运行源码和开关见各 measured/config.json、arm.json。', '',
@@ -244,11 +259,15 @@ def render_markdown(report):
     for repeat, values in report['baseline'].get('rounds', {}).items():
         lines += [f'### 第 {int(repeat) + 1} 轮', '', latency_table(values), '']
     lines += ['基线编译/回退诊断：`' + json.dumps(report['baseline_diagnostics'], ensure_ascii=False) + '`。', '',
+              '原基线未启用 TORCH_LOGS=recompiles，重编译条目为缺测，不能解释为没有重编译。'
+              '现有日志若出现 recompile_limit 回退，则该部分是 eager 性能，不能当作持续编译后的成绩。', '',
               '## 同卡候选结果', '']
     for name, value in report['arms'].items():
         config = value['configuration']['configuration']
         lines += [f'### {name}', '',
                   f"状态：{value['status']}；batch={config['batch']}、early={config['early']}、prefill={config['tokens']}、max_wait_ms={config['wait_ms']}。", '']
+        if value.get('error'):
+            lines += ['失败原因：`' + value['error'].replace('`', '') + '`。', '']
         if value['modes']:
             lines += [latency_table(value['modes']), '']
         for mode, check in value.get('checks', {}).get('by_mode', {}).items():
@@ -265,6 +284,21 @@ def render_markdown(report):
                       f"模拟有声节省均值/p50={seconds(voice['mean'])}/{seconds(voice['p50'])} 秒；正值表示改善。"
                       + (f" PCM 完全相同 {compare['pcm_equal']}/{compare['valid_pairs']}。" if compare['pcm_equal'] is not None else '')]
         lines += ['']
+    lines += ['## 语音内容诊断', '']
+    diagnostic = report.get('intelligibility')
+    if diagnostic is None:
+        lines += ['尚无独立 ASR 转写结果；token 消费完整不等于语音内容完整。', '']
+    else:
+        lines += ['使用既有固定 Nemotron EN 权重对保存 WAV 离线转写，辅助发现漏词/重复。'
+                  'ASR 本身有误差，以下不是人工自然度评价；只在同一模式的相同文本上比较。', '']
+        for mode, values in diagnostic['by_mode'].items():
+            lines += [f'### {mode} 内容检查', '',
+                      '| 配置 | 尝试/失败 | 总参考词 | ASR 词错误 | WER | 整句匹配 |',
+                      '| --- | ---: | ---: | ---: | ---: | ---: |']
+            for name, data in values.items():
+                lines.append(f"| {name} | {data['attempts']}/{data['failures']} | {data['reference_words']} | "
+                             f"{data['word_errors']} | {seconds(data['wer'])} | {data['exact_sentences']} |")
+            lines += ['']
     lines += ['## 阶段分解与剩余问题', '',
               '服务端阶段使用单一进程单调时钟，客户端端到端时间使用客户端单调时钟，两者不直接相减。'
               'prefill/step/codec/音色准备按区间分割，重叠单列，未归因等待不擅自称为排队。'
@@ -286,6 +320,8 @@ def render_markdown(report):
               '- TTS-003：开头编译初筛与新图/回退计数见上；若发生回退或持续重编译，不认定编译优化验收通过。',
               '- TTS-004：已有阶段分解，未擅自引入 KV 复用、codec/backbone 编译或更换模型。',
               '- TTS-005：新增小门槛与空闲等待上限路径并进行 sparse 对照；质量未验收前保留默认门槛。', '',
+              '稀疏输入下，原 session 主要随真实文本 token 推进一步音频；提前 prefill 不会自动补齐未来文本。'
+              '若输入速度过低，首 PCM 提前也可能仍有明显供音间隙，不能靠伪造 final 或填充未来文本解决。', '',
               '所有候选仍需在至少 30 条稀疏文本上扩大验证、隐藏配置名成对试听，并验证真实插话取消和连续播放。'
               '当前 Nemotron 主线未完成接入，未运行 FDB；不能将组件结果视为整体接话延迟或质量通过。', '',
               '完整证据包括各目录的 WAV、逐响应 JSON、server.jsonl、service.log、measured/responses.jsonl、'
@@ -299,8 +335,9 @@ def main():
     parser.add_argument('--baseline', type=Path, required=True)
     parser.add_argument('--screen', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--intelligibility', type=Path, help='Optional alternate ASR summary JSON')
     args = parser.parse_args()
-    report = build_report(args.baseline.resolve(), args.screen.resolve())
+    report = build_report(args.baseline.resolve(), args.screen.resolve(), args.intelligibility)
     args.output.mkdir(parents=True, exist_ok=True)
     (args.output / 'tts_latency_results.json').write_text(json.dumps(report, ensure_ascii=False, indent=2))
     (args.output / 'tts_latency_optimization_report.md').write_text(render_markdown(report))

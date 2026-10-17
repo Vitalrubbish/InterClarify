@@ -7,3 +7,9 @@
 `build_report` 记录作业完成标志、源码、GPU、配置和日志诊断，按候选列出收益与失败。未完成的 arm 标为待完成，不把局部结果写成最终验收；即使指标改善，也保留人工试听、真实播放器和 FDB 未验收的边界。`render_markdown` 生成完整报告，不从已有模板填入假定收益。
 
 CLI 为 `--baseline` 原基线根、`--screen` 同卡筛选根、`--output` 报告目录。输出 `tts_latency_optimization_report.md` 与 `tts_latency_results.json`，可重复生成本任务报告；原始 WAV/JSONL 保留在远端对应 run 根。报告仅使用可复核文件，不依赖日志里自称“通过”。
+
+基线若未开启重编译日志，其计数为缺测而非零；日志中的 `recompile_limit` 回退单列。sparse 是人为构造的压力流，不代表实际 LLM 的发生频率。报告解释低文本供应速率下首 PCM 与持续供音可能分离，不把提前 prefill 等同为解决全部首音问题。
+
+可选读取 `screen/intelligibility/summary.json` 或 `--intelligibility` 指定的离线 ASR 诊断，按输入模式呈现词错误与整句匹配；不混合不同模式作质量排名，缺测明确保留，人工试听状态仍为未完成。
+
+`complete` 表示所有计划的作业/候选都有终态（包含失败），`all_runs_successful` 才表示所有运行均无失败；二者都不代表质量验收通过。预热失败的候选单列错误原因，不以“缺少正式结果”为由隐藏失败。

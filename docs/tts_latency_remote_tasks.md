@@ -81,3 +81,5 @@
 按用户要求新增 [TTS-005](issues/tts_005_sparse_text_prefill_wait.md)，实现可关闭的门槛和原队列超时局部 prefill；默认配置仍保持 processor 门槛和无等待超时。下一作业采用独立 checkout 和[同卡筛选驱动](scripts/remote/tts_latency_experiments.md)，原基线目录保持冻结。筛选的 117 个正式小集合样本不能替代 30 条文本完整验收，原始 WAV、token 接收/消费与编译增量全部保留。
 
 同卡筛选作业已提交：`job-179219646950494824830-xuan-zhang`，源码 `d4056dc`，输出 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-runs/20261017-screen-01`。独立 checkout 为 `interclarify-tts-screen-20261017`；真实 MOSS 环境 50/50 组件测试通过，control_start 正在按输入预热。驱动顺序与单变量关系见镜像文档。报告生成器另在独立分析 worktree 中运行，不在作业运行中修改其源码。
+
+筛选完成后追加一次独立的 TTS WAV 可懂度诊断：复用远端现有 `interclarify-asr-selection/envs/nemotron_en` 环境（torch 2.11.0+cu128、transformers 5.15.1）和锁定的 `nvidia/nemotron-speech-streaming-en-0.6b@ebe59e5a817142986528bbbee5dba8db7b38ed50` 本地权重，不接入或替换在线 ASR、不安装依赖。模型输入接口依据现有固定权重 README 的 transformers pipeline 用法。另申请单卡作业处理保存的 WAV；作用仅为辅助检查漏词/重复，不能替代隐藏配置名试听或 FDB。
