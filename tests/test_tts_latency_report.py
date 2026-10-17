@@ -7,6 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts/remote'))
 import tts_latency_experiments as experiment
 import tts_latency_report as report
+import tts_combination_report as combination
 
 
 class ExperimentContractTests(unittest.TestCase):
@@ -29,6 +30,14 @@ class ExperimentContractTests(unittest.TestCase):
         self.assertEqual(tuple(values[1][key] for key in ('batch','early','tokens','wait_ms')), (4,1,4,0))
         with self.assertRaises(ValueError):
             experiment.arms('invalid')
+
+    def test_combination_report_keeps_missing_run_pending(self):
+        with tempfile.TemporaryDirectory() as directory:
+            value = combination.build(Path(directory))
+            self.assertFalse(value['complete'])
+            self.assertFalse(value['all_runs_successful'])
+            self.assertEqual(value['arms']['combined']['status'], 'pending')
+            self.assertIn('未完成', combination.render(value))
 
     def test_missing_outputs_do_not_claim_complete(self):
         with tempfile.TemporaryDirectory() as directory:

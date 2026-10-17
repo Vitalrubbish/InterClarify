@@ -104,3 +104,7 @@
 最终可读报告为 [tts_latency_optimization_report.md](tts_latency_optimization_report.md)，机器可读结果与逐条转写在 `reports/tts_latency/20261017/`。统计始终保留全部尝试；deadline200 有一条正式新图污染，按轮次展开。整体约 1 秒与 TTS 可听预算尚未通过，不变更产品默认参数。
 
 报告通过 JumpServer SFTP 取回并核对 SHA256：虚拟 `/d6-hpc-debuggpu-001/` 对应远端 home，不能直接在 SFTP 中使用 `/hpc_stor03/...`。三组成对试听副本保存在本地 `data/runs/tts_latency/20261017/listening/`，6 个 WAV 均与对应 JSON 的 PCM SHA256 匹配，文件名隐藏配置名，映射单独保存；只是准备试听材料，尚未进行人工试听。
+
+## 组合验证（用户追加）
+
+组合 suite 已提交 `job-179224493766087164069-xuan-zhang`，源码 `6c59aa3`，独立 worktree `interclarify-tts-combination-20261017`，输出 `interclarify-tts-runs/20261017-combination-01`。只运行 control_start / combined / control_end，共计划81条；combined 为4帧批次+早期编译+4-token门槛，200ms等待关闭。配置/规模见工程文档，结果另生成 `docs/tts_combination_validation.md`，不把本次组合与既有单变量实验混成一个分布。原在线ASR和产品默认配置不变。
