@@ -79,3 +79,5 @@
 原作业 `job-179219430342742386259-xuan-zhang` 已完成 210/210，失败/无音频均为 0，`exit_code.txt=0`。基线汇总中 whole 首 PCM p50 0.251 秒、p95 0.713 秒；incremental p50 0.337 秒、p95 0.791 秒。均值受新形状编译的少量长等待影响，后续报告按轮次分开。模拟可听首音明显晚于首 PCM，不能宣称达到 250–350ms 有声目标。
 
 按用户要求新增 [TTS-005](issues/tts_005_sparse_text_prefill_wait.md)，实现可关闭的门槛和原队列超时局部 prefill；默认配置仍保持 processor 门槛和无等待超时。下一作业采用独立 checkout 和[同卡筛选驱动](scripts/remote/tts_latency_experiments.md)，原基线目录保持冻结。筛选的 117 个正式小集合样本不能替代 30 条文本完整验收，原始 WAV、token 接收/消费与编译增量全部保留。
+
+同卡筛选作业已提交：`job-179219646950494824830-xuan-zhang`，源码 `d4056dc`，输出 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-runs/20261017-screen-01`。独立 checkout 为 `interclarify-tts-screen-20261017`；真实 MOSS 环境 50/50 组件测试通过，control_start 正在按输入预热。驱动顺序与单变量关系见镜像文档。报告生成器另在独立分析 worktree 中运行，不在作业运行中修改其源码。
