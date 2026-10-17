@@ -54,6 +54,29 @@ def corpus():
     return rows
 
 
+def sparse_schedule(item):
+    """Reconstruct exact text at 600 ms intervals and delay only the true end."""
+    words = item['text'].split(' ')
+    pieces = [' '.join(words[i:i + 2]) + (' ' if i + 2 < len(words) else '')
+              for i in range(0, len(words), 2)]
+    return [{'at_ms': i * 600, 'text': value} for i, value in enumerate(pieces)]
+
+
+def text_schedule(item, mode):
+    """Select already fixed input timing, never synthesizing an end marker."""
+    if mode == 'sparse':
+        schedule = item.get('sparse_deltas', sparse_schedule(item))
+        end_ms = item.get('end_at_ms', schedule[-1]['at_ms'] + 600)
+    elif mode == 'incremental':
+        schedule = item['deltas']
+        end_ms = schedule[-1]['at_ms']
+    else:
+        schedule, end_ms = [{'at_ms': 0, 'text': item['text']}], 0
+    if end_ms < schedule[-1]['at_ms']:
+        raise ValueError('True text end cannot precede the final delta')
+    return schedule, end_ms
+
+
 class PlaybackEstimate:
     """Estimate headless immediate-consumption buffer without a sound device."""
 
@@ -110,7 +133,8 @@ def summarize(rows):
                         'audible_estimate_seconds': distribution([r['audible_estimate_seconds'] for r in group
                             if r['error'] is None and r['audible_estimate_seconds'] is not None]),
                         'audio_per_wall': distribution([r['audio_per_wall'] for r in group if r['error'] is None]),
-                        'simulated_underruns': sum(r['simulated_underruns'] for r in group)}
+                        'simulated_underruns': sum(r['simulated_underruns'] for r in group),
+                        'pcm_before_text_end': sum(r.get('pcm_before_text_end', False) for r in group)}
     return result
 
 
@@ -186,6 +210,7 @@ async def run_case(args, item, mode, repeat, output):
     events, packets = [], []
     rate = 48000
     error = None
+    text_end_seconds = None
     buffer = PlaybackEstimate()
     started = time.monotonic()
     timeline = lambda event, **kw: events.append({'event': event, 'seconds': time.monotonic() - started,
@@ -223,12 +248,15 @@ async def run_case(args, item, mode, repeat, output):
                 raise RuntimeError('Socket closed before completed')
 
             async def send():
-                schedule = item['deltas'] if mode == 'incremental' else [{'at_ms': 0, 'text': item['text']}]
+                nonlocal text_end_seconds
+                schedule, end_ms = text_schedule(item, mode)
                 origin = time.monotonic()
                 for delta in schedule:
                     await asyncio.sleep(max(0, origin + delta['at_ms'] / 1000 - time.monotonic()))
                     timeline('text.push', text=delta['text'])
                     await ws.send(json.dumps({'type': 'push', 'text': delta['text'], 'is_final': False}))
+                await asyncio.sleep(max(0, origin + end_ms / 1000 - time.monotonic()))
+                text_end_seconds = time.monotonic() - started
                 timeline('text.end')
                 await ws.send(json.dumps({'type': 'push', 'text': '', 'is_final': True}))
 
@@ -263,6 +291,9 @@ async def run_case(args, item, mode, repeat, output):
            'audible_estimate_seconds': audible, 'wall_seconds': elapsed,
            'audio_per_wall': len(pcm) / (2 * rate * max(elapsed, 1e-9)),
            'first_packet_samples': len(packets[0][1]) // 2 if packets else 0,
+           'text_end_seconds': text_end_seconds,
+           'pcm_before_text_end': bool(packets and text_end_seconds is not None and packets[0][0] < text_end_seconds),
+           'audio_sha256': hashlib.sha256(pcm).hexdigest(),
            'simulated_underruns': buffer.underruns,
            'simulated_underrun_seconds': buffer.underrun_seconds}
     stem = f'{item["id"]}_{mode}_{repeat}'
@@ -304,8 +335,10 @@ def manifest():
 async def run(args):
     """Run warmup separately and alternate the two fixed input modes."""
     items = [json.loads(line) for line in args.corpus.read_text().splitlines() if line.strip()]
-    if not args.probe and (len(items) < 30 or args.repeats < 3):
+    if not args.probe and not args.screening and (len(items) < 30 or args.repeats < 3):
         raise ValueError('Use at least 30 texts and 3 measured repeats')
+    if not items or args.repeats < 1:
+        raise ValueError('At least one text and one repeat are required')
     ids = [item['id'] for item in items]
     if len(ids) != len(set(ids)) or any(not value.replace('_', '').replace('-', '').isalnum() for value in ids):
         raise ValueError('Corpus IDs must be unique filename-safe identifiers')
@@ -315,6 +348,11 @@ async def run(args):
         times = [d['at_ms'] for d in item['deltas']]
         if not times or min(times) < 0 or times != sorted(times):
             raise ValueError('Arrival times must be nonnegative and ordered')
+        schedule, end_ms = text_schedule(item, 'sparse')
+        if ''.join(d['text'] for d in schedule) != item['text']:
+            raise ValueError('Sparse text must reconstruct the sentence exactly')
+        if any(d['at_ms'] < 0 for d in schedule) or [d['at_ms'] for d in schedule] != sorted(d['at_ms'] for d in schedule):
+            raise ValueError('Sparse arrivals must be nonnegative and ordered')
     args.output.mkdir(parents=True, exist_ok=False)
     (args.output / 'config.json').write_text(json.dumps({**{k: str(v) for k, v in vars(args).items()},
         'corpus_sha256': hashlib.sha256(args.corpus.read_bytes()).hexdigest(),
@@ -329,13 +367,15 @@ async def run(args):
     rows = []
     for repeat in range(args.repeats):
         for item in items:
-            modes = ('whole', 'incremental') if repeat % 2 == 0 else ('incremental', 'whole')
+            modes = tuple(args.modes) if repeat % 2 == 0 else tuple(reversed(args.modes))
             for mode in modes:
                 row = await run_case(args, item, mode, repeat, args.output)
                 rows.append(row)
                 with (args.output / 'responses.jsonl').open('a') as handle:
                     handle.write(json.dumps(row) + '\n')
-    report = {'warmup': warm, 'modes': summarize(rows), 'physical_playback': None,
+    report = {'kind': 'screening' if args.screening else 'formal',
+              'warmup': warm, 'modes': summarize(rows),
+              'rounds': {str(i): summarize([r for r in rows if r['repeat'] == i]) for i in range(args.repeats)}, 'physical_playback': None,
               'quality_listening': 'pending', 'fdb_integration': 'pending'}
     if args.server_trace:
         report['server'] = analyze_server_trace(
@@ -356,6 +396,8 @@ def main():
     parser.add_argument('--repeats', type=int, default=3)
     parser.add_argument('--timeout', type=float, default=90)
     parser.add_argument('--server-trace', type=Path)
+    parser.add_argument('--screening', action='store_true', help='Explicit small-set screening; not full acceptance')
+    parser.add_argument('--modes', nargs='+', choices=('whole', 'incremental', 'sparse'), default=['whole', 'incremental'])
     parser.add_argument('--probe', action='store_true', help='Run only the first text in both modes; not a performance matrix')
     args = parser.parse_args()
     if args.prepare_corpus:

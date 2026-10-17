@@ -13,3 +13,13 @@ worker 包装器在退出时清理仍打开的 codec streaming context；正常 
 节点诊断可用 `XTALK_TTS_STACK_DIAGNOSTIC=1` 每 60 秒将 Python 栈写入服务日志，用于定位启动或推理停滞；它不属于正式性能测量，排障后关闭再跑基线。不打印请求内容或环境秘密。
 
 `load_codec` 提供独立的启动排障开关 `XTALK_TTS_CODEC_LOAD_THREADS=1`（默认 0，沿用原线程数）。仅在 `_load_codec` 调用期间将 torch CPU 线程设为 1，成功或异常后都恢复原线程数；不改模型、采样、推理线程、codec streaming 状态或现役 conda。记录切换前后线程数和加载 span。原因是远端原 8 线程 codec 初始化在 `weight_norm` 的 OpenMP 并行区长期停滞，而同节点单线程加载约 2.1 秒完成；该处理只解决启动，不能计作首音优化收益。
+
+## 稀疏文本启动候选
+
+`prefill_options` 校验门槛（0/4/8/12）与最大等待（0 或正毫秒）。`update_prefill_deadline` 在原 worker 接受不足门槛的首批真实 token 后设置截止时间，后续 push 不延长；prefill/结束/取消时清除。`ObservedQueue.get` 在原 worker 空闲等待命令时以此截止时间作 timeout，超时产生内部 push 命令；已经排队的真实命令优先处理。
+
+`partial_prefill` 在同一 worker 中以当前已有真实 token 做局部启动，临时降低 session 门槛后恢复，不设置 text-ended、不结束 codec 或清空 KV。内部命令复用原解码和音频入队路径，取消仍在提交边界检查。门槛和等待上限是独立变量，默认分别为沿用 processor 和关闭；现役行为不变。原 session 初始化处记录实际配置，push/timeout 记录待处理 token 和是否已结束。
+
+服务子类在 `push_text_tokens` 记录实际独立 tokenize 的 token 数与 ID，便于核对稀疏片段没有丢失或提前使用未来文本。此 trace 为固定非 FDB 实验文本证据，仍不能替代对生成语音的转写和人工试听。
+
+模型 prefill/step 成功后记录实际消费的文本 token，真实 finish 后记录 pending 余量。若小门槛导致提前音频 EOS，后续文本即使已接收也可能未消费；报告必须比对接收/消费顺序和剩余 token，不能只凭 WAV 非空判定通过。token 消费完整仍不能证明发音无漏词。

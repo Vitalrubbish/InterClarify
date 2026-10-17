@@ -762,12 +762,22 @@ def _reset_metrics(inferencer: Any) -> None:
     inferencer._xt_turns += 1
 
 
+def _unique_graphs():
+    """Expose the process-wide Dynamo graph counter without resetting it."""
+    try:
+        from torch._dynamo.utils import counters
+        return int(counters['stats']['unique_graphs'])
+    except (ImportError, KeyError):
+        return None
+
+
 def _log_early_frame(inferencer):
     """Report the cost of the prefix of each response, including prefill."""
     if os.environ.get("XTALK_TTS_TRACE"):
         from tts_latency_trace import emit
 
         emit("model.frame_summary", frame=inferencer._xt_turn_frames,
+             unique_graphs=_unique_graphs(),
              wall_seconds=time.perf_counter() - inferencer._xt_turn_started,
              eager=inferencer._xt_eager_frames, compiled=inferencer._xt_compiled_frames)
     if metrics_enabled() and inferencer._xt_turn_frames in (1, 5, 10, 50):
@@ -931,6 +941,9 @@ def apply_patch(module: Any) -> None:
         import torch
 
         _record_frame(self)
+        if early_compile_enabled():
+            # Singleton prefill strides otherwise specialize on text-prefix length.
+            hidden_states = hidden_states.clone(memory_format=torch.contiguous_format)
         penalty = float(repetition_penalty or 0.0)
         window = int(repetition_window or 0)
         # The repetition penalty reads the last ``repetition_window`` frames, so
@@ -1033,6 +1046,9 @@ def apply_patch(module: Any) -> None:
         self._xt_history_filled = 0
         _reset_metrics(self)
         self._xt_turn_started = time.perf_counter()
+        if os.environ.get("XTALK_TTS_TRACE"):
+            from tts_latency_trace import emit
+            emit("compile.state", phase="prefill.before", unique_graphs=_unique_graphs())
         result = original_prefill(self, *args, **kwargs)
         _push_history(self, result)
         _log_early_frame(self)

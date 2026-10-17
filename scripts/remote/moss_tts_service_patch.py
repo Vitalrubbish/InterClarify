@@ -8,6 +8,7 @@ import os
 import queue
 import sys
 import threading
+import time
 import uuid
 from pathlib import Path
 
@@ -20,6 +21,45 @@ def generation_batch_frames() -> int:
     if value not in (0, 2, 4, 6):
         raise ValueError('XTALK_TTS_GENERATION_BATCH_FRAMES must be 0, 2, 4 or 6')
     return value
+
+
+def prefill_options():
+    """Validate independently controlled, opt-in text startup experiments."""
+    tokens = int(os.environ.get('XTALK_TTS_PREFILL_TEXT_TOKENS', '0'))
+    wait_ms = int(os.environ.get('XTALK_TTS_PREFILL_MAX_WAIT_MS', '0'))
+    if tokens not in (0, 4, 8, 12) or wait_ms < 0 or wait_ms > 60000:
+        raise ValueError('Prefill tokens must be 0/4/8/12; max wait must be 0..60000 ms')
+    return tokens, wait_ms
+
+
+def update_prefill_deadline(sess, wait_ms):
+    """Bound only idle waiting for nonempty text, without resetting on a push."""
+    session = sess.tts_session
+    waiting = (wait_ms > 0 and session is not None and not session._prefilled
+               and not session._text_ended and session._pending_tokens
+               and not sess._xt_cancelled.is_set())
+    if not waiting:
+        sess._xt_prefill_deadline = None
+    elif sess._xt_prefill_deadline is None:
+        sess._xt_prefill_deadline = time.monotonic() + wait_ms / 1000
+        emit('text_gate.deadline', wait_ms=wait_ms, pending_tokens=len(session._pending_tokens))
+
+
+def partial_prefill(manager, sess):
+    """Start from available real text while keeping the text stream open."""
+    session = sess.tts_session
+    if (sess._xt_cancelled.is_set() or session is None or session._prefilled
+            or session._text_ended or not session._pending_tokens):
+        return
+    configured = session.prefill_text_len
+    session.prefill_text_len = len(session._pending_tokens)
+    try:
+        emit('text_gate.timeout', pending_tokens=len(session._pending_tokens),
+             configured_tokens=configured, text_ended=session._text_ended)
+        frames = session._drain_pending_tokens()
+        manager._emit_audio_chunks(sess, sess.frame_decoder.decode_frames(frames))
+    finally:
+        session.prefill_text_len = configured
 
 
 def bounded_pending(session, limit: int, cancelled):
@@ -55,6 +95,7 @@ class ObservedQueue(queue.Queue):
     def __init__(self, session_id):
         super().__init__()
         self.session_id = session_id
+        self.session = None
 
     def put(self, item, *args, **kwargs):
         """Record command availability before publishing it to the worker."""
@@ -65,7 +106,15 @@ class ObservedQueue(queue.Queue):
 
     def get(self, *args, **kwargs):
         """Record when the original worker takes ownership."""
-        item = super().get(*args, **kwargs)
+        deadline = getattr(self.session, '_xt_prefill_deadline', None)
+        if deadline is not None and not args and not kwargs:
+            try:
+                item = super().get(timeout=max(0.0, deadline - time.monotonic()))
+            except queue.Empty:
+                item = {'type': 'push_text', 'text': '', '_xt_partial_prefill': True,
+                        '_xt_command_id': str(uuid.uuid4())}
+        else:
+            item = super().get(*args, **kwargs)
         with trace_scope(self.session_id, self.session_id):
             emit('queue.get', command=item.get('type'), command_id=item['_xt_command_id'])
         return item
@@ -93,6 +142,7 @@ def load_codec(loader, *args, **kwargs):
 def apply_service_patch(module):
     """Wrap the pinned service without touching its source checkout."""
     limit = generation_batch_frames()
+    prefill_tokens, prefill_wait_ms = prefill_options()
     original_load_codec = getattr(module, '_load_codec', None)
     if original_load_codec is not None:
         module._load_codec = functools.partial(load_codec, original_load_codec)
@@ -101,6 +151,8 @@ def apply_service_patch(module):
 
     def start_worker(self, sess):
         sess.command_queue = ObservedQueue(sess.session_id)
+        sess.command_queue.session = sess
+        sess._xt_prefill_deadline = None
         sess._xt_cancelled = threading.Event()
         sess._xt_commit_lock = threading.Lock()
         return original_start(self, sess)
@@ -145,6 +197,11 @@ def apply_service_patch(module):
     class InstrumentedSession(original_session):
         """Only this service uses the optional lazy pending-token path."""
 
+        def push_text_tokens(self, tokens):
+            values = list(tokens)
+            emit('text.tokens', count=len(values), token_ids=[int(t) for t in values])
+            return super().push_text_tokens(values)
+
         def _drain_pending_tokens(self):
             emit('text_gate', pending_tokens=len(self._pending_tokens),
                  prefill_text_len=self.prefill_text_len,
@@ -161,6 +218,10 @@ def apply_service_patch(module):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
             self._xt_cancelled = lambda: False
+            if prefill_tokens:
+                self.prefill_text_len = prefill_tokens
+            emit('text_gate.config', prefill_text_len=self.prefill_text_len,
+                 max_wait_ms=prefill_wait_ms)
 
     module.MossTTSRealtimeStreamingSession = InstrumentedSession
     for name in ('_handle_start_turn', '_handle_push_text', '_handle_finish_turn'):
@@ -172,7 +233,16 @@ def apply_service_patch(module):
                 if sess._xt_cancelled.is_set():
                     return
                 with trace_scope(sess.session_id, sess.session_id), span(name):
-                    result = original(self, sess, *args, **kwargs)
+                    cmd = args[0] if args else kwargs.get('cmd', {})
+                    if name == '_handle_push_text' and cmd.get('_xt_partial_prefill'):
+                        with sess.lock:
+                            result = partial_prefill(self, sess)
+                    else:
+                        result = original(self, sess, *args, **kwargs)
+                    update_prefill_deadline(sess, prefill_wait_ms)
+                    if name == '_handle_finish_turn' and sess.tts_session is not None:
+                        emit('text.remaining', token_ids=[int(t) for t in sess.tts_session._pending_tokens],
+                             count=len(sess.tts_session._pending_tokens))
                     return result
             return handler
 
@@ -246,6 +316,13 @@ def apply_service_patch(module):
                 with span('model.' + name, prefix_length=(len(prefix[0]) if prefix is not None else None)):
                     result = original(self, *args, **kwargs)
                 emit('audio_frame', phase=name)
+                if name == 'prefill':
+                    values = kwargs.get('text_prefix_ids', [[]])[0]
+                    emit('text.consumed', phase='prefill', token_ids=[int(t) for t in values])
+                else:
+                    value = args[0] if args else kwargs.get('text_token')
+                    if isinstance(value, int):
+                        emit('text.consumed', phase='step', token_ids=[value])
                 return result
             return model_call
 
@@ -255,6 +332,7 @@ def apply_service_patch(module):
     emit('service.environment', python=sys.version, conda_prefix=os.environ.get('CONDA_PREFIX'),
          dependencies={name: importlib.metadata.version(name) for name in ('torch', 'transformers')})
     emit('service.config', generation_batch_frames=limit,
+         prefill_text_tokens=prefill_tokens, prefill_max_wait_ms=prefill_wait_ms,
          early_compile=os.environ.get('XTALK_TTS_EARLY_COMPILE', '0'),
          missing=['socket_send', 'physical_playback', 'voice_cache_hit_without_prompt'])
 

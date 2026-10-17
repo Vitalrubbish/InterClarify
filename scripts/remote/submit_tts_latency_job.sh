@@ -13,9 +13,15 @@ for variable in TTS_CODEC_LOAD_THREADS TTS_HEALTH_TIMEOUT TTS_STACK_DIAGNOSTIC T
     NODE_COMMAND+="$assignment"
   fi
 done
-printf -v NODE_SCRIPT '%q' "$TASK_ROOT/scripts/remote/run_tts_latency_node_job.sh"
+NODE_FILE=run_tts_latency_node_job.sh
+DESCRIPTION=tts-latency-baseline
+if [[ "${TTS_SCREEN_JOB:-0}" = 1 ]]; then
+  NODE_FILE=run_tts_latency_screen_job.sh
+  DESCRIPTION=tts-latency-screen
+fi
+printf -v NODE_SCRIPT '%q' "$TASK_ROOT/scripts/remote/$NODE_FILE"
 NODE_COMMAND+="bash $NODE_SCRIPT"
 vc submit --image docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4 \
-  --partition pdgpu-4090 --job tts-latency-baseline --num-task 1 \
+  --partition pdgpu-4090 --job "$DESCRIPTION" --num-task 1 \
   --cpu-per-task 8 --mem-per-task 32G --gpu-per-task 1 \
   JOB=1:1 "$LOG_ROOT/$(basename "$OUTPUT").log" --cmd "$NODE_COMMAND"

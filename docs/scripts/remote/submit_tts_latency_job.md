@@ -7,3 +7,5 @@
 可显式传递 `TTS_HEALTH_TIMEOUT` 和 `TTS_STACK_DIAGNOSTIC`，用于排障作业；诊断结果与正式测量分开保存。
 
 `TTS_CODEC_LOAD_THREADS` 可显式转发到节点，仅控制 codec 启动加载，不改变热态推理线程数。
+
+`TTS_SCREEN_JOB=1` 选择筛选节点入口，任务描述为 `tts-latency-screen`；其他设置与原基线相同。此开关由提交端选择脚本，不转发任意命令到节点。

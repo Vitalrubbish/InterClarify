@@ -67,3 +67,7 @@ XTALK_TTS_LOCAL_COMPILE=cudagraph XTALK_TTS_SAMPLE=greedy XTALK_TTS_METRICS=1 \
 原 CUDA event 切片在 trace 开启时同步输出 `gpu.slice` 关联事件（仍仅消费已完成 event，不执行全局同步）；pending 数量保留，末尾尚未完成的时间不伪装为零开销。
 
 失败边界：构建 runner 与 warmup 失败会记录 traceback 并回退 eager；正式帧执行若失败则由原服务记为响应失败，不盲目重放可能已推进的 RNG/KV。运行期重编译检测与此类错误的恢复仍需远端验证，不视为 TTS-003 已验收。
+
+开头编译候选还将 local loop 输入 hidden state 克隆为标准连续布局，消除长度为 1 的维度携带不同 prefill stride 而产生的图特化；只有早期编译开关开启时生效，数据值不变。trace 增加进程级 `unique_graphs`（Dynamo 累积计数，不清零），结合响应边界区分新图与热态；不能把进程总数当作单次响应编译数。
+
+prefill 前记录 `compile.state`，逐帧记录累积图数量，以计算同一响应的图增量。只有响应 ID 和进程时钟域匹配才允许求差。

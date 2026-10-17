@@ -15,3 +15,7 @@ CLI 的 `--prepare-corpus` 生成 30 条短答/澄清及 5 条边界文本，每
 `--probe` 只用于提交后的真实服务接入检查：运行指定 corpus 首条、whole/incremental 各一例并标为 probe，绕过正式矩阵的数量门槛。正式模式保持至少 30 条、3 轮，不能把 probe 纳入热态分布。
 
 `analyze_server_trace` 接受正式响应 ID 集合，正式汇总排除 cold/warm 探针、客户端 smoke 和 warmup，避免编译启动开销混入阶段分布。原始服务 trace 仍完整保留。
+
+新增 `sparse` 模式：按固定 600ms 间隔推送至多两个单词的真实文本片段，末块之后等 600ms 才发送真实 final。片段是字符级协议输入，不声称恰好 1/2 个 TTS token；服务 trace 记录独立 tokenize 后的真实 token 数。`end_at_ms` 为相对发送起点的真实结束时刻；未提供时沿用末块立即 final。`--screening` 明确允许小集合筛选（至少一条、至少一轮），报告注明 screening；正式模式仍保留至少 30 条和 3 轮门禁。整句、100ms 增量和 sparse 独立分布。
+
+新增每例文本发送/结束时间、首 PCM 是否早于 final、音频 SHA256 与分轮统计；不把更早的静音 PCM 当成更早语音。正式与筛选共用同一 `run_case`，不读取未来片段启动。

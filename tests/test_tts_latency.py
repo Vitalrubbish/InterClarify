@@ -6,6 +6,8 @@ import os
 import struct
 import sys
 import tempfile
+import threading
+import time
 import types
 import unittest
 from pathlib import Path
@@ -103,6 +105,82 @@ class BatchTests(unittest.TestCase):
         with patch.dict(os.environ, {'XTALK_TTS_GENERATION_BATCH_FRAMES': '1'}):
             with self.assertRaises(ValueError):
                 service.generation_batch_frames()
+
+
+class SparsePrefillTests(unittest.TestCase):
+    """Partial startup must neither terminate text nor reorder later tokens."""
+
+    def make_runtime(self, tokens):
+        session = FakeSession(tokens, threshold=12)
+        session._drain_pending_tokens = lambda: list(service.bounded_pending(session, 4, lambda: False))
+        return types.SimpleNamespace(tts_session=session,
+            _xt_cancelled=threading.Event(), _xt_prefill_deadline=None,
+            frame_decoder=types.SimpleNamespace(decode_frames=lambda frames: frames))
+
+    def test_prefill_options_reject_invalid_values(self):
+        for tokens, wait in [('3', '0'), ('4', '-1'), ('0', '60001')]:
+            with patch.dict(os.environ, {'XTALK_TTS_PREFILL_TEXT_TOKENS': tokens,
+                                         'XTALK_TTS_PREFILL_MAX_WAIT_MS': wait}):
+                with self.assertRaises(ValueError):
+                    service.prefill_options()
+
+    def test_deadline_is_not_extended_and_clears_after_prefill(self):
+        sess = self.make_runtime([1, 2])
+        with patch.object(service.time, 'monotonic', return_value=10.):
+            service.update_prefill_deadline(sess, 200)
+        self.assertAlmostEqual(sess._xt_prefill_deadline, 10.2)
+        sess.tts_session._pending_tokens.append(3)
+        with patch.object(service.time, 'monotonic', return_value=10.1):
+            service.update_prefill_deadline(sess, 200)
+        self.assertAlmostEqual(sess._xt_prefill_deadline, 10.2)
+        sess.tts_session._prefilled = True
+        service.update_prefill_deadline(sess, 200)
+        self.assertIsNone(sess._xt_prefill_deadline)
+
+    def test_timeout_uses_existing_queue_with_real_command_priority(self):
+        sess = self.make_runtime([1])
+        sess._xt_prefill_deadline = time.monotonic() - 1
+        queue = service.ObservedQueue('fixture')
+        queue.session = sess
+        queue.put({'type': 'finish_turn'})
+        self.assertEqual(queue.get()['type'], 'finish_turn')
+        internal = queue.get()
+        self.assertTrue(internal['_xt_partial_prefill'])
+        self.assertEqual(internal['text'], '')
+        self.assertIn('_xt_command_id', internal)
+
+    def test_partial_start_keeps_stream_open_and_continues_in_order(self):
+        sess = self.make_runtime([1, 2])
+        received = []
+        manager = types.SimpleNamespace(_emit_audio_chunks=lambda sess, frames: received.extend(frames))
+        service.partial_prefill(manager, sess)
+        self.assertEqual(received, [(1, 2)])
+        self.assertFalse(sess.tts_session._text_ended)
+        self.assertEqual(sess.tts_session.prefill_text_len, 12)
+        sess.tts_session._pending_tokens.extend([3, 4])
+        self.assertEqual(list(service.bounded_pending(sess.tts_session, 4, lambda: False)), [3, 4])
+        self.assertEqual(sess.tts_session.generated, [(1, 2), 3, 4])
+
+    def test_cancel_and_exception_do_not_leave_lowered_threshold(self):
+        sess = self.make_runtime([1, 2])
+        manager = types.SimpleNamespace(_emit_audio_chunks=lambda *args: self.fail('cancel must not emit'))
+        sess._xt_cancelled.set()
+        service.partial_prefill(manager, sess)
+        self.assertFalse(sess.tts_session._prefilled)
+        sess._xt_cancelled.clear()
+        sess.tts_session._drain_pending_tokens = lambda: (_ for _ in ()).throw(RuntimeError('fixture'))
+        with self.assertRaises(RuntimeError):
+            service.partial_prefill(manager, sess)
+        self.assertEqual(sess.tts_session.prefill_text_len, 12)
+
+    def test_sparse_schedule_preserves_text_and_real_final_delay(self):
+        item = {'text': 'Would you like tea or coffee?', 'deltas': []}
+        schedule, end = benchmark.text_schedule(item, 'sparse')
+        self.assertEqual(''.join(x['text'] for x in schedule), item['text'])
+        self.assertEqual([x['at_ms'] for x in schedule], [0, 600, 1200])
+        self.assertEqual(end, 1800)
+        with self.assertRaises(ValueError):
+            benchmark.text_schedule({**item, 'end_at_ms': 100}, 'sparse')
 
 
 class ServicePatchTests(unittest.TestCase):
