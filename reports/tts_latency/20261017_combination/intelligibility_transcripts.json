@@ -1,0 +1,1379 @@
+[
+  {
+    "arm": "combined",
+    "id": "text_00",
+    "mode": "whole",
+    "repeat": 0,
+    "response_id": "8b8f518a-9597-4b0e-880c-034447b6d865",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_00",
+    "mode": "incremental",
+    "repeat": 0,
+    "response_id": "aad458e5-a214-4d31-8f82-5787b7d4c7f7",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_00",
+    "mode": "sparse",
+    "repeat": 0,
+    "response_id": "b06808fe-77de-4794-aadf-67476cd09bd5",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_18",
+    "mode": "whole",
+    "repeat": 0,
+    "response_id": "378df391-c174-4ad8-888c-63f8ba21adb5",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_18",
+    "mode": "incremental",
+    "repeat": 0,
+    "response_id": "593c1705-d692-420c-93fd-599cb22a7818",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_18",
+    "mode": "sparse",
+    "repeat": 0,
+    "response_id": "338b61f6-8bdd-4227-9c9e-5d8009f859e5",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_34",
+    "mode": "whole",
+    "repeat": 0,
+    "response_id": "22377f0b-5422-489f-9c90-ef0c1fbd2dc7",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_34",
+    "mode": "incremental",
+    "repeat": 0,
+    "response_id": "95c5180a-0a0a-4e5f-b845-245f4c820236",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_34",
+    "mode": "sparse",
+    "repeat": 0,
+    "response_id": "32915568-e4e3-4a7a-b253-d4afd9840a60",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_00",
+    "mode": "sparse",
+    "repeat": 1,
+    "response_id": "c4563a21-0be1-4ded-8568-e0174e73ca36",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_00",
+    "mode": "incremental",
+    "repeat": 1,
+    "response_id": "a9e3fb45-0e78-428d-9f67-cf90f3b604e2",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_00",
+    "mode": "whole",
+    "repeat": 1,
+    "response_id": "fbd17fdd-88d3-4fc9-86e8-c0a57b4b823f",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_18",
+    "mode": "sparse",
+    "repeat": 1,
+    "response_id": "af4d8dbe-c15c-4edf-8b33-1400ac91a932",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_18",
+    "mode": "incremental",
+    "repeat": 1,
+    "response_id": "3340b743-2d5b-4e6d-ac1b-5169c3904ce9",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_18",
+    "mode": "whole",
+    "repeat": 1,
+    "response_id": "b48f5a00-555a-4cf5-aad1-bab3bb2f8b95",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_34",
+    "mode": "sparse",
+    "repeat": 1,
+    "response_id": "e9186a58-ba0a-4a5b-bdcf-5ef289a5e8bc",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_34",
+    "mode": "incremental",
+    "repeat": 1,
+    "response_id": "19af1b21-2fe4-4e98-9ded-b8272f4bb5b0",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_34",
+    "mode": "whole",
+    "repeat": 1,
+    "response_id": "7de27500-aad5-427c-a6ce-42d57046fa3b",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_00",
+    "mode": "whole",
+    "repeat": 2,
+    "response_id": "fc974499-43d4-45fa-bc53-d5b055f0a267",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_00",
+    "mode": "incremental",
+    "repeat": 2,
+    "response_id": "c9b5ab18-45f6-4db4-acfa-0cf12124027c",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_00",
+    "mode": "sparse",
+    "repeat": 2,
+    "response_id": "0ce0438a-9c87-4206-9bb1-383af0058067",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_18",
+    "mode": "whole",
+    "repeat": 2,
+    "response_id": "4edbb4af-2034-404b-9fb6-72cf6c1dead1",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_18",
+    "mode": "incremental",
+    "repeat": 2,
+    "response_id": "2cf758e4-3fb6-420d-b7b2-d7974e71f8e3",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_18",
+    "mode": "sparse",
+    "repeat": 2,
+    "response_id": "49923aaa-7751-4514-b095-c5cc863bbb71",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_34",
+    "mode": "whole",
+    "repeat": 2,
+    "response_id": "b54f9adc-7838-4e28-b787-64d415c957b0",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_34",
+    "mode": "incremental",
+    "repeat": 2,
+    "response_id": "78eff4b5-4164-497c-a6a6-af4ef1a8bf22",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "combined",
+    "id": "text_34",
+    "mode": "sparse",
+    "repeat": 2,
+    "response_id": "c1b569f2-20f9-48b2-9c86-6cc7abc93448",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_00",
+    "mode": "whole",
+    "repeat": 0,
+    "response_id": "f6ceea58-ff75-493c-895d-73f96430cfe7",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_00",
+    "mode": "incremental",
+    "repeat": 0,
+    "response_id": "5e30f90a-c6a5-4bf0-8452-6d742916d88c",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_00",
+    "mode": "sparse",
+    "repeat": 0,
+    "response_id": "ef14fad9-aeee-4f44-99a6-5878c6ef265f",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_18",
+    "mode": "whole",
+    "repeat": 0,
+    "response_id": "0b65c861-cdae-4050-a05c-65be40c02b0e",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_18",
+    "mode": "incremental",
+    "repeat": 0,
+    "response_id": "50d1f93d-fc4a-4e7c-8cde-5dace49a528d",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_18",
+    "mode": "sparse",
+    "repeat": 0,
+    "response_id": "ec49decb-cfd3-442e-9763-4d981f55647f",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_34",
+    "mode": "whole",
+    "repeat": 0,
+    "response_id": "8b3488d9-dad5-4093-b34a-f748c7799165",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_34",
+    "mode": "incremental",
+    "repeat": 0,
+    "response_id": "5c0b4553-6b5f-4bd6-84af-258ba0ffee18",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_34",
+    "mode": "sparse",
+    "repeat": 0,
+    "response_id": "258092d4-6c43-470e-918e-69d26c90ca63",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number. Keep your ticket ready and allow enough time to walk to the far end",
+    "edits": {
+      "reference_words": 25,
+      "errors": 3,
+      "substitutions": 0,
+      "deletions": 3,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_00",
+    "mode": "sparse",
+    "repeat": 1,
+    "response_id": "29e3836c-842a-42e4-99fe-56af6e5526ac",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_00",
+    "mode": "incremental",
+    "repeat": 1,
+    "response_id": "5990022e-805b-43f5-a44a-b64847f30c76",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_00",
+    "mode": "whole",
+    "repeat": 1,
+    "response_id": "c77222b1-ef75-4575-affd-ecbc03a08ab1",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_18",
+    "mode": "sparse",
+    "repeat": 1,
+    "response_id": "3d661f92-509d-4323-af45-48606510c35c",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_18",
+    "mode": "incremental",
+    "repeat": 1,
+    "response_id": "8c83f7db-4e5c-443d-96d8-8f8cad1eb3c4",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_18",
+    "mode": "whole",
+    "repeat": 1,
+    "response_id": "8bacb03a-373b-4795-9b45-537f989b7bb4",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_34",
+    "mode": "sparse",
+    "repeat": 1,
+    "response_id": "c1108add-d90b-4d7f-864d-13fa70e60760",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number. Keep your ticket ready and allow enough time to walk to the far end",
+    "edits": {
+      "reference_words": 25,
+      "errors": 3,
+      "substitutions": 0,
+      "deletions": 3,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_34",
+    "mode": "incremental",
+    "repeat": 1,
+    "response_id": "92c42a56-19f0-4c92-bc30-137f609a2b36",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_34",
+    "mode": "whole",
+    "repeat": 1,
+    "response_id": "e058efcf-069e-4a70-ac5a-ee5ea18e22a9",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_00",
+    "mode": "whole",
+    "repeat": 2,
+    "response_id": "feed1255-fb15-48c3-ba3c-54fc443b0cb3",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_00",
+    "mode": "incremental",
+    "repeat": 2,
+    "response_id": "e74d6f08-7924-4b9e-9ef1-3289b19031f8",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_00",
+    "mode": "sparse",
+    "repeat": 2,
+    "response_id": "47df7f6a-fc62-47d9-8a01-4ba387227863",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_18",
+    "mode": "whole",
+    "repeat": 2,
+    "response_id": "2793843c-d7c1-4732-8f59-896c7310d810",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_18",
+    "mode": "incremental",
+    "repeat": 2,
+    "response_id": "9549c685-e339-4801-ad0a-bfc5e17bb03c",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_18",
+    "mode": "sparse",
+    "repeat": 2,
+    "response_id": "43ec4460-71f5-469c-93e1-3bea46cae722",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_34",
+    "mode": "whole",
+    "repeat": 2,
+    "response_id": "d873aa68-9324-4ed2-aad5-c320a624951e",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_34",
+    "mode": "incremental",
+    "repeat": 2,
+    "response_id": "701872a1-affa-44f1-b645-514400e51f55",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_end",
+    "id": "text_34",
+    "mode": "sparse",
+    "repeat": 2,
+    "response_id": "591b9738-dbe7-4b6f-814f-8d32aa183cdc",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number. Keep your ticket ready and allow enough time to walk to the far end",
+    "edits": {
+      "reference_words": 25,
+      "errors": 3,
+      "substitutions": 0,
+      "deletions": 3,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_00",
+    "mode": "whole",
+    "repeat": 0,
+    "response_id": "00fc1c30-f0c0-4124-9d33-542476e42aee",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_00",
+    "mode": "incremental",
+    "repeat": 0,
+    "response_id": "8b1eb9c8-d06c-42c2-b442-63de11f1a0b5",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_00",
+    "mode": "sparse",
+    "repeat": 0,
+    "response_id": "a41a7b97-3a80-42dc-bae9-aaeabf69effe",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_18",
+    "mode": "whole",
+    "repeat": 0,
+    "response_id": "f25f94a8-16a1-4a09-97d8-91fa5c1dac1e",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_18",
+    "mode": "incremental",
+    "repeat": 0,
+    "response_id": "6e7e9d42-b6cf-4f61-b5cb-d86784513081",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_18",
+    "mode": "sparse",
+    "repeat": 0,
+    "response_id": "874e661b-a463-4df7-997e-0f2395e12534",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_34",
+    "mode": "whole",
+    "repeat": 0,
+    "response_id": "75caeaf1-543b-40a4-8433-77c3d2a31785",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_34",
+    "mode": "incremental",
+    "repeat": 0,
+    "response_id": "12208f18-76e5-4b60-b8f1-d899af01f50b",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_34",
+    "mode": "sparse",
+    "repeat": 0,
+    "response_id": "1282c9f8-8076-443f-9ef2-682db6d77f1d",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number. Keep your ticket ready and allow enough time to walk to the far end",
+    "edits": {
+      "reference_words": 25,
+      "errors": 3,
+      "substitutions": 0,
+      "deletions": 3,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_00",
+    "mode": "sparse",
+    "repeat": 1,
+    "response_id": "9a02907d-def1-4e07-aa2e-81486df22c5a",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_00",
+    "mode": "incremental",
+    "repeat": 1,
+    "response_id": "9672389a-bfc1-46ca-984a-3d2ad7683ef4",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_00",
+    "mode": "whole",
+    "repeat": 1,
+    "response_id": "d815ceb6-8376-422e-8ca2-2e4f6a2133b9",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_18",
+    "mode": "sparse",
+    "repeat": 1,
+    "response_id": "cc376059-d633-4daf-93ce-d1c4afa220c2",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_18",
+    "mode": "incremental",
+    "repeat": 1,
+    "response_id": "c8351860-c4ef-4e29-85b3-ff8182484b4f",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_18",
+    "mode": "whole",
+    "repeat": 1,
+    "response_id": "31d4bf7d-3f53-4404-8569-34a140d15a45",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_34",
+    "mode": "sparse",
+    "repeat": 1,
+    "response_id": "90f687ed-efa1-49de-9cb6-f0e35598814f",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number. Keep your ticket ready and allow enough time to walk to the far end",
+    "edits": {
+      "reference_words": 25,
+      "errors": 3,
+      "substitutions": 0,
+      "deletions": 3,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_34",
+    "mode": "incremental",
+    "repeat": 1,
+    "response_id": "d5356051-5a96-4f8a-b6be-cdbe77512747",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_34",
+    "mode": "whole",
+    "repeat": 1,
+    "response_id": "cb746fe6-0624-44bf-9aeb-bc22ddc88ef5",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_00",
+    "mode": "whole",
+    "repeat": 2,
+    "response_id": "05e6e1bf-bd2f-4878-9a36-ad87c318dd93",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_00",
+    "mode": "incremental",
+    "repeat": 2,
+    "response_id": "235a6045-9191-49cf-ab7c-620403ec7422",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_00",
+    "mode": "sparse",
+    "repeat": 2,
+    "response_id": "f5aabfff-31db-4baf-8db9-1c610839c481",
+    "expected": "Yes, that works.",
+    "transcript": "Yes, that works.",
+    "edits": {
+      "reference_words": 3,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_18",
+    "mode": "whole",
+    "repeat": 2,
+    "response_id": "cbe1aa1a-3478-4963-ab04-16cfbed4de6f",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_18",
+    "mode": "incremental",
+    "repeat": 2,
+    "response_id": "d24b7f02-1090-4b8f-9c17-5e64161d4c23",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_18",
+    "mode": "sparse",
+    "repeat": 2,
+    "response_id": "bac34277-bcf2-4cfc-aa9b-c1e7b25e1d8e",
+    "expected": "Would you prefer the earlier train?",
+    "transcript": "Would you prefer the earlier train?",
+    "edits": {
+      "reference_words": 6,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_34",
+    "mode": "whole",
+    "repeat": 2,
+    "response_id": "ded0d08e-6d1b-41e4-a86c-d4d5fa302ee4",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_34",
+    "mode": "incremental",
+    "repeat": 2,
+    "response_id": "1482e389-b01c-4cea-b39f-27dfda45d8ad",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform",
+    "edits": {
+      "reference_words": 25,
+      "errors": 0,
+      "substitutions": 0,
+      "deletions": 0,
+      "insertions": 0
+    },
+    "error": null
+  },
+  {
+    "arm": "control_start",
+    "id": "text_34",
+    "mode": "sparse",
+    "repeat": 2,
+    "response_id": "4b084565-3dec-4748-83de-10585d20e4ad",
+    "expected": "Before leaving the station, check your platform number, keep your ticket ready, and allow enough time to walk to the far end of the platform.",
+    "transcript": "Before leaving the station, check your platform number. Keep your ticket ready and allow enough time to walk to the far end",
+    "edits": {
+      "reference_words": 25,
+      "errors": 3,
+      "substitutions": 0,
+      "deletions": 3,
+      "insertions": 0
+    },
+    "error": null
+  }
+]

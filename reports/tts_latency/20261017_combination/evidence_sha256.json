@@ -1,0 +1,10 @@
+{
+  "remote_results_sha256": "8b60d044c88a53d5a195e4f50ec5fbdf39c9eb582a9c195aaf4b23decdf9e01b",
+  "files": {
+    "reports/tts_latency/20261017_combination/tts_combination_results.json": "8b60d044c88a53d5a195e4f50ec5fbdf39c9eb582a9c195aaf4b23decdf9e01b",
+    "reports/tts_latency/20261017_combination/intelligibility_transcripts.json": "62faefdb039d552ee71406d4831aa22195dd48dd4a1d4c7283dd61db09b69641",
+    "reports/tts_latency/20261017_combination/intelligibility_manifest.json": "0684836bc9207ac268e0d03c23c221bc5cabfdd1a7874f0012b195d7e0dff4c4",
+    "docs/tts_combination_validation.md": "7c93bcc1e3883f166d68de825d0792458f06041b3a250e1e26b28f23e335b85d",
+    "scripts/remote/tts_combination_report.py": "d8593119a7c76d03fc4950abc98a47d3ded665ce7dd8cddb121dcf3a6f217286"
+  }
+}

@@ -108,3 +108,13 @@
 ## 组合验证（用户追加）
 
 组合 suite 已提交 `job-179224493766087164069-xuan-zhang`，源码 `6c59aa3`，独立 worktree `interclarify-tts-combination-20261017`，输出 `interclarify-tts-runs/20261017-combination-01`。只运行 control_start / combined / control_end，共计划81条；combined 为4帧批次+早期编译+4-token门槛，200ms等待关闭。配置/规模见工程文档，结果另生成 `docs/tts_combination_validation.md`，不把本次组合与既有单变量实验混成一个分布。原在线ASR和产品默认配置不变。
+
+### 组合终态
+
+`job-179224493766087164069-xuan-zhang` 已完成，exit=0，control_start/combined/control_end 各27条，共81条，失败/无音频0。GPU为 `GPU-18f69071-ae27-7afe-7546-fc2e82eec090`（RTX4090）；真实环境组件门禁60/60通过。组合27条token消费一致、结束无余量、正式无新图。前后control的模拟有声均值差绝对值不超过11ms，未见足以解释组合收益的明显漂移。
+
+离线内容作业 `job-179224676434988761253-xuan-zhang` Completed，81条记录、16个不同WAV，识别作业失败0。组合27/27整句转写匹配；control sparse长句仍有句尾词差异。仅为同一固定ASR辅助诊断，不替代人工自然度。
+
+平均模拟有声：whole 2.046→1.303秒，incremental 2.356→1.079秒，sparse 3.877→1.821秒；平均首PCM分别0.907→0.359、0.423→0.244、1.919→0.711秒。完整报告 [tts_combination_validation.md](tts_combination_validation.md)，证据 `reports/tts_latency/20261017_combination/`，JSON已核对远端SHA256 `8b60d044c88a53d5a195e4f50ec5fbdf39c9eb582a9c195aaf4b23decdf9e01b`。
+
+结论：组合有明确收益，但仍不支持可听200–300ms目标，不能称作已穷尽所有优化空间。建议下一阶段做替代TTS同输入对照；用户“更换ASR/TTS”的组件指向尚待确认，当前未替换任何在线组件、默认参数不变。
