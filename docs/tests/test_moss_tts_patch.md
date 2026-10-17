@@ -23,7 +23,7 @@
 ## 运行
 
 ```bash
-# TTS 环境：25 个用例全跑
+# TTS 环境：28 个用例全跑
 PYTHONPATH=/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/moss-source/moss_tts_realtime \
   conda run -n xtalk-round1-moss python -m unittest tests.test_moss_tts_patch
 

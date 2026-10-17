@@ -1,0 +1,12 @@
+{
+  "remote_results_sha256": "20768055ccd9e3be2ecbe07a5e4ef804d9e1fc5d8dce4de7f57141644032f90a",
+  "remote_transcripts_jsonl_sha256": "83f33072c8b5dd3d8400ac3b72291e6c9ae5a96f97405958f3b3c45e574cbdb6",
+  "remote_generated_markdown_sha256": "f2caff57845b0d7a36af12ddab2ddc6b8135d69839a967aafffbf7a6b036cb8d",
+  "files": {
+    "docs/tts_latency_optimization_report.md": "99785ae1651d1151a26804de227db7cfe6113e052a56cfe0fdceb638f7d1bddd",
+    "reports/tts_latency/20261017/tts_latency_results.json": "20768055ccd9e3be2ecbe07a5e4ef804d9e1fc5d8dce4de7f57141644032f90a",
+    "reports/tts_latency/20261017/intelligibility_transcripts.json": "16fb863fe1535d87fc371d2265a87fe49eae6accd28438b24a27daedbbb61f4c",
+    "reports/tts_latency/20261017/intelligibility_manifest.json": "0684836bc9207ac268e0d03c23c221bc5cabfdd1a7874f0012b195d7e0dff4c4",
+    "scripts/remote/tts_latency_report.py": "e930139a1d69d669078e5d4c65f163463b17d0a1473c323ecca037a167f3eaad"
+  }
+}

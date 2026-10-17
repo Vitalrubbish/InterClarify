@@ -1,0 +1,28 @@
+{
+  "model": {
+    "repo": "nvidia/nemotron-speech-streaming-en-0.6b",
+    "revision": "ebe59e5a817142986528bbbee5dba8db7b38ed50",
+    "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/models/nemotron_en",
+    "files": {
+      ".gitattributes": "678c7bb31818cebfb9b45c4ac6ac63c1846a45a09f95ace1214765cb6d0dee50",
+      "README.md": "7701f4b2f1c16542c8ceb2b3a61dd144032898c17f4dc9cc1bbecda6972edec8",
+      "bias.md": "39e6946fc24c38a9465843b43d24a7b58c4edb62f4b48a5c8d6a4b0e60a575f4",
+      "config.json": "dffe850bc79ad2b0f8117804502b24d2c4a445aafbed4c1e40f8d78e0cb44065",
+      "explainability.md": "61fef25aef4c9eb07de62c5af97f2a313d05facc39ea24ed1f524b6798819c3b",
+      "generation_config.json": "6ce531b39df8046cc8dbbe29dc64458b72972011d4717e160e6efb2c1af198d1",
+      "model.safetensors": "bddd8a7300826efd19cf7e01f1c7db8402bed6786fc4c7739632894f69c71473",
+      "privacy.md": "11b539ce3b6bafc829628ce26b8fdb23ee6783b5ca66380b342c9291ee79bdde",
+      "processor_config.json": "cf35efc9abdd0963db7e96967f8a91d9c8243803b9f6bbd900aa936ee3ce42f3",
+      "safety.md": "644108dc43bfab59a5ed3da41cbaf3e0fdb85a004dad5cbeafef76d3a1817a40",
+      "tokenizer.json": "60dc0361763fa3cd62df60f34fca3e61134676a939967853931db5f3869b2db2",
+      "tokenizer_config.json": "0665bee664daf39a155e5ee013bb1d885c58b4901994abc07b9a6b3904cce132"
+    }
+  },
+  "dependencies": {
+    "torch": "2.11.0+cu128",
+    "transformers": "5.15.1",
+    "soundfile": "0.14.0",
+    "scipy": "1.18.1"
+  },
+  "note": "ASR diagnostic only; not human naturalness or runtime integration acceptance."
+}

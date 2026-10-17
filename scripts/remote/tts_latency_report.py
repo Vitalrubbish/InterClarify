@@ -253,6 +253,17 @@ def latency_table(modes):
     return '\n'.join(lines)
 
 
+def render_diagnostics(value):
+    """Keep the prose concise while the full warmup series stays in JSON."""
+    warmup = value['warmup_seconds']
+    recompiles = value['recompile_log_entries']
+    return (f"eager 回退 {value['fallbacks']} 次（其中重编译上限 {value['recompile_limit_fallbacks']} 次）；"
+            f"实际编译路径日志 {value['compiled_engaged']} 条；"
+            f"重编译日志 {recompiles if recompiles is not None else '未采集'}（含预热）；"
+            f"预热日志 {len(warmup)} 次，最大 {seconds(max(warmup)) if warmup else '缺测'} 秒；"
+            f"worker 错误 {value['worker_errors']} 次。")
+
+
 def render_findings(report):
     """Lead with measured, scope-limited findings instead of a generic success claim."""
     lines = ['本轮实测要点：', '']
@@ -297,7 +308,10 @@ def render_markdown(report):
              '产品默认配置未切换：模型输出与音质尚未通过人工试听、真实播放器和 FDB 集成验收。', '',
              '首 PCM、波形 RMS 语音起点和模拟播放有声时刻是三个不同指标。'
              '模拟欠载使用立即消费、零启动缓冲的 headless 模型，不能解释为真实播放器已经断流。'
-             'RMS 起点为 10ms 窗口、阈值 0.01，未人工核查；不能据此声称已完成扬声器首音测量。', '',
+             'RMS 起点为 10ms 窗口、阈值 0.01，未人工核查；不能据此声称已完成扬声器首音测量。'
+             '音频秒/墙钟秒包含连接、输入间隔和真实结束等待，不等于纯模型稳态 RTF。', '',
+             '本轮尚未达到拟议的可听首音 250–350ms、p95 不高于 500ms 预算，整体约 1 秒目标未做端到端验收。'
+             '建议先扩大 prefill4 的稀疏文本验证，并补全组合配置、完整预热与人工试听；不直接将 deadline200 切为默认。', '',
              '## 实验来源与规模', '',
              f"原基线：`{report['baseline_root']}`，退出码 `{report['baseline_exit']}`。",
              f"同卡筛选：`{report['screen_root']}`，退出码 `{report['screen_exit']}`。", '',
@@ -312,12 +326,12 @@ def render_markdown(report):
              '模型 revision 与路径详见 JSON 摘要中的 models，独立运行源码和开关见各 measured/config.json、arm.json。', '',
              f"原基线 GPU：`{report['baseline_gpu']}`。",
              f"筛选 GPU：`{report['screen_gpu']}`。", '',
-             '原基线与筛选可能分配到不同 4090，不直接将二者差值归因于优化。所有候选与首尾 control 在筛选作业内同卡比较。', '',
+             '原基线用于全量描述，各候选收益均按筛选或复测内部同卡 control 配对计算。', '',
              '## 原始基线', '', latency_table(report['baseline']['modes']), '',
              '所有尝试均保留。均值中的长尾可能含新形状编译，不剔除这些响应以美化结果。分轮结果如下：', '']
     for repeat, values in report['baseline'].get('rounds', {}).items():
         lines += [f'### 第 {int(repeat) + 1} 轮', '', latency_table(values), '']
-    lines += ['基线编译/回退诊断：`' + json.dumps(report['baseline_diagnostics'], ensure_ascii=False) + '`。', '',
+    lines += ['基线编译/回退诊断：' + render_diagnostics(report['baseline_diagnostics']), '',
               '原基线未启用 TORCH_LOGS=recompiles，重编译条目为缺测，不能解释为没有重编译。'
               '现有日志若出现 recompile_limit 回退，则该部分是 eager 性能，不能当作持续编译后的成绩。', '',
               '## 同卡候选结果', '']
@@ -326,7 +340,7 @@ def render_markdown(report):
         lines += [f'### {name}', '',
                   f"状态：{value['status']}；batch={config['batch']}、early={config['early']}、prefill={config['tokens']}、max_wait_ms={config['wait_ms']}。", '']
         if value.get('error'):
-            lines += ['失败原因：`' + value['error'].replace('`', '') + '`。', '']
+            lines += ['失败原因：' + ('首条预热未产出音频，未进入正式测量；详细上下文保留在 JSON。' if 'Warmup failed' in value['error'] else value['error'].replace('`', '')), '']
         if value['modes']:
             lines += [latency_table(value['modes']), '']
         for mode, check in value.get('checks', {}).get('by_mode', {}).items():
@@ -339,7 +353,7 @@ def render_markdown(report):
             lines += ['', '正式区间仍发生新图，完整分布保留；按轮次单列，不能统称热态。', '']
             for repeat, modes in value.get('rounds', {}).items():
                 lines += [f'第 {int(repeat) + 1} 轮：', '', latency_table(modes), '']
-        lines += ['', '编译与服务诊断：`' + json.dumps(value['diagnostics'], ensure_ascii=False) + '`。', '']
+        lines += ['', '编译与服务诊断：' + render_diagnostics(value['diagnostics']), '']
         for mode, compare in report['comparisons'].get(name, {}).items():
             first, voice = compare['first_pcm_saved_seconds'], compare['audible_estimate_saved_seconds']
             lines += [f"- 对照 {config['control']} / {mode}：{compare['valid_pairs']}/{compare['matched_attempts']} 个有效配对；"
@@ -356,10 +370,10 @@ def render_markdown(report):
         for name, value in retest['arms'].items():
             lines += [f'### {name} 复测', '', f"状态：{value['status']}。", '']
             if value.get('error'):
-                lines += ['失败原因：`' + value['error'].replace('`', '') + '`。', '']
+                lines += ['失败原因：' + ('首条预热未产出音频，未进入正式测量；详细上下文保留在 JSON。' if 'Warmup failed' in value['error'] else value['error'].replace('`', '')), '']
             if value['modes']:
                 lines += [latency_table(value['modes']), '']
-            lines += ['诊断：`' + json.dumps(value['diagnostics'], ensure_ascii=False) + '`。', '']
+            lines += ['诊断：' + render_diagnostics(value['diagnostics']), '']
             for mode, check in value.get('checks', {}).get('by_mode', {}).items():
                 lines += [f"- {mode}：token 完整观测 {check['token_checks_complete']}/{check['observed_responses']}；"
                           f"顺序不一致 {check['token_mismatches']}；正式新图响应 {check['responses_with_new_graphs']}。"]

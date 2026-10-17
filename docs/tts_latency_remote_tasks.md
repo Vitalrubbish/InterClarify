@@ -89,3 +89,18 @@
 离线 ASR 接入探针 `job-179219748134739540386-xuan-zhang` 已完成当时可读的 30 个 WAV（27 control + 3 batch4），无识别服务失败；control 的 sparse 长句转写尾部少 3 词，其输入 token 余量为 0。该现象需要保留用于质量核查，不能仅凭输入 token 完整就宣布生成语音无漏词。最终 ASR 将在全部作业结束后重新覆盖全部正式筛选 WAV。
 
 早期编译修复复测已提交：`job-179219795970912268354-xuan-zhang`，独立 worktree `interclarify-tts-early-fix-20261017@6b41342`，输出 `interclarify-tts-runs/20261017-early-retest-02`，只测 batch4/early_batch4 两臂，共计划 36 条；远端 58/58 组件测试通过。原筛选继续跑 prefill8/4 与 deadline200，不在运行中修改源码。报告必须把原失败与复测结果并列，不能覆盖失败证据或跨卡借用 control。
+
+## 本轮终态与归档
+
+所有 GPU 作业已结束，`vc list` 无本轮活动任务；固定 MOSS 源码/adapter 的 `git diff HEAD` 仍干净。
+
+| 作业 | 来源/退出状态 | 正式记录 |
+| --- | --- | --- |
+| `job-179219430342742386259-xuan-zhang` | `931746b`，exit 0 | 基线 210，失败/无音频 0 |
+| `job-179219646950494824830-xuan-zhang` | `d4056dc`，exit 1 | 原筛选完成 99；旧 early 预热失败，未填零或隐藏 |
+| `job-179219795970912268354-xuan-zhang` | `6b41342`，exit 0 | 修复后的 batch4/early 同卡各 18，共 36 |
+| `job-179219909689662915563-xuan-zhang` | ASR 诊断，Completed | 135 条 WAV 记录、20 个不同 WAV，识别作业失败 0 |
+
+最终可读报告为 [tts_latency_optimization_report.md](tts_latency_optimization_report.md)，机器可读结果与逐条转写在 `reports/tts_latency/20261017/`。统计始终保留全部尝试；deadline200 有一条正式新图污染，按轮次展开。整体约 1 秒与 TTS 可听预算尚未通过，不变更产品默认参数。
+
+报告通过 JumpServer SFTP 取回并核对 SHA256：虚拟 `/d6-hpc-debuggpu-001/` 对应远端 home，不能直接在 SFTP 中使用 `/hpc_stor03/...`。三组成对试听副本保存在本地 `data/runs/tts_latency/20261017/listening/`，6 个 WAV 均与对应 JSON 的 PCM SHA256 匹配，文件名隐藏配置名，映射单独保存；只是准备试听材料，尚未进行人工试听。

@@ -12,6 +12,7 @@ InterClarify 研究全双工语音代理在用户话轮内主动澄清的时机�
 | 阶段 A 历史证据 | [验收记录](docs/xtalk_a4_remote_acceptance.md)、[结果目录](reports/duplex_acceptance/) |
 | X2 诊断运行配置 | [配置](configs/xtalk_duplex_x2_runtime.json)、[说明](docs/configs/xtalk_duplex_x2_runtime.md) |
 | 通用模型服务与 MOSS 补丁 | [服务工具](docs/scripts/remote/run_xtalk_round1.md)、[TTS 补丁](docs/scripts/remote/moss_tts_patch.md) |
+| TTS 延迟优化与稀疏文本修复 | [优化报告](docs/tts_latency_optimization_report.md)、[TTS-005](docs/issues/tts_005_sparse_text_prefill_wait.md) |
 
 本地与远端均使用 conda。通用环境按 `environment.yml` 创建，并在该环境安装 `requirements.txt`；模型与 X-Talk 依赖按各服务说明隔离。已具备相关依赖的 conda 环境可以运行离线测试：
 
