@@ -253,6 +253,40 @@ def latency_table(modes):
     return '\n'.join(lines)
 
 
+def render_findings(report):
+    """Lead with measured, scope-limited findings instead of a generic success claim."""
+    lines = ['本轮实测要点：', '']
+    batch = report.get('comparisons', {}).get('batch4', {}).get('whole')
+    if batch:
+        paired = sum(value['valid_pairs'] for value in report['comparisons']['batch4'].values())
+        lines.append(f"- batch4 的整句配对首 PCM 平均提前 {seconds(batch['first_pcm_saved_seconds']['mean'])} 秒，"
+                     f"中位数仅提前 {seconds(batch['first_pcm_saved_seconds']['p50'])} 秒，收益集中于长句。"
+                     f'{paired} 个整句/增量配对的 PCM 一致性见下表，不把平均收益外推到所有短答。')
+    retest = report.get('early_retest')
+    if retest and retest['arms']['early_batch4']['status'] == 'complete':
+        a = retest['arms']['batch4']['checks']['by_mode']['whole']['early_frame_seconds']['10']['p50']
+        b = retest['arms']['early_batch4']['checks']['by_mode']['whole']['early_frame_seconds']['10']['p50']
+        lines.append(f"- 早期编译修复复测：前 10 帧 p50 从 {seconds(a)} 降至 {seconds(b)} 秒；"
+                     '正式响应的新图、token 和 PCM 差异分别核查。音频发生变化时不宣称逐 token 无损。')
+    four = report.get('comparisons', {}).get('prefill4', {}).get('sparse')
+    if four:
+        lines.append(f"- prefill4 在 3 条文本 × 3 轮 sparse 筛选中，首 PCM 配对平均提前 "
+                     f"{seconds(four['first_pcm_saved_seconds']['mean'])} 秒，模拟有声平均提前 "
+                     f"{seconds(four['audible_estimate_saved_seconds']['mean'])} 秒；这不是完整 30 条质量验收。")
+    deadline = report.get('arms', {}).get('deadline200', {})
+    checks = deadline.get('checks', {}).get('by_mode', {}).get('sparse')
+    if checks:
+        lines.append(f"- deadline200 的 worker 文本至 prefill p95 为 "
+                     f"{seconds(checks['worker_text_to_prefill_seconds']['p95'])} 秒，说明有界等待路径生效；"
+                     f"正式区间仍有 {checks['responses_with_new_graphs']} 条响应产生新图。"
+                     '首包或有声时间不能用 200ms 门槛等待替代，也不能去掉编译长尾后宣称达标。')
+    diagnostic = report.get('intelligibility')
+    if diagnostic:
+        lines.append(f"- 独立 ASR 检查 {diagnostic['responses']} 条记录、{diagnostic['unique_audio']} 个不同 WAV；"
+                     '重复轮次不等于同样数量的独立语音内容。逐模式词错误见下文，人工自然度仍未验收。')
+    return '\n'.join(lines)
+
+
 def render_markdown(report):
     """Write a self-contained report distinguishing measured gains from acceptance."""
     lines = ['# TTS 端延迟优化报告', '', '日期：2026-10-17。'
@@ -301,6 +335,10 @@ def render_markdown(report):
                       f"worker 文本至 prefill p50/p95={seconds(check['worker_text_to_prefill_seconds']['p50'])}/"
                       f"{seconds(check['worker_text_to_prefill_seconds']['p95'])} 秒；"
                       f"正式响应新图 {check['responses_with_new_graphs']}（图计数观测 {check['graph_observation_complete']}）。"]
+        if any(check['responses_with_new_graphs'] for check in value.get('checks', {}).get('by_mode', {}).values()):
+            lines += ['', '正式区间仍发生新图，完整分布保留；按轮次单列，不能统称热态。', '']
+            for repeat, modes in value.get('rounds', {}).items():
+                lines += [f'第 {int(repeat) + 1} 轮：', '', latency_table(modes), '']
         lines += ['', '编译与服务诊断：`' + json.dumps(value['diagnostics'], ensure_ascii=False) + '`。', '']
         for mode, compare in report['comparisons'].get(name, {}).items():
             first, voice = compare['first_pcm_saved_seconds'], compare['audible_estimate_saved_seconds']
@@ -380,7 +418,8 @@ def render_markdown(report):
               '当前 Nemotron 主线未完成接入，未运行 FDB；不能将组件结果视为整体接话延迟或质量通过。', '',
               '完整证据包括各目录的 WAV、逐响应 JSON、server.jsonl、service.log、measured/responses.jsonl、'
               'GPU 采样与源码/环境清单；本报告的 JSON 摘要保留失败、缺测及配对依据。', '']
-    return '\n'.join(lines)
+    text = '\n'.join(lines)
+    return text.replace('## 实验来源与规模', render_findings(report) + '\n\n## 实验来源与规模', 1)
 
 
 def main():
