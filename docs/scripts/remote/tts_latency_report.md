@@ -13,3 +13,5 @@ CLI 为 `--baseline` 原基线根、`--screen` 同卡筛选根、`--output` 报�
 可选读取 `screen/intelligibility/summary.json` 或 `--intelligibility` 指定的离线 ASR 诊断，按输入模式呈现词错误与整句匹配；不混合不同模式作质量排名，缺测明确保留，人工试听状态仍为未完成。
 
 `complete` 表示所有计划的作业/候选都有终态（包含失败），`all_runs_successful` 才表示所有运行均无失败；二者都不代表质量验收通过。预热失败的候选单列错误原因，不以“缺少正式结果”为由隐藏失败。
+
+`--early-retest` 单独读取首轮 inference tensor 生命周期修复后的双臂复测。原失败保留，复测仅对同一新卡的 batch4/early 作配对，不跨卡借用原 control。所有计划必须有终态后报告才标作完成，实际响应数不为失败候选补零。

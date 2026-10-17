@@ -173,7 +173,7 @@ def gpu_summary(path):
             'samples': len(memory), 'gpu_uuids': sorted(identities)}
 
 
-def build_report(baseline, screen, intelligibility=None):
+def build_report(baseline, screen, intelligibility=None, early_retest=None):
     """Keep acceptance limitations explicit even when a candidate is faster."""
     report = {'baseline_root': str(baseline), 'screen_root': str(screen),
               'baseline_exit': (baseline / 'exit_code.txt').read_text().strip() if (baseline / 'exit_code.txt').exists() else None,
@@ -203,11 +203,34 @@ def build_report(baseline, screen, intelligibility=None):
         if arm['control']:
             report['comparisons'][arm['name']] = compare_runs(report['arms'][arm['control']],
                 report['arms'][arm['name']], require_pcm=arm['name'] == 'batch4')
+    report['early_retest'] = None
+    if early_retest is not None:
+        retest_arms = {}
+        for name in ('batch4', 'early_batch4'):
+            root = early_retest / name
+            retest_arms[name] = summarize_run(root / 'measured', root / 'server.jsonl')
+            retest_arms[name]['diagnostics'] = diagnostics(root)
+        retest_progress = read_json(early_retest / 'progress.json')
+        for failure in (retest_progress or {}).get('failed', []):
+            if failure['arm'] in retest_arms:
+                retest_arms[failure['arm']].update(status='failed', error=failure['error'])
+        report['early_retest'] = {
+            'root': str(early_retest), 'arms': retest_arms,
+            'gpu': gpu_summary(early_retest / 'gpu.csv'),
+            'progress': retest_progress,
+            'exit': (early_retest / 'exit_code.txt').read_text().strip()
+                if (early_retest / 'exit_code.txt').exists() else None,
+            'comparison': compare_runs(retest_arms['batch4'], retest_arms['early_batch4']),
+        }
     report['complete'] = (report['baseline_exit'] is not None and report['screen_exit'] is not None
                           and (report.get('screen_progress') or {}).get('phase') == 'finished'
                           and all(value['status'] in ('complete', 'failed') for value in report['arms'].values()))
     report['all_runs_successful'] = (report['baseline_exit'] == '0' and report['screen_exit'] == '0'
                                    and all(value['status'] == 'complete' for value in report['arms'].values()))
+    if report['early_retest'] is not None:
+        retest = report['early_retest']
+        report['complete'] = (report['complete'] and retest['exit'] is not None
+                              and (retest['progress'] or {}).get('phase') == 'finished')
     return report
 
 
@@ -244,7 +267,8 @@ def render_markdown(report):
              f"原基线：`{report['baseline_root']}`，退出码 `{report['baseline_exit']}`。",
              f"同卡筛选：`{report['screen_root']}`，退出码 `{report['screen_exit']}`。", '',
              '基线为 35 条非 FDB 文本 × whole/incremental × 3 轮，共 210 条。'
-             '筛选只含原集合中的短答、澄清与长句三条，每模式三轮；不同候选共 117 条，属于小集合初筛，不能外推可靠的 p95。'
+             '筛选只含原集合中的短答、澄清与长句三条，每模式三轮；首轮原计划 117 条，失败候选不会补零。'
+             '若有独立早期编译复测，另计划 36 条，实际数量见各结果。小集合不能外推可靠的 p95。'
              'whole 一次推送，incremental 每三个词间隔 100ms，sparse 每两个词间隔 600ms、末块后 600ms 才真实结束。'
              '实际 TTS token 数由服务记录，与单词数或 LLM token 数不同。'
              'sparse 是构造的压力输入，并非真实 LLM 流的发生频率估计。', '',
@@ -283,6 +307,27 @@ def render_markdown(report):
                       f"首 PCM 节省均值/p50={seconds(first['mean'])}/{seconds(first['p50'])} 秒；"
                       f"模拟有声节省均值/p50={seconds(voice['mean'])}/{seconds(voice['p50'])} 秒；正值表示改善。"
                       + (f" PCM 完全相同 {compare['pcm_equal']}/{compare['valid_pairs']}。" if compare['pcm_equal'] is not None else '')]
+        lines += ['']
+    retest = report.get('early_retest')
+    if retest is not None:
+        lines += ['## 早期编译修复复测', '',
+                  '首轮失败记录保留在上文。修复 inference tensor 生命周期后，在新的单卡分配中重跑 batch4 control 与 early_batch4；'
+                  '只在该复测内部比较，不能借用原作业另一块卡的 control。', '',
+                  f"复测目录：`{retest['root']}`；退出码 `{retest['exit']}`；GPU `{retest['gpu']}`。", '']
+        for name, value in retest['arms'].items():
+            lines += [f'### {name} 复测', '', f"状态：{value['status']}。", '']
+            if value.get('error'):
+                lines += ['失败原因：`' + value['error'].replace('`', '') + '`。', '']
+            if value['modes']:
+                lines += [latency_table(value['modes']), '']
+            lines += ['诊断：`' + json.dumps(value['diagnostics'], ensure_ascii=False) + '`。', '']
+            for mode, check in value.get('checks', {}).get('by_mode', {}).items():
+                lines += [f"- {mode}：token 完整观测 {check['token_checks_complete']}/{check['observed_responses']}；"
+                          f"顺序不一致 {check['token_mismatches']}；正式新图响应 {check['responses_with_new_graphs']}。"]
+        for mode, value in retest['comparison'].items():
+            lines += ['', f"{mode} 有效配对 {value['valid_pairs']}；首 PCM 平均节省 "
+                      f"{seconds(value['first_pcm_saved_seconds']['mean'])} 秒，模拟有声平均节省 "
+                      f"{seconds(value['audible_estimate_saved_seconds']['mean'])} 秒。"]
         lines += ['']
     lines += ['## 语音内容诊断', '']
     diagnostic = report.get('intelligibility')
@@ -335,9 +380,10 @@ def main():
     parser.add_argument('--baseline', type=Path, required=True)
     parser.add_argument('--screen', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--early-retest', type=Path, help='Isolated paired retest after the inference-buffer fix')
     parser.add_argument('--intelligibility', type=Path, help='Optional alternate ASR summary JSON')
     args = parser.parse_args()
-    report = build_report(args.baseline.resolve(), args.screen.resolve(), args.intelligibility)
+    report = build_report(args.baseline.resolve(), args.screen.resolve(), args.intelligibility, args.early_retest)
     args.output.mkdir(parents=True, exist_ok=True)
     (args.output / 'tts_latency_results.json').write_text(json.dumps(report, ensure_ascii=False, indent=2))
     (args.output / 'tts_latency_optimization_report.md').write_text(render_markdown(report))

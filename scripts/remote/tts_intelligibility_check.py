@@ -85,8 +85,11 @@ def run(args):
     corpus = {row['id']: row['text'] for row in
               (json.loads(line) for line in (args.screen / 'screen_corpus.jsonl').read_text().splitlines())}
     cache, rows = {}, []
-    for path in sorted(args.screen.glob('*/measured/responses.jsonl')):
-        arm = path.parent.parent.name
+    paths = [(path, '') for path in sorted(args.screen.glob('*/measured/responses.jsonl'))]
+    if args.extra_screen:
+        paths += [(path, '_retest') for path in sorted(args.extra_screen.glob('*/measured/responses.jsonl'))]
+    for path, suffix in paths:
+        arm = path.parent.parent.name + suffix
         for source in (json.loads(line) for line in path.read_text().splitlines()):
             row = {'arm': arm, 'id': source['id'], 'mode': source['mode'], 'repeat': source['repeat'],
                    'response_id': source['response_id'], 'expected': corpus[source['id']],
@@ -123,6 +126,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('screen', 'model', 'lock', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
+    parser.add_argument('--extra-screen', type=Path, help='Additional isolated paired retest; label arms with _retest')
     return run(parser.parse_args())
 
 

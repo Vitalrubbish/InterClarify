@@ -87,3 +87,5 @@
 首轮筛选中 `batch4` 完成 18 条，均与配对 control 的 PCM 完全相同；`early_batch4` 首次真实 prefill 因持久历史 buffer 是 inference tensor、返回后在 inference mode 外更新而失败，无音频。保留失败，不视为优化通过。已增加模拟上游 inference-mode 装饰器的完整挂载回归，并修复普通持久 buffer 的创建方式。后续使用独立 checkout / 同卡 batch4 + early_batch4 两臂复测，不修改正在进行的原门槛实验。
 
 离线 ASR 接入探针 `job-179219748134739540386-xuan-zhang` 已完成当时可读的 30 个 WAV（27 control + 3 batch4），无识别服务失败；control 的 sparse 长句转写尾部少 3 词，其输入 token 余量为 0。该现象需要保留用于质量核查，不能仅凭输入 token 完整就宣布生成语音无漏词。最终 ASR 将在全部作业结束后重新覆盖全部正式筛选 WAV。
+
+早期编译修复复测已提交：`job-179219795970912268354-xuan-zhang`，独立 worktree `interclarify-tts-early-fix-20261017@6b41342`，输出 `interclarify-tts-runs/20261017-early-retest-02`，只测 batch4/early_batch4 两臂，共计划 36 条；远端 58/58 组件测试通过。原筛选继续跑 prefill8/4 与 deadline200，不在运行中修改源码。报告必须把原失败与复测结果并列，不能覆盖失败证据或跨卡借用 control。
