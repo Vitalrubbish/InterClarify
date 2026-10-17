@@ -100,6 +100,7 @@ def summarize_run(directory, trace_path):
     for mode, values in modes.items():
         group = [row for row in rows if row['mode'] == mode]
         values['simulated_underrun_seconds'] = bench.distribution([row['simulated_underrun_seconds'] for row in group])
+        values['generated_audio_seconds'] = bench.distribution([row['samples'] / row['sample_rate'] for row in group])
         values['waveform_onset_seconds'] = bench.distribution([row['onset_seconds'] for row in group if row['onset_seconds'] is not None])
         values['slow_first_pcm_over_5s'] = sum((row['first_pcm_seconds'] or 0) > 5 for row in group)
         values['wall_seconds'] = bench.distribution([row['wall_seconds'] for row in group])
@@ -220,7 +221,7 @@ def build_report(baseline, screen, intelligibility=None, early_retest=None):
             'progress': retest_progress,
             'exit': (early_retest / 'exit_code.txt').read_text().strip()
                 if (early_retest / 'exit_code.txt').exists() else None,
-            'comparison': compare_runs(retest_arms['batch4'], retest_arms['early_batch4']),
+            'comparison': compare_runs(retest_arms['batch4'], retest_arms['early_batch4'], require_pcm=True),
         }
     report['complete'] = (report['baseline_exit'] is not None and report['screen_exit'] is not None
                           and (report.get('screen_progress') or {}).get('phase') == 'finished'
@@ -324,11 +325,19 @@ def render_markdown(report):
             for mode, check in value.get('checks', {}).get('by_mode', {}).items():
                 lines += [f"- {mode}：token 完整观测 {check['token_checks_complete']}/{check['observed_responses']}；"
                           f"顺序不一致 {check['token_mismatches']}；正式新图响应 {check['responses_with_new_graphs']}。"]
+            if value.get('checks', {}).get('by_mode'):
+                lines += ['', '| 模式 | 前1帧 p50 | 前5帧 p50 | 前10帧 p50 | 前50帧 p50（秒） |',
+                          '| --- | ---: | ---: | ---: | ---: |']
+                for mode, check in value['checks']['by_mode'].items():
+                    lines.append('| ' + mode + ' | ' + ' | '.join(seconds(check['early_frame_seconds'][str(n)]['p50']) for n in (1,5,10,50)) + ' |')
         for mode, value in retest['comparison'].items():
             lines += ['', f"{mode} 有效配对 {value['valid_pairs']}；首 PCM 平均节省 "
                       f"{seconds(value['first_pcm_saved_seconds']['mean'])} 秒，模拟有声平均节省 "
-                      f"{seconds(value['audible_estimate_saved_seconds']['mean'])} 秒。"]
-        lines += ['']
+                      f"{seconds(value['audible_estimate_saved_seconds']['mean'])} 秒；PCM 完全相同 "
+                      f"{value['pcm_equal']}/{value['valid_pairs']}。"]
+        lines += ['', '早期编译若改变 PCM，可能涉及编译数值或随机采样执行差异；'
+                  '参数相同并不保证随机序列相同。需结合前 N 帧时间、音频长度、波形起点和内容转写解释，'
+                  '不能把可听时刻的全部变化都归为计算加速，亦不宣称逐 token 无损。', '']
     lines += ['## 语音内容诊断', '']
     diagnostic = report.get('intelligibility')
     if diagnostic is None:
