@@ -23,3 +23,7 @@ worker 包装器在退出时清理仍打开的 codec streaming context；正常 
 服务子类在 `push_text_tokens` 记录实际独立 tokenize 的 token 数与 ID，便于核对稀疏片段没有丢失或提前使用未来文本。此 trace 为固定非 FDB 实验文本证据，仍不能替代对生成语音的转写和人工试听。
 
 模型 prefill/step 成功后记录实际消费的文本 token，真实 finish 后记录 pending 余量。若小门槛导致提前音频 EOS，后续文本即使已接收也可能未消费；报告必须比对接收/消费顺序和剩余 token，不能只凭 WAV 非空判定通过。token 消费完整仍不能证明发音无漏词。
+
+`service_patch_requested` 汇总 trace、批次、prefill、codec 加载和栈诊断开关供 launcher 判断，保证单独启用稀疏文本修复也能进入包装器；不依赖另一个实验开关作为隐式前置。
+
+复用同一服务 session 开始新 turn 时，先清除前一轮 deadline；close 取消时同时清除，避免计时状态串到新一轮。取消标记与 PCM 提交锁的原检查仍保留。

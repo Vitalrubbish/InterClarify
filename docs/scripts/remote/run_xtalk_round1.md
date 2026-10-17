@@ -15,3 +15,5 @@
 ## TTS 延迟实验入口
 
 `serve_service` 仅在设置 `XTALK_TTS_TRACE` 或非零 `XTALK_TTS_GENERATION_BATCH_FRAMES` 时，将固定 adapter 交给显式 `moss_tts_service_patch.py` 运行；仍先检查两个上游提交和干净工作树。批次值在启动前校验。默认服务命令和配置保持原样，实验文件与 sitecustomize 补丁通过相同 PYTHONPATH 提供。早期编译开关由原 inference 补丁读取。
+
+独立设置 prefill 门槛、最大等待或 codec 加载线程时也会启用显式服务包装器，无需同时开启 trace 或批次实验；否则这些开关会被静默忽略。启动前同时校验批次和 prefill 参数，默认全关闭时仍直接运行固定 adapter。实验测量原先都显式启用 trace，因此此接入修复不改变已有测量路径。

@@ -15,6 +15,15 @@ from pathlib import Path
 from tts_latency_trace import emit, span, trace_scope
 
 
+def service_patch_requested():
+    """Enable the wrapper for any of its independent service options."""
+    names = ('XTALK_TTS_GENERATION_BATCH_FRAMES', 'XTALK_TTS_PREFILL_TEXT_TOKENS',
+             'XTALK_TTS_PREFILL_MAX_WAIT_MS', 'XTALK_TTS_CODEC_LOAD_THREADS',
+             'XTALK_TTS_STACK_DIAGNOSTIC')
+    return bool(os.environ.get('XTALK_TTS_TRACE', '').strip()) or any(
+        os.environ.get(name, '0').strip() not in ('', '0') for name in names)
+
+
 def generation_batch_frames() -> int:
     """Validate the independent batch-size experiment."""
     value = int(os.environ.get('XTALK_TTS_GENERATION_BATCH_FRAMES', '0'))
@@ -178,6 +187,7 @@ def apply_service_patch(module):
         if sess is not None:
             with sess._xt_commit_lock:
                 sess._xt_cancelled.set()
+                sess._xt_prefill_deadline = None
             with trace_scope(session_id, session_id):
                 emit('cancel')
         return original_delete(self, session_id)
@@ -260,6 +270,7 @@ def apply_service_patch(module):
     traced_start = manager._handle_start_turn
 
     def handle_start(self, sess, cmd):
+        sess._xt_prefill_deadline = None
         current_session.cancelled = sess._xt_cancelled.is_set
         try:
             return traced_start(self, sess, cmd)

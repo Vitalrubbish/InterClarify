@@ -117,6 +117,18 @@ class SparsePrefillTests(unittest.TestCase):
             _xt_cancelled=threading.Event(), _xt_prefill_deadline=None,
             frame_decoder=types.SimpleNamespace(decode_frames=lambda frames: frames))
 
+    def test_prefill_feature_can_be_enabled_without_trace_or_batches(self):
+        values = {name: '0' for name in ('XTALK_TTS_GENERATION_BATCH_FRAMES',
+            'XTALK_TTS_PREFILL_TEXT_TOKENS', 'XTALK_TTS_PREFILL_MAX_WAIT_MS',
+            'XTALK_TTS_CODEC_LOAD_THREADS', 'XTALK_TTS_STACK_DIAGNOSTIC')}
+        values['XTALK_TTS_TRACE'] = ''
+        with patch.dict(os.environ, values):
+            self.assertFalse(service.service_patch_requested())
+            for name, value in [('XTALK_TTS_PREFILL_TEXT_TOKENS', '4'),
+                                ('XTALK_TTS_PREFILL_MAX_WAIT_MS', '200')]:
+                with patch.dict(os.environ, {name: value}):
+                    self.assertTrue(service.service_patch_requested())
+
     def test_prefill_options_reject_invalid_values(self):
         for tokens, wait in [('3', '0'), ('4', '-1'), ('0', '60001')]:
             with patch.dict(os.environ, {'XTALK_TTS_PREFILL_TEXT_TOKENS': tokens,
@@ -213,6 +225,7 @@ class ServicePatchTests(unittest.TestCase):
             def delete(self, sid):
                 return None
             def _handle_start_turn(self, sess, cmd):
+                sess.deadline_on_start = sess._xt_prefill_deadline
                 sess.tts_session = module.MossTTSRealtimeStreamingSession(range(10))
                 sess.frames = list(sess.tts_session._drain_pending_tokens())
             def _handle_push_text(self, sess, cmd):
@@ -235,7 +248,9 @@ class ServicePatchTests(unittest.TestCase):
             streaming=types.SimpleNamespace(buffer_threshold_seconds=0))
         manager.sess = sess
         manager._start_worker(sess)
+        sess._xt_prefill_deadline = 123.0
         manager._handle_start_turn(sess, {})
+        self.assertIsNone(sess.deadline_on_start)
         self.assertEqual(sess.frames, [(0, 1, 2)] + list(range(3, 10)))
         module._maybe_wait_for_buffer = lambda *args: manager.delete(sess.session_id)
         manager._emit_audio_chunks(sess, iter([np.ones(240)]))
