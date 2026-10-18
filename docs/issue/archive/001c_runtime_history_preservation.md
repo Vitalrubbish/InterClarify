@@ -10,3 +10,6 @@
 ## 完成回填
 
 修复后远端runtime-fixed-r2四组51拍首次差异均null；runtime-r3-protocol的真实权重raw条件8拍也通过。完整词条件的末窗请求数差异归001b继续定位，不以此声明整轮通过。证据见reports/layer1_training/issue001-runtime-20261018。
+
+
+本轮实现提交：InterClarify `d23f80f`，X-Talk `f1531f3`；运行仍以各自run manifest的原始源码摘要为准。

@@ -8,3 +8,6 @@
 
 
 完成证据：冻结源码v6、r4-asr / r4-tts均退出0，真实模型自动验收通过，报告见 `reports/english_integration/20261018-r4/`。原始失败和旧分段结果保留远端，修复不改写旧结论。人耳听感仍由003c单列。
+
+
+本轮实现提交：InterClarify `d23f80f`，X-Talk `f1531f3`；运行仍以各自run manifest的原始源码摘要为准。
