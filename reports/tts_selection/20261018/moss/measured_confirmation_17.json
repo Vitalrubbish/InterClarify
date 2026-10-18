@@ -1,0 +1,70 @@
+{
+  "id": "confirmation_17",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "I have reserved room B twelve for the afternoon workshop.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 6.734522257000208,
+  "chunks": [
+    {
+      "arrival_seconds": 0.2617103597149253,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.5960080549120903,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 1.0515338061377406,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.628241672180593,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.324344647116959,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.1483923122286797,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.9611251894384623,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.775221351534128,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.60201540030539,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.40907584130764,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.728225398808718,
+      "samples": 3840
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.16,
+  "audible_db50_seconds": 0.6760080549120903,
+  "onset_db45_seconds": 0.3,
+  "audible_db45_seconds": 1.1115338061377407,
+  "onset_db40_seconds": 0.31,
+  "audible_db40_seconds": 1.1215338061377407,
+  "audio_seconds": 3.68,
+  "stalls": 9,
+  "stall_seconds": 3.027365481592714,
+  "first_packet_seconds": 0.2617103597149253,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.8267940487712622,
+  "rtf": 1.8300332220109259
+}

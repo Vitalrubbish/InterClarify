@@ -1,0 +1,286 @@
+{
+  "id": "confirmation_08",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "I have moved the weekly review to Friday, keeping the same start time.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 2.1192521322518587,
+  "chunks": [
+    {
+      "arrival_seconds": 0.7382929474115372,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7713412325829268,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7927302634343505,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8140091467648745,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8352311197668314,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8565275520086288,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8777775196358562,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8990674028173089,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9202458215877414,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9609227972105145,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.00191680341959,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0019207764416933,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0429184259846807,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0429218234494328,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.083915788680315,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0839193658903241,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1249162573367357,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1249193390831351,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1659164810553193,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1659192265942693,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.206914760172367,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2069181995466352,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2479145843535662,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2479177378118038,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2889197720214725,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2889240076765418,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3299168227240443,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.329919864423573,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.370913845486939,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.370916579850018,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4119147416204214,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4119176426902413,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.452915788628161,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.452919284813106,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4939184114336967,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.49392154160887,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5349248880520463,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5361631223931909,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5574748711660504,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.578704135492444,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5999503806233406,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.6211360888555646,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.6423287745565176,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.6635347418487072,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.684743587858975,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7059943685308099,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7272007344290614,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.748514723032713,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7697476455941796,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7909874189645052,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.8122687954455614,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.8335261112079024,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.8547685565426946,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.875984901562333,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.897263984195888,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.9185223504900932,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.9397501721978188,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.9610122395679355,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.9822287121787667,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 2.0034623267129064,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 2.0246604988351464,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 2.045884328894317,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 2.0670705679804087,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 2.0883127376437187,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 2.109506756067276,
+      "samples": 1920
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.03,
+  "audible_db50_seconds": 0.7682929474115372,
+  "onset_db45_seconds": 0.09,
+  "audible_db45_seconds": 0.8282929474115371,
+  "onset_db40_seconds": 0.12,
+  "audible_db40_seconds": 0.8582929474115372,
+  "audio_seconds": 5.2,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.7382929474115372,
+  "first_packet_samples": 1920,
+  "max_packet_gap_seconds": 0.04100334644317627,
+  "rtf": 0.4075484869715113
+}

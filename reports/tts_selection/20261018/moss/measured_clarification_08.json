@@ -1,0 +1,58 @@
+{
+  "id": "clarification_08",
+  "category": "clarification",
+  "listening": "no",
+  "text": "Is the appointment online or in person?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 67.90757544245571,
+  "chunks": [
+    {
+      "arrival_seconds": 63.49946385808289,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 63.8218637118116,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 64.2563482504338,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 64.80452022422105,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 65.46731549687684,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 66.24305171798915,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 67.0158150922507,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 67.7873166128993,
+      "samples": 23040
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.62,
+  "audible_db50_seconds": 64.94452022422105,
+  "onset_db45_seconds": 0.62,
+  "audible_db45_seconds": 64.94452022422105,
+  "onset_db40_seconds": 0.62,
+  "audible_db40_seconds": 64.94452022422105,
+  "audio_seconds": 2.64,
+  "stalls": 7,
+  "stall_seconds": 2.1278527548164163,
+  "first_packet_seconds": 63.49946385808289,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.7757362211123109,
+  "rtf": 25.722566455475647
+}

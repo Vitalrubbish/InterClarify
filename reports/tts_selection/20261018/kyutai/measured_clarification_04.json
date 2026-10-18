@@ -1,0 +1,134 @@
+{
+  "id": "clarification_04",
+  "category": "clarification",
+  "listening": "no",
+  "text": "Which Alex should I invite to the meeting?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 1.3090766621753573,
+  "chunks": [
+    {
+      "arrival_seconds": 0.7361165741458535,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7689660713076591,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7903084354475141,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8116429857909679,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8328985162079334,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8541597733274102,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8754317732527852,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8967191390693188,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.917989264242351,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9581536520272493,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9991534827277064,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9991579912602901,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0401730528101325,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0401793858036399,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0811525639146566,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0811566729098558,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1221485249698162,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1221517389640212,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.16315149795264,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1631546411663294,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2041518744081259,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2041552187874913,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2451478401198983,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2451512906700373,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2861502394080162,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.286154156550765,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.309073556214571,
+      "samples": 1920
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.11,
+  "audible_db50_seconds": 0.8461165741458535,
+  "onset_db45_seconds": 0.12,
+  "audible_db45_seconds": 0.8561165741458535,
+  "onset_db40_seconds": 0.12,
+  "audible_db40_seconds": 0.8561165741458535,
+  "audio_seconds": 2.16,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.7361165741458535,
+  "first_packet_samples": 1920,
+  "max_packet_gap_seconds": 0.04101506154984236,
+  "rtf": 0.6060540102663691
+}

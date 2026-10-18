@@ -1,0 +1,122 @@
+{
+  "id": "answer_16",
+  "category": "answer",
+  "listening": "no",
+  "text": "I have not sent the updated invitation yet. The proposed change moves the call from ten to ten forty-five and keeps the duration at half an hour. Please confirm before I send it.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 12.4662473667413,
+  "chunks": [
+    {
+      "arrival_seconds": 3.1220966475084424,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 3.2124036122113466,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 3.302176230587065,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 3.392727494239807,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 3.4828375233337283,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.5726649072021246,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.775763371028006,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.556990069337189,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.333576085045934,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.112154625356197,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.838786211796105,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.27585116121918,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.71164149325341,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.151197524741292,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.589918931014836,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.025407116860151,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.461727772839367,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.897809016518295,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.335855255834758,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.770056707784534,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.209497450850904,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.645057333633304,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 12.081316323019564,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 12.459912171587348,
+      "samples": 15360
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.22,
+  "audible_db50_seconds": 3.3524036122113468,
+  "onset_db45_seconds": 0.46,
+  "audible_db45_seconds": 3.592403612211347,
+  "onset_db40_seconds": 0.51,
+  "audible_db40_seconds": 3.642403612211347,
+  "audio_seconds": 10.16,
+  "stalls": 2,
+  "stall_seconds": 0.11668956428766109,
+  "first_packet_seconds": 3.1220966475084424,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.7812266983091831,
+  "rtf": 1.2269928510572146
+}

@@ -1,0 +1,54 @@
+{
+  "id": "clarification_12",
+  "category": "clarification",
+  "listening": "no",
+  "text": "Should I include the whole team?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 3.863021608442068,
+  "chunks": [
+    {
+      "arrival_seconds": 0.24914537649601698,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.5660424251109362,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 0.9967206111177802,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.5413205586373806,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.202727375552058,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 2.97419601585716,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.746087536215782,
+      "samples": 23040
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.18,
+  "audible_db50_seconds": 0.6660424251109361,
+  "onset_db45_seconds": 0.37,
+  "audible_db45_seconds": 1.12672061111778,
+  "onset_db40_seconds": 0.4,
+  "audible_db40_seconds": 1.1567206111177801,
+  "audio_seconds": 2.16,
+  "stalls": 6,
+  "stall_seconds": 1.8169421597197652,
+  "first_packet_seconds": 0.24914537649601698,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.7718915203586221,
+  "rtf": 1.7884359298342907
+}

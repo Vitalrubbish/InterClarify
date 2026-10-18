@@ -1,0 +1,15 @@
+{
+  "command": "run",
+  "backend": "kyutai",
+  "port": 18761,
+  "moss_url": "ws://127.0.0.1:18004/tts/ws",
+  "reference": "/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/audio/reference.wav",
+  "model": null,
+  "voice": null,
+  "device": "cuda",
+  "threads": 2,
+  "seed": 17,
+  "timeout": 180.0,
+  "texts": "configs/tts_selection_texts.csv",
+  "output": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/runs/kyutai-r2/measurements"
+}

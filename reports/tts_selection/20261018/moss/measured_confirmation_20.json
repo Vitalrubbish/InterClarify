@@ -1,0 +1,82 @@
+{
+  "id": "confirmation_20",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "I have canceled the duplicate invitation and kept the updated version.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 8.170895908027887,
+  "chunks": [
+    {
+      "arrival_seconds": 0.25386095978319645,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.5759582575410604,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 1.0131104597821832,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.5684944335371256,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.2409997200593352,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.024811099283397,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.8082263879477978,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.596478254534304,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.383602083660662,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.1672683991491795,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.9007997289299965,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.344036015681922,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.781717328354716,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.165211024694145,
+      "samples": 15360
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.11,
+  "audible_db50_seconds": 0.6059582575410605,
+  "onset_db45_seconds": 0.16,
+  "audible_db45_seconds": 0.6559582575410604,
+  "onset_db40_seconds": 0.33,
+  "audible_db40_seconds": 1.1031104597821833,
+  "audio_seconds": 5.36,
+  "stalls": 10,
+  "stall_seconds": 3.0469387691467986,
+  "first_packet_seconds": 0.25386095978319645,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.7882518665865064,
+  "rtf": 1.5244208783634117
+}

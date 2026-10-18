@@ -1,0 +1,62 @@
+{
+  "id": "clarification_10",
+  "category": "clarification",
+  "listening": "no",
+  "text": "Which calendar should I update?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 5.257505861110985,
+  "chunks": [
+    {
+      "arrival_seconds": 0.248318025842309,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.5684759169816971,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 1.0038259010761976,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.5564587321132421,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.2269322676584125,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.0132015934213996,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.7994734747335315,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.584378094412386,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.252429109066725,
+      "samples": 15360
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.13,
+  "audible_db50_seconds": 0.6184759169816971,
+  "onset_db45_seconds": 0.16,
+  "audible_db45_seconds": 0.648475916981697,
+  "onset_db40_seconds": 0.24,
+  "audible_db40_seconds": 1.0038259010761976,
+  "audio_seconds": 2.96,
+  "stalls": 8,
+  "stall_seconds": 2.364111083224415,
+  "first_packet_seconds": 0.248318025842309,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.7862718813121319,
+  "rtf": 1.776184412537495
+}

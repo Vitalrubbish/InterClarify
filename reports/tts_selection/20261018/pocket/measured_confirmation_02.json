@@ -1,0 +1,210 @@
+{
+  "id": "confirmation_02",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "The meeting will last forty-five minutes, with a short break afterward.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 2.1438046507537365,
+  "chunks": [
+    {
+      "arrival_seconds": 0.20783661492168903,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.24603289924561977,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.2907310342416167,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3306838348507881,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3850333793088794,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.42651172913610935,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.45134744234383106,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.49276556819677353,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5258986381813884,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5663195690140128,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6073348298668861,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6483188588172197,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6893306775018573,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7303288392722607,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7303326921537519,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7713346276432276,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.802163626998663,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0379468202590942,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0751435616984963,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1051412355154753,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1374971335753798,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.171820075251162,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2070273319259286,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2393306093290448,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2728370167315006,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3131586108356714,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3465167274698615,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3790237372741103,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4117799177765846,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4561588745564222,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4899120759218931,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5171608868986368,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5735931005328894,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.611629850231111,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.6449303468689322,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7005545003339648,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7336735175922513,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7665333962067962,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7995650870725513,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.8553277356550097,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.8887639679014683,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.9778153644874692,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 2.003951574675739,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 2.03724420722574,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 2.0766762364655733,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 2.1424208637326956,
+      "samples": 1920
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.23,
+  "audible_db50_seconds": 0.43783661492168907,
+  "onset_db45_seconds": 0.24,
+  "audible_db45_seconds": 0.4478366149216891,
+  "onset_db40_seconds": 0.24,
+  "audible_db40_seconds": 0.4478366149216891,
+  "audio_seconds": 3.68,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.20783661492168903,
+  "first_packet_samples": 1920,
+  "max_packet_gap_seconds": 0.2357831932604313,
+  "rtf": 0.5825556116178632
+}

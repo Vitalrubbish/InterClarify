@@ -1,0 +1,190 @@
+{
+  "id": "clarification_13",
+  "category": "clarification",
+  "listening": "no",
+  "text": "Do you mean noon or midnight?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 1.6062148995697498,
+  "chunks": [
+    {
+      "arrival_seconds": 0.7343675289303064,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7683346308767796,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7897712988778949,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8110899589955807,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8323381626978517,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8535866299644113,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8747906936332583,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8960428750142455,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.917249321937561,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9573896462097764,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9983861781656742,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9983892012387514,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0393844610080123,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.039387603290379,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0803907997906208,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0803950671106577,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1214057467877865,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1214115088805556,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.16238674800843,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1623898521065712,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2033856678754091,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2033889601007104,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2443869672715664,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.244390374980867,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.28538918774575,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2853936655446887,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3263866817578673,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3263898976147175,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.367389477789402,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.367392798885703,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4083861988037825,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4083892544731498,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4493851326406002,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4493895936757326,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4903910122811794,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4903941303491592,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5313947470858693,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.532369595952332,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5540136927738786,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.575626770965755,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5968601740896702,
+      "samples": 1920
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.0,
+  "audible_db50_seconds": 0.7343675289303064,
+  "onset_db45_seconds": 0.09,
+  "audible_db45_seconds": 0.8243675289303064,
+  "onset_db40_seconds": 0.09,
+  "audible_db40_seconds": 0.8243675289303064,
+  "audio_seconds": 3.28,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.7343675289303064,
+  "first_packet_samples": 1920,
+  "max_packet_gap_seconds": 0.04101067967712879,
+  "rtf": 0.48969966450297253
+}

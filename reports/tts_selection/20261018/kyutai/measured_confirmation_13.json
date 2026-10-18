@@ -1,0 +1,194 @@
+{
+  "id": "confirmation_13",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "I will keep the original event until you confirm the new time.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 1.627174997702241,
+  "chunks": [
+    {
+      "arrival_seconds": 0.7351584136486053,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7682471908628941,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7895829882472754,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8108849162235856,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.83213119674474,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8534188317134976,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8746874388307333,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8960078740492463,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9172507105395198,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9579977337270975,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9989704862236977,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9989743269979954,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0399698056280613,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0399733986705542,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0809694612398744,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0809729974716902,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.121968793682754,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1219732128083706,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1629711044952273,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1629747282713652,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.203967971727252,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2039713561534882,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2449700916185975,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.244973387569189,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.285967854782939,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2859713062644005,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3269711891189218,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.326974580064416,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.367970373481512,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.36797359213233,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.408966451883316,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4089693194255233,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4499716013669968,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4499762253835797,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4909701105207205,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4909732658416033,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5319781377911568,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5331016015261412,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.554288205690682,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5755357360467315,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.596763700246811,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.6180003518238664,
+      "samples": 1920
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.0,
+  "audible_db50_seconds": 0.7351584136486053,
+  "onset_db45_seconds": 0.05,
+  "audible_db45_seconds": 0.7851584136486054,
+  "onset_db40_seconds": 0.23,
+  "audible_db40_seconds": 0.9651584136486053,
+  "audio_seconds": 3.36,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.7351584136486053,
+  "first_packet_samples": 1920,
+  "max_packet_gap_seconds": 0.04100487194955349,
+  "rtf": 0.48427827312566696
+}

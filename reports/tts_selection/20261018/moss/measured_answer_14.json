@@ -1,0 +1,138 @@
+{
+  "id": "answer_14",
+  "category": "answer",
+  "listening": "no",
+  "text": "The meeting crosses midnight in your local time zone. It starts late on Tuesday and ends early on Wednesday. I will show both dates clearly in the invitation to avoid confusion.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 14.261692035011947,
+  "chunks": [
+    {
+      "arrival_seconds": 2.786313673481345,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 2.876459593884647,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 2.9666244881227612,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 3.0587593158707023,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 3.1494516292586923,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.2401954317465425,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.7930185943841934,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.5759402848780155,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.362646614201367,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.143548442050815,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.871323116123676,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.310429964214563,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.7449267180636525,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.181499194353819,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.617625268176198,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.05392009112984,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.492439080029726,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.929658222012222,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.366830346174538,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.80346539337188,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.247596442699432,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.683924860320985,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 12.122501931153238,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 12.562404735945165,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 12.999741279520094,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 13.438191768713295,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 13.876347379758954,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 14.25525826215744,
+      "samples": 15360
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.22,
+  "audible_db50_seconds": 3.016459593884647,
+  "onset_db45_seconds": 0.31,
+  "audible_db45_seconds": 3.106459593884647,
+  "onset_db40_seconds": 0.36,
+  "audible_db40_seconds": 3.156459593884647,
+  "audio_seconds": 12.08,
+  "stalls": 3,
+  "stall_seconds": 0.4850094426423297,
+  "first_packet_seconds": 2.786313673481345,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.7867063293233514,
+  "rtf": 1.180603645282446
+}

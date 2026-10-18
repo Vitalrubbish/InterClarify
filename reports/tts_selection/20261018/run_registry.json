@@ -1,0 +1,59 @@
+{
+  "remote_root": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018",
+  "runs": [
+    {
+      "run": "kyutai",
+      "job_id": "job-179228918945794425736-xuan-zhang",
+      "status": "startup_failed",
+      "note": "Offline voice cache alias missing; no measured requests."
+    },
+    {
+      "run": "kyutai-r1",
+      "job_id": "job-179228928376304268655-xuan-zhang",
+      "status": "excluded",
+      "note": "60 measured requests completed, then mutable wrapper exited 127; replaced by frozen-entrypoint repeat."
+    },
+    {
+      "run": "kyutai-r2",
+      "job_id": "job-179229032860602148452-xuan-zhang",
+      "status": "measured_complete",
+      "note": "60 measured requests; wrapper exit 0."
+    },
+    {
+      "run": "moss",
+      "job_id": "job-179228941042125380459-xuan-zhang",
+      "status": "startup_failed",
+      "note": "Shared conda environment lacked flash-attn; cold request produced no audio. Switched to pinned container environment."
+    },
+    {
+      "run": "moss-r1",
+      "job_id": "job-179228956652186221824-xuan-zhang",
+      "status": "measurements_complete_wrapper_failed",
+      "note": "All 60 measured requests have complete packet timelines and no transport errors; 59 pass sustained -45dBFS onset. Mutable shell failed after measurement with exit 127; retain code and disclose wrapper failure."
+    },
+    {
+      "run": "pocket",
+      "job_id": "job-179228968079634259346-xuan-zhang",
+      "status": "cancelled_pending",
+      "note": "CPU partition remained pending; cancelled before inference."
+    },
+    {
+      "run": "pocket-cpu",
+      "job_id": "job-179229013183910553547-xuan-zhang",
+      "status": "cold_failed",
+      "note": "Outer inference_mode created tensors incompatible with the official threaded generator. No measured samples; fixed with no_grad."
+    },
+    {
+      "run": "pocket-cpu-r1",
+      "job_id": "job-179229021881594016020-xuan-zhang",
+      "status": "measured_complete",
+      "note": "60 measured requests, CPU with 2 PyTorch threads, GPU partition container allocated but GPU unused; wrapper exit 0."
+    },
+    {
+      "run": "kokoro",
+      "job_id": "job-179228992946450708652-xuan-zhang",
+      "status": "measured_complete",
+      "note": "60 measured requests, RTX 4090, segment synthesis; wrapper exit 0."
+    }
+  ]
+}

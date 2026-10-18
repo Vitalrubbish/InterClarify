@@ -1,0 +1,82 @@
+{
+  "id": "clarification_01",
+  "category": "clarification",
+  "listening": "yes",
+  "text": "Did you mean this Friday or next Friday?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 73.53286414593458,
+  "chunks": [
+    {
+      "arrival_seconds": 0.24874158389866352,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.5658587142825127,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 0.9959009271115065,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.5411408608779311,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.1982049783691764,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 2.968464581295848,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.7396040009334683,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.511709023267031,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.285713247954845,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.055120854638517,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 72.47445514239371,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 72.90684098750353,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 73.33238717447966,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 73.52720118779689,
+      "samples": 3840
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.29,
+  "audible_db50_seconds": 1.0459009271115065,
+  "onset_db45_seconds": 0.3,
+  "audible_db45_seconds": 1.0559009271115065,
+  "onset_db40_seconds": 2.01,
+  "audible_db40_seconds": 4.069604000933468,
+  "audio_seconds": 5.12,
+  "stalls": 10,
+  "stall_seconds": 68.62571355849504,
+  "first_packet_seconds": 0.24874158389866352,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 66.41933428775519,
+  "rtf": 14.361887528502848
+}

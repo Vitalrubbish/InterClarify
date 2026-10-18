@@ -1,0 +1,66 @@
+{
+  "id": "confirmation_03",
+  "category": "confirmation",
+  "listening": "yes",
+  "text": "Your dentist appointment is on October twenty-third at two thirty.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 6.03026865888387,
+  "chunks": [
+    {
+      "arrival_seconds": 0.26313448045402765,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.5938785867765546,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 1.0501145143061876,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.6172432685270905,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.317613210529089,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.1303331246599555,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.933550969697535,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.738869457505643,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.551040477119386,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.022934318520129,
+      "samples": 7680
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.33,
+  "audible_db50_seconds": 1.1401145143061877,
+  "onset_db45_seconds": 0.33,
+  "audible_db45_seconds": 1.1401145143061877,
+  "onset_db40_seconds": 0.35,
+  "audible_db40_seconds": 1.1601145143061877,
+  "audio_seconds": 3.28,
+  "stalls": 8,
+  "stall_seconds": 2.647905996665358,
+  "first_packet_seconds": 0.26313448045402765,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.8127199141308665,
+  "rtf": 1.8384965423426434
+}

@@ -1,0 +1,30 @@
+{
+  "id": "answer_15",
+  "category": "answer",
+  "listening": "no",
+  "text": "You asked for the last Friday of the month. This month that falls on the thirtieth, while next month it falls on the twenty-seventh. Which month did you have in mind?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 0.13636956550180912,
+  "chunks": [
+    {
+      "arrival_seconds": 0.13633290491998196,
+      "samples": 238800
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.33,
+  "audible_db50_seconds": 0.46633290491998197,
+  "onset_db45_seconds": 0.33,
+  "audible_db45_seconds": 0.46633290491998197,
+  "onset_db40_seconds": 0.33,
+  "audible_db40_seconds": 0.46633290491998197,
+  "audio_seconds": 9.95,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.13633290491998196,
+  "first_packet_samples": 238800,
+  "max_packet_gap_seconds": 0.0,
+  "rtf": 0.013705483970031069
+}

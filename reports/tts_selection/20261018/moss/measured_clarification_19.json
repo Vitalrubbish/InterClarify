@@ -1,0 +1,58 @@
+{
+  "id": "clarification_19",
+  "category": "clarification",
+  "listening": "no",
+  "text": "Is your guest joining from New York?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 4.176738190464675,
+  "chunks": [
+    {
+      "arrival_seconds": 0.2510207239538431,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.5670258039608598,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 0.9961432544514537,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.5441634161397815,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.203301110304892,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 2.972336433827877,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.7426461540162563,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.170755483210087,
+      "samples": 7680
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.48,
+  "audible_db50_seconds": 1.5441634161397815,
+  "onset_db45_seconds": 0.49,
+  "audible_db45_seconds": 1.5541634161397815,
+  "onset_db40_seconds": 0.5,
+  "audible_db40_seconds": 1.5641634161397815,
+  "audio_seconds": 2.32,
+  "stalls": 6,
+  "stall_seconds": 1.8116254300624133,
+  "first_packet_seconds": 0.2510207239538431,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.7703097201883793,
+  "rtf": 1.800318185545119
+}

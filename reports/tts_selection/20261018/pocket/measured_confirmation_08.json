@@ -1,0 +1,214 @@
+{
+  "id": "confirmation_08",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "I have moved the weekly review to Friday, keeping the same start time.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 1.583368451334536,
+  "chunks": [
+    {
+      "arrival_seconds": 0.1230585128068924,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.15352743212133646,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.1845685038715601,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.21573750115931034,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.24689012486487627,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.27818827889859676,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3098556147888303,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3408001083880663,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.37206645030528307,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.41267085913568735,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.4536540796980262,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.49466468673199415,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5356559054926038,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5356601066887379,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5766607392579317,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5911063952371478,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6224246490746737,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6531786574050784,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6847492232918739,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7156897028908134,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.74658062774688,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7774743232876062,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8088537901639938,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8398924507200718,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8719300627708435,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.903136926703155,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9341543540358543,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9653433002531528,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9970610523596406,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.028631554916501,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0597143527120352,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0913177514448762,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1299533853307366,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1591013632714748,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.190196204930544,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2216322319582105,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2530974764376879,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2848721109330654,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.316219030879438,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3477677600458264,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3793276781216264,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4107914427295327,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4422332998365164,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4736725222319365,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5052168238908052,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.536402815952897,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.568082394078374,
+      "samples": 1920
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.0,
+  "audible_db50_seconds": 0.1230585128068924,
+  "onset_db45_seconds": 0.0,
+  "audible_db45_seconds": 0.1230585128068924,
+  "onset_db40_seconds": 0.0,
+  "audible_db40_seconds": 0.1230585128068924,
+  "audio_seconds": 3.76,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.1230585128068924,
+  "first_packet_samples": 1920,
+  "max_packet_gap_seconds": 0.04101060703396797,
+  "rtf": 0.4211086306740788
+}

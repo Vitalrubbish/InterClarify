@@ -1,0 +1,62 @@
+{
+  "id": "clarification_01",
+  "category": "clarification",
+  "listening": "yes",
+  "text": "Did you mean this Friday or next Friday?",
+  "phase": "cold",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 75.7543825712055,
+  "chunks": [
+    {
+      "arrival_seconds": 70.71951810829341,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 71.05057912599295,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 71.49072239547968,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 72.04659597203135,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 72.71997417788953,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 73.50752076692879,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 74.29577212966979,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 75.08216511178762,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 75.75099186692387,
+      "samples": 15360
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.69,
+  "audible_db50_seconds": 72.25659597203135,
+  "onset_db45_seconds": 0.7,
+  "audible_db45_seconds": 72.26659597203135,
+  "onset_db40_seconds": 0.92,
+  "audible_db40_seconds": 72.83997417788953,
+  "audio_seconds": 2.96,
+  "stalls": 8,
+  "stall_seconds": 2.391473758630454,
+  "first_packet_seconds": 70.71951810829341,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.7882513627409935,
+  "rtf": 25.59269681459645
+}

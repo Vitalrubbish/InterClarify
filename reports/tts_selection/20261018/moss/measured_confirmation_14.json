@@ -1,0 +1,106 @@
+{
+  "id": "confirmation_14",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "The train arrives at eight fifty, so nine thirty gives you time to travel.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 11.143848593346775,
+  "chunks": [
+    {
+      "arrival_seconds": 0.7404432082548738,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.832843154668808,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 1.0457535171881318,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.6021841121837497,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.268768164329231,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.050887103192508,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.84916097112,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.6583567671477795,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.465671081095934,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.272523161023855,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.020172155462205,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.468951973132789,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.922882594168186,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.376886399462819,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.827611054293811,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.28014951851219,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.732757023535669,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.182002833113074,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.629303064197302,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.077461685054004,
+      "samples": 23040
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.12,
+  "audible_db50_seconds": 0.872843154668808,
+  "onset_db45_seconds": 0.2,
+  "audible_db45_seconds": 0.952843154668808,
+  "onset_db40_seconds": 1.52,
+  "audible_db40_seconds": 3.370887103192508,
+  "audio_seconds": 8.4,
+  "stalls": 10,
+  "stall_seconds": 2.6797289472073302,
+  "first_packet_seconds": 0.7404432082548738,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.8091957960277796,
+  "rtf": 1.3266486420650923
+}

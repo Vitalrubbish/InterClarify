@@ -1,0 +1,74 @@
+{
+  "id": "confirmation_11",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "The reminder will arrive fifteen minutes before the appointment begins.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 7.5072572426870465,
+  "chunks": [
+    {
+      "arrival_seconds": 0.2636649012565613,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.5933416103944182,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 1.0429594069719315,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.6119139166548848,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.296011110767722,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.0999385276809335,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.9008987015113235,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.706561032682657,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.508703842759132,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.311756721697748,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.0565487295389175,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.500610961578786,
+      "samples": 19200
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.3,
+  "audible_db50_seconds": 1.1029594069719315,
+  "onset_db45_seconds": 0.32,
+  "audible_db45_seconds": 1.1229594069719315,
+  "onset_db40_seconds": 0.4,
+  "audible_db40_seconds": 1.2029594069719314,
+  "audio_seconds": 4.48,
+  "stalls": 10,
+  "stall_seconds": 3.192883828282355,
+  "first_packet_seconds": 0.2636649012565613,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.8056623311713338,
+  "rtf": 1.675727063099787
+}

@@ -1,0 +1,122 @@
+{
+  "id": "answer_04",
+  "category": "answer",
+  "listening": "no",
+  "text": "The room is available for the first half hour, but another team has booked it afterward. We could shorten the meeting, find a different room, or move it to later in the afternoon.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 12.30566374771297,
+  "chunks": [
+    {
+      "arrival_seconds": 3.198877101764083,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 3.2874944424256682,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 3.3779623210430145,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 3.4673915756866336,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 3.5577210299670696,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.648829635232687,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.7358812736347318,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.509798990562558,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.279747385531664,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.049433948472142,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.763833275064826,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.194117918610573,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.622111522592604,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.051317336969078,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.485682097263634,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.918297046795487,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.350491103716195,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.780318411067128,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.20849937479943,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.64011810068041,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.069149262271821,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.496503522619605,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.927340996451676,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 12.300363820977509,
+      "samples": 15360
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.19,
+  "audible_db50_seconds": 3.397494442425668,
+  "onset_db45_seconds": 0.2,
+  "audible_db45_seconds": 3.4074944424256683,
+  "onset_db40_seconds": 0.3,
+  "audible_db40_seconds": 3.5074944424256684,
+  "audio_seconds": 10.16,
+  "stalls": 1,
+  "stall_seconds": 0.00861734066158526,
+  "first_packet_seconds": 3.198877101764083,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.7739177169278264,
+  "rtf": 1.2111873767434025
+}

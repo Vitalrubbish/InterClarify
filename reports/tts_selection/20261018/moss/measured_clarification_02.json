@@ -1,0 +1,66 @@
+{
+  "id": "clarification_02",
+  "category": "clarification",
+  "listening": "no",
+  "text": "Should I use your local time or London time?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 5.567919770255685,
+  "chunks": [
+    {
+      "arrival_seconds": 0.24729325994849205,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.5607559736818075,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 0.9877850981429219,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.5285216942429543,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.183849141933024,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 2.9541895631700754,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.7184996623545885,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.486089530400932,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.254154462367296,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.562634316273034,
+      "samples": 3840
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.32,
+  "audible_db50_seconds": 1.067785098142922,
+  "onset_db45_seconds": 0.33,
+  "audible_db45_seconds": 1.077785098142922,
+  "onset_db40_seconds": 0.41,
+  "audible_db40_seconds": 1.1577850981429219,
+  "audio_seconds": 3.2,
+  "stalls": 8,
+  "stall_seconds": 2.3668612024188036,
+  "first_packet_seconds": 0.24729325994849205,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.7703404212370515,
+  "rtf": 1.7399749282049015
+}

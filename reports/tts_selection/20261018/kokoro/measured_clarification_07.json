@@ -1,0 +1,30 @@
+{
+  "id": "clarification_07",
+  "category": "clarification",
+  "listening": "no",
+  "text": "Should this repeat every week?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 0.11643098015338182,
+  "chunks": [
+    {
+      "arrival_seconds": 0.11641569342464209,
+      "samples": 54000
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.29,
+  "audible_db50_seconds": 0.40641569342464207,
+  "onset_db45_seconds": 0.29,
+  "audible_db45_seconds": 0.40641569342464207,
+  "onset_db40_seconds": 0.29,
+  "audible_db40_seconds": 0.40641569342464207,
+  "audio_seconds": 2.25,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.11641569342464209,
+  "first_packet_samples": 54000,
+  "max_packet_gap_seconds": 0.0,
+  "rtf": 0.05174710229039192
+}

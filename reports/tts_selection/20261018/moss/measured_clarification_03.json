@@ -1,0 +1,58 @@
+{
+  "id": "clarification_03",
+  "category": "clarification",
+  "listening": "yes",
+  "text": "Is that nine in the morning or nine at night?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 4.636220532469451,
+  "chunks": [
+    {
+      "arrival_seconds": 0.249138449318707,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.5648475149646401,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 0.9936491278931499,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.5381607711315155,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.1947683095932007,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 2.967852517031133,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.736829152330756,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.51902271900326,
+      "samples": 23040
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.16,
+  "audible_db50_seconds": 0.6448475149646401,
+  "onset_db45_seconds": 0.41,
+  "audible_db45_seconds": 1.1636491278931498,
+  "onset_db40_seconds": 0.42,
+  "audible_db40_seconds": 1.1736491278931498,
+  "audio_seconds": 2.64,
+  "stalls": 7,
+  "stall_seconds": 2.109884269684553,
+  "first_packet_seconds": 0.249138449318707,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.782193566672504,
+  "rtf": 1.7561441410869134
+}

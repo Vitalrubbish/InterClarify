@@ -1,0 +1,146 @@
+{
+  "id": "clarification_08",
+  "category": "clarification",
+  "listening": "no",
+  "text": "Is the appointment online or in person?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 1.0980608370155096,
+  "chunks": [
+    {
+      "arrival_seconds": 0.15481968875974417,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.18517371732741594,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.2167859235778451,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.24891111627221107,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.28055398911237717,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3124261135235429,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3443651935085654,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.37614907044917345,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.4080193107947707,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.44815508741885424,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.48915844038128853,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5301427943632007,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.571138659492135,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5711432723328471,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6121457675471902,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6316875237971544,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6635186923667789,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6957659646868706,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.727617222815752,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7598206587135792,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7915307283401489,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8234254280105233,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8554769977927208,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8878476312384009,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9198853727430105,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9521579202264547,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9845597222447395,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.017295427620411,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0494707208126783,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0815957961604,
+      "samples": 1920
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.08,
+  "audible_db50_seconds": 0.23481968875974418,
+  "onset_db45_seconds": 0.09,
+  "audible_db45_seconds": 0.2448196887597442,
+  "onset_db40_seconds": 0.09,
+  "audible_db40_seconds": 0.2448196887597442,
+  "audio_seconds": 2.4,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.15481968875974417,
+  "first_packet_samples": 1920,
+  "max_packet_gap_seconds": 0.04100335296243429,
+  "rtf": 0.45752534875646234
+}

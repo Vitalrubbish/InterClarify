@@ -1,0 +1,70 @@
+{
+  "id": "confirmation_13",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "I will keep the original event until you confirm the new time.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 6.779056909494102,
+  "chunks": [
+    {
+      "arrival_seconds": 0.38110320270061493,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.5923418924212456,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 1.0426924815401435,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.6123810019344091,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.301249163225293,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.110514534637332,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.9128776295110583,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.715858772397041,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.521712641231716,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.324259272776544,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.771376680582762,
+      "samples": 7680
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.66,
+  "audible_db50_seconds": 1.792381001934409,
+  "onset_db45_seconds": 0.67,
+  "audible_db45_seconds": 1.802381001934409,
+  "onset_db40_seconds": 0.67,
+  "audible_db40_seconds": 1.802381001934409,
+  "audio_seconds": 3.76,
+  "stalls": 9,
+  "stall_seconds": 2.823156070075928,
+  "first_packet_seconds": 0.38110320270061493,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.8092653714120388,
+  "rtf": 1.8029406674186443
+}

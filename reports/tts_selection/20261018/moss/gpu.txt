@@ -1,0 +1,2 @@
+name, uuid, driver_version, memory.total [MiB]
+NVIDIA GeForce RTX 4090, GPU-55604041-b3bb-1d78-2cf3-4f224d1b9609, 580.105.08, 24564 MiB

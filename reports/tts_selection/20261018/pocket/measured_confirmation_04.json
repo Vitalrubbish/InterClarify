@@ -1,0 +1,198 @@
+{
+  "id": "confirmation_04",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "I will invite Emma, James, and Olivia to the planning session.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 1.6070993766188622,
+  "chunks": [
+    {
+      "arrival_seconds": 0.17597319558262825,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.20360649842768908,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.23512456007301807,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.2661640103906393,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.2973405169323087,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3285299874842167,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.35990498028695583,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.39311494026333094,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.42518838960677385,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.4920075610280037,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5323380650952458,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.573339675553143,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6143386056646705,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6143426531925797,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6563432542607188,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6711024045944214,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7020911043509841,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7325766179710627,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.764425435103476,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7950770370662212,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8256589472293854,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8567886892706156,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8878501774743199,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9188140193000436,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9501021364703774,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9813485313206911,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0125286867842078,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0437831757590175,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0750494366511703,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1062529236078262,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1371083464473486,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.168168735690415,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2039188714697957,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.237915842793882,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.268946117721498,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2996652452275157,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3303683251142502,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.366138681769371,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.416250865906477,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4503808310255408,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5137642016634345,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5474537573754787,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.59242052026093,
+      "samples": 1920
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.03,
+  "audible_db50_seconds": 0.20597319558262825,
+  "onset_db45_seconds": 0.03,
+  "audible_db45_seconds": 0.20597319558262825,
+  "onset_db40_seconds": 0.03,
+  "audible_db40_seconds": 0.20597319558262825,
+  "audio_seconds": 3.44,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.17597319558262825,
+  "first_packet_samples": 1920,
+  "max_packet_gap_seconds": 0.06681917142122984,
+  "rtf": 0.46718005134269247
+}

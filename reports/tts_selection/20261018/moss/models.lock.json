@@ -1,0 +1,29 @@
+{
+  "models": {
+    "asr": {
+      "model_id": "Qwen/Qwen3-ASR-1.7B",
+      "revision": "7278e1e70fe206f11671096ffdd38061171dd6e5",
+      "snapshot_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/xtalk-round1/models/cache/models--Qwen--Qwen3-ASR-1.7B/snapshots/7278e1e70fe206f11671096ffdd38061171dd6e5"
+    },
+    "tts": {
+      "model_id": "OpenMOSS-Team/MOSS-TTS-Realtime",
+      "revision": "75682787d8e2fcc73faca37ba2931453ca9c4022",
+      "snapshot_path": "/hpc_stor03/sjtu_home/xuan.zhang/paratalker-p0-models/moss-tts-realtime"
+    },
+    "codec": {
+      "model_id": "OpenMOSS-Team/MOSS-Audio-Tokenizer",
+      "revision": "3cd226ba2947efa357ef453bcad111b6eafba782",
+      "snapshot_path": "/hpc_stor03/sjtu_home/xuan.zhang/paratalker-p0-models/moss-audio-tokenizer"
+    },
+    "llm": {
+      "model_id": "Qwen/Qwen3-8B-AWQ",
+      "revision": "4da05a8edb55c6046cce958586c33b61da07bb79",
+      "snapshot_path": "/hpc_stor03/sjtu_home/xuan.zhang/xtalk/models/HuggingFace/Qwen3-8B-AWQ"
+    },
+    "turn_detector": {
+      "model_id": "xcczach/xturnix-zh-base",
+      "revision": "b69ac8a4d98e93332ca3452c569a77dd499287a9",
+      "snapshot_path": "/mnt/cloudstorfs/sjtu_home/xuan.zhang/xtalk-round1/models/cache/models--xcczach--xturnix-zh-base/snapshots/b69ac8a4d98e93332ca3452c569a77dd499287a9"
+    }
+  }
+}

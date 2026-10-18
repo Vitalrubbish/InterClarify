@@ -1,0 +1,154 @@
+{
+  "id": "answer_11",
+  "category": "answer",
+  "listening": "no",
+  "text": "Your calendar shows a public holiday on Monday. I can still create the event, although some invitees may be unavailable. Would you prefer to move it to the next working day?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 15.96149580925703,
+  "chunks": [
+    {
+      "arrival_seconds": 3.015416828915477,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 3.1071473136544228,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 3.198380747810006,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 3.2899935813620687,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 3.38093385938555,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.4718133490532637,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.7920869747176766,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.577541220933199,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.362372165545821,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.146477455273271,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.876490824855864,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.318088687025011,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.756449617445469,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.193977481685579,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.631322144530714,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.068459812551737,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.505951879546046,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.944748149253428,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.38130372390151,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.818731537088752,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.261337046511471,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.696857857517898,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 12.1340057188645,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 12.570499607361853,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 13.007852257229388,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 13.44577622320503,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 13.884205154143274,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 14.32002281025052,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 14.757830426096916,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 15.19693214725703,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 15.63472141418606,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 15.954672066494823,
+      "samples": 11520
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.39,
+  "audible_db50_seconds": 3.417147313654423,
+  "onset_db45_seconds": 0.4,
+  "audible_db45_seconds": 3.427147313654423,
+  "onset_db40_seconds": 0.4,
+  "audible_db40_seconds": 3.427147313654423,
+  "audio_seconds": 13.92,
+  "stalls": 2,
+  "stall_seconds": 0.26107399594038583,
+  "first_packet_seconds": 3.015416828915477,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.7854542462155223,
+  "rtf": 1.1466591816994993
+}

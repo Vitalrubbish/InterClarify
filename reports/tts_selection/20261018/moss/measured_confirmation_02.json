@@ -1,0 +1,74 @@
+{
+  "id": "confirmation_02",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "The meeting will last forty-five minutes, with a short break afterward.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 7.307527535595,
+  "chunks": [
+    {
+      "arrival_seconds": 0.5001739701256156,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.5911173969507217,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 1.0414521424099803,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.6062427451834083,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.2952255131676793,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.1034511774778366,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.9094593105837703,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.6970790876075625,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.4780492736026645,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.2791847893968225,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.027860472910106,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.30082434322685,
+      "samples": 7680
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.31,
+  "audible_db50_seconds": 1.1114521424099804,
+  "onset_db45_seconds": 0.34,
+  "audible_db45_seconds": 1.1414521424099804,
+  "onset_db40_seconds": 0.35,
+  "audible_db40_seconds": 1.1514521424099804,
+  "audio_seconds": 4.24,
+  "stalls": 10,
+  "stall_seconds": 2.927686502784489,
+  "first_packet_seconds": 0.5001739701256156,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.8082256643101573,
+  "rtf": 1.7234734753761791
+}

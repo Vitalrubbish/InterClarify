@@ -1,0 +1,30 @@
+{
+  "id": "answer_12",
+  "category": "answer",
+  "listening": "no",
+  "text": "The original booking includes four people and a conference room. Changing only the time will preserve those details. If you also want to add someone, please tell me their name.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 0.13634177204221487,
+  "chunks": [
+    {
+      "arrival_seconds": 0.13630393892526627,
+      "samples": 259800
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.31,
+  "audible_db50_seconds": 0.44630393892526626,
+  "onset_db45_seconds": 0.32,
+  "audible_db45_seconds": 0.4563039389252663,
+  "onset_db40_seconds": 0.33,
+  "audible_db40_seconds": 0.4663039389252663,
+  "audio_seconds": 10.825,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.13630393892526627,
+  "first_packet_samples": 259800,
+  "max_packet_gap_seconds": 0.0,
+  "rtf": 0.012595082867641097
+}

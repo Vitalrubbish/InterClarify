@@ -1,0 +1,90 @@
+{
+  "id": "confirmation_15",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "Your guest is five hours behind you. That would be seven in their morning.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 9.196147322654724,
+  "chunks": [
+    {
+      "arrival_seconds": 0.7366366144269705,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.828030264005065,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 1.0403796937316656,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.6072593359276652,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.3070666026324034,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.1431567957624793,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.9614930525422096,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.785010782070458,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.5975934052839875,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.421036686748266,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.175726609304547,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.629439647309482,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.080886035226285,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.533650110475719,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.982557834126055,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.188525908626616,
+      "samples": 3840
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.31,
+  "audible_db50_seconds": 1.1103796937316657,
+  "onset_db45_seconds": 0.32,
+  "audible_db45_seconds": 1.1203796937316657,
+  "onset_db40_seconds": 0.33,
+  "audible_db40_seconds": 1.1303796937316657,
+  "audio_seconds": 6.08,
+  "stalls": 10,
+  "stall_seconds": 2.8390899948775754,
+  "first_packet_seconds": 0.7366366144269705,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.8360901931300759,
+  "rtf": 1.5125242306997901
+}

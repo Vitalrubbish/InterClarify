@@ -1,0 +1,254 @@
+{
+  "id": "confirmation_10",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "You have a conflict with your lunch reservation at twelve thirty.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 1.9468892822042108,
+  "chunks": [
+    {
+      "arrival_seconds": 0.736674727872014,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.769658206962049,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7910236772149801,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8122730879113078,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8334925621747971,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8547450741752982,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8760204249992967,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8972643529996276,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9185384595766664,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9594192188233137,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0004099048674107,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0004136366769671,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0414068885147572,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.041409649886191,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0824112882837653,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0824146922677755,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1234092712402344,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1234126407653093,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1644131308421493,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1644163150340319,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.205413792282343,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2054183669388294,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.246409229002893,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.246412849985063,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2874080054461956,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2874120278283954,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3284117318689823,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3284146590158343,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3694085255265236,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.369411357678473,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4104074193164706,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4104109890758991,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4514069380238652,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4514105645939708,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4924148870632052,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4924181420356035,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.533418545499444,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5342350918799639,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5555117260664701,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5767562659457326,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.597950997762382,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.6191319385543466,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.6403425382450223,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.6615313980728388,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.682802858762443,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7040457846596837,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7252871384844184,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7465816270560026,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7677974635735154,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7889938512817025,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.8102221908047795,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.8314602132886648,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.8527022618800402,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.873946967534721,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.8951556906104088,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.916414150968194,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.9376201834529638,
+      "samples": 1920
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.02,
+  "audible_db50_seconds": 0.7566747278720141,
+  "onset_db45_seconds": 0.03,
+  "audible_db45_seconds": 0.7666747278720141,
+  "onset_db40_seconds": 0.06,
+  "audible_db40_seconds": 0.7966747278720141,
+  "audio_seconds": 4.56,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.736674727872014,
+  "first_packet_samples": 1920,
+  "max_packet_gap_seconds": 0.04100432246923447,
+  "rtf": 0.42694940399215153
+}

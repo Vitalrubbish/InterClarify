@@ -1,0 +1,250 @@
+{
+  "id": "confirmation_14",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "The train arrives at eight fifty, so nine thirty gives you time to travel.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 1.85615180619061,
+  "chunks": [
+    {
+      "arrival_seconds": 0.13399116415530443,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.16431620437651873,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.19521252531558275,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.22615518607199192,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.25736831687390804,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.28826710768043995,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3190632136538625,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3500899001955986,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3810160169377923,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.421710173599422,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.46267888229340315,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.503664780408144,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.544680604711175,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5446854177862406,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.585665718652308,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5976728703826666,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6285535609349608,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6594201419502497,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6902267076075077,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7211391311138868,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7518627122044563,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7825092021375895,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8135579591616988,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8444998543709517,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8754075476899743,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9064582427963614,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9374194499105215,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.969429804943502,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0007699588313699,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0319013809785247,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.06311921402812,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0939551489427686,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1249420624226332,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1617853809148073,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.193388600833714,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2243048381060362,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.255120387300849,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.28593323007226,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3175643412396312,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3481555469334126,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3789821276441216,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4096667589619756,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.440813586115837,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4721260201185942,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.502973211929202,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5336143402382731,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5642090812325478,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.5948315970599651,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.6255215965211391,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.6562024811282754,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.6868164893239737,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7177075268700719,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7487084800377488,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.7798267742618918,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.8106151558458805,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.8412823900580406,
+      "samples": 1920
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.28,
+  "audible_db50_seconds": 0.41399116415530446,
+  "onset_db45_seconds": 0.28,
+  "audible_db45_seconds": 0.41399116415530446,
+  "onset_db40_seconds": 0.28,
+  "audible_db40_seconds": 0.41399116415530446,
+  "audio_seconds": 4.48,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.13399116415530443,
+  "first_packet_samples": 1920,
+  "max_packet_gap_seconds": 0.04101582430303097,
+  "rtf": 0.41431959959611825
+}

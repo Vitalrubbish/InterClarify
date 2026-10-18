@@ -1,0 +1,146 @@
+{
+  "id": "clarification_01",
+  "category": "clarification",
+  "listening": "yes",
+  "text": "Did you mean this Friday or next Friday?",
+  "phase": "cold",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 0.9980622623115778,
+  "chunks": [
+    {
+      "arrival_seconds": 0.18397983815521002,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.2001565909013152,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.22051829937845469,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.24913111981004477,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.276985757984221,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3054808368906379,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3338184021413326,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.36171773355454206,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3901425348594785,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.4310587616637349,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.47204291075468063,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.51304966583848,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5130539312958717,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5540601825341582,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.558012611232698,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5866330647841096,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6149757346138358,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.643803933635354,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6722049573436379,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7006131205707788,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7289199503138661,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7574890349060297,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7854373622685671,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8137219324707985,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8424926651641726,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.871099304407835,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.899521111510694,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9283167738467455,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9570511961355805,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9857549453154206,
+      "samples": 1920
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.17,
+  "audible_db50_seconds": 0.35397983815521006,
+  "onset_db45_seconds": 0.18,
+  "audible_db45_seconds": 0.36397983815521007,
+  "onset_db40_seconds": 0.18,
+  "audible_db40_seconds": 0.36397983815521007,
+  "audio_seconds": 2.4,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.18397983815521002,
+  "first_packet_samples": 1920,
+  "max_packet_gap_seconds": 0.04100675508379936,
+  "rtf": 0.4158592759631574
+}

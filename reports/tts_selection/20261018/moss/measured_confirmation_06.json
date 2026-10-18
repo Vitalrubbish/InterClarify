@@ -1,0 +1,86 @@
+{
+  "id": "confirmation_06",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "I found two events with that name. One is today, and the other is tomorrow.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 8.800118825398386,
+  "chunks": [
+    {
+      "arrival_seconds": 0.9711454836651683,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 1.0612606015056372,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 1.1544716032221913,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.6024674028158188,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.2900622468441725,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.096832139417529,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.9043981563299894,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.713955861516297,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.525589378550649,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.340749395079911,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.092309717088938,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.550990704447031,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.004608748480678,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.461930459365249,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.794884615577757,
+      "samples": 11520
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.29,
+  "audible_db50_seconds": 1.2712606015056371,
+  "onset_db45_seconds": 0.3,
+  "audible_db45_seconds": 1.2812606015056371,
+  "onset_db40_seconds": 0.31,
+  "audible_db40_seconds": 1.2912606015056372,
+  "audio_seconds": 5.76,
+  "stalls": 9,
+  "stall_seconds": 2.521164233423768,
+  "first_packet_seconds": 0.9711454836651683,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.8151600165292621,
+  "rtf": 1.5277984071872197
+}

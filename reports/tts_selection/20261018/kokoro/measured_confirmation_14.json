@@ -1,0 +1,30 @@
+{
+  "id": "confirmation_14",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "The train arrives at eight fifty, so nine thirty gives you time to travel.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 0.12401353567838669,
+  "chunks": [
+    {
+      "arrival_seconds": 0.12399074994027615,
+      "samples": 115200
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.3,
+  "audible_db50_seconds": 0.42399074994027613,
+  "onset_db45_seconds": 0.3,
+  "audible_db45_seconds": 0.42399074994027613,
+  "onset_db40_seconds": 0.31,
+  "audible_db40_seconds": 0.43399074994027614,
+  "audio_seconds": 4.8,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.12399074994027615,
+  "first_packet_samples": 115200,
+  "max_packet_gap_seconds": 0.0,
+  "rtf": 0.025836153266330562
+}

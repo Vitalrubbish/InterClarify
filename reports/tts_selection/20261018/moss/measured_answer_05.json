@@ -1,0 +1,118 @@
+{
+  "id": "answer_05",
+  "category": "answer",
+  "listening": "no",
+  "text": "I have prepared the recurring event for every other Thursday. The first occurrence would be next week, and the series would end in December. Would you like me to save it?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 11.786156219430268,
+  "chunks": [
+    {
+      "arrival_seconds": 2.847730476409197,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 2.935883767902851,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 3.0249564200639725,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 3.1149694519117475,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 3.203446675091982,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.2918426049873233,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.718902187421918,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.486646145582199,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.250461331568658,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.012541681528091,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.723303404636681,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.152768522500992,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.585179585963488,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.014539115130901,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.44391961954534,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.875210128724575,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.309048097580671,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.738567496649921,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.168328247964382,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.598036403767765,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.028661523014307,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.460245584137738,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.779580380767584,
+      "samples": 11520
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.27,
+  "audible_db50_seconds": 3.125883767902851,
+  "onset_db45_seconds": 0.32,
+  "audible_db45_seconds": 3.1758837679028513,
+  "onset_db40_seconds": 0.32,
+  "audible_db40_seconds": 3.1758837679028513,
+  "audio_seconds": 9.6,
+  "stalls": 3,
+  "stall_seconds": 0.2755729282274828,
+  "first_packet_seconds": 2.847730476409197,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.7677439581602812,
+  "rtf": 1.227724606190653
+}

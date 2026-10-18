@@ -1,0 +1,202 @@
+{
+  "id": "confirmation_16",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "The appointment is confirmed for December second, twenty twenty-six.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 1.5052654352039099,
+  "chunks": [
+    {
+      "arrival_seconds": 0.12787497602403164,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.15846304967999458,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.19004707410931587,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.22136268392205238,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.2527958666905761,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.28432747814804316,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.31525610107928514,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3468734445050359,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.3785093817859888,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.4193196687847376,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.4603495066985488,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5023108273744583,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5433073127642274,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5433109700679779,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.5843112803995609,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6006889352574944,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6325411144644022,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.66406518407166,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.6959239561110735,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7275802260264754,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7594461422413588,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.7912587672472,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8230345705524087,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8545090686529875,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.8857902698218822,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9171751663088799,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9490807205438614,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 0.9812394566833973,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0126341301947832,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0441640326753259,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.0762045960873365,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.107826890423894,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1393879996612668,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.1712915375828743,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2030555047094822,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.2349757915362716,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.266723900102079,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.298782855272293,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.3303391374647617,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.362303796224296,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.393712836317718,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4256642535328865,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.457367260940373,
+      "samples": 1920
+    },
+    {
+      "arrival_seconds": 1.4893376640975475,
+      "samples": 1920
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.24,
+  "audible_db50_seconds": 0.3678749760240317,
+  "onset_db45_seconds": 0.24,
+  "audible_db45_seconds": 0.3678749760240317,
+  "onset_db40_seconds": 0.25,
+  "audible_db40_seconds": 0.3778749760240317,
+  "audio_seconds": 3.52,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.12787497602403164,
+  "first_packet_samples": 1920,
+  "max_packet_gap_seconds": 0.04196132067590952,
+  "rtf": 0.42763222591020167
+}

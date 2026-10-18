@@ -1,0 +1,74 @@
+{
+  "id": "confirmation_04",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "I will invite Emma, James, and Olivia to the planning session.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 7.3376341592520475,
+  "chunks": [
+    {
+      "arrival_seconds": 0.5009085088968277,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.592784721404314,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 1.0396285010501742,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.6091436613351107,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.294408220797777,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.0998468939214945,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.8999732192605734,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.702110152691603,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.505992068909109,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.308726541697979,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.057986453175545,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.330448599532247,
+      "samples": 7680
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.18,
+  "audible_db50_seconds": 0.692784721404314,
+  "onset_db45_seconds": 0.68,
+  "audible_db45_seconds": 1.8091436613351106,
+  "onset_db40_seconds": 0.68,
+  "audible_db40_seconds": 1.8091436613351106,
+  "audio_seconds": 4.24,
+  "stalls": 10,
+  "stall_seconds": 2.9570779442787156,
+  "first_packet_seconds": 0.5009085088968277,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.8054386731237173,
+  "rtf": 1.7305740941632186
+}

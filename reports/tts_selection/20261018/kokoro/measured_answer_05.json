@@ -1,0 +1,30 @@
+{
+  "id": "answer_05",
+  "category": "answer",
+  "listening": "no",
+  "text": "I have prepared the recurring event for every other Thursday. The first occurrence would be next week, and the series would end in December. Would you like me to save it?",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 0.13664894644171,
+  "chunks": [
+    {
+      "arrival_seconds": 0.1365993767976761,
+      "samples": 243000
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.32,
+  "audible_db50_seconds": 0.4565993767976761,
+  "onset_db45_seconds": 0.32,
+  "audible_db45_seconds": 0.4565993767976761,
+  "onset_db40_seconds": 0.32,
+  "audible_db40_seconds": 0.4565993767976761,
+  "audio_seconds": 10.125,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.1365993767976761,
+  "first_packet_samples": 243000,
+  "max_packet_gap_seconds": 0.0,
+  "rtf": 0.013496192241156543
+}

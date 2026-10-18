@@ -1,0 +1,30 @@
+{
+  "id": "answer_13",
+  "category": "answer",
+  "listening": "no",
+  "text": "I can add a reminder for the evening before and another for ten minutes before the appointment. Neither reminder will change the event itself or notify the other attendees.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 0.13354683853685856,
+  "chunks": [
+    {
+      "arrival_seconds": 0.13350315857678652,
+      "samples": 262200
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.31,
+  "audible_db50_seconds": 0.4435031585767865,
+  "onset_db45_seconds": 0.31,
+  "audible_db45_seconds": 0.4435031585767865,
+  "onset_db40_seconds": 0.31,
+  "audible_db40_seconds": 0.4435031585767865,
+  "audio_seconds": 10.925,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.13350315857678652,
+  "first_packet_samples": 262200,
+  "max_packet_gap_seconds": 0.0,
+  "rtf": 0.01222396691412893
+}

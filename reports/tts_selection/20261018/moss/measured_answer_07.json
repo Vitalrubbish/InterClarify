@@ -1,0 +1,110 @@
+{
+  "id": "answer_07",
+  "category": "answer",
+  "listening": "no",
+  "text": "There is a scheduling conflict with your team meeting. Moving the appointment forward by thirty minutes would resolve it, but it would leave no travel time between the two locations.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 11.252808257937431,
+  "chunks": [
+    {
+      "arrival_seconds": 2.6855456130579114,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 2.776721980422735,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 2.867929366417229,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 2.9600214194506407,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 3.051875618286431,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.144083264283836,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.847349841147661,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.671752357855439,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.466608891263604,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.267850720323622,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.0088464030995965,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.4637509463354945,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.913270031102002,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.359786605462432,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.80167849548161,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.25093996990472,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.700984781607985,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.147050278261304,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.589302505366504,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.036118252202868,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.24328526481986,
+      "samples": 3840
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.32,
+  "audible_db50_seconds": 3.0167219804227354,
+  "onset_db45_seconds": 0.4,
+  "audible_db45_seconds": 3.0967219804227355,
+  "onset_db40_seconds": 0.41,
+  "audible_db40_seconds": 3.1067219804227353,
+  "audio_seconds": 8.48,
+  "stalls": 4,
+  "stall_seconds": 0.7233007900416837,
+  "first_packet_seconds": 2.6855456130579114,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.824402516707778,
+  "rtf": 1.326982105888848
+}

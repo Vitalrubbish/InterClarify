@@ -1,0 +1,78 @@
+{
+  "id": "confirmation_08",
+  "category": "confirmation",
+  "listening": "no",
+  "text": "I have moved the weekly review to Friday, keeping the same start time.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 7.9154256312176585,
+  "chunks": [
+    {
+      "arrival_seconds": 0.620682381093502,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 0.7124783080071211,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 1.044558367691934,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 1.6118077142164111,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 2.30606805998832,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.116226291283965,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.9233299819752574,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.736686499789357,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.53643889259547,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.327054401859641,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.069321755319834,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.5204893965274096,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.909492609091103,
+      "samples": 15360
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 1.28,
+  "audible_db50_seconds": 3.196226291283965,
+  "onset_db45_seconds": 1.3,
+  "audible_db45_seconds": 3.216226291283965,
+  "onset_db40_seconds": 1.31,
+  "audible_db40_seconds": 3.226226291283965,
+  "audio_seconds": 4.88,
+  "stalls": 10,
+  "stall_seconds": 2.8486393742263303,
+  "first_packet_seconds": 0.620682381093502,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.8133565178140998,
+  "rtf": 1.622013449020012
+}

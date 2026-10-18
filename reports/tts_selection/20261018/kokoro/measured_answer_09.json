@@ -1,0 +1,30 @@
+{
+  "id": "answer_09",
+  "category": "answer",
+  "listening": "no",
+  "text": "The workshop runs from nine until noon, followed by lunch. If you only need to attend the final discussion, I can block the last forty-five minutes instead of the entire morning.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 24000,
+  "wall_seconds": 0.13778650108724833,
+  "chunks": [
+    {
+      "arrival_seconds": 0.1377405133098364,
+      "samples": 270000
+    }
+  ],
+  "transport": "loopback HTTP framed PCM16",
+  "onset_db50_seconds": 0.3,
+  "audible_db50_seconds": 0.4377405133098364,
+  "onset_db45_seconds": 0.3,
+  "audible_db45_seconds": 0.4377405133098364,
+  "onset_db40_seconds": 0.3,
+  "audible_db40_seconds": 0.4377405133098364,
+  "audio_seconds": 11.25,
+  "stalls": 0,
+  "stall_seconds": 0.0,
+  "first_packet_seconds": 0.1377405133098364,
+  "first_packet_samples": 270000,
+  "max_packet_gap_seconds": 0.0,
+  "rtf": 0.012247688985533184
+}

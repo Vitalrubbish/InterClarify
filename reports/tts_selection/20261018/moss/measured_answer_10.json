@@ -1,0 +1,118 @@
+{
+  "id": "answer_10",
+  "category": "answer",
+  "listening": "no",
+  "text": "I heard you change the date from the fourteenth to the fifteenth. I will use the fifteenth, but please confirm whether the original start time of two thirty should stay the same.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 11.991154735907912,
+  "chunks": [
+    {
+      "arrival_seconds": 3.254022378474474,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 3.344277346506715,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 3.4350624829530716,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 3.525593183003366,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 3.6165935760363936,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.707300089299679,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.7951415088027716,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.578236140310764,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.355480168946087,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.136914938688278,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.862907589413226,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.302139746956527,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.737570310942829,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.17376328073442,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.613597467541695,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.046911268495023,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.481532268226147,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.91611275728792,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.355490417219698,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.790498037822545,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.227008640766144,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.664645968936384,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.984227505512536,
+      "samples": 11520
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.3,
+  "audible_db50_seconds": 3.564277346506715,
+  "onset_db45_seconds": 0.3,
+  "audible_db45_seconds": 3.564277346506715,
+  "onset_db40_seconds": 0.31,
+  "audible_db40_seconds": 3.574277346506715,
+  "audio_seconds": 9.6,
+  "stalls": 1,
+  "stall_seconds": 0.010254968032240797,
+  "first_packet_seconds": 3.254022378474474,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.7830946315079927,
+  "rtf": 1.249078618323741
+}

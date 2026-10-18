@@ -1,0 +1,122 @@
+{
+  "id": "answer_17",
+  "category": "answer",
+  "listening": "no",
+  "text": "Everyone is available on Thursday except Daniel, who can join after three. We can start at three fifteen, or keep the earlier time and send him a recording of the first section.",
+  "phase": "measured",
+  "error": null,
+  "sample_rate": 48000,
+  "wall_seconds": 12.475286061875522,
+  "chunks": [
+    {
+      "arrival_seconds": 3.01575549505651,
+      "samples": 3840
+    },
+    {
+      "arrival_seconds": 3.1075691552832723,
+      "samples": 7680
+    },
+    {
+      "arrival_seconds": 3.1989942202344537,
+      "samples": 11520
+    },
+    {
+      "arrival_seconds": 3.290181224234402,
+      "samples": 15360
+    },
+    {
+      "arrival_seconds": 3.3807246265932918,
+      "samples": 19200
+    },
+    {
+      "arrival_seconds": 3.4708988135680556,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 3.7911864276975393,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 4.5719096744433045,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 5.350186103023589,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.1293224431574345,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 6.856029606424272,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.292634665034711,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 7.7281459821388125,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.163873095996678,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 8.598321640864015,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.033118013292551,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.46938162483275,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 9.905541119165719,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.342291633598506,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 10.777582756243646,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.216828448697925,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 11.65319828223437,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 12.090159682556987,
+      "samples": 23040
+    },
+    {
+      "arrival_seconds": 12.469058280810714,
+      "samples": 15360
+    }
+  ],
+  "transport": "native MOSS WebSocket PCM16",
+  "onset_db50_seconds": 0.19,
+  "audible_db50_seconds": 3.217569155283272,
+  "onset_db45_seconds": 0.28,
+  "audible_db45_seconds": 3.3075691552832724,
+  "onset_db40_seconds": 0.29,
+  "audible_db40_seconds": 3.3175691552832722,
+  "audio_seconds": 10.16,
+  "stalls": 2,
+  "stall_seconds": 0.24027411136776067,
+  "first_packet_seconds": 3.01575549505651,
+  "first_packet_samples": 3840,
+  "max_packet_gap_seconds": 0.7807232467457652,
+  "rtf": 1.227882486405071
+}
