@@ -33,3 +33,5 @@ conda run --no-capture-output -n interclarify-dev python scripts/remote/duplex_m
 Issue001独立参考对照增加generate_ids诊断端点，使用同一权重、锁、精度及生成预算，仅绕过集成history renderer；逐token附带generated_token_id供原版参考解码器消费。产品generate保持原契约，原始IDs越界拒绝；本端点不证明独立checkpoint恢复。
 
 Issue001d：结构构建后先移到实际设备，再strict恢复发布state，避免CPU同时驻留两套完整模型；记录base加载、GPU结构、state打开和strict恢复四个阶段的耗时与峰值RSS。无完整恢复则不开HTTP服务，参数映射和实际精度不变。
+
+Issue001e：validate_prompt_ids每个请求只取一次词表大小，之后仍逐ID严格检查上下界。旧tokenizers0.20.3的len可能较慢，禁止在逐token表达式中反复调用。duplex_request日志新增validation_seconds，与原有生成seconds分开，完整请求耗时仍由客户端时间线衡量。

@@ -22,6 +22,21 @@ WIRE_TOKENS = (
 )
 
 
+def validate_prompt_ids(ids: list[int], tokenizer: Any) -> None:
+    """Check prompt bounds with one vocabulary-size lookup per request.
+
+    Parameters
+    ----------
+    ids : list[int]
+        The raw input IDs that will be consumed by the model.
+    tokenizer : Any
+        Released tokenizer; older backends may reconstruct vocabulary on len.
+    """
+    vocab_size = len(tokenizer)
+    if any(token < 0 or token >= vocab_size for token in ids):
+        raise ValueError('Prompt token ID outside the released vocabulary')
+
+
 def validate_state_keys(expected: set[str], supplied: set[str]) -> None:
     """Reject incomplete checkpoints instead of serving partially initialized weights.
 
@@ -230,8 +245,9 @@ class OfficialDuplexModel:
         from transformers import StoppingCriteria, StoppingCriteriaList
         from transformers.generation.streamers import BaseStreamer
 
-        if any(token < 0 or token >= len(self.tokenizer) for token in ids):
-            raise ValueError('Prompt token ID outside the released vocabulary')
+        validation_started = time.monotonic()
+        validate_prompt_ids(ids, self.tokenizer)
+        validation_seconds = time.monotonic() - validation_started
         if len(ids) + max_new_tokens > self.context_length:
             raise ValueError(f'Raw micro-turn history exceeds model context length: '
                              f'{len(ids)} prompt tokens + {max_new_tokens} new tokens '
@@ -306,6 +322,7 @@ class OfficialDuplexModel:
                 peak = torch.cuda.max_memory_allocated() / 2 ** 30 if self.device.startswith('cuda') else 0.0
                 print(json.dumps({'duplex_request': {
                     'prompt_tokens': len(ids), 'generated_tokens': len(streamer.ids),
+                    'validation_seconds': round(validation_seconds, 6),
                     'finish_reason': reason, 'seconds': round(time.monotonic() - started, 3),
                     'peak_gpu_gib': round(peak, 3)}}), flush=True)
                 completion = {'finish_reason': reason, 'token_ids': list(streamer.ids),

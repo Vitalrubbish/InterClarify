@@ -35,6 +35,24 @@ class FakeModel:
 class DuplexModelServiceTests(unittest.TestCase):
     """Test the service boundary without GPU or checkpoint downloads."""
 
+    def test_prompt_bounds_use_one_vocabulary_lookup(self):
+        """Long prompts must retain strict bounds without repeated vocabulary scans."""
+        class Tokenizer:
+            def __init__(self):
+                self.lookups = 0
+
+            def __len__(self):
+                self.lookups += 1
+                return 151652
+
+        tokenizer = Tokenizer()
+        service.validate_prompt_ids([0, 151651] * 500, tokenizer)
+        self.assertEqual(tokenizer.lookups, 1)
+        for ids in ([-1], [151652]):
+            with self.assertRaises(ValueError):
+                service.validate_prompt_ids(ids, tokenizer)
+        self.assertEqual(tokenizer.lookups, 3)
+
     def test_independent_raw_ids_endpoint(self):
         """Reference IDs bypass history rendering and preserve token identity."""
         with TestClient(service.create_app(FakeModel())) as client:

@@ -4,6 +4,8 @@
 
 001 拆分为已完成的 [资产只读扫描](archive/001a_asset_inventory.md) 和进行中的 [运行时对照](001b_runtime_comparison.md)。资产扫描不是权重恢复或许可审核通过证据。
 
+用户追问节拍数量后，新增 [001e输入校验耗时修复](001e_prompt_validation_overhead.md)：旧tokenizer词表大小被逐token重复计算，已定位为两路掉拍的主要额外开销，待修复后远端复测。
+
 | 编号 | 任务 | 优先级 | 依赖 |
 | --- | --- | --- | --- |
 | [001](001_input_contract_and_baseline.md) | 冻结输入契约、运行时逐拍对照、基线和验收口径 | P0 | 无 |
