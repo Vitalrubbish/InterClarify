@@ -4,7 +4,7 @@
 
 本轮由用户授权：在 `feature/tts-selection` 分支调研英文、低延迟、流式 TTS，在远端测试每个入选系统 50–100 条，返回首音频包、首可听内容延迟与同文本试听音频。这里只增加独立评测工具，不替换 X-Talk 运行底座，不增加仲裁器或播放所有者，不改变 Layer 边界。
 
-已按用户指示通过 Windows 用户目录的 RSA 密钥认证 JumpServer，并经 `guizhou` 资产进入 `d6-hpc-debuggpu-001`。使用 `vc submit` 提交计算作业；GPU 模型在 `pdgpu-4090`、CPU 模型优先在 `pdcpu` 测试。共享实验目录为 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018`。官方来源比较见 [调研](tts_selection_research.md)。历史 MOSS 数字不填入本轮结果。最终结果、执行异常和试听入口见 [实测结论](tts_selection_results.md)。
+已按用户指示通过 Windows 用户目录的 RSA 密钥认证 JumpServer，并经 `guizhou` 资产进入 `d6-hpc-debuggpu-001`。使用 `vc submit` 提交计算作业；GPU 模型在 `pdgpu-4090`、CPU 模型优先在 `pdcpu` 测试。共享实验目录为 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018`。官方来源比较见 [调研](tts_selection_research.md)。历史 MOSS 数字不填入本轮结果。最终结果、执行异常和试听入口见 [实测结论](tts_selection_results.md)；人工评分已完成，推荐与原始评分归档见 [最终选型报告](tts_selection_decision.md)。
 
 ## 固定协议
 

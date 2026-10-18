@@ -1,0 +1,70 @@
+{
+  "instructions": "按整体听感，为每段音频填写一个 1–5 的综合分数，可填小数，越高越好。将 scores 中 A/B/C/D 对应的 null 替换为分数；null 表示尚未评分。",
+  "score_scale": {
+    "min": 1,
+    "max": 5,
+    "higher_is_better": true
+  },
+  "samples": [
+    {
+      "text_id": "answer_01",
+      "text": "You have two appointments on Friday morning. The first is a checkup at nine, and the second is a project review at eleven. Which one would you like me to move?",
+      "scores": {
+        "A": 4.5,
+        "B": 4.5,
+        "C": 4,
+        "D": 4
+      }
+    },
+    {
+      "text_id": "answer_03",
+      "text": "Before I send the invitation, I need to check the time zone. You mentioned eight in the morning, but your colleague is in London. Should I interpret that as your time or theirs?",
+      "scores": {
+        "A": 3.8,
+        "B": 4.5,
+        "C": 4.6,
+        "D": 3.6
+      }
+    },
+    {
+      "text_id": "clarification_01",
+      "text": "Did you mean this Friday or next Friday?",
+      "scores": {
+        "A": 3.3,
+        "B": 4.3,
+        "C": 4.3,
+        "D": 3.6
+      }
+    },
+    {
+      "text_id": "clarification_03",
+      "text": "Is that nine in the morning or nine at night?",
+      "scores": {
+        "A": 4.1,
+        "B": 4.5,
+        "C": 4.3,
+        "D": 4.2
+      }
+    },
+    {
+      "text_id": "confirmation_01",
+      "text": "I have scheduled your appointment for Tuesday at ten in the morning.",
+      "scores": {
+        "A": 4.2,
+        "B": 4.6,
+        "C": 4.5,
+        "D": 3.8
+      }
+    },
+    {
+      "text_id": "confirmation_03",
+      "text": "Your dentist appointment is on October twenty-third at two thirty.",
+      "scores": {
+        "A": 4.5,
+        "B": 4.5,
+        "C": 4.5,
+        "D": 4.2
+      }
+    }
+  ]
+}

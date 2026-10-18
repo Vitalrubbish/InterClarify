@@ -6,7 +6,7 @@ InterClarify 研究全双工语音代理在用户话轮内主动澄清的时机�
 
 | 内容 | 位置 |
 | --- | --- |
-| 英文 TTS 调研与测试协议 | [实测结论与试听](docs/tts_selection_results.md)、[调研](docs/tts_selection_research.md)、[任务单](docs/tts_selection_benchmark.md) |
+| 英文 TTS 最终选型与测试 | [最终选型](docs/tts_selection_decision.md)、[实测结论与试听](docs/tts_selection_results.md)、[调研](docs/tts_selection_research.md)、[任务单](docs/tts_selection_benchmark.md) |
 | ASR 最终测试报告与原始结果 | [报告](reports/asr_selection/20261016-results/summary.md) |
 | ASR 选择与后续适配 | [选型决定](docs/asr_selection_decision.md) |
 | 清理范围与历史源码恢复 | [清理记录](docs/asr_cleanup.md) |
