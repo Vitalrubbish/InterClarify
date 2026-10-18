@@ -99,16 +99,64 @@ async def verify_asr(args):
     return rows
 
 
+def tts_timing_metrics(chunks, packets, timeline):
+    """Separate queue starvation, PCM edge silence and compute/audio durations."""
+    playback_end, gaps, audible, run = 0., 0., None, 0
+    played=[]
+    for data,event in zip(chunks,packets):
+        start=max(playback_end,event['arrival_seconds'])
+        gap=max(0,start-playback_end) if playback_end else 0.
+        if gap:
+            gaps+=gap
+            played.append(bytes(round(gap*48000)*2))
+        played.append(data)
+        samples=np.frombuffer(data,dtype='<i2').astype(np.float64)/32768
+        if gap:run=0
+        for index in range(0,len(samples)-479,480):
+            loud=np.sqrt(np.mean(samples[index:index+480]**2)) > 10**(-45/20)
+            run=run+1 if loud else 0
+            if run>=3 and audible is None:audible=start+(index-960)/48000
+        playback_end=start+len(samples)/48000
+    pcm=b''.join(chunks)
+    segments=[]
+    cursor=0
+    for event in [row for row in timeline if row['kind']=='pcm']:
+        size=event['bytes']
+        values=np.frombuffer(pcm[cursor:cursor+size],dtype='<i2').astype(np.float64)/32768
+        cursor+=size
+        frames=values[:len(values)//480*480].reshape(-1,480)
+        active=np.flatnonzero(np.sqrt(np.mean(frames**2,axis=1))>10**(-45/20))
+        duration=len(values)/48000
+        leading=active[0]*.01 if len(active) else duration
+        trailing=(len(frames)-active[-1]-1)*.01 if len(active) else duration
+        compute=event.get('compute_seconds')
+        segments.append({'audio_seconds':duration,'raw_audio_seconds':event.get('raw_audio_seconds',duration),
+                         'compute_seconds':compute,'request_seconds':event.get('request_seconds'),
+                         'compute_realtime_factor':compute/duration if compute is not None and duration else None,
+                         'leading_silence_seconds':float(leading),'trailing_silence_seconds':float(trailing),
+                         'leading_trim_seconds':event.get('leading_trim_seconds',0),
+                         'trailing_trim_seconds':event.get('trailing_trim_seconds',0)})
+    boundaries=[left['trailing_silence_seconds']+right['leading_silence_seconds']
+                for left,right in zip(segments,segments[1:])]
+    return {'first_audible_proxy_seconds':audible,'simulated_underflow_seconds':gaps,
+            'audio_seconds':len(pcm)/96000,'played_audio_seconds':sum(map(len,played))/96000,
+            'segment_timing':segments,'boundary_silence_seconds':boundaries,
+            'max_boundary_silence_seconds':max(boundaries,default=0),
+            'segments_shorter_than_600ms':sum(row['audio_seconds']<.6 for row in segments)},b''.join(played)
+
+
 async def verify_tts(args):
     """Supply actual timed fragments, retain playable WAV and audible proxies."""
     from xtalk.models.tts.kokoro_segmented import KokoroSegmented
-    texts = [('confirmation','Yes, Tuesday at nine thirty works.'),
-             ('clarification','Did you mean Tuesday at 9:30, or Thursday at 3:15?'),
+    texts = [('confirmation','Yes, Tuesday at nine thirty works.',5,.05),
+             ('clarification','Did you mean Tuesday at 9:30, or Thursday at 3:15?',5,.05),
              ('long_answer','I can help with that appointment. First, please confirm the date and time. '
               'Then I will check the calendar and summarize the arrangement before proceeding. '
-              'If you need to change the date, tell me and we can update the same appointment.')]
+              'If you need to change the date, tell me and we can update the same appointment.',5,.05),
+             ('micro_turn_supply','Yes, Tuesday at nine thirty works.',12,.6),
+             ('slow_text_supply','Yes, Tuesday at nine thirty works.',3,.6)]
     rows = []
-    for name,text in texts:
+    for name,text,chars,interval in texts:
         client = KokoroSegmented(args.url)
         started = time.monotonic()
         chunks, audio_events = [], []
@@ -120,9 +168,9 @@ async def verify_tts(args):
         receiver = asyncio.create_task(receive())
         error = None
         try:
-            for offset in range(0,len(text),5):
-                await client.append_text(text[offset:offset+5])
-                await asyncio.sleep(.05)
+            for offset in range(0,len(text),chars):
+                await client.append_text(text[offset:offset+chars])
+                await asyncio.sleep(interval)
             await client.flush()
             await asyncio.wait_for(receiver,60)
             await client.stop()
@@ -135,26 +183,15 @@ async def verify_tts(args):
             await client.cancel()
             receiver.cancel()
             await asyncio.gather(receiver,return_exceptions=True)
-        pcm = b''.join(chunks)
+        metrics,played=tts_timing_metrics(chunks,audio_events,timeline)
         with wave.open(str(args.output/f'{name}.wav'),'wb') as output:
             output.setnchannels(1); output.setsampwidth(2); output.setframerate(48000)
-            output.writeframes(pcm)
-        playback_end, gaps, audible, run = 0., 0., None, 0
-        for data,event in zip(chunks,audio_events):
-            start = max(playback_end,event['arrival_seconds'])
-            if playback_end:
-                gaps += max(0,start-playback_end)
-            samples = np.frombuffer(data,dtype='<i2').astype(np.float64)/32768
-            for index in range(0,len(samples)-479,480):
-                loud = np.sqrt(np.mean(samples[index:index+480]**2)) > 10**(-45/20)
-                run = run+1 if loud else 0
-                if run >= 3 and audible is None:
-                    audible = start + (index-960)/48000
-            playback_end = start + len(samples)/48000
+            output.writeframes(played)
         row = {'scenario':name,'text':text,'source_type':'fixed_script_incremental_text',
+               'scope':'primary' if interval==.05 else 'supply_diagnostic',
+               'input_chars_per_fragment':chars,'input_interval_seconds':interval,
                'first_pcm_seconds': audio_events[0]['arrival_seconds'] if audio_events else None,
-               'first_audible_proxy_seconds':audible,'simulated_underflow_seconds':gaps,
-               'audio_seconds':len(pcm)/96000,'error':error,'timeline':timeline,'packets':audio_events}
+               **metrics,'error':error,'timeline':timeline,'packets':audio_events}
         rows.append(row)
         write_json(args.output/f'{name}.json',row)
     client = KokoroSegmented(args.url,max_wait_ms=20)

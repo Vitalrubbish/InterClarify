@@ -1,0 +1,18 @@
+{
+  "remote_client_unit_tests": {
+    "run": 9,
+    "passed": 9
+  },
+  "local_timing_metric_tests": {
+    "run": 2,
+    "passed": 2
+  },
+  "gpu_job_exit_code": 0,
+  "human_review_status": "pending_issue003c",
+  "primary_underflow_seconds": [
+    0,
+    0,
+    0
+  ],
+  "slow_text_supply_underflow_seconds": 3.885499389171598
+}

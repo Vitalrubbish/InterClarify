@@ -5,7 +5,7 @@
   },
   "tts": {
     "type": "KokoroSegmented",
-    "params": {"base_url": "http://127.0.0.1:8004", "min_chars": 12, "max_chars": 160, "max_wait_ms": 250}
+    "params": {"base_url": "http://127.0.0.1:8004", "min_chars": 12, "max_chars": 160, "max_wait_ms": 600}
   },
   "service_config": {
     "duplex_enabled": true,

@@ -1,6 +1,9 @@
 # 英文组件真实接口核验
 
-verify_asr 用真实PCM按80ms时钟投送，并独立轮询输出；正常、停顿恢复、连续两轮、串行会话、短尾EOF和取消重连分别保存时间线、摘要、代际与错误。soundfile接受PCM或IEEE float WAV，统一转为16kHz mono PCM16，拒绝采样率或声道不符；不修改原文件。暂停插入的三秒静音与重复音频明确属于构造接入测试，不宣称自然语料。verify_tts 用固定脚本文本每50ms投送5字符，保存分段、首PCM、-45dBFS连续30ms首非静音代理、模拟供音断流与WAV；另测取消后的新代际。底层GPU取消释放与人耳听感不由此证明。run 保存失败与缺测并非零退出；write_json 只写本次独立目录。无类。
+`verify_asr` 在真实80ms音频时钟下回放，独立轮询正常、停顿恢复、连续两轮、串行会话、短尾EOF和取消重连，保存raw/visible前缀、到达、代际、源音频摘要、错误与末词交付。构造音频明确标记为接入诊断，禁止进入训练。
 
+`verify_tts` 按5字符/50ms实际投送原三例文本，增加12字符/600ms和3字符/600ms两种供给诊断，分别报告，不预先提供完整回答。`tts_timing_metrics` 分开统计队列断流、PCM边界静音、服务计算耗时与原始/交付音频长度，给出实时因子、短于600ms的段数及首可听代理。首可听按-45dBFS/连续30ms计；模拟供音不足的静音缺口保留在WAV，不能用无缝拼接文件掩盖断流。
 
-资源与来源补充：health记录加载耗时和进程峰值RSS，作业收尾保留service /proc状态，GPU逐秒采样；ASR关闭记录等待worker释放耗时。采集manifest标为integration_diagnostic_only且禁止训练，保留源音频摘要与失败。TTS核验增加真实Kokoro经RuntimeAdapter、TTSManager、协调器和播放管理器执行短附和、有效插话停旧音频及新响应，headless确认不等同扬声器实播。
+`verify_native_playback` 使用真实Kokoro和脚本控制，经原有RuntimeAdapter、TTSManager、协调器和播放管理器核验附和、插话及新响应代际；headless确认不等同扬声器实播。`run` 保留独立输出、manifest、失败和非零退出，传输自动通过不等于听感或全链路通过；`write_json` 保存本次产物。无类。
+
+资源记录沿用health、进程RSS和GPU采样。底层GPU取消释放不由网络取消耗时证明，人工读法和韵律仍须试听。真实模型和集群测试使用远端独立conda环境与单卡调度作业。

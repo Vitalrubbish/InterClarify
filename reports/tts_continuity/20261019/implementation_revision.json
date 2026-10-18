@@ -1,0 +1,10 @@
+{
+  "interclarify_base_commit": "ffd17fe19d26efa92ac8a62fc11bdc2230111b4a",
+  "xtalk_base_commit": "f1531f338544e926a55902bd74fc1555446791fb",
+  "xtalk_implementation_commit": "def5c295da999cbe8f048f3e3a1a9c95c6d9feed",
+  "run_snapshot_note": "Actual run bytes are preserved by r2/source.sha256; commits do not rewrite run provenance.",
+  "model_revision": "f3ff3571791e39611d31c381e3a41a3af07b4987",
+  "voice": "af_heart",
+  "runtime_generation_changed": false,
+  "single_playback_owner_preserved": true
+}

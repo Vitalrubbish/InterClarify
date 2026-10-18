@@ -7,7 +7,7 @@
 | [001](archive/001_input_contract_and_baseline.md) | 官方输入契约与基线 | 完成，已归档；五例共 136 拍一致，资产及生命周期证据齐全 |
 | [001b](archive/001b_runtime_comparison.md) | 官方控制路径对照 | 完成，已归档；原生 Word 输入、五例真权重和远端 7 项测试通过 |
 | [002](archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入 | 完成，已归档；r4-asr 退出 0 |
-| [003](003_kokoro_playback_integration.md) | Kokoro 分段播放 | 进行中；读法通过，分段连贯性未通过；待 [003d 修复](003d_segment_continuity.md)与 [003c 复听](003c_audio_listening_review.md) |
+| [003](003_kokoro_playback_integration.md) | Kokoro 分段播放 | 进行中；[003d 修复](003d_segment_continuity.md)及远端自动验证完成，新试听包待 [003c 复听](003c_audio_listening_review.md) |
 | [004](004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 进行中；来源清单完成，下载验真、生成和审计待做 |
 | [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 待办；推理 strict 加载不替代训练恢复与零更新对齐 |
 | [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；004、005 及 007 开训前准备未完成 |
