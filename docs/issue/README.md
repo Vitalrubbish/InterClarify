@@ -7,13 +7,23 @@
 | [001](001_input_contract_and_baseline.md) | 冻结输入契约、基线和验收口径 | P0 | 无 |
 | [002](002_nemotron_streaming_integration.md) | Nemotron 在线接入与轨迹采集 | P0 | 001 |
 | [003](003_kokoro_playback_integration.md) | Kokoro 分段合成与播放接入 | P0 | 001 |
-| [004](004_training_data_and_annotation.md) | 训练数据、前缀标注与切分 | P0 | 001；文本训练集不依赖 002 |
+| [004](004_training_data_and_annotation.md) | UltraChat 与自产 micro-turn 生成管线 | P0 | 001；文本训练集不依赖 002 |
 | [005](005_training_runtime_and_resource_probe.md) | 训练恢复与远端资源短跑 | P0 | 001；最终短跑依赖 004 最小集 |
 | [006](006_punctuation_robust_adaptation.md) | 三组有限适配训练 | P0 | 001、004、005 |
 | [007](007_turn_control_evaluation.md) | 独立话轮评测与权重选择 | P0 | 002、006；评测器可提前开发 |
 | [008](008_full_chain_fdb_acceptance.md) | 新组合真实音频与 FDB 验收 | P1 | 002、003、007 |
 
 文本训练路径为 001 → 004/005 → 006；002 的真实 ASR 轨迹与 006 的候选共同进入 007，再执行 008。003 可与训练准备并行安排。首轮优先复用 UltraChat 与论文生成方法，50/50 用户句读混合为主候选；开训不依赖先采集固定数量真实音频。这里的并行仅描述任务依赖，不要求启用多个代理。当前不重开 ASR/TTS 选型，不启动 Layer 2/3 实现或大规模训练。
+
+## 固定的三项决策与完成证据
+
+| 决策 | 必须交付的完成证据 | 主责 issue |
+| --- | --- | --- |
+| 使用官方论文采用的 UltraChat dataset | 实际数据来源/revision/split/许可、原始 ID 与摘要、1,000/200/300 对话切分；作者精确 50k 清单未知时明确记录 | 001、004 |
+| 自行实现数据生成管线 | 论文参数到配置的映射、micro-turn/交互事件/监督/句读混合实现、固定种子可复现审计与测试报告 | 004 |
+| 在官方 checkpoint 上继续训练 | 完整权重恢复审计、零更新对齐、仅既有 q/v LoRA 更新、训练状态恢复与可重载候选资产 | 005、006 |
+
+数据与模型证据必须贯穿 run manifest 和 007 评测；不能用原始 Qwen2 模型随机初始化双工参数替代官方 checkpoint，不把合成文本改善直接判作真实 ASR 验收通过。
 
 ## 共用约束
 

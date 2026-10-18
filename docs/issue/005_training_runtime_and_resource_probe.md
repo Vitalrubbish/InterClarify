@@ -6,6 +6,12 @@
 
 发布模型包含基础权重之外的控制 embedding/head 和 q/v LoRA。目标是先证明恢复正确、梯度范围正确、训练可运行，再承诺训练规模或工期。不能把“加载成功”视为恢复了完整官方 checkpoint。
 
+## 继续训练的恢复契约
+
+所有训练臂必须从发布的官方 DuplexCascade checkpoint 完整恢复，再开始本次继续训练；不能仅加载 Qwen2-7B-Instruct 后随机初始化双工参数。基础模型只是恢复依赖，tokenizer/新增 token、官方训练后的 embedding/lm_head、现有 q/v LoRA 及模型配置均须恢复。
+
+继续更新已有 q/v LoRA，不额外叠加一个随机初始化 adapter 替代官方 adapter。首轮冻结基础模型及已恢复 embedding/head。发布资产若没有 optimizer/scheduler/RNG 状态，则本次新建并记录它们；这属于从官方模型权重继续训练，不能宣称逐步续接作者原训练。中断本次作业后的恢复则必须包含本次训练状态和数据生成/采样位置。
+
 ## 工作项
 
 - [ ] 盘点发布资产布局与 token 映射，完整恢复基础模型、embedding/head、LoRA 和推理配置；保持无 System Backchannel 的五类 token。
@@ -21,8 +27,10 @@
 
 ## 测试与完成条件
 
-- [ ] 固定样本未更新推理与官方路径一致或差异有可接受解释；实际 prompt IDs 与生成历史不变形。
+- [ ] 输出完整权重加载审计：每类发布参数与目标参数对应，缺失、意外 key 和 shape 不一致均为零，或仅有预先登记且验证等价的映射；不允许静默跳过、随机填补或未说明的 strict=False。
+- [ ] 零更新推理使用相同 prompt IDs、精度、生成设置对照官方路径，验证 logits/贪心输出及控制行为；数值容忍在比较前冻结，差异越界阻断开训。
+- [ ] checkpoint、base、tokenizer、embedding/head 和 LoRA 的来源摘要及恢复后摘要有记录；三训练臂起始可训练权重完全相同，只有原定 LoRA 参数参与更新。
 - [ ] 有限步训练 loss/gradient 为有限值，仅允许参数改变，目标 mask 不含 user/padding，输出没有损坏协议。
-- [ ] 保存/恢复可继续训练，并在相同设置下与未中断短跑核对，明确非确定性来源。
+- [ ] 使用 004 生成的合法 micro-turn 样本完成一次真实参数更新；保存/恢复覆盖权重、optimizer、scheduler、RNG 和数据生成/采样状态，与未中断短跑核对，明确非确定性来源。
 - [ ] 回填 GPU/CPU/内存、最大序列长度、batch/累积、峰值显存、步耗时、预计总预算和退出码。
 - [ ] 006 的两轮预算由短跑确定后冻结；本 issue 不运行完整三组训练。
