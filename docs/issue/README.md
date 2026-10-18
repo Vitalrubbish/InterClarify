@@ -7,13 +7,13 @@
 | [001](001_input_contract_and_baseline.md) | 冻结输入契约、基线和验收口径 | P0 | 无 |
 | [002](002_nemotron_streaming_integration.md) | Nemotron 在线接入与轨迹采集 | P0 | 001 |
 | [003](003_kokoro_playback_integration.md) | Kokoro 分段合成与播放接入 | P0 | 001 |
-| [004](004_training_data_and_annotation.md) | 训练数据、前缀标注与切分 | P0 | 001；真实轨迹交付依赖 002 |
+| [004](004_training_data_and_annotation.md) | 训练数据、前缀标注与切分 | P0 | 001；文本训练集不依赖 002 |
 | [005](005_training_runtime_and_resource_probe.md) | 训练恢复与远端资源短跑 | P0 | 001；最终短跑依赖 004 最小集 |
-| [006](006_punctuation_robust_adaptation.md) | 三组有限适配训练 | P0 | 002、004、005 |
-| [007](007_turn_control_evaluation.md) | 独立话轮评测与权重选择 | P0 | 006；评测器可提前开发 |
+| [006](006_punctuation_robust_adaptation.md) | 三组有限适配训练 | P0 | 001、004、005 |
+| [007](007_turn_control_evaluation.md) | 独立话轮评测与权重选择 | P0 | 002、006；评测器可提前开发 |
 | [008](008_full_chain_fdb_acceptance.md) | 新组合真实音频与 FDB 验收 | P1 | 002、003、007 |
 
-执行路径为 001 → 002/004/005 → 006 → 007 → 008；003 可与训练准备并行安排。这里的并行仅描述任务依赖，不要求启用多个代理。当前不重开 ASR/TTS 选型，不启动 Layer 2/3 实现或大规模训练。
+文本训练路径为 001 → 004/005 → 006；002 的真实 ASR 轨迹与 006 的候选共同进入 007，再执行 008。003 可与训练准备并行安排。首轮优先复用 UltraChat 与论文生成方法，50/50 用户句读混合为主候选；开训不依赖先采集固定数量真实音频。这里的并行仅描述任务依赖，不要求启用多个代理。当前不重开 ASR/TTS 选型，不启动 Layer 2/3 实现或大规模训练。
 
 ## 共用约束
 
