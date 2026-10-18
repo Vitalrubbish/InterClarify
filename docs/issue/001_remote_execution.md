@@ -1,37 +1,33 @@
-# Issue 001 远端核验任务单
+# Issue 001：官方 Word 输入远端核验任务单
 
-状态：进行中，2026-10-18 核对。只读资产扫描、固定输出四组对照和单条 protocol 轨迹真实权重复测已执行；历史五例完整矩阵、独立单步与在途 reset/cancel 尚未完成。本任务单保留待执行范围，不归档。
+状态：进行中。必验范围为一套官方控制配置下的历史五例；当前仅有资产扫描和诊断回放证据，尚未通过官方 Word 输入验收。
 
-已执行结果见 [资产核验](../../reports/layer1_training/issue001-inventory-20261018/README.md)、[阶段对照](../../reports/layer1_training/issue001-runtime-20261018/README.md)和[最新复测](../../reports/layer1_training/issue001-validation-20261018/README.md)。最新作业 `job-179233595533938893476-xuan-zhang` 退出 0，raw 13/13、完整词 12/12；只覆盖 first-nonempty 起拍的 protocol 轨迹。以下表格仍是目标矩阵，不代表已全部执行。
+## 执行前准备
 
-先将当前两仓库源码同步到独立目录，记录提交与工作树摘要，不覆盖历史实验。CPU 资产扫描在远端已有 conda 环境执行；全文件哈希可能产生较大存储读取量，串行运行。以下路径来自历史脚本，执行前核实。`--asset` 接受文件或目录，输出目录必须不存在。
+1. 核对历史五例的 Kyutai 原始 `Word` 消息和实际到达时间，冻结样本清单与哈希。若只有累计文本或字符增量，先补采缺失事件；不得从完整转写推算到达时间。Kyutai 只作参考输入来源，产品仍用 Nemotron/Kokoro。
+2. 将两仓库源码保存到独立目录，冻结提交、工作树文件摘要、官方源码、checkpoint/tokenizer、依赖和输入摘要。
+3. 先按 [001b](001b_runtime_comparison.md)修正现有比较器的 Word 缓冲和每拍拼接，再运行真实权重。现有 raw 与有界 complete_word 入口均不是官方 Word 验收命令，不能直接复跑后宣布通过。
 
-```bash
-conda run -p /hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/interclarify-dev \
-  python scripts/remote/inventory_layer1_assets.py \
-  --repo . --xtalk xtalk \
-  --asset official_source=/hpc_stor03/sjtu_home/xuan.zhang/DuplexCascade \
-  --asset checkpoint=/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/sbintuitions--DuplexCascade/c3dd51ce9a5a7d27f810ffd5dab309f132a94d28 \
-  --asset base=/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/Qwen--Qwen2-7B-Instruct/8dce1f8a2d3286a7adf09b977e661350ad67e40a \
-  --asset nemotron=/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/models/nemotron_en \
-  --output data/runs/issue001-inventory-UNIQUE
-```
+## 唯一配置
 
-另以 `--asset kokoro=<实际目录>` 登记 Kokoro，以同样方式登记真实轨迹与 UltraChat 来源清单。工具记录磁盘事实，不推断模型 revision 或许可结论；逐一核对模型卡、许可、来源 revision、tokenizer、发布配置与 safetensors 参数目录，回填协议配置。缺失文件、读取失败、运行中变化均保留为失败。
-
-GPU 诊断必须通过 `vc` 调度，起步 1×4090、8 CPU、32GB 主存，最多 4 GPU 小时；实际模型主存需求超限时先登记资源调整。复用 `retest_asr_official_input.py`，仅选择 `--configs nemotron_en-160`，保留 original/without_punctuation；旧删除标点函数仅是历史诊断，不作为 004 保护时间、小数等字符的训练增强实现。
-
-独立官方参考执行入口和两路事件驱动已由 `compare_layer1_runtime.py` 与 `run_layer1_runtime_comparison.sh` 实现。参考执行原版 AST 控制循环；单步模式已实现但未独立执行。后续使用上述入口补齐矩阵，旧 `retest_asr_official_input.py` 不能替代完整对照：
-
-| 维度 | 固定范围 |
+| 项目 | 要求 |
 | --- | --- |
-| 输入 | 历史 endpoint-b4d12d6 的五例 EN160 轨迹；另外八种最小协议场景 |
-| 场景 | 空拍、词内增量、句中停顿、接话、有效插话、用户附和、连续两轮、reset |
-| 时钟 | session-start 与 first-nonempty 分别出表；600ms，串行，无过时拍积压 |
-| 发布粒度 | raw 与 complete-word；后者最多暂存 160ms，只用已到达字符；超时刷新，EOF 仅排空，不进入 LLM |
-| 排错 | 同 prompt 单步；固定生成输出执行；独立生成历史自由回放，三者分开 |
-| 记录 | 逻辑/实测时刻、可见前缀、窗口、请求序号、在途请求、prompt/生成 IDs、控制、正文、取消/reset |
+| 官方源码 | `42893024ca90c8de8ac3ed624467ebc123512ff8`；server.py SHA256 见协议配置 |
+| 输入 | 历史五例原样 Kyutai Word 事件与到达时间；逐词 strip，每拍用空格连接 |
+| 起拍与时钟 | 首个非空 Word 到达后等待 600ms 开始首拍；串行执行，迟到单列 |
+| 模型 | 同一发布 checkpoint/tokenizer，BF16、64-token 贪心、官方结束 ID |
+| 回放 | 双方独立生成 assistant 历史，保留完整生成 IDs；不补标点、不发送 EOF 让轮信号 |
+| 比较 | 窗口、prompt/生成 IDs、控制动作、历史和正文提交的首个差异 |
+| 生命周期 | 集成在途 reset/cancel 独立核对旧请求、历史与响应代际隔离 |
 
-完整词视图必须显式标为诊断，不变更产品发布方式。存在前缀回写时停止该条件并记录不适用原因，不能强行冻结前缀。输入及最小场景须在推理前保存文件哈希。参考代码固定为 `42893024ca90c8de8ac3ed624467ebc123512ff8`，server.py SHA256 见协议配置；任何补丁另存摘要。参考执行不能调用集成路径的 prompt/状态实现。
+固定输出和同 prompt 单步仅在出现具体差异时排错，不再要求完整词/raw、两种起拍或原样/去句读交叉组合。现有 160ms complete_word 超时残词发布不能冒充官方 Word。
 
-报告写 `reports/layer1_training/<run_id>/`，大日志留远端；包含双方时间线、首次差异、失败/缺测、退出码、资源、允许差异和通过／修复重测／阻塞结论。原始 EN160 0/5 基线保持历史来源，不伪造新 run。参考缺失、覆盖不足或影响分拍/历史/控制的未解释差异阻断 006，但不阻止离线资产与数据工具准备。
+## 资源、产物与放行
+
+真实权重必须通过 `vc` 调度，起步 1×4090、8 CPU、32GB 主存，最多 4 GPU 小时；资源调整按实测记录。本地和远端均使用 conda，不在登录节点跑模型，不覆盖旧结果。
+
+复用 `compare_layer1_runtime.py`、`run_layer1_runtime_comparison.sh`；修正 Word 输入后在同路径说明中登记准确命令。当前脚本仍仅用于历史诊断，不提供假定可运行的官方 Word 命令。
+
+大日志保留远端 `data/runs/<run_id>/`，紧凑结果保存 `reports/layer1_training/<run_id>/`。报告包含输入/源码摘要、逐例时间线、缺测、退出码、资源、允许差异、集成生命周期证据及放行结论；原接话 0/5 是历史失败基线，不要求其变好才允许训练。
+
+已有证据：[资产核验](../../reports/layer1_training/issue001-inventory-20261018/README.md)、[阶段诊断](../../reports/layer1_training/issue001-runtime-20261018/README.md)、[最新诊断](../../reports/layer1_training/issue001-validation-20261018/README.md)。保留原 run 和文件摘要，不把诊断成功改写成官方输入对齐。必要证据缺失或影响训练归因的差异未排除时，006 继续不放行。

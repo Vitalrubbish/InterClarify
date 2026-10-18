@@ -1,67 +1,30 @@
-# Issue 001：冻结输入契约、基线与验收口径
+# Issue 001：冻结官方输入契约、基线与验收口径
 
-状态：进行中。优先级：P0。依赖：无。002 已单独验收归档，003 接入自动验收已通过；004/005 可继续不依赖运行时放行的数据工具与加载准备，006 仍受本 issue 门禁约束。
+状态：进行中。优先级：P0。002 已单独完成；004/005 可继续数据和加载准备，006 仍未放行。
 
-## 2026-10-18 启动记录
+## 目标与范围
 
-已建立 `configs/layer1_adaptation_protocol.yaml`、只读资产盘点入口和远端核验任务单。历史 prompt 审计不升级为运行时对齐证据。首次 SSH 两次超时，用户要求重试后已恢复交互式登录；已完成远端只读资产扫描（退出码 0），见归档的 [001a](archive/001a_asset_inventory.md)。权重推理与完整逐拍对照尚未验收，不放行 006。
+按 DuplexCascade 官方的一套控制配置检查 X-Talk 集成是否正确，避免用训练掩盖协议错误。仅验收相同输入下的窗口、prompt IDs、完整生成历史、控制动作和正文提交，不要求未经适配的官方权重达到接话率目标。
 
-已核验官方代码提交与 server.py 摘要、发布 tokenizer EOS=151645、BOS 不存在、词表 151652；checkpoint 头含 453 项，q/v LoRA A/B 各 56 项，embedding/head 含 original 与 modules_to_save 两套。头部存在不等于加载正确。已固定 UltraChat 官方项目链接的 stingning/ultrachat revision 与十个 train shard 的 LFS SHA256，原始数据下载验证由 004 执行；作者精确 50k 仍未知。
+官方固定源码为 [server.py](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/server.py#L422-L499)：接收 Kyutai `Word` 消息，逐项 strip 后入队，每拍用单个空格连接；首个非空 Word 到达后等待 600ms 开始首拍，空拍使用 no-voice。配置保持发布 checkpoint/tokenizer、BF16、64-token 贪心及官方结束 ID。
 
-配置中的数值门槛是本项目在候选结果前登记的首版决策，不是历史实验结论。001 维护协议与上限；004 交付真实切分和样本清单，005 在上限内冻结实际训练参数，007 实现验收计算。资产 revision、许可和实际 token IDs 未核验处使用 null；资产扫描也不能替代完整恢复及独立参考路径验证。执行方法见 [任务单](001_remote_execution.md)。
+官方采用词级发布：Kyutai [ASR 实现](https://github.com/kyutai-labs/moshi/blob/main/rust/moshi-core/src/asr.rs#L217-L238)积累词内 token，遇到边界标记后发出 Word；DuplexCascade 不消费任意 raw 字符后缀，也不等待整句。本项目的 `complete_word` 会在 160ms 超时后释放残词，也不等同官方 Word。必验对照使用同一份保留到达时间的官方 Word 事件，不把现有两种诊断模式直接称为官方输入。
 
-## 问题与目标
+只运行上述一套配置和历史五例原样样本，不展开时钟、发布粒度或句读组合。单步和固定输出仅用于定位具体差异。Nemotron/Kokoro 仍是产品组合，Kyutai 仅提供官方参考输入；真实产品迁移和音频验收由 007/008 负责。集成在途 reset/cancel 单独检查旧请求、历史和代际隔离，不与参考输入交叉组合。
 
-官方空白对齐后 EN 160ms 仍为 0/5；本轮有关请求审计通过，但词内增量、分拍和起拍条件尚未分离。目标是在准备训练时收敛输入混杂，避免用训练掩盖接口错误。ASR/TTS 选择已定，不再开展候选普查。
+## 已完成
 
-## 已确定的训练路线
+- [x] [001a 资产扫描](archive/001a_asset_inventory.md)：官方源码、checkpoint/base、tokenizer 与组件摘要已有记录，token IDs 已核验；许可审核尚未完成。
+- [x] [001c 历史保持](archive/001c_runtime_history_preservation.md)、[001d 加载修复](archive/001d_checkpoint_load_memory.md)、[001e 校验耗时修复](archive/001e_prompt_validation_overhead.md)已归档。
+- [x] 协议登记 UltraChat 来源、1,000/200/300 规模、三组继续训练、随机种子及最多两轮、72 GPU 小时上限；数据下载和实际切分归 004，训练参数短跑归 005。
+- [x] 保存 EN160 官方权重接话 0/5 的[历史基线](../asr_official_input_retest.md)。已有固定输出 51 拍及 protocol raw 13/13、complete_word 12/12 均为诊断证据，不证明官方 Word 输入已对齐。
 
-本轮使用官方论文采用的 UltraChat dataset，自行实现双工 micro-turn 数据生成管线，从完整官方 DuplexCascade checkpoint 继续训练。Qwen2-7B-Instruct 只作为官方 checkpoint 恢复所需的基础模型，不作为重新训练双工能力的独立初始化；本轮不设置从原始模型重训的实验臂。
+## 剩余任务与完成条件
 
-## 工作项
+- [ ] 核对历史五例是否保存原始 Kyutai Word 与到达时间，冻结样本清单和摘要；缺失时远端补采，不用完整转写反推在线词边界。
+- [ ] 在现有比较器中直接支持官方 Word 输入，保留逐词 strip 和每拍空格连接；替换必验路径的 RawDeltaBuffer 拼接，不增加第二套控制器。具体实现与对照由 [001b](001b_runtime_comparison.md)负责。
+- [ ] 单套配置下完成五例连续自由回放，双方各自生成历史；逐请求 prompt/生成 IDs、控制和提交历史一致，影响训练归因的未解释差异为零，失败与缺测完整保留。
+- [ ] 留存集成侧在途 reset/cancel 的旧请求、历史和响应代际隔离证据；已有测试可复用。
+- [ ] 完成资产许可审核与冻结清单，汇总源码摘要、输入契约、逐例结果、退出码和明确放行结论。
 
-- [ ] 盘点实际 X-Talk checkout、官方 checkpoint、基础模型、tokenizer、embedding/head、q/v LoRA 与发布配置，冻结 revision、文件摘要和许可证。
-- [ ] 冻结 Nemotron 160ms、Kokoro 82M/af_heart、600ms micro-turn、BF16/实际精度、64-token 贪心生成及结束 ID；确认产品会话起拍与历史首非空起拍的差异。
-- [ ] 复用固定轨迹核对 strip、空拍、BOS、ChatML、assistant 原始生成 IDs 与独立官方 oracle；审计逐请求 prompt IDs。
-- [ ] 完成下述运行时逐拍对照，交付首次差异与归因；官方参考路径须独立执行，不能仅用本项目同一 prompt 构造函数生成“期望值”。
-- [ ] 限定一次词内增量/完整词发布与时钟诊断，记录真实可见前缀。任何暂存只用已到达字符，必须明确刷新与超时并计入延迟；若不适用完整词发布，记录原因，不硬造对照。
-- [ ] 记录原样 EN 160ms 官方权重失败基线，不向模型发送 EOF、标注边界或补句号；不把只改 prompt 审计理解成完全复现官方服务。
-- [x] 预登记训练对照、数据保留集、随机种子、最多两轮适配的预算上限和验收规则；005 在上限内根据短跑冻结实际步数/资源配置，超出上限须先修订登记，不能直接开训。
-
-## 运行时逐拍对照与放行规则
-
-本检查验证官方控制推理路径与 X-Talk Layer 1 集成路径在固定事件输入下的一致性；Nemotron/Kokoro 的实际服务生命周期及播放正确性分别由 002/003/008 验证，不能将本检查通过称为整套官方语音系统完全复现。
-
-1. **固定参考与输入。** 冻结官方参考代码入口、提交和必要补丁，以及双方 checkpoint、tokenizer、精度与生成设置。复用已有带时间 ASR 轨迹，并补充最小协议用例，覆盖空拍、词内增量、句中停顿、接话、有效插话、用户附和、连续两轮和 reset；输入不得包含未来文本或人工让轮信号。固定事件回放不依赖 002 新适配器完成。
-2. **比较每拍状态。** 按同一逻辑时钟交付相同可见增量，比较起拍、窗口归属、空拍、请求顺序、在途请求处理、prompt IDs、assistant 原始生成 ID 历史、结束条件、控制 token、正文提交及取消/reset 后状态。记录逻辑事件时间和实测耗时，分别判断协议差异与性能差异；调度迟到和积压策略必须显式记录。
-3. **定位首次分歧。** 先在相同 prompt/历史上比较单步输出，必要时用固定输出轨迹检查协议执行；再运行各自生成历史的连续自由回放。固定输出或强制历史仅用于排错，不能充当自由回放通过证据。分歧后先追踪首个不同的输入、状态或输出，不把后续连锁差异分别归为模型失败。数值容忍与时序容忍在结果前冻结；与 005 共用参考推理资产，避免重复建立 oracle。
-4. **逐项归因与放行。** 差异登记为实现错误、预登记的允许差异或尚未排除；允许差异需有设计依据及不改变本轮比较契约的证据。影响分拍、历史、控制动作或训练归因的实现错误与未排除项阻断 006；参考入口不可运行或关键行为不可观测时，记录缺失证据，不声称对齐通过。可继续不依赖该结论的资产盘点、数据工具及资源准备。
-
-对照范围和样本清单须预先固定。一次诊断结束后给出通过、修复后重测或阻塞结论；不能用“诊断限一次”跳过未解决错误，也不能无限扩展为组件重新选型。
-
-## 拟交付物
-
-`configs/layer1_adaptation_protocol.yaml` 与同路径 docs；诊断优先复用 `scripts/remote/retest_asr_official_input.py`，新增逻辑同步其说明。远端结果写独立 `data/runs/<run_id>/`，紧凑报告写 `reports/layer1_training/<run_id>/`。
-
-报告须包含运行时对照矩阵、双方逐拍时间线、原始 IDs、首次差异位置、允许差异清单及放行结论；记录参考路径与集成路径的源码摘要。真实权重对照在远端 conda 环境执行。
-
-## 测试与完成条件
-
-- [ ] 固定轨迹逐请求输入审计零不一致，错误有原始 IDs 与首次差异位置。
-- [ ] 提供分拍、到达、生成历史及正文启动的逐例对照，区别协议错误、持续等待、提前正文和旧回答续写。
-- [ ] 运行时逐拍对照在声明的范围内通过，影响训练归因的未解释差异为零；单步、固定输出排错与连续自由回放证据分开，参考缺失或覆盖缺口不能标为通过。
-- [ ] 所有参数/摘要及诊断退出码可复核；没有遗留会污染训练的数据格式问题。
-- [ ] 冻结清单明确 UltraChat 来源、由本项目实现的生成器、官方 checkpoint/tokenizer/base/embedding/head/LoRA 摘要及组间共享条件；无法取得的作者精确样本清单标明未知。
-- [ ] 若发现必须改变线上前缀交付的行为，先更新工程文档，再实现并重测。
-
-本 issue 不要求官方权重接话达标才允许训练。诊断目的在于确认真实输入契约，不能无限延长或重新选型。
-
-
-## 2026-10-18 进度核对
-
-- 已完成：[001a 资产扫描](archive/001a_asset_inventory.md)、[001c 历史保持](archive/001c_runtime_history_preservation.md)、[001d 加载修复](archive/001d_checkpoint_load_memory.md)、[001e 输入校验耗时修复](archive/001e_prompt_validation_overhead.md)，均已归档。资产扫描不包含许可审核，`licenses_reviewed` 仍为 false。
-- 已完成：`configs/layer1_adaptation_protocol.yaml` 登记组件、600ms 时钟、生成设置、种子、数据规模、三组训练、最多两轮及 72 GPU 小时总上限和首版验收阈值；实际步数、长度、batch 和验收样本清单仍未冻结。
-- 部分完成：[固定输出四组共 51 拍](../../reports/layer1_training/issue001-runtime-20261018/README.md)一致；[最新真实权重复测](../../reports/layer1_training/issue001-validation-20261018/README.md)在 first-nonempty 起拍的同一 protocol 轨迹上 raw 13/13、完整词 12/12，退出 0。旧 8/7 差异已修复，仅保留为历史失败。
-- 尚未完成：001b 的历史五例完整矩阵、独立同 prompt 单步、在途 reset/cancel 参考对照，以及资产许可审核和完整放行清单。已有局部输入审计不能勾选全范围验收条件。
-
-继续工作见 [001b](001b_runtime_comparison.md)。`training_released` 保持 false；本次仅核对仓库已有证据，没有新增远端实验或启动训练。
+使用现有比较器和远端 conda/单卡入口，先修正输入契约再执行，见[远端任务单](001_remote_execution.md)。数值与时序容忍维持协议登记值；不补句号、不发送人工让轮信号或 EOF 标记。`training_released` 保持 false，计划收敛不表示验收通过。

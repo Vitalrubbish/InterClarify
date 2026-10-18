@@ -1,54 +1,41 @@
 # 开发与测试 issue 索引
 
-更新：2026-10-18，已核对实际代码、配置及仓库保存的远端报告。本文目录中的 issue 是仓库内任务单，不是已发布的 GitHub issue。目标组合为 **Nemotron EN 0.6B / 160ms + Kokoro 82M / af_heart**，当前进入 Layer 1 兼容性训练准备。001、003、004 进行中，002 已完成归档，005–008 待办；004 仅完成来源清单，生成管线尚未实现。完成的工作单元移入 `archive/`，父 issue 全部条件满足后再归档。
+更新：2026-10-19。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**，当前准备有限 Layer 1 继续训练，尚未开训。这里是仓库内任务单；完成任务移入 `archive/`，父任务仅在全部条件满足后归档。
 
-001 拆分为已完成的 [资产只读扫描](archive/001a_asset_inventory.md) 和进行中的 [运行时对照](001b_runtime_comparison.md)。资产扫描不是权重恢复或许可审核通过证据。
-
-用户追问节拍数量后，新增 [001e输入校验耗时修复](archive/001e_prompt_validation_overhead.md)：旧tokenizer词表大小被逐token重复计算，修复后raw两路13拍、完整词两路12拍，远端退出0，已完成归档。
-
-| 编号 | 任务 | 状态与剩余工作 | 优先级 | 依赖 |
-| --- | --- | --- | --- | --- |
-| [001](001_input_contract_and_baseline.md) | 输入契约、运行时对照与验收口径 | 进行中；补齐历史矩阵、独立单步、在途 reset/cancel 及许可审核 | P0 | 无 |
-| [002](archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入与轨迹采集 | 完成，已归档；r4-asr 退出 0 | P0 | 001；接入单独验收 |
-| [003](003_kokoro_playback_integration.md) | Kokoro 分段合成与播放接入 | 进行中；仅剩 003c 人工试听 | P0 | 001；接入单独验收 |
-| [004](004_training_data_and_annotation.md) | UltraChat 与 micro-turn 生成管线 | 进行中；来源清单完成，下载验真、生成与审计待做 | P0 | 001；文本训练集不依赖 002 |
-| [005](005_training_runtime_and_resource_probe.md) | 训练恢复与远端资源短跑 | 待办；推理 strict 加载不等于训练恢复通过 | P0 | 001；最终短跑依赖 004 最小集 |
-| [006](006_punctuation_robust_adaptation.md) | 三组有限适配训练 | 待办；前置门禁未通过，未开训 | P0 | 001、004、005 |
-| [007](007_turn_control_evaluation.md) | 独立话轮评测与权重选择 | 待办；评测器、独立样本与候选报告未交付 | P0 | 002、006 资产交付；规则与评测器在训练前准备 |
-| [008](008_full_chain_fdb_acceptance.md) | 新组合真实音频与 FDB 验收 | 待办；组件验收不等于真实 LLM 全链路或 FDB 通过 | P1 | 002、003、007 |
-
-远端任务单：[001](001_remote_execution.md) 进行中，已有局部对照；[002/003](002_003_remote_execution.md) 自动验收完成，人工试听未完成，已纠正原“待执行”状态。两份任务单均保留未完成条件，暂不归档。
-
-文本训练路径为 001 → 004/005 → 006；002 的真实 ASR 轨迹与 006 的候选共同进入 007，再执行 008。003 可与训练准备并行安排。首轮优先复用 UltraChat 与论文生成方法，50/50 用户句读混合为主候选；开训不依赖先采集固定数量真实音频。这里的并行仅描述任务依赖，不要求启用多个代理。当前不重开 ASR/TTS 选型，不启动 Layer 2/3 实现或大规模训练。
-
-001 使用已有固定事件轨迹比较官方参考控制推理与 X-Talk 集成运行时，不依赖 002 新适配器；002/003/008 分别验收真实 ASR、TTS 与全链路。影响训练归因的运行时错误或未排除差异阻断 006，不能用 token 审计通过替代。001 先登记预算上限，005 短跑后冻结实际配置；006 完成交付三组训练资产与 dev 报告，007 再进行独立验收，避免相互等待。
-
-## 固定的三项决策与完成证据
-
-| 决策 | 必须交付的完成证据 | 主责 issue |
+| 编号 | 任务 | 当前状态与剩余工作 |
 | --- | --- | --- |
-| 使用官方论文采用的 UltraChat dataset | 实际数据来源/revision/split/许可、原始 ID 与摘要、1,000/200/300 对话切分；作者精确 50k 清单未知时明确记录 | 001、004 |
-| 自行实现数据生成管线 | 论文参数到配置的映射、micro-turn/交互事件/监督/句读混合实现、固定种子可复现审计与测试报告 | 004 |
-| 在官方 checkpoint 上继续训练 | 完整权重恢复审计、零更新对齐、仅既有 q/v LoRA 更新、训练状态恢复与可重载候选资产 | 005、006 |
+| [001](001_input_contract_and_baseline.md) | 官方输入契约与基线 | 进行中；核验真实 Word 输入、完成单套配置对照、集成生命周期、许可和放行报告 |
+| [001b](001b_runtime_comparison.md) | 官方控制路径对照 | 进行中；现有 raw/有界 complete_word 是诊断，需直接修正词事件输入并运行历史五例 |
+| [002](archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入 | 完成，已归档；r4-asr 退出 0 |
+| [003](003_kokoro_playback_integration.md) | Kokoro 分段播放 | 进行中；自动验收完成，仅剩 [003c 人工试听](003c_audio_listening_review.md) |
+| [004](004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 进行中；来源清单完成，下载验真、生成和审计待做 |
+| [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 待办；推理 strict 加载不替代训练恢复与零更新对齐 |
+| [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；001、004、005 门禁未通过 |
+| [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |
+| [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 验收 | 待办；组件通过不等于新组合全链路通过 |
 
-数据与模型证据必须贯穿 run manifest 和 007 评测；不能用原始 Qwen2 模型随机初始化双工参数替代官方 checkpoint，不把合成文本改善直接判作真实 ASR 验收通过。
+远端执行见 [001 任务单](001_remote_execution.md)与 [002/003 任务单](002_003_remote_execution.md)。001 只验证一套官方配置：Kyutai Word 逐词 strip、每拍空格连接、首非空 Word 起拍、600ms、BF16、64-token 贪心。raw 字符增量和 160ms 超时释放残词均不等同官方 Word；不展开时钟、发布粒度与句读矩阵。已有报告保留为诊断，不升级为官方输入完成证据。
+
+## 依赖与交付
+
+文本训练路径为 001 → 004/005 → 006 → 007 → 008。004 数据工具、005 加载准备和 007 评价规则可在正式训练前推进；005 最终短跑依赖 004 最小集。002 轨迹用于 007 独立迁移评测，003 可独立完成试听。006 交付训练资产及 dev 报告后由 007 选择和验收候选，008 最后完成新组合音频及 FDB；不重开选型、不实现 Layer 2/3。
+
+| 已确定路线 | 必须交付的证据 | 主责 |
+| --- | --- | --- |
+| 使用论文采用的 UltraChat | 实际 revision/split/许可、原始 ID 与摘要、1,000/200/300 切分；精确作者 50k 清单未知时如实记录 | 001、004 |
+| 自行实现 micro-turn 生成 | 论文参数映射、事件/监督/句读混合、固定种子审计与测试 | 004 |
+| 从官方 checkpoint 继续训练 | 完整恢复、零更新对齐、仅已有 q/v LoRA 更新、训练状态恢复与可重载资产 | 005、006 |
 
 ## 共用约束
 
-- 遵循 [工程方案](../engineering_implementation.md) 与 [研究范围](../research_design.md)；实现行为变化先更新相应文档。
-- 状态使用待办、进行中、阻塞、完成；完成时回填提交、run_id、结果路径和遗留问题。依赖阻塞必须写明原因，不能以跳过任务当成完成。
-- 每个实现文件同步 docs 同路径说明，含功能、类和核心方法；文件名、代码注释和提交消息使用英文。
-- 本地和远端使用 conda；真实模型和集群测试在远端，提交前提供任务脚本、资源配置和独立输出路径。任务单列出的拟新增文件尚不可直接运行。
-- 冻结两仓库提交、源码摘要、模型/tokenizer revision、依赖、数据、种子、时钟和预算；失败、退出码与缺测保留，不污染训练/开发/测试划分。
-- 维持既有五类控制 token、完整生成 ID 历史、唯一协议执行者/仲裁路径和唯一播放所有权。已播放内容不可撤销，Layer 3 仅允许未提交片段的版本化修订。
+- 遵循[工程方案](../engineering_implementation.md)和[研究范围](../research_design.md)。状态使用待办、进行中、阻塞、完成，完成时记录提交、run_id、结果路径和遗留问题。
+- 修改现有文档时直接维护当前版本；实验过程和失败保留在报告，避免重复追加互相更正的计划。实现优先修改现有模块，代码与同路径中文说明同步，文件名、注释和提交消息使用英文。
+- 本地和远端使用 conda；真实模型及集群测试在远端调度作业执行，冻结两仓库源码、资产、数据、种子、时钟和预算，独立 run_id，保留失败及退出码。
+- 保持五类控制 token、完整生成历史、唯一协议执行/仲裁路径与唯一播放所有权；已播放内容不可撤销，Layer 3 仅能修订未提交片段。
+- 001/004/007 在候选结果前冻结数据和评价门槛；005 实测冻结训练配置。不得用 test/FDB 调参，不以成功样本均值掩盖漏答。音频目标均值约 1s、上限 1.5s，简单问题亚秒，008 补齐实际停播与 FDB 门槛。
 
-## 验收门槛的冻结
+## 归档
 
-001/004/007 在查看候选模型结果前形成验收配置：各类样本数、接话覆盖下限、误抢话/附和误停上限、质量容忍幅度、训练预算和随机种子。以按说话人分组的区间与逐例结果解释收益，不能只报训练损失或成功样本延迟。用户确定的延迟目标为平均约 1s、不超过 1.5s，简单问题亚秒；未回复率和亚秒覆盖必须一起报告。未达门槛时标为未通过，不事后降低标准。
+已有完成实现：[001a 资产扫描](archive/001a_asset_inventory.md)、[001c 历史保持](archive/001c_runtime_history_preservation.md)、[001d 加载压力](archive/001d_checkpoint_load_memory.md)、[001e 校验耗时](archive/001e_prompt_validation_overhead.md)、[002 接入](archive/002_nemotron_streaming_integration.md)、[002a WAV 读取](archive/002a_warmup_wav_format.md)、[003a 音色加载](archive/003a_local_voice_loading.md)、[003b 分段计时](archive/003b_segment_word_boundaries.md)。
 
-007 的评价规则在 006 开训前冻结，最终 test 前用 dev 固定各组 checkpoint 和主候选；008 在全链路结果前补齐 FDB 回归容忍、语音覆盖及实际停播门槛。运行时、交付或分段策略变化须重验受影响对照，避免将链路修复收益归为训练收益。
-
-
-接入子任务归档：[002a WAV读取](archive/002a_warmup_wav_format.md)、[003a音色加载](archive/003a_local_voice_loading.md)、[003b分段计时](archive/003b_segment_word_boundaries.md)。003仅剩[人工试听003c](003c_audio_listening_review.md)。[历史保持001c](archive/001c_runtime_history_preservation.md)与[加载压力001d](archive/001d_checkpoint_load_memory.md)已完成归档；001e已消除旧8/7差异，001仍需完成[运行时对照001b](001b_runtime_comparison.md)的剩余覆盖和全范围放行报告，不能宣布训练放行。
-
-本次核对未发现尚未归档且全部完成的既有 issue；既有归档共 8 项，继续保留。维护工作记录为 [009 进度核对](archive/009_issue_progress_audit.md)，完成后直接归档。本次没有执行新模型实验、训练或人工试听。
+文档维护：[009 进度核对](archive/009_issue_progress_audit.md)、[010 官方输入核实与计划收敛](archive/010_issue001_scope_reduction.md)。这两项归档不表示 001/001b 通过，训练门禁仍为 false。

@@ -11,7 +11,7 @@ runtime:
   tts: Kokoro-82M
   voice: af_heart
   micro_turn_ms: 600
-  clock_conditions: [session_start, first_nonempty]
+  clock_conditions: [first_nonempty]
   production_clock: session_start
   diagnostic_clock: first_nonempty
   inference_dtype: bfloat16
@@ -85,16 +85,13 @@ training:
   actual_batch: null
   resource_owner: issue005
 diagnostic:
-  historical_trace: endpoint-b4d12d6
-  asr_config: nemotron_en-160
   historical_samples: 5
-  variants: [original, without_punctuation]
+  input_contract: kyutai_word_strip_then_space_join
+  input_manifest: null
+  clock: first_nonempty
+  mode: independent_free_replay
   observation_seconds: 12
   reply_windows_seconds: [2, 5, 12]
-  protocol_cases: [empty, intra_word, pause, handover, interruption, backchannel, two_turns, reset]
-  modes: [same_prompt_single_step, fixed_output_debug, independent_free_replay]
-  publication_conditions: [raw, complete_word]
-  complete_word_max_hold_ms: 160
   clock_event_tolerance_ms: 1
   physical_lateness_policy: report_separately_never_hide
   prompt_id_mismatches_allowed: 0

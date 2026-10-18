@@ -1,8 +1,7 @@
-# 官方控制循环单卡对照入口
+# 官方控制循环单卡诊断入口
 
-无类。脚本校验冻结源码、独立输出目录、设备；使用已有model/client隔离conda，模型单卡加载固定完整checkpoint，health后运行原版AST参考与集成路径的五例轨迹对照。固定输出排错和自由回放分别保存，默认first_nonempty、600ms、64token；停止服务并保留退出码。经vc调度申请1×4090、8CPU、32GB，首次若主存不足按证据调整。该入口不跑ASR/TTS，不训练；比较器fully_aligned仍受覆盖缺口限制。
+`scripts/remote/run_layer1_runtime_comparison.sh` 无类。脚本核验 source.sha256、独立输出目录与设备，在独立模型/客户端 conda 环境启动单卡服务；等待最长 300 秒 readiness 后运行比较器，退出时关闭服务并保存退出码。模型恢复完整发布 checkpoint，BF16、64-token 贪心；调度资源起步 1×4090、8 CPU、32GB。
 
+当前入口针对历史 Nemotron 累计文本，使用 first-nonempty、600ms 和 raw/有界 complete_word 两种诊断发布；`LAYER1_COMPARISON_CASE` 可限定样本。它没有原始 Kyutai Word 输入，不能作为官方 Word 对齐验收命令。本轮计划维护不修改脚本执行行为。
 
-首轮修正：共同GPU内核先真实预热并单列耗时；原版gen_thread.join保持执行，随后仅增加整拍提交观测与测量截止检查，避免EOS消费前截断。逐拍增加控制、停播和提交正文比较。增加same-prompt单步、raw/完整词两条件；完整词暂存最多160ms，仅使用当时已到达字符，超时排空不发送EOF信号。通过cases/modes分片；CPU固定输出与GPU自由回放分开，不能用分片成功外推未执行样本。首次长作业缺少正常退出码，保留部分证据，不推定调度终止原因。
-
-readiness期限调整为300秒；此前180秒两份作业超时证据保留，不直接归因OOM。单卡主存仍32GB，不使用额外闲置GPU规避配额。
+001b 应直接修改现有入口和比较器，使必验只运行一套官方 Word 输入配置；单步和固定输出仅按需排错，准确命令随实现更新。任务范围见 [001 远端任务单](../../issue/001_remote_execution.md)。本脚本不执行 ASR/TTS、训练或 FDB，不以退出 0 代替父任务放行。

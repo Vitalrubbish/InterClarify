@@ -1,31 +1,23 @@
-# Issue 001b：独立官方控制路径逐拍对照
+# Issue 001b：按官方 Word 输入对照控制路径
 
-状态：进行中。父任务：001。依赖资产核验；不依赖新 ASR 接入。
+状态：进行中。父任务：[001](001_input_contract_and_baseline.md)。不依赖新 ASR 接入。
 
-在固定官方源码上执行参考控制循环，集成侧使用真实 MicroTurnAssembler/RuntimeAdapter。分别报告同 prompt 单步、固定输出协议排错和独立历史自由回放；比较输入时钟、窗口、prompt IDs、生成 IDs、控制及正文、取消/reset。范围见 [远端任务单](001_remote_execution.md)，协议见 `configs/layer1_adaptation_protocol.yaml`。
+## 输入与执行
 
-必须记录首次差异。参考路径不得调用集成 prompt 构造器；AST prompt 片段审计不能替代完整控制循环。影响训练归因的差异未解释前阻断 006。独立 reference 的取样/插桩若影响行为，记录补丁和允许差异；无法执行的场景保持缺测，不标记通过。
+参考执行固定提交的官方控制循环，集成执行现有 MicroTurnAssembler/RuntimeAdapter。共同输入为同一份带到达时间的 Kyutai Word 事件：逐词 strip，每拍用空格连接；首个非空 Word 起拍、600ms、BF16、64-token 贪心、原样句读。只使用历史五例，不展开配置矩阵。
 
-完成后附双方时间线、源码摘要、退出码、报告路径及放行结论并归档；001 其他条件仍由父 issue 管理。
+官方依据为 [server.py 的接收和分拍逻辑](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/server.py#L422-L499)。现有 RawDeltaBuffer 将字符后缀拼成一个伪 Word，`complete_word_events` 又允许 160ms 超时释放残词，两者都不能作为官方 Word 协议的完成证据。优先复用真实已保存 Word 事件；若缺失，只补采所需五例，不重新选型 ASR。
 
+## 任务与验收
 
-## 2026-10-18 早期结果（后续由001e修正）
+- [ ] 冻结五例 Word 原始事件、到达时间、参考源码和模型摘要。
+- [ ] 直接修改现有比较器的输入读取与缓冲，保留官方词事件语义；不新增通用模式框架或复制控制循环。同步实现文档，核验跨拍空格和词内片段不被当作独立 Word。
+- [ ] 双方独立历史连续自由回放，比较窗口、prompt IDs、原始生成 IDs、控制动作和正文；输出首个差异及原因，必要范围缺测不算通过。
+- [ ] 集成侧在途 reset/cancel 核对旧请求、历史和响应代际隔离，复用已有测试；无需官方提供同名接口。
+- [ ] 保存逐例时间线、退出码、源码摘要、允许差异和 go/revise/block 结论，再交父任务审核。
 
-原版AST控制体与集成路径在修复后四组固定输出（两种起拍×raw/完整词）51拍一致；真实权重raw协议8拍一致。完整词条件共同前7拍IDs一致，但截止时reference8拍、integration7拍，整轮退出1。原始时间线显示两路实际请求耗时及末窗拍数不同，必须继续分离逻辑时钟与传输/调度耗时；不能事后放宽既有标准。历史五例完整分片、same-prompt单步独立执行以及在途reset/cancel参考对照尚缺。报告见reports/layer1_training/issue001-runtime-20261018，001/006仍未放行。
+仅在出现具体差异时运行同 prompt 单步或固定输出排错。比较器的 `fully_aligned` 还包含完整官方语音链路等覆盖限制，既不能单独据此否定本项，也不能只凭退出 0 放行。
 
+## 已有证据
 
-## 最新结果
-
-后续001e更正：旧8/7差异主要来自共享服务逐token重复计算词表大小，引发整体掉拍。修复后同一真实权重protocol轨迹raw两路13拍、完整词两路12拍，退出0；该差异已消除，剩余工作是历史五例完整分片、same-prompt单步独立执行和在途reset/cancel参考对照，不再把旧8/7列为当前未解释阻塞。
-
-## 2026-10-18 验收清单核对
-
-- [x] 独立官方 AST 控制循环与集成侧执行入口已实现。
-- [x] 固定输出协议排错：两种起拍 × raw/完整词，合计 51 拍一致。
-- [x] 单条 protocol 轨迹真实权重自由回放：first-nonempty 起拍，raw 13/13、完整词 12/12，逐拍 IDs、历史、控制及正文一致。
-- [ ] 历史五例及规定输入变体、两种起拍、两种发布粒度的完整矩阵。
-- [ ] 相同 prompt/历史的单步模式独立执行与结果留存。
-- [ ] 在途 reset/cancel 的独立参考对照。
-- [ ] 汇总全范围首次差异、允许差异、缺测与放行结论。
-
-最新证据为 [issue001-validation-20261018](../../reports/layer1_training/issue001-validation-20261018/README.md)，实现提交 `368aa87`，远端作业 `job-179233595533938893476-xuan-zhang` 退出 0；早期失败见 [issue001-runtime-20261018](../../reports/layer1_training/issue001-runtime-20261018/README.md)。本项继续进行中，不能按局部复测成功归档或放行 006。
+[阶段报告](../../reports/layer1_training/issue001-runtime-20261018/README.md)包含固定输出 51 拍；[最新复测](../../reports/layer1_training/issue001-validation-20261018/README.md)的 protocol raw 13/13、complete_word 12/12 一致，作业 `job-179233595533938893476-xuan-zhang` 退出 0，实现提交 `368aa87`。这些证明已测诊断输入下的修复效果，旧 8/7 耗时问题已消除；没有原始 Word 输入证据，不升级为官方输入验收。历史报告原样保留，本任务尚不归档。
