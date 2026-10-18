@@ -1,0 +1,9 @@
+{
+  "run": "r4-tts",
+  "human_review_status": "pending_issue003c",
+  "files": {
+    "confirmation.wav": "82cdad9d8ebe9764fec7cb6d6801524c46ef6bfdc102b95536f50d85b9adb22c",
+    "clarification.wav": "270ff79103ac8786c0068d2ef9aef976d2b94ce8854e7d340812d2d45f717ab1",
+    "long_answer.wav": "590ea1d9cdd326f2d467dcfb9c6576d5ae00668611dd6a004a0f749c48a6ace1"
+  }
+}

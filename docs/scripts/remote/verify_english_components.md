@@ -1,0 +1,6 @@
+# 英文组件真实接口核验
+
+verify_asr 用真实PCM按80ms时钟投送，并独立轮询输出；正常、停顿恢复、连续两轮、串行会话、短尾EOF和取消重连分别保存时间线、摘要、代际与错误。soundfile接受PCM或IEEE float WAV，统一转为16kHz mono PCM16，拒绝采样率或声道不符；不修改原文件。暂停插入的三秒静音与重复音频明确属于构造接入测试，不宣称自然语料。verify_tts 用固定脚本文本每50ms投送5字符，保存分段、首PCM、-45dBFS连续30ms首非静音代理、模拟供音断流与WAV；另测取消后的新代际。底层GPU取消释放与人耳听感不由此证明。run 保存失败与缺测并非零退出；write_json 只写本次独立目录。无类。
+
+
+资源与来源补充：health记录加载耗时和进程峰值RSS，作业收尾保留service /proc状态，GPU逐秒采样；ASR关闭记录等待worker释放耗时。采集manifest标为integration_diagnostic_only且禁止训练，保留源音频摘要与失败。TTS核验增加真实Kokoro经RuntimeAdapter、TTSManager、协调器和播放管理器执行短附和、有效插话停旧音频及新响应，headless确认不等同扬声器实播。

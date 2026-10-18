@@ -20,6 +20,11 @@ class FakeModel:
 
     info = {'token_ids': {'<|im_end|>': 151645}}
 
+    async def stream_ids(self, ids, max_new_tokens):
+        """Echo independently constructed IDs for the diagnostic endpoint test."""
+        yield {'prompt_token_ids': ids, 'generated_token_id': 151645}
+        yield {'finish_reason': 'stop', 'token_ids': [151645]}
+
     async def stream(self, request):
         """Expose preserved text and model termination metadata."""
         yield {'text': '<|user is talking|>'}
@@ -29,6 +34,16 @@ class FakeModel:
 
 class DuplexModelServiceTests(unittest.TestCase):
     """Test the service boundary without GPU or checkpoint downloads."""
+
+    def test_independent_raw_ids_endpoint(self):
+        """Reference IDs bypass history rendering and preserve token identity."""
+        with TestClient(service.create_app(FakeModel())) as client:
+            response = client.post('/generate_ids', json={'prompt_token_ids':[7,8]})
+            self.assertEqual(response.status_code,200)
+            rows=[json.loads(line) for line in response.text.splitlines()]
+            self.assertEqual(rows[0]['prompt_token_ids'],[7,8])
+            self.assertEqual(rows[0]['generated_token_id'],151645)
+            self.assertEqual(client.post('/generate_ids',json={'prompt_token_ids':[]}).status_code,422)
 
     def test_checkpoint_validation(self):
         """Missing or extra keys cannot silently initialize an invalid model."""
@@ -66,6 +81,7 @@ class DuplexModelServiceTests(unittest.TestCase):
 
         model = object.__new__(service.OfficialDuplexModel)
         model.tokenizer = Tokenizer()
+        model.bos_id = None
         model.header_user_ids = [1]
         model.header_assist_ids = [2]
         model.im_end_nl_ids = [3]
@@ -79,6 +95,18 @@ class DuplexModelServiceTests(unittest.TestCase):
             model.build_prompt_ids(history),
             [1, ord('H'), ord('i'), 3, 2, 9, 3, 1, 4, 3, 2],
         )
+        spaced = [
+            service.HistoryTurn(role='user', text=' Hi '),
+            service.HistoryTurn(role='assistant', token_ids=[9, 3]),
+            service.HistoryTurn(role='user', text=' \t '),
+        ]
+        self.assertEqual(model.build_prompt_ids(spaced), model.build_prompt_ids(history))
+        model.bos_id = 7
+        self.assertEqual(model.build_prompt_ids(spaced),
+                         [7, 1, ord('H'), ord('i'), 3, 2, 9, 3, 1, 4, 3, 2])
+        self.assertEqual(model.build_prompt_ids(spaced)[0], 7)
+        self.assertEqual(model.build_prompt_ids([service.HistoryTurn(role='user', text="  It's  9:30.  ")]),
+                         [7, 1] + [ord(c) for c in "It's  9:30."] + [3, 2])
         with self.assertRaises(ValueError):
             model.build_prompt_ids([])
         with self.assertRaises(ValueError):

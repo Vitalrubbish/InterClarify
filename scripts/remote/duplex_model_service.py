@@ -77,6 +77,14 @@ class GenerateRequest(BaseModel):
 
     history: list[HistoryTurn] = Field(default_factory=list)
     max_new_tokens: int = Field(default=64, ge=1, le=256)
+    audit_prompt: bool = False
+
+
+class GenerateIDsRequest(BaseModel):
+    """Accept independent reference prompt IDs for offline runtime diagnostics."""
+
+    prompt_token_ids: list[int] = Field(min_length=1)
+    max_new_tokens: int = Field(default=64, ge=1, le=256)
 
 
 class OfficialDuplexModel:
@@ -93,6 +101,12 @@ class OfficialDuplexModel:
     """
 
     def __init__(self, checkpoint: Path, base_model: Path, device: str = 'cuda') -> None:
+        import resource
+        started = time.monotonic()
+        def phase(name):
+            print(json.dumps({'duplex_load': {'phase': name,
+                'seconds': time.monotonic()-started,
+                'peak_rss_kib': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}}), flush=True)
         import torch
         from peft import LoraConfig, TaskType, get_peft_model
         from safetensors.torch import load_file
@@ -115,6 +129,7 @@ class OfficialDuplexModel:
         base = AutoModelForCausalLM.from_pretrained(str(base_model), local_files_only=True,
             torch_dtype=torch.bfloat16 if device.startswith('cuda') else torch.float32,
             trust_remote_code=bool(cfg.get('trust_remote_code', False)))
+        phase('base_loaded')
         base.resize_token_embeddings(len(self.tokenizer))
         adapted = get_peft_model(base, LoraConfig(
             r=int(cfg.get('lora_r', 16)), lora_alpha=int(cfg.get('lora_alpha', 32)),
@@ -124,11 +139,16 @@ class OfficialDuplexModel:
         # The official Model wrapper nests the PEFT model under llm.
         wrapper = torch.nn.Module()
         wrapper.add_module('llm', adapted)
+        # Avoid retaining both the entire CPU model and published CPU tensors.
+        wrapper.to(device)
+        phase('structure_on_device')
         state = load_file(str(checkpoint / 'model_state.safetensors'), device='cpu')
+        phase('published_state_opened')
         state = normalize_state_dict(state, set(wrapper.state_dict()))
         wrapper.load_state_dict(state, strict=True)
+        phase('published_state_restored')
         del state
-        self.model = adapted.to(device).eval()
+        self.model = adapted.eval()
         self.model.requires_grad_(False)
         self.device = device
         # Official server.py builds the raw ChatML prompt from these id runs.
@@ -136,12 +156,14 @@ class OfficialDuplexModel:
         self.header_assist_ids = self.tokenizer.encode('<|im_start|>assistant\n', add_special_tokens=False)
         self.im_end_nl_ids = self.tokenizer.encode('<|im_end|>\n', add_special_tokens=False)
         self.no_voice_ids = self.tokenizer.encode('<|no voice|>', add_special_tokens=False)
+        self.bos_id = self.tokenizer.bos_token_id
         self.eos_id = self.token_ids['<|im_end|>']
         self.context_length = int(base.config.max_position_embeddings)
         self.info = {'checkpoint': str(checkpoint.resolve()), 'base_model': str(base_model.resolve()),
+                     'load_seconds': time.monotonic()-started,
                      'token_ids': self.token_ids, 'context_length': self.context_length,
                      'torch': torch.__version__, 'tokenizer_class': type(self.tokenizer).__name__,
-                     'dtype': str(next(self.model.parameters()).dtype)}
+                     'dtype': str(next(self.model.parameters()).dtype), 'bos_token_id': self.bos_id}
 
     def build_prompt_ids(self, history: list[HistoryTurn]) -> list[int]:
         """Flatten one micro-turn history into the official raw ChatML id run.
@@ -160,14 +182,15 @@ class OfficialDuplexModel:
         """
         if not history or history[-1].role != 'user':
             raise ValueError('history must end with a user micro-turn')
-        ids: list[int] = []
+        ids: list[int] = [] if self.bos_id is None else [int(self.bos_id)]
         for turn in history:
             if turn.role not in ('user', 'assistant'):
                 raise ValueError(f'unknown history role: {turn.role!r}')
             if turn.role == 'user':
                 ids.extend(self.header_user_ids)
-                if turn.text.strip():
-                    ids.extend(self.tokenizer.encode(turn.text, add_special_tokens=False))
+                text = turn.text.strip()
+                if text:
+                    ids.extend(self.tokenizer.encode(text, add_special_tokens=False))
                 else:
                     ids.extend(self.no_voice_ids)
                 ids.extend(self.im_end_nl_ids)
@@ -187,14 +210,31 @@ class OfficialDuplexModel:
         request : GenerateRequest
             Raw micro-turn history and generation limit.
         """
+        ids = self.build_prompt_ids(request.history)
+        async for item in self.stream_ids(ids, request.max_new_tokens, request.audit_prompt):
+            yield item
+
+    async def stream_ids(self, ids: list[int], max_new_tokens: int, audit_prompt: bool = True) -> AsyncIterator[dict[str, Any]]:
+        """Run the same inference kernel on independently constructed reference IDs.
+
+        Parameters
+        ----------
+        ids : list[int]
+            Raw diagnostic prompt IDs, bypassing history construction.
+        max_new_tokens : int
+            Frozen generation budget.
+        audit_prompt : bool
+            Whether to emit the exact consumed prompt.
+        """
         import torch
         from transformers import StoppingCriteria, StoppingCriteriaList
         from transformers.generation.streamers import BaseStreamer
 
-        ids = self.build_prompt_ids(request.history)
-        if len(ids) + request.max_new_tokens > self.context_length:
+        if any(token < 0 or token >= len(self.tokenizer) for token in ids):
+            raise ValueError('Prompt token ID outside the released vocabulary')
+        if len(ids) + max_new_tokens > self.context_length:
             raise ValueError(f'Raw micro-turn history exceeds model context length: '
-                             f'{len(ids)} prompt tokens + {request.max_new_tokens} new tokens '
+                             f'{len(ids)} prompt tokens + {max_new_tokens} new tokens '
                              f'> {self.context_length}')
         tensor = torch.tensor([ids], dtype=torch.long, device=self.device)
         items: queue.Queue[dict[str, Any]] = queue.Queue()
@@ -222,6 +262,8 @@ class OfficialDuplexModel:
                     self.prompt = False
                     return
                 self.ids.extend(int(value) for value in value.reshape(-1).tolist())
+                for token_id in value.reshape(-1).tolist():
+                    items.put({'generated_token_id': int(token_id)})
                 self._emit(final=False)
 
             def _emit(self, final):
@@ -256,7 +298,7 @@ class OfficialDuplexModel:
             try:
                 with torch.inference_mode():
                     self.model.generate(input_ids=tensor, attention_mask=torch.ones_like(tensor),
-                        max_new_tokens=request.max_new_tokens, eos_token_id=eos_id,
+                        max_new_tokens=max_new_tokens, eos_token_id=eos_id,
                         pad_token_id=eos_id, do_sample=False, streamer=streamer,
                         num_logits_to_keep=1,
                         stopping_criteria=StoppingCriteriaList([Cancellation()]))
@@ -266,12 +308,18 @@ class OfficialDuplexModel:
                     'prompt_tokens': len(ids), 'generated_tokens': len(streamer.ids),
                     'finish_reason': reason, 'seconds': round(time.monotonic() - started, 3),
                     'peak_gpu_gib': round(peak, 3)}}), flush=True)
-                items.put({'finish_reason': reason, 'token_ids': list(streamer.ids),
-                           'prompt_tokens': len(ids)})
+                completion = {'finish_reason': reason, 'token_ids': list(streamer.ids),
+                              'prompt_tokens': len(ids)}
+                if audit_prompt:
+                    completion['prompt_token_ids'] = ids
+                items.put(completion)
             except Exception as exc:
                 items.put({'error': str(exc)})
             finally:
                 items.put({'done': True})
+
+        if audit_prompt:
+            yield {'prompt_audit': True, 'prompt_token_ids': ids}
 
         thread = threading.Thread(target=generate, daemon=True)
         thread.start()
@@ -321,6 +369,18 @@ def create_app(model: OfficialDuplexModel) -> FastAPI:
                 except (ValueError, RuntimeError) as exc:
                     yield json.dumps({'error': str(exc)}, ensure_ascii=False) + '\n'
 
+        return StreamingResponse(rows(), media_type='application/x-ndjson')
+
+    @app.post('/generate_ids')
+    async def generate_ids(request: GenerateIDsRequest):
+        """Execute reference IDs without using the integration history renderer."""
+        async def rows():
+            async with lock:
+                try:
+                    async for item in model.stream_ids(request.prompt_token_ids, request.max_new_tokens):
+                        yield json.dumps(item, ensure_ascii=False) + '\n'
+                except (ValueError, RuntimeError) as exc:
+                    yield json.dumps({'error': str(exc)}) + '\n'
         return StreamingResponse(rows(), media_type='application/x-ndjson')
 
     return app

@@ -1,0 +1,143 @@
+{
+  "dataset": "stingning/ultrachat",
+  "revision": "f220fe796ce3ed62fbe1681b45ce6cbc9c6cabe0",
+  "split": "train",
+  "license": "MIT",
+  "official_host_link": "https://github.com/thunlp/UltraChat#data",
+  "api_transport": "https://hf-mirror.com/api/datasets/stingning/ultrachat",
+  "fields": {
+    "id": "original_dialogue_id",
+    "data": "alternating_user_assistant_strings"
+  },
+  "author_exact_50k_ids": "unknown",
+  "files": [
+    {
+      "type": "file",
+      "oid": "be94cdea73076c950df6e99bf0c30ae63fda75fb",
+      "size": 963569677,
+      "lfs": {
+        "oid": "83e8bf5ad58dad37317e20daf8dd8fcdf483a8ff29ba73351a47cad3c2cad368",
+        "size": 963569677,
+        "pointerSize": 134
+      },
+      "xetHash": "d4892dd21f83d4a8cabbec61ec8630b56883ded348725e4b2795d2b44879a2a0",
+      "path": "train_0.jsonl"
+    },
+    {
+      "type": "file",
+      "oid": "0311e91deb3eaa0db645a19eb1211ce187f5a05b",
+      "size": 927226258,
+      "lfs": {
+        "oid": "7999f0f2d91e83aefe9829d6d50bdf3d367a2ae2200924835cdb081ab892965d",
+        "size": 927226258,
+        "pointerSize": 134
+      },
+      "xetHash": "c45d5820f47e71a7f523d7588f630a18a72fc8824ce303edc95a7dbf2a7f0d8e",
+      "path": "train_1.jsonl"
+    },
+    {
+      "type": "file",
+      "oid": "79a133cf60e4f913565e62a0142b43224a3574a6",
+      "size": 951538082,
+      "lfs": {
+        "oid": "6965bff4197fe9bc0142d58157d5b19c9da14792a95d5e2d52b9af0cd9ce08b8",
+        "size": 951538082,
+        "pointerSize": 134
+      },
+      "xetHash": "78560ef054eac0a3d0a7e2d4b515e2451b62ca4d53be6576c2c3eea36c5ae022",
+      "path": "train_2.jsonl"
+    },
+    {
+      "type": "file",
+      "oid": "2cc0e85e3d4a2605521aa2ed05186206d3083f89",
+      "size": 965600216,
+      "lfs": {
+        "oid": "bf4610dd5628e5e95a11006df92703a2c79486676c63dfd8a0fc284f69937283",
+        "size": 965600216,
+        "pointerSize": 134
+      },
+      "xetHash": "e4941b8388d2fd6cf980a888da97a2469bf1ff9aa82cdf76e6b14ad5c63c0a0f",
+      "path": "train_3.jsonl"
+    },
+    {
+      "type": "file",
+      "oid": "207f5d91c10851fa338d09c3b9521d9d5df6469a",
+      "size": 1069027912,
+      "lfs": {
+        "oid": "69533bdb1d1ad75886863296283df0957d57db9aa6f5bad597def4f9d6890139",
+        "size": 1069027912,
+        "pointerSize": 135
+      },
+      "xetHash": "374463946c986a2b4da65c1bad73272caa8557934a091aafa143949b1549c05c",
+      "path": "train_4.jsonl"
+    },
+    {
+      "type": "file",
+      "oid": "1c4cd4968cad06b7a4d8fe6ac8bb008703be6f44",
+      "size": 1121477851,
+      "lfs": {
+        "oid": "495fac9a3e6aa32b3ba304975fbc3605e0d91200ce7372db2744f7107b0cab19",
+        "size": 1121477851,
+        "pointerSize": 135
+      },
+      "xetHash": "30389f1bdbb9642641ea3e9e44a0f39f73b5a2df35a6d2a07d401d30c1f970b0",
+      "path": "train_5.jsonl"
+    },
+    {
+      "type": "file",
+      "oid": "aae0900be72b6f8627524022d4124bff47d35adf",
+      "size": 1124203002,
+      "lfs": {
+        "oid": "e14f35923754ce2a925e759a46d05f102e04a95a0561420dec33f1541c8ea092",
+        "size": 1124203002,
+        "pointerSize": 135
+      },
+      "xetHash": "6b552a2bce174fccaa0d8b2ae578b525cce4066f239ca4a0a4ebd0f33c4f1215",
+      "path": "train_6.jsonl"
+    },
+    {
+      "type": "file",
+      "oid": "34d93e99cc0e6fa3ff20e0a9f23fc0b39851b624",
+      "size": 958221100,
+      "lfs": {
+        "oid": "e6b4c9e9252a54f2baeaab5ddf29d1645c50b15ade4ebe42858b588b89bade69",
+        "size": 958221100,
+        "pointerSize": 134
+      },
+      "xetHash": "21d6204af84594c06a909795def5cea3e300c7cc35c6f635aee4531c7cc87b2e",
+      "path": "train_7.jsonl"
+    },
+    {
+      "type": "file",
+      "oid": "38eb31cd7a7dc0f9d8541b8940f5e373d7138b69",
+      "size": 674794002,
+      "lfs": {
+        "oid": "4ad4fb592d9f8176e7c01f1123211af1a64c9c3441b6221b83a34c9b2177c0f5",
+        "size": 674794002,
+        "pointerSize": 134
+      },
+      "xetHash": "fb0e2d0afecfc148c01fc65b89c8652cc2f5976a3e17e4328edac5574a0c2907",
+      "path": "train_8.jsonl"
+    },
+    {
+      "type": "file",
+      "oid": "98e269cb26b57bdbabe358ab6ef260597ee5e9ea",
+      "size": 533332795,
+      "lfs": {
+        "oid": "c117d4baa16af818beaf7e01884bd75ef5eb3267050e69e61e8eaadf9581dd3f",
+        "size": 533332795,
+        "pointerSize": 134
+      },
+      "xetHash": "43a9247d418c681df46d28c131a3c65f6a8e493a07b8f4afe599b99cd774c65d",
+      "path": "train_9.jsonl"
+    }
+  ],
+  "download_status": "not_downloaded; issue004 must verify each LFS SHA256 before use",
+  "evidence_sha256": {
+    "interclarify-ultrachat-readme.md": "bf531f65cc70bc38a0dd0cb3114489e17fd5ab920b270e4024f34002a41a13e0",
+    "interclarify-ultrachat-api.json": "8a5865a77a880b36685be5ae57267ef5871d15ecfce8793282db1c35b1c1c1b9",
+    "interclarify-ultrachat-tree.json": "2ca40f10c0ae5ecc2e1ffd0f29323beb408e8c0b5626e3336e4ea01e0a2734fc",
+    "interclarify-ultrachat-modelcard.md": "1a8af8055f71acc69bac07fb06d0d2de2a1695e8cb590223f5d993c5c20db8e5",
+    "interclarify-kokoro-modelcard.md": "91dcabced89db6f109b8786642f50402d3ee87450e8189589b6f85520e7f4d78"
+  }
+}

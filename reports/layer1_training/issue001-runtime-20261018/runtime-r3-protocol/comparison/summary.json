@@ -1,0 +1,84 @@
+{
+  "rows": [
+    {
+      "case": "protocol",
+      "mode": "independent_free_replay",
+      "clock": "first_nonempty",
+      "first_difference": null,
+      "publication": "raw",
+      "requests": 8
+    },
+    {
+      "case": "protocol",
+      "mode": "independent_free_replay",
+      "clock": "first_nonempty",
+      "first_difference": {
+        "field": "request_count",
+        "reference": 8,
+        "integrated": 7
+      },
+      "publication": "complete_word",
+      "requests": 8
+    }
+  ],
+  "reference_sha256": "404a1b6f51e87c012e1111cc21a712ed8895e9a5ee99328bd1245a7c6a654037",
+  "kernel_warmup": {
+    "seconds": 3.5065247360616922,
+    "rows": [
+      {
+        "prompt_audit": true,
+        "prompt_token_ids": [
+          151644,
+          872,
+          198,
+          9707,
+          151645,
+          198,
+          151644,
+          77091,
+          198
+        ]
+      },
+      {
+        "generated_token_id": 151647
+      },
+      {
+        "text": "<|user is talking|>"
+      },
+      {
+        "generated_token_id": 151645
+      },
+      {
+        "text": "<|im_end|>"
+      },
+      {
+        "finish_reason": "stop",
+        "token_ids": [
+          151647,
+          151645
+        ],
+        "prompt_tokens": 9,
+        "prompt_token_ids": [
+          151644,
+          872,
+          198,
+          9707,
+          151645,
+          198,
+          151644,
+          77091,
+          198
+        ]
+      }
+    ]
+  },
+  "input_shim": "raw-prefix delta coalesced to one Word per micro-turn; fixed ASR input only",
+  "kernel": "same frozen GPU service; independent reference raw IDs bypass integration renderer",
+  "coverage_gaps": [
+    "actual Kyutai Word transport",
+    "in-flight reset/cancel",
+    "separate checkpoint loading"
+  ],
+  "fully_aligned": false,
+  "passed_declared_prompt_and_history_scope": false
+}

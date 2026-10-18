@@ -16,6 +16,7 @@
 
 - [ ] 盘点发布资产布局与 token 映射，完整恢复基础模型、embedding/head、LoRA 和推理配置；保持无 System Backchannel 的五类 token。
 - [ ] 在固定 prompt 上将训练加载路径的无更新输出与官方推理路径比较，记录 dtype/设备差异及容忍标准；保存前后权重摘要。
+- [ ] 引用 001 冻结的独立官方参考资产、prompt/历史与容忍标准；本项验证训练加载路径，不代替 001 对 X-Talk 连续运行时的逐拍检查。发现共同参考或资产变化时同步重验受影响的对照。
 - [ ] 首轮只开放既有 q/v LoRA，列出可训练参数名与数量，验证 embedding/head 和其他基础参数冻结；loss 仅覆盖符合监督规则的 assistant 位置。
 - [ ] 实现可复现的 optimizer、scheduler、随机种子、gradient accumulation、gradient checkpointing、保存/恢复；新增训练逻辑使用正常 Python 模块，不将模型生命周期复制成第二套产品服务。
 - [ ] 准备独立远端 conda 环境与调度脚本，先一张 24GB 4090，以不同真实长度 batch 测峰值显存、step time、tokens/s、数据等待和保存开销。

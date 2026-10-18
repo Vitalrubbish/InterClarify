@@ -1,0 +1,20 @@
+{
+  "asr": {
+    "type": "NemotronStreamingClient",
+    "params": {"base_url": "http://127.0.0.1:8005", "chunk_ms": 80, "timeout": 120}
+  },
+  "tts": {
+    "type": "KokoroSegmented",
+    "params": {"base_url": "http://127.0.0.1:8004", "min_chars": 12, "max_chars": 160, "max_wait_ms": 250}
+  },
+  "service_config": {
+    "duplex_enabled": true,
+    "acoustic_vad_enabled": false,
+    "duplex_model_url": "http://127.0.0.1:8006",
+    "duplex_micro_turn_seconds": 0.6,
+    "duplex_max_new_tokens": 64,
+    "duplex_timeout_seconds": 30,
+    "duplex_timeline_enabled": true,
+    "duplex_timeline_dir": "data/duplex_timeline"
+  }
+}

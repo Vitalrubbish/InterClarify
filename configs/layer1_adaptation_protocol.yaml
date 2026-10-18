@@ -1,0 +1,138 @@
+schema_version: 1
+issue: '001'
+status: in_progress
+training_released: false
+seed: 20261018
+runtime:
+  asr: nvidia/nemotron-speech-streaming-en-0.6b
+  asr_chunk_ms: 160
+  audio_transport_chunk_ms: 80
+  asr_dtype: float32
+  tts: Kokoro-82M
+  voice: af_heart
+  micro_turn_ms: 600
+  clock_conditions: [session_start, first_nonempty]
+  production_clock: session_start
+  diagnostic_clock: first_nonempty
+  inference_dtype: bfloat16
+  max_new_tokens: 64
+  do_sample: false
+  eos_token: '<|im_end|>'
+  eos_token_id: 151645
+  bos_token_id: null
+  bos_is_verified_absent: true
+  assistant_history: original_generated_ids
+  user_boundary: strip_only
+  empty_window: '<|no voice|>'
+  system_backchannel: false
+  layer2: false
+  layer3: false
+  eof_to_llm: false
+  punctuation_insertion: false
+  playback_owner: xtalk
+  wire_tokens:
+    '<user is speaking>': '<|user is talking|>'
+    '<user finish speaking>': '<|user finish talking|>'
+    '<user is interrupting>': '<|user interruption|>'
+    '<user backchannel>': '<|user backchannel|>'
+    '<user is thinking>': '<|user is thinking|>'
+assets:
+  official_source_revision: 42893024ca90c8de8ac3ed624467ebc123512ff8
+  official_server_sha256: 404a1b6f51e87c012e1111cc21a712ed8895e9a5ee99328bd1245a7c6a654037
+  checkpoint_revision_hint: c3dd51ce9a5a7d27f810ffd5dab309f132a94d28
+  base_revision_hint: 8dce1f8a2d3286a7adf09b977e661350ad67e40a
+  nemotron_revision_hint: ebe59e5a817142986528bbbee5dba8db7b38ed50
+  verified_inventory: reports/layer1_training/issue001-inventory-20261018/inventory_summary.json
+  licenses_reviewed: false
+  tokenizer_verified: true
+  kokoro_revision: f3ff3571791e39611d31c381e3a41a3af07b4987
+data:
+  source: stingning/ultrachat
+  source_revision: f220fe796ce3ed62fbe1681b45ce6cbc9c6cabe0
+  source_split: train
+  source_license: MIT
+  source_manifest: reports/layer1_training/issue001-inventory-20261018/data_source_manifest.json
+  source_files_download_verified: false
+  author_exact_50k_ids: unknown
+  generator: project_implementation
+  train_dialogues: 1000
+  text_dev_dialogues: 200
+  text_test_dialogues: 300
+  smoke_dialogues: [32, 100]
+  split_before_augmentation: true
+  grouping: [original_dialogue_id, near_duplicate_group]
+  mix_original_fraction: 0.5
+  mix_unit: original_dialogue_per_epoch
+  protected_user_characters: [apostrophe, hyphen, decimal, time]
+  preserve_assistant_punctuation: true
+  exclusions: [historical_five_cases, fleurs_100, full_fdb]
+  real_asr_role: independent_transfer_evaluation
+training:
+  initialization: complete_official_checkpoint
+  trainable: existing_q_v_lora_only
+  freeze: [base, embedding, lm_head, asr, tts]
+  conditions: [B0, T1_original, T2_user_unpunctuated, T3_balanced_mix]
+  max_rounds: 2
+  max_gpus: 8
+  gpu_memory_gb: 24
+  round1_max_dialogues: 1000
+  round2_max_dialogues: 3000
+  max_epochs_per_condition_per_round: 1
+  max_gpu_hours_per_condition: [8, 16]
+  total_training_gpu_hours_cap: 72
+  actual_steps: null
+  sequence_length: null
+  actual_batch: null
+  resource_owner: issue005
+diagnostic:
+  historical_trace: endpoint-b4d12d6
+  asr_config: nemotron_en-160
+  historical_samples: 5
+  variants: [original, without_punctuation]
+  observation_seconds: 12
+  reply_windows_seconds: [2, 5, 12]
+  protocol_cases: [empty, intra_word, pause, handover, interruption, backchannel, two_turns, reset]
+  modes: [same_prompt_single_step, fixed_output_debug, independent_free_replay]
+  publication_conditions: [raw, complete_word]
+  complete_word_max_hold_ms: 160
+  clock_event_tolerance_ms: 1
+  physical_lateness_policy: report_separately_never_hide
+  prompt_id_mismatches_allowed: 0
+  generated_id_mismatches_allowed: 0
+  unexplained_state_differences_allowed: 0
+  logits_atol: 0.02
+  logits_rtol: 0.01
+  logits_tolerance_allows_control_change: false
+acceptance:
+  status: preregistered_before_candidates
+  real_dev_min_per_behavior: 30
+  real_test_min_per_behavior: 100
+  behaviors: [handover, pause, self_correction, backchannel, interruption]
+  real_test_min_speakers: 20
+  speaker_disjoint_dev_test: true
+  sample_manifest: null
+  grouped_bootstrap_seed: 20261018
+  grouped_bootstrap_replicates: 2000
+  interval_level: 0.95
+  new_reply_within_2s_min: 0.90
+  new_reply_within_12s_min: 0.95
+  premature_reply_max: 0.05
+  backchannel_false_stop_max: 0.05
+  interruption_stop_intent_min: 0.90
+  interruption_relevant_new_answer_min: 0.90
+  protocol_errors_allowed: 0
+  content_blind_acceptable_fraction_min: 0.90
+  content_acceptable_fraction_drop_vs_b0_max: 0.05
+  critical_datetime_or_negation_errors_max: 0
+  decision_uses: point_thresholds_and_grouped_uncertainty_review
+  inconclusive_interval_action: collect_independent_samples_without_lowering_thresholds
+  audio_latency_owner: issue008
+  audible_mean_target_seconds: 1.0
+  audible_mean_max_seconds: 1.5
+  simple_question_subsecond_coverage_min: 0.90
+gates:
+  issue001_runtime_comparison: pending
+  issue004_data_audit: pending
+  issue005_zero_update_and_recovery: pending
+  issue007_independent_real_asr_test: pending
+  issue008_audio_and_fdb: pending

@@ -1,19 +1,23 @@
 # 开发与测试 issue 索引
 
-更新：2026-10-18。本文目录中的 issue 是仓库内任务单，不是已发布的 GitHub issue。目标组合为 **Nemotron EN 0.6B / 160ms + Kokoro 82M / af_heart**，当前进入 Layer 1 兼容性训练准备。所有任务初始状态为待办，文档建立不表示实现或实验已执行。
+更新：2026-10-18。本文目录中的 issue 是仓库内任务单，不是已发布的 GitHub issue。目标组合为 **Nemotron EN 0.6B / 160ms + Kokoro 82M / af_heart**，当前进入 Layer 1 兼容性训练准备。001、003 进行中，002 已完成归档，004–008 待办；文档建立不表示实验已执行。完成的工作单元移入 `archive/`，父 issue 全部条件满足后再归档。
+
+001 拆分为已完成的 [资产只读扫描](archive/001a_asset_inventory.md) 和进行中的 [运行时对照](001b_runtime_comparison.md)。资产扫描不是权重恢复或许可审核通过证据。
 
 | 编号 | 任务 | 优先级 | 依赖 |
 | --- | --- | --- | --- |
-| [001](001_input_contract_and_baseline.md) | 冻结输入契约、基线和验收口径 | P0 | 无 |
-| [002](002_nemotron_streaming_integration.md) | Nemotron 在线接入与轨迹采集 | P0 | 001 |
+| [001](001_input_contract_and_baseline.md) | 冻结输入契约、运行时逐拍对照、基线和验收口径 | P0 | 无 |
+| [002](archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入与轨迹采集 | P0 | 001 |
 | [003](003_kokoro_playback_integration.md) | Kokoro 分段合成与播放接入 | P0 | 001 |
 | [004](004_training_data_and_annotation.md) | UltraChat 与自产 micro-turn 生成管线 | P0 | 001；文本训练集不依赖 002 |
 | [005](005_training_runtime_and_resource_probe.md) | 训练恢复与远端资源短跑 | P0 | 001；最终短跑依赖 004 最小集 |
 | [006](006_punctuation_robust_adaptation.md) | 三组有限适配训练 | P0 | 001、004、005 |
-| [007](007_turn_control_evaluation.md) | 独立话轮评测与权重选择 | P0 | 002、006；评测器可提前开发 |
+| [007](007_turn_control_evaluation.md) | 独立话轮评测与权重选择 | P0 | 002、006 资产交付；规则与评测器在训练前准备 |
 | [008](008_full_chain_fdb_acceptance.md) | 新组合真实音频与 FDB 验收 | P1 | 002、003、007 |
 
 文本训练路径为 001 → 004/005 → 006；002 的真实 ASR 轨迹与 006 的候选共同进入 007，再执行 008。003 可与训练准备并行安排。首轮优先复用 UltraChat 与论文生成方法，50/50 用户句读混合为主候选；开训不依赖先采集固定数量真实音频。这里的并行仅描述任务依赖，不要求启用多个代理。当前不重开 ASR/TTS 选型，不启动 Layer 2/3 实现或大规模训练。
+
+001 使用已有固定事件轨迹比较官方参考控制推理与 X-Talk 集成运行时，不依赖 002 新适配器；002/003/008 分别验收真实 ASR、TTS 与全链路。影响训练归因的运行时错误或未排除差异阻断 006，不能用 token 审计通过替代。001 先登记预算上限，005 短跑后冻结实际配置；006 完成交付三组训练资产与 dev 报告，007 再进行独立验收，避免相互等待。
 
 ## 固定的三项决策与完成证据
 
@@ -37,3 +41,8 @@
 ## 验收门槛的冻结
 
 001/004/007 在查看候选模型结果前形成验收配置：各类样本数、接话覆盖下限、误抢话/附和误停上限、质量容忍幅度、训练预算和随机种子。以按说话人分组的区间与逐例结果解释收益，不能只报训练损失或成功样本延迟。用户确定的延迟目标为平均约 1s、不超过 1.5s，简单问题亚秒；未回复率和亚秒覆盖必须一起报告。未达门槛时标为未通过，不事后降低标准。
+
+007 的评价规则在 006 开训前冻结，最终 test 前用 dev 固定各组 checkpoint 和主候选；008 在全链路结果前补齐 FDB 回归容忍、语音覆盖及实际停播门槛。运行时、交付或分段策略变化须重验受影响对照，避免将链路修复收益归为训练收益。
+
+
+接入子任务归档：[002a WAV读取](archive/002a_warmup_wav_format.md)、[003a音色加载](archive/003a_local_voice_loading.md)、[003b分段计时](archive/003b_segment_word_boundaries.md)。003仅剩[人工试听003c](003c_audio_listening_review.md)。[历史保持001c](archive/001c_runtime_history_preservation.md)与[加载压力001d](archive/001d_checkpoint_load_memory.md)已完成归档；001仍需完成[运行时对照001b](001b_runtime_comparison.md)的剩余范围与时钟归因，不能宣布训练放行。

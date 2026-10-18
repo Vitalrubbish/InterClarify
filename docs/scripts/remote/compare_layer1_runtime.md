@@ -1,0 +1,8 @@
+# 独立官方控制循环对照
+
+load_reference 校验固定server.py摘要，提取并执行原版prepare_llm_tokens、TokenQueueStreamer和llm_tick_task，不调用集成prompt/控制实现。Tensor仅为跨进程传输形状适配，真实权重推理统一在GPU模型服务。ReferenceKernel将官方原始IDs交给generate_ids端点，逐token回送原版解码器；Tokenizer使用发布tokenizer.json。RawDeltaBuffer将同一窗口的真实增量合并成一个Word，明确是固定ASR输入适配，未复现Kyutai传输。
+
+reference运行官方时钟和控制体，integrated运行既有Assembler/RuntimeAdapter；固定输出排错与各自历史自由回放分开。compare记录首次prompt/生成ID或历史差异，run保留双方时间线及覆盖缺口。首个实现尚缺完整词发布、在途reset/cancel和独立加载数值证据，fully_aligned始终false，不能以局部通过放行001或006。session_start是明确将参考起拍事件置位的实验条件，与官方默认first_nonempty分别报告。
+
+
+首轮修正：共同GPU内核先真实预热并单列耗时；原版gen_thread.join保持执行，随后仅增加整拍提交观测与测量截止检查，避免EOS消费前截断。逐拍增加控制、停播和提交正文比较。增加same-prompt单步、raw/完整词两条件；完整词暂存最多160ms，仅使用当时已到达字符，超时排空不发送EOF信号。通过cases/modes分片；CPU固定输出与GPU自由回放分开，不能用分片成功外推未执行样本。首次长作业缺少正常退出码，保留部分证据，不推定调度终止原因。
