@@ -31,7 +31,7 @@ python scripts/remote/duplex_a4_replay.py --config configs/xtalk_duplex_runtime.
   --fdb-limit 5 --out /path/new-driver-report
 ```
 
-`--native` 在 FDB 模式保留原生配置的语义 manager，开启相同 timeline；需先启动原生服务。系统附和配置必须为空。详情见 [A4 任务单](../../xtalk_a4_remote_acceptance.md)。
+`--native` 在 FDB 模式保留原生配置的语义 manager，开启相同 timeline；需先启动原生服务。系统附和配置必须为空。详情见 [A4 任务单（历史快照）](https://github.com/Vitalrubbish/InterClarify/blob/c614d55/docs/xtalk_a4_remote_acceptance.md)。
 
 
 X2 duplex 的会话能力 `acoustic_vad_enabled=false` 由服务端按连续 ASR 能力确定。禁用声学 VAD 检测、声学开始/结束信号及 pause/resume 调度；保持会话级连续 PCM 与每拍文本读取。浏览器在握手后创建关闭 VAD 的输入设备，旧客户端声学信号在网关被忽略。Qwen 与内部文本提交边界保持原行为。验证覆盖残留 VAD 信号不触发 ASR 控制、静音和播放期间连续输入、同一解码会话及握手能力。

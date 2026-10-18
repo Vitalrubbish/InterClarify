@@ -1,5 +1,7 @@
 # `scripts/remote/run_xtalk_round1.py`
 
+用途说明（2026-10-18）：本文说明保留的历史/诊断实现。当前目标已确定为 Nemotron EN 160ms + Kokoro；新组合接入和训练按 [issue 任务](../../issue/README.md) 推进，本文参数不代表新组合已部署。
+
 通用模型准备、依赖检查、服务启动与独立 TTS 流式检查工具。Qwen3-ASR 已退役，删除 ASR smoke、修订前缀处理、ASR 依赖检查和服务启动入口；ASR 由独立脚本与配置管理。脚本没有自定义类。
 
 - `read_config` / `write_json`：读取版本化 YAML，写入 UTF-8 结果。

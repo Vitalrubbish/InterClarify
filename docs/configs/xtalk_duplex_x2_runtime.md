@@ -1,5 +1,7 @@
 # X2 Duplex 配置
 
+用途说明（2026-10-18）：本文说明保留的历史/诊断实现。当前目标已确定为 Nemotron EN 160ms + Kokoro；新组合接入和训练按 [issue 任务](../issue/README.md) 推进，本文参数不代表新组合已部署。
+
 仅把 ASR 改为 X2StreamingClient，80 ms 输入；其余模型协议、600 ms micro-turn、VAD 与唯一 MOSS 播放链保留。
 
 

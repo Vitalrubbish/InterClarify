@@ -17,7 +17,7 @@ round-one 验收镜像的**增量层**配方：以**已发布**的镜像 tag 为
 
 - base：`...xtalk-round1:v0.3`（`--build-arg BASE_IMAGE` 可覆盖）。
 - 改动：在 client 环境安装 `onnxruntime==1.31.0`，并在构建期自检 `import onnxruntime` 成功。
-- 原因：duplex 运行时的后端 VAD 在 client 进程内跑，而 `VADManager` 在"没有配置 VAD 模型"时会整体禁用，导致 ASR 片段边界被推迟到音频流结束（见 [任务单 §9.5.4.2](../../xtalk_a4_remote_acceptance.md)）。`onnxruntime` 只由 `xtalk[silero-vad]`（或 `[fast-enhancer]`）extra 提供，v0.3 的 client 环境没有。
+- 原因：duplex 运行时的后端 VAD 在 client 进程内跑，而 `VADManager` 在"没有配置 VAD 模型"时会整体禁用，导致 ASR 片段边界被推迟到音频流结束（见 [任务单 §9.5.4.2（历史快照）](https://github.com/Vitalrubbish/InterClarify/blob/c614d55/docs/xtalk_a4_remote_acceptance.md)）。`onnxruntime` 只由 `xtalk[silero-vad]`（或 `[fast-enhancer]`）extra 提供，v0.3 的 client 环境没有。
 - 为什么只装这一个包、而不是重跑 `-e "xtalk[example,dev,silero-vad]"`：后者会让 pip 重解整棵 extras 依赖树（实测在 `langchain-openai` 上反复回溯，耗时数分钟），而本次需要新增的只有 `onnxruntime` 及其小依赖。
 - 为什么离线装：`pypi.org` 在这个 17MB wheel 上会长时间卡住（2026-10-15 从零构建与增量构建各遇到一次，日志停在 `Downloading onnxruntime-... (17.4 MB)` 不动），而 wheelhouse 里已有 1.31.0 同版本 wheel；缺的 `coloredlogs`/`humanfriendly` 两个小 wheel 已补进 wheelhouse。
 

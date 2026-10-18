@@ -1,8 +1,10 @@
 # `scripts/remote/turnsense/`
 
+用途说明（2026-10-18）：本文说明保留的历史/诊断实现。当前目标已确定为 Nemotron EN 160ms + Kokoro；新组合接入和训练按 [issue 任务](../../../issue/README.md) 推进，本文参数不代表新组合已部署。
+
 ## 整体作用
 
-vendored 的 **TurnSense** 独立 ONNX HTTP 服务：一个基于**音频**的话轮检测器，对缓冲的用户语音预测 `complete` / `incomplete` / `invalid`。当前 X-Talk 组合使用它处理音频式话轮边界；组件来源和连接证据见 [xtalk_baseline_stack.md](../../../xtalk_baseline_stack.md)。
+vendored 的 **TurnSense** 独立 ONNX HTTP 服务：一个基于**音频**的话轮检测器，对缓冲的用户语音预测 `complete` / `incomplete` / `invalid`。当前 X-Talk 组合使用它处理音频式话轮边界；组件来源和连接证据见 [xtalk_baseline_stack.md（历史快照）](https://github.com/Vitalrubbish/InterClarify/blob/c614d55/docs/xtalk_baseline_stack.md)。
 
 `scripts/remote/run_xtalk_round1.py serve turn_detector` 在端口 8003 启动 `service.py`；X-Talk 侧的客户端是 fork 的 `models/turn_detector/turn_sense.py`，运行配置 `configs/xtalk_round1_runtime.json` 指向它。
 

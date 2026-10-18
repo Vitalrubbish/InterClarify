@@ -31,7 +31,7 @@ bash scripts/remote/setup_x2_asr_env.sh
 
 ## 与 A4 作业的衔接
 
-节点脚本用 `DUPLEX_ASR_ENV`（conda prefix，不是环境名）以 `conda run -p` 启动 X2 服务，并用 `DUPLEX_X2_SOURCE` / `DUPLEX_X2_MODEL` 指定源码与权重目录；服务启动时校验源码 HEAD 是否等于固定提交。因此 `ready.txt` 的三个路径应原样传入作业环境变量，见 [X2 复测任务单](../../x2streaming_asr_retest.md)。
+节点脚本用 `DUPLEX_ASR_ENV`（conda prefix，不是环境名）以 `conda run -p` 启动 X2 服务，并用 `DUPLEX_X2_SOURCE` / `DUPLEX_X2_MODEL` 指定源码与权重目录；服务启动时校验源码 HEAD 是否等于固定提交。因此 `ready.txt` 的三个路径应原样传入作业环境变量，见 [X2 复测任务单（历史快照）](https://github.com/Vitalrubbish/InterClarify/blob/c614d55/docs/x2streaming_asr_retest.md)。
 
 ## 已知边界
 

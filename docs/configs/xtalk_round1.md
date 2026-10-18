@@ -1,5 +1,7 @@
 # `configs/xtalk_round1.yaml`
 
+用途说明（2026-10-18）：本文说明保留的历史/诊断实现。当前目标已确定为 Nemotron EN 160ms + Kokoro；新组合接入和训练按 [issue 任务](../issue/README.md) 推进，本文参数不代表新组合已部署。
+
 记录保留的通用模型准备与服务参数，由 `run_xtalk_round1.py` 读取，不能直接传给 `Xtalk.from_config`。Qwen3-ASR 已退役，因此不再包含 ASR 模型、源码、环境、服务或修订窗口设置。没有自定义类或方法。
 
 `sources` 固定 X-Talk 历史连接来源及 MOSS 的服务和模型源码；X-Talk 分支名是历史来源标识，不代表启用 Qwen ASR。`models` 只包含 LLM、MOSS 和 codec，`revision=null` 由首次下载解析为不可变 SHA，后续复用 `models.lock.json`。旧锁可以保留额外资产，准备脚本不会为已移除的 ASR 发起下载。

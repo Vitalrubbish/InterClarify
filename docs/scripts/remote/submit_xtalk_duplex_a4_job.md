@@ -1,5 +1,7 @@
 # `scripts/remote/submit_xtalk_duplex_a4_job.sh`
 
+用途说明（2026-10-18）：本文说明保留的历史/诊断实现。当前目标已确定为 Nemotron EN 160ms + Kokoro；新组合接入和训练按 [issue 任务](../../issue/README.md) 推进，本文参数不代表新组合已部署。
+
 将阶段 A 节点入口提交到 `pdgpu-4090`，默认 round1 v0.3 镜像和 3 GPU / 24 CPU / 96G。脚本只提交作业，不同步源码、不下载模型；源码在当前共享盘工作树原地开发后生成清单即可。
 
 ```bash
