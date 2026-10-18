@@ -10,6 +10,7 @@ InterClarify 研究全双工语音代理在用户话轮内主动澄清的时机�
 | ASR 最终测试报告与原始结果 | [报告](reports/asr_selection/20261016-results/summary.md) |
 | ASR 选择与后续适配 | [选型决定](docs/asr_selection_decision.md) |
 | 清理范围与历史源码恢复 | [清理记录](docs/asr_cleanup.md) |
+| 新英文链路的 FDB 子集推进 | [前置缺口、接入顺序与测试范围](docs/fdb_subset_retest_plan.md) |
 | 阶段 A 历史证据 | [验收记录](docs/xtalk_a4_remote_acceptance.md)、[结果目录](reports/duplex_acceptance/) |
 | X2 诊断运行配置 | [配置](configs/xtalk_duplex_x2_runtime.json)、[说明](docs/configs/xtalk_duplex_x2_runtime.md) |
 | 通用模型服务与 MOSS 补丁 | [服务工具](docs/scripts/remote/run_xtalk_round1.md)、[TTS 补丁](docs/scripts/remote/moss_tts_patch.md) |
