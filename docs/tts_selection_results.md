@@ -40,6 +40,6 @@ Kyutai 首轮同样遇到测量后的包装错误，已排除并用冻结入口�
 
 ## 人工试听
 
-[试听页](../artifacts/tts_selection/20261018/listening/index.html)、[试听包 ZIP](../artifacts/tts_selection/20261018/tts_listening.zip)、[评分 CSV](../artifacts/tts_selection/20261018/listening/scores.csv)。共 **6 条相同原文 × 4 个系统 = 24 段音频**，模型映射单独保存，不在试听页展示。
+[试听页](../artifacts/tts_selection/20261018/listening/index.html)、[试听包 ZIP](../artifacts/tts_selection/20261018/tts_listening.zip)、[评分 JSON](../artifacts/tts_selection/20261018/listening/scores.json)。共 **6 条相同原文 × 4 个系统 = 24 段音频**，模型映射单独保存，不在试听页展示。
 
-ZIP 解压后打开 `listening/index.html`。请分别填写自然度、清晰度（1–5）、是否读错、是否吞字或开头异常。音频保留原始音量和开头静音；试听页播放合并后的原始音频，服务供音断流另见延迟报告。自然度结果当前为空，最终音质选择由用户评价。本轮没有自动 MOS 代替人工评分，也未自动替换产品 TTS。
+ZIP 解压后打开 `listening/index.html`。按整体听感，为每段音频填写一个 1–5 的综合分数（可填小数，越高越好），不再分项打分。打开 `scores.json`，将各条原文 `scores` 中 A/B/C/D 对应的 `null` 改成分数即可。音频保留原始音量和开头静音；试听页播放合并后的原始音频，服务供音断流另见延迟报告。自然度结果当前为空，最终音质选择由用户评价。本轮没有自动 MOS 代替人工评分，也未自动替换产品 TTS。

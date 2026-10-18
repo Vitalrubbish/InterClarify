@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Collect completed TTS evidence and build a small anonymous listening package."""
 import argparse
-import csv
 import hashlib
 import html
 import json
@@ -66,7 +65,7 @@ def build(args):
               '| 系统 | 传输完成/尝试 | 首包 p50/p95 | 首可听代理 p50/p95 | RTF p50 | 累计断流秒 |',
               '| --- | --- | --- | --- | --- | --- |']
     details, notices = [], []
-    score_rows, audio_hashes = [], {}
+    audio_hashes = {}
     texts = {}
     for directory in candidates:
         name = directory.name
@@ -110,13 +109,12 @@ def build(args):
             target=args.listening/filename
             shutil.copy2(source,target)
             audio_hashes[filename]=hashlib.sha256(target.read_bytes()).hexdigest()
-            score_rows.append([row['id'], labels[name], row['text'], '', '', '', '', ''])
     report += ['', 'CPU 与 GPU、帧级音频流与分段合成须结合调研及环境清单解释，不能把该表当作同算力模型排名。每类只有 20 条，尾部分位数不构成服务 SLA。', ''] + notices + [''] + details
     (args.output/'report.md').write_text('\n'.join(report))
     page=['<!doctype html><html lang="zh"><meta charset="utf-8"><title>英文语音试听</title>',
           '<style>body{font:17px system-ui;max-width:1000px;margin:40px auto;padding:16px}article{border-top:1px solid #ddd;padding:20px 0}audio{width:90%;max-width:600px}label{display:block;margin:12px}</style>',
-          '<h1>英文语音对比</h1><p>6 段相同英文文本，各有匿名语音。请评自然度与清晰度（1–5），并记下错读、吞字或开头异常。保留原始音量和开头静音，建议使用耳机。此页播放合并后的原始音频；流式到达造成的断流另见报告。</p>',
-          '<p><a href="scores.csv" download>下载评分表</a></p>']
+          '<h1>英文语音对比</h1><p>6 段相同英文文本，各有匿名语音。请按整体听感，为每段音频给一个 1–5 的综合分数（可填小数，越高越好）。下载评分 JSON，将各段原文 scores 中 A/B/C/D 对应的 null 改为分数。保留原始音量和开头静音，建议使用耳机。此页播放合并后的原始音频；流式到达造成的断流另见报告。</p>',
+          '<p><a href="scores.json" download>下载评分表</a></p>']
     for text_id,text in sorted(texts.items()):
         page += [f'<article><p>{html.escape(text_id)}</p><p>{html.escape(text)}</p>']
         for label in sorted(labels.values()):
@@ -124,10 +122,16 @@ def build(args):
         page.append('</article>')
     page.append('</html>')
     (args.listening/'index.html').write_text('\n'.join(page))
-    with (args.listening/'scores.csv').open('w',newline='') as handle:
-        writer=csv.writer(handle)
-        writer.writerow(['text_id','voice','text','naturalness_1_5','clarity_1_5','pronunciation_correct','onset_issue','notes'])
-        writer.writerows(sorted(score_rows))
+    scores = {
+        'instructions': '按整体听感，为每段音频填写一个 1–5 的综合分数，可填小数，越高越好。将 scores 中 A/B/C/D 对应的 null 替换为分数；null 表示尚未评分。',
+        'score_scale': {'min': 1, 'max': 5, 'higher_is_better': True},
+        'samples': [
+            {'text_id': text_id, 'text': text,
+             'scores': {label: None for label in sorted(labels.values())}}
+            for text_id, text in sorted(texts.items())
+        ],
+    }
+    (args.listening/'scores.json').write_text(json.dumps(scores, ensure_ascii=False, indent=2)+'\n')
     (args.listening/'audio_sha256.json').write_text(json.dumps(audio_hashes,indent=2))
     archive=args.listening.parent/'tts_listening.zip'
     with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as bundle:

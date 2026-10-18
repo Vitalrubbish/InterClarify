@@ -38,7 +38,9 @@
   "listening": {
     "texts": 6,
     "audio_files": 24,
-    "rating_rows": 24,
-    "zip_sha256": "b70a7e4be80fea418c0c64fe2d88ba424f91527bd254e0b2c19d79cbbf2fa708"
+    "zip_sha256": "a1bbbeb2fd9f353ea5b0ff9fc50326894a336660548c64af61a6a64e8bcf9560",
+    "rating_entries": 24,
+    "score_format": "json",
+    "score_type": "single_overall_score_1_to_5"
   }
 }
