@@ -8,6 +8,7 @@ import contextlib
 import copy
 import hashlib
 import json
+import math
 from pathlib import Path
 import queue
 import threading
@@ -50,17 +51,6 @@ class Tokenizer:
 
     def decode(self, ids, skip_special_tokens=False):
         return self.raw.decode(ids, skip_special_tokens=skip_special_tokens)
-
-
-class RawDeltaBuffer(list):
-    """Adapt a shared visible raw-prefix contract to one official Word per window.
-
-    Only the ASR transport boundary is adapted: no control, prompt or history
-    logic is copied from X-Talk. Original Kyutai Word timing is outside scope.
-    """
-
-    def __iter__(self):
-        return iter([''.join(list.__iter__(self)).strip()])
 
 
 def load_reference(path):
@@ -134,7 +124,7 @@ class ReferenceKernel:
             streamer.end()
 
 
-async def reference(args, events, duration, tokenizer, clock, fixed=None):
+async def reference(args, events, duration, tokenizer, fixed=None):
     """Run the original tick body and decoder with explicit transport-only stubs."""
     prepare,factory,scope=load_reference(args.official_source)
     started=time.monotonic()
@@ -152,7 +142,7 @@ async def reference(args, events, duration, tokenizer, clock, fixed=None):
     prepare(self)
     if self.bos_id is not None:
         history.append(self.bos_id)
-    ready, words, lock=asyncio.Event(),RawDeltaBuffer(),asyncio.Lock()
+    ready, words, lock=asyncio.Event(),[],asyncio.Lock()
     async def send(value):
         output.append({'at':time.monotonic()-started,**value})
     class TTS:
@@ -164,17 +154,13 @@ async def reference(args, events, duration, tokenizer, clock, fixed=None):
             await send({'type':'stop','reason':reason})
     tick,state=factory(self,ready,words,lock,history,send,TTS())
     async def produce():
-        previous=''
         for event in events:
             await asyncio.sleep(max(0,started+event['arrival_seconds']-time.monotonic()))
-            text=event['text']
-            if not text.startswith(previous):
-                raise ValueError('Fixed trace rewrites a delivered prefix')
-            async with lock:
-                words.append(text[len(previous):])
-            previous=text
-            if text.strip():ready.set()
-    if clock=='session_start':ready.set()
+            word=event['text'].strip()
+            if word:
+                async with lock:
+                    words.append(word)
+                ready.set()
     producer=asyncio.create_task(produce())
     ticker=asyncio.create_task(tick())
     try:
@@ -193,8 +179,8 @@ async def reference(args, events, duration, tokenizer, clock, fixed=None):
         await asyncio.gather(producer,ticker,return_exceptions=True)
 
 
-async def integrated(args, events, duration, tokenizer, clock, fixed=None):
-    """Use the existing assembler, raw bridge and protocol executor unchanged."""
+async def integrated(args, events, duration, tokenizer, fixed=None):
+    """Feed native words through the existing cumulative-prefix event interface."""
     from retest_asr_official_input import HTTPModelProxy, OfficialBridge
     from xtalk.duplex_control.micro_turn import MicroTurnAssembler
     from xtalk.duplex_control.runtime_adapter import DuplexRuntimeAdapter
@@ -236,11 +222,15 @@ async def integrated(args, events, duration, tokenizer, clock, fixed=None):
         bus.subscribe(cls,observe,priority=-50)
     ready=asyncio.Event()
     async def produce():
+        words=[]
         for event in events:
             await asyncio.sleep(max(0,started+event['arrival_seconds']-time.monotonic()))
-            await bus.publish(ASRResultPartial(session_id='comparison',text=event['text']),
+            word=event['text'].strip()
+            if not word:continue
+            words.append(word)
+            await bus.publish(ASRResultPartial(session_id='comparison',text=' '.join(words)),
                               mode=EventDispatchMode.WAIT_UNTIL_COMPLETE)
-            if event['text'].strip():ready.set()
+            ready.set()
     async def ticks():
         await ready.wait()
         next_tick=time.monotonic()+.6
@@ -249,9 +239,6 @@ async def integrated(args, events, duration, tokenizer, clock, fixed=None):
             if time.monotonic()-started>=duration:return
             next_tick=max(time.monotonic(),next_tick+.6)
             await assembler.flush()
-    if clock=='session_start':
-        await bus.publish(LLMAgentLoop(session_id='comparison'),mode=EventDispatchMode.WAIT_UNTIL_COMPLETE)
-        ready.set()
     producer=asyncio.create_task(produce());ticker=asyncio.create_task(ticks())
     try:
         await asyncio.sleep(duration)
@@ -273,6 +260,8 @@ async def integrated(args, events, duration, tokenizer, clock, fixed=None):
 
 def compare(left,right):
     """Locate the first request divergence rather than counting its descendants."""
+    if not left['requests'] or not right['requests']:
+        return {'field':'missing_requests'}
     for index,(a,b) in enumerate(zip(left['requests'],right['requests'])):
         for field in ('prompt_token_ids','generated_ids'):
             if a.get(field)!=b.get(field):
@@ -305,32 +294,52 @@ def compare(left,right):
     return None
 
 
-def complete_word_events(events, max_hold=.16):
-    """Publish arrived complete words or expire a causal bounded partial-word hold."""
-    output=[];visible='';raw='';deadline=None
-    def publish(text,at):
-        nonlocal visible
-        if text != visible:
-            if not text.startswith(visible):raise ValueError('Publication would rewrite delivered text')
-            output.append({'arrival_seconds':at,'text':text})
-            visible=text
-    for event in events:
-        at=event['arrival_seconds']
-        if deadline is not None and deadline <= at:
-            publish(raw,deadline);deadline=None
-        text=event['text']
-        if not text.startswith(raw):raise ValueError('Complete-word view is inapplicable to a rewriting trace')
-        raw=text
-        boundary=max((i+1 for i,char in enumerate(text) if char.isspace()),default=0)
-        if boundary > len(visible):publish(text[:boundary],at)
-        if len(raw)>len(visible) and deadline is None:deadline=at+max_hold
-        if raw==visible:deadline=None
-    if deadline is not None:publish(raw,deadline)
-    return output
+def load_word_cases(path):
+    """Require native timestamped Word events, never infer them from raw prefixes."""
+    manifest=json.loads(path.read_text())
+    if manifest.get('input_contract') != 'kyutai_word_strip_then_space_join':
+        raise ValueError('Manifest must declare the official Kyutai Word contract')
+    samples=manifest.get('samples',[])
+    if len(samples) != 5:
+        raise ValueError('The frozen acceptance manifest must contain five samples')
+    cases=[]
+    seen=set()
+    for sample in samples:
+        name=sample['id']
+        if not isinstance(name,str) or not name or name in seen:
+            raise ValueError('Sample IDs must be unique nonempty strings')
+        if any(char not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_' for char in name):
+            raise ValueError('Sample IDs must be safe output filenames')
+        seen.add(name)
+        source=sample.get('source_capture_sha256','')
+        if len(source)!=64 or any(char not in '0123456789abcdef' for char in source):
+            raise ValueError('Each sample requires its original capture SHA256')
+        duration=sample['duration_seconds']
+        if isinstance(duration,bool) or not isinstance(duration,(int,float)) or not math.isfinite(duration) or duration<=0:
+            raise ValueError('Observation duration must be positive and finite')
+        events=sample['word_events']
+        previous=0
+        for event in events:
+            at=event['arrival_seconds']
+            if event.get('type')!='Word' or not isinstance(event.get('text'),str):
+                raise ValueError('Only native Word messages with text are accepted')
+            if isinstance(at,bool) or not isinstance(at,(int,float)) or not math.isfinite(at) or not 0<=previous<=at<=duration:
+                raise ValueError('Word arrival times must be ordered and within the observation')
+            previous=at
+        if not any(event['text'].strip() and event['arrival_seconds']+.6<duration for event in events):
+            raise ValueError('A sample must permit a nonempty Word and a first tick')
+        cases.append((name,events,duration))
+    return cases
 
 
 async def run(args):
     """Write both raw timelines and mark incomplete coverage explicitly."""
+    cases=load_word_cases(args.manifest)
+    manifest_count=len(cases)
+    if args.cases:
+        unknown=set(args.cases)-{case[0] for case in cases}
+        if unknown:raise ValueError(f'Unknown cases: {sorted(unknown)}')
+        cases=[case for case in cases if case[0] in args.cases]
     args.output.mkdir(parents=True,exist_ok=False)
     tokenizer=Tokenizer(args.tokenizer)
     warmup=None
@@ -347,51 +356,30 @@ async def run(args):
     fixed=['<|user is talking|><|im_end|>', '<|user finish talking|>Yes.<|im_end|>',
            '<|user backchannel|><|im_end|>', '<|user interruption|><|im_end|>',
            '<|user finish talking|>Tuesday.<|im_end|>','<|user is thinking|><|im_end|>']
-    cases=[('single-step', [{'arrival_seconds':.05,'text':'  Hello '}],.7),
-           ('protocol', [{'arrival_seconds':.05,'text':'Cou'},
-                         {'arrival_seconds':.25,'text':'Could'},
-                         {'arrival_seconds':.7,'text':'Could you'},
-                         {'arrival_seconds':1.3,'text':'Could you confirm Tuesday at 9:30?'}],8.0)]
-    if args.manifest:
-        manifest=json.loads(args.manifest.read_text())
-        samples=[row for row in manifest['samples'] if row['split']=='test']
-        for index,row in enumerate(samples,1):
-            path=args.asr_run/'nemotron_en-160'/f'sample-{index:04d}.jsonl'
-            events=[json.loads(line) for line in path.read_text().splitlines()]
-            cases.append((f'historical-{index}',events,row['boundary_seconds']+12))
     results=[]
-    if args.cases:
-        selected=set(args.cases)
-        unknown=selected-{case[0] for case in cases}
-        if unknown:raise ValueError(f'Unknown cases: {sorted(unknown)}')
-        cases=[case for case in cases if case[0] in selected]
+    mode='fixed_output_debug' if args.fixed_output_debug else 'independent_free_replay'
+    if not args.fixed_output_debug and not args.model_url:
+        raise ValueError('Free replay requires the fixed GPU model service')
     for name,events,duration in cases:
-      for publication in args.publications:
-        visible=complete_word_events(events) if publication=='complete_word' else events
-        modes=args.modes or (['fixed_output_debug','independent_free_replay'] if args.model_url else ['fixed_output_debug'])
-        for mode in modes:
-            if mode=='independent_free_replay' and not args.model_url:
-                raise ValueError('Free replay requires the fixed GPU model service')
-            for clock in args.clocks:
-                outputs=fixed if mode=='fixed_output_debug' else None
-                left=await reference(args,visible,duration,tokenizer,clock,outputs)
-                right=await integrated(args,visible,duration,tokenizer,clock,outputs)
-                # Normalize the service bridge's real request timestamps only.
-                for row in right['requests']:
-                    if 'at' not in row:row['at']=row['started_monotonic']
-                difference=compare(left,right)
-                row={'case':name,'mode':'same_prompt_single_step' if name=='single-step' and not outputs else mode,'clock':clock,'first_difference':difference,
-                     'publication':publication,'requests':len(left['requests'])}
-                results.append(row)
-                stem=f'{name}-{mode}-{clock}-{publication}'
-                (args.output/f'{stem}.json').write_text(json.dumps({'reference':left,'integrated':right,'comparison':row,'input_events':visible},indent=2))
-                print(json.dumps(row),flush=True)
+        outputs=fixed if args.fixed_output_debug else None
+        left=await reference(args,events,duration,tokenizer,outputs)
+        right=await integrated(args,events,duration,tokenizer,outputs)
+        for record in right['requests']:
+            if 'at' not in record:record['at']=record['started_monotonic']
+        difference=compare(left,right)
+        row={'case':name,'mode':mode,'clock':'first_nonempty',
+             'input_contract':'kyutai_word_strip_then_space_join',
+             'first_difference':difference,'requests':len(left['requests'])}
+        results.append(row)
+        (args.output/f'{name}-{mode}.json').write_text(json.dumps(
+            {'reference':left,'integrated':right,'comparison':row,'input_events':events},indent=2))
+        print(json.dumps(row),flush=True)
     summary={'rows':results,'reference_sha256':OFFICIAL_SHA,
-             'kernel_warmup':warmup,
-             'input_shim':'raw-prefix delta coalesced to one Word per micro-turn; fixed ASR input only',
-             'kernel':'same frozen GPU service; independent reference raw IDs bypass integration renderer',
-             'coverage_gaps':['actual Kyutai Word transport','in-flight reset/cancel','separate checkpoint loading'],
-             'fully_aligned':False,'passed_declared_prompt_and_history_scope':not any(row['first_difference'] for row in results)}
+             'manifest_sha256':hashlib.sha256(args.manifest.read_bytes()).hexdigest(),
+             'kernel_warmup':warmup,'input_contract':'kyutai_word_strip_then_space_join',
+             'complete_manifest_coverage':len(results)==manifest_count,
+             'coverage_gaps':['in-flight reset/cancel checked separately','separate training checkpoint loading'],
+             'passed_declared_prompt_and_history_scope':bool(results) and not any(row['first_difference'] for row in results)}
     (args.output/'summary.json').write_text(json.dumps(summary,indent=2))
     return int(not summary['passed_declared_prompt_and_history_scope'])
 
@@ -402,15 +390,11 @@ def main():
     parser.add_argument('--official-source',type=Path,required=True)
     parser.add_argument('--tokenizer',type=Path,required=True)
     parser.add_argument('--model-url')
-    parser.add_argument('--manifest',type=Path)
-    parser.add_argument('--asr-run',type=Path)
-    parser.add_argument('--clocks',nargs='+',choices=['session_start','first_nonempty'],default=['first_nonempty'])
+    parser.add_argument('--manifest',type=Path,required=True)
     parser.add_argument('--cases',nargs='+')
-    parser.add_argument('--modes',nargs='+',choices=['fixed_output_debug','independent_free_replay'])
-    parser.add_argument('--publications',nargs='+',choices=['raw','complete_word'],default=['raw'])
+    parser.add_argument('--fixed-output-debug',action='store_true')
     parser.add_argument('--output',type=Path,required=True)
     args=parser.parse_args()
-    if args.manifest and not args.asr_run:parser.error('--manifest requires --asr-run')
     raise SystemExit(asyncio.run(run(args)))
 
 

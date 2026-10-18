@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-issue001-word-20261019/scripts/remote/capture_kyutai_words.py", line 100, in <module>
+    asyncio.run(main(parser.parse_args()))
+  File "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/interclarify-dev/lib/python3.10/asyncio/runners.py", line 44, in run
+    return loop.run_until_complete(main)
+  File "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/interclarify-dev/lib/python3.10/asyncio/base_events.py", line 649, in run_until_complete
+    return future.result()
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-issue001-word-20261019/scripts/remote/capture_kyutai_words.py", line 79, in main
+    await capture(args.url,dev,args.output/'warmup.json')
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-issue001-word-20261019/scripts/remote/capture_kyutai_words.py", line 34, in capture
+    async with websockets.connect(url,max_size=8<<20,open_timeout=30) as ws:
+  File "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/interclarify-dev/lib/python3.10/site-packages/websockets/legacy/client.py", line 629, in __aenter__
+    return await self
+  File "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/interclarify-dev/lib/python3.10/site-packages/websockets/legacy/client.py", line 647, in __await_impl_timeout__
+    return await self.__await_impl__()
+  File "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/interclarify-dev/lib/python3.10/site-packages/websockets/legacy/client.py", line 654, in __await_impl__
+    await protocol.handshake(
+  File "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/interclarify-dev/lib/python3.10/site-packages/websockets/legacy/client.py", line 325, in handshake
+    raise InvalidStatusCode(status_code, response_headers)
+websockets.exceptions.InvalidStatusCode: server rejected WebSocket connection: HTTP 401

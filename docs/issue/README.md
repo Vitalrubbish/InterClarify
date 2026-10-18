@@ -1,20 +1,20 @@
 # 开发与测试 issue 索引
 
-更新：2026-10-19。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**，当前准备有限 Layer 1 继续训练，尚未开训。这里是仓库内任务单；完成任务移入 `archive/`，父任务仅在全部条件满足后归档。
+更新：2026-10-19。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**，001 官方控制对照已通过，继续准备有限 Layer 1 训练，尚未开训。这里是仓库内任务单；完成任务移入 `archive/`，父任务仅在全部条件满足后归档。
 
 | 编号 | 任务 | 当前状态与剩余工作 |
 | --- | --- | --- |
-| [001](001_input_contract_and_baseline.md) | 官方输入契约与基线 | 进行中；核验真实 Word 输入、完成单套配置对照、集成生命周期、许可和放行报告 |
-| [001b](001b_runtime_comparison.md) | 官方控制路径对照 | 进行中；现有 raw/有界 complete_word 是诊断，需直接修正词事件输入并运行历史五例 |
+| [001](archive/001_input_contract_and_baseline.md) | 官方输入契约与基线 | 完成，已归档；五例共 136 拍一致，资产及生命周期证据齐全 |
+| [001b](archive/001b_runtime_comparison.md) | 官方控制路径对照 | 完成，已归档；原生 Word 输入、五例真权重和远端 7 项测试通过 |
 | [002](archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入 | 完成，已归档；r4-asr 退出 0 |
-| [003](003_kokoro_playback_integration.md) | Kokoro 分段播放 | 进行中；自动验收完成，仅剩 [003c 人工试听](003c_audio_listening_review.md) |
+| [003](003_kokoro_playback_integration.md) | Kokoro 分段播放 | 进行中；读法通过，分段连贯性未通过；待 [003d 修复](003d_segment_continuity.md)与 [003c 复听](003c_audio_listening_review.md) |
 | [004](004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 进行中；来源清单完成，下载验真、生成和审计待做 |
 | [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 待办；推理 strict 加载不替代训练恢复与零更新对齐 |
-| [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；001、004、005 门禁未通过 |
+| [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；004、005 及 007 开训前准备未完成 |
 | [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |
 | [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 验收 | 待办；组件通过不等于新组合全链路通过 |
 
-远端执行见 [001 任务单](001_remote_execution.md)与 [002/003 任务单](002_003_remote_execution.md)。001 只验证一套官方配置：Kyutai Word 逐词 strip、每拍空格连接、首非空 Word 起拍、600ms、BF16、64-token 贪心。raw 字符增量和 160ms 超时释放残词均不等同官方 Word；不展开时钟、发布粒度与句读矩阵。已有报告保留为诊断，不升级为官方输入完成证据。
+远端执行见 [001 任务单](archive/001_remote_execution.md)与 [002/003 任务单](002_003_remote_execution.md)。001 只验证一套官方配置：Kyutai Word 逐词 strip、每拍空格连接、首非空 Word 起拍、600ms、BF16、64-token 贪心。raw 字符增量和 160ms 超时释放残词均不等同官方 Word；不展开时钟、发布粒度与句读矩阵。旧 raw/超时残词报告只作诊断；新原生 Word 五例全部通过，结果见 [001 验收报告](../../reports/layer1_training/issue001-word-20261019/README.md)。
 
 ## 依赖与交付
 
@@ -38,4 +38,4 @@
 
 已有完成实现：[001a 资产扫描](archive/001a_asset_inventory.md)、[001c 历史保持](archive/001c_runtime_history_preservation.md)、[001d 加载压力](archive/001d_checkpoint_load_memory.md)、[001e 校验耗时](archive/001e_prompt_validation_overhead.md)、[002 接入](archive/002_nemotron_streaming_integration.md)、[002a WAV 读取](archive/002a_warmup_wav_format.md)、[003a 音色加载](archive/003a_local_voice_loading.md)、[003b 分段计时](archive/003b_segment_word_boundaries.md)。
 
-文档维护：[009 进度核对](archive/009_issue_progress_audit.md)、[010 官方输入核实与计划收敛](archive/010_issue001_scope_reduction.md)。这两项归档不表示 001/001b 通过，训练门禁仍为 false。
+文档维护：[009 进度核对](archive/009_issue_progress_audit.md)、[010 官方输入核实与计划收敛](archive/010_issue001_scope_reduction.md)。001/001b 和远端任务单现已基于新证据完成归档；训练仍受 004/005 等前置约束，保持 false。

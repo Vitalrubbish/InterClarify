@@ -2,11 +2,11 @@
 
 `configs/layer1_adaptation_protocol.yaml` 是实验登记文件，不是产品启动配置；无类或方法，现有远端入口不会自动读取它。`runtime` 记录组件和生成设置，`assets` 记录来源与核验状态，`data/training` 固定数据和有限继续训练方案，`diagnostic` 登记 001 单套参考对照，`acceptance/gates` 记录候选门槛和未完成证据。
 
-001 的官方输入依据是 [server.py](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/server.py#L422-L499)：接收 Kyutai Word，逐词 strip、每拍空格连接；首个非空 Word 起拍，600ms、64-token 贪心，推理精度保持本项目冻结的 BF16。`diagnostic.input_contract` 指定该语义，`input_manifest: null` 表示五例原始词事件清单尚未核验，不得据此放行。
+001 的官方输入依据是 [server.py](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/server.py#L422-L499)：接收 Kyutai Word，逐词 strip、每拍空格连接；首个非空 Word 起拍，600ms、64-token 贪心，推理精度保持本项目冻结的 BF16。`diagnostic.input_contract` 指定该语义，`input_manifest` 和 `evidence_report` 已指向 2026-10-19 验收证据；原件摘要与紧凑副本摘要分开保存，五例 136 拍通过，`issue001_runtime_comparison: passed`。
 
-现有 raw 字符增量和 160ms 超时释放残词的 complete_word 均为本项目诊断方式，不等同官方 Word。001 不再展开配置矩阵；单步、固定输出仅用于定位具体差异，集成 reset/cancel 独立核对。产品仍为 Nemotron/Kokoro，`production_clock` 记录实际 session-start，产品迁移与音频验收由 007/008 完成。
+旧 raw 字符增量和 160ms 超时释放残词的 complete_word 不等同官方 Word，本轮已从比较器删除，仅保留历史报告。001 不再展开配置矩阵；单步、固定输出仅用于定位具体差异，集成 reset/cancel 独立核对。产品仍为 Nemotron/Kokoro，`production_clock` 记录实际 session-start，产品迁移与音频验收由 007/008 完成。
 
-同资产同 prompt 要求生成 IDs 一致，logits 容忍不允许改变控制选择。1ms 只用于逻辑事件归属，物理迟到、排队和完整请求耗时另报。`training_released: false` 只是登记状态，未来训练入口仍须检查全部前置证据；001 不要求官方权重达到接话率目标。
+同资产同 prompt 要求生成 IDs 一致，logits 容忍不允许改变控制选择。1ms 只用于逻辑事件归属，物理迟到、排队和完整请求耗时另报。`training_released: false` 只是登记状态，未来训练入口仍须检查全部前置证据；001 不要求官方权重达到接话率目标。`assets.licenses_reviewed: true` 表示来源与当前研究使用边界已核验，见本轮报告；不表示新增分发许可。
 
 首轮最多 1,000 条、第二轮最多 3,000 条，每组每轮最多一 epoch，GPU 小时上限分别为 8/16，总计 72，最多 8×4090。005 根据实测冻结长度、batch 和步数；001 诊断预算 4 GPU 小时另计。训练只更新完整恢复的官方 checkpoint 中已有 q/v LoRA。
 

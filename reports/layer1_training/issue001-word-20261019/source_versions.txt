@@ -1,0 +1,3 @@
+InterClarify base commit: 22db3e9
+X-Talk commit: f1531f3
+Actual changed source is frozen by source.sha256; inference snapshots are not rewritten by later commits.

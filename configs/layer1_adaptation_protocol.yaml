@@ -1,6 +1,6 @@
 schema_version: 1
 issue: '001'
-status: in_progress
+status: complete
 training_released: false
 seed: 20261018
 runtime:
@@ -43,7 +43,7 @@ assets:
   base_revision_hint: 8dce1f8a2d3286a7adf09b977e661350ad67e40a
   nemotron_revision_hint: ebe59e5a817142986528bbbee5dba8db7b38ed50
   verified_inventory: reports/layer1_training/issue001-inventory-20261018/inventory_summary.json
-  licenses_reviewed: false
+  licenses_reviewed: true
   tokenizer_verified: true
   kokoro_revision: f3ff3571791e39611d31c381e3a41a3af07b4987
 data:
@@ -87,7 +87,9 @@ training:
 diagnostic:
   historical_samples: 5
   input_contract: kyutai_word_strip_then_space_join
-  input_manifest: null
+  input_manifest: reports/layer1_training/issue001-word-20261019/data/word-capture-r2/word_manifest.json
+  evidence_report: reports/layer1_training/issue001-word-20261019/README.md
+  input_manifest_original_sha256: e8ae3fdb21f7a1d453fa42d3be4824d58e623629187be0b1983500c9790aba0e
   clock: first_nonempty
   mode: independent_free_replay
   observation_seconds: 12
@@ -128,7 +130,7 @@ acceptance:
   audible_mean_max_seconds: 1.5
   simple_question_subsecond_coverage_min: 0.90
 gates:
-  issue001_runtime_comparison: pending
+  issue001_runtime_comparison: passed
   issue004_data_audit: pending
   issue005_zero_update_and_recovery: pending
   issue007_independent_real_asr_test: pending

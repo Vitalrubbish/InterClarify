@@ -1,0 +1,18 @@
+{
+  "base": "source.sha256",
+  "revisions": {
+    "source-r1.sha256": {
+      "original_file_sha256": "d86c2dc3c6e545568b70686b7919f830cbc4f57f2e81b746e2418b07f6ce9aec",
+      "overrides": {
+        "scripts/remote/capture_kyutai_words.py": "952abf6573dc198908da5a8592fbd50f1dd746cff71650a6305905ecd726bea9",
+        "tests/test_layer1_runtime_comparison.py": "be068d9995aea7a0143662b5ecd17ab66f3445ac96ffa70e42daa500102c26c3"
+      }
+    },
+    "source-capture-r2.sha256": {
+      "original_file_sha256": "d212d702903096a5893589e6db329aaf33e831960de436819b40644ffe14d486",
+      "overrides": {
+        "tests/test_layer1_runtime_comparison.py": "be068d9995aea7a0143662b5ecd17ab66f3445ac96ffa70e42daa500102c26c3"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+test_cancelled_session_does_not_commit_into_restarted_session (test_layer1_runtime_comparison.RuntimeComparisonTests.test_cancelled_session_does_not_commit_into_restarted_session) ... ok
+test_changed_official_source_rejected (test_layer1_runtime_comparison.RuntimeComparisonTests.test_changed_official_source_rejected) ... ok
+test_first_prompt_difference (test_layer1_runtime_comparison.RuntimeComparisonTests.test_first_prompt_difference) ... ok
+test_invalid_word_sources_are_rejected (test_layer1_runtime_comparison.RuntimeComparisonTests.test_invalid_word_sources_are_rejected) ... ok
+test_missing_requests_and_history_are_not_success (test_layer1_runtime_comparison.RuntimeComparisonTests.test_missing_requests_and_history_are_not_success) ... ok
+test_official_ast_preserves_word_spacing_and_empty_window (test_layer1_runtime_comparison.RuntimeComparisonTests.test_official_ast_preserves_word_spacing_and_empty_window) ... ok
+test_word_events_retain_original_boundaries_and_time (test_layer1_runtime_comparison.RuntimeComparisonTests.test_word_events_retain_original_boundaries_and_time) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 7.166s
+
+OK

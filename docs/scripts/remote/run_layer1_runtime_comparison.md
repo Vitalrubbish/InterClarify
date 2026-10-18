@@ -1,7 +1,7 @@
-# 官方控制循环单卡诊断入口
+# 官方 Word 控制循环单卡对照入口
 
-`scripts/remote/run_layer1_runtime_comparison.sh` 无类。脚本核验 source.sha256、独立输出目录与设备，在独立模型/客户端 conda 环境启动单卡服务；等待最长 300 秒 readiness 后运行比较器，退出时关闭服务并保存退出码。模型恢复完整发布 checkpoint，BF16、64-token 贪心；调度资源起步 1×4090、8 CPU、32GB。
+`scripts/remote/run_layer1_runtime_comparison.sh` 无类。要求 `LAYER1_COMPARISON_ROOT`、新的 `LAYER1_COMPARISON_OUTPUT` 和已核验的 `LAYER1_WORD_MANIFEST`；不再内置 Nemotron raw 或完整词变体。`LAYER1_COMPARISON_CASE` 可限定一个样本。
 
-当前入口针对历史 Nemotron 累计文本，使用 first-nonempty、600ms 和 raw/有界 complete_word 两种诊断发布；`LAYER1_COMPARISON_CASE` 可限定样本。它没有原始 Kyutai Word 输入，不能作为官方 Word 对齐验收命令。本轮计划维护不修改脚本执行行为。
+脚本校验源码摘要、输入和设备，在独立模型/客户端 conda 环境启动 BF16 发布 checkpoint；最长等待 300 秒 readiness，随后运行唯一 Word 对照配置。EXIT trap 关闭本作业模型进程组并保存退出码；不覆盖既有输出。经 vc 调度申请 1×4090、8 CPU、32GB 主存。
 
-001b 应直接修改现有入口和比较器，使必验只运行一套官方 Word 输入配置；单步和固定输出仅按需排错，准确命令随实现更新。任务范围见 [001 远端任务单](../../issue/001_remote_execution.md)。本脚本不执行 ASR/TTS、训练或 FDB，不以退出 0 代替父任务放行。
+入口不运行 ASR/TTS、不训练、不执行 FDB。Word manifest 和样本来源须先按 [001 任务单](../../issue/archive/001_remote_execution.md)核验；比较器结果、集成生命周期和资产证据齐全后再判断 001 放行。
