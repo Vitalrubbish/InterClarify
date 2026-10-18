@@ -1,0 +1,414 @@
+{
+  "first_row": "kernel_warmup",
+  "requests": [
+    {
+      "prompt_tokens": 9,
+      "generated_tokens": 2,
+      "validation_seconds": 0.027874,
+      "finish_reason": "stop",
+      "seconds": 1.815,
+      "peak_gpu_gib": 16.275
+    },
+    {
+      "prompt_tokens": 9,
+      "generated_tokens": 2,
+      "validation_seconds": 0.024155,
+      "finish_reason": "stop",
+      "seconds": 0.044,
+      "peak_gpu_gib": 16.275
+    },
+    {
+      "prompt_tokens": 20,
+      "generated_tokens": 2,
+      "validation_seconds": 0.019432,
+      "finish_reason": "stop",
+      "seconds": 0.048,
+      "peak_gpu_gib": 16.276
+    },
+    {
+      "prompt_tokens": 39,
+      "generated_tokens": 2,
+      "validation_seconds": 0.016977,
+      "finish_reason": "stop",
+      "seconds": 0.044,
+      "peak_gpu_gib": 16.28
+    },
+    {
+      "prompt_tokens": 50,
+      "generated_tokens": 12,
+      "validation_seconds": 0.020412,
+      "finish_reason": "stop",
+      "seconds": 0.267,
+      "peak_gpu_gib": 16.284
+    },
+    {
+      "prompt_tokens": 71,
+      "generated_tokens": 11,
+      "validation_seconds": 0.019018,
+      "finish_reason": "stop",
+      "seconds": 0.245,
+      "peak_gpu_gib": 16.286
+    },
+    {
+      "prompt_tokens": 91,
+      "generated_tokens": 11,
+      "validation_seconds": 0.02234,
+      "finish_reason": "stop",
+      "seconds": 0.224,
+      "peak_gpu_gib": 16.289
+    },
+    {
+      "prompt_tokens": 111,
+      "generated_tokens": 11,
+      "validation_seconds": 0.017787,
+      "finish_reason": "stop",
+      "seconds": 0.222,
+      "peak_gpu_gib": 16.293
+    },
+    {
+      "prompt_tokens": 131,
+      "generated_tokens": 11,
+      "validation_seconds": 0.017603,
+      "finish_reason": "stop",
+      "seconds": 0.259,
+      "peak_gpu_gib": 16.297
+    },
+    {
+      "prompt_tokens": 151,
+      "generated_tokens": 11,
+      "validation_seconds": 0.020772,
+      "finish_reason": "stop",
+      "seconds": 0.245,
+      "peak_gpu_gib": 16.302
+    },
+    {
+      "prompt_tokens": 171,
+      "generated_tokens": 11,
+      "validation_seconds": 0.020116,
+      "finish_reason": "stop",
+      "seconds": 0.234,
+      "peak_gpu_gib": 16.305
+    },
+    {
+      "prompt_tokens": 191,
+      "generated_tokens": 11,
+      "validation_seconds": 0.019024,
+      "finish_reason": "stop",
+      "seconds": 0.235,
+      "peak_gpu_gib": 16.308
+    },
+    {
+      "prompt_tokens": 211,
+      "generated_tokens": 11,
+      "validation_seconds": 0.019664,
+      "finish_reason": "stop",
+      "seconds": 0.235,
+      "peak_gpu_gib": 16.313
+    },
+    {
+      "prompt_tokens": 231,
+      "generated_tokens": 11,
+      "validation_seconds": 0.020868,
+      "finish_reason": "stop",
+      "seconds": 0.236,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 9,
+      "generated_tokens": 2,
+      "validation_seconds": 0.025331,
+      "finish_reason": "stop",
+      "seconds": 0.055,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 20,
+      "generated_tokens": 2,
+      "validation_seconds": 0.020605,
+      "finish_reason": "stop",
+      "seconds": 0.044,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 39,
+      "generated_tokens": 2,
+      "validation_seconds": 0.018812,
+      "finish_reason": "stop",
+      "seconds": 0.044,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 50,
+      "generated_tokens": 12,
+      "validation_seconds": 0.01877,
+      "finish_reason": "stop",
+      "seconds": 0.241,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 71,
+      "generated_tokens": 11,
+      "validation_seconds": 0.019058,
+      "finish_reason": "stop",
+      "seconds": 0.223,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 91,
+      "generated_tokens": 11,
+      "validation_seconds": 0.018738,
+      "finish_reason": "stop",
+      "seconds": 0.224,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 111,
+      "generated_tokens": 11,
+      "validation_seconds": 0.022167,
+      "finish_reason": "stop",
+      "seconds": 0.222,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 131,
+      "generated_tokens": 11,
+      "validation_seconds": 0.020069,
+      "finish_reason": "stop",
+      "seconds": 0.228,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 151,
+      "generated_tokens": 11,
+      "validation_seconds": 0.019308,
+      "finish_reason": "stop",
+      "seconds": 0.229,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 171,
+      "generated_tokens": 11,
+      "validation_seconds": 0.019198,
+      "finish_reason": "stop",
+      "seconds": 0.234,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 191,
+      "generated_tokens": 11,
+      "validation_seconds": 0.020852,
+      "finish_reason": "stop",
+      "seconds": 0.235,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 211,
+      "generated_tokens": 11,
+      "validation_seconds": 0.018913,
+      "finish_reason": "stop",
+      "seconds": 0.235,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 231,
+      "generated_tokens": 11,
+      "validation_seconds": 0.017923,
+      "finish_reason": "stop",
+      "seconds": 0.236,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 9,
+      "generated_tokens": 2,
+      "validation_seconds": 0.025965,
+      "finish_reason": "stop",
+      "seconds": 0.043,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 23,
+      "generated_tokens": 2,
+      "validation_seconds": 0.021358,
+      "finish_reason": "stop",
+      "seconds": 0.043,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 38,
+      "generated_tokens": 2,
+      "validation_seconds": 0.026051,
+      "finish_reason": "stop",
+      "seconds": 0.044,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 49,
+      "generated_tokens": 12,
+      "validation_seconds": 0.015719,
+      "finish_reason": "stop",
+      "seconds": 0.241,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 70,
+      "generated_tokens": 11,
+      "validation_seconds": 0.025747,
+      "finish_reason": "stop",
+      "seconds": 0.223,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 90,
+      "generated_tokens": 11,
+      "validation_seconds": 0.020763,
+      "finish_reason": "stop",
+      "seconds": 0.224,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 110,
+      "generated_tokens": 11,
+      "validation_seconds": 0.019149,
+      "finish_reason": "stop",
+      "seconds": 0.222,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 130,
+      "generated_tokens": 11,
+      "validation_seconds": 0.018148,
+      "finish_reason": "stop",
+      "seconds": 0.228,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 150,
+      "generated_tokens": 11,
+      "validation_seconds": 0.018863,
+      "finish_reason": "stop",
+      "seconds": 0.23,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 170,
+      "generated_tokens": 11,
+      "validation_seconds": 0.019069,
+      "finish_reason": "stop",
+      "seconds": 0.236,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 190,
+      "generated_tokens": 11,
+      "validation_seconds": 0.026625,
+      "finish_reason": "stop",
+      "seconds": 0.235,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 210,
+      "generated_tokens": 11,
+      "validation_seconds": 0.023382,
+      "finish_reason": "stop",
+      "seconds": 0.441,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 9,
+      "generated_tokens": 2,
+      "validation_seconds": 0.027057,
+      "finish_reason": "stop",
+      "seconds": 0.087,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 23,
+      "generated_tokens": 2,
+      "validation_seconds": 0.027278,
+      "finish_reason": "stop",
+      "seconds": 0.043,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 38,
+      "generated_tokens": 2,
+      "validation_seconds": 0.027037,
+      "finish_reason": "stop",
+      "seconds": 0.044,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 49,
+      "generated_tokens": 12,
+      "validation_seconds": 0.018957,
+      "finish_reason": "stop",
+      "seconds": 0.241,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 70,
+      "generated_tokens": 11,
+      "validation_seconds": 0.025332,
+      "finish_reason": "stop",
+      "seconds": 0.224,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 90,
+      "generated_tokens": 11,
+      "validation_seconds": 0.027102,
+      "finish_reason": "stop",
+      "seconds": 0.225,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 110,
+      "generated_tokens": 11,
+      "validation_seconds": 0.025399,
+      "finish_reason": "stop",
+      "seconds": 0.223,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 130,
+      "generated_tokens": 11,
+      "validation_seconds": 0.025448,
+      "finish_reason": "stop",
+      "seconds": 0.229,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 150,
+      "generated_tokens": 11,
+      "validation_seconds": 0.020029,
+      "finish_reason": "stop",
+      "seconds": 0.305,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 170,
+      "generated_tokens": 11,
+      "validation_seconds": 0.020063,
+      "finish_reason": "stop",
+      "seconds": 0.235,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 190,
+      "generated_tokens": 11,
+      "validation_seconds": 0.018898,
+      "finish_reason": "stop",
+      "seconds": 0.235,
+      "peak_gpu_gib": 16.319
+    },
+    {
+      "prompt_tokens": 210,
+      "generated_tokens": 11,
+      "validation_seconds": 0.01754,
+      "finish_reason": "stop",
+      "seconds": 0.235,
+      "peak_gpu_gib": 16.319
+    }
+  ],
+  "model_log_sha256": "e6922e69eabf04a73a5281aa45510e5a42cba5c857ae3ddcc3a69437abaa0211"
+}

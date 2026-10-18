@@ -60,3 +60,6 @@
 ## 本轮推进结果
 
 001a资产扫描、001c历史保持、001d加载修复已归档。修复后固定输出51拍一致，真实权重raw协议8拍一致；complete-word截止拍数8/7不一致，历史完整矩阵和在途reset/cancel仍未补齐。继续工作集中在001b，配置training_released保持false。本轮没有启动训练，不把组件接入验收等同001完成。
+
+
+用户追问节拍后补充001e：逐token词表长度查询开销已修复，同一protocol真实权重raw13/13、完整词12/12，旧8/7差异已消除。001仍保留历史完整矩阵、独立单步及在途reset/cancel覆盖缺口，training_released继续false。
