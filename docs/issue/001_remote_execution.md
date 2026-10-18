@@ -1,6 +1,8 @@
 # Issue 001 远端核验任务单
 
-状态：进行中。2026-10-18 本地 SSH 初次两次连接超时，重试后成功；只读资产扫描已执行，后续运行时对照仍需单独证据。
+状态：进行中，2026-10-18 核对。只读资产扫描、固定输出四组对照和单条 protocol 轨迹真实权重复测已执行；历史五例完整矩阵、独立单步与在途 reset/cancel 尚未完成。本任务单保留待执行范围，不归档。
+
+已执行结果见 [资产核验](../../reports/layer1_training/issue001-inventory-20261018/README.md)、[阶段对照](../../reports/layer1_training/issue001-runtime-20261018/README.md)和[最新复测](../../reports/layer1_training/issue001-validation-20261018/README.md)。最新作业 `job-179233595533938893476-xuan-zhang` 退出 0，raw 13/13、完整词 12/12；只覆盖 first-nonempty 起拍的 protocol 轨迹。以下表格仍是目标矩阵，不代表已全部执行。
 
 先将当前两仓库源码同步到独立目录，记录提交与工作树摘要，不覆盖历史实验。CPU 资产扫描在远端已有 conda 环境执行；全文件哈希可能产生较大存储读取量，串行运行。以下路径来自历史脚本，执行前核实。`--asset` 接受文件或目录，输出目录必须不存在。
 
@@ -19,7 +21,7 @@ conda run -p /hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/interclarify-dev \
 
 GPU 诊断必须通过 `vc` 调度，起步 1×4090、8 CPU、32GB 主存，最多 4 GPU 小时；实际模型主存需求超限时先登记资源调整。复用 `retest_asr_official_input.py`，仅选择 `--configs nemotron_en-160`，保留 original/without_punctuation；旧删除标点函数仅是历史诊断，不作为 004 保护时间、小数等字符的训练增强实现。
 
-运行前仍须实现并冻结独立官方参考执行入口和两路统一事件驱动；当前旧复测入口不能直接产生以下完整矩阵，不得将其运行替代本任务：
+独立官方参考执行入口和两路事件驱动已由 `compare_layer1_runtime.py` 与 `run_layer1_runtime_comparison.sh` 实现。参考执行原版 AST 控制循环；单步模式已实现但未独立执行。后续使用上述入口补齐矩阵，旧 `retest_asr_official_input.py` 不能替代完整对照：
 
 | 维度 | 固定范围 |
 | --- | --- |

@@ -1,6 +1,12 @@
 # Issue 004：使用 UltraChat 自行实现 micro-turn 数据生成管线
 
-状态：待办。优先级：P0。依赖：001；文本训练集不依赖 002，真实 ASR 迁移评测数据依赖 002。
+状态：进行中（来源清单已完成，生成管线待实现）。优先级：P0。依赖：001；文本训练集不依赖 002，真实 ASR 迁移评测数据依赖 002。
+
+## 2026-10-18 进度核对
+
+已交付 [UltraChat 来源清单](../../reports/layer1_training/issue001-inventory-20261018/data_source_manifest.json)，冻结 `stingning/ultrachat` revision `f220fe796ce3ed62fbe1681b45ce6cbc9c6cabe0`、train split、MIT 许可元数据、id/data 字段与十个 shard 的发布 LFS SHA256；来源记录随 001a 扫描交付，实现提交 `d23f80f`。这是元数据清单，正文未下载验真，协议中的 `source_files_download_verified` 仍为 false，作者精确 50k 清单仍未知。
+
+尚无 `configs/layer1_data.yaml`、`scripts/training/build_layer1_dataset.py` 或 `audit_layer1_dataset.py`，也没有 1,000/200/300 实际切分、最小审计集与生成报告。下一步仍是数据下载验 SHA256、生成器实现及审计，不能据来源清单启动 006。
 
 ## 已确定的实现路线
 
@@ -31,7 +37,7 @@
 
 ## 工作项
 
-- [ ] 交付 UltraChat 来源清单：仓库/数据集 ID、revision、split、许可、字段映射、获取方式与原始文件摘要。
+- [x] 交付 UltraChat 来源清单：仓库/数据集 ID、revision、split、许可元数据、字段映射、获取方式与发布的原始文件摘要；实际下载校验列入下方完成标准。
 - [ ] 自行实现读取、过滤、切分、基础事件生成、句读变换、混合采样、序列化和审计；不把官方推理脚本或仅删除标点的脚本当作完整生成管线。
 - [ ] 用配置表达论文生成参数和本项目关闭系统附和的差异，锁定 tokenizer 与实际 token IDs。
 - [ ] 保存原始对话到派生序列/事件/增强视图的映射，保证三训练组使用同一基础事件计划。

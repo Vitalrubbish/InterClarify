@@ -2,6 +2,10 @@
 
 状态：待办。优先级：P0。依赖：001；训练加载可先实现，最终资源短跑使用 004 的最小审计集。
 
+## 2026-10-18 进度核对
+
+已有可复用前置证据：[001a 资产扫描](archive/001a_asset_inventory.md)记录发布参数布局，[001d](archive/001d_checkpoint_load_memory.md)证明推理服务 strict 恢复成功并记录资源；这些均不等于训练加载审计、零更新数值对齐或 optimizer/RNG 恢复。当前未见 `scripts/training/train_layer1.py`、`configs/layer1_training.yaml`、`scripts/remote/run_layer1_training.sh` 及真实训练短跑报告，所有训练验收项保持未完成。训练加载准备可先推进；最终资源短跑仍缺 004 最小审计集，实际步数、长度和 batch 尚为 null。
+
 ## 问题与目标
 
 发布模型包含基础权重之外的控制 embedding/head 和 q/v LoRA。目标是先证明恢复正确、梯度范围正确、训练可运行，再承诺训练规模或工期。不能把“加载成功”视为恢复了完整官方 checkpoint。

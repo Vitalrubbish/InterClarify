@@ -2,6 +2,10 @@
 
 状态：待办。优先级：P1。依赖：002、003、007；链路 smoke 可在训练期间先用 B0 排错。
 
+## 2026-10-18 进度核对
+
+[r4 新组件自动验收](../../reports/english_integration/20261018-r4/README.md)已通过，交付了独立 conda、显式后端、EOF 排空、readiness 与取消隔离的组件证据，可复用于本项；组件作业未启动真实 LLM 或 FDB，不能勾选全链路完成条件。003 尚待人工试听、007 尚无通过的候选；现有 `reports/duplex_acceptance/` 为历史底座结果。未见 Nemotron/Kokoro + B0/候选的完整链路及新组合 FDB 评分，保持待办，音频门槛与全链路调度入口仍需补齐。
+
 ## 目标与对照
 
 固定 Nemotron EN 160ms + Kokoro 82M/af_heart，在同一输入、分段策略与播放链路上比较官方 B0 和选出的适配权重。只改变 Layer 1；旧 X2/MOSS 历史结果仅作背景，不当成单变量对照。

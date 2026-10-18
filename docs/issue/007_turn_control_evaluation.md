@@ -2,6 +2,10 @@
 
 状态：待办。优先级：P0。依赖：002、006 的训练资产交付；评测器和门槛须在 006 正式训练前准备并冻结，不要求先完成本 issue 的最终验收。
 
+## 2026-10-18 进度核对
+
+[002](archive/002_nemotron_streaming_integration.md)已交付接入诊断轨迹；协议已预登记行为分层、覆盖/质量阈值与 bootstrap 种子，但 `acceptance.sample_manifest` 仍为 null。现有轨迹来自同一条 FLEURS dev 录音及构造变体，不满足独立 dev/test 样本要求。未见 `scripts/evaluation/evaluate_layer1.py`、`configs/layer1_acceptance.yaml` 或候选独立评测报告；006 尚无训练资产。保持待办，先准备评测器和独立样本清单，不能把历史五例或组件通过作为本项验收。
+
 ## 目标与实验设计
 
 用独立真实 ASR 轨迹判断适配是否有收益。全部条件固定 Nemotron EN 160ms、600ms micro-turn、生成预算、精度和观察窗；只替换 Layer 1 权重。原样/去句读分别回放，各模型自己生成 assistant 历史，不强塞另一条件输出。
