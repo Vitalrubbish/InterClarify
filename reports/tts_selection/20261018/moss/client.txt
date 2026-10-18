@@ -1,1 +1,0 @@
-/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/scripts/run_tts_selection_job.sh: line 76: rt: command not found
