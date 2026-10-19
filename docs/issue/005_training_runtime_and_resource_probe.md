@@ -1,10 +1,12 @@
 # Issue 005：恢复训练状态并完成远端资源短跑
 
-状态：待办。优先级：P0。依赖：001；训练加载可先实现，最终资源短跑使用 004 的最小审计集。
+状态：进行中（独立训练conda环境准备已提交，训练加载/短跑待办）。优先级：P0。依赖：001；训练加载可先实现，最终资源短跑使用 004 的最小审计集。
 
-## 2026-10-18 进度核对
+## 当前进度
 
-已有可复用前置证据：[001a 资产扫描](archive/001a_asset_inventory.md)记录发布参数布局，[001d](archive/001d_checkpoint_load_memory.md)证明推理服务 strict 恢复成功并记录资源；这些均不等于训练加载审计、零更新数值对齐或 optimizer/RNG 恢复。当前未见 `scripts/training/train_layer1.py`、`configs/layer1_training.yaml`、`scripts/remote/run_layer1_training.sh` 及真实训练短跑报告，所有训练验收项保持未完成。训练加载准备可先推进；最终资源短跑仍缺 004 最小审计集，实际步数、长度和 batch 尚为 null。
+008a B0完整链路五例未接话，已按用户决定启动训练准备。独立conda prefix `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training` 从只读既有interclarify-dev种子克隆，CPU作业 `job-179238030994488852272-xuan-zhang` 已提交，当前排队，不改历史环境。环境建立不等于真实参数更新或恢复验证。
+
+001a记录发布布局，001d和008a证明推理路径strict恢复可运行；这些不替代训练加载审计、零更新数值对齐或optimizer/RNG恢复。`train_layer1.py`、训练配置和GPU短跑入口仍待实现，最终短跑仍缺004最小审计集，实际步数/长度/batch未冻结。
 
 ## 问题与目标
 

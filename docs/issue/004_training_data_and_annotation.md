@@ -1,12 +1,12 @@
 # Issue 004：使用 UltraChat 自行实现 micro-turn 数据生成管线
 
-状态：进行中（来源清单已完成，生成管线待实现）。优先级：P0。依赖：001；文本训练集不依赖 002，真实 ASR 迁移评测数据依赖 002。
+状态：进行中（来源下载验真已提交远端CPU作业，生成管线待实现）。优先级：P0。依赖：001；文本训练集不依赖 002，真实 ASR 迁移评测数据依赖 002。
 
-## 2026-10-18 进度核对
+## 当前进度
 
-已交付 [UltraChat 来源清单](../../reports/layer1_training/issue001-inventory-20261018/data_source_manifest.json)，冻结 `stingning/ultrachat` revision `f220fe796ce3ed62fbe1681b45ce6cbc9c6cabe0`、train split、MIT 许可元数据、id/data 字段与十个 shard 的发布 LFS SHA256；来源记录随 001a 扫描交付，实现提交 `d23f80f`。这是元数据清单，正文未下载验真，协议中的 `source_files_download_verified` 仍为 false，作者精确 50k 清单仍未知。
+008a当前完整链路B0五例新正文/语音0/5，用户确认的条件触发有限训练准备。已有 [来源清单](../../reports/layer1_training/issue001-inventory-20261018/data_source_manifest.json)，冻结revision、MIT许可元数据、字段和十个shard的发布LFS SHA256；正文下载须完整验真后使用，作者精确50k清单未知。
 
-尚无 `configs/layer1_data.yaml`、`scripts/training/build_layer1_dataset.py` 或 `audit_layer1_dataset.py`，也没有 1,000/200/300 实际切分、最小审计集与生成报告。下一步仍是数据下载验 SHA256、生成器实现及审计，不能据来源清单启动 006。
+已实现 `scripts/training/fetch_layer1_sources.py`，远端根 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/`，CPU作业 `job-179238030901887371251-xuan-zhang` 已提交，当前排队。逐文件核验大小和SHA256，不将“提交下载作业”标成来源验真完成。尚无micro-turn生成器、1,000/200/300实际切分或最小审计集；正式训练仍未放行。
 
 ## 已确定的实现路线
 

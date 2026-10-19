@@ -1,0 +1,14 @@
+{
+  "decision": "Proceed with finite adaptation preparation after B0 five-case failure",
+  "remote_root": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/",
+  "source_job": "job-179238030901887371251-xuan-zhang",
+  "environment_job": "job-179238030994488852272-xuan-zhang",
+  "last_observed_status": "Pending",
+  "source_verification_complete": false,
+  "environment_ready": false,
+  "data_audit_complete": false,
+  "zero_update_and_recovery_complete": false,
+  "gradient_updates_started": false,
+  "source_fetch_script_sha256": "c0c4855df2a0fe49f8d5a2d3c56d41889cd41d3b7d32768db16ea084790e06db",
+  "manifest": "reports/layer1_training/issue001-inventory-20261018/data_source_manifest.json"
+}
