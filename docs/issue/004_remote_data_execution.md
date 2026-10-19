@@ -2,6 +2,8 @@
 
 状态：待办。父任务：[004](004_training_data_and_annotation.md)。本任务单只执行 CPU 数据构建，不启动训练或模型服务。
 
+代码已通过本地测试。当前诊断/下载恢复作业 `job-179239520300088615232-xuan-zhang`（4CPU/8GiB/0GPU，指定d6-hpc-cpu-004，run_id `issue004-probe-recover-20261019-r4`），冻结 detached worktree `source/5df0ef0`，由 GitHub `issue004-data-pipeline` 分支同步。`--cmd`引用仓库内 `scripts/remote/run_layer1_data_probe.sh`，提交日志放独立submit_logs，避免与入口同名；依赖清单使用标准库metadata，避开环境pip内部错误。r1/r2失败及r3撤销均在报告保留。该作业不构建完整切分，诊断通过后在同一作业串行恢复来源；本任务单的完整生成仍待前置数据齐备后执行。
+
 ## 前置核对
 
 1. 经 GitHub 同步已提交源码，冻结 checkout 和逐文件摘要，工作目录遵循 [远端约定](../remote_workspace.md)。

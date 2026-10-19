@@ -8,7 +8,7 @@
 
 远端根 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/`。2026-10-19 实查原下载作业已退出，`vc list` 无活动任务；仅前3个shard完整，第4个为约518MiB partial，日志为ChunkedEncodingError。独立训练conda已可导入tokenizers/yaml/requests。来源尚未全部验真，不能继续引用提交时的排队快照。
 
-已实现数据核心 `layer1_data.py`、构建/审计命令、`configs/layer1_data.yaml`、远端CPU入口及同路径说明，覆盖分组切分、事件计划、三组视图、mask、序列窗口与生成恢复。实现工作见 [013](013_layer1_data_pipeline_implementation.md)，下载恢复见 [004a](004a_source_download_recovery.md)，实际执行见 [远端任务单](004_remote_data_execution.md)。尚无完整来源上的1000/200/300产物或已人审最小集，正式训练仍未放行。
+已实现数据核心 `layer1_data.py`、构建/审计命令、`configs/layer1_data.yaml`、远端CPU入口及同路径说明，覆盖分组切分、事件计划、三组视图、mask、序列窗口与生成恢复。代码子任务 [013](archive/013_layer1_data_pipeline_implementation.md) 已归档，下载恢复见 [004a](004a_source_download_recovery.md)，实际执行见 [远端任务单](004_remote_data_execution.md)。新增23项本地测试通过；修复调度入口与环境pip清单采集问题后，当前单个4CPU/8GiB/0GPU作业为 `job-179239520300088615232-xuan-zhang`（r4，指定CPU-004），先运行测试和发布tokenizer的32条诊断，通过后串行恢复下载。旧作业失败/撤销记录见实施报告，未计通过。尚无完整来源上的1000/200/300产物或已人审最小集，正式训练仍未放行。
 
 ## 已确定的实现路线
 
