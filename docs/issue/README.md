@@ -47,6 +47,8 @@
 
 ## 归档
 
+[023 研究场景修订](archive/023_research_scenario_revision.md)已完成：以复试通知适用性和打印机诊断替换 [idea 草稿](../research_idea.md)的人员排班示例，保留共同前缀、续说分支及收益/负面影响评级；测量场景仅作扩展示例。
+
 [022 主动插话研究 idea 草稿](archive/022_research_idea_draft.md)已完成：见 [research_idea.md](../research_idea.md)，整理统一在线决策、共同前缀六分支，以及信息收益与插话负面影响的高/中/低分析。仅交付讨论草稿，不改变现有实现或启动训练。
 
 已有完成实现：[001a 资产扫描](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/001a_asset_inventory.md)、[001c 历史保持](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/001c_runtime_history_preservation.md)、[001d 加载压力](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/001d_checkpoint_load_memory.md)、[001e 校验耗时](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/001e_prompt_validation_overhead.md)、[002 接入](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_nemotron_streaming_integration.md)、[002a WAV 读取](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002a_warmup_wav_format.md)、[003a 音色加载](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003a_local_voice_loading.md)、[003b 分段计时](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003b_segment_word_boundaries.md)。
