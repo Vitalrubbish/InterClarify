@@ -24,7 +24,7 @@
 
 [018正式数据交付](018_layer1_data_delivery.md)按用户决定先有限抽取最多6000原始对话再过滤/去重/切分。r3监督冲突由[019](archive/019_duplex_data_alignment_audit.md)修复，旧产物已删除；r4在调试机1CPU/nice10/2GiB硬限完成，正式切分、32/100子集、机器审计及待签署材料见[r4报告](../../reports/layer1_training/issue004-build-20261019-r4/README.md)。
 
-[020文本表面形式核查](020_asr_text_surface_alignment.md)跟进用户审阅r4后的补充问题：缩写跨拍、Nemotron大小写与数字/时间/日期写法。完成核对与必要修复前，004仍不视为人工签署完成。
+[020文本表面形式核查](archive/020_asr_text_surface_alignment.md)跟进用户审阅r4后的补充问题：缩写跨拍、Nemotron大小写与数字/时间/日期写法。完成核对与必要修复前，004仍不视为人工签署完成。
 
 [015 调试机资源实测](archive/015_debug_node_data_validation.md)完成：32条诊断在1CPU下约6.9秒、峰值约150MiB；同规模轻量检查直接在调试机受限执行。r4测试/诊断及完整来源下载最终均通过退出0。
 
@@ -55,3 +55,5 @@
 [012 主目录归拢](archive/012_remote_home_consolidation.md)已完成：24个历史目录归入interclarify-archive，顶层目录50→26；当前路径按[远端目录约定](../remote_workspace.md)和迁移清单查找。
 
 [014 实际缓存/退役资产回收](archive/014_remote_cache_reclamation.md)已完成：直接删除14个编译缓存、3组候选权重、2套旧环境，目标删除前占用约20.58GiB；当前模型、训练环境和原始结果保留。
+
+[020核验](archive/020_asr_text_surface_alignment.md)已完成：调试节点单GPU可运行该短探针，现役ASR保留大小写/缩写并主要输出英文数词；[021](021_asr_surface_data_revision.md)跟踪用户数值口语化和新数据审计，r4尚未实现这项一致性要求。

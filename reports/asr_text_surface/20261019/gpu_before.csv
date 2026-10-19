@@ -1,0 +1,5 @@
+index, name, uuid, memory.total [MiB], memory.used [MiB]
+0, NVIDIA GeForce RTX 2080 Ti, GPU-460836c4-6b34-da73-7a31-78e5d259b59a, 11264 MiB, 1 MiB
+1, NVIDIA GeForce RTX 2080 Ti, GPU-86941273-dd3c-04ff-83f6-40c9a4775e36, 11264 MiB, 3900 MiB
+2, NVIDIA GeForce RTX 2080 Ti, GPU-83006c42-ccb1-08de-7abf-6281e4af5528, 11264 MiB, 1 MiB
+3, NVIDIA GeForce RTX 2080 Ti, GPU-915b3dfc-3278-456d-716e-a2f195869b27, 11264 MiB, 1 MiB

@@ -1,0 +1,1 @@
+eSpeak NG text-to-speech: 1.49.2  Data at: /usr/share/espeak-ng-data
