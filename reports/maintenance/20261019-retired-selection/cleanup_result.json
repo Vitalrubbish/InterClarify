@@ -1,0 +1,245 @@
+{
+  "code_paths": [
+    "/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/qwen-asr",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-2254d12",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-5e6db38",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-99b7db6",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-586e804",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-13a846d",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-b4d12d6",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-1ea0969",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-b0d50be",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/source",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/scripts",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/configs",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-screen-20261017/scripts",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-screen-20261017/tests",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-screen-20261017/configs",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-screen-20261017/docs",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-analysis-20261017/scripts",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-analysis-20261017/tests",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-analysis-20261017/configs",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-analysis-20261017/docs",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-combination-20261017/scripts",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-combination-20261017/tests",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-combination-20261017/configs",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-combination-20261017/docs",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-early-fix-20261017/scripts",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-early-fix-20261017/tests",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-early-fix-20261017/configs",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-early-fix-20261017/docs",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-latency-20261017/scripts",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-latency-20261017/tests",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-latency-20261017/configs",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-latency-20261017/docs"
+  ],
+  "model_path": "/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/models/cache/models--Qwen--Qwen3-ASR-1.7B",
+  "environment_path": "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/xtalk-round1-asr",
+  "retained_paths": [
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-english-integration-20261018-v6/envs/asr/bin/python",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-english-integration-20261018-v6/envs/tts/bin/python",
+    "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/interclarify-dev/bin/python",
+    "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/xtalk-round1-client/bin/python",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/bin/python",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/dataset",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/models/nemotron_en",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/models",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-kyutai/bin/bin/moshi-server"
+  ],
+  "code_archive": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-maintenance-20261019/retired_selection_sources.tar.gz",
+  "removed": [
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/models/cache/models--Qwen--Qwen3-ASR-1.7B",
+      "allocated_bytes_before": 6475233792,
+      "kind": "model"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/qwen-asr",
+      "allocated_bytes_before": 5778944,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source",
+      "allocated_bytes_before": 58368,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-2254d12",
+      "allocated_bytes_before": 41472,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-5e6db38",
+      "allocated_bytes_before": 54784,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-99b7db6",
+      "allocated_bytes_before": 98816,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-586e804",
+      "allocated_bytes_before": 35328,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-13a846d",
+      "allocated_bytes_before": 94208,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-b4d12d6",
+      "allocated_bytes_before": 77824,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-1ea0969",
+      "allocated_bytes_before": 88576,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-b0d50be",
+      "allocated_bytes_before": 30208,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/source",
+      "allocated_bytes_before": 238592,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/scripts",
+      "allocated_bytes_before": 44032,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/configs",
+      "allocated_bytes_before": 11776,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-screen-20261017/scripts",
+      "allocated_bytes_before": 546304,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-screen-20261017/tests",
+      "allocated_bytes_before": 193024,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-screen-20261017/configs",
+      "allocated_bytes_before": 7680,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-screen-20261017/docs",
+      "allocated_bytes_before": 406016,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-analysis-20261017/scripts",
+      "allocated_bytes_before": 519168,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-analysis-20261017/tests",
+      "allocated_bytes_before": 110592,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-analysis-20261017/configs",
+      "allocated_bytes_before": 7680,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-analysis-20261017/docs",
+      "allocated_bytes_before": 448000,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-combination-20261017/scripts",
+      "allocated_bytes_before": 661504,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-combination-20261017/tests",
+      "allocated_bytes_before": 219648,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-combination-20261017/configs",
+      "allocated_bytes_before": 7680,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-combination-20261017/docs",
+      "allocated_bytes_before": 446464,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-early-fix-20261017/scripts",
+      "allocated_bytes_before": 637952,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-early-fix-20261017/tests",
+      "allocated_bytes_before": 214528,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-early-fix-20261017/configs",
+      "allocated_bytes_before": 7680,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-early-fix-20261017/docs",
+      "allocated_bytes_before": 414720,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-latency-20261017/scripts",
+      "allocated_bytes_before": 517632,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-latency-20261017/tests",
+      "allocated_bytes_before": 179712,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-latency-20261017/configs",
+      "allocated_bytes_before": 7680,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-latency-20261017/docs",
+      "allocated_bytes_before": 391168,
+      "kind": "retired_source"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/xtalk-round1-asr",
+      "allocated_bytes_before": 226451968,
+      "kind": "retired_environment"
+    }
+  ],
+  "archive_sha256": "4be45792321ba88b4b48aee1f83487bf054d642115efab5f49e1350f73120a2e",
+  "archive_bytes": 4032660,
+  "protected_paths_exist_after": {
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-english-integration-20261018-v6/envs/asr/bin/python": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-english-integration-20261018-v6/envs/tts/bin/python": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/interclarify-dev/bin/python": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/xtalk-round1-client/bin/python": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/bin/python": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/dataset": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/models/nemotron_en": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/models": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-kyutai/bin/bin/moshi-server": true
+  },
+  "removed_target_allocated_bytes": 6714283520,
+  "net_target_bytes_less_recovery_archive": 6710250860,
+  "quota_delta_measured": false,
+  "completed": true
+}

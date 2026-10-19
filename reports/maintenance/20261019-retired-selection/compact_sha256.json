@@ -1,0 +1,13 @@
+{
+  "qwen3_asr_environment.packages.txt": "4fe5a0214e16239b3fe529b99884347fc4ece9f379e2c900e47d9e734b431c6f",
+  "qwen3_asr_environment.conda.txt": "e82ba1dee37f39b137f7804a43af88d4685a5a6e44e35e157a5f82e50912125c",
+  "verification_after.json": "9b13c30e81dbb547730d4ad9a7ea5a84c15378016ea829633c73f5d7d1c09287",
+  "README.md": "e0ccbdfbbd578c344e406000b274af8e3c5e420ef76f0b88eef95a4dcbbe8440",
+  "tasks_at_deletion.txt": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+  "tasks_before.txt": "39870d597437222cb0be57ad19e8de881be95803a4295a08383ef98e2f056cf2",
+  "supplement_result.json": "fee6b321b40f7c293ad3b953827fcc546f2c0de183e519f645251c87fbda55d9",
+  "qwen3_asr_model_inventory.json": "fe004c2617411a8e05f784c120db2b511c38148e44f8ea02639ad68e17b94f38",
+  "log_sources.json": "f92943a8eb6b7e751e0a3e6a94d671a674f95262115c9c7c920075253e595067",
+  "cleanup.log": "8929d4eecd8df36d59a60bf58aa250da14fb591a46a7909b7a8936e8237cb2b6",
+  "cleanup_result.json": "2b00cb49b3b9e1229d3e0a9ee498546bfa65cd614b9fa4d4ac5a0d2a2e5e6213"
+}

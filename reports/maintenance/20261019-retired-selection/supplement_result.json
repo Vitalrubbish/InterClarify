@@ -1,0 +1,66 @@
+{
+  "removed": [
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/scripts/remote/qwen3_asr_service.py",
+      "bytes": 14177,
+      "sha256": "87767079cfc88c24fba0486dea49d19e4a65ee3cd41e8d7ee1a5b30f30c7d7f6"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/scripts/remote/__pycache__/qwen3_asr_service.cpython-312.pyc",
+      "bytes": 18400,
+      "sha256": "58c4fb77819fe02e10992c682997b352fd34492ef21cd6e0691dd97e3165b637"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/tests/test_qwen3_asr_service.py",
+      "bytes": 13257,
+      "sha256": "9baf1e2529fbe31e80c4dd5d1b52eebe44aba7d6a41abca8cc7f9c4d0c0d2f71"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/tests/__pycache__/test_qwen3_asr_service.cpython-312.pyc",
+      "bytes": 22709,
+      "sha256": "21dafe727869d6344ae77e78de0b16450bafdd80dcf3ad9625add0423484d9ce"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/docs/scripts/remote/qwen3_asr_service.md",
+      "bytes": 2928,
+      "sha256": "c0fc3ad710914676ff835833b92d65eecdfc2d0538f45768231c807637e4b963"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/InterClarify/docs/tests/test_qwen3_asr_service.md",
+      "bytes": 3547,
+      "sha256": "d508c52eb71e77f7259d05fdedda65d9adcea26d9cb6510d62311eed37d0ccb9"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-b4d12d6.tar.b64",
+      "bytes": 20488,
+      "sha256": "faab126817215d9a5f9f3cfb6c26483c0cd4d2d078fe04c7b94a263781bdc7ea"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-1ea0969.tar.b64",
+      "bytes": 21612,
+      "sha256": "989c6324c49ece9394447784460e84e45911e404c50cfe5cb4d78b5c962440b5"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-b0d50be.tar.b64",
+      "bytes": 10480,
+      "sha256": "ae2e21b2272e302005e4d98a66acbf4f1de07018a477300c0ab0fe2a7f43a772"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/source-13a846d.tar.b64",
+      "bytes": 18440,
+      "sha256": "55e15484dd925b4d69f15d3710386730c228d777ce7abfacfcb2290fcbecbcfa"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/source.tar.gz",
+      "bytes": 18686,
+      "sha256": "e93ce418bdf70129b4597132e6b6a2c65acc779f5b23df1cef721968c70501dd"
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/models/cache/.locks/models--Qwen--Qwen3-ASR-1.7B",
+      "kind": "retired_cache_lock"
+    }
+  ],
+  "recovery_archive": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-maintenance-20261019/retired_selection_supplement.tar.gz",
+  "archive_sha256": "2e96bce313f0e3ef0fe78bd2b244080609cf2cc88a303b8d583dd88b32664e5b",
+  "archive_bytes": 99002
+}

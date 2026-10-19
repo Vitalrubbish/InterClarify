@@ -1,0 +1,2 @@
+job-179238030994488852272-xuan-zhang | pdcpu | 2026-10-19 11:25:10 | Running | 4   | 8G  | 0   | 0d0h4m34s | issue005-training-env-20261019     |        |
+job-179238030901887371251-xuan-zhang | pdcpu | 2026-10-19 11:25:09 | Running | 2   | 4G  | 0   | 0d0h4m34s | issue004-ultrachat-source-20261019 |        |
