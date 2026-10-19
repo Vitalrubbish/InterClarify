@@ -9,7 +9,7 @@
 | [002](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入 | 完成，已归档；r4-asr 退出 0 |
 | [003](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003_kokoro_playback_integration.md) | Kokoro 分段播放 | 完成，已归档；[003d修复](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003d_segment_continuity.md)及[003c用户复听](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003c_audio_listening_review.md)通过 |
 | [004](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 完成归档；r5全量机器审计通过，用户明确免除复审后关闭 |
-| [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 进行中；017已关闭，用户接受回归拍界抖动；训练器及恢复短跑待实现 |
+| [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 进行中；[024](archive/024_layer1_training_state.md)完成归档，32条真实更新和恢复精确一致；[025](025_layer1_remote_probe.md)单卡100条多长度资源测量中 |
 | [017](../../reports/layer1_training/issue017-loading-20261019/README.md) | 完整训练加载与零更新 | 完成、已归档；零更新通过，回归拍界抖动由用户明确接受 |
 | [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；005及007开训前准备未完成；004已完成 |
 | [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |

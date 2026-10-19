@@ -1,6 +1,6 @@
 # Issue 024：实现有限训练及完整训练状态恢复
 
-状态：进行中。父任务：[005](005_training_runtime_and_resource_probe.md)。2026-10-20 用户授权启动005。
+状态：完成，已归档。父任务：[005](../005_training_runtime_and_resource_probe.md)。2026-10-20 用户授权启动005。实现提交`c21a352`，真实验证作业`job-179242817730774595080-xuan-zhang`；结果见[005报告](../../../reports/layer1_training/issue005-probe-20261020/README.md)。
 
 ## 范围
 
@@ -12,6 +12,6 @@
 
 ## 完成条件
 
-- [ ] 实现及中文镜像文档齐全，轻量契约测试通过。
-- [ ] 远端真实模型完成更新、冻结参数摘要不变，checkpoint可恢复。
-- [ ] 未中断与干净进程恢复的loss、LoRA及optimizer/scheduler/RNG/游标对齐，差异如实记录。
+- [x] 实现及中文镜像文档齐全，本地4项轻量契约通过，远端7项全部通过。
+- [x] 远端真实模型完成更新，112个既有LoRA张量改变、冻结参数完整摘要不变。
+- [x] 未中断与干净进程恢复的loss、LoRA及optimizer/scheduler/RNG/游标完全一致，未放宽容忍度。

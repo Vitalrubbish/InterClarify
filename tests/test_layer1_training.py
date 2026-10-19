@@ -9,6 +9,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts/training'))
 import train_layer1 as training
+import run_layer1_probe as probe
 
 
 class SupervisionTests(unittest.TestCase):
@@ -49,6 +50,14 @@ class SupervisionTests(unittest.TestCase):
         for cursor, count in ((-1, 1), (1, 1), (0, 2)):
             with self.assertRaisesRegex(ValueError, 'single-epoch'):
                 dataset.rows(cursor, count)
+
+    def test_resource_headroom_uses_actual_capacity(self):
+        gib = 1024**3
+        rows = [{'length': 1024, 'summary': {'peak_reserved_bytes': 21 * gib}},
+                {'length': 2048, 'summary': {'peak_reserved_bytes': int(21.8 * gib)}}]
+        self.assertEqual(probe.select_resource(rows, int(23.5 * gib))['length'], 1024)
+        with self.assertRaisesRegex(RuntimeError, 'headroom'):
+            probe.select_resource(rows, 22 * gib)
 
 
 @unittest.skipUnless(importlib.util.find_spec('torch'), 'Tensor checks run in the remote training conda')

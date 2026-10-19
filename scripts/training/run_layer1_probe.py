@@ -12,6 +12,14 @@ import time
 from layer1_data import write_json
 
 
+def select_resource(successes, total_memory):
+    """Reserve headroom against actual device capacity, including driver reservations."""
+    safe = [r for r in successes if r['summary']['peak_reserved_bytes'] <= total_memory - 2 * 1024**3]
+    if not safe:
+        raise RuntimeError('No resource configuration has 2 GiB memory headroom')
+    return max(safe, key=lambda r: r['length'])
+
+
 def main(args):
     root, output = args.root.resolve(), args.output.resolve()
     trainer = root / 'scripts/training/train_layer1.py'
@@ -74,10 +82,8 @@ def main(args):
             successes.append({'length': length, 'phase': phase, 'summary': summary,
                               'identity': manifest['identity']})
     # Retain memory headroom instead of selecting the largest barely passing window.
-    safe = [r for r in successes if r['summary']['peak_reserved_bytes'] <= 22 * 1024**3]
-    if not safe:
-        raise RuntimeError('No resource configuration has 2 GiB memory headroom')
-    selected = max(safe, key=lambda r: r['length'])
+    device = json.loads((output / 'gpu_preflight.json').read_text())
+    selected = select_resource(successes, device['total_memory'])
     index_phase = run('full-train-index', [sys.executable, str(trainer), 'index',
                       '--dataset', str(dataset / 'dataset'), '--audit', str(dataset / 'audit.json'),
                       '--tokenizer', str(checkpoint / 'tokenizer'), '--length', str(selected['length']),
