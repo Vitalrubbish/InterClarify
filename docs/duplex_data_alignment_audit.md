@@ -1,6 +1,6 @@
 # Issue 004 数据生成与 DuplexCascade 官方对齐审计
 
-日期：2026-10-19。范围：当前 `issue004-build-r3` 的生成配置、事件计划、编码器，以及前 32 条人工审计材料。此报告为静态语义复核；未更改代码或冻结数据。后续修复由 [019 工作单](issue/019_duplex_data_alignment_audit.md) 跟踪。
+日期：2026-10-19。范围：旧 `issue004-build-r3` 的生成配置、事件计划、编码器，以及前 32 条人工审计材料。下表记录修复前的静态语义复核；修复和r4重建由[019归档工作单](issue/archive/019_duplex_data_alignment_audit.md)记录。
 
 | 检查项 | 官方依据 | 当前行为与结论 |
 | --- | --- | --- |
@@ -15,6 +15,6 @@
 
 官方论文明确给出行为与概率，但[官方仓库](https://github.com/sbintuitions/DuplexCascade/tree/42893024ca90c8de8ac3ed624467ebc123512ff8)没有公开完整训练数据生成器。因此本结论是**与已公开协议和论文语义的对齐检查**，不是与作者训练样本逐字节一致的声明。官方依据为[论文第 3.2–3.3 节](https://arxiv.org/html/2603.09180v1#S3.SS3)及[固定提交的 `server.py`](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/server.py)。
 
-计数方法：扫描 `reports/layer1_training/issue004-build-20261019/review_32` 中 32 份逐条材料的事件表，筛出“用户原样去空白后非空，去句读文本去空白后为空”的行。结果为 `response_start=39`、`user_continuation=10`。例如[审计 20](../reports/layer1_training/issue004-build-20261019/review_32/20_353876.md) event 131：原样 `.`，去句读为空，控制为 finish。该统计覆盖前 32 条，不外推为全部 1500 条比例。
+计数方法：扫描当时r3前32份逐条材料的事件表，筛出“用户原样去空白后非空，去句读文本去空白后为空”的行。结果为 `response_start=39`、`user_continuation=10`。例如旧审计20的 event 131 为原样 `.`、去句读为空、控制为 finish。r3远端产物和仓库审计副本已按用户要求删除，保留上述缺陷摘要，不再提供旧材料签署入口。
 
-**审计结论：** 基础双工事件和发布 token 协议总体对齐；当前去句读视图存在可复现的无声监督冲突。004 的人审对象应在 019 修复、远端重建和机器复核后重新交付，现有 r3 的机器通过结果只能说明冻结产物结构一致。
+**审计结论：** 基础双工事件和发布 token 协议总体对齐；r3去句读视图存在可复现的无声监督冲突。019已修复并生成[r4正式产物](../reports/layer1_training/issue004-build-20261019-r4/README.md)：全量机器审计通过，前32条6222个事件独立核对没有来源用户片段变为空串。004仍等待用户对新材料的人工审计。

@@ -2,7 +2,7 @@
 
 状态：机器执行完成（退出0，32条材料已交付，等待用户审计）。父任务：[004](004_training_data_and_annotation.md)。本任务单只执行CPU数据构建，不启动训练或模型服务。
 
-完成的run_id为issue004-build-r3，冻结生成源码ae02d60，在调试机1CPU/nice10/2GiB硬限下退出0。有限6000条原始对话过滤后5730候选，正式1000/200/300、三视图、机器审计和32条材料均已交付。[用户审计目录](../../reports/layer1_training/issue004-build-20261019/review_32/README.md)可逐条打开，收口规则见[018](018_layer1_data_delivery.md)。旧r1/r2已停止。
+当前有效run_id为issue004-build-r4，冻结生成源码70d57b6，在调试机1CPU/nice10/2GiB硬限下退出0。有限6000条原始对话过滤后5730候选，正式1000/200/300、三视图、机器审计和32条材料均已交付。[用户审计目录](../../reports/layer1_training/issue004-build-20261019-r4/review_32/README.md)可逐条打开，收口规则见[018](018_layer1_data_delivery.md)。r3因语义冲突按用户要求删除；旧r1/r2已停止。
 
 诊断/下载恢复作业 `job-179239520300088615232-xuan-zhang`（r4，源码5df0ef0）已完成：23项测试、32条诊断及10文件下载验真均通过，最终退出0。后续source/dfd36d3独立复核全部SHA256通过。原失败/撤销记录保留。来源隔离登记已完成，用户取消FDB补转写条件，下一步可准备正式分组切分和数据审计。
 
@@ -17,7 +17,7 @@
 
 ## 执行命令
 
-以下路径是已登记资产，提交前核对其实际存在；`LAYER1_EXCLUSIONS` 须由前置审查生成。4096 仅作首次数据信息审计长度，005 实测后重建/冻结实际训练长度。
+当前复现实验使用[受限r4入口](../scripts/remote/run_issue004_alignment_rebuild.md)；以下早期r1命令仅保留为执行过程记录，不再作为可提交的当前任务单。4096 仅作数据审计长度，005 实测后冻结实际训练长度。
 
 ```bash
 export LAYER1_DATA_ROOT=/hpc_stor03/sjtu_home/xuan.zhang/InterClarify
