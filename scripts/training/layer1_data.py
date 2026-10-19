@@ -247,7 +247,8 @@ class DialogueIndex:
                     identity = str(row['id']) if isinstance(row, dict) and 'id' in row else ''
                     if not reason:
                         fingerprint = digest(normalized('\n'.join(row['data'])))
-                        if identity in exclusions['ids'] or fingerprint in exclusions['normalized_hashes']:
+                        text_hashes = {fingerprint, *(digest(normalized(t)) for t in row['data'])}
+                        if identity in exclusions['ids'] or text_hashes.intersection(exclusions['normalized_hashes']):
                             reason = 'external_exclusion'
                         elif self.db.execute('SELECT 1 FROM dialogues WHERE id=?', (identity,)).fetchone():
                             raise ValueError(f'Duplicate raw dialogue ID: {identity}')

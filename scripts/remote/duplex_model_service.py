@@ -16,67 +16,13 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-WIRE_TOKENS = (
-    '<|no voice|>', '<|user is talking|>', '<|user finish talking|>',
-    '<|user is thinking|>', '<|user interruption|>', '<|user backchannel|>',
+# Direct-script and test imports share the repository's normal training module.
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'training'))
+from layer1_model import (
+    WIRE_TOKENS, load_official_checkpoint, normalize_state_dict,
+    validate_prompt_ids, validate_state_keys,
 )
-
-
-def validate_prompt_ids(ids: list[int], tokenizer: Any) -> None:
-    """Check prompt bounds with one vocabulary-size lookup per request.
-
-    Parameters
-    ----------
-    ids : list[int]
-        The raw input IDs that will be consumed by the model.
-    tokenizer : Any
-        Released tokenizer; older backends may reconstruct vocabulary on len.
-    """
-    vocab_size = len(tokenizer)
-    if any(token < 0 or token >= vocab_size for token in ids):
-        raise ValueError('Prompt token ID outside the released vocabulary')
-
-
-def validate_state_keys(expected: set[str], supplied: set[str]) -> None:
-    """Reject incomplete checkpoints instead of serving partially initialized weights.
-
-    Parameters
-    ----------
-    expected, supplied : set[str]
-        Model and released state-dictionary key sets.
-    """
-    missing, extra = expected - supplied, supplied - expected
-    if missing or extra:
-        raise ValueError(f'Checkpoint keys mismatch: missing={sorted(missing)[:8]}, extra={sorted(extra)[:8]}')
-
-
-def normalize_state_dict(state: dict[str, Any], expected: set[str]) -> dict[str, Any]:
-    """Map published q/v base-weight names to current PEFT wrappers without changing tensors.
-
-    Parameters
-    ----------
-    state : dict[str, Any]
-        Published state dictionary.
-    expected : set[str]
-        Instantiated model keys.
-
-    Returns
-    -------
-    dict[str, Any]
-        The same tensors under validated, unique model keys.
-    """
-    normalized = {}
-    for key, tensor in state.items():
-        target = key
-        if key not in expected:
-            candidate = re.sub(r"\.(q_proj|v_proj)\.(weight|bias)$", r".\1.base_layer.\2", key)
-            if candidate in expected:
-                target = candidate
-        if target in normalized:
-            raise ValueError(f'Checkpoint mapping collision: {target}')
-        normalized[target] = tensor
-    validate_state_keys(expected, set(normalized))
-    return normalized
 
 
 class HistoryTurn(BaseModel):
@@ -122,63 +68,19 @@ class OfficialDuplexModel:
             print(json.dumps({'duplex_load': {'phase': name,
                 'seconds': time.monotonic()-started,
                 'peak_rss_kib': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}}), flush=True)
-        import torch
-        from peft import LoraConfig, TaskType, get_peft_model
-        from safetensors.torch import load_file
-        from transformers import AutoModelForCausalLM, AutoTokenizer
-
-        cfg = json.loads((checkpoint / 'train_cfg.json').read_text())['model']
-        if cfg.get('use_lora') != 'qv' or cfg.get('name') != 'Qwen/Qwen2-7B-Instruct':
-            raise ValueError('Expected official Qwen2-7B-Instruct q/v LoRA checkpoint')
-        # The released tokenizer.json needs a recent `tokenizers` (>=0.20); the
-        # official server also loads it as a fast tokenizer.
-        self.tokenizer = AutoTokenizer.from_pretrained(str(checkpoint / 'tokenizer'), use_fast=True, local_files_only=True)
-        self.token_ids = {}
-        for marker in (*WIRE_TOKENS, '<|im_end|>'):
-            ids = self.tokenizer.encode(marker, add_special_tokens=False)
-            if len(ids) != 1 or self.tokenizer.convert_ids_to_tokens(ids[0]) != marker:
-                raise ValueError(f'Expected one registered special token for {marker}')
-            self.token_ids[marker] = ids[0]
-        # Official releases rely on this registration order and embedding shape.
-        self.tokenizer.add_special_tokens({'additional_special_tokens': list(WIRE_TOKENS)})
-        base = AutoModelForCausalLM.from_pretrained(str(base_model), local_files_only=True,
-            torch_dtype=torch.bfloat16 if device.startswith('cuda') else torch.float32,
-            trust_remote_code=bool(cfg.get('trust_remote_code', False)))
-        phase('base_loaded')
-        base.resize_token_embeddings(len(self.tokenizer))
-        adapted = get_peft_model(base, LoraConfig(
-            r=int(cfg.get('lora_r', 16)), lora_alpha=int(cfg.get('lora_alpha', 32)),
-            lora_dropout=float(cfg.get('lora_dropout', 0.05)), bias=cfg.get('lora_bias', 'none'),
-            task_type=TaskType.CAUSAL_LM, target_modules=['q_proj', 'v_proj'],
-            modules_to_save=['embed_tokens', 'lm_head']))
-        # The official Model wrapper nests the PEFT model under llm.
-        wrapper = torch.nn.Module()
-        wrapper.add_module('llm', adapted)
-        # Avoid retaining both the entire CPU model and published CPU tensors.
-        wrapper.to(device)
-        phase('structure_on_device')
-        state = load_file(str(checkpoint / 'model_state.safetensors'), device='cpu')
-        phase('published_state_opened')
-        state = normalize_state_dict(state, set(wrapper.state_dict()))
-        wrapper.load_state_dict(state, strict=True)
-        phase('published_state_restored')
-        del state
-        self.model = adapted.eval()
-        self.model.requires_grad_(False)
+        loaded = load_official_checkpoint(checkpoint, base_model, device, training=False, phase=phase)
+        self.tokenizer = loaded.tokenizer
+        self.token_ids = loaded.token_ids
+        self.model = loaded.model
         self.device = device
-        # Official server.py builds the raw ChatML prompt from these id runs.
         self.header_user_ids = self.tokenizer.encode('<|im_start|>user\n', add_special_tokens=False)
         self.header_assist_ids = self.tokenizer.encode('<|im_start|>assistant\n', add_special_tokens=False)
         self.im_end_nl_ids = self.tokenizer.encode('<|im_end|>\n', add_special_tokens=False)
         self.no_voice_ids = self.tokenizer.encode('<|no voice|>', add_special_tokens=False)
         self.bos_id = self.tokenizer.bos_token_id
         self.eos_id = self.token_ids['<|im_end|>']
-        self.context_length = int(base.config.max_position_embeddings)
-        self.info = {'checkpoint': str(checkpoint.resolve()), 'base_model': str(base_model.resolve()),
-                     'load_seconds': time.monotonic()-started,
-                     'token_ids': self.token_ids, 'context_length': self.context_length,
-                     'torch': torch.__version__, 'tokenizer_class': type(self.tokenizer).__name__,
-                     'dtype': str(next(self.model.parameters()).dtype), 'bos_token_id': self.bos_id}
+        self.context_length = loaded.info['context_length']
+        self.info = loaded.info
 
     def build_prompt_ids(self, history: list[HistoryTurn]) -> list[int]:
         """Flatten one micro-turn history into the official raw ChatML id run.

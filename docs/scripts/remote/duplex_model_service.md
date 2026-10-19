@@ -6,6 +6,8 @@
 
 ## 类设计与核心方法
 
+005训练加载实施将完整权重恢复、键迁移及prompt范围检查提取到 `scripts/training/layer1_model.py`。OfficialDuplexModel构造时调用公共加载器的training=False，再建立原有ChatML字段；模型/health/流式协议不改。旧validate_state_keys/normalize_state_dict/validate_prompt_ids名称继续重导出，已有调用和测试保留。新增统一shape检查在复制前拒收不完整资产，审计语义比原服务更明确；真实服务回归与001受影响对照另留证据，不把此重构自动标为已通过。
+
 OfficialDuplexModel 按 train_cfg.json 加载本地 Qwen2-7B-Instruct，resize token embedding，创建 q/v LoRA 与 embed_tokens/lm_head 保存层，装载官方 model_state.safetensors。tokenizer 与官方 server.py 一致使用 fast 实现（`use_fast=True`）：官方 tokenizer.json 含 `ignore_merges` 等字段，需要 `tokenizers>=0.20`，因此 `interclarify-dev` 已升级到 transformers 4.46.3 / tokenizers 0.20.3 / peft 0.13.2（torch 保持 2.4.1+cu121 未动）。升级前已记录 pip freeze 快照，且实测 fast 与 slow 在本权重上的分词结果完全一致。核验 tokenizer token 单 ID 与权重键，normalize_state_dict 对发布 q_proj/v_proj 的 weight/bias 增加 PEFT base_layer 层级；只做键名迁移并核验映射无碰撞，缺失或不匹配直接失败；CUDA 使用 BF16（24GB 4090 部署参数，区别于官方 demo 未显式指定 dtype 的默认加载），冻结推理、do_sample=False，以实际 im_end ID 结束。
 
 stream 保留模型 special token、stop/length 原因；客户端断开通过 stopping criteria 取消后台生成。服务全局串行锁避免多个会话同时占用模型。GET /health 登记模型目录、token IDs 与加载结果；POST /generate 接收 micro-turn 历史（user 文本与 assistant token id 交替，末条必须是 user）和 max_new_tokens，由 `build_prompt_ids` 用官方 header/`<|im_end|>\n`/`<|no voice|>` 单 ID 展平为 raw ChatML，输出 NDJSON text、token_ids、prompt_tokens、finish_reason 或 error。历史形状非法返回 400；超过模型上下文时拒绝请求，并给出实际 token 数，禁止静默裁剪历史。
