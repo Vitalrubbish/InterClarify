@@ -84,9 +84,21 @@ training:
   max_epochs_per_condition_per_round: 1
   max_gpu_hours_per_condition: [8, 16]
   total_training_gpu_hours_cap: 72
-  actual_steps: null
-  sequence_length: null
-  actual_batch: null
+  actual_steps: 5763
+  sequence_length: 512
+  actual_batch: 1
+  gradient_accumulation: 2
+  effective_batch: 2
+  seed: 20261020
+  round1_sequences_per_condition: 11526
+  round1_effective_tokens_per_condition: 1193875
+  round1_estimated_training_gpu_hours_per_condition: 0.9331
+  round2_estimated_training_gpu_hours_per_condition: 2.8390
+  round2_exact_steps: null
+  resource_gpus: 1
+  resource_min_headroom_gib: 2
+  resource_report: reports/layer1_training/issue005-probe-20261020/README.md
+  full_train_index: reports/layer1_training/issue005-probe-20261020/r1/run/full_train_index.json
   resource_owner: issue005
 diagnostic:
   historical_samples: 5
@@ -136,6 +148,6 @@ acceptance:
 gates:
   issue001_runtime_comparison: passed
   issue004_data_audit: passed
-  issue005_zero_update_and_recovery: pending
+  issue005_zero_update_and_recovery: passed
   issue007_independent_real_asr_test: pending
   issue008_audio_and_fdb: pending

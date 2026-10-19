@@ -1,6 +1,6 @@
 # 开发与测试 issue 索引
 
-更新：2026-10-20。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**，001 官方控制对照已通过，继续准备有限 Layer 1 训练，尚未开训。这里是仓库内任务单；完成任务移入 `archive/`，父任务仅在全部条件满足后归档。
+更新：2026-10-20。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**，001官方对照、004数据及005真实更新/完整恢复/资源短跑已通过，三臂正式训练尚未启动。完成任务移入`archive/`，父任务仅在全部条件满足后归档。
 
 | 编号 | 任务 | 当前状态与剩余工作 |
 | --- | --- | --- |
@@ -9,15 +9,15 @@
 | [002](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入 | 完成，已归档；r4-asr 退出 0 |
 | [003](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003_kokoro_playback_integration.md) | Kokoro 分段播放 | 完成，已归档；[003d修复](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003d_segment_continuity.md)及[003c用户复听](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003c_audio_listening_review.md)通过 |
 | [004](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 完成归档；r5全量机器审计通过，用户明确免除复审后关闭 |
-| [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 进行中；[024](archive/024_layer1_training_state.md)完成归档，32条真实更新和恢复精确一致；[025](025_layer1_remote_probe.md)单卡100条多长度资源测量中 |
+| [005](archive/005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 完成归档；[024](archive/024_layer1_training_state.md)真实恢复精确一致，[025](archive/025_layer1_remote_probe.md)资源边界测量完成；512窗口/batch1/累积2、首轮每臂5,763步 |
 | [017](../../reports/layer1_training/issue017-loading-20261019/README.md) | 完整训练加载与零更新 | 完成、已归档；零更新通过，回归拍界抖动由用户明确接受 |
-| [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；005及007开训前准备未完成；004已完成 |
+| [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；001/004/005已完成，仍待007开训前准备；training_released=false |
 | [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |
 | [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 验收 | 进行中；B0完整链路0/5，候选及FDB待验收 |
 
 远端执行见 [001 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/001_remote_execution.md)与 [002/003 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_003_remote_execution.md)。001 只验证一套官方配置：Kyutai Word 逐词 strip、每拍空格连接、首非空 Word 起拍、600ms、BF16、64-token 贪心。raw 字符增量和 160ms 超时释放残词均不等同官方 Word；不展开时钟、发布粒度与句读矩阵。旧 raw/超时残词报告只作诊断；新原生 Word 五例全部通过，结果见 [001 验收报告](../../reports/layer1_training/issue001-word-20261019/README.md)。
 
-[008a 官方权重完整链路诊断](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/008a_official_full_chain_smoke.md)已完成：当前五例新正文/语音0/5，共178拍无协议/组件错误；已转入004/005训练准备，正式梯度更新尚未启动。
+[008a 官方权重完整链路诊断](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/008a_official_full_chain_smoke.md)已完成：当前五例新正文/语音0/5，共178拍无协议/组件错误。005现已完成有限步真实更新和资源验证，三臂正式适配及质量验收尚未启动。
 
 ## 依赖与交付
 

@@ -6,6 +6,7 @@ import random
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts/training'))
 import train_layer1 as training
@@ -58,6 +59,18 @@ class SupervisionTests(unittest.TestCase):
         self.assertEqual(probe.select_resource(rows, int(23.5 * gib))['length'], 1024)
         with self.assertRaisesRegex(RuntimeError, 'headroom'):
             probe.select_resource(rows, 22 * gib)
+
+    def test_existing_run_is_never_modified_by_failed_startup(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp)
+            path = directory / 'failure.json'
+            path.write_text('prior evidence')
+            args = SimpleNamespace(command='train', output=directory)
+            training.record_failure(args, FileExistsError('Already exists'))
+            self.assertEqual(path.read_text(), 'prior evidence')
+            args.output_created = True
+            training.record_failure(args, ValueError('Owned run failed'))
+            self.assertIn('Owned run failed', path.read_text())
 
 
 @unittest.skipUnless(importlib.util.find_spec('torch'), 'Tensor checks run in the remote training conda')

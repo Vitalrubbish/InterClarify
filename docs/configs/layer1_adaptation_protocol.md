@@ -10,7 +10,11 @@
 
 首轮最多 1,000 条、第二轮最多 3,000 条，每组每轮最多一 epoch，GPU 小时上限分别为 8/16，总计 72，最多 8×4090。005 根据实测冻结长度、batch 和步数；001 诊断预算 4 GPU 小时另计。训练只更新完整恢复的官方 checkpoint 中已有 q/v LoRA。
 
-2026-10-19来源验真：UltraChat十个固定shard已下载完成并重新逐文件核对大小/SHA256，共9,288,990,895字节，下载和复核退出均0；source_files_download_verified更新为true，见[证据](../../reports/layer1_training/issue016-source-and-exclusions-20261019/source_verification.json)。用户取消FDB补转写要求，来源隔离登记已完成。r5全量数据审计已通过，用户明确免除新人工复审，issue004_data_audit更新为passed；005/007门禁仍未完成，training_released保持false。
+2026-10-19来源验真：UltraChat十个固定shard已下载完成并重新逐文件核对大小/SHA256，共9,288,990,895字节，下载和复核退出均0；source_files_download_verified更新为true，见[证据](../../reports/layer1_training/issue016-source-and-exclusions-20261019/source_verification.json)。用户取消FDB补转写要求，来源隔离登记已完成。r5全量数据审计已通过，用户明确免除新人工复审，issue004_data_audit更新为passed。
+
+2026-10-20的005单卡试跑完成，完整状态恢复精确一致，issue005_zero_update_and_recovery更新为passed。按实际显存保留至少2GiB余量，冻结训练窗口512、每卡batch1、累积2；训练采样seed为20261020，数据生成seed仍为20261018。全量三臂各11,526序列、1,193,875监督token、单epoch5,763步。原4096事件计划不变，重新分窗保留全部监督目标；可见历史缩短，质量由006/007验证，不能宣称等价于4096上下文训练。
+
+首轮训练循环外推约0.93GPU小时/臂；第二轮3,000条约2.84GPU小时/臂仅为密度估算，尚未构建数据，round2_exact_steps保持null。估算不含启动、checkpoint选择和评价；原8/16小时及72总上限保留。正式optimizer/scheduler配置和评价准备仍由006/007冻结，005的100步scheduler仅用于短跑恢复。007开训前准备未完成，training_released保持false。证据见[005报告](../../reports/layer1_training/issue005-probe-20261020/README.md)。
 
 r5登记user_numeric_surface=english_numeric_v1，完整用户轮先转换数值读法再分拍；decimal/time原始形式保存在映射，不再承诺模型输入保留原数字字符串。audited_dataset_manifest指向正式r5清单，human_review_policy明确记录用户豁免。原样/去句读/混合三臂共享这一前处理。
 

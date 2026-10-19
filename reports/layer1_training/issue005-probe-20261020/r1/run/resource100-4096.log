@@ -1,0 +1,29 @@
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.39it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:01<00:01,  1.25it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:02<00:00,  1.13it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:03<00:00,  1.19it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:03<00:00,  1.20it/s]
+/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/torch/utils/checkpoint.py:1399: FutureWarning: `torch.cpu.amp.autocast(args...)` is deprecated. Please use `torch.amp.autocast('cpu', args...)` instead.
+  with device_autocast_ctx, torch.cpu.amp.autocast(**cpu_autocast_kwargs), recompute_context:  # type: ignore[attr-defined]
+Traceback (most recent call last):
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/source/c21a352/scripts/training/train_layer1.py", line 412, in <module>
+    report = train(arguments) if arguments.command == 'train' else compare(arguments)
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/source/c21a352/scripts/training/train_layer1.py", line 309, in train
+    loss = loaded.model(**batch, use_cache=False).loss
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/peft/peft_model.py", line 1644, in forward
+    return self.base_model(
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/peft/tuners/tuners_utils.py", line 197, in forward
+    return self.model.forward(*args, **kwargs)
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/transformers/models/qwen2/modeling_qwen2.py", line 1183, in forward
+    loss = self.loss_function(logits, labels, self.vocab_size, **loss_kwargs)
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/transformers/loss/loss_utils.py", line 46, in ForCausalLMLoss
+    loss = fixed_cross_entropy(shift_logits, shift_labels, num_items_in_batch, ignore_index, **kwargs)
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/transformers/loss/loss_utils.py", line 26, in fixed_cross_entropy
+    loss = nn.functional.cross_entropy(source, target, ignore_index=ignore_index, reduction=reduction)
+  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/torch/nn/functional.py", line 3104, in cross_entropy
+    return torch._C._nn.cross_entropy_loss(input, target, weight, _Reduction.get_enum(reduction), ignore_index, label_smoothing)
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 2.31 GiB. GPU 0 has a total capacity of 23.53 GiB of which 1.20 GiB is free. Including non-PyTorch memory, this process has 22.32 GiB memory in use. Of the allocated memory 20.65 GiB is allocated by PyTorch, and 1.16 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

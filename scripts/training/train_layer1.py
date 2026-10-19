@@ -242,6 +242,7 @@ def train(args):
     require(0 < args.steps <= config['scheduler_steps'], 'Invalid step limit')
     require(torch.cuda.is_available() and torch.cuda.device_count() == 1, 'One allocated CUDA device required')
     args.output.mkdir(parents=True, exist_ok=False)
+    args.output_created = True
     check_disk(args.output, config)
     started = time.monotonic()
     os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
@@ -358,6 +359,12 @@ def vars_for_json(args):
     return {key: str(value) if isinstance(value, Path) else value for key, value in vars(args).items()}
 
 
+def record_failure(args, error):
+    """Write failure evidence only inside the directory owned by this invocation."""
+    if args.command == 'train' and getattr(args, 'output_created', False):
+        write_json(args.output / 'failure.json', {'passed': False, 'error': f'{type(error).__name__}: {error}'})
+
+
 def compare(args):
     left = json.loads((args.continuous / 'summary.json').read_text())
     right = json.loads((args.resumed / 'summary.json').read_text())
@@ -412,6 +419,5 @@ if __name__ == '__main__':
             report = train(arguments) if arguments.command == 'train' else compare(arguments)
         print(json.dumps(report), flush=True)
     except Exception as error:
-        if arguments.command == 'train' and arguments.output.is_dir():
-            write_json(arguments.output / 'failure.json', {'passed': False, 'error': f'{type(error).__name__}: {error}'})
+        record_failure(arguments, error)
         raise

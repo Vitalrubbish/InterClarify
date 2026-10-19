@@ -1,6 +1,6 @@
 # Issue 024：实现有限训练及完整训练状态恢复
 
-状态：完成，已归档。父任务：[005](../005_training_runtime_and_resource_probe.md)。2026-10-20 用户授权启动005。实现提交`c21a352`，真实验证作业`job-179242817730774595080-xuan-zhang`；结果见[005报告](../../../reports/layer1_training/issue005-probe-20261020/README.md)。
+状态：完成，已归档。父任务：[005](005_training_runtime_and_resource_probe.md)。2026-10-20 用户授权启动005。实现提交`c21a352`，真实验证作业`job-179242817730774595080-xuan-zhang`；结果见[005报告](../../../reports/layer1_training/issue005-probe-20261020/README.md)。
 
 ## 范围
 
