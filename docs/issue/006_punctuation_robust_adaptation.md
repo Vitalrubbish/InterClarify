@@ -2,9 +2,9 @@
 
 状态：待办。优先级：P0。依赖：001、004、005；配置与评价门槛须先冻结。
 
-## 2026-10-18 进度核对
+## 2026-10-19 进度核对
 
-协议已登记 B0/T1/T2/T3、现有 q/v LoRA 更新范围、数据规模及两轮预算上限，尚未执行三组训练。001 运行时全范围放行、004 数据审计、005 零更新与恢复均未完成，`configs/layer1_adaptation_protocol.yaml` 中 `training_released: false`；没有候选 checkpoint、训练 run manifest 或 dev 报告。保持待办，前置门禁满足前不得开训。
+协议已登记 B0/T1/T2/T3、现有 q/v LoRA 更新范围、数据规模及两轮预算上限，尚未执行三组训练。001 原生 Word 运行时对照已通过归档；004 数据审计、005 零更新与恢复及 007 开训前准备仍未完成，`configs/layer1_adaptation_protocol.yaml` 中 `training_released: false`；没有候选 checkpoint、训练 run manifest 或 dev 报告。保持待办，前置门禁满足前不得开训。模块、运行产物及三组比较契约见 [训练管线设计](../training_pipeline_design.md)。
 
 ## 实验目标
 
