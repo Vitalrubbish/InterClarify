@@ -9,3 +9,6 @@
 `ReferenceKernel` 通过同一冻结 GPU 服务传递原始 IDs；`Tensor` 仅适配传输，`Tokenizer` 读取发布资产。内核预热及整拍提交观测避免冷启动和 EOS 未消费造成误判。`compare` 定位请求、prompt/生成 IDs、历史、控制、停止或正文的首次差异；无请求和请求错误不能记为通过。
 
 运行命令为 `python scripts/remote/compare_layer1_runtime.py --official-source /path/server.py --tokenizer /path/tokenizer.json --model-url http://127.0.0.1:18806 --manifest /path/word_manifest.json --output /path/new-output`。可用 `--cases` 分片。输出保留输入、双方逐拍时间线、输入/源码摘要及必要样本覆盖；不以退出 0 替代资产与生命周期放行。
+
+
+2026-10-20的017 r4复测中，第4例第6拍存在距名义拍界约1.59ms的词事件，两条独立墙钟回放将其分入不同片段，prompt首次分歧；其他4例一致。该次验收保持失败。当前报告未记录Word实际入队或tick实际截窗时刻，不能只用请求发出时间判断可见输入；后续由[022](../../issue/022_runtime_replay_boundary_ordering.md)先补齐观测再界定测试器/运行时责任。本次不改比较器实现、不改001旧报告，也不放宽逐拍一致标准。

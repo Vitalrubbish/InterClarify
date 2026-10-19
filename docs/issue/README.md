@@ -1,6 +1,6 @@
 # 开发与测试 issue 索引
 
-更新：2026-10-19。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**，001 官方控制对照已通过，继续准备有限 Layer 1 训练，尚未开训。这里是仓库内任务单；完成任务移入 `archive/`，父任务仅在全部条件满足后归档。
+更新：2026-10-20。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**，001 官方控制对照已通过，继续准备有限 Layer 1 训练，尚未开训。这里是仓库内任务单；完成任务移入 `archive/`，父任务仅在全部条件满足后归档。
 
 | 编号 | 任务 | 当前状态与剩余工作 |
 | --- | --- | --- |
@@ -9,8 +9,9 @@
 | [002](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入 | 完成，已归档；r4-asr 退出 0 |
 | [003](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003_kokoro_playback_integration.md) | Kokoro 分段播放 | 完成，已归档；[003d修复](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003d_segment_continuity.md)及[003c用户复听](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003c_audio_listening_review.md)通过 |
 | [004](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 完成归档；r5全量机器审计通过，用户明确免除复审后关闭 |
-| [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 进行中；公共加载与独立零更新工具已实现；017单卡入口退出2，真权重验证待重跑 |
-| [017](017_training_loader_zero_update.md) | 完整训练加载与零更新 | 进行中；r1 GPU环境检查失败，真权重及136拍回归未执行，审查不予关闭 |
+| [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 进行中；017完整恢复/零更新通过；136拍服务回归4/5待022定位，训练器及恢复短跑待实现 |
+| [017](017_training_loader_zero_update.md) | 完整训练加载与零更新 | 进行中；GPU入口修复、零更新通过；服务回归4/5，暂不关闭 |
+| [022](022_runtime_replay_boundary_ordering.md) | Word回放拍界差异定位 | 待办；017第4例第6拍分词窗口差异，补充实际入队/截窗证据后修复回归 |
 | [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；005及007开训前准备未完成；004已完成 |
 | [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |
 | [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 验收 | 进行中；B0完整链路0/5，候选及FDB待验收 |

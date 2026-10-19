@@ -1,0 +1,15 @@
+{
+  "job_id": "job-179242541424100807674-xuan-zhang",
+  "exit_code": 127,
+  "reason": "/usr/bin/time is absent in the container; entry was not executed",
+  "files": {
+    "issue017-zero-update-r3.sh": {
+      "bytes": 2548,
+      "sha256": "6b1d7e278fba1b32a2b57dfd61c5d96f93d6fc797a6ad02fdd2cfdad02c9ac2a"
+    },
+    "job_output.txt": {
+      "bytes": 3043,
+      "sha256": "9c8e56ebb6ac5c3966477043f5715611c6085852422ed3a7369d5e8fae2277a1"
+    }
+  }
+}

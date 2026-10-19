@@ -1,0 +1,41 @@
+{
+  "job_id": "job-179242557114450383845-xuan-zhang",
+  "source_commit": "12d478a",
+  "zero_update_passed": true,
+  "prompts": 15,
+  "generated_tokens": 111,
+  "max_abs_logit_error": 0.0,
+  "restored_tensors": 453,
+  "trainable_tensors": 112,
+  "trainable_numel": 5046272,
+  "runtime_cases_passed": 4,
+  "runtime_cases_total": 5,
+  "runtime_ticks_total": 136,
+  "runtime_passed": false,
+  "first_difference": {
+    "request": 5,
+    "field": "prompt_token_ids",
+    "first_token_offset": 71
+  },
+  "zero_resources": {
+    "exit_code": 0,
+    "wall_seconds": 252.0307981260121,
+    "max_rss_kib": 7388396,
+    "user_seconds": 144.79387,
+    "system_seconds": 70.205204
+  },
+  "runtime_resources": {
+    "exit_code": 1,
+    "wall_seconds": 256.38317489624023,
+    "max_rss_kib": 7406820,
+    "user_seconds": 86.952624,
+    "system_seconds": 33.902503
+  },
+  "remote_disk_kib": {
+    "zero": 131959,
+    "runtime": 3174
+  },
+  "closure_approved": false,
+  "training_allowed": false,
+  "followup_issue": "022"
+}

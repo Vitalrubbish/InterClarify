@@ -1,0 +1,55 @@
+################### env ###################
+#NVIDIA_VISIBLE_DEVICES=GPU-22e342ae-22ca-bc33-0ff1-7696428a5e5f
+#KUBERNETES_SERVICE_PORT_HTTPS=443
+#KUBERNETES_SERVICE_PORT=443
+#PYTHONUNBUFFERED=1
+#PYTHONNOUSERSITE=True
+#HOSTNAME=job-179242557114450383845-xuan-zhang-master-0
+#NUMEXPR_NUM_THREADS=8
+#MASTER_PORT=23456
+#NCCL_SOCKET_IFNAME=bond1,bond0,eth0
+#NCCL_NET_GDR_LEVEL=0
+#PWD=/mnt/cloudstorfs/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/source/12d478a
+#NVIDIA_DRIVER_CAPABILITIES=video,compute,utility
+#VC_MASTER_NUM=1
+#NCCL_DEBUG=INFO
+#VC_WORKER_HOSTS=
+#OPENBLAS_NUM_THREADS=8
+#WORLD_SIZE=1
+#HOME=/hpc_stor03/sjtu_home/xuan.zhang
+#LANG=C.UTF-8
+#KUBERNETES_PORT_443_TCP=tcp://10.96.0.1:443
+#CUDA_VERSION=12.8.1
+#JOB=1
+#LOG_FILE=/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/submit_logs/issue017-zero-update-r4.log
+#VC_MASTER_HOSTS=job-179242557114450383845-xuan-zhang-master-0.job-179242557114450383845-xuan-zhang
+#GPU_NUM=1
+#VECLIB_NUM_THREADS=8
+#VC_WORKER_NUM=0
+#MASTER_ADDR=job-179242557114450383845-xuan-zhang-master-0.job-179242557114450383845-xuan-zhang
+#PYTHONPATH=:
+#USER=xuan.zhang
+#SHLVL=0
+#KUBERNETES_PORT_443_TCP_PROTO=tcp
+#PARENT_ENV=PYTHONPATH=@@PATH=/hpc_stor03/sjtu_home/xuan.zhang/.cargo/bin:/hpc_stor03/sjtu_home/xuan.zhang/.kimi-code/bin:/hpc_stor03/sjtu_home/xuan.zhang/.npm-global/bin:/hpc_stor03/sjtu_home/xuan.zhang/.local/bin:/hpc_stor03/sjtu_home/xuan.zhang/bin:/hpc_stor08/client/model-cli:/hpc_stor08/client/da-cli:/hpc_stor01/project/ezkws/ai-ability-cli:/hpc_stor08/client/da-cli:/hpc_stor01/project/ezkws/ai-ability-cli:/usr/share/Modules/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin@@LD_LIBRARY_PATH=/tmp/_MEI9MC56u
+#KUBERNETES_PORT_443_TCP_ADDR=10.96.0.1
+#LD_LIBRARY_PATH=/tmp/_MEI9MC56u:/usr/local/nvidia/lib:/usr/local/nvidia/lib64
+#NCCL_IB_DISABLE=1
+#RANK=0
+#GPU_PER_TASK=1
+#OMP_NUM_THREADS=8
+#KUBERNETES_SERVICE_HOST=10.96.0.1
+#LC_ALL=C.UTF-8
+#KUBERNETES_PORT=tcp://10.96.0.1:443
+#KUBERNETES_PORT_443_TCP_PORT=443
+#JobID=job-179242557114450383845-xuan-zhang
+#PATH=/hpc_stor03/sjtu_home/xuan.zhang/.cargo/bin:/hpc_stor03/sjtu_home/xuan.zhang/.kimi-code/bin:/hpc_stor03/sjtu_home/xuan.zhang/.npm-global/bin:/hpc_stor03/sjtu_home/xuan.zhang/.local/bin:/hpc_stor03/sjtu_home/xuan.zhang/bin:/hpc_stor08/client/model-cli:/hpc_stor08/client/da-cli:/hpc_stor01/project/ezkws/ai-ability-cli:/hpc_stor08/client/da-cli:/hpc_stor01/project/ezkws/ai-ability-cli:/usr/share/Modules/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/opt/node/bin:/usr/local/nvidia/bin:/usr/local/cuda/bin:/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+#MKL_NUM_THREADS=8
+#DEBIAN_FRONTEND=noninteractive
+#OLDPWD=/opt/interclarify
+#_=/usr/bin/env
+################### info ###################
+data now: 2026-10-19 15:59:34
+run on node: d6-hpc-gpu-053
+###########################################
+

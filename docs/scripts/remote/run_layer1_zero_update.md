@@ -1,19 +1,21 @@
 # 单卡零更新验证入口
 
-`scripts/remote/run_layer1_zero_update.sh`在获分配单张4090上执行005加载测试、推理服务回归和独立零更新对照，无类。明确冻结源码、独立conda、官方/base/checkpoint目录、新输出和GPU分配，依赖版本用标准库读取。
+`scripts/remote/run_layer1_zero_update.sh`在受调度的单张4090上执行加载测试、HTTP契约回归和独立真权重零更新对照，无类。先记录环境、源码和设备，再核对冻结资产，在两个干净子进程中串行运行官方参考及候选训练加载；不运行优化器或梯度更新。
 
-显式变量LAYER1_ZERO_ROOT、LAYER1_TRAINING_ENV、LAYER1_ZERO_OUTPUT；资产可通过LAYER1_MODEL_HOME/LAYER1_OFFICIAL_SOURCE指定。最大线程4，物理主存由调度器32GiB cgroup硬限约束，测试各120秒、外层对照1500秒，禁core dump；申请8CPU/32GiB/1×24GiB4090，整体墙钟1800秒，输出预算5GiB。集群实际规则为每张GPU最多8CPU/32GiB，最初64GiB申请被拒绝后下调，不通过多申请GPU绕过。两个模型干净进程串行加载，源码/资产/logits/参数摘要和失败日志保留，退出码写入产物。
+## 输入、GPU检查与失败记录
 
-该入口只跑零更新，不训练，不在调试机加载7B权重。服务恢复逻辑共用后必须重跑受影响的001原始Word对照，不能仅凭HTTP替身测试宣称真实服务回归完成。
+必填LAYER1_ZERO_ROOT、LAYER1_TRAINING_ENV、LAYER1_ZERO_OUTPUT，分别指定冻结源码、独立conda和新输出目录，均使用绝对路径。资产可通过LAYER1_MODEL_HOME/LAYER1_OFFICIAL_SOURCE指定。旧输出存在时退出2，不覆盖原件；创建新目录后立即安装EXIT/TERM/INT处理，因此环境或GPU检查失败也留下exit_code.txt。
 
-当前提交命令在入口成功后同卡顺序调用既有run_layer1_runtime_comparison.sh，另限600秒，整个作业最多2400秒。冻结X-Talk通过只读引用001归档源码提供，Word清单使用归档后的现路径，source.sha256包括公共加载器；不改写001原报告或其输入摘要。
+GPU检查要求调度器JobID，以及CUDA_VISIBLE_DEVICES或NVIDIA_VISIBLE_DEVICES中的至少一个；不覆盖设备编号。训练conda中的torch实际检查CUDA可用、恰好一张可见RTX 4090、22–25GiB显存范围及BF16支持。gpu_preflight.json保存分配变量与实际设备，gpu-preflight.log保存失败信息；此步骤只初始化CUDA，不加载模型。r4在CUDA_VISIBLE_DEVICES为空、NVIDIA_VISIBLE_DEVICES有效的真实集群容器中已通过。
 
-## r1失败后的入口修正
+## 资源与产物
 
-r1所在容器由调度器设置NVIDIA_VISIBLE_DEVICES和JobID，没有CUDA_VISIBLE_DEVICES；仅检查后者会误拒绝已分配GPU。修订入口接受两种可见性变量中的任一种，并要求调度作业JobID；不自行覆盖CUDA_VISIBLE_DEVICES，避免把容器外GPU编号当作容器内编号。随后在独立训练conda中用torch检查CUDA可用、恰好一张可见RTX 4090、约24GiB显存及BF16支持，将设备信息和原始分配变量写入gpu_preflight.json。此步骤只初始化CUDA，不加载模型。
+申请8CPU/32GiB物理主存/1×24GiB4090，最大计算线程4、禁core dump。物理主存由调度器cgroup硬限约束，不设置进程虚拟地址空间上限；CUDA地址预留与safetensors文件映射不能按物理RSS计费。原28GiB虚拟地址限制曾阻断r2第二个base分片mmap，已移除，物理预算未扩大。
 
-新输出目录创建后立即安装EXIT/TERM/INT处理，再验证环境与GPU；失败留下exit_code.txt及gpu-preflight.log，不覆盖旧输出。源码摘要纳入入口本身。后续模型、prompt、阈值和预算保持原登记；使用新的独立run_id，两个阶段在同一作业串行执行。入口修复与重跑继续在017跟踪，未取得完整通过证据前不归档。
+GPU预检查60秒，两组测试各120秒，零更新命令1500秒，提交时零更新整体timeout1800秒，输出预算5GiB。源码摘要包括加载器、比较器、服务、入口及配置；环境版本、资产摘要、固定prompt、logits及全参数摘要、失败日志和退出码均留存。两个模型串行加载，禁止在调试机加载7B。入口只执行零更新，不能用HTTP替身测试替代真实服务回归。
 
-## r2映射失败后的资源修正
+## 同卡回归与当前状态
 
-r2已通过真实单卡预检查及7+6项测试、逐文件资产核验，但官方参考加载第二个base分片时，safe_open无法mmap约3.60GiB文件并报Cannot allocate memory。原入口的ulimit -v 28GiB约束进程总虚拟地址，包含CUDA地址预留和文件映射，并非物理主存峰值；因此移除该限制，由调度器维持原定32GiB主存硬限，不增加GPU、CPU或物理内存申请。r3仍串行运行两套模型，保留同样的超时和输出预算，并通过/usr/bin/time记录入口峰值RSS。若触发cgroup OOM，将按实际证据再决定加载内存优化，不以放宽物理预算掩盖。
+提交命令在零更新成功后，以&&串行调用run_layer1_runtime_comparison.sh，另限600秒，总上限2400秒。冻结X-Talk通过只读引用001归档源码提供，使用原生Word清单现路径和source.sha256，不改写001原报告或输入摘要。两个阶段都用独立训练conda中的Python标准库subprocess/resource/time包裹，保存退出码、墙钟、子进程峰值RSS及CPU耗时；无需容器外部/usr/bin/time。该包装已验证退出码透传及JSON记录。
+
+017 r4（源码12d478a）真权重零更新通过，136拍服务回归4/5，有一例Word拍界差异，仍不放行训练；原件及资源记录见[审查报告](../../../reports/layer1_training/issue017-loading-20261019/README.md)。后续[022](../../issue/022_runtime_replay_boundary_ordering.md)需定位差异并完成回归，不能通过重试挑选成功记录或改阈值关闭017。

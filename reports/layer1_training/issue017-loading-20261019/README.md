@@ -1,47 +1,43 @@
-# 训练加载与零更新审查记录
+# Issue 017 修复与远端重跑审查
 
-源码dc0cc7b实现公共完整恢复、shape/key审计、现有q/v default LoRA精确白名单、独立官方Model参考及零更新入口；dfd36d3将单GPU主存申请调整到实际配额32GiB。源码和测试说明位于docs同路径。训练器optimizer/梯度/RNG恢复尚未实现，本报告不宣称005完成。
+更新：2026-10-20。**GPU入口已修复，真权重零更新通过；136拍服务回归为4/5，017继续进行中，不关闭。** 训练放行保持false，未运行optimizer或梯度更新。完整结论见[机器摘要](review_decision.json)，后续边界分拍问题由[022](../../../docs/issue/022_runtime_replay_boundary_ordering.md)跟踪。
 
-## 验证范围
+## 最终重跑证据
 
-本地相关回归44项中40通过、4项按条件跳过，另6项既有服务测试通过；2项真张量测试的本地跳过由远端补齐。远端独立训练conda上已运行全部[7项加载测试](loading_tests.txt)，包括权重摘要变化和全词表容忍检查，退出0、约4.4秒。调试机绑定1CPU、nice10、8GiB地址空间上限、60秒CPU/90秒墙钟限制，峰值约418MiB，无GPU。源记录见[cpu_contract.json](cpu_contract.json)，该次service导入失败保留，不计入通过。
+r4作业`job-179242557114450383845-xuan-zhang`，源码`12d478a`，节点d6-hpc-gpu-053。冻结checkout在训练根`source/12d478a`；两个输出为`data/runs/issue017-zero-update-r4`和`data/runs/issue017-runtime-regression-r4`。训练根为`/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019`，独立conda为其`envs/training`；X-Talk仍只读引用001归档快照。原始[调度入口](r4-review/submit/issue017-zero-update-r4.sh)、[作业输出](r4-review/submit/issue017-zero-update-r4.log.txt)和[回收清单/摘要](r4-review/retrieval.json)已保存；完整logits留远端，形状和摘要均已回收。
 
-该远端环境缺httpx，首次服务测试在导入时失败，原件保留在issue017-cpu-contract-r1。通过conda base可用pip的--python参数，仅向独立训练prefix补httpx0.27.2/httpcore1.0.9/sniffio1.3.1，[安装日志](test_dependency_install.txt)和[最终版本](dependency_versions.json)齐全，torch/transformers/peft与既有h11/anyio保持原值。重新受限执行的[6项服务测试](service_tests.txt)全部通过，退出0、约1.97秒、峰值45,360KiB，见[资源记录](service_contract.json)。
-
-## 真权重任务
-
-单卡任务job-179239981090839983547-xuan-zhang，输出训练根data/runs/issue017-zero-update-r1，源码dfd36d3，申请8CPU/32GiB/1×4090。先运行加载/HTTP回归，再逐文件核对冻结资产，然后在两个干净子进程串行构建官方参考与候选训练加载。
-
-固定001的15个prompt，长度为12/234/494、13/209/469、10/188/448、10/232/492、11/217/423 token，分别对应五例首/中/末请求。每prompt最多64个生成token，BF16 eval贪心；每步保存完整词表raw logits，按atol0.02/rtol0.01比较，生成ID须完全一致；实际恢复后的全参数摘要两路径一致，且零更新前后不变。白名单保留每层q/v LoRA A/B，embedding/head冻结。
-
-通过后同一GPU顺序运行001原生Word的五例136拍回归，复用冻结X-Talk源码快照，检验公共加载重构没有改变实际服务行为。零更新1800秒、回归另600秒，总预算上限2400秒。首次64GiB申请被配额拒绝，未启动；32GiB作业已于2026-10-19 20:52:02（+08:00）启动并在同秒失败，退出2，未进入模型加载。
-
-完整资产、logits和权重摘要留远端，仓库只回收紧凑报告和原件摘要；训练放行保持false。004已按r5机器审计及用户免除复审授权关闭；后续仍需017真权重验证、005梯度与恢复短跑和007开训前准备。
-
-## 2026-10-19 远端结果审查与关闭决策
-
-**不关闭017，保持进行中。** 本次取得的是入口失败证据，不能作为真权重验证通过。原始[作业输出](r1-review/job_output.txt)、[调度器描述](r1-review/job_describe.txt)、[调度器生成入口](r1-review/issue017-zero-update-r1.sh)及[回收摘要](r1-review/retrieval.json)已保存。
-
-调度器记录phase=Failed、reason=Error、exitCode=2；节点d6-hpc-gpu-053，申请8CPU/32GiB/1GPU。容器环境包含NVIDIA_VISIBLE_DEVICES=GPU-7b57855a-1ee0-bc43-987c-3b381e85405d，未包含CUDA_VISIBLE_DEVICES。run_layer1_zero_update.sh在创建输出目录前要求CUDA_VISIBLE_DEVICES非空，因此报An allocated GPU is required并退出。这是GPU分配判定与集群容器环境不匹配，现有证据不支持归因于OOM、权重或logits差异。
-
-回收时data/runs/issue017-zero-update-r1目录不存在；入口在该检查后才安装退出码trap，因此也没有产物exit_code.txt。后续136拍回归通过&&连接，未执行。旧的7项加载与6项HTTP测试结果仍有效，但本次GPU作业连这两组测试也未运行，不能重复计为新验证。调度器另报./path.sh不存在，但wrapper以echo容忍该错误并继续到GPU检查，直接终止原因仍为GPU检查。
-
-| 验收项 | 当前证据 | 结论 |
+| 验收项 | 实际结果 | 证据 |
 | --- | --- | --- |
-| 小张量加载与HTTP契约 | 既有远端7项、6项通过 | 已满足轻量验证 |
-| 发布资产逐文件摘要与strict/shape映射 | 真权重入口未执行 | 未验收 |
-| 15个prompt完整词表logits与生成IDs | 无comparison.json和模型输出 | 未验收 |
-| 两路径全参数摘要、零更新前后摘要及LoRA白名单 | 无真权重审计产物 | 未验收 |
-| 重构后的五例136拍真实服务回归 | 前置失败，未执行 | 未验收 |
+| GPU分配 | CUDA_VISIBLE_DEVICES为空，NVIDIA_VISIBLE_DEVICES有效；实际单张RTX 4090、25262096384字节显存、BF16可用 | [预检查](r4-review/issue017-zero-update-r4/gpu_preflight.json) |
+| 加载/HTTP契约 | 7项加载、6项服务测试全部通过 | [加载测试](r4-review/issue017-zero-update-r4/loading-tests.txt)、[服务测试](r4-review/issue017-zero-update-r4/service-tests.txt) |
+| 发布资产/恢复 | 逐文件摘要通过；453个参数张量strict恢复，无缺失/意外键/shape错误 | [资产](r4-review/issue017-zero-update-r4/comparison/assets.json)、[候选审计](r4-review/issue017-zero-update-r4/comparison/candidate/report.json) |
+| 零更新输出 | 15个原001固定prompt，共111个生成token；每步151652维完整词表raw logits，最大绝对误差0，IDs逐例完全一致 | [比较](r4-review/issue017-zero-update-r4/comparison/comparison.json) |
+| 参数摘要/白名单 | 两路径453张量摘要一致，零更新前后不变；只开放已有q/v default LoRA A/B的112张量、5046272参数，embedding/head冻结 | [参考摘要](r4-review/issue017-zero-update-r4/comparison/reference/weights.json)、[候选摘要](r4-review/issue017-zero-update-r4/comparison/candidate/weights.json) |
+| 服务回归 | 五例28/26/26/28/28拍，共136拍；第1/2/3/5例一致，第4例有prompt差异，阶段退出1 | [回归摘要](r4-review/issue017-runtime-regression-r4/comparison/summary.json) |
 
-重跑前需修正单卡入口的分配检查：兼容集群NVIDIA_VISIBLE_DEVICES，并在受调度的容器内用实际CUDA可用性、可见设备数量及显存确认单卡；不可仅删除检查后在调试机加载7B。还需在检查失败时留下可回收的退出证据。修正代码前同步对应中文说明，保持现有单GPU、8CPU/32GiB、总2400秒、输出5GiB上限，使用新run_id，保留r1原件。随后先零更新、成功后再136拍回归，全部满足才可关闭017；005及006训练放行仍为false。本次仅回收和审查，未修改实现或提交新GPU作业。
+本地已核对回收报告：注册配置/源码摘要一致；15个prompt与001原始请求索引、IDs和来源摘要匹配；两条恢复路径权重摘要相同，logits产物摘要逐例相同。未以新模型结果重选prompt，未放宽BF16/64-token贪心、atol0.02/rtol0.01或IDs完全一致标准。
 
-## r2修复与重跑准备
+## 回归失败与关闭决策
 
-用户授权修正并重跑后，已按同路径说明修正GPU可见性检查，要求调度JobID并在实际CUDA预检查中验证单张24GiB RTX 4090/BF16；不重写设备编号。新输出目录先安装退出处理，入口源码也计入摘要。bash语法检查通过；本地conda base下验证无分配时退出2且保存日志/退出码，再次执行不覆盖旧输出。未在本地加载模型或运行GPU测试。r2沿用15个固定prompt、BF16/64-token、0.02/0.01容忍及完全相同IDs标准，仍只在零更新成功后执行136拍回归。
+[第4例原始记录](r4-review/issue017-runtime-regression-r4/comparison/historical-4-independent_free_replay.json)的首处分歧是request=5（第6次请求）、prompt_token_ids偏移71。此前5次prompt与输出一致；当拍生成IDs也一致，但参考路径用户片段为` bathroom with like`，集成路径为` bathroom with like the`。两边下一拍分别纳入`the steam`和`steam`，说明首处分歧发生在词事件分拍，而非已观察到的同prompt数值差异。
 
-## r2实际结果与r3修正
+首个非空Word时间0.8120505698秒，名义第6拍4.4120505698秒；`the`记录到达4.4136404991秒，相差约1.59ms。参考实际请求记录在4.4147777241秒，日志未记录两边实际入队与截窗时刻，因此只能支持边界调度顺序的排查方向，尚不能断言纯回放器抖动或排除运行时缺陷。保持本次失败，不通过反复重试挑选成功结果，不修改001原报告、不更换输入或调宽验收标准。022需先补齐实际时序证据并界定责任，再修复与重新完成五例回归；017当前不能归档。
 
-r2作业job-179242512241984503787-xuan-zhang使用493404b，真实单卡预检查通过；CUDA_VISIBLE_DEVICES为空而NVIDIA_VISIBLE_DEVICES有效，实际1张RTX 4090、25262096384字节显存、BF16可用，证明r1修复已生效。7项加载测试1.456秒、6项服务测试0.208秒均通过；逐文件资产核验完成并物化15个prompt。原始[预检查](r2-review/issue017-zero-update-r2/gpu_preflight.json)、[失败日志](r2-review/issue017-zero-update-r2/comparison/reference.log.txt)、[失败记录](r2-review/issue017-zero-update-r2/comparison/failure.json)及[完整回收摘要](r2-review/retrieval.json)已保存。
+## 资源与边界
 
-零更新退出1，官方参考构建中safe_open映射第二个base分片3864726352字节时失败：Cannot allocate memory (12)。尚未产出模型对照，后续136拍回归未执行，017继续未通过。依据该错误，移除入口28GiB虚拟地址空间限制，避免CUDA预留/文件映射消耗地址额度；物理内存申请及集群32GiB硬限保持不变。r3继续同一验收协议与资源预算，入口额外用/usr/bin/time记录RSS；保留r1/r2，不覆盖失败记录。
+申请保持1×24GiB4090、8CPU、32GiB物理主存，最多1个GPU作业；各轮均在前一任务退出后提交。r4零更新252.03秒、回归256.38秒，总508.41秒，小于2400秒；零更新退出0，回归退出1。Python resource记录的子进程峰值RSS分别7388396/7406820KiB（不是整个cgroup内存峰值）；零更新两路径各峰值CUDA分配17592070144字节，约16.38GiB。两输出占用合计135133KiB，约132MiB，小于5GiB。
+
+详见[零更新资源](r4-review/submit/issue017-zero-update-r4-resources.json)及[回归资源](r4-review/submit/issue017-runtime-regression-r4-resources.json)。资源统计使用训练conda中的subprocess/resource/time，已验证退出码透传和JSON记录；没有加载模型到本地或调试机。
+
+## 修复与失败保留
+
+| 轮次 | 作业/源码 | 结果与处理 |
+| --- | --- | --- |
+| r1 | job-179239981090839983547-xuan-zhang / dfd36d3 | CUDA_VISIBLE_DEVICES检查误拒绝集群NVIDIA_VISIBLE_DEVICES，退出2；[原件](r1-review/retrieval.json) |
+| r2 | job-179242512241984503787-xuan-zhang / 493404b | 真实GPU检查、7+6测试及资产核验通过；28GiB虚拟地址限制使第二个base分片mmap失败，退出1；[原件](r2-review/retrieval.json) |
+| r3 | job-179242541424100807674-xuan-zhang / 12d478a | 提交命令使用容器不存在的/usr/bin/time，入口未执行、退出127；[原件](r3-review/retrieval.json) |
+| r4 | job-179242557114450383845-xuan-zhang / 12d478a | 零更新通过，服务回归4/5，保留差异并登记022；[原件](r4-review/retrieval.json) |
+
+入口先安装退出处理再验证环境；兼容两种GPU可见性变量并验证真实CUDA单卡/BF16，不覆盖设备编号。移除28GiB虚拟地址限制以允许CUDA地址预留和safetensors映射，物理主存仍受调度器32GiB硬限。bash语法、无分配退出2并保留日志、旧输出不被覆盖均已验证。代码与[同路径说明](../../../docs/scripts/remote/run_layer1_zero_update.md)同步。
+
+先前远端CPU小张量及依赖恢复证据保留：[加载测试](loading_tests.txt)、[HTTP测试](service_tests.txt)、[CPU资源](cpu_contract.json)、[HTTP资源](service_contract.json)、[依赖安装](test_dependency_install.txt)、[依赖版本](dependency_versions.json)。004已按r5机器审计及用户授权关闭；005仍待训练器、梯度/保存恢复短跑，006和007前置条件不因零更新通过而自动满足。

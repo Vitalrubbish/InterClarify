@@ -1,0 +1,1 @@
+{"passed": true, "training_allowed": false}

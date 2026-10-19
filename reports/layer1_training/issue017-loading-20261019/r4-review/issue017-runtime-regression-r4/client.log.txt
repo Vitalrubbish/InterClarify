@@ -1,0 +1,5 @@
+{"case": "historical-1", "mode": "independent_free_replay", "clock": "first_nonempty", "input_contract": "kyutai_word_strip_then_space_join", "first_difference": null, "requests": 28}
+{"case": "historical-2", "mode": "independent_free_replay", "clock": "first_nonempty", "input_contract": "kyutai_word_strip_then_space_join", "first_difference": null, "requests": 26}
+{"case": "historical-3", "mode": "independent_free_replay", "clock": "first_nonempty", "input_contract": "kyutai_word_strip_then_space_join", "first_difference": null, "requests": 26}
+{"case": "historical-4", "mode": "independent_free_replay", "clock": "first_nonempty", "input_contract": "kyutai_word_strip_then_space_join", "first_difference": {"request": 5, "field": "prompt_token_ids", "first_token_offset": 71}, "requests": 28}
+{"case": "historical-5", "mode": "independent_free_replay", "clock": "first_nonempty", "input_contract": "kyutai_word_strip_then_space_join", "first_difference": null, "requests": 28}
