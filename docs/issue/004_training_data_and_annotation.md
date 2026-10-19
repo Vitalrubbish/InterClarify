@@ -1,16 +1,16 @@
 # Issue 004：使用 UltraChat 自行实现 micro-turn 数据生成管线
 
-状态：进行中（生成/审计代码已实现，完整来源下载恢复、远端规模生成和人审待完成）。优先级：P0。依赖：001；文本训练集不依赖 002，真实 ASR 迁移评测数据依赖 002。
+状态：进行中（完整来源已验真，排除清单已生成但119条FDB缺转写，正式规模生成和人审待完成）。优先级：P0。依赖：001；文本训练集不依赖 002，真实 ASR 迁移评测数据依赖 002。
 
 ## 当前进度
 
 008a当前完整链路B0五例新正文/语音0/5，用户确认的条件触发有限训练准备。已有 [来源清单](../../reports/layer1_training/issue001-inventory-20261018/data_source_manifest.json)，冻结revision、MIT许可元数据、字段和十个shard的发布LFS SHA256；正文下载须完整验真后使用，作者精确50k清单未知。
 
-远端根 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/`。2026-10-19 实查原下载作业已退出，`vc list` 无活动任务；仅前3个shard完整，第4个为约518MiB partial，日志为ChunkedEncodingError。独立训练conda已可导入tokenizers/yaml/requests。来源尚未全部验真，不能继续引用提交时的排队快照。
+远端根 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/`。10个shard共9,288,990,895字节已下载且逐文件核对大小/SHA256，r4退出0；另在调试机1CPU/512MiB限制下重验通过，44.31秒、峰值19,656KiB。独立训练conda可用。来源验真已完成，证据见[来源记录](../../reports/layer1_training/issue016-source-and-exclusions-20261019/source_verification.json)。
 
-已实现数据核心 `layer1_data.py`、构建/审计命令、`configs/layer1_data.yaml`、远端CPU入口及同路径说明，覆盖分组切分、事件计划、三组视图、mask、序列窗口与生成恢复。代码子任务 [013](archive/013_layer1_data_pipeline_implementation.md) 已归档，下载恢复见 [004a](004a_source_download_recovery.md)，实际执行见 [远端任务单](004_remote_data_execution.md)。新增23项本地测试通过；修复调度入口与环境pip清单采集问题后，当前单个4CPU/8GiB/0GPU作业为 `job-179239520300088615232-xuan-zhang`（r4，指定CPU-004），先运行测试和发布tokenizer的32条诊断，通过后串行恢复下载。旧作业失败/撤销记录见实施报告，未计通过。尚无完整来源上的1000/200/300产物或已人审最小集，正式训练仍未放行。
+已实现数据核心、构建/审计命令、配置、远端入口及同路径说明，代码子任务[013](archive/013_layer1_data_pipeline_implementation.md)、下载恢复[004a](archive/004a_source_download_recovery.md)已归档。r4的23项测试与32条发布tokenizer诊断通过；调试机资源复测见[015](archive/015_debug_node_data_validation.md)。尚无完整来源上的1000/200/300正式产物或已人审最小集。
 
-最新实查：r4的19项数据测试、4项下载测试和32条发布tokenizer诊断均通过，正在恢复来源，已有4/10文件完成校验。按用户要求另在调试机以1CPU/2GiB硬限补做32条资源测量：6.894秒、峰值RSS约149.94MiB、退出0，两次报告一致；[015](archive/015_debug_node_data_validation.md)已归档。今后此规模轻量检查直接在调试机受限执行，完整建库和训练另作资源安排。
+排除清单已在manifests/exclusions.json生成：3325个文本摘要，覆盖FLEURS 100 test+1 dev、历史五例及FDB727例目录；119条Candor接话音频无转写，reviewed=false，缺口由[016](016_external_data_exclusion.md)跟踪，不能冒充完整隔离审查。正式训练保持关闭。
 
 ## 已确定的实现路线
 
@@ -54,7 +54,7 @@
 
 ## 测试与完成标准
 
-- [ ] 实际可读取官方采用的 UltraChat 数据来源，版本、字段和摘要齐全；不把未知的作者精确 50k 清单作为已完成资产。
+- [x] 实际UltraChat来源十个shard完整可读，版本、字段和文件摘要齐全；未知作者精确50k清单继续登记unknown，不当作已取得。
 - [ ] 1,000/200/300 条原始对话切分完整，分组泄漏和跨集合近重复为零；过滤、补选、派生序列数量可追溯。
 - [ ] 相同来源、tokenizer、配置和种子重复生成的事件/序列摘要相同；不同种子改变允许的随机选择而保持协议合法。动态生成保存/恢复后顺序可核对。
 - [ ] 确定性测试覆盖继续说话、句末接话、句中空窗、用户插话、用户附和和思考；实际 token ID、目标 mask、消息边界正确，不出现系统附和目标。

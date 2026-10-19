@@ -10,4 +10,6 @@
 
 首轮最多 1,000 条、第二轮最多 3,000 条，每组每轮最多一 epoch，GPU 小时上限分别为 8/16，总计 72，最多 8×4090。005 根据实测冻结长度、batch 和步数；001 诊断预算 4 GPU 小时另计。训练只更新完整恢复的官方 checkpoint 中已有 q/v LoRA。
 
+2026-10-19来源验真：UltraChat十个固定shard已下载完成并重新逐文件核对大小/SHA256，共9,288,990,895字节，下载和复核退出均0；source_files_download_verified更新为true，见[证据](../../reports/layer1_training/issue016-source-and-exclusions-20261019/source_verification.json)。本字段仅表示源文件验真，119条FDB转写覆盖缺口、完整数据审计及005/007门禁仍未完成，training_released保持false。
+
 真实 dev 每行为至少 30 例，test 每行为至少 100 例、至少 20 位说话人且 dev/test 说话人不交叉；报告按说话人分组的 95% bootstrap 区间，样本不足时补充独立样本。004/007 在候选结果前交付清单，数值门槛见 YAML，不事后降低。质量使用盲标签评审；音频延迟归 008，均值上限 1.5 秒、简单问题亚秒覆盖下限 90%，漏答保留分母。

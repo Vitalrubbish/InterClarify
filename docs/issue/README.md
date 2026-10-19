@@ -8,8 +8,8 @@
 | [001b](archive/001b_runtime_comparison.md) | 官方控制路径对照 | 完成，已归档；原生 Word 输入、五例真权重和远端 7 项测试通过 |
 | [002](archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入 | 完成，已归档；r4-asr 退出 0 |
 | [003](archive/003_kokoro_playback_integration.md) | Kokoro 分段播放 | 完成，已归档；[003d修复](archive/003d_segment_continuity.md)及[003c用户复听](archive/003c_audio_listening_review.md)通过 |
-| [004](004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 进行中；生成/审计代码已实现，来源下载断流待恢复，完整规模与人审待做 |
-| [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 进行中；独立conda环境CPU作业已提交，训练恢复/零更新待做 |
+| [004](004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 进行中；10文件全部验真，排除清单119条转写缺口，完整规模/人审待做 |
+| [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 进行中；公共加载与独立零更新工具已实现，单卡验证已提交 |
 | [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；004、005 及 007 开训前准备未完成 |
 | [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |
 | [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 验收 | 进行中；B0完整链路0/5，候选及FDB待验收 |
@@ -20,9 +20,9 @@
 
 ## 依赖与交付
 
-004 工具实现见已归档 [013](archive/013_layer1_data_pipeline_implementation.md)；[来源恢复](004a_source_download_recovery.md)与[完整远端数据任务](004_remote_data_execution.md)继续跟踪实际产物和人审，不能把代码子任务完成视为004完成。
+004工具实现[013](archive/013_layer1_data_pipeline_implementation.md)与[来源恢复](archive/004a_source_download_recovery.md)已归档；[016排除覆盖](016_external_data_exclusion.md)、[完整数据任务](004_remote_data_execution.md)与[017加载/零更新](017_training_loader_zero_update.md)继续跟踪实际产物，不能把代码或来源验真当正式训练放行。
 
-[015 调试机资源实测](archive/015_debug_node_data_validation.md)完成：32条诊断在1CPU下约6.9秒、峰值约150MiB；同规模轻量检查直接在调试机受限执行。r4远端23项测试与32条诊断均通过，目前只继续唯一来源下载实例。
+[015 调试机资源实测](archive/015_debug_node_data_validation.md)完成：32条诊断在1CPU下约6.9秒、峰值约150MiB；同规模轻量检查直接在调试机受限执行。r4测试/诊断及完整来源下载最终均通过退出0。
 
 文本训练路径为 001 → 004/005 → 006 → 007 → 008。004 数据工具、005 加载准备和 007 评价规则可在正式训练前推进；005 最终短跑依赖 004 最小集。002 轨迹用于 007 独立迁移评测，003 接入与人工试听已完成归档。006 交付训练资产及 dev 报告后由 007 选择和验收候选，008 最后完成新组合音频及 FDB；不重开选型、不实现 Layer 2/3。
 

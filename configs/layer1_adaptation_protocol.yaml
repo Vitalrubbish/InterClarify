@@ -52,7 +52,7 @@ data:
   source_split: train
   source_license: MIT
   source_manifest: reports/layer1_training/issue001-inventory-20261018/data_source_manifest.json
-  source_files_download_verified: false
+  source_files_download_verified: true
   author_exact_50k_ids: unknown
   generator: project_implementation
   train_dialogues: 1000

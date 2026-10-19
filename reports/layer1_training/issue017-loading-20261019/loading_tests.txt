@@ -1,0 +1,12 @@
+test_inventory_digest_and_unsafe_paths_fail_closed (test_layer1_loading.LoadingTests) ... ok
+test_missing_extra_collision_and_shape_are_rejected_before_copy (test_layer1_loading.LoadingTests) ... ok
+test_only_complete_existing_qv_default_adapter_is_trainable (test_layer1_loading.LoadingTests) ... ok
+test_prompt_fixture_is_frozen_from_independent_historical_records (test_layer1_loading.LoadingTests) ... ok
+test_strict_mapping_keeps_every_tensor_and_reports_shapes (test_layer1_loading.LoadingTests) ... ok
+test_full_vocabulary_comparison_rejects_logit_and_control_changes (test_layer1_loading.TensorLoadingTests) ... ok
+test_tensor_hashes_detect_frozen_parameter_change (test_layer1_loading.TensorLoadingTests) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 3.705s
+
+OK

@@ -1,12 +1,14 @@
 # Issue 005：恢复训练状态并完成远端资源短跑
 
-状态：进行中（独立训练conda环境准备已提交，训练加载/短跑待办）。优先级：P0。依赖：001；训练加载可先实现，最终资源短跑使用 004 的最小审计集。
+状态：进行中（训练加载和独立零更新工具已实现，真权重验证及训练短跑待完成）。优先级：P0。依赖：001；训练加载可先实现，最终资源短跑使用 004 的最小审计集。
 
 ## 当前进度
 
-008a B0完整链路五例未接话，已按用户决定启动训练准备。独立conda prefix `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training` 从只读既有interclarify-dev种子克隆，CPU作业 `job-179238030994488852272-xuan-zhang` 已提交，当前排队，不改历史环境。环境建立不等于真实参数更新或恢复验证。
+008a B0完整链路五例未接话，已按用户决定启动训练准备。独立conda prefix `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training`已建立，实测torch2.4.1+cu121、transformers4.46.3、peft0.13.2可导入；环境建立不等于真实参数更新或恢复验证。
 
 001a记录发布布局，001d和008a证明推理路径strict恢复可运行；这些不替代训练加载审计、零更新数值对齐或optimizer/RNG恢复。`train_layer1.py`、训练配置和GPU短跑入口仍待实现，最终短跑仍缺004最小审计集，实际步数/长度/batch未冻结。
+
+已实现公共完整加载layer1_model.py、已有q/v LoRA精确白名单、独立官方Model零更新check_layer1_zero_update.py及单卡入口；现有模型服务复用公共加载。固定15个历史prompt、完整词表raw logits及权重前后摘要，详见[017](017_training_loader_zero_update.md)。这些代码不实现optimizer或梯度更新，真权重对照及受影响001逐拍回归通过前不放行。
 
 ## 问题与目标
 

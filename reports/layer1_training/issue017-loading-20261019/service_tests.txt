@@ -1,0 +1,17 @@
+test_checkpoint_validation (test_duplex_model_service.DuplexModelServiceTests)
+Missing or extra keys cannot silently initialize an invalid model. ... ok
+test_health_and_raw_chatml_stream (test_duplex_model_service.DuplexModelServiceTests)
+HTTP preserves actual special markers and an explicit stop reason. ... ok
+test_history_flattens_to_official_chatml_token_ids (test_duplex_model_service.DuplexModelServiceTests)
+User text, silence markers and released ids reproduce the official run. ... ok
+test_independent_raw_ids_endpoint (test_duplex_model_service.DuplexModelServiceTests)
+Reference IDs bypass history rendering and preserve token identity. ... ok
+test_prompt_bounds_use_one_vocabulary_lookup (test_duplex_model_service.DuplexModelServiceTests)
+Long prompts must retain strict bounds without repeated vocabulary scans. ... ok
+test_published_qv_base_weights_are_mapped_without_ignoring_tensors (test_duplex_model_service.DuplexModelServiceTests)
+Legacy released base weights load into PEFT base_layer with no value changes. ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.158s
+
+OK
