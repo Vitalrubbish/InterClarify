@@ -8,9 +8,9 @@
 | [001b](archive/001b_runtime_comparison.md) | 官方控制路径对照 | 完成，已归档；原生 Word 输入、五例真权重和远端 7 项测试通过 |
 | [002](archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入 | 完成，已归档；r4-asr 退出 0 |
 | [003](archive/003_kokoro_playback_integration.md) | Kokoro 分段播放 | 完成，已归档；[003d修复](archive/003d_segment_continuity.md)及[003c用户复听](archive/003c_audio_listening_review.md)通过 |
-| [004](004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 进行中；正式切分及机器审计通过，32条材料已交付，等待用户签署后关闭 |
+| [004](archive/004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 完成归档；r5全量机器审计通过，用户明确免除复审后关闭 |
 | [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 进行中；公共加载与独立零更新工具已实现，单卡验证已提交 |
-| [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；004、005 及 007 开训前准备未完成 |
+| [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；005及007开训前准备未完成；004已完成 |
 | [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |
 | [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 验收 | 进行中；B0完整链路0/5，候选及FDB待验收 |
 
@@ -20,11 +20,11 @@
 
 ## 依赖与交付
 
-004工具实现[013](archive/013_layer1_data_pipeline_implementation.md)、[来源恢复](archive/004a_source_download_recovery.md)与[016来源隔离](archive/016_external_data_exclusion.md)已完成归档；用户取消FDB补转写及其训练前置条件。[完整数据任务](004_remote_data_execution.md)与[017加载/零更新](017_training_loader_zero_update.md)继续跟踪实际产物，不能把代码或来源验真当正式训练放行。
+004工具实现[013](archive/013_layer1_data_pipeline_implementation.md)、[来源恢复](archive/004a_source_download_recovery.md)与[016来源隔离](archive/016_external_data_exclusion.md)已完成归档；用户取消FDB补转写及其训练前置条件。[完整数据任务](archive/004_remote_data_execution.md)已完成，与[017加载/零更新](017_training_loader_zero_update.md)分别跟踪数据及权重证据，不能把代码或来源验真当正式训练放行。
 
-[018正式数据交付](018_layer1_data_delivery.md)按用户决定先有限抽取最多6000原始对话再过滤/去重/切分。r3监督冲突由[019](archive/019_duplex_data_alignment_audit.md)修复，旧产物已删除；r4在调试机1CPU/nice10/2GiB硬限完成，正式切分、32/100子集、机器审计及待签署材料见[r4报告](../../reports/layer1_training/issue004-build-20261019-r4/README.md)。
+[018正式数据交付](archive/018_layer1_data_delivery.md)按用户决定先有限抽取最多6000原始对话再过滤/去重/切分。r3监督冲突由[019](archive/019_duplex_data_alignment_audit.md)修复，旧产物已删除；r5在调试机1CPU/nice10/2GiB硬限完成，正式切分、32/100子集、机器审计及用户免除复审的记录见[r5报告](../../reports/layer1_training/issue004-build-20261019-r5/README.md)。
 
-[020文本表面形式核查](archive/020_asr_text_surface_alignment.md)跟进用户审阅r4后的补充问题：缩写跨拍、Nemotron大小写与数字/时间/日期写法。完成核对与必要修复前，004仍不视为人工签署完成。
+[020文本表面形式核查](archive/020_asr_text_surface_alignment.md)完成了用户审阅r4后的补充核验；[021修订](archive/021_asr_surface_data_revision.md)交付r5。用户明确免除r5新增人工复审，004已按机器证据及该授权关闭。
 
 [015 调试机资源实测](archive/015_debug_node_data_validation.md)完成：32条诊断在1CPU下约6.9秒、峰值约150MiB；同规模轻量检查直接在调试机受限执行。r4测试/诊断及完整来源下载最终均通过退出0。
 
@@ -56,4 +56,4 @@
 
 [014 实际缓存/退役资产回收](archive/014_remote_cache_reclamation.md)已完成：直接删除14个编译缓存、3组候选权重、2套旧环境，目标删除前占用约20.58GiB；当前模型、训练环境和原始结果保留。
 
-[020核验](archive/020_asr_text_surface_alignment.md)已完成：调试节点单GPU可运行该短探针，现役ASR保留大小写/缩写并主要输出英文数词；[021](021_asr_surface_data_revision.md)跟踪用户数值口语化和新数据审计，r4尚未实现这项一致性要求。
+[020核验](archive/020_asr_text_surface_alignment.md)已完成：调试节点单GPU可运行该短探针，现役ASR保留大小写/缩写并主要输出英文数词；[021](archive/021_asr_surface_data_revision.md)已完成用户数值口语化及r5审计，r4已删除，004按用户授权关闭。

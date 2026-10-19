@@ -4,7 +4,7 @@
 
 ## 2026-10-18 进度核对
 
-协议已登记 B0/T1/T2/T3、现有 q/v LoRA 更新范围、数据规模及两轮预算上限，尚未执行三组训练。001 运行时全范围放行、004 数据审计、005 零更新与恢复均未完成，`configs/layer1_adaptation_protocol.yaml` 中 `training_released: false`；没有候选 checkpoint、训练 run manifest 或 dev 报告。保持待办，前置门禁满足前不得开训。
+协议已登记 B0/T1/T2/T3、现有 q/v LoRA 更新范围、数据规模及两轮预算上限，尚未执行三组训练。001运行时对照和004数据审计已完成；005零更新与恢复、007开训前准备仍未完成，`configs/layer1_adaptation_protocol.yaml` 中 `training_released: false`；没有候选 checkpoint、训练 run manifest 或 dev 报告。保持待办，前置门禁满足前不得开训。
 
 ## 实验目标
 

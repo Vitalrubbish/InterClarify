@@ -63,7 +63,11 @@ data:
   grouping: [original_dialogue_id, near_duplicate_group]
   mix_original_fraction: 0.5
   mix_unit: original_dialogue_per_epoch
-  protected_user_characters: [apostrophe, hyphen, decimal, time]
+  protected_user_characters: [apostrophe, hyphen]
+  user_numeric_surface: english_numeric_v1
+  numeric_normalization_before_chunking: true
+  audited_dataset_manifest: reports/layer1_training/issue004-build-20261019-r5/completed/dataset/manifest.json
+  human_review_policy: user_waived_after_machine_audit
   preserve_assistant_punctuation: true
   exclusions: [historical_five_cases, fleurs_100, full_fdb]
   real_asr_role: independent_transfer_evaluation
@@ -131,7 +135,7 @@ acceptance:
   simple_question_subsecond_coverage_min: 0.90
 gates:
   issue001_runtime_comparison: passed
-  issue004_data_audit: pending
+  issue004_data_audit: passed
   issue005_zero_update_and_recovery: pending
   issue007_independent_real_asr_test: pending
   issue008_audio_and_fdb: pending

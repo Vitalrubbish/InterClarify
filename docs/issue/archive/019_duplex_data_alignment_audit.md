@@ -1,6 +1,6 @@
 # Issue 019：DuplexCascade 数据生成语义对齐复核
 
-状态：完成（修复、r4重建及机器审计通过，用户32条人审仍归父任务004）。父任务：[004](../004_training_data_and_annotation.md)。
+状态：完成（修复、r4重建及机器审计通过，用户32条人审仍归父任务004）。父任务：[004](004_training_data_and_annotation.md)。
 
 ## 工作单元
 
@@ -21,7 +21,7 @@
 - [x] 修改生成器和必要的语义审计，增加针对标点独占末片段及非末片段的回归；同步更新每个修改文件对应的 `docs` 文档。本地与远端 conda 各26项测试通过。
 - [x] 在受限远端 conda 环境重新生成、审计并回收32条完整材料；r4源码70d57b6，构建退出0、机器审计通过，5394序列、281260微轮，32条6222事件。r3生成目录及仓库旧副本已删除。r4原件摘要为`006dcac7c359ae1436bfe1b168c8102827f5b017c06ab955ae7bb048a6382acb`；人工签署为空，仍归004。
 
-对照依据：[DuplexCascade 论文 3.2–3.3 节](https://arxiv.org/html/2603.09180v1#S3.SS3)、[官方 `server.py` 固定提交](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/server.py)。详细核对见[审计报告](../../duplex_data_alignment_audit.md)，新产物见[r4报告](../../../reports/layer1_training/issue004-build-20261019-r4/README.md)。
+对照依据：[DuplexCascade 论文 3.2–3.3 节](https://arxiv.org/html/2603.09180v1#S3.SS3)、[官方 `server.py` 固定提交](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/server.py)。详细核对见[审计报告](../../duplex_data_alignment_audit.md)，后续正式替代产物见[r5报告](../../../reports/layer1_training/issue004-build-20261019-r5/README.md)。
 
 ## 修复设计（先于代码）
 
