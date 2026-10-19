@@ -109,6 +109,28 @@ class DataPipelineTests(unittest.TestCase):
         self.assertEqual(data.remove_punctuation(text, self.config['views']['remove_characters']),
                          'Don’t re-enter at 09:30 use 3.14 okay <|no voice|>')
 
+    def test_punctuation_only_boundaries_do_not_turn_into_no_voice(self):
+        self.dialogue['texts'] = ['?Please answer.', 'Certainly.']
+        plan = self.plan(user_tokens=[1, 1], interruption_probability=0)
+        sourced = [e for e in plan['events'] if e['user_origin']]
+        self.assertTrue(plan['sampling']['punctuation_boundary_merges'])
+        self.assertEqual(''.join(e['user_text'] for e in sourced), self.dialogue['texts'][0])
+        self.assertTrue(all(e['user_unpunctuated'].strip() for e in sourced))
+        self.assertEqual(sourced[-1]['control'], 'finish')
+        encoder = data.SequenceEncoder(self.tokenizer, self.config, 4096)
+        for event in sourced:
+            prefix, _ = encoder.event_ids(event, 'unpunctuated')
+            self.assertNotEqual(prefix[len(encoder.user_header)], self.config['token_ids']['<|no voice|>'])
+
+    def test_punctuation_only_user_turn_is_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            index = data.DialogueIndex(Path(folder) / 'index.sqlite3', self.config)
+            try:
+                self.assertEqual(index.rejection({'id': 'punct', 'data': ['?!', 'This is an answer.']}),
+                                 'empty_user_after_punctuation_removal')
+            finally:
+                index.close()
+
     def test_three_views_share_events_targets_and_supervise_once(self):
         plan = self.plan()
         encoder = data.SequenceEncoder(self.tokenizer, self.config, 220)

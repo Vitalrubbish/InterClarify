@@ -70,6 +70,8 @@ def audit(directory, tokenizer_dir):
             if origin:
                 require(dialogue['texts'][origin['turn']][origin['start']:origin['end']] == event['user_text'],
                         'User span does not match source')
+                require(bool(event['user_text'].strip()) and bool(event['user_unpunctuated'].strip()),
+                        'Sourced user micro-turn became no-voice')
             if event['control'] in ('speaking', 'thinking', 'interruption'):
                 require(not event['assistant_ids'], 'Silent control contains response content')
             if event['kind'] == 'natural_pause':

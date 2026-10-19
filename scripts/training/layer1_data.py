@@ -264,6 +264,9 @@ class DialogueIndex:
         if '<|' in joined or '|>' in joined or '\ufffd' in joined:
             return 'reserved_marker_or_encoding'
         rule = self.config['filter']
+        if any(not remove_punctuation(text, self.config['views']['remove_characters']).strip()
+               for text in texts[::2]):
+            return 'empty_user_after_punctuation_removal'
         if not rule['min_chars'] <= len(joined) <= rule['max_chars']:
             return 'length'
         letters = [x for x in joined if x.isalpha()]
@@ -382,6 +385,36 @@ class MicroTurnPlanner:
     def __init__(self, tokenizer, config):
         self.tokenizer, self.config = tokenizer, config
 
+    def user_chunks(self, text, rng, bounds):
+        """Join punctuation-only spans before assigning shared event boundaries."""
+        characters = self.config['views']['remove_characters']
+        chunks, leading, merges = [], None, 0
+        for raw in self.tokenizer.user_chunks(text, rng, bounds):
+            chunk = dict(raw)
+            if not remove_punctuation(chunk['text'], characters).strip():
+                merges += 1
+                if chunks:
+                    previous = chunks[-1]
+                    previous['text'] += chunk['text']
+                    previous['end'] = chunk['end']
+                    previous['base_tokens'] += chunk['base_tokens']
+                elif leading is None:
+                    leading = chunk
+                else:
+                    leading['text'] += chunk['text']
+                    leading['end'] = chunk['end']
+                    leading['base_tokens'] += chunk['base_tokens']
+                continue
+            if leading is not None:
+                chunk['text'] = leading['text'] + chunk['text']
+                chunk['start'] = leading['start']
+                chunk['base_tokens'] += leading['base_tokens']
+                leading = None
+            chunks.append(chunk)
+        if leading is not None or not chunks:
+            raise ValueError('User turn is empty after punctuation removal')
+        return chunks, merges
+
     def plan(self, dialogue, epoch):
         cfg = self.config['generation']
         rng = stable_rng(self.config['seed'], dialogue['dialogue_id'], epoch, 'events')
@@ -404,7 +437,10 @@ class MicroTurnPlanner:
 
         turn, interrupting = 0, False
         while turn < len(texts):
-            chunks = list(self.tokenizer.user_chunks(texts[turn], rng, cfg['user_tokens']))
+            chunks, merges = self.user_chunks(texts[turn], rng, cfg['user_tokens'])
+            sampling['punctuation_boundary_merges'] += merges
+            sampling['user_chunks_over_seven_tokens'] += sum(
+                chunk['base_tokens'] > cfg['user_tokens'][1] for chunk in chunks)
             for i, chunk in enumerate(chunks):
                 origin = {'turn': turn, 'start': chunk['start'], 'end': chunk['end'],
                           'base_tokens': chunk['base_tokens']}
@@ -480,6 +516,8 @@ class SequenceEncoder:
         text = event['user_text']
         if view == 'unpunctuated':
             text = event['user_unpunctuated']
+        if event['user_origin'] and not text.strip():
+            raise ValueError('A sourced user micro-turn became no-voice')
         user = self.tokenizer.encode(text.strip()) if text.strip() else [self.config['token_ids']['<|no voice|>']]
         prefix = self.user_header + user + self.user_end + self.assistant_header
         target = []

@@ -4,6 +4,8 @@
 
 `ReleasedTokenizer` 只用发布 `tokenizer.json` 和配置，逐项验证实际特殊 token 单 ID、EOS、无 BOS，并记录文件摘要。`user_chunks` 使用原文字符 offsets 保留跨度，不经 decode/re-encode 重建原始用户文本；遇到 Unicode 多 token 共享字符时延长到合法字符边界，因此可超过抽样的 7 token，跨度与实际 token 数保留在事件中。assistant 直接保留编码 ID，每片段最多 10 个内容 token。
 
+019修复后，`MicroTurnPlanner` 在原始随机分片之后、事件生成之前，将去句读后为空的标点片段合入相邻用户片段。合并记录次数和超过7基础token的片段数；这些片段不再变成 no-voice。`DialogueIndex.rejection` 排除任何去句读后整体为空的用户长轮。这样保持原始跨度、三视图共同边界与控制目标，同时承认合并是相对论文严格1–7 token的一项例外。
+
 `DialogueIndex` 使用SQLite保存抽样对话的原文/来源位置/摘要、排除记录、近重复倒排与并查组。`ingest`只处理source_records给出的有界完整对话，先做字段/语言/长度过滤及外部排除，再精确和近重复归组。Jaccard前缀过滤使用相同稳定shingle顺序，每组前缀长度为n-ceil(0.85*n)+1，倒排完整召回候选，再核验交并比；不承诺语义改写识别。`select`按种子及原始ID稳定排序，每个近重复组只选一个代表，顺序补足1000/200/300，数量不足失败。
 
 `source_records`默认在已验真各shard读取固定种子字节窗口，总预算raw_source_dialogues=6000；跳过起点残行、文件末尾可回绕、同一行偏移不重复。只解析/过滤这些完整对话，记录原始byte_offset与raw_sha256，line=null表示未计算绝对行号；排除表和来源ID表也保留字节位置。未配置raw预算的旧测试配置保留完整扫描分支，正式配置不使用。窗口抽样不主张全库逐对话等概率。最终跨split另做逐对近重复审计。
