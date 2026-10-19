@@ -58,12 +58,13 @@ NUMBER = r'(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?'
 PATTERN = re.compile(
     r'(?P<iso>\b\d{4}[-/]\d{1,2}[-/]\d{1,2}\b)'
     r'|(?P<slash>\b\d{1,2}/\d{1,2}/\d{4}\b)'
+    r'|(?P<monthyear>\b' + MONTH_PATTERN + r'\s+\d{4}\b)'
     r'|(?P<month>\b' + MONTH_PATTERN + r'\s+\d{1,2}(?:st|nd|rd|th)?(?:,?\s+\d{4})?\b)'
     r'|(?P<daymonth>\b\d{1,2}(?:st|nd|rd|th)?\s+' + MONTH_PATTERN + r'(?:,?\s+\d{4})?\b)'
     r'|(?P<time>\b\d{1,2}:\d{2}(?::\d{2})?(?:\s*[AaPp]\.?[Mm])?)'
     r'|(?P<phone>(?<!\w)(?:\+\d{1,3}[ -])?(?:\(\d{3}\)[ -]?|\d{3}[ -])\d{3}[ -]\d{4}(?!\d))'
-    r'|(?P<money>[$£€]' + NUMBER + r')'
-    r'|(?P<percent>' + NUMBER + r'\s*%)'
+    r'|(?P<money>[$£€]-?' + NUMBER + r'(?:\s+(?:thousand|million|billion|trillion)\b)?)'
+    r'|(?P<percent>-?' + NUMBER + r'\s*%)'
     r'|(?P<range>\b' + NUMBER + r'\s*[–-]\s*' + NUMBER + r'\b)'
     r'|(?P<ordinal>\b\d+(?:st|nd|rd|th)\b)'
     r'|(?P<number>(?<!\w)-?' + NUMBER + r'(?!\w))', re.I)
@@ -76,7 +77,7 @@ def render_number(raw, before):
     if '.' in raw:
         whole, fraction = raw.split('.')
         return cardinal(int(whole)) + ' point ' + digits(fraction)
-    if len(raw) > 1 and raw.startswith('0') or len(raw) >= 7:
+    if len(raw) > 1 and raw.startswith('0'):
         return digits(raw)
     if len(raw) == 4 and re.search(r'\b(?:in|since|during|year|born|from|until|by|before|after)\s*$', before, re.I):
         return year_words(int(raw))
@@ -95,6 +96,9 @@ def render(match, text):
             raise ValueError('Ambiguous numeric date')
         month, day = (second, first) if first > 12 else (first, second)
         return kind, calendar_words(year, month, day)
+    if kind == 'monthyear':
+        month, year = raw.split()
+        return kind, month + ' ' + year_words(int(year))
     if kind in ('month', 'daymonth'):
         name = re.search(MONTH_PATTERN, raw, re.I).group()
         values = [int(x) for x in re.findall(r'\d+', raw)]
@@ -124,11 +128,17 @@ def render(match, text):
         units = {'$': ('dollar', 'cent'), '£': ('pound', 'penny'), '€': ('euro', 'cent')}
         major, minor = units[raw[0]]
         amount = raw[1:].replace(',', '')
+        negative = amount.startswith('-')
+        if negative:
+            amount = amount[1:]
+        scaled = re.fullmatch('(' + NUMBER + r')\s+(thousand|million|billion|trillion)', amount, re.I)
+        if scaled:
+            return kind, ('minus ' if negative else '') + render_number(scaled[1], '') + ' ' + scaled[2] + ' ' + major + 's'
         whole, _, fraction = amount.partition('.')
         if len(fraction) > 2:
             raise ValueError('Unsupported currency precision')
         number, cents = int(whole), int(fraction.ljust(2, '0') or '0')
-        spoken = cardinal(number) + ' ' + major + ('' if number == 1 else 's')
+        spoken = ('minus ' if negative else '') + cardinal(number) + ' ' + major + ('' if number == 1 else 's')
         if cents:
             spoken += ' and ' + cardinal(cents) + ' ' + (minor if cents == 1 else 'pence' if minor == 'penny' else minor + 's')
         return kind, spoken

@@ -12,6 +12,7 @@ class NumberSurfaceTests(unittest.TestCase):
     def test_spoken_forms(self):
         cases = {
             'There are 42 people.': 'There are forty two people.',
+            'There are 1000000 people.': 'There are one million people.',
             'In 2002, it happened.': 'In two thousand two, it happened.',
             'Since 1889.': 'Since eighteen eighty nine.',
             'In 2026.': 'In twenty twenty six.',
@@ -23,8 +24,11 @@ class NumberSurfaceTests(unittest.TestCase):
             'Read pages 1-5.': 'Read pages one to five.',
             'At 23:59:01.': 'At twenty three fifty nine and one second.',
             'The price is $42.50.': 'The price is forty two dollars and fifty cents.',
+            'Balance $-1.50.': 'Balance minus one dollar and fifty cents.',
+            'Budget $1.5 million.': 'Budget one point five million dollars.',
             'Pay £1.01 and €2.00.': 'Pay one pound and one penny and two euros.',
             'Discount 12.5%.': 'Discount twelve point five percent.',
+            'Change -5%.': 'Change minus five percent.',
             'Use 3.14 and -2.5.': 'Use three point one four and minus two point five.',
             'Read 0012.': 'Read zero zero one two.',
             'Phone: 555-123-4567.': 'Phone: five five five one two three four five six seven.',
@@ -33,6 +37,7 @@ class NumberSurfaceTests(unittest.TestCase):
             'It is the 21st item.': 'It is the twenty first item.',
             'On 2026-10-19.': 'On October nineteenth twenty twenty six.',
             'On October 19, 2026.': 'On October nineteenth twenty twenty six.',
+            'In October 2026.': 'In October twenty twenty six.',
             'On 19 October 2026.': 'On nineteenth October twenty twenty six.',
             'On 19/10/2026.': 'On October nineteenth twenty twenty six.',
             "I'll call at 9:30; we're ready.": "I'll call at nine thirty; we're ready.",
