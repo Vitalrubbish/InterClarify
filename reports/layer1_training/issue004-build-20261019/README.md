@@ -1,12 +1,12 @@
 # Issue 004正式数据交付执行记录
 
-当前run_id：issue004-build-r3，源码ae02d60。用户取消全库过滤后在调试机直接受限启动，精确环境、命令与PID见[submission_r3.json](submission_r3.json)。旧r1/r2全库作业已撤销，回执见[submission.json](submission.json)、[submission_r2.json](submission_r2.json)。本报告不把启动当成最终数据/人审通过。
+完成的run_id：issue004-build-r3，生成源码ae02d60，最终退出0。用户取消全库过滤后在调试机受限完成，环境及启动PID见[submission_r3.json](submission_r3.json)。旧r1/r2已撤销，回执保留。[正式机器验收原件](completed/README.md)与[32条用户审计目录](review_32/README.md)已交付，当前等待用户签署，不冒称人审已通过。
 
 ## 范围与资源
 
 固定10个已验真UltraChat shard、隔离清单、种子20261018，目标1000/200/300。r3只在固定种子跨shard完整JSONL窗口中抽取最多6000原始对话，再过滤、分组和切分，不解析/过滤全库。窗口抽样不主张全库逐对话均匀随机。保留原始ID、字节位置及原文摘要，绝对行号未知时null。最终集合间近重复仍逐对检查。
 
-r3固定CPU0、nice10、2GiB地址空间/单文件硬限、目录10GiB、0GPU。构建1800秒、审计900秒、材料300秒、外层3600秒，单个实例。配置副本仅将目录预算收紧至10GiB，记录SHA256，沿用独立训练conda。实际日志已读取6000对话、过滤后5730候选，候选去重正在进行。
+r3固定CPU0、nice10、2GiB地址空间/单文件硬限、目录10GiB、0GPU，按时限完成。读取6000对话、5730候选，正式1000/200/300、5436序列、284378基础微轮均已生成。机器审计重建比对全部计划/序列通过，跨集合ID/分组/近重复为0，T3为500/500。源码8dd1546按用户审计政策重验同一冻结数据，51.86秒、退出0；不改动生成数据或训练放行状态。
 
 首轮r1在d6-hpc-cpu-010启动：4000行索引约239,927,296字节，外加约24,609,040字节journal，进度速度不匹配本轮1500条交付；停止前末次进度为6000源行/5913合格。通过vc撤销并保留build.log和索引，停止后无exit_code文件，不能标为执行通过。上述实测促使先更新018规则，再实施有界候选图并以新run重提，避免浪费整轮时间/磁盘。
 
@@ -16,10 +16,10 @@ r3固定CPU0、nice10、2GiB地址空间/单文件硬限、目录10GiB、0GPU。
 
 机器审计后生成review/minimum_32.md：前32条训练对话的完整原文和全部事件，用可读文本展示用户两视图、控制和assistant目标。review/expanded_samples.md从同一正式数据抽120事件，6类行为各20个（train/dev/test为12/4/4），每类4个事件安排两位人工独立复核。它是对完整数据的质量抽查，不增加训练数据或曝光。
 
-selection.json绑定种子、样本及原产物摘要；human_review_template.json中的reviewer/accepted/reason均留空。实际人审完成后回填dataset/human_review.json并重跑审计；不以模型检查、程序通过或材料生成替代人工签署。候选不足如实报告，不复制填充或按模型表现选例。
+selection.json绑定种子、样本及原产物摘要；签署均留空。按用户最新决定，以[前32条完整用户审计](review_32/README.md)通过作为004人审收口；120事件和双人复核仅为可选，不再另设阻塞。32条共6550事件，逐条文件与原件SHA256已核对。用户确认后记录真实签署、复核并关闭004/018；当前不自动填通过。
 
 ## 本地验证与待回填
 
 相关回归共52项、48通过、4项按远端条件跳过。新增窗口抽样用例验证预算、跨shard可复现、原字节位置追溯及小文件不重复凑数。Python编译、shell语法和差异检查通过。过滤与事件协议不变，近重复图范围仅为抽取候选，不能外推为全库已过滤/去重。
 
-当前产物位于训练根data/runs/issue004-build-r3/，含build.log、audit.json、review/、依赖/源码与退出码；r1/r2原件保留停止记录。018及004保持进行中，实际生成/审计/人审结果待回填，training_allowed保持false。
+远端产物仍位于训练根data/runs/issue004-build-r3/。机器原件及32条可读文件已回收到本目录，数据manifest SHA256为cf2d2a1e2f1dd49115575f8f122f1b44f61caa6e8a4d998976a8fa8ee349223d，签署请求见[review_request.json](review_32/review_request.json)。004/018保持进行中，仅等待用户实际审计；training_allowed=false，005/007不因数据issue关闭而自动通过。

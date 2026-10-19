@@ -8,7 +8,7 @@
 | [001b](archive/001b_runtime_comparison.md) | 官方控制路径对照 | 完成，已归档；原生 Word 输入、五例真权重和远端 7 项测试通过 |
 | [002](archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入 | 完成，已归档；r4-asr 退出 0 |
 | [003](archive/003_kokoro_playback_integration.md) | Kokoro 分段播放 | 完成，已归档；[003d修复](archive/003d_segment_continuity.md)及[003c用户复听](archive/003c_audio_listening_review.md)通过 |
-| [004](004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 进行中；正式1000/200/300构建、审计及审查材料导出作业已提交，人审待完成 |
+| [004](004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 进行中；正式切分及机器审计通过，32条材料已交付，等待用户签署后关闭 |
 | [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 进行中；公共加载与独立零更新工具已实现，单卡验证已提交 |
 | [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；004、005 及 007 开训前准备未完成 |
 | [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |

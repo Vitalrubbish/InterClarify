@@ -1,8 +1,8 @@
 # Issue 004 远端数据执行任务单
 
-状态：进行中（正式构建作业已提交，实际产物与人审待完成）。父任务：[004](004_training_data_and_annotation.md)。本任务单只执行 CPU 数据构建，不启动训练或模型服务。
+状态：机器执行完成（退出0，32条材料已交付，等待用户审计）。父任务：[004](004_training_data_and_annotation.md)。本任务单只执行CPU数据构建，不启动训练或模型服务。
 
-当前run_id为issue004-build-r3，冻结源码ae02d60，在调试机固定1CPU/nice10/2GiB地址空间硬限下直接执行，外层3600秒、数据目录10GiB、0GPU。只读取固定种子跨shard窗口中最多6000条原始对话，再过滤、候选分组、1000/200/300切分、三视图及机器审计和材料导出。旧r1/r2全库作业已停止并保留记录；不再要求全库对话过滤。每1000已抽取对话写build.log。详见[018](018_layer1_data_delivery.md)。
+完成的run_id为issue004-build-r3，冻结生成源码ae02d60，在调试机1CPU/nice10/2GiB硬限下退出0。有限6000条原始对话过滤后5730候选，正式1000/200/300、三视图、机器审计和32条材料均已交付。[用户审计目录](../../reports/layer1_training/issue004-build-20261019/review_32/README.md)可逐条打开，收口规则见[018](018_layer1_data_delivery.md)。旧r1/r2已停止。
 
 诊断/下载恢复作业 `job-179239520300088615232-xuan-zhang`（r4，源码5df0ef0）已完成：23项测试、32条诊断及10文件下载验真均通过，最终退出0。后续source/dfd36d3独立复核全部SHA256通过。原失败/撤销记录保留。来源隔离登记已完成，用户取消FDB补转写条件，下一步可准备正式分组切分和数据审计。
 
@@ -35,4 +35,4 @@ bash "$LAYER1_DATA_ROOT/scripts/remote/run_layer1_data.sh"
 
 ## 回收与验收
 
-回收 source/environment/exit_code、build/audit 日志、完整 manifest 和审计统计，不提交全部原文和序列。导出review/minimum_32.md、expanded_samples.md、selection.json及human_review_template.json。最小32条全部人工审查；从已生成数据按6类行为每类20事件抽查，train/dev/test为12/4/4，每类4事件安排独立双人复核。这是对正式数据的抽查，不扩大训练集。模板签署留空，实际人工完成后回填dataset/human_review.json并重跑审计。逐项回填004，005最小集移交明确实际长度；规模不齐、人审未完成或审计失败均不放行006。
+已回收源码/依赖、退出码、日志、完整manifest及机器统计，未提交全部训练正文/序列。32条完整可读文件及签署空表已交付。按用户最新决定，32条用户审计通过后回填dataset/human_review.json并重跑审计，再关闭004；原120事件抽查及双人复核为可选，不再阻塞。005/007仍独立限制后续训练，不因004关闭而自动放行006。
