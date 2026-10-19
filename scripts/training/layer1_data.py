@@ -14,6 +14,8 @@ import shutil
 import sqlite3
 import unicodedata
 
+from number_surface import VERSION, normalize_user_text
+
 
 CONTROLS = {
     'speaking': '<|user is talking|>',
@@ -23,6 +25,11 @@ CONTROLS = {
     'backchannel': '<|user backchannel|>',
 }
 ARMS = ('T1', 'T2', 'T3')
+
+
+def spoken_dialogue_texts(texts):
+    """Preserve assistant turns while normalizing complete user turns."""
+    return [text if i % 2 else normalize_user_text(text)['text'] for i, text in enumerate(texts)]
 
 
 def canonical(value):
@@ -216,6 +223,9 @@ class DialogueIndex:
             CREATE INDEX IF NOT EXISTS by_fingerprint ON dialogues(fingerprint);
             CREATE TABLE IF NOT EXISTS prefixes (shingle TEXT, id TEXT);
             CREATE INDEX IF NOT EXISTS by_shingle ON prefixes(shingle);
+            CREATE TABLE IF NOT EXISTS surface_grams (id TEXT PRIMARY KEY, shingles TEXT);
+            CREATE TABLE IF NOT EXISTS surface_prefixes (shingle TEXT, id TEXT);
+            CREATE INDEX IF NOT EXISTS surface_by_shingle ON surface_prefixes(shingle);
             CREATE TABLE IF NOT EXISTS excluded (shard TEXT, line INTEGER, id TEXT, reason TEXT, byte_offset INTEGER);
             CREATE TABLE IF NOT EXISTS source_inventory (id TEXT PRIMARY KEY, shard TEXT, line INTEGER, byte_offset INTEGER);
         ''')
@@ -264,6 +274,11 @@ class DialogueIndex:
         if '<|' in joined or '|>' in joined or '\ufffd' in joined:
             return 'reserved_marker_or_encoding'
         rule = self.config['filter']
+        try:
+            for text in texts[::2]:
+                normalize_user_text(text)
+        except ValueError:
+            return 'unsupported_or_ambiguous_numeric_surface'
         if any(not remove_punctuation(text, self.config['views']['remove_characters']).strip()
                for text in texts[::2]):
             return 'empty_user_after_punctuation_removal'
@@ -293,6 +308,9 @@ class DialogueIndex:
             if not reason:
                 fingerprint = digest(normalized('\n'.join(row['data'])))
                 text_hashes = {fingerprint, *(digest(normalized(t)) for t in row['data'])}
+                spoken = spoken_dialogue_texts(row['data'])
+                text_hashes.update(digest(normalized(t)) for t in spoken)
+                text_hashes.add(digest(normalized('\n'.join(spoken))))
                 if identity in excluded_ids or text_hashes.intersection(excluded_texts):
                     reason = 'external_exclusion'
             if reason:
@@ -355,6 +373,16 @@ class DialogueIndex:
             if similar(grams, json.loads(serialized), threshold):
                 self.union(identity, other)
         self.db.executemany('INSERT INTO prefixes VALUES (?,?)', [(x, identity) for x in prefix])
+        surface = shingles(spoken_dialogue_texts(payload['texts']), self.config['dedup']['word_ngram'])
+        prefix = surface[:len(surface) - math.ceil(threshold * len(surface)) + 1]
+        self.db.execute('DELETE FROM candidates')
+        for gram in prefix:
+            self.db.execute('INSERT OR IGNORE INTO candidates SELECT id FROM surface_prefixes WHERE shingle=?', (gram,))
+        for other, serialized in self.db.execute('SELECT d.id,d.shingles FROM surface_grams d JOIN candidates c ON d.id=c.id'):
+            if similar(surface, json.loads(serialized), threshold):
+                self.union(identity, other)
+        self.db.execute('INSERT INTO surface_grams VALUES (?,?)', (identity, canonical(surface)))
+        self.db.executemany('INSERT INTO surface_prefixes VALUES (?,?)', [(x, identity) for x in prefix])
 
     def select(self):
         """Choose one representative per group, with deterministic replacement order."""
@@ -418,7 +446,10 @@ class MicroTurnPlanner:
     def plan(self, dialogue, epoch):
         cfg = self.config['generation']
         rng = stable_rng(self.config['seed'], dialogue['dialogue_id'], epoch, 'events')
-        texts, events = dialogue['texts'], []
+        texts, events = list(dialogue['texts']), []
+        user_turns = {str(i): normalize_user_text(texts[i]) for i in range(0, len(texts), 2)}
+        for i in range(0, len(texts), 2):
+            texts[i] = user_turns[str(i)]['text']
         masks = {i: punctuation_keep_mask(texts[i], self.config['views']['remove_characters'])
                  for i in range(0, len(texts), 2)}
         sampling = Counter()
@@ -488,6 +519,7 @@ class MicroTurnPlanner:
                     emit('post_response_thinking', control='thinking')
             turn += 2
         return {'dialogue_id': dialogue['dialogue_id'], 'epoch': epoch, 'events': events,
+                'user_turns': user_turns,
                 'source_type': 'synthetic_ultrachat', 'clock_type': 'synthetic_window_only',
                 'sampling': dict(sampling)}
 
@@ -565,6 +597,8 @@ def validate_config(config):
     """Reject unsupported settings instead of silently changing an experiment."""
     if config['schema_version'] != 1 or config['generation']['system_backchannel']:
         raise ValueError('Only schema 1 without system backchannels is supported')
+    if config['generation'].get('user_surface') != VERSION:
+        raise ValueError('Unsupported user text surface version')
     if set(config['splits']) != {'train', 'dev', 'test'} or any(
             type(n) is not int or n < 0 for n in config['splits'].values()):
         raise ValueError('Invalid split sizes')

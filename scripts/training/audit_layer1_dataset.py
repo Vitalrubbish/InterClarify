@@ -9,8 +9,9 @@ from pathlib import Path
 
 from layer1_data import (
     ARMS, CONTROLS, MicroTurnPlanner, ReleasedTokenizer, SequenceEncoder,
-    canonical, digest, file_digest, mixed_assignments, shingles, similar, write_json,
+    canonical, digest, file_digest, mixed_assignments, shingles, similar, write_json, spoken_dialogue_texts,
 )
+from number_surface import validate_surface
 
 
 def require(condition, message):
@@ -33,11 +34,14 @@ def audit(directory, tokenizer_dir):
     require(len({d['dialogue_id'] for d in selected}) == len(selected), 'Repeated dialogue ID')
     require(len({d['duplicate_group'] for d in selected}) == len(selected), 'Duplicate group leakage')
     grams = [set(shingles(d['texts'], config['dedup']['word_ngram'])) for d in selected]
+    surface_grams = [set(shingles(spoken_dialogue_texts(d['texts']), config['dedup']['word_ngram'])) for d in selected]
     for i, left in enumerate(selected):
         for j in range(i):
             if left['split'] != selected[j]['split']:
                 require(not similar(grams[i], grams[j], config['dedup']['jaccard_threshold']),
                         'Cross-split near duplicate')
+                require(not similar(surface_grams[i], surface_grams[j], config['dedup']['jaccard_threshold']),
+                        'Cross-split normalized surface near duplicate')
     assignments = json.loads((directory / 'view_assignments.json').read_text())
     require(assignments == mixed_assignments(selected, config['seed'], manifest['identity']['epoch']),
             'Invalid view assignment')
@@ -48,6 +52,7 @@ def audit(directory, tokenizer_dir):
     planner = MicroTurnPlanner(tokenizer, config)
     encoder = SequenceEncoder(tokenizer, config, manifest['identity']['max_length'])
     controls, kinds, lengths, sampling = Counter(), Counter(), [], Counter()
+    numeric_surfaces = Counter()
     sequence_counts, token_counts, events_per_split = Counter(), Counter(), Counter()
     expected_artifacts = set()
     for dialogue in selected:
@@ -63,12 +68,16 @@ def audit(directory, tokenizer_dir):
         require(artifact['dialogue_id'] == dialogue['dialogue_id'] and artifact['split'] == dialogue['split'],
                 'Artifact provenance mismatch')
         events = plan['events']
+        for turn, surface in plan['user_turns'].items():
+            require(surface['raw_text'] == dialogue['texts'][int(turn)], 'Raw user surface differs from source')
+            validate_surface(surface)
+            numeric_surfaces.update(row['kind'] for row in surface['replacements'])
         for event in events:
             kinds[event['kind']] += 1
             controls[event['control'] or 'content_only'] += 1
             origin = event['user_origin']
             if origin:
-                require(dialogue['texts'][origin['turn']][origin['start']:origin['end']] == event['user_text'],
+                require(plan['user_turns'][str(origin['turn'])]['text'][origin['start']:origin['end']] == event['user_text'],
                         'User span does not match source')
                 require(bool(event['user_text'].strip()) and bool(event['user_unpunctuated'].strip()),
                         'Sourced user micro-turn became no-voice')
@@ -133,8 +142,13 @@ def audit(directory, tokenizer_dir):
             double_reviewed += 1
     expanded_ok = set(CONTROLS) <= reviewed_behaviors and double_reviewed > 0 and review.get('complete') is True
     review_policy = review.get('policy', 'minimum_and_expanded_review')
-    if review_policy not in ('minimum_and_expanded_review', 'user_minimum_32_signoff'):
+    if review_policy not in ('minimum_and_expanded_review', 'user_minimum_32_signoff', 'user_waived_after_machine_audit'):
         raise ValueError('Unknown human-review policy')
+    waived = review_policy == 'user_waived_after_machine_audit'
+    if waived:
+        reason = manifest['identity'].get('human_review_waiver_reason')
+        require(isinstance(reason, str) and bool(reason.strip()) and review.get('waiver_reason') == reason,
+                'Human-review waiver is missing from the frozen build identity')
     expanded_required = review_policy == 'minimum_and_expanded_review'
     rates = {}
     for name, denominator in (('pause', 'pause_eligible_boundaries'),
@@ -144,15 +158,16 @@ def audit(directory, tokenizer_dir):
                        'rate': sampling[name + '_triggers'] / sampling[denominator] if sampling[denominator] else None,
                        'sampling_unit': denominator}
     pending = ['issue005_resource_and_recovery', 'issue007_pretraining_evaluation_gates']
-    if not minimum_ok:
+    if not minimum_ok and not waived:
         pending.append('minimum_32_human_review')
     if expanded_required and not expanded_ok:
         pending.append('expanded_behavior_and_double_review')
     if not manifest['identity']['exclusions_reviewed']:
         pending.append('external_exclusion_review')
     return {'schema_version': 1, 'machine_passed': True, 'training_allowed': False,
-            'parent_issue_complete': bool(minimum_ok and (expanded_ok or not expanded_required)
+            'parent_issue_complete': bool((waived or minimum_ok and (expanded_ok or not expanded_required))
                                           and manifest['identity']['exclusions_reviewed']),
+            'human_review_waived': waived, 'human_review_waiver_reason': review.get('waiver_reason') if waived else None,
             'human_review_policy': review_policy, 'expanded_review_required': expanded_required,
             'minimum_32_human_review_passed': bool(minimum_ok),
             'expanded_review_complete': expanded_ok,
@@ -164,9 +179,11 @@ def audit(directory, tokenizer_dir):
             'auditor_sha256': file_digest(__file__), 'dialogues': dict(Counter(d['split'] for d in selected)),
             'cross_split_id_overlap': 0, 'cross_split_group_overlap': 0,
             'cross_split_near_duplicate_pairs': 0,
+            'cross_split_surface_near_duplicate_pairs': 0,
             'sequences': dict(sequence_counts), 'effective_tokens': dict(token_counts),
             'micro_turns': dict(events_per_split), 'controls': dict(controls), 'event_kinds': dict(kinds),
             'sampling': dict(sampling),
+            'numeric_surface_replacements': dict(numeric_surfaces),
             'observed_rates': rates,
             'source': config['source'], 'source_manifest_sha256': manifest['identity']['source_manifest_sha256'],
             'accepted_source_dialogues': manifest['accepted_source_dialogues'], 'exclusion_counts': manifest['exclusions'],

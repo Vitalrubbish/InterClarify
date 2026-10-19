@@ -159,7 +159,10 @@ class DataPipelineTests(unittest.TestCase):
         self.dialogue['texts'] = ['Go at 09:30 and pay 3.14, please!', 'A sufficiently long answer.']
         plan = self.plan(user_tokens=[1, 1], pause_probability=0, interruption_probability=0)
         reconstructed = ''.join(e['user_unpunctuated'] for e in plan['events'] if e['user_origin'])
-        self.assertEqual(reconstructed, 'Go at 09:30 and pay 3.14 please')
+        self.assertEqual(reconstructed, 'Go at nine thirty and pay three point one four please')
+        self.assertEqual(plan['user_turns']['0']['raw_text'], self.dialogue['texts'][0])
+        self.assertEqual(''.join(self.tokenizer.decode(e['assistant_ids']) for e in plan['events']),
+                         self.dialogue['texts'][1])
 
     def test_eval_views_frozen_across_training_epochs(self):
         rows = [{'dialogue_id': str(i), 'split': 'dev'} for i in range(10)]
@@ -200,8 +203,8 @@ class DataPipelineTests(unittest.TestCase):
         config['limits']['min_free_gib'] = 0
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            rows = [{'id': 'a', 'data': [' '.join(f'word{i}' for i in range(80)), 'The original answer.']},
-                    {'id': 'b', 'data': [' '.join(f'word{i}' for i in range(80)), 'The original answer!']},
+            rows = [{'id': 'a', 'data': [' '.join(f'word {i}' for i in range(80)), 'The original answer.']},
+                    {'id': 'b', 'data': [' '.join(f'word {i}' for i in range(80)), 'The original answer!']},
                     {'id': 'c', 'data': ['A distinct query on botany and trees.', 'Plants grow using sunlight.']},
                     {'id': 'd', 'data': ['Another topic concerns airplane design.', 'Wings create sufficient lift.']},
                     {'id': 'e', 'data': ['Explain mineral chemistry and crystal structure.', 'Atoms form a lattice.']},
@@ -215,6 +218,18 @@ class DataPipelineTests(unittest.TestCase):
                 self.assertEqual(len(selected), 4)
                 self.assertEqual(index.root('a'), index.root('b'))
                 self.assertEqual(index.db.execute('SELECT reason FROM excluded').fetchone()[0], 'reserved_marker_or_encoding')
+            finally:
+                index.close()
+
+    def test_spoken_number_forms_share_a_duplicate_group(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            index = data.DialogueIndex(Path(temporary) / 'index.sqlite3', self.config)
+            try:
+                for identity, text in [('digits', 'Please buy 42 apples.'), ('words', 'Please buy forty two apples.')]:
+                    texts = [text, 'The fruit order is ready.']
+                    index.index_candidate({'dialogue_id': identity, 'texts': texts,
+                                           'normalized_sha256': data.digest(data.normalized(' '.join(texts)))})
+                self.assertEqual(index.root('digits'), index.root('words'))
             finally:
                 index.close()
 
@@ -387,7 +402,7 @@ class DataPipelineTests(unittest.TestCase):
             args.config.write_text(yaml.safe_dump(config))
             source = args.source_dir / 'train.jsonl'
             source.write_text(''.join(data.canonical({'id': str(i), 'data': [
-                f'Question {i} on topic {data.digest(i)[:12]}.', f'Answer for topic {i} is recorded here.']}) + '\n'
+                f'Question {i} on topic {data.digest(i)[:12].translate(str.maketrans("0123456789", "ghijklmnop"))}.', f'Answer for topic {i} is recorded here.']}) + '\n'
                 for i in range(32)))
             pinned = json.loads(args.source_manifest.read_text())
             pinned['files'][0].update(size=source.stat().st_size, lfs={'oid': data.file_digest(source)})
@@ -422,6 +437,27 @@ class DataPipelineTests(unittest.TestCase):
             data.write_json(args.exclusions, {'ids': [], 'normalized_hashes': [], 'source_refs': [], 'reviewed': True})
             with self.assertRaisesRegex(ValueError, 'checked external sources'):
                 builder.build(args)
+
+    def test_explicit_user_waiver_closes_data_without_faking_signatures(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            args = self.make_build(Path(temporary))
+            args.human_review_waiver_reason = 'User explicitly waived r5 human review.'
+            data.write_json(args.exclusions, {'ids': [], 'normalized_hashes': [], 'source_refs': ['fixture'], 'reviewed': True})
+            with patch.object(builder, 'ReleasedTokenizer', CharacterTokenizer), patch.object(auditor, 'ReleasedTokenizer', CharacterTokenizer):
+                builder.build(args)
+                report = auditor.audit(args.output, args.tokenizer)
+                self.assertTrue(report['parent_issue_complete'])
+                self.assertTrue(report['human_review_waived'])
+                self.assertFalse(report['minimum_32_human_review_passed'])
+                self.assertFalse(report['training_allowed'])
+                self.assertNotIn('minimum_32_human_review', report['pending'])
+                path = args.output / 'human_review.json'
+                review = json.loads(path.read_text())
+                self.assertTrue(all(r['accepted'] is None for r in review['minimum_set']))
+                review['waiver_reason'] = 'changed'
+                data.write_json(path, review)
+                with self.assertRaisesRegex(ValueError, 'waiver'):
+                    auditor.audit(args.output, args.tokenizer)
 
     def test_invalid_configuration_and_unicode_fail_closed(self):
         config = copy.deepcopy(self.config)

@@ -13,3 +13,7 @@ source_sampling报告实际抽样/读取预算、过滤计数及full_source_filt
 人工最小审查必须覆盖 train 前 32 条，对应产物摘要、reviewer 和 accepted=true 全部齐全。扩充审查记录在 expanded_behavior_reviews：每项包含 dialogue_id、sha256、event_id 及 reviews 列表（reviewer、accepted）。expanded_review_complete 要求实际覆盖五类控制、至少一个事件有两名不同审查者通过、complete=true，不能只手写一个布尔值。正式交付仍需核实抽样充分性和意见分歧，不替代父任务验收。合成文本保留集可能被官方预训练见过，报告明确标 unknown。
 
 按本轮用户决定，human_review.json的policy=user_minimum_32_signoff表示004以32条用户签署收口，扩充抽查仅记录可选状态，不再加入pending或阻塞parent_issue_complete。仍逐条核对32个ID/产物摘要及人工签署，source_review和机器检查必须通过；005/007继续列在训练pending且training_allowed=false。旧policy未指定时保留原扩充检查，以免改变历史报告的原口径。
+
+r5审计逐用户长轮核验数值转换映射及无残留数字，再按规范化跨度验证事件；报告替换类别计数。显式user_waived_after_machine_audit政策要求构建身份与review中的非空豁免理由一致，跳过人审待办而不填签署通过；005/007仍保留，training_allowed=false。
+
+r5同时以原始文本与数值规范化后的文本进行切分前近重复分组、切分后跨集合审计，避免书面数字和英文数词在转换后变成跨集合重复；外部排除摘要也检查规范化后的用户文本。

@@ -19,6 +19,7 @@ dedup:
   word_ngram: 5
   jaccard_threshold: 0.85
 generation:
+  user_surface: english_numeric_v1
   user_tokens: [1, 7]
   assistant_tokens: 10
   pause_probability: 0.10

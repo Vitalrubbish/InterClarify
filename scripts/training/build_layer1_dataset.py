@@ -21,6 +21,9 @@ def build(args):
     """Resume only complete dialogue artifacts under an immutable input manifest."""
     config = yaml.safe_load(args.config.read_text())
     validate_config(config)
+    waiver_reason = getattr(args, 'human_review_waiver_reason', None)
+    if waiver_reason is not None and not waiver_reason.strip():
+        raise ValueError('Human-review waiver requires an explicit reason')
     if args.max_length < 64 or args.epoch < 0:
         raise ValueError('Invalid sequence length or epoch')
     exclusions = json.loads(args.exclusions.read_text())
@@ -41,7 +44,9 @@ def build(args):
                 'optional_text_coverage_complete': exclusions.get('text_coverage_complete'),
                 'exclusion_source_refs': exclusions['source_refs'], 'tokenizer': tokenizer.fingerprint,
                 'max_length': args.max_length, 'epoch': args.epoch,
-                'code': {p.name: file_digest(p) for p in (Path(__file__), Path(__file__).with_name('layer1_data.py'))}}
+                'human_review_waiver_reason': waiver_reason,
+                'code': {p.name: file_digest(p) for p in (Path(__file__), Path(__file__).with_name('layer1_data.py'),
+                                                        Path(__file__).with_name('number_surface.py'))}}
     args.output.mkdir(parents=True, exist_ok=True)
     manifest_path = args.output / 'manifest.json'
     if manifest_path.exists():
@@ -115,6 +120,8 @@ def build(args):
         review_path = args.output / 'human_review.json'
         if not review_path.exists():
             write_json(review_path, {'schema_version': 1, 'minimum_set': review_rows,
+                                    'policy': 'user_waived_after_machine_audit' if waiver_reason else 'minimum_and_expanded_review',
+                                    'waiver_reason': waiver_reason,
                                     'expanded_behavior_reviews': [], 'complete': False})
         manifest.update(complete=True, training_allowed=False,
                         split_counts=dict(Counter(d['split'] for d in selected)),
@@ -137,6 +144,7 @@ def parser():
     result.add_argument('--epoch', type=int, default=0)
     result.add_argument('--output', type=Path, required=True)
     result.add_argument('--resume', action='store_true')
+    result.add_argument('--human-review-waiver-reason')
     return result
 
 

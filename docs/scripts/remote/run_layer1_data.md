@@ -9,3 +9,5 @@
 004最终交付增加审查材料导出：机器审计通过后调用prepare_layer1_review.py，生成前32条完整可读事件表及固定分层抽查清单，不自动写accepted/reviewer或将人审标为完成。抽查使用已经生成的1000/200/300数据，不增加训练曝光。
 
 用户取消全库过滤后，正式默认仅抽6000原始对话再过滤/去重/切分，可按受限调试机配置执行。LAYER1_DATA_THREADS、MEMORY_KIB、BUILD_TIMEOUT、AUDIT_TIMEOUT、REVIEW_TIMEOUT分别覆盖线程、地址空间KiB及各阶段秒数；调试机由父进程固定1CPU/nice10/2GiB硬限，配置线程1、构建1800秒/审计900秒/材料300秒，外层3600秒。只读来源字节验真仍保留，绝不退回全库对话过滤。原4CPU/32GiB是已停止的全库作业申请，不是6000样本的强制要求。
+
+r5入口可用LAYER1_HUMAN_REVIEW_WAIVER_REASON向构建器记录用户免除复审的理由；LAYER1_DATA_SKIP_REVIEW=1时只构建和机器审计，不导出新的人工材料。
