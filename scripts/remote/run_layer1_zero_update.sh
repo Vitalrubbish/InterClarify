@@ -13,7 +13,7 @@ trap 'rc=$?; printf "%s\n" "$rc" > "$OUTPUT/exit_code.txt"' EXIT
 cd "$ROOT"
 export PYTHONNOUSERSITE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 TOKENIZERS_PARALLELISM=false
 export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4
-ulimit -v 58720256
+ulimit -v 29360128
 ulimit -c 0
 git rev-parse HEAD > "$OUTPUT/source_commit.txt"
 sha256sum scripts/training/layer1_model.py scripts/training/check_layer1_zero_update.py \
