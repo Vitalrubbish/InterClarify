@@ -7,3 +7,9 @@
 该入口只跑零更新，不训练，不在调试机加载7B权重。服务恢复逻辑共用后必须重跑受影响的001原始Word对照，不能仅凭HTTP替身测试宣称真实服务回归完成。
 
 当前提交命令在入口成功后同卡顺序调用既有run_layer1_runtime_comparison.sh，另限600秒，整个作业最多2400秒。冻结X-Talk通过只读引用001归档源码提供，Word清单使用归档后的现路径，source.sha256包括公共加载器；不改写001原报告或其输入摘要。
+
+## r1失败后的入口修正
+
+r1所在容器由调度器设置NVIDIA_VISIBLE_DEVICES和JobID，没有CUDA_VISIBLE_DEVICES；仅检查后者会误拒绝已分配GPU。修订入口接受两种可见性变量中的任一种，并要求调度作业JobID；不自行覆盖CUDA_VISIBLE_DEVICES，避免把容器外GPU编号当作容器内编号。随后在独立训练conda中用torch检查CUDA可用、恰好一张可见RTX 4090、约24GiB显存及BF16支持，将设备信息和原始分配变量写入gpu_preflight.json。此步骤只初始化CUDA，不加载模型。
+
+新输出目录创建后立即安装EXIT/TERM/INT处理，再验证环境与GPU；失败留下exit_code.txt及gpu-preflight.log，不覆盖旧输出。源码摘要纳入入口本身。后续模型、prompt、阈值和预算保持原登记；使用新的issue017-zero-update-r2及issue017-runtime-regression-r2，两个阶段在同一作业串行执行。入口修复与重跑继续在017跟踪，未取得完整通过证据前不归档。
