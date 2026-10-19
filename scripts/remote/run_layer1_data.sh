@@ -31,3 +31,6 @@ timeout --signal=TERM --kill-after=30 14400 "$ENV_PREFIX/bin/python" -u \
 timeout --signal=TERM --kill-after=30 3600 "$ENV_PREFIX/bin/python" -u \
   scripts/training/audit_layer1_dataset.py --dataset "$OUTPUT/dataset" \
   --tokenizer "$TOKENIZER" --output "$OUTPUT/audit.json" > "$OUTPUT/audit.log" 2>&1
+timeout --signal=TERM --kill-after=30 1800 "$ENV_PREFIX/bin/python" -u \
+  scripts/training/prepare_layer1_review.py --dataset "$OUTPUT/dataset" --audit "$OUTPUT/audit.json" \
+  --tokenizer "$TOKENIZER" --output "$OUTPUT/review" > "$OUTPUT/review.log" 2>&1

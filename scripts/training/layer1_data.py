@@ -236,6 +236,9 @@ class DialogueIndex:
     def ingest(self, paths, exclusions):
         """Group before selecting splits; exact prefix filtering retains near-pair recall."""
         threshold = self.config['dedup']['jaccard_threshold']
+        excluded_ids = set(exclusions['ids'])
+        excluded_texts = set(exclusions['normalized_hashes'])
+        indexed_count = self.db.execute('SELECT COUNT(*) FROM dialogues').fetchone()[0]
         for path in paths:
             with path.open(encoding='utf-8') as stream:
                 for number, line in enumerate(stream, 1):
@@ -248,7 +251,7 @@ class DialogueIndex:
                     if not reason:
                         fingerprint = digest(normalized('\n'.join(row['data'])))
                         text_hashes = {fingerprint, *(digest(normalized(t)) for t in row['data'])}
-                        if identity in exclusions['ids'] or text_hashes.intersection(exclusions['normalized_hashes']):
+                        if identity in excluded_ids or text_hashes.intersection(excluded_texts):
                             reason = 'external_exclusion'
                         elif self.db.execute('SELECT 1 FROM dialogues WHERE id=?', (identity,)).fetchone():
                             raise ValueError(f'Duplicate raw dialogue ID: {identity}')
@@ -262,6 +265,7 @@ class DialogueIndex:
                         self.db.execute('INSERT INTO dialogues VALUES (?,?,?,?,?,?)',
                                         (identity, canonical(payload), fingerprint, canonical(grams), identity,
                                          digest([self.config['seed'], identity])))
+                        indexed_count += 1
                         exact = self.db.execute('SELECT id FROM dialogues WHERE fingerprint=? AND id<>?',
                                                 (fingerprint, identity)).fetchall()
                         for (other,) in exact:
@@ -279,6 +283,9 @@ class DialogueIndex:
                     if number % 1000 == 0:
                         self.db.commit()
                         self.check_resources()
+                        print(canonical({'stage': 'index', 'shard': path.name, 'source_lines': number,
+                                         'indexed': indexed_count}),
+                              flush=True)
             self.db.commit()
             self.check_resources()
 
