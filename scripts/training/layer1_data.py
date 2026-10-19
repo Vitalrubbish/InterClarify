@@ -219,6 +219,10 @@ class DialogueIndex:
         if any(not isinstance(x, str) or not x.strip() for x in texts):
             return 'empty_or_invalid_turn'
         joined = '\n'.join(texts)
+        try:
+            joined.encode('utf-8')
+        except UnicodeError:
+            return 'invalid_unicode'
         if '<|' in joined or '|>' in joined or '\ufffd' in joined:
             return 'reserved_marker_or_encoding'
         rule = self.config['filter']
@@ -470,3 +474,8 @@ def validate_config(config):
     if not config['generation']['backchannels'] or any(
             not isinstance(x, str) or not x.strip() or '<|' in x for x in config['generation']['backchannels']):
         raise ValueError('Backchannel inventory must contain plain nonempty strings')
+    rule, limits = config['filter'], config['limits']
+    if not 0 < rule['min_chars'] <= rule['max_chars'] or not 0 <= rule['min_ascii_letter_fraction'] <= 1:
+        raise ValueError('Invalid filtering limits')
+    if limits['max_disk_gib'] <= 0 or limits['min_free_gib'] < 0 or limits['max_sequences_per_dialogue'] < 1:
+        raise ValueError('Invalid resource limits')

@@ -26,6 +26,12 @@ def build(args):
     exclusions = json.loads(args.exclusions.read_text())
     if not all(key in exclusions for key in ('ids', 'normalized_hashes', 'source_refs', 'reviewed')):
         raise ValueError('Explicit external exclusion manifest is required')
+    if type(exclusions['reviewed']) is not bool or any(
+            not isinstance(exclusions[key], list) or any(not isinstance(x, str) for x in exclusions[key])
+            for key in ('ids', 'normalized_hashes', 'source_refs')):
+        raise ValueError('Invalid exclusion manifest fields')
+    if exclusions['reviewed'] and not exclusions['source_refs']:
+        raise ValueError('Reviewed exclusions must identify the checked external sources')
     tokenizer = ReleasedTokenizer(args.tokenizer, config['token_ids'])
     paths = verify_sources(args.source_manifest, args.source_dir, args.download_manifest, config['source'])
     identity = {'schema_version': 1, 'config': config, 'source_manifest_sha256': file_digest(args.source_manifest),

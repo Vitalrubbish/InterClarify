@@ -12,4 +12,4 @@
 
 `SequenceEncoder.event_ids` 手动拼接官方 raw ChatML：user header、当拍用户或 no-voice、user 消息结束及换行、assistant header、控制/正文目标与 im_end，不插入默认 system prompt。`encode` 不跨对话 packing，不截断单个 micro-turn；三视图共同最大长度决定一致窗口。后续窗口为历史预留约半个长度，携带能容纳的最近完整事件；超长历史明确受窗口限制，不声称总能保留整段请求。重叠历史、所有 user/消息头置 -100，只有当前 assistant 目标监督一次，无 padding。训练器负责 causal shift，不能再移位 labels。目标片段只有真实消息结束，不新增人工用户让轮信号。
 
-`verify_sources` 重新核对下载清单身份、完整性、所有固定 shard 的大小/SHA256；不能只相信 complete。`validate_config` 拒绝不支持的开关和非法范围。`write_json` 原子发布 JSON；稳定摘要不使用 Python 随机 hash。SQLite 建索引中断后要求换新输出，事件生成则从已完成对话游标恢复并重新校验全部输入/产物摘要。
+`verify_sources` 重新核对下载清单身份、完整性、所有固定 shard 的大小/SHA256；不能只相信 complete。`validate_config` 拒绝不支持的开关、非文本附和词和非法过滤/资源范围；读取时拒收非法 Unicode。`write_json` 原子发布 JSON；稳定摘要不使用 Python 随机 hash。SQLite 建索引中断后要求换新输出，事件生成则从已完成对话游标恢复并重新校验全部输入/产物摘要。

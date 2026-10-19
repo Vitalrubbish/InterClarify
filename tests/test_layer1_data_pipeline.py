@@ -259,6 +259,36 @@ class DataPipelineTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Unverified source'):
                 data.verify_sources(args.source_manifest, args.source_dir, args.download_manifest, config['source'])
 
+    def test_incomplete_download_cannot_be_used(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            args = self.make_build(Path(temporary))
+            download = json.loads(args.download_manifest.read_text())
+            download['complete'] = False
+            data.write_json(args.download_manifest, download)
+            config = yaml.safe_load(args.config.read_text())
+            with self.assertRaisesRegex(ValueError, 'Incomplete'):
+                data.verify_sources(args.source_manifest, args.source_dir, args.download_manifest, config['source'])
+
+    def test_rejects_unreviewed_claim_without_external_sources(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            args = self.make_build(Path(temporary))
+            data.write_json(args.exclusions, {'ids': [], 'normalized_hashes': [], 'source_refs': [], 'reviewed': True})
+            with self.assertRaisesRegex(ValueError, 'checked external sources'):
+                builder.build(args)
+
+    def test_invalid_configuration_and_unicode_fail_closed(self):
+        config = copy.deepcopy(self.config)
+        config['generation']['backchannels'] = [True]
+        with self.assertRaisesRegex(ValueError, 'plain nonempty strings'):
+            data.validate_config(config)
+        with tempfile.TemporaryDirectory() as temporary:
+            index = data.DialogueIndex(Path(temporary) / 'index.sqlite3', self.config)
+            try:
+                self.assertEqual(index.rejection({'id': 'x', 'data': ['Unicode surrogate \ud800 in text', 'Answer text.']}),
+                                 'invalid_unicode')
+            finally:
+                index.close()
+
     def test_actual_tokenizer_metadata_and_single_token_validation(self):
         from tokenizers import Tokenizer, models
         with tempfile.TemporaryDirectory() as temporary:
