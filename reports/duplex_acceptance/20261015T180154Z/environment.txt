@@ -1,8 +1,0 @@
-model 2.4.1+cu121 4.46.3 0.13.2
-
-x2 2.11.0+cu128 5.15.1
-
-tts 2.9.1+cu128 5.0.0
-
-client /mnt/cloudstorfs/sjtu_home/xuan.zhang/interclarify-retests/20261015T180154Z/xtalk/src/xtalk/__init__.py
-

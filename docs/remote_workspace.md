@@ -16,4 +16,4 @@
 
 维护操作串行执行，优先同文件系统rename，避免复制大模型和音频或高并发整盘扫描。现役环境先查软链接和conda注册，不移动嵌入绝对prefix的环境；当前任务、磁盘/内存和作业配额均须先核对。其他项目、共享包缓存和原始研究结果不因名称过时而删除。
 
-014进一步直接删除旧选型的Nemotron多语/Python Kyutai/Pocket权重及前两者专用环境，还有已结束TTS实验的编译缓存；只保留来源和配置，现役模型/环境种子及原始结果仍在。此项释放与012归拢分开计量，见[014记录](issue/archive/014_remote_cache_reclamation.md)。
+014进一步直接删除旧选型的Nemotron多语/Python Kyutai/Pocket权重及前两者专用环境，还有已结束TTS实验的编译缓存；只保留来源和配置，现役模型/环境种子及原始结果仍在。此项释放与012归拢分开计量，见[014记录](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/014_remote_cache_reclamation.md)。

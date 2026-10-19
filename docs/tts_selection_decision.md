@@ -2,7 +2,7 @@
 
 ## 结论
 
-**2026-10-18 用户最终确定使用 Kokoro TTS，首轮采用已测 Kokoro 82M / af_heart。** 后续通过 X-Talk 原有 TTS 扩展点接入，验收 LLM 增量分段、跨段韵律、取消与唯一播放所有权。当前选择已定，尚未完成运行时替换。开发与测试任务见 [Issue 003](issue/archive/003_kokoro_playback_integration.md) 和 [Issue 008](issue/008_full_chain_fdb_acceptance.md)。
+**2026-10-18 用户最终确定使用 Kokoro TTS，首轮采用已测 Kokoro 82M / af_heart。** 后续通过 X-Talk 原有 TTS 扩展点接入，验收 LLM 增量分段、跨段韵律、取消与唯一播放所有权。当前选择已定，尚未完成运行时替换。开发与测试任务见 [Issue 003](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003_kokoro_playback_integration.md) 和 [Issue 008](issue/008_full_chain_fdb_acceptance.md)。
 
 此前根据原生音频帧输出和 CPU 资源提出的 Pocket 推荐已被本次用户决定取代。以下测量与人工评分仍按原始结果保留：Kokoro 人工均分更高、首可听 p95 更低；Pocket 的 CPU 首可听中位数与帧输出优势作为历史比较，不再作为当前接入目标。
 

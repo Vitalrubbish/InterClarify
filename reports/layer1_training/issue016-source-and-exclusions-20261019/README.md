@@ -12,4 +12,4 @@ FLEURS为100条test及1条dev，历史五例使用真实Word事件文本。FDB v
 
 [3项排除工具测试](exclusion_tests.txt)在本地和远端均通过，检查缺文本拒收、确定性和逐轮命中排除。实际构建在调试机单CPU、nice10、2GiB地址空间限制下执行，未读取模型、未申请GPU。清单ID只作外部来源溯源，不与UltraChat数字ID混用。
 
-范围修正提交d7b90ca，远端run_id为issue016-scope-correction-r2：清单按实际源文件重建，reviewed/coverage_complete=true表示来源清点通过，text_coverage_complete=false仍如实记录可选文本范围；3325个辅助摘要与之前完全相同。新SHA256为6599f6968dfaf83185812eedceaace8e7a8ea5b57967a5ffa51269b3aec40944，见[修正记录](scope_correction.json)与[4项远端回归](scope_correction_tests.txt)。[016](../../../docs/issue/archive/016_external_data_exclusion.md)完成归档，正式数据生成、人审及005/007继续独立验收。
+范围修正提交d7b90ca，远端run_id为issue016-scope-correction-r2：清单按实际源文件重建，reviewed/coverage_complete=true表示来源清点通过，text_coverage_complete=false仍如实记录可选文本范围；3325个辅助摘要与之前完全相同。新SHA256为6599f6968dfaf83185812eedceaace8e7a8ea5b57967a5ffa51269b3aec40944，见[修正记录](scope_correction.json)与[4项远端回归](scope_correction_tests.txt)。[016](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/016_external_data_exclusion.md)完成归档，正式数据生成、人审及005/007继续独立验收。

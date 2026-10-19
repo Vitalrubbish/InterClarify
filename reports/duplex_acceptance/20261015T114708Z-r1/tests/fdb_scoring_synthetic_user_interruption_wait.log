@@ -1,1 +1,0 @@
-2026-10-15T13:00:20Z gpt-4-turbo unavailable: {"error":{"message":"Current group [ENC:qxfDy35VlHfNRbE] has no available channels for model gpt-4-turbo under billing mode [pay-as-you-go]","localized_message":"Unknown error","type":"shell_api_error

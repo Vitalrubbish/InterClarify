@@ -16,12 +16,12 @@ Qwen3-ASR 因回写与前缀冻结导致交付停滞而退役，X2 仅作诊断�
 
 | 运行 | 主要证据与限制 |
 | --- | --- |
-| `20261015T060611Z` | [报告目录](../reports/duplex_acceptance/20261015T060611Z/)；Qwen/MOSS，接话 TOR 0.80，接话延迟 2.558s |
-| `20261015T114708Z-r1` | [报告目录](../reports/duplex_acceptance/20261015T114708Z-r1/)；ASR final 后重建分段；Candor pause TOR 0.40，接话 TOR 0.80、延迟 2.838s；UI TOR 1.00、延迟 2.384s，样本 102 沿用旧话题；judge 改为 gpt-4o，rating 不直接跨轮比较 |
-| `20261015T172109Z` | [报告目录](../reports/duplex_acceptance/20261015T172109Z/)；X2 首会话预热问题导致失败 |
-| `20261015T180154Z` | [报告目录](../reports/duplex_acceptance/20261015T180154Z/)；X2/MOSS 自动门禁通过，Pause 两子集 TOR 0.00；接话 TOR 0.40、UI TOR 0.80、UI 延迟 3.26s；新话题回答仅 3/5，异步末次接收与真实 EOF 排空仍有缺口 |
+| `20261015T060611Z` | [报告目录](https://github.com/Vitalrubbish/InterClarify/tree/6ca5eea/reports/duplex_acceptance/20261015T060611Z)；Qwen/MOSS，接话 TOR 0.80，接话延迟 2.558s |
+| `20261015T114708Z-r1` | [报告目录](https://github.com/Vitalrubbish/InterClarify/tree/6ca5eea/reports/duplex_acceptance/20261015T114708Z-r1)；ASR final 后重建分段；Candor pause TOR 0.40，接话 TOR 0.80、延迟 2.838s；UI TOR 1.00、延迟 2.384s，样本 102 沿用旧话题；judge 改为 gpt-4o，rating 不直接跨轮比较 |
+| `20261015T172109Z` | [报告目录](https://github.com/Vitalrubbish/InterClarify/tree/6ca5eea/reports/duplex_acceptance/20261015T172109Z)；X2 首会话预热问题导致失败 |
+| `20261015T180154Z` | [报告目录](https://github.com/Vitalrubbish/InterClarify/tree/6ca5eea/reports/duplex_acceptance/20261015T180154Z)；X2/MOSS 自动门禁通过，Pause 两子集 TOR 0.00；接话 TOR 0.40、UI TOR 0.80、UI 延迟 3.26s；新话题回答仅 3/5，异步末次接收与真实 EOF 排空仍有缺口 |
 
-Pause 保持沉默是预期行为，不能作为漏答。官方 TOR 不能代替新回答覆盖或话题切换正确率。历史 judge 不同的内容分数不直接比较。历史原始音频、完整日志保留远端，紧凑结果保留 reports，不因文档清理改写。
+Pause 保持沉默是预期行为，不能作为漏答。官方 TOR 不能代替新回答覆盖或话题切换正确率。历史 judge 不同的内容分数不直接比较。历史原始音频、完整日志保留远端，旧紧凑结果已按用户要求从reports删除，以上链接固定到删除前提交；当前证据见[最新索引](../reports/README.md)。
 
 ## 本轮文档清理
 

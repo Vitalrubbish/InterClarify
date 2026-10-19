@@ -4,4 +4,4 @@
 
 脚本校验源码摘要、输入和设备，在独立模型/客户端 conda 环境启动 BF16 发布 checkpoint；最长等待 300 秒 readiness，随后运行唯一 Word 对照配置。EXIT trap 关闭本作业模型进程组并保存退出码；不覆盖既有输出。经 vc 调度申请 1×4090、8 CPU、32GB 主存。
 
-入口不运行 ASR/TTS、不训练、不执行 FDB。Word manifest 和样本来源须先按 [001 任务单](../../issue/archive/001_remote_execution.md)核验；比较器结果、集成生命周期和资产证据齐全后再判断 001 放行。
+入口不运行 ASR/TTS、不训练、不执行 FDB。Word manifest 和样本来源须先按 [001 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/001_remote_execution.md)核验；比较器结果、集成生命周期和资产证据齐全后再判断 001 放行。

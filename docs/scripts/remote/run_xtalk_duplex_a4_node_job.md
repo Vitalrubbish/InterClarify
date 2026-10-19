@@ -67,3 +67,5 @@ X2 duplex 运行配置不加载 VAD，runtime_build 校验连续 ASR 对应无 V
 完整 X2 预热：节点入口传入 `DUPLEX_X2_WARMUP_AUDIO`（缺省为固定场景 `NORMAL_AUDIO`，非 FDB 测量样本），在 assets 阶段检查文件。服务必须完成真实语音在线出字、EOF 排空及会话释放后才监听 HTTP。
 
 2026-10-16：Qwen 启动、导入检查、驱动单测和配置选择分支已经移除；通用配置只修改 TTS 端口。无默认 ASR 后端，缺显式选择或传入非 X2 后端时立即失败。该入口保留作既有链路回归，不表示 X2 成为主线或 Nemotron 已接入。脚本没有类，核心过程为 `record_step`、`wait_http`、`stop_services` 与顺序门禁。
+
+仓库证据维护口径：旧阶段A报告已清理，当前只跟踪[最新证据索引](../../../reports/README.md)列出的结果；历史生成器仍可输出报告，但全局log/jsonl忽略规则生效，不自动将全部运行日志纳入Git。

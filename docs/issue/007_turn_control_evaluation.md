@@ -4,7 +4,7 @@
 
 ## 2026-10-18 进度核对
 
-[002](archive/002_nemotron_streaming_integration.md)已交付接入诊断轨迹；协议已预登记行为分层、覆盖/质量阈值与 bootstrap 种子，但 `acceptance.sample_manifest` 仍为 null。现有轨迹来自同一条 FLEURS dev 录音及构造变体，不满足独立 dev/test 样本要求。未见 `scripts/evaluation/evaluate_layer1.py`、`configs/layer1_acceptance.yaml` 或候选独立评测报告；006 尚无训练资产。保持待办，先准备评测器和独立样本清单，不能把历史五例或组件通过作为本项验收。
+[002](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_nemotron_streaming_integration.md)已交付接入诊断轨迹；协议已预登记行为分层、覆盖/质量阈值与 bootstrap 种子，但 `acceptance.sample_manifest` 仍为 null。现有轨迹来自同一条 FLEURS dev 录音及构造变体，不满足独立 dev/test 样本要求。未见 `scripts/evaluation/evaluate_layer1.py`、`configs/layer1_acceptance.yaml` 或候选独立评测报告；006 尚无训练资产。保持待办，先准备评测器和独立样本清单，不能把历史五例或组件通过作为本项验收。
 
 ## 目标与实验设计
 

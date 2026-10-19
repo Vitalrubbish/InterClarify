@@ -1,6 +1,6 @@
 # Issue 004 数据生成与 DuplexCascade 官方对齐审计
 
-日期：2026-10-19。范围：旧 `issue004-build-r3` 的生成配置、事件计划、编码器，以及前 32 条人工审计材料。下表记录修复前的静态语义复核；修复和r4重建由[019归档工作单](issue/archive/019_duplex_data_alignment_audit.md)记录。
+日期：2026-10-19。范围：旧 `issue004-build-r3` 的生成配置、事件计划、编码器，以及前 32 条人工审计材料。下表记录修复前的静态语义复核；修复和r4重建由[019归档工作单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/019_duplex_data_alignment_audit.md)记录。
 
 | 检查项 | 官方依据 | 当前行为与结论 |
 | --- | --- | --- |
