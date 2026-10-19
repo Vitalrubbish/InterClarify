@@ -163,6 +163,42 @@ def verify_sources(manifest_path, source_dir, download_path, expected):
     return paths
 
 
+def source_records(paths, seed, budget=None):
+    """Read a bounded set of whole-line windows, retaining original byte locations."""
+    ordered = sorted(paths, key=lambda p: p.name)
+    if budget is not None:
+        stable_rng(seed, 'source_shards').shuffle(ordered)
+    for index, path in enumerate(ordered):
+        quota = None if budget is None else budget // len(ordered) + (index < budget % len(ordered))
+        if quota == 0:
+            continue
+        size = path.stat().st_size
+        if size == 0:
+            continue
+        with path.open('rb') as stream:
+            if budget is not None:
+                start = stable_rng(seed, 'source_window', path.name).randrange(size)
+                if start:
+                    stream.seek(start - 1)
+                    if stream.read(1) != b'\n':
+                        stream.readline()
+            seen, number = set(), 0
+            while quota is None or number < quota:
+                offset = stream.tell()
+                raw = stream.readline()
+                if not raw:
+                    if quota is None:
+                        break
+                    stream.seek(0)
+                    continue
+                if quota is not None and offset in seen:
+                    break
+                if quota is not None:
+                    seen.add(offset)
+                number += 1
+                yield path, number if budget is None else None, raw, offset
+
+
 class DialogueIndex:
     """Keep full-source filtering and duplicate groups in a disk-backed index."""
 
@@ -180,8 +216,8 @@ class DialogueIndex:
             CREATE INDEX IF NOT EXISTS by_fingerprint ON dialogues(fingerprint);
             CREATE TABLE IF NOT EXISTS prefixes (shingle TEXT, id TEXT);
             CREATE INDEX IF NOT EXISTS by_shingle ON prefixes(shingle);
-            CREATE TABLE IF NOT EXISTS excluded (shard TEXT, line INTEGER, id TEXT, reason TEXT);
-            CREATE TABLE IF NOT EXISTS source_inventory (id TEXT PRIMARY KEY, shard TEXT, line INTEGER);
+            CREATE TABLE IF NOT EXISTS excluded (shard TEXT, line INTEGER, id TEXT, reason TEXT, byte_offset INTEGER);
+            CREATE TABLE IF NOT EXISTS source_inventory (id TEXT PRIMARY KEY, shard TEXT, line INTEGER, byte_offset INTEGER);
         ''')
 
     def close(self):
@@ -240,51 +276,49 @@ class DialogueIndex:
         excluded_ids = set(exclusions['ids'])
         excluded_texts = set(exclusions['normalized_hashes'])
         limit = self.config.get('sampling', {}).get('candidate_pool_dialogues')
+        raw_budget = self.config.get('sampling', {}).get('raw_source_dialogues')
         candidates = []
         eligible_count, total_lines = 0, 0
-        for path in paths:
-            with path.open(encoding='utf-8') as stream:
-                for number, line in enumerate(stream, 1):
-                    total_lines += 1
-                    try:
-                        row = json.loads(line)
-                    except (ValueError, UnicodeError):
-                        row = None
-                    reason = self.rejection(row)
-                    identity = str(row['id']) if isinstance(row, dict) and 'id' in row else ''
-                    if not reason:
-                        fingerprint = digest(normalized('\n'.join(row['data'])))
-                        text_hashes = {fingerprint, *(digest(normalized(t)) for t in row['data'])}
-                        if identity in excluded_ids or text_hashes.intersection(excluded_texts):
-                            reason = 'external_exclusion'
-                    if reason:
-                        self.db.execute('INSERT INTO excluded VALUES (?,?,?,?)', (path.name, number, identity, reason))
-                    else:
-                        try:
-                            self.db.execute('INSERT INTO source_inventory VALUES (?,?,?)', (identity, path.name, number))
-                        except sqlite3.IntegrityError as error:
-                            raise ValueError(f'Duplicate raw dialogue ID: {identity}') from error
-                        eligible_count += 1
-                        payload = {'dialogue_id': identity, 'texts': row['data'], 'shard': path.name,
-                                   'line': number, 'raw_sha256': hashlib.sha256(line.encode()).hexdigest(),
-                                   'normalized_sha256': fingerprint, 'source_type': 'synthetic_ultrachat'}
-                        if limit is None:
-                            self.index_candidate(payload)
-                        else:
-                            item = (-int(digest([self.config['seed'], identity]), 16), identity, payload)
-                            if len(candidates) < limit:
-                                heapq.heappush(candidates, item)
-                            elif item[:2] > candidates[0][:2]:
-                                heapq.heapreplace(candidates, item)
-                    if number % 1000 == 0:
-                        self.db.commit()
-                        self.check_resources()
-                        print(canonical({'stage': 'source_scan', 'shard': path.name, 'source_lines': number,
-                                         'total_source_lines': total_lines, 'eligible': eligible_count,
-                                         'candidate_pool': len(candidates) if limit else eligible_count}),
-                              flush=True)
-            self.db.commit()
-            self.check_resources()
+        for path, number, raw, offset in source_records(paths, self.config['seed'], raw_budget):
+            total_lines += 1
+            try:
+                row = json.loads(raw)
+            except (ValueError, UnicodeError):
+                row = None
+            reason = self.rejection(row)
+            identity = str(row['id']) if isinstance(row, dict) and 'id' in row else ''
+            if not reason:
+                fingerprint = digest(normalized('\n'.join(row['data'])))
+                text_hashes = {fingerprint, *(digest(normalized(t)) for t in row['data'])}
+                if identity in excluded_ids or text_hashes.intersection(excluded_texts):
+                    reason = 'external_exclusion'
+            if reason:
+                self.db.execute('INSERT INTO excluded VALUES (?,?,?,?,?)', (path.name, number, identity, reason, offset))
+            else:
+                try:
+                    self.db.execute('INSERT INTO source_inventory VALUES (?,?,?,?)', (identity, path.name, number, offset))
+                except sqlite3.IntegrityError as error:
+                    raise ValueError(f'Duplicate sampled dialogue ID: {identity}') from error
+                eligible_count += 1
+                payload = {'dialogue_id': identity, 'texts': row['data'], 'shard': path.name,
+                           'line': number, 'byte_offset': offset, 'raw_sha256': hashlib.sha256(raw).hexdigest(),
+                           'normalized_sha256': fingerprint, 'source_type': 'synthetic_ultrachat'}
+                if limit is None:
+                    self.index_candidate(payload)
+                else:
+                    item = (-int(digest([self.config['seed'], identity]), 16), identity, payload)
+                    if len(candidates) < limit:
+                        heapq.heappush(candidates, item)
+                    elif item[:2] > candidates[0][:2]:
+                        heapq.heapreplace(candidates, item)
+            if total_lines % 1000 == 0:
+                self.db.commit()
+                self.check_resources()
+                print(canonical({'stage': 'sample_filter' if raw_budget is not None else 'source_scan',
+                                 'shard': path.name, 'source_dialogues_read': total_lines,
+                                 'eligible': eligible_count, 'candidate_pool': len(candidates) if limit else eligible_count}), flush=True)
+        self.db.commit()
+        self.check_resources()
         if limit is not None:
             for number, (_, identity, payload) in enumerate(sorted(candidates, key=lambda x: (-x[0], x[1])), 1):
                 self.index_candidate(payload)
@@ -294,8 +328,9 @@ class DialogueIndex:
                     print(canonical({'stage': 'candidate_dedup', 'indexed': number, 'candidate_pool': len(candidates)}), flush=True)
         self.db.commit()
         self.scan_summary = {'source_lines': total_lines, 'eligible_source_dialogues': eligible_count,
+                             'raw_source_dialogue_budget': raw_budget, 'full_source_filtering': raw_budget is None,
                              'candidate_pool_requested': limit, 'candidate_dialogues': len(candidates) if limit else eligible_count,
-                             'selection': 'lowest_stable_seed_dialogue_id_hash',
+                             'selection': 'seeded_shard_byte_windows_then_stable_hash' if raw_budget else 'lowest_stable_seed_dialogue_id_hash',
                              'near_duplicate_scope': 'candidate_pool_before_split'}
 
     def index_candidate(self, payload):
@@ -511,6 +546,9 @@ def validate_config(config):
     pool = config.get('sampling', {}).get('candidate_pool_dialogues')
     if pool is not None and (type(pool) is not int or pool < sum(config['splits'].values())):
         raise ValueError('Candidate pool must cover all requested split dialogues')
+    raw_budget = config.get('sampling', {}).get('raw_source_dialogues')
+    if raw_budget is not None and (type(raw_budget) is not int or raw_budget < sum(config['splits'].values())):
+        raise ValueError('Raw sampling budget must cover all requested split dialogues')
     if not config['generation']['backchannels'] or any(
             not isinstance(x, str) or not x.strip() or '<|' in x for x in config['generation']['backchannels']):
         raise ValueError('Backchannel inventory must contain plain nonempty strings')

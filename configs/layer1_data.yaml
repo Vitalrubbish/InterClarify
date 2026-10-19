@@ -9,6 +9,7 @@ splits:
   dev: 200
   test: 300
 sampling:
+  raw_source_dialogues: 6000
   candidate_pool_dialogues: 6000
 filter:
   min_chars: 20

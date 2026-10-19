@@ -224,6 +224,36 @@ class DataPipelineTests(unittest.TestCase):
                     index.close()
             self.assertEqual(pools[0], pools[1])
 
+    def test_raw_window_sampling_is_bounded_reproducible_and_traceable(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            paths = []
+            for shard in range(3):
+                path = root / f'shard{shard}.jsonl'
+                path.write_bytes(b''.join((data.canonical({'id': f'{shard}-{i}', 'data': ['A source question.',
+                    'A source answer.']}) + '\n').encode() for i in range(100)))
+                paths.append(path)
+            first = list(data.source_records(paths, 123, 18))
+            second = list(data.source_records(list(reversed(paths)), 123, 18))
+            self.assertEqual(first, second)
+            self.assertEqual(len(first), 18)
+            self.assertEqual(len({(p.name, offset) for p, line, raw, offset in first}), 18)
+            self.assertEqual({p.name for p, line, raw, offset in first}, {p.name for p in paths})
+            self.assertTrue(all(line is None for p, line, raw, offset in first))
+            for path, line, raw, offset in first:
+                with path.open('rb') as stream:
+                    stream.seek(offset)
+                    self.assertEqual(stream.readline(), raw)
+                self.assertIn('id', json.loads(raw))
+            self.assertNotEqual(first, list(data.source_records(paths, 124, 18)))
+
+    def test_raw_window_sampling_does_not_repeat_rows_to_fill_small_sources(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / 'tiny.jsonl'
+            path.write_bytes(b'{"id": "only", "data": ["Question", "Answer"]}\n')
+            rows = list(data.source_records([path], 123, 6000))
+            self.assertEqual(len(rows), 1)
+
     def make_build(self, root):
         config = copy.deepcopy(self.config)
         config['splits'] = {'train': 2, 'dev': 1, 'test': 1}

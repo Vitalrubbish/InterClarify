@@ -2,7 +2,7 @@
 
 `configs/layer1_data.yaml` 固定 UltraChat 来源、对话级切分、过滤/去重、事件采样、句读增强、资源限额及发布 token ID，无类或方法。构建入口校验配置后保存原文结构和摘要；正式训练不由此配置放行。
 
-`sampling.candidate_pool_dialogues=6000`控制近重复候选池。先完整过滤扫描全部源文件并记录ID，再按全局seed/原始ID稳定哈希选6000条；候选去重分组后选1000/200/300。同一来源顺序改变不应改变候选结果。此调整依据r1实际索引开销，适用于本轮小规模交付，不是只读取源文件前缀，也不扩大训练数据规模。
+`sampling.raw_source_dialogues=6000`限定实际解析/过滤的原始对话总数；固定种子跨shard定位完整JSONL窗口，只抽取该部分。candidate_pool_dialogues=6000是过滤后候选上限；候选分组后选1000/200/300。保留原始字节位置，不伪造绝对行号。它是可复现的有限窗口抽样，不声称全库逐对话等概率；用户已取消全库过滤，不为未抽取对话建立ID/近重复索引。
 
 来源为 `stingning/ultrachat` 固定 revision，原始 `id/data` 字段。默认 train/dev/test 为 1000/200/300 条，T3 每个训练 epoch 恰好 500/500。32/100 子集从已切分 train 的稳定顺序取出，不借用 dev/test。
 

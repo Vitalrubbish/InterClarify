@@ -16,21 +16,22 @@ mkdir -p "$OUTPUT"
 trap 'rc=$?; printf "%s\n" "$rc" > "$OUTPUT/exit_code.txt"' EXIT
 cd "$ROOT"
 export PYTHONNOUSERSITE=1 HF_HUB_OFFLINE=1 TOKENIZERS_PARALLELISM=false
-export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4
-ulimit -v 29360128
+THREADS="${LAYER1_DATA_THREADS:-4}"
+export OMP_NUM_THREADS="$THREADS" MKL_NUM_THREADS="$THREADS" OPENBLAS_NUM_THREADS="$THREADS"
+ulimit -v "${LAYER1_DATA_MEMORY_KIB:-29360128}"
 ulimit -c 0
 "$ENV_PREFIX/bin/python" -c 'import tokenizers, yaml, sqlite3'
 git rev-parse HEAD > "$OUTPUT/source_commit.txt"
 "$ENV_PREFIX/bin/python" -c 'from importlib.metadata import distributions; print("\n".join(sorted((d.metadata.get("Name") or "unknown") + "==" + d.version for d in distributions())))' > "$OUTPUT/environment.txt"
-timeout --signal=TERM --kill-after=30 14400 "$ENV_PREFIX/bin/python" -u \
+timeout --signal=TERM --kill-after=30 "${LAYER1_DATA_BUILD_TIMEOUT:-14400}" "$ENV_PREFIX/bin/python" -u \
   scripts/training/build_layer1_dataset.py --config "$CONFIG" \
   --source-manifest "$SOURCE_MANIFEST" --source-dir "$SOURCE" \
   --download-manifest "$SOURCE/download_manifest.json" --tokenizer "$TOKENIZER" \
   --exclusions "$EXCLUSIONS" --max-length "$MAX_LENGTH" --output "$OUTPUT/dataset" \
   > "$OUTPUT/build.log" 2>&1
-timeout --signal=TERM --kill-after=30 3600 "$ENV_PREFIX/bin/python" -u \
+timeout --signal=TERM --kill-after=30 "${LAYER1_DATA_AUDIT_TIMEOUT:-3600}" "$ENV_PREFIX/bin/python" -u \
   scripts/training/audit_layer1_dataset.py --dataset "$OUTPUT/dataset" \
   --tokenizer "$TOKENIZER" --output "$OUTPUT/audit.json" > "$OUTPUT/audit.log" 2>&1
-timeout --signal=TERM --kill-after=30 1800 "$ENV_PREFIX/bin/python" -u \
+timeout --signal=TERM --kill-after=30 "${LAYER1_DATA_REVIEW_TIMEOUT:-1800}" "$ENV_PREFIX/bin/python" -u \
   scripts/training/prepare_layer1_review.py --dataset "$OUTPUT/dataset" --audit "$OUTPUT/audit.json" \
   --tokenizer "$TOKENIZER" --output "$OUTPUT/review" > "$OUTPUT/review.log" 2>&1
