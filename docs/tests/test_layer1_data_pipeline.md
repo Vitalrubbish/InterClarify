@@ -5,3 +5,5 @@
 `DataPipelineTests` 覆盖五类控制、停顿/插话/附和/思考、插话丢弃旧回答尾部、单片段插话后独立 finish、无后续轮不伪造插话、固定种子重放与 epoch 差异、跨片段时间/小数保护、评测视图冻结、三视图目标和分拍不变、user/header mask、每事件一次监督、无未来用户输入、超长事件拒收、T3 500/500、Jaccard 前缀召回、切分前去重、来源验真/未完成下载拒收、无来源审查声明拒收、配置/Unicode检查、构建/恢复及产物篡改拒收。
 
 本地在 conda 环境运行：`conda run -n paratalker-dev python -m unittest discover -s tests -p test_layer1_data_pipeline.py -v`。完整来源生成、发布 tokenizer 和集群测试按远端任务单执行，不由替身测试结论代替。
+
+端到端用例另核对审计报告的来源、待完成人审/排除状态和观测采样频率，防止机器通过掩盖缺少审查。

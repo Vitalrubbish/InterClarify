@@ -230,6 +230,9 @@ class DataPipelineTests(unittest.TestCase):
                 self.assertTrue(report['machine_passed'])
                 self.assertFalse(report['training_allowed'])
                 self.assertFalse(report['minimum_32_human_review_passed'])
+                self.assertIn('external_exclusion_review', report['pending'])
+                self.assertEqual(report['source'], CONFIG['source'])
+                self.assertTrue(all(r['rate'] is None or 0 <= r['rate'] <= 1 for r in report['observed_rates'].values()))
                 first = copy.deepcopy(built['artifacts'])
                 args.resume = True
                 self.assertEqual(builder.build(args)['artifacts'], first)

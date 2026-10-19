@@ -130,6 +130,20 @@ def audit(directory, tokenizer_dir):
         if len(reviewers) >= 2:
             double_reviewed += 1
     expanded_ok = set(CONTROLS) <= reviewed_behaviors and double_reviewed > 0 and review.get('complete') is True
+    rates = {}
+    for name, denominator in (('pause', 'pause_eligible_boundaries'),
+                              ('interruption', 'interruption_eligible_long_turns'),
+                              ('backchannel', 'backchannel_eligible_continuations')):
+        rates[name] = {'triggers': sampling[name + '_triggers'], 'eligible': sampling[denominator],
+                       'rate': sampling[name + '_triggers'] / sampling[denominator] if sampling[denominator] else None,
+                       'sampling_unit': denominator}
+    pending = ['issue005_resource_and_recovery', 'issue007_pretraining_evaluation_gates']
+    if not minimum_ok:
+        pending.append('minimum_32_human_review')
+    if not expanded_ok:
+        pending.append('expanded_behavior_and_double_review')
+    if not manifest['identity']['exclusions_reviewed']:
+        pending.append('external_exclusion_review')
     return {'schema_version': 1, 'machine_passed': True, 'training_allowed': False,
             'parent_issue_complete': False, 'minimum_32_human_review_passed': bool(minimum_ok),
             'expanded_review_complete': expanded_ok,
@@ -140,11 +154,14 @@ def audit(directory, tokenizer_dir):
             'sequences': dict(sequence_counts), 'effective_tokens': dict(token_counts),
             'micro_turns': dict(events_per_split), 'controls': dict(controls), 'event_kinds': dict(kinds),
             'sampling': dict(sampling),
+            'observed_rates': rates,
+            'source': config['source'], 'source_manifest_sha256': manifest['identity']['source_manifest_sha256'],
+            'accepted_source_dialogues': manifest['accepted_source_dialogues'], 'exclusion_counts': manifest['exclusions'],
             'length': {'min': min(lengths), 'max': max(lengths), 'mean': sum(lengths) / len(lengths)},
             't3_train_views': dict(mix), 'source_type': 'synthetic_ultrachat',
             'clock_type': 'synthetic_window_only', 'official_pretraining_overlap': 'unknown',
             'near_duplicate_scope': 'normalized_word_shingle_jaccard',
-            'pending': ['issue005_resource_and_recovery', 'issue007_pretraining_evaluation_gates']}
+            'pending': pending}
 
 
 if __name__ == '__main__':
