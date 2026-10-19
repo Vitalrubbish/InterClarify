@@ -7,18 +7,18 @@
 | [001](archive/001_input_contract_and_baseline.md) | 官方输入契约与基线 | 完成，已归档；五例共 136 拍一致，资产及生命周期证据齐全 |
 | [001b](archive/001b_runtime_comparison.md) | 官方控制路径对照 | 完成，已归档；原生 Word 输入、五例真权重和远端 7 项测试通过 |
 | [002](archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入 | 完成，已归档；r4-asr 退出 0 |
-| [003](003_kokoro_playback_integration.md) | Kokoro 分段播放 | 进行中；[003d 修复](003d_segment_continuity.md)及远端自动验证完成，新试听包待 [003c 复听](003c_audio_listening_review.md) |
+| [003](archive/003_kokoro_playback_integration.md) | Kokoro 分段播放 | 完成，已归档；[003d修复](archive/003d_segment_continuity.md)及[003c用户复听](archive/003c_audio_listening_review.md)通过 |
 | [004](004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 进行中；来源清单完成，下载验真、生成和审计待做 |
 | [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 待办；推理 strict 加载不替代训练恢复与零更新对齐 |
 | [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；004、005 及 007 开训前准备未完成 |
 | [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |
 | [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 验收 | 待办；组件通过不等于新组合全链路通过 |
 
-远端执行见 [001 任务单](archive/001_remote_execution.md)与 [002/003 任务单](002_003_remote_execution.md)。001 只验证一套官方配置：Kyutai Word 逐词 strip、每拍空格连接、首非空 Word 起拍、600ms、BF16、64-token 贪心。raw 字符增量和 160ms 超时释放残词均不等同官方 Word；不展开时钟、发布粒度与句读矩阵。旧 raw/超时残词报告只作诊断；新原生 Word 五例全部通过，结果见 [001 验收报告](../../reports/layer1_training/issue001-word-20261019/README.md)。
+远端执行见 [001 任务单](archive/001_remote_execution.md)与 [002/003 任务单](archive/002_003_remote_execution.md)。001 只验证一套官方配置：Kyutai Word 逐词 strip、每拍空格连接、首非空 Word 起拍、600ms、BF16、64-token 贪心。raw 字符增量和 160ms 超时释放残词均不等同官方 Word；不展开时钟、发布粒度与句读矩阵。旧 raw/超时残词报告只作诊断；新原生 Word 五例全部通过，结果见 [001 验收报告](../../reports/layer1_training/issue001-word-20261019/README.md)。
 
 ## 依赖与交付
 
-文本训练路径为 001 → 004/005 → 006 → 007 → 008。004 数据工具、005 加载准备和 007 评价规则可在正式训练前推进；005 最终短跑依赖 004 最小集。002 轨迹用于 007 独立迁移评测，003 可独立完成试听。006 交付训练资产及 dev 报告后由 007 选择和验收候选，008 最后完成新组合音频及 FDB；不重开选型、不实现 Layer 2/3。
+文本训练路径为 001 → 004/005 → 006 → 007 → 008。004 数据工具、005 加载准备和 007 评价规则可在正式训练前推进；005 最终短跑依赖 004 最小集。002 轨迹用于 007 独立迁移评测，003 接入与人工试听已完成归档。006 交付训练资产及 dev 报告后由 007 选择和验收候选，008 最后完成新组合音频及 FDB；不重开选型、不实现 Layer 2/3。
 
 | 已确定路线 | 必须交付的证据 | 主责 |
 | --- | --- | --- |

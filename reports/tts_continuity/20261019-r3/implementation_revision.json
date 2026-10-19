@@ -2,5 +2,5 @@
   "root_base_commit": "5a2d8863eb585c92ceda98089a78312b0b4362c0",
   "xtalk_implementation_commit": "419f283e64e4de28b01f84586df779a94b18ede3",
   "run_source": "source.sha256",
-  "human_review": "pending_issue003c"
+  "human_review": "passed_issue003c"
 }
