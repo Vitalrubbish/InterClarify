@@ -18,4 +18,4 @@ GPU预检查60秒，两组测试各120秒，零更新命令1500秒，提交时�
 
 提交命令在零更新成功后，以&&串行调用run_layer1_runtime_comparison.sh，另限600秒，总上限2400秒。冻结X-Talk通过只读引用001归档源码提供，使用原生Word清单现路径和source.sha256，不改写001原报告或输入摘要。两个阶段都用独立训练conda中的Python标准库subprocess/resource/time包裹，保存退出码、墙钟、子进程峰值RSS及CPU耗时；无需容器外部/usr/bin/time。该包装已验证退出码透传及JSON记录。
 
-017 r4（源码12d478a）真权重零更新通过，136拍服务回归4/5，有一例Word拍界差异，仍不放行训练；原件及资源记录见[审查报告](../../../reports/layer1_training/issue017-loading-20261019/README.md)。后续[022](../../issue/022_runtime_replay_boundary_ordering.md)需定位差异并完成回归，不能通过重试挑选成功记录或改阈值关闭017。
+017 r4（源码12d478a）真权重零更新通过，136拍服务回归4/5；第4例毫秒级Word拍界差异由用户按运行时抖动接受，017已关闭归档，022排查取消。原始结果及关闭依据见[审查报告](../../../reports/layer1_training/issue017-loading-20261019/README.md)。005仍待训练器及真实更新/恢复短跑，因此006尚未放行。

@@ -9,9 +9,8 @@
 | [002](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入 | 完成，已归档；r4-asr 退出 0 |
 | [003](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003_kokoro_playback_integration.md) | Kokoro 分段播放 | 完成，已归档；[003d修复](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003d_segment_continuity.md)及[003c用户复听](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003c_audio_listening_review.md)通过 |
 | [004](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 完成归档；r5全量机器审计通过，用户明确免除复审后关闭 |
-| [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 进行中；017完整恢复/零更新通过；136拍服务回归4/5待022定位，训练器及恢复短跑待实现 |
-| [017](017_training_loader_zero_update.md) | 完整训练加载与零更新 | 进行中；GPU入口修复、零更新通过；服务回归4/5，暂不关闭 |
-| [022](022_runtime_replay_boundary_ordering.md) | Word回放拍界差异定位 | 待办；017第4例第6拍分词窗口差异，补充实际入队/截窗证据后修复回归 |
+| [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 进行中；017已关闭，用户接受回归拍界抖动；训练器及恢复短跑待实现 |
+| [017](../../reports/layer1_training/issue017-loading-20261019/README.md) | 完整训练加载与零更新 | 完成、已归档；零更新通过，回归拍界抖动由用户明确接受 |
 | [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；005及007开训前准备未完成；004已完成 |
 | [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |
 | [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 验收 | 进行中；B0完整链路0/5，候选及FDB待验收 |
@@ -22,7 +21,7 @@
 
 ## 依赖与交付
 
-004工具实现[013](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/013_layer1_data_pipeline_implementation.md)、[来源恢复](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004a_source_download_recovery.md)与[016来源隔离](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/016_external_data_exclusion.md)已完成归档；用户取消FDB补转写及其训练前置条件。[完整数据任务](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_remote_data_execution.md)已完成，与[017加载/零更新](017_training_loader_zero_update.md)分别跟踪数据及权重证据，不能把代码或来源验真当正式训练放行。
+004工具实现[013](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/013_layer1_data_pipeline_implementation.md)、[来源恢复](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004a_source_download_recovery.md)与[016来源隔离](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/016_external_data_exclusion.md)已完成归档；用户取消FDB补转写及其训练前置条件。[完整数据任务](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_remote_data_execution.md)已完成，与[017加载/零更新](../../reports/layer1_training/issue017-loading-20261019/README.md)分别跟踪数据及权重证据，不能把代码或来源验真当正式训练放行。
 
 [018正式数据交付](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/018_layer1_data_delivery.md)按用户决定先有限抽取最多6000原始对话再过滤/去重/切分。r3监督冲突由[019](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/019_duplex_data_alignment_audit.md)修复，旧产物已删除；r5在调试机1CPU/nice10/2GiB硬限完成，正式切分、32/100子集、机器审计及用户免除复审的记录见[r5报告](../../reports/layer1_training/issue004-build-20261019-r5/README.md)。
 

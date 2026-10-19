@@ -35,7 +35,12 @@
     "zero": 131959,
     "runtime": 3174
   },
-  "closure_approved": false,
+  "closure_approved": true,
   "training_allowed": false,
-  "followup_issue": "022"
+  "followup_issue": null,
+  "issue_status": "complete",
+  "closure_basis": "Zero-update passed; user explicitly accepted the millisecond tick-boundary difference as runtime jitter and requested closure.",
+  "runtime_difference_accepted": true,
+  "acceptance_authority": "user",
+  "cancelled_followup_issue": "022_runtime_replay_boundary_ordering"
 }

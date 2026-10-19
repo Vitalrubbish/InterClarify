@@ -1,14 +1,14 @@
 # Issue 005：恢复训练状态并完成远端资源短跑
 
-状态：进行中（017真权重零更新已通过；服务回归4/5待022定位，训练短跑待完成）。优先级：P0。依赖：001；训练加载可先实现，最终资源短跑使用 004 的最小审计集。
+状态：进行中（017已关闭：零更新通过、拍界抖动由用户接受；训练短跑待完成）。优先级：P0。依赖：001；训练加载可先实现，最终资源短跑使用 004 的最小审计集。
 
 ## 当前进度
 
 008a B0完整链路五例未接话，已按用户决定启动训练准备。独立conda prefix `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training`已建立，实测torch2.4.1+cu121、transformers4.46.3、peft0.13.2可导入；环境建立不等于真实参数更新或恢复验证。
 
-001a记录发布布局，001d和008a证明推理路径strict恢复可运行；这些不替代训练加载审计、零更新数值对齐或optimizer/RNG恢复。`train_layer1.py`、训练配置和GPU短跑入口仍待实现，004已交付r5正式数据及最小审计集；最终短跑仍待训练器实现及017服务回归完成，实际步数/长度/batch未冻结。
+001a记录发布布局，001d和008a证明推理路径strict恢复可运行；这些不替代训练加载审计、零更新数值对齐或optimizer/RNG恢复。`train_layer1.py`、训练配置和GPU短跑入口仍待实现，004已交付r5正式数据及最小审计集；最终短跑仍待训练器及训练状态恢复实现，实际步数/长度/batch未冻结。
 
-已实现公共完整加载layer1_model.py、已有q/v LoRA精确白名单、独立官方Model零更新check_layer1_zero_update.py及单卡入口；现有模型服务复用公共加载。固定15个历史prompt、完整词表raw logits及权重前后摘要，详见[017](017_training_loader_zero_update.md)。2026-10-20的r4已通过完整权重恢复及零更新，15个prompt共111个生成步logits/IDs完全一致、前后摘要不变；服务回归136拍为4/5，第4例词事件分拍差异由[022](022_runtime_replay_boundary_ordering.md)定位，017仍不关闭。这些代码不实现optimizer或梯度更新，真权重对照及受影响001逐拍回归通过前不放行。
+已实现公共完整加载layer1_model.py、已有q/v LoRA精确白名单、独立官方Model零更新check_layer1_zero_update.py及单卡入口；现有模型服务复用公共加载。固定15个历史prompt、完整词表raw logits及权重前后摘要，详见[017验收报告](../../reports/layer1_training/issue017-loading-20261019/README.md)。2026-10-20的r4已通过完整权重恢复及零更新，15个prompt共111个生成步logits/IDs完全一致、前后摘要不变；服务回归136拍为4/5，第4例约1.59ms拍界差异经用户明确按运行时抖动接受，017已关闭，022排查取消。训练器、真实梯度更新及optimizer/RNG保存恢复仍未实现，本父任务继续进行中，尚不放行006。
 
 ## 问题与目标
 
