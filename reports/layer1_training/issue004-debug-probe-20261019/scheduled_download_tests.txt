@@ -1,0 +1,9 @@
+test_disconnect_resumes_and_verifies_complete_content (test_fetch_layer1_sources.SourceRecoveryTests) ... ok
+test_ignored_range_restarts_without_appending (test_fetch_layer1_sources.SourceRecoveryTests) ... ok
+test_malformed_range_and_corrupt_payload_fail_closed (test_fetch_layer1_sources.SourceRecoveryTests) ... ok
+test_retry_limit_retains_partial_and_existing_shard_is_reverified (test_fetch_layer1_sources.SourceRecoveryTests) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.005s
+
+OK

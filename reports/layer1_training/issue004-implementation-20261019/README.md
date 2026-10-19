@@ -16,7 +16,7 @@
 
 ## 远端实查与执行
 
-训练根 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/`，独立conda `envs/training` 实测可导入tokenizers/yaml/requests；原来源下载已断流，第4shard留下约518MiB partial。原始10文件合计9,288,990,895字节（约8.651GiB），目前只有前3个完整文件，不能声称来源验真完成。
+训练根 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/`，独立conda `envs/training` 实测可导入tokenizers/yaml/requests；原来源下载断流时只有前3个完整文件，第4shard留下约518MiB partial。恢复后最近核实4个文件已校验。原始10文件合计9,288,990,895字节（约8.651GiB），不能声称全部来源验真完成。
 
 首次作业 `job-179239288144741235618-xuan-zhang`（r1）在进入代码前失败：vc按日志名生成同名.sh，覆盖临时入口并递归调用自身，最终报Argument list too long退出；没有执行单元测试、诊断或来源恢复。失败wrapper/log保留，未当作通过。`b2a2e98` 增加仓库内独立入口，日志移到submit_logs，与入口路径分离，防止再次覆盖。
 
@@ -24,7 +24,9 @@
 
 当前作业 `job-179239520300088615232-xuan-zhang`，run_id `issue004-probe-recover-20261019-r4`，冻结 detached worktree `source/5df0ef0`，由GitHub分支同步。申请4CPU/8GiB/0GPU，指定已有镜像的d6-hpc-cpu-004，保持最多一个活动作业。先运行新增23项测试，再用发布tokenizer及首个完整验真shard的32条真实对话检查计划/增强/编码，通过后恢复来源下载。测试分别限时120秒，诊断300秒，下载14400秒，虚拟内存限7GiB，线程4，同一作业内串行。
 
-产物位于 `data/runs/issue004-probe-recover-20261019-r4/`，保存源码/依赖、测试日志、probe/report.json、下载恢复日志与退出码。最近实查r4为Pending，尚未开始测试，状态待回填；diagnostic_only样本不是正式分组切分或人工审查最小集。
+产物位于 `data/runs/issue004-probe-recover-20261019-r4/`，保存源码/依赖、测试日志、probe/report.json、下载恢复日志与退出码。最新实查r4的19项数据测试、4项下载测试和32条发布tokenizer诊断全部通过，probe退出0，来源恢复正在运行，4/10文件完成校验；diagnostic_only样本不是正式分组切分或人工审查最小集。
+
+按用户要求，另在远端调试机以1CPU/2GiB硬限补做32条资源诊断，耗时6.894秒、峰值RSS约149.94MiB、退出0，报告与r4完全相同。今后该规模轻量检查无需计算队列；现有唯一下载实例保留，完整建库和训练仍另作资源测量。证据见 [调试机实测](../issue004-debug-probe-20261019/README.md)。
 
 ## 未完成条件
 

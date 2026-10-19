@@ -1,0 +1,23 @@
+{
+  "hostname": "d6-hpc-debuggpu-001",
+  "source_commit": "5df0ef0135e51cf912262520b90b576547c071d7",
+  "cpu_affinity": [
+    0
+  ],
+  "nice": 10,
+  "address_space_limit_gib": 2,
+  "cpu_time_limit_s": 180,
+  "wall_timeout_s": 360,
+  "memory_before_kib": {
+    "MemTotal": 394583288,
+    "MemAvailable": 298708156
+  },
+  "peak_rss_kib": 153536,
+  "elapsed_s": 6.8944605429996955,
+  "user_cpu_s": 4.495375,
+  "system_cpu_s": 0.581615,
+  "exit_code": 0,
+  "output_bytes": 1073028,
+  "diagnostic_only": true,
+  "training_allowed": false
+}

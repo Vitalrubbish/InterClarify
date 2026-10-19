@@ -10,6 +10,8 @@
 
 已实现数据核心 `layer1_data.py`、构建/审计命令、`configs/layer1_data.yaml`、远端CPU入口及同路径说明，覆盖分组切分、事件计划、三组视图、mask、序列窗口与生成恢复。代码子任务 [013](archive/013_layer1_data_pipeline_implementation.md) 已归档，下载恢复见 [004a](004a_source_download_recovery.md)，实际执行见 [远端任务单](004_remote_data_execution.md)。新增23项本地测试通过；修复调度入口与环境pip清单采集问题后，当前单个4CPU/8GiB/0GPU作业为 `job-179239520300088615232-xuan-zhang`（r4，指定CPU-004），先运行测试和发布tokenizer的32条诊断，通过后串行恢复下载。旧作业失败/撤销记录见实施报告，未计通过。尚无完整来源上的1000/200/300产物或已人审最小集，正式训练仍未放行。
 
+最新实查：r4的19项数据测试、4项下载测试和32条发布tokenizer诊断均通过，正在恢复来源，已有4/10文件完成校验。按用户要求另在调试机以1CPU/2GiB硬限补做32条资源测量：6.894秒、峰值RSS约149.94MiB、退出0，两次报告一致；[015](archive/015_debug_node_data_validation.md)已归档。今后此规模轻量检查直接在调试机受限执行，完整建库和训练另作资源安排。
+
 ## 已确定的实现路线
 
 使用 DuplexCascade 官方论文采用的 **UltraChat 原始对话数据集**，由本项目自行实现数据生成管线，从普通文本对话构造双工 micro-turn、控制监督和用户句读增强视图。首轮不以自行采集音频或生成新的基础对话语料替代 UltraChat。
