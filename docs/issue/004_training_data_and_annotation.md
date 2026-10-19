@@ -1,6 +1,6 @@
 # Issue 004：使用 UltraChat 自行实现 micro-turn 数据生成管线
 
-状态：进行中（完整来源已验真，排除清单已生成但119条FDB缺转写，正式规模生成和人审待完成）。优先级：P0。依赖：001；文本训练集不依赖 002，真实 ASR 迁移评测数据依赖 002。
+状态：进行中（来源验真与来源隔离登记已完成，正式规模生成和人审待完成）。优先级：P0。依赖：001；文本训练集不依赖 002，真实 ASR 迁移评测数据依赖 002。
 
 ## 当前进度
 
@@ -10,7 +10,7 @@
 
 已实现数据核心、构建/审计命令、配置、远端入口及同路径说明，代码子任务[013](archive/013_layer1_data_pipeline_implementation.md)、下载恢复[004a](archive/004a_source_download_recovery.md)已归档。r4的23项测试与32条发布tokenizer诊断通过；调试机资源复测见[015](archive/015_debug_node_data_validation.md)。尚无完整来源上的1000/200/300正式产物或已人审最小集。
 
-排除清单已在manifests/exclusions.json生成：3325个文本摘要，覆盖FLEURS 100 test+1 dev、历史五例及FDB727例目录；119条Candor接话音频无转写，reviewed=false，缺口由[016](016_external_data_exclusion.md)跟踪，不能冒充完整隔离审查。正式训练保持关闭。
+来源隔离登记[016](archive/016_external_data_exclusion.md)已完成：训练只读固定UltraChat，外部评测单独保留；manifests/exclusions.json记录来源及3325个已有文本的辅助摘要。用户已取消119条FDB补转写及其阻塞条件，清单reviewed=true仅表示来源清点完成，完整文本覆盖另报false，不要求补齐。正式训练仍受本issue的数据/人审及005/007条件约束。
 
 ## 已确定的实现路线
 

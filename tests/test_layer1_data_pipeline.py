@@ -283,6 +283,21 @@ class DataPipelineTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, 'Interrupted source index'):
                     builder.build(args)
 
+    def test_optional_fdb_text_coverage_does_not_add_training_data_review_gate(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            args = self.make_build(Path(temporary))
+            data.write_json(args.exclusions, {'ids': [], 'normalized_hashes': [],
+                'source_refs': ['fixture/external-evaluation'], 'reviewed': True,
+                'review_scope': 'source_inventory_and_available_text', 'text_coverage_complete': False})
+            with patch.object(builder, 'ReleasedTokenizer', CharacterTokenizer), patch.object(auditor, 'ReleasedTokenizer', CharacterTokenizer):
+                builder.build(args)
+                report = auditor.audit(args.output, args.tokenizer)
+            self.assertTrue(report['exclusions_reviewed'])
+            self.assertFalse(report['optional_text_coverage_complete'])
+            self.assertNotIn('external_exclusion_review', report['pending'])
+            self.assertIn('minimum_32_human_review', report['pending'])
+            self.assertFalse(report['training_allowed'])
+
     def test_rejects_unreviewed_claim_without_external_sources(self):
         with tempfile.TemporaryDirectory() as temporary:
             args = self.make_build(Path(temporary))

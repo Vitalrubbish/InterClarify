@@ -6,10 +6,10 @@
 
 ## 实际排除清单
 
-`manifests/exclusions.json`已在远端生成，SHA256为877836703f689380e2087dd3e9fdb7b989c24ee6917feafb269a7b118a667997。包含3325个规范化文本摘要、1186条逐文件来源记录；来源、覆盖计数和缺测ID见 [exclusion_coverage.json](exclusion_coverage.json)。保留完整清单在远端，仓库回收摘要和精确引用。
+初次`manifests/exclusions.json`的SHA256为877836703f689380e2087dd3e9fdb7b989c24ee6917feafb269a7b118a667997，包含3325个文本摘要和1186条来源记录；原检查口径与范围见 [exclusion_coverage.json](exclusion_coverage.json)。用户随后取消FDB补转写要求，实际清单已按下述范围修正重建，旧原件另存，不覆盖历史证据。
 
-FLEURS为100条test及1条dev，全部排除；历史五例使用真实Word事件文本。FDB v1.0五子集共727例目录齐全，其中synthetic_user_interruption的context/interrupt字段可用；candor_turn_taking的119例只有TURN-TAKING时间标注，无transcription.json或其他普通文本。标记不当作正文，未虚构转写；reviewed和coverage_complete均false。其余来源已提取文本，完整文本隔离尚有119例缺口。
+FLEURS为100条test及1条dev，历史五例使用真实Word事件文本。FDB v1.0五子集共727例目录齐全；candor_turn_taking的119例无普通文本。初版错误地将此设为训练前置，现按用户要求取消，不补转写、不虚构文本。训练只读取固定UltraChat，FDB单独用于评测，已有文本摘要仅辅助重复检查。
 
 [3项排除工具测试](exclusion_tests.txt)在本地和远端均通过，检查缺文本拒收、确定性和逐轮命中排除。实际构建在调试机单CPU、nice10、2GiB地址空间限制下执行，未读取模型、未申请GPU。清单ID只作外部来源溯源，不与UltraChat数字ID混用。
 
-本任务的来源验真已完成；[016](../../../docs/issue/016_external_data_exclusion.md)继续跟踪转写覆盖缺口，不能把本文当作全部隔离审查已完成。
+范围修正提交d7b90ca，远端run_id为issue016-scope-correction-r2：清单按实际源文件重建，reviewed/coverage_complete=true表示来源清点通过，text_coverage_complete=false仍如实记录可选文本范围；3325个辅助摘要与之前完全相同。新SHA256为6599f6968dfaf83185812eedceaace8e7a8ea5b57967a5ffa51269b3aec40944，见[修正记录](scope_correction.json)与[4项远端回归](scope_correction_tests.txt)。[016](../../../docs/issue/archive/016_external_data_exclusion.md)完成归档，正式数据生成、人审及005/007继续独立验收。

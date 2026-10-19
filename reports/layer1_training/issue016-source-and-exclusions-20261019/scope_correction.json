@@ -1,0 +1,45 @@
+{
+  "builder_sha256": "67b6eed9bce272c104bd4adb2e2e5dffd930bcf1d19e38ed23b9c28dfb5f8acd",
+  "config_sha256": "de21d431e9ab692169a05191ad48f1e2ff7b06cb13f4cd1357ab19068c0017a2",
+  "coverage": {
+    "fdb/candor_pause_handling": 216,
+    "fdb/candor_turn_taking": 119,
+    "fdb/icc_backchannel": 55,
+    "fdb/synthetic_pause_handling": 137,
+    "fdb/synthetic_user_interruption": 200,
+    "fleurs": 101,
+    "fleurs_test": 100,
+    "historical": 5
+  },
+  "coverage_complete": true,
+  "fdb_transcription_required": false,
+  "fleurs_source": {
+    "repo": "google/fleurs",
+    "revision": "70bb2e84b976b7e960aa89f1c648e09c59f894dd",
+    "selection": "SHA256(filename), ascending"
+  },
+  "ids": [],
+  "match_scope": "normalized_each_text_unit_and_concatenated_sample",
+  "missing": [],
+  "namespace_policy": "external_ids_are_provenance_only_not_ultrachat_ids",
+  "review_scope": "source_inventory_and_available_text",
+  "reviewed": true,
+  "schema_version": 1,
+  "source_refs": [
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/dataset/manifest.json",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-issue001-word-20261019/data/word-capture-r2/word_manifest.json",
+    "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/candor_pause_handling",
+    "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/candor_turn_taking",
+    "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/icc_backchannel",
+    "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_pause_handling",
+    "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0/synthetic_user_interruption"
+  ],
+  "text_coverage_complete": false,
+  "training_allowed": false,
+  "optional_text_missing_count": 119,
+  "normalized_hash_count": 3325,
+  "record_count": 1186,
+  "exclusion_manifest_sha256": "6599f6968dfaf83185812eedceaace8e7a8ea5b57967a5ffa51269b3aec40944",
+  "source_commit": "d7b90ca",
+  "auxiliary_hashes_unchanged": true
+}

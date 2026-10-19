@@ -2,9 +2,9 @@
 
 状态：待办。父任务：[004](004_training_data_and_annotation.md)。本任务单只执行 CPU 数据构建，不启动训练或模型服务。
 
-诊断/下载恢复作业 `job-179239520300088615232-xuan-zhang`（r4，源码5df0ef0）已完成：23项测试、32条诊断及10文件下载验真均通过，最终退出0。后续source/dfd36d3独立复核全部SHA256通过。原失败/撤销记录保留。完整数据生成仍待排除清单119条转写缺口及审查条件解决。
+诊断/下载恢复作业 `job-179239520300088615232-xuan-zhang`（r4，源码5df0ef0）已完成：23项测试、32条诊断及10文件下载验真均通过，最终退出0。后续source/dfd36d3独立复核全部SHA256通过。原失败/撤销记录保留。来源隔离登记已完成，用户取消FDB补转写条件，下一步可准备正式分组切分和数据审计。
 
-按用户明确要求，轻量单元测试/32条检查可在远端调试机按1CPU、2GiB地址空间硬限和超时执行；[实测](../../reports/layer1_training/issue004-debug-probe-20261019/README.md)为6.894秒、约149.94MiB峰值RSS。以下调度与32GiB申请约束仍用于完整全库构建，不用于要求同规模轻量检查排队。实际排除清单在manifests/exclusions.json，当前reviewed=false，不能手改为true绕过缺测。
+按用户明确要求，轻量单元测试/32条检查可在远端调试机按1CPU、2GiB地址空间硬限和超时执行；[实测](../../reports/layer1_training/issue004-debug-probe-20261019/README.md)为6.894秒、约149.94MiB峰值RSS。以下调度与32GiB申请约束仍用于完整全库构建，不用于要求同规模轻量检查排队。排除清单已在scope-correction-r2按新规则重建，reviewed=true、review_scope=source_inventory_and_available_text；可选FDB文本覆盖不完整不阻塞此任务。
 
 ## 前置核对
 
