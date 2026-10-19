@@ -271,6 +271,17 @@ class DataPipelineTests(unittest.TestCase):
             config = yaml.safe_load(args.config.read_text())
             with self.assertRaisesRegex(ValueError, 'Incomplete'):
                 data.verify_sources(args.source_manifest, args.source_dir, args.download_manifest, config['source'])
+        with tempfile.TemporaryDirectory() as temporary:
+            args = self.make_build(Path(temporary))
+            config = yaml.safe_load(args.config.read_text())
+            config['filter']['min_chars'] = 10000
+            args.config.write_text(yaml.safe_dump(config))
+            with patch.object(builder, 'ReleasedTokenizer', CharacterTokenizer):
+                with self.assertRaisesRegex(ValueError, 'Insufficient'):
+                    builder.build(args)
+                args.resume = True
+                with self.assertRaisesRegex(ValueError, 'Interrupted source index'):
+                    builder.build(args)
 
     def test_rejects_unreviewed_claim_without_external_sources(self):
         with tempfile.TemporaryDirectory() as temporary:

@@ -6,4 +6,4 @@
 
 本地在 conda 环境运行：`conda run -n paratalker-dev python -m unittest discover -s tests -p test_layer1_data_pipeline.py -v`。完整来源生成、发布 tokenizer 和集群测试按远端任务单执行，不由替身测试结论代替。
 
-端到端用例另核对审计报告的来源、待完成人审/排除状态和观测采样频率，防止机器通过掩盖缺少审查。
+端到端用例另核对审计报告的来源、待完成人审/排除状态和观测采样频率，防止机器通过掩盖缺少审查。来源拒收用例检查只有排除行的中断索引也不得重用，避免恢复时重复累计过滤记录。

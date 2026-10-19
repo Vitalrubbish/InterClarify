@@ -8,4 +8,4 @@
 
 最小 train 的前 32/100 条 ID 单独列出。`human_review.json` 逐条保存待审路径、摘要、reviewer、accepted；初始均未完成，不自动伪造人审。
 
-`--resume` 要求配置、代码、tokenizer、来源、排除清单、epoch 和 max-length 全部一致；已有完整对话逐项验摘要，未完成对话从稳定种子重建。完整建库中断尚不支持行级恢复，明确报错并要求新目录。开发/测试计划不随训练 epoch 改变。所有构建结果固定 `training_allowed=false`，后续 005/007 门禁独立处理。
+`--resume` 要求配置、代码、tokenizer、来源、排除清单、epoch 和 max-length 全部一致；已有完整对话逐项验摘要，未完成对话从稳定种子重建。完整建库中断尚不支持行级恢复，只要已有合格或排除行就明确报错并要求新目录，避免重复累计过滤记录。开发/测试计划不随训练 epoch 改变。所有构建结果固定 `training_allowed=false`，后续 005/007 门禁独立处理。

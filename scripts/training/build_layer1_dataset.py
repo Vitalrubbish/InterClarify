@@ -61,7 +61,7 @@ def build(args):
     index = DialogueIndex(index_path, config)
     try:
         if not manifest.get('index_complete'):
-            if index.db.execute('SELECT COUNT(*) FROM dialogues').fetchone()[0]:
+            if index.db.execute('SELECT (SELECT COUNT(*) FROM dialogues)+(SELECT COUNT(*) FROM excluded)').fetchone()[0]:
                 raise ValueError('Interrupted source index: start a fresh output directory')
             index.ingest(paths, exclusions)
             selected = index.select()
