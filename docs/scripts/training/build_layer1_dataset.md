@@ -6,6 +6,8 @@
 
 必须提供 JSON 外部排除清单，字段为 `ids`、`normalized_hashes`、`source_refs`（字符串列表）、`reviewed`（布尔值）；规范化摘要为核心模块 `digest(normalized(text))`。reviewed=true 要求非空 source_refs；只有实际核对外部来源后才能登记，空清单不表示完成 FDB/FLEURS 隔离审查。原始来源只读取已冻结 UltraChat，不把外部评测语料加入候选集。
 
+FDB转写不作为训练前置。构建manifest额外保存exclusion_review_scope和optional_text_coverage_complete，区分来源清点与可选全文重复检查；text_coverage_complete=false不新增阻塞，训练只读UltraChat的约束不变。旧清单无范围字段时登记legacy_manifest，不擅自声称全文覆盖。
+
 最小 train 的前 32/100 条 ID 单独列出。`human_review.json` 逐条保存待审路径、摘要、reviewer、accepted；初始均未完成，不自动伪造人审。
 
 `--resume` 要求配置、代码、tokenizer、来源、排除清单、epoch 和 max-length 全部一致；已有完整对话逐项验摘要，未完成对话从稳定种子重建。完整建库中断尚不支持行级恢复，只要已有合格或排除行就明确报错并要求新目录，避免重复累计过滤记录。开发/测试计划不随训练 epoch 改变。所有构建结果固定 `training_allowed=false`，后续 005/007 门禁独立处理。

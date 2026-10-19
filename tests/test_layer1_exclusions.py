@@ -35,15 +35,27 @@ class ExclusionTests(unittest.TestCase):
         return argparse.Namespace(config=path, fleurs_manifest=fleurs, historical_manifest=history,
                                   fdb_root=root / 'fdb', output=root / 'excluded.json')
 
-    def test_missing_fdb_text_is_not_reviewed_even_with_exact_sample_counts(self):
+    def test_missing_fdb_text_does_not_block_source_inventory(self):
         with tempfile.TemporaryDirectory() as tmp:
             args = self.setup_sources(Path(tmp))
             result = exclusions.build(args)
-            self.assertFalse(result['reviewed'])
-            self.assertEqual(result['missing'], [{'scope': 'fdb/subset', 'sample_id': '1', 'reason': 'no_text'}])
+            self.assertTrue(result['reviewed'])
+            self.assertTrue(result['coverage_complete'])
+            self.assertFalse(result['text_coverage_complete'])
+            self.assertFalse(result['fdb_transcription_required'])
+            self.assertEqual(result['missing'], [])
+            self.assertEqual(result['optional_text_missing'], [{'scope': 'fdb/subset', 'sample_id': '1', 'reason': 'no_text'}])
             self.assertEqual(result['ids'], [])
             self.assertIn(data.digest(data.normalized('Hello there.')), result['normalized_hashes'])
             self.assertNotIn(data.digest(data.normalized('[TURN-TAKING]')), result['normalized_hashes'])
+
+    def test_missing_source_directory_still_blocks_inventory_review(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            args = self.setup_sources(Path(tmp))
+            args.fdb_root = Path(tmp) / 'absent'
+            result = exclusions.build(args)
+            self.assertFalse(result['reviewed'])
+            self.assertTrue(any(row['reason'] == 'sample_count' for row in result['missing']))
 
     def test_complete_coverage_is_deterministic_and_includes_concatenated_text(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -51,6 +63,7 @@ class ExclusionTests(unittest.TestCase):
             data.write_json(args.fdb_root / 'subset/1/transcription.json', [{'text': 'How are'}, {'text': 'you?'}])
             first = exclusions.build(args)
             self.assertTrue(first['reviewed'])
+            self.assertTrue(first['text_coverage_complete'])
             self.assertIn(data.digest(data.normalized('How are you?')), first['normalized_hashes'])
             self.assertEqual(first, exclusions.build(args))
 

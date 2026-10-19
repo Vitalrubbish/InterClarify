@@ -37,6 +37,8 @@ def build(args):
     identity = {'schema_version': 1, 'config': config, 'source_manifest_sha256': file_digest(args.source_manifest),
                 'download_manifest_sha256': file_digest(args.download_manifest),
                 'exclusions_sha256': file_digest(args.exclusions), 'exclusions_reviewed': exclusions['reviewed'],
+                'exclusion_review_scope': exclusions.get('review_scope', 'legacy_manifest'),
+                'optional_text_coverage_complete': exclusions.get('text_coverage_complete'),
                 'exclusion_source_refs': exclusions['source_refs'], 'tokenizer': tokenizer.fingerprint,
                 'max_length': args.max_length, 'epoch': args.epoch,
                 'code': {p.name: file_digest(p) for p in (Path(__file__), Path(__file__).with_name('layer1_data.py'))}}

@@ -1,4 +1,4 @@
-"""Build source-scoped external evaluation exclusions with explicit coverage gaps."""
+"""Inventory held-out sources and hash available text without requiring FDB transcripts."""
 
 from __future__ import annotations
 
@@ -28,11 +28,12 @@ def extract_text(value, keys, ignored):
 
 
 def build(args):
-    """Mark reviewed only when all registered samples provide usable text."""
+    """Separate required source coverage from optional FDB text overlap checks."""
     config = yaml.safe_load(args.config.read_text())
     if config['schema_version'] != 1:
         raise ValueError('Unsupported exclusion schema')
     hashes, sources, missing, records = set(), [], [], []
+    optional_text_missing = []
     counts = Counter()
     source_digests = {}
 
@@ -92,10 +93,14 @@ def build(args):
             if texts:
                 hashes.add(digest(normalized(' '.join(texts))))
             else:
-                missing.append({'scope': 'fdb/' + subset, 'sample_id': directory.name, 'reason': 'no_text'})
+                optional_text_missing.append({'scope': 'fdb/' + subset, 'sample_id': directory.name, 'reason': 'no_text'})
         sources.append(str(root))
     result = {'schema_version': 1, 'ids': [], 'normalized_hashes': sorted(hashes),
               'source_refs': sources, 'reviewed': not missing, 'coverage_complete': not missing,
+              'review_scope': 'source_inventory_and_available_text',
+              'text_coverage_complete': not missing and not optional_text_missing,
+              'optional_text_missing': optional_text_missing,
+              'fdb_transcription_required': False,
               'namespace_policy': 'external_ids_are_provenance_only_not_ultrachat_ids',
               'match_scope': 'normalized_each_text_unit_and_concatenated_sample',
               'coverage': dict(counts), 'missing': missing, 'records': records,

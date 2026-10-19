@@ -149,6 +149,8 @@ def audit(directory, tokenizer_dir):
             'expanded_review_complete': expanded_ok,
             'double_reviewed_events': double_reviewed,
             'exclusions_reviewed': manifest['identity']['exclusions_reviewed'],
+            'exclusion_review_scope': manifest['identity'].get('exclusion_review_scope', 'legacy_manifest'),
+            'optional_text_coverage_complete': manifest['identity'].get('optional_text_coverage_complete'),
             'manifest_sha256': file_digest(directory / 'manifest.json'),
             'auditor_sha256': file_digest(__file__), 'dialogues': dict(Counter(d['split'] for d in selected)),
             'sequences': dict(sequence_counts), 'effective_tokens': dict(token_counts),
