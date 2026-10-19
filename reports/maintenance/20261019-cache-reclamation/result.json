@@ -1,0 +1,152 @@
+{
+  "targets": [
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-baseline-01/cache/inductor",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-baseline-01/cache/triton",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-diagnostic-03/cache/inductor",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-diagnostic-03/cache/triton",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-screen-01/cache/inductor",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-screen-01/cache/triton",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-baseline-02/cache/inductor",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-baseline-02/cache/triton",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-baseline-04/cache/inductor",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-baseline-04/cache/triton",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-early-retest-02/cache/inductor",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-early-retest-02/cache/triton",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-combination-01/cache/inductor",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-combination-01/cache/triton",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/models/nemotron_multi",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/models/kyutai",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/models/hf/hub/models--kyutai--pocket-tts-without-voice-cloning",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/envs/nemotron_multi",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/envs/kyutai"
+  ],
+  "removed": [
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-baseline-01/cache/inductor",
+      "kind": "compiled_cache",
+      "allocated_bytes_before": 4096
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-baseline-01/cache/triton",
+      "kind": "compiled_cache",
+      "allocated_bytes_before": 4096
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-diagnostic-03/cache/inductor",
+      "kind": "compiled_cache",
+      "allocated_bytes_before": 26193408
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-diagnostic-03/cache/triton",
+      "kind": "compiled_cache",
+      "allocated_bytes_before": 14914560
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-screen-01/cache/inductor",
+      "kind": "compiled_cache",
+      "allocated_bytes_before": 226268160
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-screen-01/cache/triton",
+      "kind": "compiled_cache",
+      "allocated_bytes_before": 30303744
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-baseline-02/cache/inductor",
+      "kind": "compiled_cache",
+      "allocated_bytes_before": 4096
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-baseline-02/cache/triton",
+      "kind": "compiled_cache",
+      "allocated_bytes_before": 4096
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-baseline-04/cache/inductor",
+      "kind": "compiled_cache",
+      "allocated_bytes_before": 167437312
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-baseline-04/cache/triton",
+      "kind": "compiled_cache",
+      "allocated_bytes_before": 28638208
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-early-retest-02/cache/inductor",
+      "kind": "compiled_cache",
+      "allocated_bytes_before": 150545408
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-early-retest-02/cache/triton",
+      "kind": "compiled_cache",
+      "allocated_bytes_before": 30496256
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-combination-01/cache/inductor",
+      "kind": "compiled_cache",
+      "allocated_bytes_before": 188678144
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-runs/20261017-combination-01/cache/triton",
+      "kind": "compiled_cache",
+      "allocated_bytes_before": 30438912
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/models/nemotron_multi",
+      "kind": "retired_model",
+      "allocated_bytes_before": 2553726464
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/models/kyutai",
+      "kind": "retired_model",
+      "allocated_bytes_before": 2363223040
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/models/hf/hub/models--kyutai--pocket-tts-without-voice-cloning",
+      "kind": "retired_model",
+      "allocated_bytes_before": 225523200
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/envs/nemotron_multi",
+      "kind": "environment",
+      "allocated_bytes_before": 7985969664
+    },
+    {
+      "path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/envs/kyutai",
+      "kind": "environment",
+      "allocated_bytes_before": 8073314304
+    }
+  ],
+  "protected_paths": [
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/models/nemotron_en",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/envs/nemotron_en/bin/python",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/envs/pocket/bin/python",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/models/hf/hub/models--hexgrad--Kokoro-82M",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-english-integration-20261018-v6/envs/asr/bin/python",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-english-integration-20261018-v6/envs/tts/bin/python",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/kyutai/stt-1b-en_fr-candle",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-kyutai/bin/bin/moshi-server",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/bin/python",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/runs"
+  ],
+  "completed": true,
+  "new_cluster_jobs": 0,
+  "weight_copies_created": false,
+  "protected_paths_exist_after": {
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/models/nemotron_en": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/envs/nemotron_en/bin/python": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/envs/pocket/bin/python": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/models/hf/hub/models--hexgrad--Kokoro-82M": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-english-integration-20261018-v6/envs/asr/bin/python": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-english-integration-20261018-v6/envs/tts/bin/python": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/kyutai/stt-1b-en_fr-candle": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-kyutai/bin/bin/moshi-server": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/bin/python": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs": true,
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/runs": true
+  },
+  "removed_target_allocated_bytes": 22095687168,
+  "quota_delta_measured": false,
+  "initial_environment_cli_failure": "conda env remove did not accept --offline; recovered using CONDA_OFFLINE=true and successful plain env remove"
+}

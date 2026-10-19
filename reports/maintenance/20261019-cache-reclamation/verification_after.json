@@ -1,0 +1,8 @@
+{
+  "all_19_retired_targets_absent": true,
+  "all_protected_paths_present": true,
+  "current_client_imports_passed": true,
+  "original_asr_tts_runs_preserved": true,
+  "retired_envs_removed": true,
+  "no_new_cluster_jobs": true
+}

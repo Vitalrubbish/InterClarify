@@ -1,0 +1,18 @@
+{
+  "initial_operations.log": {
+    "sha256": "9dc327cd562aed459cec231e5a8f86748ee9b04cc9a2eea6beac78689e552dfa",
+    "bytes": 1344
+  },
+  "nemotron_multi.remove.log": {
+    "sha256": "eef214e04990278b82f8c3fde953c0ed04ba896b9ed6297a79e82b6aa7b9426b",
+    "bytes": 103
+  },
+  "nemotron_multi.remove-retry.log": {
+    "sha256": "6f02e9a90a20a23b25197964aec58f7a2159390c050908837e8700589f6618cf",
+    "bytes": 3604
+  },
+  "kyutai.remove-retry.log": {
+    "sha256": "472d52be8cd259d43e8e40b106eff1cae7e16989eecf4466b2a70d46a67b983b",
+    "bytes": 3540
+  }
+}

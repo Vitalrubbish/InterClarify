@@ -8,7 +8,7 @@
 | [001b](archive/001b_runtime_comparison.md) | 官方控制路径对照 | 完成，已归档；原生 Word 输入、五例真权重和远端 7 项测试通过 |
 | [002](archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入 | 完成，已归档；r4-asr 退出 0 |
 | [003](archive/003_kokoro_playback_integration.md) | Kokoro 分段播放 | 完成，已归档；[003d修复](archive/003d_segment_continuity.md)及[003c用户复听](archive/003c_audio_listening_review.md)通过 |
-| [004](004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 进行中；来源清单完成，下载验真CPU作业已提交，生成/审计待做 |
+| [004](004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 进行中；生成/审计代码已实现，来源下载断流待恢复，完整规模与人审待做 |
 | [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 进行中；独立conda环境CPU作业已提交，训练恢复/零更新待做 |
 | [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；004、005 及 007 开训前准备未完成 |
 | [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |
@@ -45,3 +45,5 @@
 远端维护：[011 清理无用环境与目录](archive/011_remote_storage_cleanup.md)完成并归档。Qwen3-ASR模型/专用环境及旧ASR/TTS选型开发实现已删除，原始结果和现役资产保留；主清单约6.25GiB目标占用已清理。
 
 [012 主目录归拢](archive/012_remote_home_consolidation.md)已完成：24个历史目录归入interclarify-archive，顶层目录50→26；当前路径按[远端目录约定](../remote_workspace.md)和迁移清单查找。
+
+[014 实际缓存/退役资产回收](archive/014_remote_cache_reclamation.md)已完成：直接删除14个编译缓存、3组候选权重、2套旧环境，目标删除前占用约20.58GiB；当前模型、训练环境和原始结果保留。
