@@ -36,5 +36,21 @@ class TTSTimingTests(unittest.TestCase):
         self.assertEqual(len(played), len(pcm) * 2 + round(.3 * 96000))
 
 
+class SpokenTimeTests(unittest.TestCase):
+    """Keep clock normalization restricted to the spoken copy."""
+
+    def test_explicit_clock_times_and_unrelated_numbers(self):
+        spec = importlib.util.spec_from_file_location('kokoro_service',
+            Path(__file__).parents[1] / 'scripts/remote/kokoro_tts_service.py')
+        service = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(service)
+        self.assertEqual(service.spoken_time_text('Tuesday at 9:30, or Thursday at 3:15?'),
+                         'Tuesday at nine thirty, or Thursday at three fifteen?')
+        self.assertEqual(service.spoken_time_text('At 09:05 and before 00:00.'),
+                         "At nine oh five and before zero o'clock.")
+        for text in ['ratio 3:15', 'at 9:75', 'at 24:30', 'value 3.14', 'at 9:30:15']:
+            self.assertEqual(service.spoken_time_text(text), text)
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -5,6 +5,7 @@ import argparse
 import base64
 import json
 import logging
+import re
 from pathlib import Path
 import threading
 import time
@@ -14,6 +15,26 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 LOG = logging.getLogger(__name__)
+
+
+def spoken_time_text(text):
+    """Expand valid clock times only in explicit time contexts for speech."""
+    small = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven',
+             'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen',
+             'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen']
+
+    def number(value):
+        return small[value] if value < 20 else ['twenty', 'thirty', 'forty', 'fifty'][value // 10 - 2] + (
+            ' ' + small[value % 10] if value % 10 else '')
+
+    def replace(match):
+        hour, minute = int(match['hour']), int(match['minute'])
+        ending = "o'clock" if minute == 0 else ('oh ' + number(minute) if minute < 10 else number(minute))
+        return match['context'] + number(hour) + ' ' + ending
+
+    return re.sub(r'(?P<context>\b(?:at|around|by|from|until|before|after)\s+)'
+                  r'(?P<hour>[01]?\d|2[0-3]):(?P<minute>[0-5]\d)(?![\d:])',
+                  replace, text, flags=re.IGNORECASE)
 
 
 class KokoroEngine:
@@ -39,7 +60,7 @@ class KokoroEngine:
         from scipy.signal import resample_poly
         with self.lock:
             chunks = [result.audio.detach().cpu().numpy().reshape(-1)
-                      for result in self.pipeline(text, voice=self.voice, speed=1, split_pattern=None)]
+                      for result in self.pipeline(spoken_time_text(text), voice=self.voice, speed=1, split_pattern=None)]
         if not chunks or not any(len(chunk) for chunk in chunks):
             raise RuntimeError('Kokoro produced no audio')
         audio = resample_poly(np.concatenate(chunks), 2, 1)

@@ -1,0 +1,8 @@
+test_explicit_clock_times_and_unrelated_numbers (test_english_tts_timing.SpokenTimeTests) ... ok
+test_embedded_silence_is_separate_from_supply_gaps (test_english_tts_timing.TTSTimingTests) ... ok
+test_supply_gap_is_included_in_listening_audio (test_english_tts_timing.TTSTimingTests) ... ok
+
+----------------------------------------------------------------------
+Ran 3 tests in 1.373s
+
+OK

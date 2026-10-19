@@ -1,14 +1,16 @@
 # Issue 003c：Kokoro 分段试听复核
 
-状态：进行中，待修复包复听。父任务：[003](003_kokoro_playback_integration.md)。
+状态：进行中，第二轮复听未通过，继续修复。父任务：[003](003_kokoro_playback_integration.md)。
 
 ## 已有人工反馈
 
 2026-10-19，评价者为用户。原r4包读法没有问题，但一句话被分成多块、块间不连续，首轮听感未通过；尚无逐文件时间位置，不补造记录。原文件摘要见 [r4试听清单](../../reports/english_integration/20261018-r4/listening_manifest.json)，原结果保留。
 
+用户对第一版修复包的反馈：long_answer短停顿明显改善但仍存在，clarification的时间数字间停顿过长。前一包不能归档为通过；003d正在针对后续句界等待及时间读法生成新包。
+
 ## 当前试听包
 
-[003d](003d_segment_continuity.md)已完成代码及远端自动验证，新文件见 [试听报告](../../reports/tts_continuity/20261019/README.md)和 [SHA256清单](../../reports/tts_continuity/20261019/listening_manifest.json)：
+[003d](003d_segment_continuity.md)已完成代码及远端自动验证，最新第二轮文件见 [试听报告](../../reports/tts_continuity/20261019-r3/README.md)和 [SHA256清单](../../reports/tts_continuity/20261019-r3/listening_manifest.json)：
 
 - [ ] confirmation.wav：短确认是否自然，nine thirty等读法是否仍正常。
 - [ ] clarification.wav：Tuesday/Thursday及9:30/3:15是否清楚，整句接续是否自然。

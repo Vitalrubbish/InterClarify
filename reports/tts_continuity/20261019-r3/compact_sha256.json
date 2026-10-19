@@ -1,0 +1,19 @@
+{
+  "timing-tests.log": "6b8970d2bdb9274f1b53e1e0feba664300f18a8decbbc3176d68bfdf6d854b26",
+  "raw_artifact_sha256.json": "3cc4b656ecd00e988b0c3e15d05d99eb41edde77d357bbda7352e85c6309562b",
+  "README.md": "77f57e29e198b249aa6984aa9c5a748b8899b93420994fccf446aab3538f8e82",
+  "unit-tests.log": "51902fa26abe778af46c8fd3afa6ac9b618717fa9e42cd795ae9659080b15d95",
+  "implementation_revision.json": "3fe53756f48f43ae17a789d1e49555e6cea79317c3c53493b9186e26d5d5a419",
+  "listening_manifest.json": "1e4d86d22ad141e2ffdce21cf86287e57722a274df2344fcb593f1695de82b97",
+  "source.sha256": "affa2156995c3eb89e80df4cba6175484a3cbc4e7aaf35cca339b4d40ca48228",
+  "data/continuity-r3/health.json": "29d331f4644d80e4046c9d4841c937fad6e30666f3995a164a5df51a19ad9e89",
+  "data/continuity-r3/exit_code.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+  "data/continuity-r3/verification/collection_manifest.json": "2d3755c2e0c49346f217e8278e450011a4a07577b9d358fa0ce3037e26307ea6",
+  "data/continuity-r3/verification/long_answer.json": "5809c9e98fcf9a6b8fbb6045f74c0187ce7b7f526912d4e5bf39e9cc78b7e938",
+  "data/continuity-r3/verification/micro_turn_supply.json": "c738f255c9befb6f512979c7ef0c486c1b64277e795733bc33d2907d588737aa",
+  "data/continuity-r3/verification/slow_text_supply.json": "92372f758a24003c4cc6f3224d4cc588b918ef147efc5b25b9cce2c5618d22ed",
+  "data/continuity-r3/verification/native_playback_chain.json": "b954beeb6b5989d21d92ed47be8fbf55f1f62fb991e878a21004dba214e14aa1",
+  "data/continuity-r3/verification/confirmation.json": "b72f51515c69cc777fc9c9aa419ab04e85e5f2a813aef7e09e5e5a1bdd8d2f16",
+  "data/continuity-r3/verification/summary.json": "6fd70f2e9a593aebf1af72087d9c7f86284373e18e1d37439aa7ea9b7da428d2",
+  "data/continuity-r3/verification/clarification.json": "1f09a18f9ff869f53fccd80909c549db561b66c9b6d7b03d573030b8bf1a4b60"
+}

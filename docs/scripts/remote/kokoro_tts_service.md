@@ -6,3 +6,5 @@
 
 
 资源与来源补充：health记录加载耗时和进程峰值RSS，作业收尾保留service /proc状态，GPU逐秒采样；ASR关闭记录等待worker释放耗时。采集manifest标为integration_diagnostic_only且禁止训练，保留源音频摘要与失败。TTS核验增加真实Kokoro经RuntimeAdapter、TTSManager、协调器和播放管理器执行短附和、有效插话停旧音频及新响应，headless确认不等同扬声器实播。
+
+003d第二轮：`spoken_time_text`仅在at/around/by/from/until/before/after的明确时间语境将合法0–23小时、00–59分钟的HH:MM展开为英文（零分钟o'clock，单数字分钟前oh），保留12/24小时显示值；比率、无语境冒号及非法时间不改。KokoroEngine仅在传给pipeline时使用该副本，原请求文本和模型历史保留原样。
