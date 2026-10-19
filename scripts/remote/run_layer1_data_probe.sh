@@ -18,7 +18,7 @@ cd "$ROOT"
 git rev-parse HEAD > "$OUT/source_commit.txt"
 sha256sum scripts/training/*.py scripts/remote/probe_layer1_data.py \
   scripts/remote/run_layer1_data_probe.sh configs/layer1_data.yaml > "$OUT/source.sha256"
-"$PY" -m pip freeze > "$OUT/environment.txt"
+"$PY" -c 'from importlib.metadata import distributions; print("\n".join(sorted((d.metadata.get("Name") or "unknown") + "==" + d.version for d in distributions())))' > "$OUT/environment.txt"
 timeout 120 "$PY" -m unittest discover -s tests -p test_layer1_data_pipeline.py -v > "$OUT/pipeline-tests.txt" 2>&1
 timeout 120 "$PY" -m unittest discover -s tests -p test_fetch_layer1_sources.py -v > "$OUT/download-tests.txt" 2>&1
 timeout 300 "$PY" scripts/remote/probe_layer1_data.py --config configs/layer1_data.yaml \

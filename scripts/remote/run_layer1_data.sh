@@ -21,7 +21,7 @@ ulimit -v 29360128
 ulimit -c 0
 "$ENV_PREFIX/bin/python" -c 'import tokenizers, yaml, sqlite3'
 git rev-parse HEAD > "$OUTPUT/source_commit.txt"
-"$ENV_PREFIX/bin/python" -m pip freeze > "$OUTPUT/environment.txt"
+"$ENV_PREFIX/bin/python" -c 'from importlib.metadata import distributions; print("\n".join(sorted((d.metadata.get("Name") or "unknown") + "==" + d.version for d in distributions())))' > "$OUTPUT/environment.txt"
 timeout --signal=TERM --kill-after=30 14400 "$ENV_PREFIX/bin/python" -u \
   scripts/training/build_layer1_dataset.py --config "$CONFIG" \
   --source-manifest "$SOURCE_MANIFEST" --source-dir "$SOURCE" \
