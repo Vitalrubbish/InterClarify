@@ -1,0 +1,25 @@
+{
+  "source_commit": "fdcf886",
+  "run_id": "issue004-build-r1",
+  "resources": {
+    "cpus": 4,
+    "memory_gib": 32,
+    "gpus": 0,
+    "output_budget_gib": 100,
+    "wall_timeout_s": 20000
+  },
+  "environment": {
+    "LAYER1_DATA_ROOT": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/source/fdcf886",
+    "LAYER1_TRAINING_ENV": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training",
+    "LAYER1_SOURCE_DIR": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/ultrachat",
+    "LAYER1_SOURCE_MANIFEST": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/source/fdcf886/reports/layer1_training/issue001-inventory-20261018/data_source_manifest.json",
+    "LAYER1_TOKENIZER": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/sbintuitions--DuplexCascade/c3dd51ce9a5a7d27f810ffd5dab309f132a94d28/tokenizer",
+    "LAYER1_EXCLUSIONS": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/manifests/exclusions.json",
+    "LAYER1_DATA_OUTPUT": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue004-build-r1",
+    "LAYER1_DATA_MAX_LENGTH": "4096"
+  },
+  "command": "env LAYER1_DATA_ROOT=/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/source/fdcf886 LAYER1_TRAINING_ENV=/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training LAYER1_SOURCE_DIR=/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/ultrachat LAYER1_SOURCE_MANIFEST=/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/source/fdcf886/reports/layer1_training/issue001-inventory-20261018/data_source_manifest.json LAYER1_TOKENIZER=/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/sbintuitions--DuplexCascade/c3dd51ce9a5a7d27f810ffd5dab309f132a94d28/tokenizer LAYER1_EXCLUSIONS=/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/manifests/exclusions.json LAYER1_DATA_OUTPUT=/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue004-build-r1 LAYER1_DATA_MAX_LENGTH=4096 timeout --signal=TERM --kill-after=30 20000 bash /hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/source/fdcf886/scripts/remote/run_layer1_data.sh",
+  "human_review_complete": false,
+  "training_allowed": false,
+  "submission_receipt": "job-179240362770926053575-xuan-zhang"
+}

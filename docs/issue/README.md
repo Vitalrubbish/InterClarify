@@ -8,7 +8,7 @@
 | [001b](archive/001b_runtime_comparison.md) | 官方控制路径对照 | 完成，已归档；原生 Word 输入、五例真权重和远端 7 项测试通过 |
 | [002](archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入 | 完成，已归档；r4-asr 退出 0 |
 | [003](archive/003_kokoro_playback_integration.md) | Kokoro 分段播放 | 完成，已归档；[003d修复](archive/003d_segment_continuity.md)及[003c用户复听](archive/003c_audio_listening_review.md)通过 |
-| [004](004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 进行中；来源验真与隔离登记完成，正式规模/人审待做 |
+| [004](004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 进行中；正式1000/200/300构建、审计及审查材料导出作业已提交，人审待完成 |
 | [005](005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 进行中；公共加载与独立零更新工具已实现，单卡验证已提交 |
 | [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；004、005 及 007 开训前准备未完成 |
 | [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |
@@ -21,6 +21,8 @@
 ## 依赖与交付
 
 004工具实现[013](archive/013_layer1_data_pipeline_implementation.md)、[来源恢复](archive/004a_source_download_recovery.md)与[016来源隔离](archive/016_external_data_exclusion.md)已完成归档；用户取消FDB补转写及其训练前置条件。[完整数据任务](004_remote_data_execution.md)与[017加载/零更新](017_training_loader_zero_update.md)继续跟踪实际产物，不能把代码或来源验真当正式训练放行。
+
+[018正式数据交付](018_layer1_data_delivery.md)已提交单个CPU作业，产出正式切分、32/100子集、机器审计及待签署材料。扩充集抽查使用同一正式数据，6类各20事件、每类4事件安排双人，不增加训练规模，也不将程序检查当人工审查。
 
 [015 调试机资源实测](archive/015_debug_node_data_validation.md)完成：32条诊断在1CPU下约6.9秒、峰值约150MiB；同规模轻量检查直接在调试机受限执行。r4测试/诊断及完整来源下载最终均通过退出0。
 

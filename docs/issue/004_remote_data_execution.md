@@ -1,6 +1,8 @@
 # Issue 004 远端数据执行任务单
 
-状态：待办。父任务：[004](004_training_data_and_annotation.md)。本任务单只执行 CPU 数据构建，不启动训练或模型服务。
+状态：进行中（正式构建作业已提交，实际产物与人审待完成）。父任务：[004](004_training_data_and_annotation.md)。本任务单只执行 CPU 数据构建，不启动训练或模型服务。
+
+当前正式作业job-179240423784558167930-xuan-zhang，run_id为issue004-build-r2，冻结源码fbe82b7。单个4CPU/32GiB/0GPU，无指定节点；输出位于训练根data/runs/issue004-build-r2。完整扫描约147万条来源，按固定哈希保留6000候选，在候选内去重分组再做1000/200/300切分，随后三视图、独立跨集合近重复审计、前32条及分层抽查材料导出。首轮r1因全库巨型近重复索引开销不适配而停止，原件保留。每1000源行写build.log，退出码与失败保留。详见[018](018_layer1_data_delivery.md)。
 
 诊断/下载恢复作业 `job-179239520300088615232-xuan-zhang`（r4，源码5df0ef0）已完成：23项测试、32条诊断及10文件下载验真均通过，最终退出0。后续source/dfd36d3独立复核全部SHA256通过。原失败/撤销记录保留。来源隔离登记已完成，用户取消FDB补转写条件，下一步可准备正式分组切分和数据审计。
 
@@ -33,4 +35,4 @@ bash "$LAYER1_DATA_ROOT/scripts/remote/run_layer1_data.sh"
 
 ## 回收与验收
 
-回收 source/environment/exit_code、build/audit 日志、完整 manifest 和审计统计，不提交全部原文和序列。最小 32 条全部人工审查；完整集按行为类别抽查并对部分样本双人复核，保存审查与产物摘要的对应。逐项回填 004，005 最小集移交明确其实际长度。来源未验真、规模不齐、人审未完成或审计失败均不放行 006。
+回收 source/environment/exit_code、build/audit 日志、完整 manifest 和审计统计，不提交全部原文和序列。导出review/minimum_32.md、expanded_samples.md、selection.json及human_review_template.json。最小32条全部人工审查；从已生成数据按6类行为每类20事件抽查，train/dev/test为12/4/4，每类4事件安排独立双人复核。这是对正式数据的抽查，不扩大训练集。模板签署留空，实际人工完成后回填dataset/human_review.json并重跑审计。逐项回填004，005最小集移交明确实际长度；规模不齐、人审未完成或审计失败均不放行006。
