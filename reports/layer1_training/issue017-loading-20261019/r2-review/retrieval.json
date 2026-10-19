@@ -1,0 +1,88 @@
+{
+  "job_id": "job-179242512241984503787-xuan-zhang",
+  "source_commit": "493404b761628213222defc6fb5df678c5e80014",
+  "remote_root": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs",
+  "retrieval": "SSH tar/base64; log suffixes renamed to .log.txt without content changes",
+  "files": {
+    "issue017-zero-update-r2/comparison/assets.json": {
+      "remote_relative_path": "issue017-zero-update-r2/comparison/assets.json",
+      "bytes": 5694,
+      "sha256": "ec64dd0f70ff9f2bd750d64a950dcff271d8d38fbf383d7cda1dca3afcd50e26"
+    },
+    "issue017-zero-update-r2/comparison/config.json": {
+      "remote_relative_path": "issue017-zero-update-r2/comparison/config.json",
+      "bytes": 586,
+      "sha256": "3c7899c6dc930a69233f281265e625c6fdfec0f2479011e43b71e4c8a359da46"
+    },
+    "issue017-zero-update-r2/comparison/failure.json": {
+      "remote_relative_path": "issue017-zero-update-r2/comparison/failure.json",
+      "bytes": 1313,
+      "sha256": "33da6f1fbc4c59b48e68f118133d989284631dbc5be8c79ace6e9e3da2de0f98"
+    },
+    "issue017-zero-update-r2/comparison/preregistered.json": {
+      "remote_relative_path": "issue017-zero-update-r2/comparison/preregistered.json",
+      "bytes": 450,
+      "sha256": "9a55c5754e3401ba7f4c5220bebec51805d84293ae547817a17a35b96c48041b"
+    },
+    "issue017-zero-update-r2/comparison/prompts.json": {
+      "remote_relative_path": "issue017-zero-update-r2/comparison/prompts.json",
+      "bytes": 20567,
+      "sha256": "cf295609c57a4711fca81a8a78fa3511a44c9c30888045a711c8368d1f922030"
+    },
+    "issue017-zero-update-r2/comparison/reference.log.txt": {
+      "remote_relative_path": "issue017-zero-update-r2/comparison/reference.log",
+      "bytes": 2273,
+      "sha256": "7fd479bf31d1b3836f7de70705abc719d8fcdb76ac929df788bca317ea1ff070"
+    },
+    "issue017-zero-update-r2/environment.txt": {
+      "remote_relative_path": "issue017-zero-update-r2/environment.txt",
+      "bytes": 1565,
+      "sha256": "f363d3528fe48c2e99988f1526b3d0e7cf25ff994901eac5dd1deaf8548ef988"
+    },
+    "issue017-zero-update-r2/exit_code.txt": {
+      "remote_relative_path": "issue017-zero-update-r2/exit_code.txt",
+      "bytes": 2,
+      "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    "issue017-zero-update-r2/gpu-preflight.log.txt": {
+      "remote_relative_path": "issue017-zero-update-r2/gpu-preflight.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "issue017-zero-update-r2/gpu.csv": {
+      "remote_relative_path": "issue017-zero-update-r2/gpu.csv",
+      "bytes": 108,
+      "sha256": "a0ba985e698d0f8cc74f13644d6aec65baf1caddbfd4f1df9e4326387fc2ff62"
+    },
+    "issue017-zero-update-r2/gpu_preflight.json": {
+      "remote_relative_path": "issue017-zero-update-r2/gpu_preflight.json",
+      "bytes": 299,
+      "sha256": "47168b42cca5c5a0d16c00b11d4d12c05e1d8ee0db8d77cf69d9000c1e39a081"
+    },
+    "issue017-zero-update-r2/loading-tests.txt": {
+      "remote_relative_path": "issue017-zero-update-r2/loading-tests.txt",
+      "bytes": 819,
+      "sha256": "b3d9c5dcbd78cf5868c89ce3b3714adaf10b0e67d87e78a189791d520bf64b10"
+    },
+    "issue017-zero-update-r2/service-tests.txt": {
+      "remote_relative_path": "issue017-zero-update-r2/service-tests.txt",
+      "bytes": 1136,
+      "sha256": "9ff64860fcf838bbc37510ce4cf449391f8ba7bc16e726cb3ab7730d36a0f910"
+    },
+    "issue017-zero-update-r2/source.sha256": {
+      "remote_relative_path": "issue017-zero-update-r2/source.sha256",
+      "bytes": 520,
+      "sha256": "24ae6e573bda0771647ebd59aa098ef43870980605583456533ee1b6d8a495a4"
+    },
+    "issue017-zero-update-r2/source_commit.txt": {
+      "remote_relative_path": "issue017-zero-update-r2/source_commit.txt",
+      "bytes": 41,
+      "sha256": "4a795fc35573c605425ad00608923fd9513864049bc7d1b218d1bcee223aa993"
+    },
+    "issue017-zero-update-r2/zero-update.log.txt": {
+      "remote_relative_path": "issue017-zero-update-r2/zero-update.log",
+      "bytes": 1994,
+      "sha256": "cc37e88adab6d8481b2b7cebca58d6503dfa26b0789d07b7d9f3493b6b1bfa3e"
+    }
+  }
+}

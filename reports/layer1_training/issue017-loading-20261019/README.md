@@ -39,3 +39,9 @@
 ## r2修复与重跑准备
 
 用户授权修正并重跑后，已按同路径说明修正GPU可见性检查，要求调度JobID并在实际CUDA预检查中验证单张24GiB RTX 4090/BF16；不重写设备编号。新输出目录先安装退出处理，入口源码也计入摘要。bash语法检查通过；本地conda base下验证无分配时退出2且保存日志/退出码，再次执行不覆盖旧输出。未在本地加载模型或运行GPU测试。r2沿用15个固定prompt、BF16/64-token、0.02/0.01容忍及完全相同IDs标准，仍只在零更新成功后执行136拍回归。
+
+## r2实际结果与r3修正
+
+r2作业job-179242512241984503787-xuan-zhang使用493404b，真实单卡预检查通过；CUDA_VISIBLE_DEVICES为空而NVIDIA_VISIBLE_DEVICES有效，实际1张RTX 4090、25262096384字节显存、BF16可用，证明r1修复已生效。7项加载测试1.456秒、6项服务测试0.208秒均通过；逐文件资产核验完成并物化15个prompt。原始[预检查](r2-review/issue017-zero-update-r2/gpu_preflight.json)、[失败日志](r2-review/issue017-zero-update-r2/comparison/reference.log.txt)、[失败记录](r2-review/issue017-zero-update-r2/comparison/failure.json)及[完整回收摘要](r2-review/retrieval.json)已保存。
+
+零更新退出1，官方参考构建中safe_open映射第二个base分片3864726352字节时失败：Cannot allocate memory (12)。尚未产出模型对照，后续136拍回归未执行，017继续未通过。依据该错误，移除入口28GiB虚拟地址空间限制，避免CUDA预留/文件映射消耗地址额度；物理内存申请及集群32GiB硬限保持不变。r3继续同一验收协议与资源预算，入口额外用/usr/bin/time记录RSS；保留r1/r2，不覆盖失败记录。

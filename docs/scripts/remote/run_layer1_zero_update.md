@@ -2,7 +2,7 @@
 
 `scripts/remote/run_layer1_zero_update.sh`在获分配单张4090上执行005加载测试、推理服务回归和独立零更新对照，无类。明确冻结源码、独立conda、官方/base/checkpoint目录、新输出和GPU分配，依赖版本用标准库读取。
 
-显式变量LAYER1_ZERO_ROOT、LAYER1_TRAINING_ENV、LAYER1_ZERO_OUTPUT；资产可通过LAYER1_MODEL_HOME/LAYER1_OFFICIAL_SOURCE指定。最大线程4，虚拟地址空间28GiB，测试各120秒、外层对照1500秒，禁core dump；申请8CPU/32GiB/1×24GiB4090，整体墙钟1800秒，输出预算5GiB。集群实际规则为每张GPU最多8CPU/32GiB，最初64GiB申请被拒绝后下调，不通过多申请GPU绕过。两个模型干净进程串行加载，源码/资产/logits/参数摘要和失败日志保留，退出码写入产物。
+显式变量LAYER1_ZERO_ROOT、LAYER1_TRAINING_ENV、LAYER1_ZERO_OUTPUT；资产可通过LAYER1_MODEL_HOME/LAYER1_OFFICIAL_SOURCE指定。最大线程4，物理主存由调度器32GiB cgroup硬限约束，测试各120秒、外层对照1500秒，禁core dump；申请8CPU/32GiB/1×24GiB4090，整体墙钟1800秒，输出预算5GiB。集群实际规则为每张GPU最多8CPU/32GiB，最初64GiB申请被拒绝后下调，不通过多申请GPU绕过。两个模型干净进程串行加载，源码/资产/logits/参数摘要和失败日志保留，退出码写入产物。
 
 该入口只跑零更新，不训练，不在调试机加载7B权重。服务恢复逻辑共用后必须重跑受影响的001原始Word对照，不能仅凭HTTP替身测试宣称真实服务回归完成。
 
@@ -12,4 +12,8 @@
 
 r1所在容器由调度器设置NVIDIA_VISIBLE_DEVICES和JobID，没有CUDA_VISIBLE_DEVICES；仅检查后者会误拒绝已分配GPU。修订入口接受两种可见性变量中的任一种，并要求调度作业JobID；不自行覆盖CUDA_VISIBLE_DEVICES，避免把容器外GPU编号当作容器内编号。随后在独立训练conda中用torch检查CUDA可用、恰好一张可见RTX 4090、约24GiB显存及BF16支持，将设备信息和原始分配变量写入gpu_preflight.json。此步骤只初始化CUDA，不加载模型。
 
-新输出目录创建后立即安装EXIT/TERM/INT处理，再验证环境与GPU；失败留下exit_code.txt及gpu-preflight.log，不覆盖旧输出。源码摘要纳入入口本身。后续模型、prompt、阈值和预算保持原登记；使用新的issue017-zero-update-r2及issue017-runtime-regression-r2，两个阶段在同一作业串行执行。入口修复与重跑继续在017跟踪，未取得完整通过证据前不归档。
+新输出目录创建后立即安装EXIT/TERM/INT处理，再验证环境与GPU；失败留下exit_code.txt及gpu-preflight.log，不覆盖旧输出。源码摘要纳入入口本身。后续模型、prompt、阈值和预算保持原登记；使用新的独立run_id，两个阶段在同一作业串行执行。入口修复与重跑继续在017跟踪，未取得完整通过证据前不归档。
+
+## r2映射失败后的资源修正
+
+r2已通过真实单卡预检查及7+6项测试、逐文件资产核验，但官方参考加载第二个base分片时，safe_open无法mmap约3.60GiB文件并报Cannot allocate memory。原入口的ulimit -v 28GiB约束进程总虚拟地址，包含CUDA地址预留和文件映射，并非物理主存峰值；因此移除该限制，由调度器维持原定32GiB主存硬限，不增加GPU、CPU或物理内存申请。r3仍串行运行两套模型，保留同样的超时和输出预算，并通过/usr/bin/time记录入口峰值RSS。若触发cgroup OOM，将按实际证据再决定加载内存优化，不以放宽物理预算掩盖。
