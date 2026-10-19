@@ -45,3 +45,5 @@
 文档维护：[009 进度核对](archive/009_issue_progress_audit.md)、[010 官方输入核实与计划收敛](archive/010_issue001_scope_reduction.md)。001/001b 和远端任务单现已基于新证据完成归档；训练仍受 004/005 等前置约束，保持 false。
 
 远端维护：[011 清理无用环境与目录](archive/011_remote_storage_cleanup.md)完成并归档。Qwen3-ASR模型/专用环境及旧ASR/TTS选型开发实现已删除，原始结果和现役资产保留；主清单约6.25GiB目标占用已清理。
+
+[012 主目录归拢](archive/012_remote_home_consolidation.md)已完成：24个历史目录归入interclarify-archive，顶层目录50→26；当前路径按[远端目录约定](../remote_workspace.md)和迁移清单查找。
