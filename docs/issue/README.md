@@ -22,7 +22,7 @@
 
 004工具实现[013](archive/013_layer1_data_pipeline_implementation.md)、[来源恢复](archive/004a_source_download_recovery.md)与[016来源隔离](archive/016_external_data_exclusion.md)已完成归档；用户取消FDB补转写及其训练前置条件。[完整数据任务](004_remote_data_execution.md)与[017加载/零更新](017_training_loader_zero_update.md)继续跟踪实际产物，不能把代码或来源验真当正式训练放行。
 
-[018正式数据交付](018_layer1_data_delivery.md)已提交单个CPU作业，产出正式切分、32/100子集、机器审计及待签署材料。扩充集抽查使用同一正式数据，6类各20事件、每类4事件安排双人，不增加训练规模，也不将程序检查当人工审查。
+[018正式数据交付](018_layer1_data_delivery.md)按用户决定先有限抽取最多6000原始对话再过滤/去重/切分，取消全库过滤及其CPU作业；当前在调试机1CPU/nice10/2GiB硬限运行r3。产出正式切分、32/100子集、机器审计及待签署材料；扩充集抽查使用同一正式数据，不增加训练规模。
 
 [015 调试机资源实测](archive/015_debug_node_data_validation.md)完成：32条诊断在1CPU下约6.9秒、峰值约150MiB；同规模轻量检查直接在调试机受限执行。r4测试/诊断及完整来源下载最终均通过退出0。
 

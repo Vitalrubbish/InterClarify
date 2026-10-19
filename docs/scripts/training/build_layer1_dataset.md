@@ -12,4 +12,4 @@ FDB转写不作为训练前置。构建manifest额外保存exclusion_review_scop
 
 `--resume` 要求配置、代码、tokenizer、来源、排除清单、epoch 和 max-length 全部一致；已有完整对话逐项验摘要，未完成对话从稳定种子重建。完整建库中断尚不支持行级恢复，只要已有合格或排除行就明确报错并要求新目录，避免重复累计过滤记录。开发/测试计划不随训练 epoch 改变。所有构建结果固定 `training_allowed=false`，后续 005/007 门禁独立处理。
 
-018采用全源过滤后6000候选去重。manifest的accepted_source_dialogues仍统计完整来源合格对话数，不以候选数量代替；source_sampling单独列完整扫描行数、候选预算/实际数量及近重复分组范围。中断检查同时包含source_inventory，扫描尚未完成时不得直接重用半成品索引。
+018当前先有限抽取最多6000原始对话再过滤去重。accepted_source_dialogues统计本次读取部分的合格对话数；source_sampling显式列raw_source_dialogue_budget和full_source_filtering=false，不得解释成147万条全库过滤计数。原始行号未知时line=null，以byte_offset和raw_sha256追溯；中断检查同时包含source_inventory，不重用半成品索引。
