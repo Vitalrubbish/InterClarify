@@ -1,0 +1,7 @@
+# 远端 Layer 1 数据构建与审计
+
+`scripts/remote/run_layer1_data.sh` 在已申请的单个 CPU 作业中执行构建及审计，无类。环境变量显式指定冻结源码、独立训练 conda prefix、完整源数据/清单、官方 tokenizer、外部排除清单、审计长度和新 run 输出。
+
+脚本验证 conda-meta 与解释器，冻结 Git 提交和 pip 依赖，限制 Python 用户包、线程数 4、虚拟内存 28GiB、core dump；构建最长 4 小时，审计最长 1 小时。退出码写入独立 run，失败日志保留。申请 4 CPU/32GiB/0GPU，同时最多一个此类数据作业。数据目录预算由核心模块检查，原始 shard 和环境额外核对远端配额，不复制模型。
+
+脚本拒绝已有输出；生成中断时在同一 conda 下使用 Python 构建入口的 `--resume`，只允许相同输入恢复。原始索引中断需新目录，保留失败证据。完整任务命令见 [004 远端任务单](../../issue/004_remote_data_execution.md)。
