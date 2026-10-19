@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 import hashlib
+import heapq
 import json
 import math
 from pathlib import Path
@@ -180,6 +181,7 @@ class DialogueIndex:
             CREATE TABLE IF NOT EXISTS prefixes (shingle TEXT, id TEXT);
             CREATE INDEX IF NOT EXISTS by_shingle ON prefixes(shingle);
             CREATE TABLE IF NOT EXISTS excluded (shard TEXT, line INTEGER, id TEXT, reason TEXT);
+            CREATE TABLE IF NOT EXISTS source_inventory (id TEXT PRIMARY KEY, shard TEXT, line INTEGER);
         ''')
 
     def close(self):
@@ -235,13 +237,15 @@ class DialogueIndex:
 
     def ingest(self, paths, exclusions):
         """Group before selecting splits; exact prefix filtering retains near-pair recall."""
-        threshold = self.config['dedup']['jaccard_threshold']
         excluded_ids = set(exclusions['ids'])
         excluded_texts = set(exclusions['normalized_hashes'])
-        indexed_count = self.db.execute('SELECT COUNT(*) FROM dialogues').fetchone()[0]
+        limit = self.config.get('sampling', {}).get('candidate_pool_dialogues')
+        candidates = []
+        eligible_count, total_lines = 0, 0
         for path in paths:
             with path.open(encoding='utf-8') as stream:
                 for number, line in enumerate(stream, 1):
+                    total_lines += 1
                     try:
                         row = json.loads(line)
                     except (ValueError, UnicodeError):
@@ -253,41 +257,66 @@ class DialogueIndex:
                         text_hashes = {fingerprint, *(digest(normalized(t)) for t in row['data'])}
                         if identity in excluded_ids or text_hashes.intersection(excluded_texts):
                             reason = 'external_exclusion'
-                        elif self.db.execute('SELECT 1 FROM dialogues WHERE id=?', (identity,)).fetchone():
-                            raise ValueError(f'Duplicate raw dialogue ID: {identity}')
                     if reason:
                         self.db.execute('INSERT INTO excluded VALUES (?,?,?,?)', (path.name, number, identity, reason))
                     else:
-                        grams = shingles(row['data'], self.config['dedup']['word_ngram'])
+                        try:
+                            self.db.execute('INSERT INTO source_inventory VALUES (?,?,?)', (identity, path.name, number))
+                        except sqlite3.IntegrityError as error:
+                            raise ValueError(f'Duplicate raw dialogue ID: {identity}') from error
+                        eligible_count += 1
                         payload = {'dialogue_id': identity, 'texts': row['data'], 'shard': path.name,
                                    'line': number, 'raw_sha256': hashlib.sha256(line.encode()).hexdigest(),
                                    'normalized_sha256': fingerprint, 'source_type': 'synthetic_ultrachat'}
-                        self.db.execute('INSERT INTO dialogues VALUES (?,?,?,?,?,?)',
-                                        (identity, canonical(payload), fingerprint, canonical(grams), identity,
-                                         digest([self.config['seed'], identity])))
-                        indexed_count += 1
-                        exact = self.db.execute('SELECT id FROM dialogues WHERE fingerprint=? AND id<>?',
-                                                (fingerprint, identity)).fetchall()
-                        for (other,) in exact:
-                            self.union(identity, other)
-                        prefix = grams[:len(grams) - math.ceil(threshold * len(grams)) + 1]
-                        self.db.execute('CREATE TEMP TABLE IF NOT EXISTS candidates(id TEXT PRIMARY KEY)')
-                        self.db.execute('DELETE FROM candidates')
-                        for gram in prefix:
-                            self.db.execute('INSERT OR IGNORE INTO candidates SELECT id FROM prefixes WHERE shingle=?', (gram,))
-                        for other, serialized in self.db.execute(
-                                'SELECT d.id,d.shingles FROM dialogues d JOIN candidates c ON d.id=c.id'):
-                            if similar(grams, json.loads(serialized), threshold):
-                                self.union(identity, other)
-                        self.db.executemany('INSERT INTO prefixes VALUES (?,?)', [(x, identity) for x in prefix])
+                        if limit is None:
+                            self.index_candidate(payload)
+                        else:
+                            item = (-int(digest([self.config['seed'], identity]), 16), identity, payload)
+                            if len(candidates) < limit:
+                                heapq.heappush(candidates, item)
+                            elif item[:2] > candidates[0][:2]:
+                                heapq.heapreplace(candidates, item)
                     if number % 1000 == 0:
                         self.db.commit()
                         self.check_resources()
-                        print(canonical({'stage': 'index', 'shard': path.name, 'source_lines': number,
-                                         'indexed': indexed_count}),
+                        print(canonical({'stage': 'source_scan', 'shard': path.name, 'source_lines': number,
+                                         'total_source_lines': total_lines, 'eligible': eligible_count,
+                                         'candidate_pool': len(candidates) if limit else eligible_count}),
                               flush=True)
             self.db.commit()
             self.check_resources()
+        if limit is not None:
+            for number, (_, identity, payload) in enumerate(sorted(candidates, key=lambda x: (-x[0], x[1])), 1):
+                self.index_candidate(payload)
+                if number % 1000 == 0:
+                    self.db.commit()
+                    self.check_resources()
+                    print(canonical({'stage': 'candidate_dedup', 'indexed': number, 'candidate_pool': len(candidates)}), flush=True)
+        self.db.commit()
+        self.scan_summary = {'source_lines': total_lines, 'eligible_source_dialogues': eligible_count,
+                             'candidate_pool_requested': limit, 'candidate_dialogues': len(candidates) if limit else eligible_count,
+                             'selection': 'lowest_stable_seed_dialogue_id_hash',
+                             'near_duplicate_scope': 'candidate_pool_before_split'}
+
+    def index_candidate(self, payload):
+        """Build duplicate groups only among dialogues eligible for the frozen split."""
+        threshold = self.config['dedup']['jaccard_threshold']
+        identity, fingerprint = payload['dialogue_id'], payload['normalized_sha256']
+        grams = shingles(payload['texts'], self.config['dedup']['word_ngram'])
+        self.db.execute('INSERT INTO dialogues VALUES (?,?,?,?,?,?)',
+                        (identity, canonical(payload), fingerprint, canonical(grams), identity,
+                         digest([self.config['seed'], identity])))
+        for (other,) in self.db.execute('SELECT id FROM dialogues WHERE fingerprint=? AND id<>?', (fingerprint, identity)).fetchall():
+            self.union(identity, other)
+        prefix = grams[:len(grams) - math.ceil(threshold * len(grams)) + 1]
+        self.db.execute('CREATE TEMP TABLE IF NOT EXISTS candidates(id TEXT PRIMARY KEY)')
+        self.db.execute('DELETE FROM candidates')
+        for gram in prefix:
+            self.db.execute('INSERT OR IGNORE INTO candidates SELECT id FROM prefixes WHERE shingle=?', (gram,))
+        for other, serialized in self.db.execute('SELECT d.id,d.shingles FROM dialogues d JOIN candidates c ON d.id=c.id'):
+            if similar(grams, json.loads(serialized), threshold):
+                self.union(identity, other)
+        self.db.executemany('INSERT INTO prefixes VALUES (?,?)', [(x, identity) for x in prefix])
 
     def select(self):
         """Choose one representative per group, with deterministic replacement order."""
@@ -479,6 +508,9 @@ def validate_config(config):
             raise ValueError(f'Invalid {name} bounds')
     if config['generation']['assistant_tokens'] < 1:
         raise ValueError('Invalid assistant chunk length')
+    pool = config.get('sampling', {}).get('candidate_pool_dialogues')
+    if pool is not None and (type(pool) is not int or pool < sum(config['splits'].values())):
+        raise ValueError('Candidate pool must cover all requested split dialogues')
     if not config['generation']['backchannels'] or any(
             not isinstance(x, str) or not x.strip() or '<|' in x for x in config['generation']['backchannels']):
         raise ValueError('Backchannel inventory must contain plain nonempty strings')

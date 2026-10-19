@@ -63,14 +63,15 @@ def build(args):
     index = DialogueIndex(index_path, config)
     try:
         if not manifest.get('index_complete'):
-            if index.db.execute('SELECT (SELECT COUNT(*) FROM dialogues)+(SELECT COUNT(*) FROM excluded)').fetchone()[0]:
+            if index.db.execute('SELECT (SELECT COUNT(*) FROM dialogues)+(SELECT COUNT(*) FROM excluded)+(SELECT COUNT(*) FROM source_inventory)').fetchone()[0]:
                 raise ValueError('Interrupted source index: start a fresh output directory')
             index.ingest(paths, exclusions)
             selected = index.select()
             write_json(selected_path, selected)
             rejected = dict(index.db.execute('SELECT reason,COUNT(*) FROM excluded GROUP BY reason'))
-            accepted = index.db.execute('SELECT COUNT(*) FROM dialogues').fetchone()[0]
+            accepted = index.db.execute('SELECT COUNT(*) FROM source_inventory').fetchone()[0]
             manifest.update(index_complete=True, accepted_source_dialogues=accepted, exclusions=rejected,
+                            source_sampling=index.scan_summary,
                             selected_sha256=file_digest(selected_path))
             write_json(manifest_path, manifest)
         if file_digest(selected_path) != manifest['selected_sha256']:

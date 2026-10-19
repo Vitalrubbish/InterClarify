@@ -196,6 +196,34 @@ class DataPipelineTests(unittest.TestCase):
             finally:
                 index.close()
 
+    def test_candidate_sampling_scans_all_sources_and_is_order_independent(self):
+        config = copy.deepcopy(self.config)
+        config['splits'] = {'train': 2, 'dev': 1, 'test': 1}
+        config['sampling'] = {'candidate_pool_dialogues': 6}
+        config['limits']['min_free_gib'] = 0
+        rows = [{'id': str(i), 'data': [f'Explain topic {i} with its own question.',
+                                       f'Answer {i} provides a detailed explanation.']} for i in range(24)]
+        expected = sorted((str(i) for i in range(24)), key=lambda x: (data.digest([config['seed'], x]), x))[:6]
+        pools = []
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for run, items in enumerate((rows, list(reversed(rows)))):
+                source = root / f'source{run}.jsonl'
+                source.write_text(''.join(data.canonical(row) + '\n' for row in items))
+                index = data.DialogueIndex(root / f'index{run}.sqlite3', config)
+                try:
+                    index.ingest([source], {'ids': [], 'normalized_hashes': []})
+                    actual = [r[0] for r in index.db.execute('SELECT id FROM dialogues ORDER BY rank,id')]
+                    self.assertEqual(actual, expected)
+                    self.assertEqual(index.scan_summary['source_lines'], 24)
+                    self.assertEqual(index.scan_summary['eligible_source_dialogues'], 24)
+                    self.assertEqual(index.scan_summary['candidate_dialogues'], 6)
+                    self.assertEqual(index.db.execute('SELECT COUNT(*) FROM source_inventory').fetchone()[0], 24)
+                    pools.append(actual)
+                finally:
+                    index.close()
+            self.assertEqual(pools[0], pools[1])
+
     def make_build(self, root):
         config = copy.deepcopy(self.config)
         config['splits'] = {'train': 2, 'dev': 1, 'test': 1}

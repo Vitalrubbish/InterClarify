@@ -6,4 +6,6 @@
 
 外部审查同时报告exclusion_review_scope及optional_text_coverage_complete。来源清点通过即不再pending external_exclusion_review；可选FDB文本检查未覆盖不影响这一状态，不要求为测试集补转写。其他人审、数据/权重门禁仍保留。
 
+source_sampling报告018候选预算与完整来源扫描计数，近重复图只覆盖候选集合；最终train/dev/test仍独立逐对检查同一Jaccard阈值，不能将候选去重通过外推为147万条全库近重复图已建立。
+
 人工最小审查必须覆盖 train 前 32 条，对应产物摘要、reviewer 和 accepted=true 全部齐全。扩充审查记录在 expanded_behavior_reviews：每项包含 dialogue_id、sha256、event_id 及 reviews 列表（reviewer、accepted）。expanded_review_complete 要求实际覆盖五类控制、至少一个事件有两名不同审查者通过、complete=true，不能只手写一个布尔值。正式交付仍需核实抽样充分性和意见分歧，不替代父任务验收。合成文本保留集可能被官方预训练见过，报告明确标 unknown。

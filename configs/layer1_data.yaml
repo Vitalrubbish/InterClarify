@@ -8,6 +8,8 @@ splits:
   train: 1000
   dev: 200
   test: 300
+sampling:
+  candidate_pool_dialogues: 6000
 filter:
   min_chars: 20
   max_chars: 12000

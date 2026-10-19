@@ -159,6 +159,7 @@ def audit(directory, tokenizer_dir):
             'observed_rates': rates,
             'source': config['source'], 'source_manifest_sha256': manifest['identity']['source_manifest_sha256'],
             'accepted_source_dialogues': manifest['accepted_source_dialogues'], 'exclusion_counts': manifest['exclusions'],
+            'source_sampling': manifest.get('source_sampling'),
             'length': {'min': min(lengths), 'max': max(lengths), 'mean': sum(lengths) / len(lengths)},
             't3_train_views': dict(mix), 'source_type': 'synthetic_ultrachat',
             'clock_type': 'synthetic_window_only', 'official_pretraining_overlap': 'unknown',
