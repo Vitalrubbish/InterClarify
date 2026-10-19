@@ -41,3 +41,5 @@
 已有完成实现：[001a 资产扫描](archive/001a_asset_inventory.md)、[001c 历史保持](archive/001c_runtime_history_preservation.md)、[001d 加载压力](archive/001d_checkpoint_load_memory.md)、[001e 校验耗时](archive/001e_prompt_validation_overhead.md)、[002 接入](archive/002_nemotron_streaming_integration.md)、[002a WAV 读取](archive/002a_warmup_wav_format.md)、[003a 音色加载](archive/003a_local_voice_loading.md)、[003b 分段计时](archive/003b_segment_word_boundaries.md)。
 
 文档维护：[009 进度核对](archive/009_issue_progress_audit.md)、[010 官方输入核实与计划收敛](archive/010_issue001_scope_reduction.md)。001/001b 和远端任务单现已基于新证据完成归档；训练仍受 004/005 等前置约束，保持 false。
+
+远端维护：[011 清理无用环境与目录](011_remote_storage_cleanup.md)进行中。已识别现役软链接及候选缓存，尚未删除；跳板机到集群暂未连通，恢复后核对当前任务再执行。
