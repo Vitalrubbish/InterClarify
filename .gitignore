@@ -9,6 +9,11 @@ venv/
 env/
 
 # Local configuration and secrets
+.agents/
+.aws/
+.codex/
+/docs/**/archive/
+
 .env
 .env.*
 !.env.example
@@ -73,14 +78,3 @@ openai_use.example
 # Independent X-Talk fork checkout. Its commits are tracked in its own repo;
 # InterClarify records the selected revision in configs and run manifests.
 /xtalk/
-
-# Stage A acceptance reports are curated evidence and stay tracked even though
-# they contain *.log and *.jsonl, which are ignored globally above.
-!reports/duplex_acceptance/
-!reports/duplex_acceptance/**
-!reports/duplex_acceptance/**/*.log
-!reports/duplex_acceptance/**/*.jsonl
-
-# Only the A4 acceptance reports keep their *.log / *.jsonl exceptions: the
-# one-off marker-probe and ASR before/after evidence directories were removed on
-# 2026-10-14 (their conclusions live in docs/xtalk_a4_remote_acceptance.md).
