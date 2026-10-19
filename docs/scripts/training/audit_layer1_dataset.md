@@ -9,3 +9,5 @@
 source_sampling报告实际抽样/读取预算、过滤计数及full_source_filtering=false，近重复图只覆盖抽取的候选集合；最终train/dev/test仍独立逐对检查同一Jaccard阈值，不能将抽样检查外推为147万条全库已过滤/去重。
 
 人工最小审查必须覆盖 train 前 32 条，对应产物摘要、reviewer 和 accepted=true 全部齐全。扩充审查记录在 expanded_behavior_reviews：每项包含 dialogue_id、sha256、event_id 及 reviews 列表（reviewer、accepted）。expanded_review_complete 要求实际覆盖五类控制、至少一个事件有两名不同审查者通过、complete=true，不能只手写一个布尔值。正式交付仍需核实抽样充分性和意见分歧，不替代父任务验收。合成文本保留集可能被官方预训练见过，报告明确标 unknown。
+
+按本轮用户决定，human_review.json的policy=user_minimum_32_signoff表示004以32条用户签署收口，扩充抽查仅记录可选状态，不再加入pending或阻塞parent_issue_complete。仍逐条核对32个ID/产物摘要及人工签署，source_review和机器检查必须通过；005/007继续列在训练pending且training_allowed=false。旧policy未指定时保留原扩充检查，以免改变历史报告的原口径。

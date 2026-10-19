@@ -130,6 +130,10 @@ def audit(directory, tokenizer_dir):
         if len(reviewers) >= 2:
             double_reviewed += 1
     expanded_ok = set(CONTROLS) <= reviewed_behaviors and double_reviewed > 0 and review.get('complete') is True
+    review_policy = review.get('policy', 'minimum_and_expanded_review')
+    if review_policy not in ('minimum_and_expanded_review', 'user_minimum_32_signoff'):
+        raise ValueError('Unknown human-review policy')
+    expanded_required = review_policy == 'minimum_and_expanded_review'
     rates = {}
     for name, denominator in (('pause', 'pause_eligible_boundaries'),
                               ('interruption', 'interruption_eligible_long_turns'),
@@ -140,12 +144,15 @@ def audit(directory, tokenizer_dir):
     pending = ['issue005_resource_and_recovery', 'issue007_pretraining_evaluation_gates']
     if not minimum_ok:
         pending.append('minimum_32_human_review')
-    if not expanded_ok:
+    if expanded_required and not expanded_ok:
         pending.append('expanded_behavior_and_double_review')
     if not manifest['identity']['exclusions_reviewed']:
         pending.append('external_exclusion_review')
     return {'schema_version': 1, 'machine_passed': True, 'training_allowed': False,
-            'parent_issue_complete': False, 'minimum_32_human_review_passed': bool(minimum_ok),
+            'parent_issue_complete': bool(minimum_ok and (expanded_ok or not expanded_required)
+                                          and manifest['identity']['exclusions_reviewed']),
+            'human_review_policy': review_policy, 'expanded_review_required': expanded_required,
+            'minimum_32_human_review_passed': bool(minimum_ok),
             'expanded_review_complete': expanded_ok,
             'double_reviewed_events': double_reviewed,
             'exclusions_reviewed': manifest['identity']['exclusions_reviewed'],
@@ -153,6 +160,8 @@ def audit(directory, tokenizer_dir):
             'optional_text_coverage_complete': manifest['identity'].get('optional_text_coverage_complete'),
             'manifest_sha256': file_digest(directory / 'manifest.json'),
             'auditor_sha256': file_digest(__file__), 'dialogues': dict(Counter(d['split'] for d in selected)),
+            'cross_split_id_overlap': 0, 'cross_split_group_overlap': 0,
+            'cross_split_near_duplicate_pairs': 0,
             'sequences': dict(sequence_counts), 'effective_tokens': dict(token_counts),
             'micro_turns': dict(events_per_split), 'controls': dict(controls), 'event_kinds': dict(kinds),
             'sampling': dict(sampling),

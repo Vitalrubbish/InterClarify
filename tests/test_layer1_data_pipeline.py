@@ -356,6 +356,44 @@ class DataPipelineTests(unittest.TestCase):
             self.assertIn('minimum_32_human_review', report['pending'])
             self.assertFalse(report['training_allowed'])
 
+    def test_user_32_signoff_closes_data_issue_without_releasing_training(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            args = self.make_build(Path(temporary))
+            config = yaml.safe_load(args.config.read_text())
+            config['splits'] = {'train': 32, 'dev': 0, 'test': 0}
+            config['dedup']['jaccard_threshold'] = 1
+            args.config.write_text(yaml.safe_dump(config))
+            source = args.source_dir / 'train.jsonl'
+            source.write_text(''.join(data.canonical({'id': str(i), 'data': [
+                f'Question {i} on topic {data.digest(i)[:12]}.', f'Answer for topic {i} is recorded here.']}) + '\n'
+                for i in range(32)))
+            pinned = json.loads(args.source_manifest.read_text())
+            pinned['files'][0].update(size=source.stat().st_size, lfs={'oid': data.file_digest(source)})
+            data.write_json(args.source_manifest, pinned)
+            download = json.loads(args.download_manifest.read_text())
+            download['source_manifest_sha256'] = data.file_digest(args.source_manifest)
+            data.write_json(args.download_manifest, download)
+            data.write_json(args.exclusions, {'ids': [], 'normalized_hashes': [], 'source_refs': ['fixture'], 'reviewed': True})
+            with patch.object(builder, 'ReleasedTokenizer', CharacterTokenizer), patch.object(auditor, 'ReleasedTokenizer', CharacterTokenizer):
+                builder.build(args)
+                path = args.output / 'human_review.json'
+                review = json.loads(path.read_text())
+                review['policy'] = 'user_minimum_32_signoff'
+                data.write_json(path, review)
+                pending = auditor.audit(args.output, args.tokenizer)
+                self.assertFalse(pending['parent_issue_complete'])
+                self.assertNotIn('expanded_behavior_and_double_review', pending['pending'])
+                for row in review['minimum_set']:
+                    row.update(reviewer='fixture_user', accepted=True)
+                data.write_json(path, review)
+                passed = auditor.audit(args.output, args.tokenizer)
+                self.assertTrue(passed['parent_issue_complete'])
+                self.assertFalse(passed['training_allowed'])
+                self.assertIn('issue005_resource_and_recovery', passed['pending'])
+                review['minimum_set'][0]['sha256'] = 'changed'
+                data.write_json(path, review)
+                self.assertFalse(auditor.audit(args.output, args.tokenizer)['parent_issue_complete'])
+
     def test_rejects_unreviewed_claim_without_external_sources(self):
         with tempfile.TemporaryDirectory() as temporary:
             args = self.make_build(Path(temporary))
