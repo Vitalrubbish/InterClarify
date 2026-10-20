@@ -1,0 +1,12 @@
+{
+  "JobID": "job-179246481842203719990-xuan-zhang",
+  "CUDA_VISIBLE_DEVICES": null,
+  "NVIDIA_VISIBLE_DEVICES": "GPU-848dd694-d802-1b21-08a8-cc03302212a8",
+  "PYTORCH_CUDA_ALLOC_CONF": null,
+  "PYTORCH_ALLOC_CONF": null,
+  "available": true,
+  "count": 1,
+  "name": "NVIDIA GeForce RTX 4090",
+  "total_memory": 25262096384,
+  "bf16": true
+}

@@ -47,6 +47,8 @@
 
 ## 归档
 
+[026 单卡2048持续训练检查](archive/026_layer1_2048_stability.md)完成：100步/200序列未OOM，实际曝光95条对话，显存分配峰值20.262GiB；详见[报告](../../reports/layer1_training/issue026-2048-20261020/README.md)。2048有实测可行性，正式窗口登记及007门禁未变。
+
 [023 研究场景修订](archive/023_research_scenario_revision.md)已完成：以复试通知适用性和打印机诊断替换 [idea 草稿](../research_idea.md)的人员排班示例，保留共同前缀、续说分支及收益/负面影响评级；测量场景仅作扩展示例。
 
 [022 主动插话研究 idea 草稿](archive/022_research_idea_draft.md)已完成：见 [research_idea.md](../research_idea.md)，整理统一在线决策、共同前缀六分支，以及信息收益与插话负面影响的高/中/低分析。仅交付讨论草稿，不改变现有实现或启动训练。
