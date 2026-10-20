@@ -8,7 +8,7 @@
 
 该结论遵循 2026-10-18 已确定的开发路线，取舍是优先保证识别质量和典型增量交付速度，并承担 Layer 1 适配成本。Nemotron 几乎不在在线文本末尾输出句末标点，且未经适配的官方控制权重接话不足。组件选定不代表端到端双工能力或全链路延迟已验收；如果限定完全不调整官方控制权重，现有五例证据更支持 Kyutai 的接话兼容性。
 
-决策来源：[ASR 选择与训练方向](asr_selection_decision.md)、[原始选型报告](../reports/asr_selection/20261016-results/summary.md)。
+决策依据见[原始选型报告](../reports/asr_selection/20261016-results/summary.md)与[官方输入对齐复测](asr_official_input_retest.md)。原决策文档已按用户要求由本文取代；英文主线与兼容性限制汇总于下文。
 
 ## 2. 选型要求
 

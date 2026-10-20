@@ -2,6 +2,8 @@
 
 [035 ASR 正式选型报告](archive/035_asr_selection_report.md)已完成归档；报告汇总 2026-10-16 测量及后续输入复核，见 [正式报告](../asr_selection_report.md)。
 
+[038 TTS 正式选型报告与旧决策文档清理](archive/038_tts_selection_report.md)已完成归档；见 [TTS 报告](../tts_selection_report.md)。两份旧 decision 文档已由正式报告取代，当前链接已迁移。
+
 更新：2026-10-20。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**。首轮三臂训练和四配置FDB小子集测试已完成，接话效果不足；036/037登记下一轮配置实现、T2重训与重测，尚未实施。完成任务移入`archive/`，父任务仅在全部条件满足后归档。
 
 | 编号 | 任务 | 当前状态与剩余工作 |

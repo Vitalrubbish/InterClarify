@@ -6,7 +6,7 @@
 
 - [ASR 比较结果](../reports/asr_selection/20261016-results/summary.md)：FLEURS 英文 100 条，EN 160ms WER 7.68%，Kyutai 21.97%；正确且可对齐词的估计交付 P50 为 414/713ms。覆盖率不同、一次 EN 预热失败与原始长尾仍需保留，不能推广为目标任务错误率。
 - [官方输入对齐](asr_official_input_retest.md)：EN 160ms 五例为 0/5，Kyutai 原样/去标点为 5/5、3/5；正常完成分片审计通过，320ms 分片异常，不能宣称完整 100 条成功。
-- [TTS 实测与决定](tts_selection_decision.md)：用户最终指定 Kokoro，已有人工均分 4.48/5，完整文本条件首可听代理 P50/P95 为 439/461ms，不能替代增量文本与打断验收。
+- [TTS 正式选型报告](tts_selection_report.md)：用户最终指定 Kokoro，已有人工均分 4.48/5，完整文本条件首可听代理 P50/P95 为 439/461ms，不能替代增量文本与打断验收。
 
 ## 历史来源
 
