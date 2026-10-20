@@ -1,0 +1,40 @@
+{
+  "effective_batch": 2,
+  "length": 2048,
+  "manifest_sha256": "86c0faca1e1a12d3c7cf1fa0144e53a6a83166a8454ad48d986b24d40a97761d",
+  "training_allowed": false,
+  "arms": {
+    "T1": {
+      "effective_tokens": 1201531,
+      "sequences": 2469,
+      "single_epoch_steps": 1235,
+      "warmup_steps_preview": 124
+    },
+    "T2": {
+      "effective_tokens": 1201531,
+      "sequences": 2469,
+      "single_epoch_steps": 1235,
+      "warmup_steps_preview": 124
+    },
+    "T3": {
+      "effective_tokens": 1201531,
+      "sequences": 2469,
+      "single_epoch_steps": 1235,
+      "warmup_steps_preview": 124
+    }
+  },
+  "train_events": {
+    "user_continuation": 41939,
+    "user_final_wait": 3828,
+    "response_start": 3828,
+    "no_voice_finish": 3828,
+    "response_continuation": 88789,
+    "interruption": 805,
+    "natural_pause": 12826,
+    "post_response_thinking": 31916,
+    "user_backchannel": 844
+  },
+  "bytes": 979069697,
+  "elapsed_seconds_after_config": 662.0,
+  "sequence_inventory_sha256": "7e30536002d4cd3a76b7ac57a6bc8ce777f5115e24af0409593179181caecbea"
+}

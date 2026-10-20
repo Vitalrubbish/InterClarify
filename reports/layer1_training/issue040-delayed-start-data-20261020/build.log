@@ -1,0 +1,12 @@
+{"candidate_pool":960,"eligible":960,"shard":"train_3.jsonl","source_dialogues_read":1000,"stage":"sample_filter"}
+{"candidate_pool":1874,"eligible":1874,"shard":"train_1.jsonl","source_dialogues_read":2000,"stage":"sample_filter"}
+{"candidate_pool":2779,"eligible":2779,"shard":"train_5.jsonl","source_dialogues_read":3000,"stage":"sample_filter"}
+{"candidate_pool":3586,"eligible":3586,"shard":"train_0.jsonl","source_dialogues_read":4000,"stage":"sample_filter"}
+{"candidate_pool":4504,"eligible":4504,"shard":"train_6.jsonl","source_dialogues_read":5000,"stage":"sample_filter"}
+{"candidate_pool":5278,"eligible":5278,"shard":"train_8.jsonl","source_dialogues_read":6000,"stage":"sample_filter"}
+{"candidate_pool":5278,"indexed":1000,"stage":"candidate_dedup"}
+{"candidate_pool":5278,"indexed":2000,"stage":"candidate_dedup"}
+{"candidate_pool":5278,"indexed":3000,"stage":"candidate_dedup"}
+{"candidate_pool":5278,"indexed":4000,"stage":"candidate_dedup"}
+{"candidate_pool":5278,"indexed":5000,"stage":"candidate_dedup"}
+{"complete":true,"training_allowed":false}
