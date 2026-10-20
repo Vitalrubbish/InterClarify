@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
-# Compare the official baseline and three final adapters on frozen FDB audio.
+# Evaluate registered final adapters on frozen FDB audio.
 set -euo pipefail
 ROOT="${LAYER1_FDB_ROOT:?set frozen source}"
 OUTPUT="${LAYER1_FDB_OUTPUT:?set new output}"
 XTALK_ROOT="${LAYER1_XTALK_ROOT:?set frozen X-Talk source}"
 TRAIN_RUN="${LAYER1_TRAIN_RUN:?set completed round directory}"
+MODE="${LAYER1_FDB_MODE:-round1}"
+[[ "$MODE" == round1 || "$MODE" == round2_t2 ]] || exit 2
+CONDITIONS=(B0 T1 T2 T3)
+if [[ "$MODE" == round2_t2 ]]; then CONDITIONS=(T2_R2_paper_aligned); fi
 HOME_ROOT=/hpc_stor03/sjtu_home/xuan.zhang
 MODEL_ENV="$HOME_ROOT/interclarify-layer1-training-20261019/envs/training"
 CLIENT_ENV="$HOME_ROOT/miniconda3/envs/xtalk-round1-client"
@@ -72,21 +76,30 @@ report = {'commit': '419f283e64e4de28b01f84586df779a94b18ede3', 'files_verified'
           'source_manifest_sha256': hashlib.sha256(source.read_bytes()).hexdigest(), 'root': str(root)}
 Path(sys.argv[2]).write_text(json.dumps(report, indent=2) + '\n')
 PY
-"$MODEL_ENV/bin/python" - "$TRAIN_RUN" "$OUTPUT/training_completion.json" <<'PY'
+"$MODEL_ENV/bin/python" - "$TRAIN_RUN" "$OUTPUT/training_completion.json" "$MODE" <<'PY'
 import hashlib
 import json
 from pathlib import Path
 import sys
 p = Path(sys.argv[1])
 assert (p / 'exit_code.txt').read_text().strip() == '0'
-report = {'round_status': json.loads((p / 'status.json').read_text()), 'conditions': {}}
+second_round = sys.argv[3] == 'round2_t2'
+report = {'conditions': {}}
+if not second_round:
+    report['round_status'] = json.loads((p / 'status.json').read_text())
+else:
+    reload = json.loads((p / 'candidate_reload.json').read_text())
+    assert reload['condition'] == 'T2_R2_paper_aligned' and reload['inference_eligible']
+    assert reload['complete_inference_weights_match_training'] and reload['clean_process_probe_ids_match']
+    report['candidate_reload'] = reload
 initial = None
-for arm in ('T1', 'T2', 'T3'):
-    root = p / arm / 'training'
+for arm in (('T2_R2_paper_aligned',) if second_round else ('T1', 'T2', 'T3')):
+    root = p / 'training' if second_round else p / arm / 'training'
     summary = json.loads((root / 'summary.json').read_text())
     assert summary['passed'] and summary['final_step'] == 1214 and summary['cursor'] == 2428
     assert summary['frozen_tensors_unchanged'] and len(summary['changed_tensors']) == 112
-    assert (p / arm / 'exit_code.txt').read_text().strip() == '0'
+    if not second_round:
+        assert (p / arm / 'exit_code.txt').read_text().strip() == '0'
     assert hashlib.sha256((root / 'checkpoint.pt').read_bytes()).hexdigest() == summary['checkpoint']['sha256']
     before = hashlib.sha256((root / 'weights_before.json').read_bytes()).hexdigest()
     if initial is not None: assert before == initial
@@ -151,11 +164,15 @@ wait_ready() {
 wait_ready "$ASR_PORT" "$OUTPUT/asr_health.json"
 wait_ready "$TTS_PORT" "$OUTPUT/tts_health.json"
 FAILED=0
-for condition in B0 T1 T2 T3; do
+for condition in "${CONDITIONS[@]}"; do
   check_budget
   mkdir "$OUTPUT/$condition"
   ADAPTATION=()
-  if [[ "$condition" != B0 ]]; then ADAPTATION=(--adaptation "$TRAIN_RUN/$condition/training/checkpoint.pt"); fi
+  if [[ "$MODE" == round2_t2 ]]; then
+    ADAPTATION=(--adaptation "$TRAIN_RUN/training/checkpoint.pt")
+  elif [[ "$condition" != B0 ]]; then
+    ADAPTATION=(--adaptation "$TRAIN_RUN/$condition/training/checkpoint.pt")
+  fi
   CUDA_VISIBLE_DEVICES="${GPUS[0]}" setsid "$MODEL_ENV/bin/python" -u scripts/remote/duplex_model_service.py \
     --checkpoint "$CHECKPOINT" --base-model "$BASE" --port "$MODEL_PORT" "${ADAPTATION[@]}" \
     > "$OUTPUT/$condition/model.log" 2>&1 &
