@@ -1,0 +1,27 @@
+{
+  "job_id": "job-179247270604284962674-xuan-zhang",
+  "arms": {
+    "T1": {
+      "status": "running",
+      "updated_at": "2026-10-20T05:05:36.612678+00:00"
+    },
+    "T2": {
+      "status": "pending"
+    },
+    "T3": {
+      "status": "pending"
+    }
+  },
+  "B0": {
+    "status": "registered_untrained_baseline",
+    "optimizer_steps": 0
+  },
+  "training_order": [
+    "T1",
+    "T2",
+    "T3"
+  ],
+  "evaluation_status": "not_run",
+  "status": "running",
+  "updated_at": "2026-10-20T05:05:36.612678+00:00"
+}

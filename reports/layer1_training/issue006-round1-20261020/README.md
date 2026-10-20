@@ -1,0 +1,39 @@
+# Issue 006：首轮正式训练提交
+
+2026-10-20按用户指令提交。调度作业`job-179247270604284962674-xuan-zhang`已在`d6-hpc-gpu-052`运行，资源为1×RTX4090、8CPU、32GiB物理主存。一个作业串行执行T1→T2→T3，避免三个训练臂同时占用资源。B0登记为完整官方未训练基线，不执行优化器更新。
+
+## 冻结来源与路径
+
+源码`c388a2fd1ed90caedca563e4ff03226fc12a49e9`，独立worktree为训练根`source/c388a2f`。GitHub此前不可达，本次通过Git bundle传输并核验，61,177字节，SHA256 `d69e685470ad944d3872526eba0de54051dc30ebbd83dd46a265e43cdcf44f74`；remote Git验证依赖及对象完整后导入，未修改远端脏主工作区。提交后GitHub恢复连接，源码已推送。
+
+训练根为`/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019`，独立conda为`envs/training`，镜像为`docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4`。
+
+- 轮次输出：`data/runs/issue006-round1-r1/`，各臂目录分别为`B0/`、`T1/`、`T2/`、`T3/`。
+- 调度日志：`submit_logs/issue006-round1-r1.log`。
+- 单臂日志：轮次目录下`T1/training.log`等，逐步指标写入各臂`training/steps.jsonl`。
+- 状态：轮次`status.json`和`exit_code.txt`；每臂保留独立退出码、检查点及摘要。
+
+运行004 r5的1,000条已审计对话，三臂均2048窗口、batch1/累积2、单epoch、1,214步、1,193,875监督token；T3为500/500。所有臂从同一完整官方checkpoint重新开始，只更新原有q/v LoRA。固定最终1,214步权重用于FDB测试，中间203步间隔保存用于恢复和排错。
+
+每臂8小时/5GiB上限保留，轮次输出16GiB、至少留15GiB磁盘空间，外层timeout87,000秒。任一臂失败则停止后续臂，保留失败、退出码与已有checkpoint，不把未执行条件写成成功。提交前无现役作业，GPU配额8、存储已用425.74GB/1TB；本轮只申请1GPU。
+
+## 已核对的启动结果
+
+[启动快照](startup_snapshot.json)采集于UTC 05:07:13（北京时间13:07:13）：
+
+| 条件 | 提交后的状态 |
+| --- | --- |
+| B0 | 已登记官方未训练基线，优化器步数0 |
+| T1 | 作业内运行，正在加载/准备模型 |
+| T2 | 已编排，等待T1成功后执行 |
+| T3 | 已编排，等待T2成功后执行 |
+
+[12项适配契约](startup/test_layer1_adaptation.py.txt)与[9项张量恢复测试](startup/test_layer1_training.py.txt)在远端独立训练conda全部通过，未跳过。正式计划放行无缺项；[实际GPU检查](startup/T1/gpu_preflight.json)确认恰好一张RTX4090、BF16可用，设备容量25,262,096,384字节。
+
+[B0引用](startup/B0/baseline.json)与[源码摘要](startup/T1/source.sha256)已回收，原始检查点和完整日志留远端。启动快照不表示训练完成；最终结果须查看该作业后续状态、每臂最终summary及干净进程候选复现。
+
+后续[真实更新快照](progress_snapshot.json)采集于UTC 05:09:22（北京时间13:09:22）：T1已完成51/1,214步、曝光102个序列，当前loss0.81954、梯度范数1.16435，均有限；尚未出现OOM。张量分配累计峰值21,758,021,120字节、RSS峰值16,393,032KiB。T2/T3仍为同作业内待执行，不是两个额外占资源的独立调度作业。
+
+## 任务边界
+
+031完成表示作业已提交并可靠启动。006仍等待三臂实际训练产物、权重审计和恢复复现；007/008的FDB全链路测试、四份能力报告及人工内容检查尚未运行，本次未提交FDB作业。用户原有AGENTS.md修改及两份规范删除保持原状。
