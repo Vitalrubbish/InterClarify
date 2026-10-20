@@ -2,7 +2,7 @@
 
 InterClarify 研究全双工语音代理在用户话轮内主动澄清的时机、措辞与任务恢复。研究范围见 [研究设计](docs/research_design.md)，实现边界见 [工程方案](docs/engineering_implementation.md)。运行底座为独立维护的 [X-Talk fork](https://github.com/Vitalrubbish/xtalk)，保持唯一控制执行者与唯一 TTS 播放所有权。
 
-2026-10-18 用户确定英文组合为 **Nemotron EN 0.6B / 160ms + Kokoro 82M**，开始 Layer 1 训练适配。组件接入、训练及新组合验收尚未完成；Layer 2 尚未接入。现存 X2 + MOSS 入口仅作历史诊断，不能直接启动新组合。
+2026-10-18 用户确定英文组合为 **Nemotron EN 0.6B / 160ms + Kokoro 82M**，开始 Layer 1 训练适配。组件接入、训练及新组合验收尚未完成；Layer 2 尚未接入。旧 Qwen3-ASR、X2、MOSS、TurnSense 路线实现已从仓库移除，历史证据按固定 Git 提交追溯。
 
 | 内容 | 位置 |
 | --- | --- |
