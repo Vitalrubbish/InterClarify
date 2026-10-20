@@ -11,9 +11,9 @@
 | [004](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 完成归档；r5全量机器审计通过，用户明确免除复审后关闭 |
 | [005](archive/005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 完成归档；024真实恢复精确一致，025资源测量完成；当时保守选择512，现006按用户要求改为2048 |
 | [017](../../reports/layer1_training/issue017-loading-20261019/README.md) | 完整训练加载与零更新 | 完成、已归档；零更新通过，回归拍界抖动由用户明确接受 |
-| [006](006_punctuation_robust_adaptation.md) | 四配置基线与三组有限适配 | 进行中；三臂均完成1,214步并退出0，最终文件摘要已核验，033执行候选干净进程重载与FDB测试；未改变本轮loss |
-| [007](007_turn_control_evaluation.md) | 四配置FDB小子集能力报告 | 进行中；训练资产已交付，033实际测试已启动；报告、官方评分及人工检查待完成 |
-| [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 执行/验收 | 进行中；033四配置新组合测试已提交运行，2×4090/16CPU/64GiB；完整FDB及底座冻结留后续 |
+| [006](006_punctuation_robust_adaptation.md) | 四配置基线与三组有限适配 | 进行中；首轮三臂训练、候选重载及100会话测试完成，效果不足；后续调整待决定，未改变本轮loss |
+| [007](007_turn_control_evaluation.md) | 四配置FDB小子集能力报告 | 进行中；034交付四配置能力观察及输入ASR核查，官方评分/人工复核待办 |
+| [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 执行/验收 | 进行中；033测试Completed/退出0但接话不足，官方评分/音频复核与完整FDB留后续 |
 
 远端执行见 [001 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/001_remote_execution.md)与 [002/003 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_003_remote_execution.md)。001 只验证一套官方配置：Kyutai Word 逐词 strip、每拍空格连接、首非空 Word 起拍、600ms、BF16、64-token 贪心。raw 字符增量和 160ms 超时释放残词均不等同官方 Word；不展开时钟、发布粒度与句读矩阵。旧 raw/超时残词报告只作诊断；新原生 Word 五例全部通过，结果见 [001 验收报告](../../reports/layer1_training/issue001-word-20261019/README.md)。
 
