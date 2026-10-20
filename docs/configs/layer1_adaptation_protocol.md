@@ -12,7 +12,7 @@
 
 2026-10-19来源验真：UltraChat十个固定shard已下载完成并重新逐文件核对大小/SHA256，共9,288,990,895字节，下载和复核退出均0；source_files_download_verified更新为true，见[证据](../../reports/layer1_training/issue016-source-and-exclusions-20261019/source_verification.json)。用户取消FDB补转写要求，来源隔离登记已完成。r5全量数据审计已通过，用户明确免除新人工复审，issue004_data_audit更新为passed。
 
-2026-10-20的005单卡试跑完成，完整状态恢复精确一致，issue005_zero_update_and_recovery更新为passed。当时按缓存保留后至少2GiB余量选择512，后续用户要求通过029切换2048；005原结果保留作历史依据。训练采样seed为20261020，数据生成seed仍为20261018，原4096事件计划不变。
+2026-10-20的005单卡试跑完成，完整状态恢复精确一致，issue005_zero_update_and_recovery更新为passed。当时按缓存保留后至少2GiB余量选择512，后续用户要求通过029切换2048；005探针结果已随旧路线证据清理删除；`issue005_zero_update_and_recovery`门禁记录保留。训练采样seed为20261020，数据生成seed仍为20261018，原4096事件计划不变。
 
 029完成2048全量重编码：每臂2,428序列、1,193,875监督token及1,214优化器步，batch1/累积2。基于026实际100步循环149.910秒，首轮循环外推约0.5055GPU小时/臂；不含启动和评价。第二轮数据未构建，旧512估算撤下，耗时与round2_exact_steps保持null。原8/16小时及72总上限保留。030按用户选择移除独立dev评测开训要求，001/004/005已通过，training_released改为true；此值不表示正式训练已执行。
 

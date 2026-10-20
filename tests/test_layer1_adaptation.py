@@ -117,7 +117,7 @@ class AdaptationTests(unittest.TestCase):
         self.assertFalse(plan['post_training_evaluation']['automatic_content_quality_scorer'])
 
     def test_2048_rewindowing_preserves_dialogues_and_all_supervision(self):
-        previous = json.loads((ROOT / 'reports/layer1_training/issue005-probe-20261020/r1/run/full_train_index.json').read_text())
+        previous = json.loads((ROOT / 'tests/fixtures/layer1_previous_full_train_index.json').read_text())
         for arm in preparation.ARMS:
             for key in ('subset', 'manifest_sha256', 'audit_sha256'):
                 self.assertEqual(self.index[arm][key], previous[arm][key])

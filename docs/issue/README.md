@@ -87,3 +87,5 @@
 [044仓库瘦身](archive/044_repository_slimdown.md)已完成归档：经用户重新确认，删除X2/MOSS/TurnSense/round1-A4旧组件栈、issue005探针训练路线、`--native`对照开关及已归档任务的一次性工具，并清理文档悬空引用。保留当前FDB驱动、`xtalk_link_check.py`、T1/T2/T3参考条件和延迟启动数据协议。
 
 [040c延后启动候选测试](archive/040c_delayed_start_fdb_test.md)已完成归档；25/25会话执行成功，退出0，自然接话新回复3/5、合成插话后新回复5/5。用户要求结束当前阶段并停止继续训练，已知限制及未执行项保留在正式报告。
+
+[045删除reports旧路线证据](archive/045_remove_retired_route_reports.md)已完成归档：删除issue005 probe-only报告目录，512索引仅保留为`tests/fixtures`回归基线；维护记录按用户确认保留。

@@ -19,6 +19,6 @@
 | 远端路径映射 | [当前目录迁移清单](maintenance/20261019-home-consolidation/README.md) |
 | 退役组件清理 | [退役资产及恢复信息](maintenance/20261019-retired-selection/README.md) |
 
-已删除旧ASR契约、阶段A的Qwen/X2/MOSS报告、smoke25、TTS旧连贯性版本及旧集成TTS输出、早期运行时/输入验证、数据管线实现和debug探针。保留目录中的来源摘要、失败说明和对照计数仍用于解释该次最新结果，不代表保留另一份过时完整运行。
+已删除旧ASR契约、阶段A的Qwen/X2/MOSS报告、smoke25、issue005 probe-only报告、TTS旧连贯性版本及旧集成TTS输出、早期运行时/输入验证、数据管线实现和debug探针。保留目录中的来源摘要、失败说明和对照计数仍用于解释该次最新结果，不代表保留另一份过时完整运行。
 
 删除前的已提交证据可从[固定提交6ca5eea](https://github.com/Vitalrubbish/InterClarify/tree/6ca5eea/reports)查阅；本次不改写Git历史。远端服务器产物未因这次仓库清理删除。归档文档保留本地并受`.gitignore`管理，当前文档中的历史归档链接固定到该提交，保证从GitHub也能查阅。后续新结果替换同一验证链的旧版本，并同步更新本索引和引用。
