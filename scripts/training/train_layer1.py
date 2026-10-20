@@ -59,7 +59,6 @@ class ProbeDataset:
                 (audit['parent_issue_complete'] or delayed_start_index),
                 'A completed and accepted machine audit is required')
         require(audit['manifest_sha256'] == sha256_file(manifest_path), 'Audit manifest mismatch')
-        require(count in (32, 100, 1000), 'Only registered probes or full train indexing are allowed')
         require(64 <= length <= manifest['identity']['max_length'], 'Invalid probe window length')
         tokenizer = ReleasedTokenizer(tokenizer_dir, manifest['identity']['config']['token_ids'])
         require(tokenizer.fingerprint == manifest['identity']['tokenizer'], 'Tokenizer identity mismatch')
@@ -67,10 +66,9 @@ class ProbeDataset:
         require(sha256_file(selected_path) == manifest['selected_sha256'], 'Split digest mismatch')
         selected = json.loads(selected_path.read_text())
         train = [d for d in selected if d['split'] == 'train']
-        subset = ([d['dialogue_id'] for d in train] if count == 1000 else
-                  json.loads((self.directory / 'smoke_subsets.json').read_text())[str(count)])
+        require(count == 1000, 'Only the full train pool can be indexed')
+        subset = [d['dialogue_id'] for d in train]
         require(len(subset) == count, 'Requested dialogue count unavailable')
-        require(subset == [d['dialogue_id'] for d in train[:count]], 'Smoke subset identity mismatch')
         assignments_path = self.directory / 'view_assignments.json'
         require(sha256_file(assignments_path) == manifest['assignments_sha256'], 'View digest mismatch')
         assignments = json.loads(assignments_path.read_text())
@@ -269,9 +267,7 @@ def train(args):
                 'Official inventory differs from preregistered initialization')
         config['arm'] = args.arm
     else:
-        require(config['purpose'] == 'issue005_probe_only' and config['schema_version'] == 1,
-                'Unknown training purpose')
-        require(args.dialogues in (32, 100) and args.arm is None, 'Probe-only dialogue/arm scope')
+        raise ValueError('Unknown training purpose: ' + str(config.get('purpose')))
     import numpy as np
     import torch
     require(config['batch_size'] == 1 and config['gradient_accumulation'] > 0, 'Invalid probe batch')
@@ -504,8 +500,8 @@ def parser():
     run = sub.add_parser('train')
     for name in ('checkpoint', 'base-model', 'official-source', 'inventory', 'dataset', 'audit', 'output'):
         run.add_argument('--' + name, type=Path, required=True)
-    run.add_argument('--config', type=Path, default=Path('configs/layer1_training.yaml'))
-    run.add_argument('--dialogues', type=int, choices=(32, 100, 1000), required=True)
+    run.add_argument('--config', type=Path, required=True)
+    run.add_argument('--dialogues', type=int, choices=(1000,), required=True)
     run.add_argument('--arm', choices=('T1', 'T2', 'T3'))
     run.add_argument('--protocol', type=Path, default=Path('configs/layer1_adaptation_protocol.yaml'))
     run.add_argument('--length', type=int, required=True)
