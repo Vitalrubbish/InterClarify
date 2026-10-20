@@ -84,31 +84,32 @@ training:
   max_epochs_per_condition_per_round: 1
   max_gpu_hours_per_condition: [8, 16]
   total_training_gpu_hours_cap: 72
-  actual_steps: 5763
-  sequence_length: 512
+  actual_steps: 1214
+  sequence_length: 2048
   actual_batch: 1
   gradient_accumulation: 2
   effective_batch: 2
   seed: 20261020
-  round1_sequences_per_condition: 11526
+  round1_sequences_per_condition: 2428
   round1_effective_tokens_per_condition: 1193875
-  round1_estimated_training_gpu_hours_per_condition: 0.9331
-  round2_estimated_training_gpu_hours_per_condition: 2.8390
+  round1_estimated_training_gpu_hours_per_condition: 0.5055
+  round2_estimated_training_gpu_hours_per_condition: null
   round2_exact_steps: null
   resource_gpus: 1
-  resource_min_headroom_gib: 2
-  resource_report: reports/layer1_training/issue005-probe-20261020/README.md
-  full_train_index: reports/layer1_training/issue005-probe-20261020/r1/run/full_train_index.json
-  resource_owner: issue005
+  resource_min_headroom_gib: null
+  resource_policy: issue026_sustained_2048_user_selected
+  resource_report: reports/layer1_training/issue026-2048-20261020/README.md
+  full_train_index: reports/layer1_training/issue029-window2048-20261020/full_train_index.json
+  resource_owner: issue029
   round1_optimizer:
     learning_rate: 0.00002
     weight_decay: 0.01
     adam_betas: [0.9, 0.999]
     adam_eps: 0.00000001
     max_grad_norm: 1.0
-    scheduler_steps: 5763
-    warmup_steps: 173
-    save_every_steps: 1000
+    scheduler_steps: 1214
+    warmup_steps: 37
+    save_every_steps: 203
 evaluation_assets:
   text_dev_manifest:
     path: reports/layer1_training/issue004-build-20261019-r5/completed/dataset/manifest.json

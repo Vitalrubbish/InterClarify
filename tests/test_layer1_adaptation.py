@@ -29,7 +29,7 @@ class AdaptationTests(unittest.TestCase):
 
     def validate(self, root, arm='T1', **changes):
         config = {**self.config, **changes}
-        preparation.validate_formal_config(config, self.protocol, root, arm, 1000, 512, 5763)
+        preparation.validate_formal_config(config, self.protocol, root, arm, 1000, 2048, 1214)
 
     def release(self, root):
         self.protocol['training_released'] = True
@@ -47,7 +47,7 @@ class AdaptationTests(unittest.TestCase):
             protocol = Path(tmp) / 'protocol.yaml'
             protocol.write_text(yaml.safe_dump(self.protocol))
             args = SimpleNamespace(config=self.config_path, protocol=protocol,
-                                   arm='T1', dialogues=1000, length=512, steps=5763, output=output)
+                                   arm='T1', dialogues=1000, length=2048, steps=1214, output=output)
             with self.assertRaisesRegex(ValueError, 'Formal training blocked'):
                 training.train(args)
             self.assertFalse(output.exists())
@@ -104,12 +104,12 @@ class AdaptationTests(unittest.TestCase):
 
     def test_real_index_is_comparable_and_corruption_is_rejected(self):
         preparation.validate_index(self.index, self.protocol)
-        for key, value in (('manifest_sha256', 'changed'), ('length', 2048), ('subset', ['duplicate'] * 1000)):
+        for key, value in (('manifest_sha256', 'changed'), ('length', 512), ('subset', ['duplicate'] * 1000)):
             index = copy.deepcopy(self.index)
             index['T2'][key] = value
             with self.subTest(key=key), self.assertRaises(ValueError):
                 preparation.validate_index(index, self.protocol)
-        for key, value in (('view_original', 501), ('sequences', 11527), ('effective_tokens', 1193874)):
+        for key, value in (('view_original', 501), ('sequences', 2429), ('effective_tokens', 1193874)):
             index = copy.deepcopy(self.index)
             index['T3']['statistics'][key] = value
             with self.subTest(key=key), self.assertRaises(ValueError):
@@ -123,7 +123,26 @@ class AdaptationTests(unittest.TestCase):
         self.assertEqual(set(plan['conditions']), {'B0', 'T1', 'T2', 'T3'})
         self.assertFalse(plan['conditions']['B0']['updates'])
         self.assertFalse(plan['training_released'])
-        self.assertEqual(plan['conditions']['T3']['checkpoint_steps'], [1000, 2000, 3000, 4000, 5000, 5763])
+        self.assertEqual(plan['conditions']['T3']['checkpoint_steps'], [203, 406, 609, 812, 1015, 1214])
+
+    def test_2048_rewindowing_preserves_dialogues_and_all_supervision(self):
+        previous = json.loads((ROOT / 'reports/layer1_training/issue005-probe-20261020/r1/run/full_train_index.json').read_text())
+        for arm in preparation.ARMS:
+            for key in ('subset', 'manifest_sha256', 'audit_sha256'):
+                self.assertEqual(self.index[arm][key], previous[arm][key])
+            self.assertEqual(self.index[arm]['statistics']['effective_tokens'],
+                             previous[arm]['statistics']['effective_tokens'])
+            self.assertEqual(self.index[arm]['length'], 2048)
+            self.assertEqual(self.index[arm]['statistics']['sequences'], 2428)
+
+    def test_old_window_and_step_requests_are_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.release(root)
+            for length, steps in ((512, 1214), (2048, 5763), (512, 5763)):
+                with self.subTest(length=length, steps=steps), self.assertRaises(ValueError):
+                    preparation.validate_formal_config(self.config, self.protocol, root,
+                                                       'T1', 1000, length, steps)
 
     def test_partial_accumulation_consumes_every_sequence_once(self):
         cursor, seen = 0, []

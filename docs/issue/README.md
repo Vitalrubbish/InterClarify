@@ -9,9 +9,9 @@
 | [002](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_nemotron_streaming_integration.md) | Nemotron 在线接入 | 完成，已归档；r4-asr 退出 0 |
 | [003](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003_kokoro_playback_integration.md) | Kokoro 分段播放 | 完成，已归档；[003d修复](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003d_segment_continuity.md)及[003c用户复听](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003c_audio_listening_review.md)通过 |
 | [004](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 完成归档；r5全量机器审计通过，用户明确免除复审后关闭 |
-| [005](archive/005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 完成归档；[024](archive/024_layer1_training_state.md)真实恢复精确一致，[025](archive/025_layer1_remote_probe.md)资源边界测量完成；512窗口/batch1/累积2、首轮每臂5,763步 |
+| [005](archive/005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 完成归档；024真实恢复精确一致，025资源测量完成；当时保守选择512，现006按用户要求改为2048 |
 | [017](../../reports/layer1_training/issue017-loading-20261019/README.md) | 完整训练加载与零更新 | 完成、已归档；零更新通过，回归拍界抖动由用户明确接受 |
-| [006](006_punctuation_robust_adaptation.md) | 四配置基线与三组有限适配 | 进行中；027执行准备完成，[028](archive/028_layer1_training_gate_scope.md)按用户澄清移除真实清单开训要求；仍待合成文本dev评测与选择配置，training_released=false |
+| [006](006_punctuation_robust_adaptation.md) | 四配置基线与三组有限适配 | 进行中；[029](archive/029_layer1_round1_2048_window.md)将首轮改为2048，每臂2,428序列/1,214步；028已移除真实清单开训要求，仍待合成dev评测与选择配置，training_released=false |
 | [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |
 | [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 验收 | 进行中；B0完整链路0/5，候选及FDB待验收 |
 
@@ -47,7 +47,7 @@
 
 ## 归档
 
-[026 单卡2048持续训练检查](archive/026_layer1_2048_stability.md)完成：100步/200序列未OOM，实际曝光95条对话，显存分配峰值20.262GiB；详见[报告](../../reports/layer1_training/issue026-2048-20261020/README.md)。2048有实测可行性，正式窗口登记及007门禁未变。
+[026 单卡2048持续训练检查](archive/026_layer1_2048_stability.md)完成：100步/200序列未OOM，实际曝光95条对话，显存分配峰值20.262GiB；详见[报告](../../reports/layer1_training/issue026-2048-20261020/README.md)。029依据该证据将正式窗口切换2048并重建完整索引；007合成dev准备门禁未变。
 
 [023 研究场景修订](archive/023_research_scenario_revision.md)已完成：以复试通知适用性和打印机诊断替换 [idea 草稿](../research_idea.md)的人员排班示例，保留共同前缀、续说分支及收益/负面影响评级；测量场景仅作扩展示例。
 

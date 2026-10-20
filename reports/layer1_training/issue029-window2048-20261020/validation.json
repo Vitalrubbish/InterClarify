@@ -1,0 +1,53 @@
+{
+  "passed": true,
+  "encoding_source_hashes_match": true,
+  "dialogues_and_audited_identity_preserved": true,
+  "all_supervision_preserved": true,
+  "sequence_length": 2048,
+  "optimizer_steps_per_arm": 1214,
+  "checkpoint_steps": [
+    203,
+    406,
+    609,
+    812,
+    1015,
+    1214
+  ],
+  "statistics": {
+    "T1": {
+      "effective_tokens": 1193875,
+      "input_tokens": 4842595,
+      "max_length": 2048,
+      "sequences": 2428,
+      "view_original": 1000
+    },
+    "T2": {
+      "effective_tokens": 1193875,
+      "input_tokens": 4818712,
+      "max_length": 2047,
+      "sequences": 2428,
+      "view_unpunctuated": 1000
+    },
+    "T3": {
+      "effective_tokens": 1193875,
+      "input_tokens": 4830927,
+      "max_length": 2048,
+      "sequences": 2428,
+      "view_original": 500,
+      "view_unpunctuated": 500
+    }
+  },
+  "training_released": false,
+  "blockers": [
+    "training_released is not true",
+    "issue007_pretraining_preparation is not passed",
+    "evaluation_assets.dev_selection_config is not frozen",
+    "evaluation_assets.evaluator is not frozen"
+  ],
+  "inputs": {
+    "configs/layer1_adaptation_protocol.yaml": "bc28b6b0a030dc64e9c8c3a562e80c1ae5ddcbefdfa71bf5bd7245ce48857a6f",
+    "configs/layer1_adaptation_training.yaml": "fa22c4773ff22310349e984999ce31ab22a4720ef0de77e8798b57f0e5a7693d",
+    "reports/layer1_training/issue029-window2048-20261020/full_train_index.json": "dc834eef1c5620e2f1a51626583cb4c37ed89bce4922f8982fc7e199eda9da1f",
+    "reports/layer1_training/issue001-inventory-20261018/inventory_summary.json": "ca93ed2e34df36acf9bce1ee8be869f78f0105a18a7e9cbfd10f7fcda0d7b424"
+  }
+}

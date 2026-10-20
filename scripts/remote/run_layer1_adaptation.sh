@@ -21,6 +21,9 @@ export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4 CUBLAS_WORKSPA
 ulimit -c 0
 "$ENV_PREFIX/bin/python" scripts/training/prepare_layer1_adaptation.py \
   --output "$OUTPUT/plan.json" --require-release
+read -r DIALOGUES LENGTH STEPS < <("$ENV_PREFIX/bin/python" -c \
+  'import json, sys; c = json.load(open(sys.argv[1]))["training_config"]; print(c["dialogues"], c["sequence_length"], c["scheduler_steps"])' \
+  "$OUTPUT/plan.json")
 [[ -n "${JobID:-}" && ( -n "${CUDA_VISIBLE_DEVICES:-}" || -n "${NVIDIA_VISIBLE_DEVICES:-}" ) ]] || exit 2
 git rev-parse HEAD > "$OUTPUT/source_commit.txt"
 sha256sum scripts/training/train_layer1.py scripts/training/prepare_layer1_adaptation.py \
@@ -53,6 +56,6 @@ timeout --signal=TERM --kill-after=30 28800 "$ENV_PREFIX/bin/python" -u \
   --audit "$TRAINING_ROOT/data/runs/issue004-build-r5/audit.json" \
   --config "$ROOT/configs/layer1_adaptation_training.yaml" \
   --protocol "$ROOT/configs/layer1_adaptation_protocol.yaml" \
-  --dialogues 1000 --length 512 --steps 5763 --output "$OUTPUT/training" \
+  --dialogues "$DIALOGUES" --length "$LENGTH" --steps "$STEPS" --output "$OUTPUT/training" \
   > "$OUTPUT/training.log" 2>&1
 du -sk "$OUTPUT" > "$OUTPUT/disk_usage.txt"

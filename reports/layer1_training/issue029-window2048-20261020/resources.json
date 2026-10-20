@@ -1,0 +1,35 @@
+{
+  "source_commit": "2201c43",
+  "command": [
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/bin/python",
+    "scripts/training/train_layer1.py",
+    "index",
+    "--dataset",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue004-build-r5/dataset",
+    "--audit",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue004-build-r5/audit.json",
+    "--tokenizer",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/sbintuitions--DuplexCascade/c3dd51ce9a5a7d27f810ffd5dab309f132a94d28/tokenizer",
+    "--length",
+    "2048",
+    "--output",
+    "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue029-index2048-r1/full_train_index.json"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 40.027228418999584,
+  "max_child_rss_kib": 277240,
+  "cpu_affinity": [
+    0
+  ],
+  "nice": 10,
+  "address_space_limit_bytes": 4294967296,
+  "file_limit_bytes": 67108864,
+  "gpu_enabled": false,
+  "conda_prefix": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training",
+  "source_hashes": {
+    "train_layer1.py": "7ef2091460575b4fdeb4131a2f0a2e7086324f6602afc4963f647b0cb94231cf",
+    "layer1_data.py": "a92e75a1dd814f75d24912506f0abb1b424e28adc947c46d266658030ce8b6cc",
+    "layer1_model.py": "d2bc951658eaf24af38314fed411008d1f17387243cd30e6da4abc6061571622",
+    "number_surface.py": "bbe361321532df21fbf4468f998c6337c0f97880791039c0679c50552c76344b"
+  }
+}

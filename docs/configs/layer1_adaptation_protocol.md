@@ -12,9 +12,11 @@
 
 2026-10-19来源验真：UltraChat十个固定shard已下载完成并重新逐文件核对大小/SHA256，共9,288,990,895字节，下载和复核退出均0；source_files_download_verified更新为true，见[证据](../../reports/layer1_training/issue016-source-and-exclusions-20261019/source_verification.json)。用户取消FDB补转写要求，来源隔离登记已完成。r5全量数据审计已通过，用户明确免除新人工复审，issue004_data_audit更新为passed。
 
-2026-10-20的005单卡试跑完成，完整状态恢复精确一致，issue005_zero_update_and_recovery更新为passed。按实际显存保留至少2GiB余量，冻结训练窗口512、每卡batch1、累积2；训练采样seed为20261020，数据生成seed仍为20261018。全量三臂各11,526序列、1,193,875监督token、单epoch5,763步。原4096事件计划不变，重新分窗保留全部监督目标；可见历史缩短，质量由006/007验证，不能宣称等价于4096上下文训练。
+2026-10-20的005单卡试跑完成，完整状态恢复精确一致，issue005_zero_update_and_recovery更新为passed。当时按缓存保留后至少2GiB余量选择512，后续用户要求通过029切换2048；005原结果保留作历史依据。训练采样seed为20261020，数据生成seed仍为20261018，原4096事件计划不变。
 
-首轮训练循环外推约0.93GPU小时/臂；第二轮3,000条约2.84GPU小时/臂仅为密度估算，尚未构建数据，round2_exact_steps保持null。估算不含启动、checkpoint选择和评价；原8/16小时及72总上限保留。正式optimizer/scheduler配置和评价准备仍由006/007冻结，005的100步scheduler仅用于短跑恢复。007开训前准备未完成，training_released保持false。证据见[005报告](../../reports/layer1_training/issue005-probe-20261020/README.md)。
+029完成2048全量重编码：每臂2,428序列、1,193,875监督token及1,214优化器步，batch1/累积2。基于026实际100步循环149.910秒，首轮循环外推约0.5055GPU小时/臂；不含启动、checkpoint选择和评价。第二轮数据未构建，旧512估算撤下，耗时与round2_exact_steps保持null。原8/16小时及72总上限保留。007合成dev准备未完成，training_released保持false。
+
+资源依据改为026单张4090/2048持续100步实测，`resource_policy=issue026_sustained_2048_user_selected`。`resource_min_headroom_gib=null`表示不再使用005缓存保留后2GiB的筛选策略，不表示显存无限或已验证全量长跑。正式索引指向029报告；每步继续记录显存与RSS，失败保留证据。
 
 r5登记user_numeric_surface=english_numeric_v1，完整用户轮先转换数值读法再分拍；decimal/time原始形式保存在映射，不再承诺模型输入保留原数字字符串。audited_dataset_manifest指向正式r5清单，human_review_policy明确记录用户豁免。原样/去句读/混合三臂共享这一前处理。
 
@@ -22,6 +24,6 @@ r5登记user_numeric_surface=english_numeric_v1，完整用户轮先转换数值
 
 ## 2026-10-20 四配置启动准备
 
-006进入执行准备，首轮仍为512窗口。新增`training.round1_optimizer`登记正式AdamW、5,763步线性调度、173步warmup及每1,000步保存；不沿用005短跑100步scheduler。新增`gates.issue007_pretraining_preparation`，与最终真实test门禁分离。
+006首轮现为2048窗口；`training.round1_optimizer`登记正式AdamW、1,214步线性调度、37步warmup及每203步保存（加最终步共六个候选），不沿用005短跑100步scheduler。`gates.issue007_pretraining_preparation`与最终真实test门禁分离。
 
 按用户澄清，`evaluation_assets`仅登记合成文本dev资产：`text_dev_manifest`引用004已审计r5 manifest，包含既有200条文本dev；`dev_selection_config`和`evaluator`待交付。每项使用仓库相对`path`及完整`sha256`，文本manifest路径须与`data.audited_dataset_manifest`相同。正式入口检查这些资产、开训前门禁及`training_released`。真实`acceptance.sample_manifest`允许为空，不参与006开训校验，在后续真实迁移验收前冻结。原协议顶层`issue/status`继续表示001历史登记状态，不表示006训练已完成。

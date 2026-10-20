@@ -51,9 +51,10 @@ def validate_formal_config(config, protocol, root, arm, dialogues, length, steps
             'Invalid formal training configuration')
     require(arm in ARMS, 'B0 never trains; choose T1/T2/T3')
     training = protocol['training']
-    require(dialogues == training['round1_max_dialogues'] == 1000, 'Round-one dialogue budget mismatch')
-    require(length == training['sequence_length'] == 512, 'Registered window mismatch')
-    require(steps == config['scheduler_steps'] == training['actual_steps'] == 5763,
+    require(dialogues == config['dialogues'] == training['round1_max_dialogues'] == 1000,
+            'Round-one dialogue budget mismatch')
+    require(length == config['sequence_length'] == training['sequence_length'], 'Registered window mismatch')
+    require(steps == config['scheduler_steps'] == training['actual_steps'] and steps > 0,
             'Formal training must complete the registered single epoch')
     require(config['batch_size'] == training['actual_batch'] == 1 and
             config['gradient_accumulation'] == training['gradient_accumulation'] == 2,
@@ -106,7 +107,8 @@ def build_plan(protocol_path, config_path, root=ROOT):
     blockers = release_blockers(protocol, root)
     # Validate parameter registration even while release gates remain closed.
     try:
-        validate_formal_config(config, protocol, root, 'T1', 1000, 512, 5763)
+        validate_formal_config(config, protocol, root, 'T1', config['dialogues'],
+                               config['sequence_length'], config['scheduler_steps'])
     except ValueError as error:
         if not str(error).startswith('Formal training blocked:'):
             raise
