@@ -11,7 +11,7 @@
 | [004](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 完成归档；r5全量机器审计通过，用户明确免除复审后关闭 |
 | [005](archive/005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 完成归档；024真实恢复精确一致，025资源测量完成；当时保守选择512，现006按用户要求改为2048 |
 | [017](../../reports/layer1_training/issue017-loading-20261019/README.md) | 完整训练加载与零更新 | 完成、已归档；零更新通过，回归拍界抖动由用户明确接受 |
-| [006](006_punctuation_robust_adaptation.md) | 四配置基线与三组有限适配 | 进行中；[031](archive/031_layer1_round1_submission.md)已提交首轮作业并启动，B0登记，T1→T2→T3单卡串行；最终产物及FDB报告待完成 |
+| [006](006_punctuation_robust_adaptation.md) | 四配置基线与三组有限适配 | 进行中；031作业串行运行，T1已完成/退出0，13:45时T2运行、T3等待；[032](archive/032_layer1_t1_loss_analysis.md)完成loss/类别频数分析，未改变本轮目标函数 |
 | [007](007_turn_control_evaluation.md) | 四配置FDB小子集能力报告 | 待办；训练后在同一历史25会话上比较B0/T1/T2/T3，内容人工检查，不实现独立回放器/自动内容计分 |
 | [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 执行/验收 | 进行中；当前负责四配置新组合小子集测试，完整FDB及底座冻结留后续；历史五例B0为0/5 |
 
