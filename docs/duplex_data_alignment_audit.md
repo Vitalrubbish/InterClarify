@@ -2,6 +2,8 @@
 
 日期：2026-10-19。范围：旧 `issue004-build-r3` 的生成配置、事件计划、编码器，以及前 32 条人工审计材料。下表记录修复前的静态语义复核；修复和r4重建由[019归档工作单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/019_duplex_data_alignment_audit.md)记录。
 
+2026-10-20补充：[035训练模式对照](layer1_training_comparison.md)区分论文设计、发布推理代码和当前实现；不将“动态构建”推断为作者每步重采样，也不将未公开的packing/归一化细节写成已确认差异。本文的采样边界审计结论继续适用，旧r3缺陷不表示当前r5仍存在。
+
 | 检查项 | 官方依据 | 当前行为与结论 |
 | --- | --- | --- |
 | token 与消息格式 | 论文 3.2；发布 `server.py` | 五类控制 token、no-voice、ChatML user/assistant header 与结束符对应。构建器用发布 tokenizer 验证单 ID；关闭 system backchannel 与发布的普通版一致。|

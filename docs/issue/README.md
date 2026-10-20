@@ -49,6 +49,8 @@
 
 ## 归档
 
+[035训练模式重核](archive/035_official_training_comparison.md)完成：见[完整对照](../layer1_training_comparison.md)，区分论文加权声明与公开推理包装器普通CE，列出除上下文长度外的已确认差异和未公开项。未修改首轮配置或启动新训练。
+
 [026 单卡2048持续训练检查](archive/026_layer1_2048_stability.md)完成：100步/200序列未OOM，实际曝光95条对话，显存分配峰值20.262GiB；详见[报告](../../reports/layer1_training/issue026-2048-20261020/README.md)。029据此切换正式窗口和索引；030按用户路线移除dev评测器开训要求。
 
 [023 研究场景修订](archive/023_research_scenario_revision.md)已完成：以复试通知适用性和打印机诊断替换 [idea 草稿](../research_idea.md)的人员排班示例，保留共同前缀、续说分支及收益/负面影响评级；测量场景仅作扩展示例。
