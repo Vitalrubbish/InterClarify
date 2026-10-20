@@ -1,5 +1,7 @@
 # ASR 选择与 Layer 1 训练方向
 
+正式选型依据见 [ASR 技术选型报告](asr_selection_report.md)（2026-10-20 整理），包含需求、五配置延迟/WER、在线与 EOF 句末标点习惯及兼容性限制。
+
 更新：2026-10-18。用户已确定英文主线使用 **Nemotron Speech Streaming EN 0.6B / 160ms**，开始投入 Layer 1 小规模继续训练；TTS 配合使用 Kokoro。选型已定，接入和训练尚未验收。
 
 ## 实测依据
