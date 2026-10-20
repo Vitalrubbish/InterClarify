@@ -176,7 +176,10 @@ def validate_delayed_config(config, protocol, root, arm, dialogues, length, step
     require(protocol.get('full_train_index_sha256') and
             sha256_file(index_path) == protocol['full_train_index_sha256'], 'Delayed full index changed')
     index = json.loads(index_path.read_text())
-    effective = {**parent, 'training': {**parent['training'], **protocol['training']}}
+    effective = {**parent, 'training': {**parent['training'], **protocol['training']},
+                 'post_training_evaluation': {**parent['post_training_evaluation'],
+                     'conditions': ['T2_R3_delayed_start'],
+                     'reference_conditions': ['T2', 'T2_R2_paper_aligned'], 'automatic_submit': False}}
     validate_index(index, effective)
     for row in index.values():
         require(row['manifest_sha256'] == protocol['data_manifest_sha256']

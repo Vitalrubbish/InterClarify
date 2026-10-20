@@ -45,6 +45,8 @@ class DelayedTrainingTests(unittest.TestCase):
     def test_full_weighted_epoch_is_released(self):
         result = self.validate()
         self.assertEqual(result['training']['actual_steps'], 1235)
+        self.assertEqual(result['post_training_evaluation']['conditions'], ['T2_R3_delayed_start'])
+        self.assertFalse(result['post_training_evaluation']['automatic_submit'])
         self.assertEqual(self.config['warmup_steps'], 124)
         self.assertEqual(self.config['loss']['control_weights']['finish'], 10)
 
