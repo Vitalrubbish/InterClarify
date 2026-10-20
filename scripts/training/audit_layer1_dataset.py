@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 from collections import Counter, defaultdict
 import json
 from pathlib import Path
@@ -19,7 +20,62 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def audit(directory, tokenizer_dir):
+def audit_response_timing(plan, dialogue, tokenizer, config):
+    """Check delayed starts independently of deterministic plan replay."""
+    if config['generation'].get('response_start_timing', 'same_user_chunk') != 'next_no_voice':
+        return Counter()
+    events, counts = plan['events'], Counter()
+    starts = []
+    for turn in range(0, len(dialogue['texts']), 2):
+        sourced = [(i, e) for i, e in enumerate(events)
+                   if e['user_origin'] and e['user_origin']['turn'] == turn]
+        require(bool(sourced), 'Missing source user turn')
+        cursor = 0
+        for _, event in sourced:
+            origin = event['user_origin']
+            require(origin['start'] == cursor and origin['end'] > cursor,
+                    'Repeated or missing user source span')
+            cursor = origin['end']
+        require(cursor == len(plan['user_turns'][str(turn)]['text']), 'Incomplete user source coverage')
+        first_index, first = sourced[0]
+        if first['kind'] == 'interruption':
+            require(turn > 0 and first_index > 0 and bool(events[first_index - 1]['assistant_ids'])
+                    and first['control'] == 'interruption' and not first['assistant_ids'],
+                    'Interruption stop was delayed')
+        last_index, last = sourced[-1]
+        single_interruption = len(sourced) == 1 and last['kind'] == 'interruption'
+        require(last['kind'] == ('interruption' if single_interruption else 'user_final_wait')
+                and last['control'] == ('interruption' if single_interruption else 'speaking')
+                and not last['assistant_ids'], 'Final user text must wait or interrupt without content')
+        start_index = last_index + 1
+        require(start_index < len(events), 'Missing delayed response start')
+        start = events[start_index]
+        require(start['kind'] == 'response_start' and start['control'] == 'finish'
+                and not start['user_text'] and not start['user_unpunctuated']
+                and start['user_origin'] is None and bool(start['assistant_ids']),
+                'Response must start on the first no-voice beat')
+        starts.append(start_index)
+        counts['response_starts'] += 1
+        counts['single_chunk_interruption_starts' if single_interruption else 'user_final_waits'] += 1
+        end = next((i for i in range(start_index + 1, len(events))
+                    if events[i]['kind'] in ('interruption', 'post_response_thinking')), len(events))
+        actual = [token for event in events[start_index:end] for token in event['assistant_ids']]
+        expected = tokenizer.encode(dialogue['texts'][turn + 1])
+        interrupted = end < len(events) and events[end]['kind'] == 'interruption'
+        require(bool(actual) and actual == expected[:len(actual)]
+                and (len(actual) < len(expected) if interrupted else actual == expected),
+                'Assistant content or interruption truncation changed')
+    require([i for i, e in enumerate(events) if e['control'] == 'finish' or e['kind'] == 'response_start']
+            == starts, 'Unexpected response start or text-beat finish')
+    for event in events:
+        if event['kind'] == 'natural_pause':
+            require(event['control'] == 'speaking' and not event['assistant_ids']
+                    and not event['user_text'], 'Pause was relabeled as response start')
+            counts['natural_pause_waits'] += 1
+    return counts
+
+
+def audit(directory, tokenizer_dir, baseline_directory=None):
     """Fail closed on data corruption; keep human approval separate from code checks."""
     directory = Path(directory)
     manifest = json.loads((directory / 'manifest.json').read_text())
@@ -27,6 +83,23 @@ def audit(directory, tokenizer_dir):
     config = manifest['identity']['config']
     tokenizer = ReleasedTokenizer(tokenizer_dir, config['token_ids'])
     require(tokenizer.fingerprint == manifest['identity']['tokenizer'], 'Tokenizer asset changed')
+    baseline = None
+    baseline_events = 0
+    if baseline_directory is not None:
+        baseline_directory = Path(baseline_directory)
+        baseline = json.loads((baseline_directory / 'manifest.json').read_text())
+        require(baseline.get('complete'), 'Baseline build is incomplete')
+        require(config['generation'].get('response_start_timing') == 'next_no_voice',
+                'Baseline comparison requires delayed response starts')
+        old_config, new_config = copy.deepcopy(baseline['identity']['config']), copy.deepcopy(config)
+        require(old_config['generation'].pop('response_start_timing', 'same_user_chunk') == 'same_user_chunk',
+                'Baseline must use the original response timing')
+        new_config['generation'].pop('response_start_timing')
+        require(old_config == new_config, 'Non-timing configuration changed from baseline')
+        for key in ('source_manifest_sha256', 'download_manifest_sha256', 'exclusions_sha256', 'tokenizer', 'epoch'):
+            require(baseline['identity'][key] == manifest['identity'][key], 'Baseline source identity changed')
+        require(baseline['selected_sha256'] == manifest['selected_sha256']
+                == file_digest(baseline_directory / 'dialogues.json'), 'Baseline dialogue selection changed')
     selected = json.loads((directory / 'dialogues.json').read_text())
     require(file_digest(directory / 'dialogues.json') == manifest['selected_sha256'], 'Split artifact changed')
     require(dict(Counter(d['split'] for d in selected)) == {k: v for k, v in config['splits'].items() if v},
@@ -52,7 +125,7 @@ def audit(directory, tokenizer_dir):
     planner = MicroTurnPlanner(tokenizer, config)
     encoder = SequenceEncoder(tokenizer, config, manifest['identity']['max_length'])
     controls, kinds, lengths, sampling = Counter(), Counter(), [], Counter()
-    numeric_surfaces = Counter()
+    numeric_surfaces, response_timing = Counter(), Counter()
     sequence_counts, token_counts, events_per_split = Counter(), Counter(), Counter()
     expected_artifacts = set()
     for dialogue in selected:
@@ -68,6 +141,22 @@ def audit(directory, tokenizer_dir):
         require(artifact['dialogue_id'] == dialogue['dialogue_id'] and artifact['split'] == dialogue['split'],
                 'Artifact provenance mismatch')
         events = plan['events']
+        if baseline is not None:
+            baseline_path = baseline_directory / relative
+            require(file_digest(baseline_path) == baseline['artifacts'].get(relative), 'Baseline artifact changed')
+            old_plan = json.loads(baseline_path.read_text())['plan']
+            baseline_events += len(old_plan['events'])
+            require(old_plan['user_turns'] == plan['user_turns'] and old_plan['sampling'] == plan['sampling'],
+                    'Baseline surface or random sampling changed')
+            for key in ('assistant_ids', 'user_text', 'user_origin'):
+                require([e[key] for e in old_plan['events'] if e[key]]
+                        == [e[key] for e in events if e[key]], 'Baseline content or source spans changed')
+            for kind in ('natural_pause', 'interruption', 'user_backchannel', 'post_response_thinking'):
+                require([{k: v for k, v in e.items() if k not in ('event_id', 'synthetic_window')}
+                         for e in old_plan['events'] if e['kind'] == kind]
+                        == [{k: v for k, v in e.items() if k not in ('event_id', 'synthetic_window')}
+                            for e in events if e['kind'] == kind], 'Baseline random event changed')
+        response_timing.update(audit_response_timing(plan, dialogue, tokenizer, config))
         for turn, surface in plan['user_turns'].items():
             require(surface['raw_text'] == dialogue['texts'][int(turn)], 'Raw user surface differs from source')
             validate_surface(surface)
@@ -183,6 +272,13 @@ def audit(directory, tokenizer_dir):
             'sequences': dict(sequence_counts), 'effective_tokens': dict(token_counts),
             'micro_turns': dict(events_per_split), 'controls': dict(controls), 'event_kinds': dict(kinds),
             'sampling': dict(sampling),
+            'response_start_timing': config['generation'].get('response_start_timing', 'same_user_chunk'),
+            'response_timing': dict(response_timing),
+            'baseline_comparison': ({'manifest_sha256': file_digest(baseline_directory / 'manifest.json'),
+                                     'selected_sha256': baseline['selected_sha256'],
+                                     'content_and_random_events_unchanged': True,
+                                     'added_events': sum(events_per_split.values()) - baseline_events}
+                                    if baseline is not None else None),
             'numeric_surface_replacements': dict(numeric_surfaces),
             'observed_rates': rates,
             'source': config['source'], 'source_manifest_sha256': manifest['identity']['source_manifest_sha256'],
@@ -200,9 +296,10 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', type=Path, required=True)
     parser.add_argument('--tokenizer', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--baseline-dataset', type=Path)
     args = parser.parse_args()
     try:
-        report = audit(args.dataset, args.tokenizer)
+        report = audit(args.dataset, args.tokenizer, args.baseline_dataset)
     except Exception as error:
         write_json(args.output, {'machine_passed': False, 'training_allowed': False,
                                 'error': f'{type(error).__name__}: {error}'})

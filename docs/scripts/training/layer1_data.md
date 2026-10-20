@@ -25,3 +25,9 @@
 r5由normalize_user_text在完整用户长轮上生成英文数值读法和替换映射。MicroTurnPlanner.plan保存user_turns，事件原点跨度指向规范化文本；DialogueIndex.rejection排除歧义/不支持数值上下文。大小写、撇号及assistant正文保留，数字转换在分拍前完成。
 
 r5同时以原始文本与数值规范化后的文本进行切分前近重复分组、切分后跨集合审计，避免书面数字和英文数词在转换后变成跨集合重复；外部排除摘要也检查规范化后的用户文本。
+
+## Issue 040：下一无文本拍启动
+
+为检验静音中启动回答的监督，`generation.response_start_timing=next_no_voice` 将普通用户末片段独立记录为 `user_final_wait`，目标为 talking 和 EOS；紧接的空用户拍记录为 `response_start`，目标为 finish、原首回答片段及 EOS。单片段插话保留当拍 interruption，下一拍直接 response_start，不增加额外等待拍。no-voice 仅表示当拍无新增识别文本。
+
+新模式不额外消耗随机数，用户分片、句内暂停、插话截断、附和、思考和回答内容与同种子旧计划一致。每个用户来源跨度仅出现一次。三视图共享事件，窗口和 mask 仍由原编码器重建。配置缺失该字段或显式为 `same_user_chunk` 时复现历史时序；非法值拒收。当前正式数据配置显式采用新模式，历史 manifest 不变。

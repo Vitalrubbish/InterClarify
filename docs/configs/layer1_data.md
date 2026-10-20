@@ -17,3 +17,7 @@
 数据目录上限 100GiB、可用磁盘保留 5GiB；SQLite cache 为 32MiB。远端脚本另限制主存、线程和时长。超限明确失败，不减少来源覆盖或静默抽取 shard 前缀。
 
 r5默认启用english_numeric_v1：完整用户长轮先转换数值为英文读法再分拍。原样视图为该共同处理后保留句读的视图；歧义数值上下文按预登记规则排除并报告。
+
+## Issue 040 时序配置
+
+当前 `generation.response_start_timing=next_no_voice` 覆盖上文的历史同拍规则：末用户文字拍仅 talking，下一 no-voice 拍 finish 加回答首片段；单片段插话仍当拍 interruption，下一拍 finish。未配置该字段的历史 manifest 使用 `same_user_chunk`，可继续复现 r5。此变化是独立项目实验，不是论文时序修复；需独立输出目录和重新统计 2048 索引，不能复用旧序列数、步数或 warmup。配置变化不授权训练或新一轮 GPU 额度。

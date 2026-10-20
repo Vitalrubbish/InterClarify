@@ -445,6 +445,7 @@ class MicroTurnPlanner:
 
     def plan(self, dialogue, epoch):
         cfg = self.config['generation']
+        delayed_start = cfg.get('response_start_timing', 'same_user_chunk') == 'next_no_voice'
         rng = stable_rng(self.config['seed'], dialogue['dialogue_id'], epoch, 'events')
         texts, events = list(dialogue['texts']), []
         user_turns = {str(i): normalize_user_text(texts[i]) for i in range(0, len(texts), 2)}
@@ -480,6 +481,8 @@ class MicroTurnPlanner:
                     emit('interruption', chunk['text'], 'interruption', origin=origin)
                 elif not last:
                     emit('user_continuation', chunk['text'], 'speaking', origin=origin)
+                elif delayed_start:
+                    emit('user_final_wait', chunk['text'], 'speaking', origin=origin)
                 if not last:
                     sampling['pause_eligible_boundaries'] += 1
                     if rng.random() < cfg['pause_probability']:
@@ -487,7 +490,7 @@ class MicroTurnPlanner:
                         for _ in range(rng.randint(*cfg['pause_windows'])):
                             emit('natural_pause', control='speaking')
                 if last:
-                    if interrupting and i == 0:
+                    if delayed_start or (interrupting and i == 0):
                         response_user, response_origin = '', None
                     else:
                         response_user, response_origin = chunk['text'], origin
@@ -599,6 +602,9 @@ def validate_config(config):
         raise ValueError('Only schema 1 without system backchannels is supported')
     if config['generation'].get('user_surface') != VERSION:
         raise ValueError('Unsupported user text surface version')
+    if config['generation'].get('response_start_timing', 'same_user_chunk') not in (
+            'same_user_chunk', 'next_no_voice'):
+        raise ValueError('Unsupported response start timing')
     if set(config['splits']) != {'train', 'dev', 'test'} or any(
             type(n) is not int or n < 0 for n in config['splits'].values()):
         raise ValueError('Invalid split sizes')

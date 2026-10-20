@@ -95,6 +95,65 @@ class DataPipelineTests(unittest.TestCase):
         self.assertEqual(next_event['control'], 'finish')
         self.assertEqual(next_event['user_text'], '')
 
+    def test_delayed_start_targets_and_source_conservation(self):
+        for single in (False, True):
+            with self.subTest(single=single):
+                self.dialogue['texts'] = ['Ask' if single else 'Please explain this subject.', 'An answer.']
+                plan = self.plan(user_tokens=[3, 3], pause_probability=1)
+                counts = auditor.audit_response_timing(plan, self.dialogue, self.tokenizer, self.config)
+                self.assertEqual(counts['response_starts'], 1)
+                events = plan['events']
+                index = next(i for i, e in enumerate(events) if e['kind'] == 'response_start')
+                self.assertEqual(events[index - 1]['kind'], 'user_final_wait')
+                self.assertEqual(''.join(e['user_text'] for e in events if e['user_origin']),
+                                 self.dialogue['texts'][0])
+                encoder = data.SequenceEncoder(self.tokenizer, self.config, 220)
+                for view in ('original', 'unpunctuated'):
+                    _, wait = encoder.event_ids(events[index - 1], view)
+                    prefix, start = encoder.event_ids(events[index], view)
+                    self.assertEqual(wait, [CONFIG['token_ids']['<|user is talking|>'], encoder.eos])
+                    self.assertEqual(prefix[len(encoder.user_header)], CONFIG['token_ids']['<|no voice|>'])
+                    self.assertEqual(start, [CONFIG['token_ids']['<|user finish talking|>']]
+                                     + events[index]['assistant_ids'] + [encoder.eos])
+
+    def test_delayed_start_preserves_old_random_events_and_content(self):
+        for interruption in (0, 1):
+            for epoch in range(4):
+                self.config['generation'].update(pause_probability=1, interruption_probability=interruption,
+                                                 backchannel_probability=1)
+                self.config['generation']['response_start_timing'] = 'next_no_voice'
+                new = data.MicroTurnPlanner(self.tokenizer, self.config).plan(self.dialogue, epoch)
+                auditor.audit_response_timing(new, self.dialogue, self.tokenizer, self.config)
+                self.config['generation'].pop('response_start_timing')
+                old = data.MicroTurnPlanner(self.tokenizer, self.config).plan(self.dialogue, epoch)
+                self.assertEqual(old['sampling'], new['sampling'])
+                self.assertEqual(old['user_turns'], new['user_turns'])
+                for key in ('assistant_ids', 'user_text', 'user_origin'):
+                    self.assertEqual([e[key] for e in old['events'] if e[key]],
+                                     [e[key] for e in new['events'] if e[key]])
+                self.assertEqual([e for e in old['events'] if e['kind'] == 'response_start'][0]['control'], 'finish')
+                self.assertTrue([e for e in old['events'] if e['kind'] == 'response_start'][0]['user_text'])
+
+    def test_timing_audit_rejects_misalignment_and_duplicate_source(self):
+        self.dialogue['texts'] = ['Please answer.', 'Certainly.']
+        plan = self.plan()
+        start = next(i for i, e in enumerate(plan['events']) if e['kind'] == 'response_start')
+        for change in ('text_start', 'early_finish', 'duplicate', 'content'):
+            broken = copy.deepcopy(plan)
+            if change == 'text_start':
+                broken['events'][start]['user_text'] = 'answer'
+            elif change == 'early_finish':
+                broken['events'][start - 1]['control'] = 'finish'
+            elif change == 'content':
+                broken['events'][start]['assistant_ids'] = [999]
+            else:
+                broken['events'].insert(start, copy.deepcopy(broken['events'][start - 1]))
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                auditor.audit_response_timing(broken, self.dialogue, self.tokenizer, self.config)
+        self.config['generation']['response_start_timing'] = 'invalid'
+        with self.assertRaisesRegex(ValueError, 'response start timing'):
+            data.validate_config(self.config)
+
     def test_last_turn_never_fabricates_interruption(self):
         self.dialogue['texts'] = self.dialogue['texts'][:2]
         self.assertNotIn('interruption', [e['control'] for e in self.plan(interruption_probability=1)['events']])
@@ -116,7 +175,7 @@ class DataPipelineTests(unittest.TestCase):
         self.assertTrue(plan['sampling']['punctuation_boundary_merges'])
         self.assertEqual(''.join(e['user_text'] for e in sourced), self.dialogue['texts'][0])
         self.assertTrue(all(e['user_unpunctuated'].strip() for e in sourced))
-        self.assertEqual(sourced[-1]['control'], 'finish')
+        self.assertEqual(sourced[-1]['control'], 'speaking')
         encoder = data.SequenceEncoder(self.tokenizer, self.config, 4096)
         for event in sourced:
             prefix, _ = encoder.event_ids(event, 'unpunctuated')
@@ -348,6 +407,28 @@ class DataPipelineTests(unittest.TestCase):
                     auditor.audit(args.output, args.tokenizer)
                 with self.assertRaisesRegex(ValueError, 'changed'):
                     builder.build(args)
+
+    def test_frozen_baseline_comparison_preserves_selection_and_content(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            args = self.make_build(Path(temporary))
+            config = yaml.safe_load(args.config.read_text())
+            config['generation'].pop('response_start_timing')
+            args.config.write_text(yaml.safe_dump(config))
+            with patch.object(builder, 'ReleasedTokenizer', CharacterTokenizer), patch.object(auditor, 'ReleasedTokenizer', CharacterTokenizer):
+                builder.build(args)
+                baseline = args.output
+                config['generation']['response_start_timing'] = 'next_no_voice'
+                args.config.write_text(yaml.safe_dump(config))
+                args.output = baseline.with_name('delayed')
+                builder.build(args)
+                report = auditor.audit(args.output, args.tokenizer, baseline)
+                self.assertTrue(report['baseline_comparison']['content_and_random_events_unchanged'])
+                self.assertEqual(report['baseline_comparison']['added_events'], 4)
+                self.assertEqual(report['response_timing']['response_starts'], 4)
+                source = baseline / 'dialogues.json'
+                source.write_text('[]')
+                with self.assertRaisesRegex(ValueError, 'selection changed'):
+                    auditor.audit(args.output, args.tokenizer, baseline)
 
     def test_source_tamper_and_incomplete_download_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
