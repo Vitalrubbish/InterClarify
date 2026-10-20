@@ -6,7 +6,6 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 BASE="/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019"
 PYTHON="$BASE/envs/training/bin/python"
 OUTPUT="$BASE/data/runs/issue040-delayed-start-data"
-BASELINE="$BASE/data/runs/issue004-build-r5/dataset"
 TOKENIZER="/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/sbintuitions--DuplexCascade/c3dd51ce9a5a7d27f810ffd5dab309f132a94d28/tokenizer"
 [[ -f "$BASE/envs/training/conda-meta/history" && ! -e "$OUTPUT" ]] || exit 2
 mkdir -p "$OUTPUT"
@@ -26,7 +25,6 @@ import sys
 from pathlib import Path
 import yaml
 config = yaml.safe_load(Path(sys.argv[1]).read_text())
-assert config['generation']['response_start_timing'] == 'next_no_voice'
 config['limits']['max_disk_gib'] = 10
 Path(sys.argv[2]).write_text(yaml.safe_dump(config, sort_keys=False))
 PY
@@ -37,7 +35,7 @@ timeout --signal=TERM --kill-after=30 1800 "$PYTHON" -u scripts/training/build_l
   --tokenizer "$TOKENIZER" --exclusions "$BASE/manifests/exclusions.json" \
   --max-length 2048 --output "$OUTPUT/dataset" > "$OUTPUT/build.log" 2>&1
 timeout --signal=TERM --kill-after=30 900 "$PYTHON" -u scripts/training/audit_layer1_dataset.py \
-  --dataset "$OUTPUT/dataset" --tokenizer "$TOKENIZER" --baseline-dataset "$BASELINE" \
+  --dataset "$OUTPUT/dataset" --tokenizer "$TOKENIZER" \
   --output "$OUTPUT/audit.json" > "$OUTPUT/audit.log" 2>&1
 timeout --signal=TERM --kill-after=30 300 "$PYTHON" - "$OUTPUT" <<'PY'
 import hashlib

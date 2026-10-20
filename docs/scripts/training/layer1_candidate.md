@@ -1,13 +1,7 @@
-# 正式适配权重加载
+# 最终候选权重加载
 
-`scripts/training/layer1_candidate.py`在完整官方模型恢复之后加载006最终checkpoint，不创建新LoRA，不恢复optimizer或训练RNG，不拥有音频播放。
+`scripts/training/layer1_candidate.py` 在完整官方模型恢复之后加载最终 `T2_R3_delayed_start` checkpoint，不创建新 LoRA，不恢复 optimizer 或训练 RNG，不拥有音频播放。
 
-`load_candidate`要求正式训练summary成功、最终步数/游标与manifest一致、条件为T1/T2/T3且checkpoint摘要匹配；复核训练引用的固定资产，核对当前完整官方参数摘要等于训练前摘要。只接受完整既有q/v LoRA白名单及相同shape/dtype，全部验证后再复制。加载后完整参数摘要须与训练最终摘要相同，拒绝冻结参数改变或部分adapter。
+`load_candidate` 要求 purpose 为 `issue040_delayed_start`、条件为 `T2_R3_delayed_start`、arm 为 T2，训练 summary 成功且最终步数/游标为 1,235/2,469；checkpoint 摘要必须匹配。随后复核训练引用的固定资产和训练前完整参数摘要，只接受完整既有 q/v LoRA 白名单及相同 shape/dtype，全部验证后再复制。加载后完整参数摘要须与训练最终摘要相同，拒绝冻结参数改变或部分 adapter。
 
-干净进程使用训练末尾保存的prompt IDs按相同BF16/贪心/EOS/64-token预算生成，要求原始生成IDs完全一致；这证明候选重载，不证明FDB效果。返回摘要、条件、步数、完整还原及复现结论供服务健康信息和报告使用。大张量仍留远端，不复制完整基础模型。
-
-036支持新条件`T2_R2_paper_aligned`，继续使用相同完整LoRA/冻结资产校验。正式服务拒绝短跑；仅专用验证入口可重载明确标记的短跑，返回不可服务身份。正式第二轮候选仍须完成全部1,214步及2,428序列。
-
-037正式训练后发现加载器复用`probe`变量存储生成探针，导致最终可服务标记误读为false；改为独立`generation_probe`，不改变任何参数或生成检查。补充完整候选回归，正式训练权重不重训，原退出1证据保留，修复后在调度GPU上重新完整验证。
-
-040新增正式条件 `T2_R3_delayed_start`，仍核验完整 epoch（1235 步、2469 序列）、冻结资产、全部 LoRA、完整参数摘要和干净进程生成复现；不接受第三轮短跑或其他条件冒充候选。
+干净进程使用训练末尾保存的 prompt IDs 按相同 BF16/贪心/EOS/64-token 预算生成，要求原始生成 IDs 完全一致；这证明候选重载，不证明 FDB 效果。返回条件、步数、完整还原及复现结论供服务健康信息和报告使用。旧 006 T1/T2/T3、036 T2_R2 和探针候选分支已删除。

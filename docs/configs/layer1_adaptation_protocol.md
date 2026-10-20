@@ -1,6 +1,6 @@
 # Layer 1 适配协议登记
 
-`configs/layer1_adaptation_protocol.yaml` 是实验登记文件，不是产品启动配置；无类或方法，006正式训练入口读取它进行门禁与预算校验。`runtime` 记录组件和生成设置，`assets` 记录来源与核验状态，`data/training` 固定数据和有限继续训练方案，`diagnostic` 登记 001 单套参考对照，`acceptance/gates` 记录候选门槛和未完成证据。
+`configs/layer1_adaptation_protocol.yaml` 是父级实验登记文件，不是产品启动配置；无类或方法，最终 T2_R3 训练通过延迟协议间接读取其资产、数据、门禁和训练后评价字段。`runtime` 记录组件和生成设置，`assets` 记录来源与核验状态，`data/training` 固定数据和有限继续训练方案，`diagnostic` 登记 001 单套参考对照，`acceptance/gates` 记录候选门槛和未完成证据。
 
 001 的官方输入依据是 [server.py](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/server.py#L422-L499)：接收 Kyutai Word，逐词 strip、每拍空格连接；首个非空 Word 起拍，600ms、64-token 贪心，推理精度保持本项目冻结的 BF16。`diagnostic.input_contract` 指定该语义，`input_manifest` 和 `evidence_report` 已指向 2026-10-19 验收证据；原件摘要与紧凑副本摘要分开保存，五例 136 拍通过，`issue001_runtime_comparison: passed`。
 

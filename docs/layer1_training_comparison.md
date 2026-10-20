@@ -25,7 +25,7 @@
 | 曝光安排 | 论文未给出原始对话到序列/epoch的完整对应 | 单epoch，2,428序列/臂、1,193,875监督token，所有train对话曝光一次 | 不能用50k与1k比例直接推算官方epoch或更新强度 |
 | 用户表面形式 | 论文未登记本项目这类数值口语化及句读三臂设计 | 用户数值先转确定性英文读法；T1保留句读、T2去普通句读、T3按对话500/500；assistant正文不变 | T1“原样”也是共同数值前处理后的原样 |
 
-上述官方训练超参与可训练范围来自[论文4.1](https://arxiv.org/html/2603.09180v1#S4.SS1)；本轮参数见[正式配置](../configs/layer1_adaptation_training.yaml)、[实际完成manifest](../reports/layer1_training/issue006-round1-20261020/completion.json)和[layer1_model.py](../scripts/training/layer1_model.py)。
+上述官方训练超参与可训练范围来自[论文4.1](https://arxiv.org/html/2603.09180v1#S4.SS1)；本轮参数见[首轮配置（历史，固定提交）](https://github.com/Vitalrubbish/InterClarify/blob/67ede43/configs/layer1_adaptation_training.yaml)、[实际完成manifest](../reports/layer1_training/issue006-round1-20261020/completion.json)和[layer1_model.py](../scripts/training/layer1_model.py)。
 
 ## 需要纠正的loss口径
 

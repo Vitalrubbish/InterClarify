@@ -55,7 +55,7 @@ assert info['available'] and info['count'] == 1 and '4090' in info['name']
 assert 22 * 1024**3 <= info['total_memory'] <= 25 * 1024**3 and info['bf16']
 PY
 "$ENV_PREFIX/bin/python" -c 'from importlib.metadata import distributions; print("\n".join(sorted((d.metadata.get("Name") or "unknown") + "==" + d.version for d in distributions())))' > "$OUTPUT/environment.txt"
-for pattern in test_layer1_alignment.py test_layer1_delayed_training.py test_layer1_data_pipeline.py; do
+for pattern in test_layer1_weighted_loss.py test_layer1_delayed_training.py test_layer1_data_pipeline.py; do
   timeout --signal=TERM --kill-after=10 120 "$ENV_PREFIX/bin/python" -m unittest discover \
     -s tests -p "$pattern" -v > "$OUTPUT/$pattern.txt" 2>&1
 done
@@ -72,7 +72,7 @@ timeout --signal=TERM --kill-after=30 27900 "$ENV_PREFIX/bin/python" -u \
   --dialogues 1000 --length 2048 --steps 1235 --output "$OUTPUT/training" \
   > "$OUTPUT/training.log" 2>&1
 timeout --signal=TERM --kill-after=30 900 "$ENV_PREFIX/bin/python" -u \
-  scripts/training/run_layer1_alignment.py verify --formal \
+  scripts/training/run_layer1_alignment.py verify \
   --checkpoint "$MODEL_HOME/sbintuitions--DuplexCascade/c3dd51ce9a5a7d27f810ffd5dab309f132a94d28" \
   --base-model "$MODEL_HOME/Qwen--Qwen2-7B-Instruct/8dce1f8a2d3286a7adf09b977e661350ad67e40a" \
   --candidate "$OUTPUT/training/checkpoint.pt" --output "$OUTPUT/candidate_reload.json" \

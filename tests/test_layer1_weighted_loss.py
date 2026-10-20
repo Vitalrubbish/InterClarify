@@ -1,6 +1,5 @@
-"""Check the second-round contract and weighted causal gradients against direct CE."""
+"""Check weighted causal loss and final delayed candidate reload."""
 
-import copy
 import importlib.util
 import json
 from pathlib import Path
@@ -10,77 +9,10 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
-import yaml
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts/training'))
 from layer1_loss import CONTROL_TOKENS, CONTROL_WEIGHTS, target_statistics, weighted_causal_loss
-from prepare_layer1_adaptation import validate_alignment_config
-from layer1_candidate import load_candidate
 import train_layer1 as training
-
-
-class AlignmentConfigTests(unittest.TestCase):
-    def setUp(self):
-        self.config = yaml.safe_load((ROOT / 'configs/layer1_alignment_training.yaml').read_text())
-        self.protocol = yaml.safe_load((ROOT / 'configs/layer1_alignment_protocol.yaml').read_text())
-
-    def validate(self, probe=True, steps=8, **changes):
-        return validate_alignment_config({**self.config, **changes}, self.protocol, ROOT,
-                                         'T2', 1000, 2048, steps, probe)
-
-    def test_only_loss_and_warmup_change(self):
-        self.validate()
-        self.assertEqual(self.config['learning_rate'], 2e-5)
-        self.assertEqual(self.config['warmup_steps'], 122)
-        for changes in ({'learning_rate': 1e-5}, {'warmup_steps': 37}, {'gradient_accumulation': 4},
-                        {'purpose': 'issue006_round1'}, {'max_output_gib': 100}):
-            with self.subTest(changes=changes), self.assertRaises(ValueError):
-                self.validate(**changes)
-        loss = copy.deepcopy(self.config['loss'])
-        loss['control_weights']['finish'] = 1
-        with self.assertRaises(ValueError):
-            self.validate(loss=loss)
-
-    def test_full_training_requires_current_resource_evidence(self):
-        self.protocol['release_policy'] = 'measured_alignment_probe'
-        self.protocol['training_released'] = False
-        with self.assertRaisesRegex(ValueError, 'resource release pending'):
-            self.validate(False, 1214)
-        self.protocol['training_released'] = True
-        self.protocol['resource_report_sha256'] = None
-        with self.assertRaisesRegex(ValueError, 'evidence missing'):
-            self.validate(False, 1214)
-
-    def test_explicit_user_waiver_releases_only_the_frozen_formal_condition(self):
-        self.validate(False, 1214)
-        with self.assertRaisesRegex(ValueError, 'registered loss/warmup'):
-            self.validate(False, 1214, learning_rate=1e-5)
-        with self.assertRaisesRegex(ValueError, 'final epoch'):
-            self.validate(False, 8)
-        self.protocol['probe_waiver'] = {'decision': 'skip_every_check'}
-        with self.assertRaisesRegex(ValueError, 'explicit user'):
-            self.validate(False, 1214)
-
-    def test_probe_and_scope_cannot_expand(self):
-        for steps in (0, 101, 1214):
-            with self.subTest(steps=steps), self.assertRaises(ValueError):
-                self.validate(steps=steps)
-        for arm, count, length in (('T1', 1000, 2048), ('T2', 100, 2048), ('T2', 1000, 4096)):
-            with self.assertRaises(ValueError):
-                validate_alignment_config(self.config, self.protocol, ROOT, arm, count, length, 8, True)
-        self.protocol['parent_protocol_sha256'] = 'changed'
-        with self.assertRaisesRegex(ValueError, 'Parent protocol changed'):
-            self.validate()
-
-    def test_probe_is_rejected_by_the_serving_loader_before_loading_tensors(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            path = Path(tmp)
-            identity = {'config': self.config, 'alignment_probe': True}
-            (path / 'manifest.json').write_text(json.dumps({'identity': identity}))
-            (path / 'summary.json').write_text('{}')
-            with self.assertRaisesRegex(ValueError, 'cannot be served'):
-                load_candidate(None, path / 'checkpoint.pt', None, None)
 
 
 @unittest.skipUnless(importlib.util.find_spec('torch'), 'Requires a tensor-enabled conda')
@@ -164,15 +96,15 @@ class WeightedLossTests(unittest.TestCase):
         scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lambda step: 1)
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / 'checkpoint.pt'
-            identity = {'loss': CONTROL_WEIGHTS, 'warmup_steps': 122}
+            identity = {'loss': CONTROL_WEIGHTS, 'warmup_steps': 124}
             training.save_checkpoint(path, model, optimizer, scheduler, identity, 1, 2)
             before = training.tree_digest(model.state_dict())
             with self.assertRaisesRegex(ValueError, 'identity'):
                 training.restore_checkpoint(path, model, optimizer, scheduler,
-                                            {**identity, 'warmup_steps': 37})
+                                            {**identity, 'warmup_steps': 122})
             self.assertEqual(training.tree_digest(model.state_dict()), before)
 
-    def test_formal_generation_probe_does_not_override_candidate_eligibility(self):
+    def test_delayed_candidate_reload_matches_final_generation(self):
         torch = self.torch
         import layer1_candidate as candidate
         name = 'llm.base_model.model.model.layers.0.self_attn.q_proj.lora_A.default.weight'
@@ -181,29 +113,26 @@ class WeightedLossTests(unittest.TestCase):
         model = SimpleNamespace(parameters=lambda: iter([value]), eval=lambda: None,
                                 generate=lambda **kwargs: torch.tensor([[1, 2, 9]]))
         loaded = SimpleNamespace(wrapper=wrapper, model=model, token_ids={'<|im_end|>': 9})
-        for purpose, condition, steps, sequences in (
-                ('issue036_alignment', 'T2_R2_paper_aligned', 1214, 2428),
-                ('issue040_delayed_start', 'T2_R3_delayed_start', 1235, 2469)):
-            config = {'purpose': purpose, 'condition': condition, 'arm': 'T2', 'scheduler_steps': steps}
-            identity = {'config': config, 'alignment_probe': False, 'assets': {},
-                        'data': {'statistics': {'sequences': sequences}}}
-            with tempfile.TemporaryDirectory() as tmp:
-                root = Path(tmp)
-                path = root / 'checkpoint.pt'
-                torch.save({'identity': identity, 'step': steps, 'cursor': sequences, 'lora': {name: value.detach()}}, path)
-                summary = {'passed': True, 'formal_training_released': True, 'frozen_tensors_unchanged': True,
-                           'final_step': steps, 'cursor': sequences, 'checkpoint': {'sha256': candidate.sha256_file(path)},
-                           'protocol_probe': {'prompt_ids': [1, 2], 'generated_ids': [9]}}
-                manifest = {'identity': identity, 'formal_training_released': True,
-                            'arguments': {'inventory': 'inventory', 'official_source': 'official'}}
-                for file, data in [('summary.json', summary), ('manifest.json', manifest),
-                                   ('weights_before.json', {}), ('weights_after.json', {})]:
-                    (root / file).write_text(json.dumps(data))
-                with patch.object(candidate, 'verify_asset_inventory', return_value={}), \
-                     patch.object(candidate, 'state_fingerprints', return_value={}):
-                    report = candidate.load_candidate(loaded, path, root, root)
-                self.assertTrue(report['inference_eligible'])
-                self.assertTrue(report['clean_process_probe_ids_match'])
+        config = {'purpose': 'issue040_delayed_start', 'condition': 'T2_R3_delayed_start',
+                  'arm': 'T2', 'scheduler_steps': 1235}
+        identity = {'config': config, 'assets': {}, 'data': {'statistics': {'sequences': 2469}}}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = root / 'checkpoint.pt'
+            torch.save({'identity': identity, 'step': 1235, 'cursor': 2469, 'lora': {name: value.detach()}}, path)
+            summary = {'passed': True, 'formal_training_released': True, 'frozen_tensors_unchanged': True,
+                       'final_step': 1235, 'cursor': 2469, 'checkpoint': {'sha256': candidate.sha256_file(path)},
+                       'protocol_probe': {'prompt_ids': [1, 2], 'generated_ids': [9]}}
+            manifest = {'identity': identity, 'formal_training_released': True,
+                        'arguments': {'inventory': 'inventory', 'official_source': 'official'}}
+            for file, data in [('summary.json', summary), ('manifest.json', manifest),
+                               ('weights_before.json', {}), ('weights_after.json', {})]:
+                (root / file).write_text(json.dumps(data))
+            with patch.object(candidate, 'verify_asset_inventory', return_value={}), \
+                 patch.object(candidate, 'state_fingerprints', return_value={}):
+                report = candidate.load_candidate(loaded, path, root, root)
+            self.assertTrue(report['inference_eligible'])
+            self.assertTrue(report['clean_process_probe_ids_match'])
 
 
 if __name__ == '__main__':

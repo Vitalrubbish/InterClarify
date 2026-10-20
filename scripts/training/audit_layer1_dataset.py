@@ -20,10 +20,8 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def audit_response_timing(plan, dialogue, tokenizer, config):
+def audit_response_timing(plan, dialogue, tokenizer):
     """Check delayed starts independently of deterministic plan replay."""
-    if config['generation'].get('response_start_timing', 'same_user_chunk') != 'next_no_voice':
-        return Counter()
     events, counts = plan['events'], Counter()
     starts = []
     for turn in range(0, len(dialogue['texts']), 2):
@@ -75,7 +73,7 @@ def audit_response_timing(plan, dialogue, tokenizer, config):
     return counts
 
 
-def audit(directory, tokenizer_dir, baseline_directory=None):
+def audit(directory, tokenizer_dir):
     """Fail closed on data corruption; keep human approval separate from code checks."""
     directory = Path(directory)
     manifest = json.loads((directory / 'manifest.json').read_text())
@@ -83,23 +81,6 @@ def audit(directory, tokenizer_dir, baseline_directory=None):
     config = manifest['identity']['config']
     tokenizer = ReleasedTokenizer(tokenizer_dir, config['token_ids'])
     require(tokenizer.fingerprint == manifest['identity']['tokenizer'], 'Tokenizer asset changed')
-    baseline = None
-    baseline_events = 0
-    if baseline_directory is not None:
-        baseline_directory = Path(baseline_directory)
-        baseline = json.loads((baseline_directory / 'manifest.json').read_text())
-        require(baseline.get('complete'), 'Baseline build is incomplete')
-        require(config['generation'].get('response_start_timing') == 'next_no_voice',
-                'Baseline comparison requires delayed response starts')
-        old_config, new_config = copy.deepcopy(baseline['identity']['config']), copy.deepcopy(config)
-        require(old_config['generation'].pop('response_start_timing', 'same_user_chunk') == 'same_user_chunk',
-                'Baseline must use the original response timing')
-        new_config['generation'].pop('response_start_timing')
-        require(old_config == new_config, 'Non-timing configuration changed from baseline')
-        for key in ('source_manifest_sha256', 'download_manifest_sha256', 'exclusions_sha256', 'tokenizer', 'epoch'):
-            require(baseline['identity'][key] == manifest['identity'][key], 'Baseline source identity changed')
-        require(baseline['selected_sha256'] == manifest['selected_sha256']
-                == file_digest(baseline_directory / 'dialogues.json'), 'Baseline dialogue selection changed')
     selected = json.loads((directory / 'dialogues.json').read_text())
     require(file_digest(directory / 'dialogues.json') == manifest['selected_sha256'], 'Split artifact changed')
     require(dict(Counter(d['split'] for d in selected)) == {k: v for k, v in config['splits'].items() if v},
@@ -141,22 +122,7 @@ def audit(directory, tokenizer_dir, baseline_directory=None):
         require(artifact['dialogue_id'] == dialogue['dialogue_id'] and artifact['split'] == dialogue['split'],
                 'Artifact provenance mismatch')
         events = plan['events']
-        if baseline is not None:
-            baseline_path = baseline_directory / relative
-            require(file_digest(baseline_path) == baseline['artifacts'].get(relative), 'Baseline artifact changed')
-            old_plan = json.loads(baseline_path.read_text())['plan']
-            baseline_events += len(old_plan['events'])
-            require(old_plan['user_turns'] == plan['user_turns'] and old_plan['sampling'] == plan['sampling'],
-                    'Baseline surface or random sampling changed')
-            for key in ('assistant_ids', 'user_text', 'user_origin'):
-                require([e[key] for e in old_plan['events'] if e[key]]
-                        == [e[key] for e in events if e[key]], 'Baseline content or source spans changed')
-            for kind in ('natural_pause', 'interruption', 'user_backchannel', 'post_response_thinking'):
-                require([{k: v for k, v in e.items() if k not in ('event_id', 'synthetic_window')}
-                         for e in old_plan['events'] if e['kind'] == kind]
-                        == [{k: v for k, v in e.items() if k not in ('event_id', 'synthetic_window')}
-                            for e in events if e['kind'] == kind], 'Baseline random event changed')
-        response_timing.update(audit_response_timing(plan, dialogue, tokenizer, config))
+        response_timing.update(audit_response_timing(plan, dialogue, tokenizer))
         for turn, surface in plan['user_turns'].items():
             require(surface['raw_text'] == dialogue['texts'][int(turn)], 'Raw user surface differs from source')
             validate_surface(surface)
@@ -272,13 +238,8 @@ def audit(directory, tokenizer_dir, baseline_directory=None):
             'sequences': dict(sequence_counts), 'effective_tokens': dict(token_counts),
             'micro_turns': dict(events_per_split), 'controls': dict(controls), 'event_kinds': dict(kinds),
             'sampling': dict(sampling),
-            'response_start_timing': config['generation'].get('response_start_timing', 'same_user_chunk'),
+            'response_start_timing': 'next_no_voice',
             'response_timing': dict(response_timing),
-            'baseline_comparison': ({'manifest_sha256': file_digest(baseline_directory / 'manifest.json'),
-                                     'selected_sha256': baseline['selected_sha256'],
-                                     'content_and_random_events_unchanged': True,
-                                     'added_events': sum(events_per_split.values()) - baseline_events}
-                                    if baseline is not None else None),
             'numeric_surface_replacements': dict(numeric_surfaces),
             'observed_rates': rates,
             'source': config['source'], 'source_manifest_sha256': manifest['identity']['source_manifest_sha256'],
@@ -296,10 +257,9 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', type=Path, required=True)
     parser.add_argument('--tokenizer', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--baseline-dataset', type=Path)
     args = parser.parse_args()
     try:
-        report = audit(args.dataset, args.tokenizer, args.baseline_dataset)
+        report = audit(args.dataset, args.tokenizer)
     except Exception as error:
         write_json(args.output, {'machine_passed': False, 'training_allowed': False,
                                 'error': f'{type(error).__name__}: {error}'})

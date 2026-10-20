@@ -1,7 +1,5 @@
-# 对齐配置的远端验证
+# 候选干净进程重载
 
-`scripts/training/run_layer1_alignment.py`只在远端调度单GPU中串行执行契约测试、真实官方模型连续短跑、独立进程中断/恢复对照及干净进程推理资产重载。无类；`main`负责有界阶段调度、资源记录及汇总，`verify_candidate`区分短跑与完整正式候选，不能将短跑升级为正式候选。输出必须新建，逐阶段保存退出码/墙钟/RSS，原始权重和日志留远端。
+`scripts/training/run_layer1_alignment.py` 只保留 `verify_candidate`：在独立干净进程中完整加载官方权重，调用 `layer1_candidate.load_candidate` 恢复最终 `T2_R3_delayed_start` 检查点，校验资产、LoRA 白名单、最终 epoch 游标和 checkpoint 摘要，并复现训练结束时的协议生成 IDs。
 
-短跑先连续8步、独立4步后恢复至8步，使用完整T2索引和2048窗口；另运行100步检查warmup期间稳定性。每个训练进程最长900秒、整体3600秒，1×4090/8CPU/32GiB、并发1、worker0。磁盘总上限16GiB、保留15GiB；最终checkpoint及最近恢复状态均保留。报告不宣称FDB能力改善，不提交037正式训练。
-
-用户取消开训前短跑后，`run`子命令不执行。`verify --formal`用于正式训练结束后的干净进程加载，要求完整最终epoch并返回可服务身份；默认`verify`仍只接受短跑且不会升级身份。
+脚本无阶段调度、短跑、恢复对照或正式/探针双模式；输出为单个 JSON 报告，必须写入新路径。旧 `run` 子命令、100 步探针及候选可服务豁免已删除；正式候选只有完整最终 epoch 一种身份。

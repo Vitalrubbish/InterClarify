@@ -47,16 +47,12 @@ def validate_sequence(row):
 class ProbeDataset:
     """Index verified train-only dialogue windows without loading all token arrays."""
 
-    def __init__(self, directory, audit_path, tokenizer_dir, count, length, arm, seed,
-                 delayed_start_index=False):
+    def __init__(self, directory, audit_path, tokenizer_dir, count, length, arm, seed):
         self.directory, self.arm, self.cache = Path(directory), arm, None
         manifest_path = self.directory / 'manifest.json'
         manifest = json.loads(manifest_path.read_text())
         audit = json.loads(Path(audit_path).read_text())
-        require(not delayed_start_index or manifest['identity']['config']['generation'].get(
-                'response_start_timing') == 'next_no_voice', 'Machine-only index requires delayed-start data')
-        require(manifest['complete'] and audit['machine_passed'] and
-                (audit['parent_issue_complete'] or delayed_start_index),
+        require(manifest['complete'] and audit['machine_passed'],
                 'A completed and accepted machine audit is required')
         require(audit['manifest_sha256'] == sha256_file(manifest_path), 'Audit manifest mismatch')
         require(count == 1000, 'Only full train indexing is allowed')
@@ -236,38 +232,16 @@ def protocol_probe(loaded, row):
 
 def train(args):
     config = yaml.safe_load(args.config.read_text())
-    require(config['purpose'] in ('issue006_round1', 'issue036_alignment', 'issue040_delayed_start'),
-            'Unknown training purpose')
-    delayed = config['purpose'] == 'issue040_delayed_start'
-    alignment = config['purpose'] in ('issue036_alignment', 'issue040_delayed_start')
-    alignment_probe = getattr(args, 'alignment_probe', False)
-    require(not alignment_probe or (alignment and not delayed), 'Probe flag is exclusive to alignment configuration')
-    formal = config['purpose'] == 'issue006_round1' or (alignment and not alignment_probe)
-    protocol = None
-    if alignment:
-        from prepare_layer1_adaptation import validate_alignment_config, validate_delayed_config
-        alignment_protocol = yaml.safe_load(args.protocol.read_text())
-        root = Path(__file__).resolve().parents[2]
-        if delayed:
-            protocol = validate_delayed_config(config, alignment_protocol, root, args.arm,
-                        args.dialogues, args.length, args.steps)
-        else:
-            protocol = validate_alignment_config(config, alignment_protocol, root, args.arm,
-                        args.dialogues, args.length, args.steps, alignment_probe)
-        require(sha256_file(args.config) == alignment_protocol['training_config_sha256'],
-                'Alignment training config digest mismatch')
-        require(sha256_file(args.inventory) == sha256_file(root / protocol['assets']['verified_inventory']),
-                'Official inventory differs from preregistered initialization')
-        config['arm'] = args.arm
-    elif formal:
-        from prepare_layer1_adaptation import validate_formal_config
-        protocol = yaml.safe_load(args.protocol.read_text())
-        validate_formal_config(config, protocol, Path(__file__).resolve().parents[2], args.arm,
-                               args.dialogues, args.length, args.steps)
-        root = Path(__file__).resolve().parents[2]
-        require(sha256_file(args.inventory) == sha256_file(root / protocol['assets']['verified_inventory']),
-                'Official inventory differs from preregistered initialization')
-        config['arm'] = args.arm
+    from prepare_layer1_adaptation import validate_delayed_config, validate_index
+    delayed_protocol = yaml.safe_load(args.protocol.read_text())
+    root = Path(__file__).resolve().parents[2]
+    protocol = validate_delayed_config(config, delayed_protocol, root, args.arm,
+                                       args.dialogues, args.length, args.steps)
+    require(sha256_file(args.config) == delayed_protocol['training_config_sha256'],
+            'Delayed training config digest mismatch')
+    require(sha256_file(args.inventory) == sha256_file(root / protocol['assets']['verified_inventory']),
+            'Official inventory differs from preregistered initialization')
+    config['arm'] = args.arm
     import numpy as np
     import torch
     require(config['batch_size'] == 1 and config['gradient_accumulation'] > 0, 'Invalid training batch')
@@ -287,38 +261,31 @@ def train(args):
     torch.cuda.manual_seed_all(config['seed'])
     assets = verify_asset_inventory(args.inventory, args.checkpoint, args.base_model, args.official_source)
     dataset = ProbeDataset(args.dataset, args.audit, args.checkpoint / 'tokenizer', args.dialogues,
-                           args.length, config['arm'], config['seed'], delayed_start_index=delayed)
-    if formal or alignment:
-        from prepare_layer1_adaptation import validate_index
-        root = Path(__file__).resolve().parents[2]
-        index_path = root / protocol['training']['full_train_index']
-        full_index = json.loads(index_path.read_text())
-        validate_index(full_index, protocol)
-        require(dataset.identity == full_index[args.arm], 'Actual dataset differs from frozen full index')
-        require(config['scheduler_steps'] == (len(dataset.order) + config['gradient_accumulation'] - 1) //
-                config['gradient_accumulation'], 'Single-epoch step count mismatch')
+                           args.length, config['arm'], config['seed'])
+    index_path = root / protocol['training']['full_train_index']
+    full_index = json.loads(index_path.read_text())
+    validate_index(full_index, protocol)
+    require(dataset.identity == full_index['T2'], 'Actual dataset differs from frozen full index')
+    require(config['scheduler_steps'] == (len(dataset.order) + config['gradient_accumulation'] - 1) //
+            config['gradient_accumulation'], 'Single-epoch step count mismatch')
     source_files = [Path(__file__), Path(__file__).with_name('layer1_data.py'),
-                    Path(__file__).with_name('layer1_model.py'), Path(__file__).with_name('number_surface.py')]
-    if alignment:
-        source_files.extend(Path(__file__).with_name(name) for name in
-                            ('layer1_loss.py', 'prepare_layer1_adaptation.py', 'layer1_candidate.py'))
+                    Path(__file__).with_name('layer1_model.py'), Path(__file__).with_name('number_surface.py'),
+                    Path(__file__).with_name('layer1_loss.py'),
+                    Path(__file__).with_name('prepare_layer1_adaptation.py'),
+                    Path(__file__).with_name('layer1_candidate.py')]
     identity = {'config': config, 'data': dataset.identity, 'assets': assets,
                 'code': {p.name: sha256_file(p) for p in source_files}}
-    if formal or alignment:
-        identity['release'] = {'protocol': sha256_file(args.protocol), 'index': sha256_file(index_path),
-                               'config': sha256_file(args.config),
-                               'validator': sha256_file(Path(__file__).with_name('prepare_layer1_adaptation.py')),
-                               'post_training_evaluation': protocol['post_training_evaluation']}
-    if alignment:
-        identity['alignment_probe'] = alignment_probe
+    identity['release'] = {'protocol': sha256_file(args.protocol), 'index': sha256_file(index_path),
+                           'config': sha256_file(args.config),
+                           'validator': sha256_file(Path(__file__).with_name('prepare_layer1_adaptation.py')),
+                           'post_training_evaluation': protocol['post_training_evaluation']}
     write_json(args.output / 'manifest.json', {'identity': identity, 'purpose': config['purpose'],
-               'formal_training_released': formal, 'source_commit': subprocess.check_output(
+               'formal_training_released': True, 'source_commit': subprocess.check_output(
                    ['git', 'rev-parse', 'HEAD'], text=True).strip(), 'arguments': vars_for_json(args),
                'device': torch.cuda.get_device_name(), 'torch': torch.__version__})
     loaded = load_official_checkpoint(args.checkpoint, args.base_model, training=True)
-    if alignment:
-        require(loaded.trainable_audit['tensors'] == 112 and
-                loaded.trainable_audit['frozen_embedding_and_head'], 'Alignment trainable whitelist changed')
+    require(loaded.trainable_audit['tensors'] == 112 and
+            loaded.trainable_audit['frozen_embedding_and_head'], 'Trainable whitelist changed')
     write_json(args.output / 'loading.json', {'info': loaded.info, 'load': loaded.load_audit,
                                             'trainable': loaded.trainable_audit})
     before = state_fingerprints(loaded.wrapper)
@@ -350,48 +317,36 @@ def train(args):
     metrics, exposed = [], set()
     loop_started = time.monotonic()
     while step < args.steps:
-        if formal or alignment:
-            wall_limit = 900 if alignment_probe else config['max_wall_seconds']
-            require(time.monotonic() - started < wall_limit, 'Training wall-time budget exhausted')
+        require(time.monotonic() - started < config['max_wall_seconds'], 'Training wall-time budget exhausted')
         check_disk(args.output, config)
         torch.cuda.synchronize()
         tick = time.monotonic()
         count = accumulation_count(len(dataset.order), cursor, config['gradient_accumulation'] *
-                                   config['batch_size'], formal)
+                                   config['batch_size'], True)
         rows = dataset.rows(cursor, count)
         wait = time.monotonic() - tick
         tokens = sum(row['effective_tokens'] for row in rows)
         weighted_loss = 0.0
-        if alignment:
-            from layer1_loss import CONTROL_TOKENS, target_statistics, weighted_causal_loss
-            targets = target_statistics(rows, loaded.token_ids, config['loss']['control_weights'])
-            require(targets['effective_tokens'] == tokens, 'Causal target count differs from audited data')
-            ordinary_nll = 0.0
-            control_nll = {name: 0.0 for name in CONTROL_TOKENS}
+        from layer1_loss import CONTROL_TOKENS, target_statistics, weighted_causal_loss
+        targets = target_statistics(rows, loaded.token_ids, config['loss']['control_weights'])
+        require(targets['effective_tokens'] == tokens, 'Causal target count differs from audited data')
+        ordinary_nll = 0.0
+        control_nll = {name: 0.0 for name in CONTROL_TOKENS}
         for start in range(0, len(rows), config['batch_size']):
             batch_rows = rows[start:start + config['batch_size']]
             batch = collate(batch_rows, loaded.token_ids['<|im_end|>'], 'cuda')
-            batch_tokens = sum(row['effective_tokens'] for row in batch_rows)
-            if alignment:
-                labels = batch.pop('labels')
-                outputs = loaded.model(**batch, use_cache=False)
-                numerator, diagnostics = weighted_causal_loss(outputs.logits, labels, loaded.token_ids,
-                    config['loss']['control_weights'], config['loss']['chunk_size'])
-                scaled = numerator / targets['target_weight_sum']
-                require(bool(torch.isfinite(scaled)), 'Non-finite weighted training loss')
-                scaled.backward()
-                weighted_loss += float(scaled.detach())
-                ordinary_nll += diagnostics['ordinary_nll_sum']
-                for name in control_nll:
-                    control_nll[name] += diagnostics['control_nll_sums'][name]
-                del outputs, numerator, labels, diagnostics, scaled, batch
-            else:
-                loss = loaded.model(**batch, use_cache=False).loss
-                require(bool(torch.isfinite(loss)), 'Non-finite training loss')
-                scaled = loss * (batch_tokens / tokens)
-                scaled.backward()
-                weighted_loss += float(loss.detach()) * batch_tokens / tokens
-                del loss, scaled, batch
+            labels = batch.pop('labels')
+            outputs = loaded.model(**batch, use_cache=False)
+            numerator, diagnostics = weighted_causal_loss(outputs.logits, labels, loaded.token_ids,
+                config['loss']['control_weights'], config['loss']['chunk_size'])
+            scaled = numerator / targets['target_weight_sum']
+            require(bool(torch.isfinite(scaled)), 'Non-finite weighted training loss')
+            scaled.backward()
+            weighted_loss += float(scaled.detach())
+            ordinary_nll += diagnostics['ordinary_nll_sum']
+            for name in control_nll:
+                control_nll[name] += diagnostics['control_nll_sums'][name]
+            del outputs, numerator, labels, diagnostics, scaled, batch
         grad_norm = torch.nn.utils.clip_grad_norm_(parameters, config['max_grad_norm'], error_if_nonfinite=True)
         require(float(grad_norm) > 0, 'Zero gradient norm')
         learning_rate = optimizer.param_groups[0]['lr']
@@ -406,13 +361,12 @@ def train(args):
                  'learning_rate': learning_rate, 'seconds': time.monotonic() - tick, 'data_wait_seconds': wait,
                  'input_tokens': sum(len(row['input_ids']) for row in rows), 'effective_tokens': tokens,
                  'sequence_ids': [row['sequence_id'] for row in rows],
-                 'lengths': [len(row['input_ids']) for row in rows]}
-        if alignment:
-            entry.update(ordinary_ce=ordinary_nll / tokens, weighted_objective=weighted_loss,
-                         target_weight_sum=targets['target_weight_sum'],
-                         control_targets={name: {'count': targets['control_counts'][name],
-                             'mean_nll': control_nll[name] / targets['control_counts'][name]
-                             if targets['control_counts'][name] else None} for name in control_nll})
+                 'lengths': [len(row['input_ids']) for row in rows],
+                 'ordinary_ce': ordinary_nll / tokens, 'weighted_objective': weighted_loss,
+                 'target_weight_sum': targets['target_weight_sum'],
+                 'control_targets': {name: {'count': targets['control_counts'][name],
+                     'mean_nll': control_nll[name] / targets['control_counts'][name]
+                     if targets['control_counts'][name] else None} for name in control_nll}}
         free_memory, total_memory = torch.cuda.mem_get_info()
         entry['memory'] = {'allocated_bytes': torch.cuda.memory_allocated(),
                            'reserved_bytes': torch.cuda.memory_reserved(),
@@ -424,7 +378,7 @@ def train(args):
         with (args.output / 'steps.jsonl').open('a') as stream:
             stream.write(json.dumps(entry) + '\n')
         print(json.dumps(entry), flush=True)
-        if formal and step % config['save_every_steps'] == 0 and step < args.steps:
+        if step % config['save_every_steps'] == 0 and step < args.steps:
             saved = save_checkpoint(args.output / f'checkpoint-step-{step:06d}.pt', loaded.wrapper,
                                     optimizer, scheduler, identity, step, cursor)
             write_json(args.output / f'checkpoint-step-{step:06d}.json', saved)
@@ -447,7 +401,7 @@ def train(args):
               'peak_allocated_bytes': torch.cuda.max_memory_allocated(),
               'peak_reserved_bytes': torch.cuda.max_memory_reserved(),
               'max_rss_kib': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
-              'data_statistics': dict(dataset.statistics), 'formal_training_released': formal}
+              'data_statistics': dict(dataset.statistics), 'formal_training_released': True}
     write_json(args.output / 'summary.json', report)
     return report
 
@@ -502,35 +456,21 @@ def parser():
         run.add_argument('--' + name, type=Path, required=True)
     run.add_argument('--config', type=Path, required=True)
     run.add_argument('--dialogues', type=int, choices=(1000,), required=True)
-    run.add_argument('--arm', choices=('T1', 'T2', 'T3'))
-    run.add_argument('--protocol', type=Path, default=Path('configs/layer1_adaptation_protocol.yaml'))
+    run.add_argument('--arm', choices=('T2',), required=True)
+    run.add_argument('--protocol', type=Path, default=Path('configs/layer1_delayed_protocol.yaml'))
     run.add_argument('--length', type=int, required=True)
     run.add_argument('--steps', type=int, required=True)
     run.add_argument('--resume', type=Path)
-    run.add_argument('--alignment-probe', action='store_true',
-                     help='Run at most 100 alignment steps; output cannot be served as a final candidate')
     comp = sub.add_parser('compare')
     for name in ('continuous', 'resumed', 'output'):
         comp.add_argument('--' + name, type=Path, required=True)
-    index = sub.add_parser('index')
-    for name in ('dataset', 'audit', 'tokenizer', 'output'):
-        index.add_argument('--' + name, type=Path, required=True)
-    index.add_argument('--length', type=int, required=True)
-    index.add_argument('--delayed-start-index', action='store_true',
-                       help='Index machine-audited delayed data without claiming human review')
     return result
 
 
 if __name__ == '__main__':
     arguments = parser().parse_args()
     try:
-        if arguments.command == 'index':
-            report = {arm: ProbeDataset(arguments.dataset, arguments.audit, arguments.tokenizer,
-                      1000, arguments.length, arm, 20261020,
-                      delayed_start_index=arguments.delayed_start_index).identity for arm in ('T1', 'T2', 'T3')}
-            write_json(arguments.output, report)
-        else:
-            report = train(arguments) if arguments.command == 'train' else compare(arguments)
+        report = train(arguments) if arguments.command == 'train' else compare(arguments)
         print(json.dumps(report), flush=True)
     except Exception as error:
         record_failure(arguments, error)

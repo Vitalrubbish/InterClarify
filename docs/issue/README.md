@@ -100,3 +100,5 @@
 [045删除reports旧路线证据](archive/045_remove_retired_route_reports.md)已完成归档：删除issue005 probe-only报告目录，512索引仅保留为`tests/fixtures`回归基线；维护记录按用户确认保留。
 
 [046精简Layer1报告](archive/046_minimize_layer1_reports.md)已完成归档：`reports/layer1_training`只保留配置/测试直接依赖与正式报告引用证据，由约9.6MiB降至约1.5MiB。
+
+[049删除旧训练设计](archive/049_remove_legacy_training_switches.md)已完成归档：只保留T2_R3最终路线，删除036探针、旧时序兼容、006/037条件、FDB旧模式及三个离线分析脚本。

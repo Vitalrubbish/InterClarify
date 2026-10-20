@@ -24,7 +24,7 @@ class DelayedTrainingTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.config = yaml.safe_load((ROOT / 'configs/layer1_delayed_training.yaml').read_text())
         self.protocol = yaml.safe_load((ROOT / 'configs/layer1_delayed_protocol.yaml').read_text())
-        for name in (self.protocol['parent_protocol'], 'configs/layer1_alignment_training.yaml',
+        for name in (self.protocol['parent_protocol'],
                      'reports/layer1_training/issue040-delayed-start-data-20261020/audit.json'):
             target = self.root / name
             target.parent.mkdir(parents=True, exist_ok=True)
