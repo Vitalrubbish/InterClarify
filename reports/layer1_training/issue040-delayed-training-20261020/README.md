@@ -20,4 +20,4 @@
 
 干净进程完整推理权重及生成IDs复现通过，`inference_eligible=true`。训练耗时约2441.6秒（40.7分钟），CUDA allocated峰值约19.11GiB、reserved约21.81GiB，进程RSS峰值约15.63GiB；目录占用约350MiB，均在预算内。完整证据见[训练summary](completed/training_summary.json)、[manifest](completed/training_manifest.json)、[重载核验](completed/candidate_reload.json)及[逐步目标/尾批核查](completed/training_step_check.json)。训练作业内的10项加权/候选、4项新条件及32项数据回归全部通过。
 
-040b完成归档。用户本次要求提交测试，转[040c](../../../docs/issue/040c_delayed_start_fdb_test.md)按同一25个历史输入检查新候选；训练执行及重载通过不代表接话质量已通过。
+040b完成归档。用户本次要求提交测试，转[040c](../../../docs/issue/archive/040c_delayed_start_fdb_test.md)按同一25个历史输入检查新候选；训练执行及重载通过不代表接话质量已通过。

@@ -1,6 +1,6 @@
 # Issue 036：实现下一轮训练配置的论文对齐
 
-状态：完成，已归档。日期：2026-10-20。父任务：[006](../006_punctuation_robust_adaptation.md)。后续：[037 T2重训与重测](../037_layer1_t2_retraining_retest.md)。
+状态：完成，已归档。日期：2026-10-20。父任务：[006](006_punctuation_robust_adaptation.md)。后续：[037 T2重训与重测](037_layer1_t2_retraining_retest.md)。
 
 ## 范围与最终决定
 

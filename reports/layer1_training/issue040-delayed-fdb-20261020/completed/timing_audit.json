@@ -1,0 +1,835 @@
+[
+  {
+    "sample": "candor_pause_handling/1",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 1,
+    "finish_requests": [
+      {
+        "request_id": "39c27cfb88034e96b2a0387a391eb043",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "I never like I know like a lot of people like my age they watch like the makeup vlogs or like I don't know a lot of my friends would watch like the mommy vloggers but I always thought that was like kind of weird cause I was like I don't want to like I don't wanna like know like how people are raising their kids or whatever like that like that's not really interesting to me and I also like feel like it's weird because your kids are being filmed all the time and it's like what are they like they're gonna grow up and be like oh my gosh my whole life was on the internet like everyone could see what I was doing"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "259b345f41e0462d8cff99bcae5b340a",
+        "start_tts_seconds": 8.26867618970573,
+        "pcm_received_seconds": 9.280342526733875,
+        "playback_started_seconds": 9.280557177960873,
+        "played_audio_bytes": 628046,
+        "playback_started_in_tail": false
+      }
+    ],
+    "has_playback_in_original_window": true,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": 26.940000000000055,
+    "playback_before_annotated_user_end": true,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "candor_pause_handling/10",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 1,
+    "finish_requests": [
+      {
+        "request_id": "87e62ec829594c91a557e5e8bc1046fe",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "She just like stopped what she was doing and turned to look at me when I was describing her chirping. He was like maybe, but she she's not like a pet cat"
+      }
+    ],
+    "playbacks": [],
+    "has_playback_in_original_window": false,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": 13.330000000000155,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "candor_pause_handling/100",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 0,
+    "finish_requests": [],
+    "playbacks": [],
+    "has_playback_in_original_window": false,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": 28.649999999999977,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "candor_pause_handling/101",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 3,
+    "finish_requests": [
+      {
+        "request_id": "6943052522ae410fa395a44d9a5c2201",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Yeah giant sequoias I've never I've never been there like to the redwoods and sequoia national park"
+      },
+      {
+        "request_id": "c38114a66ff54b0a877685f931d3b667",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Yeah giant sequoias I've never I've never been there like to the redwoods and sequoia national park but I've never been over there"
+      },
+      {
+        "request_id": "c10b841e86c246bb8b96fc4e42f3b291",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Yeah giant sequoias I've never I've never been there like to the redwoods and sequoia national park but I've never been over there but that's somewhere I'd like to go"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "c843bd51dd454fc9bdf6fb8183fb4beb",
+        "start_tts_seconds": 5.879699693992734,
+        "pcm_received_seconds": 6.5876437947154045,
+        "playback_started_seconds": 6.587712554261088,
+        "stop_tts_seconds": 7.0641628708690405,
+        "played_audio_bytes": 44484,
+        "playback_started_in_tail": false
+      },
+      {
+        "response_id": "9b0cf0c315a14b99aee29ce8896fa857",
+        "start_tts_seconds": 8.28325306251645,
+        "pcm_received_seconds": 8.439586902037263,
+        "playback_started_seconds": 8.43961339443922,
+        "stop_tts_seconds": 9.469914259389043,
+        "played_audio_bytes": 92160,
+        "playback_started_in_tail": false
+      },
+      {
+        "response_id": "b9092057fc5b455fbe8a3a779e87ab5a",
+        "start_tts_seconds": 10.687855698168278,
+        "pcm_received_seconds": 11.40031574293971,
+        "playback_started_seconds": 11.400342801585793,
+        "played_audio_bytes": 419994,
+        "playback_started_in_tail": true
+      }
+    ],
+    "has_playback_in_original_window": true,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": 10.310000000000173,
+    "playback_before_annotated_user_end": true,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "candor_pause_handling/102",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 2,
+    "finish_requests": [
+      {
+        "request_id": "94146535c6f04f458de805e8b7f061af",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "The movie you spoke about the movie you spoke of about is it on Netflix"
+      },
+      {
+        "request_id": "70a5fd977c1d4e9aa534f29651fd5399",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "The movie you spoke about the movie you spoke of about is it on Netflix? Is it on Netflix"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "68c0c89e469f49b0af39d4533d299eae",
+        "start_tts_seconds": 8.282361162826419,
+        "pcm_received_seconds": 8.98682738468051,
+        "playback_started_seconds": 8.986852269619703,
+        "played_audio_bytes": 361062,
+        "playback_started_in_tail": true
+      }
+    ],
+    "has_playback_in_original_window": false,
+    "tail_only_playback": true,
+    "annotated_last_word_end_seconds": 7.230000000000018,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "candor_turn_taking/1",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 1,
+    "finish_requests": [
+      {
+        "request_id": "b701d24d998048d8bba3890b71213601",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Ten companies that let you teach English online without a degree"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "954e9052c6144139a6026b9a08206760",
+        "start_tts_seconds": 6.4773360304534435,
+        "pcm_received_seconds": 7.219078531488776,
+        "playback_started_seconds": 7.219108264893293,
+        "played_audio_bytes": 854866,
+        "playback_started_in_tail": false
+      }
+    ],
+    "has_playback_in_original_window": true,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": null,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "candor_turn_taking/10",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 2,
+    "finish_requests": [
+      {
+        "request_id": "5fb1a2d0ad3e483c9caea0c25f0668e3",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Yeah, he's never really gonna get better"
+      },
+      {
+        "request_id": "302059df4f514925a91f561e4cff7303",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Yeah, he's never really gonna get better, you know, this is gonna kill him"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "f3275db6350d4ed580fa14ce10860051",
+        "start_tts_seconds": 5.285169070586562,
+        "pcm_received_seconds": 5.988783435896039,
+        "playback_started_seconds": 5.988813882693648,
+        "played_audio_bytes": 855846,
+        "playback_started_in_tail": false
+      }
+    ],
+    "has_playback_in_original_window": true,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": null,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "candor_turn_taking/100",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 1,
+    "finish_requests": [
+      {
+        "request_id": "750a17f7aaff4470bb36a5da5cd14d65",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Get paired with I totally did not see that that was gonna happen"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "102add5f9c4944e4829f69a78d6238ad",
+        "start_tts_seconds": 5.279550446197391,
+        "pcm_received_seconds": 5.980285502970219,
+        "playback_started_seconds": 5.98031216673553,
+        "played_audio_bytes": 883978,
+        "playback_started_in_tail": false
+      }
+    ],
+    "has_playback_in_original_window": true,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": null,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "candor_turn_taking/101",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 0,
+    "finish_requests": [],
+    "playbacks": [],
+    "has_playback_in_original_window": false,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": null,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "candor_turn_taking/102",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 0,
+    "finish_requests": [],
+    "playbacks": [],
+    "has_playback_in_original_window": false,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": null,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "icc_backchannel/0",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 2,
+    "finish_requests": [
+      {
+        "request_id": "62fc13e8ced24cb5b02c792123474dd3",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "There have been times in like my friends and I checked beforehand like going to a party to see if there were Ubers around that person's house cause a lot of times they lived in the middle of nowhere and like there just wasn't so that we'd have to drive because we knew we wouldn't be able to get Uber that late"
+      },
+      {
+        "request_id": "c4fa326af68548b9b6b2e3f9b0925257",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "There have been times in like my friends and I checked beforehand like going to a party to see if there were Ubers around that person's house cause a lot of times they lived in the middle of nowhere and like there just wasn't so that we'd have to drive because we knew we wouldn't be able to get Uber that late but like I don't think that's gonna happen"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "ff7aa3c9de3a4fa6b7e97e4fd35275f7",
+        "start_tts_seconds": 18.506449211388826,
+        "pcm_received_seconds": 19.22020134329796,
+        "playback_started_seconds": 19.22023113630712,
+        "stop_tts_seconds": 19.681146271526814,
+        "played_audio_bytes": 42958,
+        "playback_started_in_tail": false
+      },
+      {
+        "response_id": "756b8c7ab1784b008488427395561ee8",
+        "start_tts_seconds": 22.107605626806617,
+        "pcm_received_seconds": 22.75801815278828,
+        "playback_started_seconds": 22.75804390385747,
+        "played_audio_bytes": 437758,
+        "playback_started_in_tail": true
+      }
+    ],
+    "has_playback_in_original_window": true,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": 21.92,
+    "playback_before_annotated_user_end": true,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "icc_backchannel/1",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 0,
+    "finish_requests": [],
+    "playbacks": [],
+    "has_playback_in_original_window": false,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": 27.44,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "icc_backchannel/10",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 3,
+    "finish_requests": [
+      {
+        "request_id": "45baef7a6d594b02a7e97bb1061d142c",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Like I think we have it really good because we know so many people and like we make the best out of a situation and like we're fun and we like to like go like honestly the stuff that happens here is totally our scene"
+      },
+      {
+        "request_id": "32445ffa821b44349285085fc61ab054",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Like I think we have it really good because we know so many people and like we make the best out of a situation and like we're fun and we like to like go like honestly the stuff that happens here is totally our scene and I understand if like you don't like that stuff that maybe it's not as fun for you"
+      },
+      {
+        "request_id": "4d44c95920dc4ff7ba7d77617f002cda",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Like I think we have it really good because we know so many people and like we make the best out of a situation and like we're fun and we like to like go like honestly the stuff that happens here is totally our scene and I understand if like you don't like that stuff that maybe it's not as fun for you like I don't think will really like to go out that much"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "5a7d22c2429b44dea27d9fe03776da1e",
+        "start_tts_seconds": 22.110958291217685,
+        "pcm_received_seconds": 22.763118509203196,
+        "playback_started_seconds": 22.763143008574843,
+        "played_audio_bytes": 449856,
+        "playback_started_in_tail": true
+      }
+    ],
+    "has_playback_in_original_window": false,
+    "tail_only_playback": true,
+    "annotated_last_word_end_seconds": 22.06,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "icc_backchannel/11",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 3,
+    "finish_requests": [
+      {
+        "request_id": "bdbff9c03b154345aa140de907efbd91",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Didn't I tell you that freak I like it's so hard I feel like I'm uh I have so much to tell you all the time but I never get to tell you anymore"
+      },
+      {
+        "request_id": "c451f8aa2fe746688e2c71838aa4860b",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Didn't I tell you that freak I like it's so hard I feel like I'm uh I have so much to tell you all the time but I never get to tell you anymore see you oh my god this is good for us we keep finally catch up"
+      },
+      {
+        "request_id": "87ca9bce93be47c9a581af0bc58c976f",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Didn't I tell you that freak I like it's so hard I feel like I'm uh I have so much to tell you all the time but I never get to tell you anymore see you oh my god this is good for us we keep finally catch up yeah so okay you know how Will is like now like been talking to that girl from back home and stuff"
+      }
+    ],
+    "playbacks": [],
+    "has_playback_in_original_window": false,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": 23.62,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "icc_backchannel/12",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 3,
+    "finish_requests": [
+      {
+        "request_id": "75ee44c897b4452594046692cd133d7b",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Yes, cause I remember I was on I was literally sitting on the bus and this happened"
+      },
+      {
+        "request_id": "1e452ac351f34038aa450d300409cf5d",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Yes, cause I remember I was on I was literally sitting on the bus and this happened literally both times where everyone was staying on the bus and then they there must have been some like mix up with them directing people"
+      },
+      {
+        "request_id": "67c8fcf6e4d04c47890494574a1e42d4",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Yes, cause I remember I was on I was literally sitting on the bus and this happened literally both times where everyone was staying on the bus and then they there must have been some like mix up with them directing people because like we were supposed to leave and then this like guy came on and just started like yelling this is not the bus to conquer to trying to get to conquered get off the bus and get on this other bus and yelled it so loud at least fifteen times"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "869e4c3acb634fd3bb181026064a472b",
+        "start_tts_seconds": 17.910579964518547,
+        "pcm_received_seconds": 18.62577553652227,
+        "playback_started_seconds": 18.625827288255095,
+        "stop_tts_seconds": 19.08165281638503,
+        "played_audio_bytes": 42582,
+        "playback_started_in_tail": false
+      }
+    ],
+    "has_playback_in_original_window": true,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": 41.34,
+    "playback_before_annotated_user_end": true,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "synthetic_pause_handling/1",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 1,
+    "finish_requests": [
+      {
+        "request_id": "214b0060d2324f458465c5198c119181",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "I've been thinking about switching jobs lately. I might consider a role in tech or maybe something more in line with my hobbies"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "69e50269dcb1446088998fed54c25a7d",
+        "start_tts_seconds": 8.88536612689495,
+        "pcm_received_seconds": 9.08699837885797,
+        "playback_started_seconds": 9.087093070149422,
+        "played_audio_bytes": 368452,
+        "playback_started_in_tail": true
+      }
+    ],
+    "has_playback_in_original_window": false,
+    "tail_only_playback": true,
+    "annotated_last_word_end_seconds": 7.5,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "synthetic_pause_handling/10",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 2,
+    "finish_requests": [
+      {
+        "request_id": "e6634f7a1258430094b5295d80141538",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "I have a checkup appointment that needs rescheduling. Is there any way to change it to next week"
+      },
+      {
+        "request_id": "215e461737fb46ab82e4e9b87b6e2fd5",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "I have a checkup appointment that needs rescheduling. Is there any way to change it to next week on Ah let's see Wednesday or Thursday"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "846c34fac7af4451903e58cac378390d",
+        "start_tts_seconds": 6.484855815768242,
+        "pcm_received_seconds": 7.238965027034283,
+        "playback_started_seconds": 7.239056782796979,
+        "stop_tts_seconds": 7.664772259071469,
+        "played_audio_bytes": 39918,
+        "playback_started_in_tail": false
+      },
+      {
+        "response_id": "aead903c52e74ea3b1672683efb7fc98",
+        "start_tts_seconds": 10.087645070627332,
+        "pcm_received_seconds": 10.733176732435822,
+        "playback_started_seconds": 10.733207060024142,
+        "played_audio_bytes": 339850,
+        "playback_started_in_tail": true
+      }
+    ],
+    "has_playback_in_original_window": true,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": 8.84,
+    "playback_before_annotated_user_end": true,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "synthetic_pause_handling/100",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 1,
+    "finish_requests": [
+      {
+        "request_id": "2b998259bc094902967e0cc2181fa7ba",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Did you get to the part about the villain's backstory yet? Yes, and I thought it was kind of unexpected how they revealed that information"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "1264d0b0770f46d79413d782a6e668cb",
+        "start_tts_seconds": 9.479666881263256,
+        "pcm_received_seconds": 10.184900736436248,
+        "playback_started_seconds": 10.184926472604275,
+        "played_audio_bytes": 351094,
+        "playback_started_in_tail": true
+      }
+    ],
+    "has_playback_in_original_window": false,
+    "tail_only_playback": true,
+    "annotated_last_word_end_seconds": 8.42,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "synthetic_pause_handling/101",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 1,
+    "finish_requests": [
+      {
+        "request_id": "cf6349bc6eed4230b7a2710464c0456c",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "Let me tell you about my trip last weekend. We ended up getting lost and found this little cafe, uh, which was surprisingly so quaint and cozy"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "424ea9e1fc5a4bd0b9040a2caff70bdd",
+        "start_tts_seconds": 11.292096046730876,
+        "pcm_received_seconds": 11.941368006169796,
+        "playback_started_seconds": 11.94139252230525,
+        "played_audio_bytes": 282418,
+        "playback_started_in_tail": true
+      }
+    ],
+    "has_playback_in_original_window": false,
+    "tail_only_playback": true,
+    "annotated_last_word_end_seconds": 9.46,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "synthetic_pause_handling/102",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 2,
+    "finish_requests": [
+      {
+        "request_id": "7b79110f77904874b3e9ac1fbaf7d624",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "I've been thinking about a career switch lately"
+      },
+      {
+        "request_id": "7496138c7e8447999a01f52e15b747a8",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "I've been thinking about a career switch lately, maybe something in the tech field like software development, or maybe cybersecurity"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "67ab066c832e45c7b1f4135a347bfded",
+        "start_tts_seconds": 8.890065152198076,
+        "pcm_received_seconds": 9.110407004132867,
+        "playback_started_seconds": 9.110433608293533,
+        "played_audio_bytes": 358262,
+        "playback_started_in_tail": true
+      }
+    ],
+    "has_playback_in_original_window": false,
+    "tail_only_playback": true,
+    "annotated_last_word_end_seconds": 7.44,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "synthetic_user_interruption/1",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 2,
+    "finish_requests": [
+      {
+        "request_id": "c68a40b9109340b7945bcbcd7c038371",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "How can I save money more effectively"
+      },
+      {
+        "request_id": "41081d146e4941edbe4cc858ad94a0a1",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "How can I save money more effectively? Actually, what are some financial goals I should set"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "240a1a1e99f04698a811bf3690c9afda",
+        "start_tts_seconds": 4.075788604095578,
+        "pcm_received_seconds": 4.786597648635507,
+        "playback_started_seconds": 4.786623295396566,
+        "stop_tts_seconds": 10.6724909581244,
+        "played_audio_bytes": 556532,
+        "playback_started_in_tail": false
+      },
+      {
+        "response_id": "0f7c31eee7a24259bfd12d721593d1d9",
+        "start_tts_seconds": 13.702508565038443,
+        "pcm_received_seconds": 14.349370621144772,
+        "playback_started_seconds": 14.349397452548146,
+        "played_audio_bytes": 1746970,
+        "playback_started_in_tail": false
+      }
+    ],
+    "has_playback_in_original_window": true,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": null,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "synthetic_user_interruption/10",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 2,
+    "finish_requests": [
+      {
+        "request_id": "7a4d2d92254f46b78ae69685ffcfe79b",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "How can I reduce stress quickly"
+      },
+      {
+        "request_id": "ce2c0232bbe145a29e9a841f2859b257",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "How can I reduce stress quickly? Can we switch to talking about sleep improvement"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "e6102efb3428428196956835d51fabce",
+        "start_tts_seconds": 3.4674642961472273,
+        "pcm_received_seconds": 4.170551097020507,
+        "playback_started_seconds": 4.170575933530927,
+        "stop_tts_seconds": 10.078165324404836,
+        "played_audio_bytes": 551608,
+        "playback_started_in_tail": false
+      },
+      {
+        "response_id": "534da9240c044690b2801ada9a4c2829",
+        "start_tts_seconds": 12.492012567818165,
+        "pcm_received_seconds": 13.192490683868527,
+        "playback_started_seconds": 13.192516691982746,
+        "played_audio_bytes": 1802446,
+        "playback_started_in_tail": false
+      }
+    ],
+    "has_playback_in_original_window": true,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": null,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "synthetic_user_interruption/100",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 2,
+    "finish_requests": [
+      {
+        "request_id": "22e4e5c03a744b10b5b600ef9ef7f10b",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "What should I know before getting a new puppy"
+      },
+      {
+        "request_id": "92c5d72b58f744f0864cb22c6157fbcf",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "What should I know before getting a new puppy? Hold on, how do I choose the right type of pet food"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "8a9190d4a08c4a72aea682c376f95c8a",
+        "start_tts_seconds": 4.075614519417286,
+        "pcm_received_seconds": 4.782749006524682,
+        "playback_started_seconds": 4.782774971798062,
+        "stop_tts_seconds": 11.867982290685177,
+        "played_audio_bytes": 662122,
+        "playback_started_in_tail": false
+      },
+      {
+        "response_id": "77bbcf07380e4a9db8b56052c404c861",
+        "start_tts_seconds": 14.91064445860684,
+        "pcm_received_seconds": 15.617163943126798,
+        "playback_started_seconds": 15.61719048768282,
+        "played_audio_bytes": 1693486,
+        "playback_started_in_tail": false
+      }
+    ],
+    "has_playback_in_original_window": true,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": null,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "synthetic_user_interruption/101",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 2,
+    "finish_requests": [
+      {
+        "request_id": "6ef64fc3d4ee44c89e36efb2350a02bb",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "What's the best time to plant tomatoes"
+      },
+      {
+        "request_id": "29cccb1f9b5c41b2926abdd17e9b332a",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "What's the best time to plant tomatoes? Oh, before I forget, how do I fix a leaky faucet"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "33fd0228974a4dac945ab09559d20b07",
+        "start_tts_seconds": 2.869553664699197,
+        "pcm_received_seconds": 3.5779544226825237,
+        "playback_started_seconds": 3.577979287132621,
+        "stop_tts_seconds": 11.265479527413845,
+        "played_audio_bytes": 719040,
+        "playback_started_in_tail": false
+      },
+      {
+        "response_id": "e729ed329da6489bb1dbc0f545cb0dec",
+        "start_tts_seconds": 14.910626947879791,
+        "pcm_received_seconds": 15.56068024970591,
+        "playback_started_seconds": 15.560713676735759,
+        "played_audio_bytes": 1698690,
+        "playback_started_in_tail": false
+      }
+    ],
+    "has_playback_in_original_window": true,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": null,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  },
+  {
+    "sample": "synthetic_user_interruption/102",
+    "prefix_rewrites": 0,
+    "finish_on_text_change": 0,
+    "finish_on_unchanged_prefix": 2,
+    "finish_requests": [
+      {
+        "request_id": "4ba29122d37840b1b8c2b45e1f7b0621",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "What are some good snacks for weight loss"
+      },
+      {
+        "request_id": "8d46588142d341fb85b8b986c1ec4d5c",
+        "prefix_changed": false,
+        "rewrite": false,
+        "prefix": "What are some good snacks for weight loss? Oh, can we talk about something else? How about some travel tips"
+      }
+    ],
+    "playbacks": [
+      {
+        "response_id": "4da9010df8694421a018424e7bc68e86",
+        "start_tts_seconds": 4.064681502059102,
+        "pcm_received_seconds": 4.711192440241575,
+        "playback_started_seconds": 4.711218364536762,
+        "stop_tts_seconds": 10.664805181324482,
+        "played_audio_bytes": 556526,
+        "playback_started_in_tail": false
+      },
+      {
+        "response_id": "dafc49bd5ca34a9b997d93fded285467",
+        "start_tts_seconds": 14.299556458368897,
+        "pcm_received_seconds": 15.001755764707923,
+        "playback_started_seconds": 15.001782892271876,
+        "played_audio_bytes": 1766164,
+        "playback_started_in_tail": false
+      }
+    ],
+    "has_playback_in_original_window": true,
+    "tail_only_playback": false,
+    "annotated_last_word_end_seconds": null,
+    "playback_before_annotated_user_end": false,
+    "playback_onsets_during_annotated_pause": []
+  }
+]

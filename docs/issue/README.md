@@ -6,7 +6,7 @@
 
 [039 ASR 首文本指标移除](archive/039_remove_asr_first_text_metric.md)已完成归档；按用户要求移除正式报告中的该列及相关表述，保留原始测量证据。
 
-更新：2026-10-20。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**。首轮三臂训练和四配置FDB小子集测试已完成，接话效果不足；036实现完成并按用户豁免短跑归档；037第二轮T2训练及25会话重测已完成，人工复核/官方评分待办。完成任务移入`archive/`，父任务仅在全部条件满足后归档。
+更新：2026-10-20。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**。首轮四配置、第二轮T2及第三轮延后启动T2的固定FDB子集实验已交付。用户明确接受当前话轮控制误差，停止继续训练；006、007、008、037、040、040c已关闭归档。完整FDB、官方评分及全面人工音频复核未执行，不冒充通过。正式结果见[Layer 1训练与FDB阶段报告](../layer1_training_fdb_report.md)。
 
 | 编号 | 任务 | 当前状态与剩余工作 |
 | --- | --- | --- |
@@ -17,16 +17,16 @@
 | [004](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 完成归档；r5全量机器审计通过，用户明确免除复审后关闭 |
 | [005](archive/005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 完成归档；024真实恢复精确一致，025资源测量完成；当时保守选择512，现006按用户要求改为2048 |
 | [017](../../reports/layer1_training/issue017-loading-20261019/README.md) | 完整训练加载与零更新 | 完成、已归档；零更新通过，回归拍界抖动由用户明确接受 |
-| [006](006_punctuation_robust_adaptation.md) | 四配置基线与三组有限适配 | 进行中；首轮三臂训练、候选重载及100会话测试完成，效果不足；后续调整待决定，未改变本轮loss |
-| [007](007_turn_control_evaluation.md) | 四配置FDB小子集能力报告 | 进行中；034交付四配置能力观察及输入ASR核查，官方评分/人工复核待办 |
-| [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 执行/验收 | 进行中；033测试Completed/退出0但接话不足，官方评分/音频复核与完整FDB留后续 |
+| [006](archive/006_punctuation_robust_adaptation.md) | 四配置基线与三组有限适配 | 完成，已归档；三轮有限训练和最终候选交付，用户决定停止继续训练 |
+| [007](archive/007_turn_control_evaluation.md) | 四配置FDB小子集能力报告 | 完成，已归档；四配置及后续两轮T2的阶段能力报告交付 |
+| [008](archive/008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 执行/验收 | 完成，按当前阶段范围归档；固定子集执行交付，完整FDB/官方评分未执行 |
 | [036](archive/036_layer1_paper_alignment.md) | 论文配置对齐实现 | 完成归档；类别加权及10% warmup，保持2e-5及已有LoRA；用户豁免开训前短跑 |
-| [037](037_layer1_t2_retraining_retest.md) | T2重训与重测 | 进行中；训练及25会话重测完成，合成插话2/5→4/5、自然接话仍1/5；不自动第三轮，人工复核/官方评分待办 |
-| [040](040_layer1_delayed_response_start.md) | 回答启动后移一拍 | 进行中；040a数据完成；040b训练完成归档（1235步、重载通过）；040c固定25会话测试Running |
+| [037](archive/037_layer1_t2_retraining_retest.md) | T2重训与重测 | 完成，已归档；第二轮训练与25会话结果保留作对照 |
+| [040](archive/040_layer1_delayed_response_start.md) | 回答启动后移一拍 | 完成，已归档；新数据、全量加权训练及25会话重测交付，用户接受当前误差 |
 
 远端执行见 [001 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/001_remote_execution.md)与 [002/003 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_003_remote_execution.md)。001 只验证一套官方配置：Kyutai Word 逐词 strip、每拍空格连接、首非空 Word 起拍、600ms、BF16、64-token 贪心。raw 字符增量和 160ms 超时释放残词均不等同官方 Word；不展开时钟、发布粒度与句读矩阵。旧 raw/超时残词报告只作诊断；新原生 Word 五例全部通过，结果见 [001 验收报告](../../reports/layer1_training/issue001-word-20261019/README.md)。
 
-[008a 官方权重完整链路诊断](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/008a_official_full_chain_smoke.md)已完成：当前五例新正文/语音0/5，共178拍无协议/组件错误。005现已完成有限步真实更新和资源验证，三臂正式适配及质量验收尚未启动。
+[008a 官方权重完整链路诊断](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/008a_official_full_chain_smoke.md)已完成：当前五例新正文/语音0/5，共178拍无协议/组件错误。后续有限训练及固定FDB子集实验均已交付，当前按用户接受范围收口。
 
 ## 依赖与交付
 
@@ -38,7 +38,7 @@
 
 [015 调试机资源实测](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/015_debug_node_data_validation.md)完成：32条诊断在1CPU下约6.9秒、峰值约150MiB；同规模轻量检查直接在调试机受限执行。r4测试/诊断及完整来源下载最终均通过退出0。
 
-当前路径为001/004/005通过 → 006正式训练与最终权重交付 → 008执行同一历史FDB小子集全链路测试 → 007生成四配置能力报告并人工检查内容。030移除独立回放器/dev选择的开训要求；后续完整FDB与底座冻结另行推进，不重开组件选型、不实现Layer2/3。
+本阶段001/004/005前置、006训练资产、008固定子集执行及007能力报告均已交付并归档；最终交付为T2_R3_delayed_start。后续完整FDB或其他层研究需另行立项，不因本阶段残余误差继续训练。
 
 | 已确定路线 | 必须交付的证据 | 主责 |
 | --- | --- | --- |
@@ -84,4 +84,4 @@
 
 [043撤销最近两次清理提交](archive/043_revert_cleanup_commits.md)已完成归档：用反向提交恢复旧训练探针及X2/MOSS/TurnSense组件，未触碰正在运行的训练作业，保留原有未提交改动。
 
-[040c延后启动候选测试](040c_delayed_start_fdb_test.md)已提交，作业`job-179250639360566170646-xuan-zhang`为Running；完整训练及候选重载通过，测试结果待交付。
+[040c延后启动候选测试](archive/040c_delayed_start_fdb_test.md)已完成归档；25/25会话执行成功，退出0，自然接话新回复3/5、合成插话后新回复5/5。用户要求结束当前阶段并停止继续训练，已知限制及未执行项保留在正式报告。

@@ -1,6 +1,18 @@
 # Issue 037：按对齐配置重训并重测T2
 
-状态：进行中。优先级：P0。父任务：006、007、008。依赖：[036配置实现与资源放行](archive/036_layer1_paper_alignment.md)。
+状态：完成，已归档。关闭依据：用户明确要求形成报告、关闭相关Issue并停止继续训练。
+
+## 关闭结论
+
+第二轮训练及25会话重测已交付，其结果保留作第三轮对照；官方评分与全面音频复核未执行，不再阻塞本阶段关闭。
+
+正式交付为[Layer 1训练与FDB阶段报告](../../layer1_training_fdb_report.md)，完整实验结果和逐例证据见[本轮测试记录](../../../reports/layer1_training/issue040-delayed-fdb-20261020/README.md)。
+
+用户接受当前话轮控制不完美，不要求达到100%正确后才结束本阶段。保留漏答、提前播放、时延增加及无finish正文启动等已知限制；官方TOR/完整FDB/全面人工音频复核未执行，未执行项不记为通过，也不再作为本阶段关闭前置。后续工作须另行明确立项，本阶段不继续训练。
+
+## 归档前计划与执行记录
+
+以下保留原计划和过程记录以便追溯。旧的运行中描述、未勾选任务和后续建议均为历史状态，以以上关闭结论和正式报告为准；不将未执行项补勾为完成。
 
 ## 目标与条件
 
@@ -40,7 +52,7 @@
 
 ## 正式训练提交
 
-调度作业`job-179248995834872020112-xuan-zhang`已运行，观察到第24/1,214步，run_id=`issue037-t2-round2-r1`，冻结源码`cf56856`，1×4090/8CPU/32GiB。详见[启动记录](../../reports/layer1_training/issue037-t2-round2-20261020/README.md)。本次未运行短跑；训练summary已通过，原作业在训练后因候选身份标记缺陷退出1，修复后在测试服务重新核验最终资产。FDB重测已提交，结果待交付。
+调度作业`job-179248995834872020112-xuan-zhang`已运行，观察到第24/1,214步，run_id=`issue037-t2-round2-r1`，冻结源码`cf56856`，1×4090/8CPU/32GiB。详见[启动记录](../../../reports/layer1_training/issue037-t2-round2-20261020/README.md)。本次未运行短跑；训练summary已通过，原作业在训练后因候选身份标记缺陷退出1，修复后在测试服务重新核验最终资产。FDB重测已提交，结果待交付。
 
 ## 等待训练与后续测试
 
@@ -48,7 +60,7 @@
 
 训练已完成1,214步且summary通过；首作业在训练后因候选可服务标记变量覆盖而退出1，原证据保留。已修复加载器并补完整候选回归；测试作业启动前在干净模型服务重新完整核验参数和生成，不重新训练，不将原退出码改为0。
 
-测试作业`job-179249282996234249654-xuan-zhang`，冻结源码`3f65d7d`，2×4090/16CPU/64GiB，独立输出`issue037-t2-fdb-r1`；详见[测试提交记录](../../reports/layer1_training/issue037-t2-round2-20261020/test_submission.json)。
+测试作业`job-179249282996234249654-xuan-zhang`，冻结源码`3f65d7d`，2×4090/16CPU/64GiB，独立输出`issue037-t2-fdb-r1`；详见[测试提交记录](../../../reports/layer1_training/issue037-t2-round2-20261020/test_submission.json)。
 
 测试服务已用修复加载器验证`inference_eligible=true`、完整参数指纹及生成IDs复现均通过，最终checkpoint SHA256=`e94af4bd939e1a8b33a00e2125009bc801b2aeb612080b370cf52a1766f21d9e`。暂停两个子集10会话已执行，其余继续等待；不提前填写能力通过。
 
@@ -56,4 +68,4 @@
 
 测试已完成，轮次/条件退出0，25会话无传输、协议或组件错误。最终候选完整推理权重与训练最终状态一致、生成IDs完全复现。合成插话标注后新响应2/5→4/5，Candor自然接话仍1/5；新增Candor暂停/102与ICC/11出声需人工复核。25例最终ASR与旧T2一致，前缀交付均匹配。
 
-[结果报告](../../reports/layer1_training/issue037-t2-round2-20261020/results.md)及[逐例文本/时延/音频路径](../../reports/layer1_training/issue037-t2-round2-20261020/test_samples.csv)已交付。停止自动扩展训练，不进入第三轮；官方对齐/TOR、人工音频和内容复核仍pending，issue保持进行中，未把transport通过当作整体能力通过。
+[结果报告](../../../reports/layer1_training/issue037-t2-round2-20261020/results.md)及[逐例文本/时延/音频路径](../../../reports/layer1_training/issue037-t2-round2-20261020/test_samples.csv)已交付。停止自动扩展训练，不进入第三轮；官方对齐/TOR、人工音频和内容复核仍pending，issue保持进行中，未把transport通过当作整体能力通过。

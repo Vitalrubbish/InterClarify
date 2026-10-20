@@ -1,6 +1,6 @@
 # Issue 040a：实现回答启动数据后移
 
-状态：完成，归档。父任务：[040](../040_layer1_delayed_response_start.md)。
+状态：完成，归档。父任务：[040](040_layer1_delayed_response_start.md)。
 
 按用户本次指令，将普通末文字拍监督为 talking＋EOS，下一 no-voice 拍监督为 finish＋原回答首片段＋EOS；单片段插话当拍 interruption 不变。保留原始 r5 对话、数值读法、同种子随机事件、正文和三视图目标一致性。
 

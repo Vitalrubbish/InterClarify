@@ -1,0 +1,34 @@
+{
+  "transport_passed": true,
+  "subsets": [
+    {
+      "subset": "candor_pause_handling",
+      "status": "PASS",
+      "sessions": 5
+    },
+    {
+      "subset": "synthetic_pause_handling",
+      "status": "PASS",
+      "sessions": 5
+    },
+    {
+      "subset": "candor_turn_taking",
+      "status": "PASS",
+      "sessions": 5
+    },
+    {
+      "subset": "synthetic_user_interruption",
+      "status": "PASS",
+      "sessions": 5
+    },
+    {
+      "subset": "icc_backchannel",
+      "status": "PASS",
+      "sessions": 5
+    }
+  ],
+  "sessions": 25,
+  "official_scoring": "pending",
+  "manual_content_review": "pending",
+  "physical_playback_measured": false
+}

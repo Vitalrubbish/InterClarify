@@ -20,10 +20,10 @@
     "min_free_gib": 15,
     "concurrent_jobs": 1
   },
-  "status": "Running",
+  "status": "completed",
   "requires_clean_candidate_revalidation": true,
-  "exit_code": null,
-  "condition_exit_code": null,
+  "exit_code": 0,
+  "condition_exit_code": 0,
   "training_exit_code": 0,
   "training_clean_reload_passed": true,
   "input_manifest_sha256": "d5885326eedab8f450843d3737ce08ccf98ebe6de89d7958b5628a8ba731cc40",
@@ -32,5 +32,10 @@
   "input_sessions_verified": 25,
   "input_files_verified": 70,
   "xtalk_source_files_verified": 134,
-  "asr_tts_health_passed": true
+  "asr_tts_health_passed": true,
+  "actual_sessions": 25,
+  "missing_or_failed_samples": 0,
+  "clean_candidate_revalidation_passed": true,
+  "official_scoring": "not_executed",
+  "stage_closed_by_user": true
 }
