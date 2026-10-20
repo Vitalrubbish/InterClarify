@@ -328,6 +328,13 @@ def train(args):
                  'input_tokens': sum(len(row['input_ids']) for row in rows), 'effective_tokens': tokens,
                  'sequence_ids': [row['sequence_id'] for row in rows],
                  'lengths': [len(row['input_ids']) for row in rows]}
+        free_memory, total_memory = torch.cuda.mem_get_info()
+        entry['memory'] = {'allocated_bytes': torch.cuda.memory_allocated(),
+                           'reserved_bytes': torch.cuda.memory_reserved(),
+                           'peak_allocated_bytes': torch.cuda.max_memory_allocated(),
+                           'peak_reserved_bytes': torch.cuda.max_memory_reserved(),
+                           'device_free_bytes': free_memory, 'device_total_bytes': total_memory,
+                           'max_rss_kib': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}
         metrics.append(entry)
         with (args.output / 'steps.jsonl').open('a') as stream:
             stream.write(json.dumps(entry) + '\n')
