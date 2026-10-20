@@ -1,0 +1,34 @@
+schema_version: 1
+issue: '040'
+condition: T2_R3_delayed_start
+training_released: true
+parent_protocol: configs/layer1_adaptation_protocol.yaml
+parent_protocol_sha256: 6162fc0ada3a4370672a017f95b523cb56307eed39454c7e17aa0a8104b7aa61
+training_config_sha256: 049eaee17d6876e9254a72f5694708b69c8b1631a0742fbf061bd43ff126b78e
+full_train_index_sha256: null
+data_manifest_sha256: 86c0faca1e1a12d3c7cf1fa0144e53a6a83166a8454ad48d986b24d40a97761d
+data_audit_sha256: 88c5d66277204c2edc961c00a04ddd4b4fed4e6f30f43cb987907d2c88889df7
+authorization:
+  date: '2026-10-20'
+  decision: direct_full_training_latest_data_weighted_loss
+  additional_epochs: 1
+  pretraining_model_probe: not_required_by_user_direct_training
+  human_review: pending_not_claimed_passed
+training:
+  full_train_index: reports/layer1_training/issue040-delayed-training-20261020/full_train_index.json
+  sequence_length: 2048
+  round1_sequences_per_condition: 2469
+  round1_effective_tokens_per_condition: 1201531
+  effective_batch: 2
+  actual_steps: 1235
+  checkpoint_selection: final_epoch
+resources:
+  gpus: 1
+  cpus: 8
+  memory_gib: 32
+  workers: 0
+  concurrent_jobs: 1
+  max_wall_seconds: 28800
+  training_output_gib: 5
+  total_output_gib: 6
+  min_free_gib: 5

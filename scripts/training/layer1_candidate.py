@@ -29,8 +29,10 @@ def load_candidate(loaded, path, checkpoint, base_model, *, verification_only=Fa
     summary = json.loads((directory / 'summary.json').read_text())
     manifest = json.loads((directory / 'manifest.json').read_text())
     identity = manifest['identity']
-    alignment = identity['config']['purpose'] == 'issue036_alignment'
+    delayed = identity['config']['purpose'] == 'issue040_delayed_start'
+    alignment = identity['config']['purpose'] in ('issue036_alignment', 'issue040_delayed_start')
     probe = alignment and identity.get('alignment_probe') is True
+    require(not (delayed and probe), 'Delayed-start candidates must complete the formal epoch')
     require(not probe or verification_only, 'Alignment probe cannot be served as a formal candidate')
     require(summary['passed'] and summary['frozen_tensors_unchanged'] and
             ((probe and verification_only) or
@@ -38,7 +40,8 @@ def load_candidate(loaded, path, checkpoint, base_model, *, verification_only=Fa
             'Candidate training was not successfully completed')
     require((identity['config']['purpose'] == 'issue006_round1' and
              identity['config']['arm'] in ('T1', 'T2', 'T3')) or
-            (alignment and identity['config']['condition'] == 'T2_R2_paper_aligned' and
+            (alignment and identity['config']['condition'] ==
+             ('T2_R3_delayed_start' if delayed else 'T2_R2_paper_aligned') and
              identity['config']['arm'] == 'T2'),
             'Only registered formal candidates can be served')
     if probe:

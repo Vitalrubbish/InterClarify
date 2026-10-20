@@ -1,0 +1,3 @@
+# 延后启动训练契约回归
+
+`tests/test_layer1_delayed_training.py` 在临时目录冻结新索引，检查完整加权配置可放行、旧数据摘要/旧索引拒收、用户授权必须匹配且不能训练短epoch、普通CE和权重变化不得进入新条件。无模型或GPU依赖。既有 `test_layer1_alignment.py` 在远端调度环境执行，继续核对加权loss与直接CE的数值/梯度等价、整累积批权重分母、mask、恢复身份及正式候选身份。

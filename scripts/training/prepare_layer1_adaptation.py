@@ -142,6 +142,49 @@ def validate_alignment_config(config, protocol, root, arm, dialogues, length, st
     return parent
 
 
+
+def validate_delayed_config(config, protocol, root, arm, dialogues, length, steps):
+    """Authorize one frozen delayed-start epoch from the latest machine-audited data."""
+    require(protocol['schema_version'] == 1 and protocol['issue'] == '040'
+            and protocol.get('training_released') is True, 'Delayed training is not released')
+    require(protocol.get('authorization') == {
+        'date': '2026-10-20', 'decision': 'direct_full_training_latest_data_weighted_loss',
+        'additional_epochs': 1, 'pretraining_model_probe': 'not_required_by_user_direct_training',
+        'human_review': 'pending_not_claimed_passed'}, 'Missing current direct-training authorization')
+    parent_path = root / protocol['parent_protocol']
+    require(sha256_file(parent_path) == protocol['parent_protocol_sha256'], 'Parent protocol changed')
+    parent = yaml.safe_load(parent_path.read_text())
+    require(not release_blockers(parent, root), 'Parent technical gates are closed')
+    baseline = yaml.safe_load((root / 'configs/layer1_alignment_training.yaml').read_text())
+    expected = {**baseline, 'purpose': 'issue040_delayed_start', 'condition': 'T2_R3_delayed_start',
+                'scheduler_steps': 1235, 'warmup_steps': 124, 'save_every_steps': 206}
+    require(config == expected and config['condition'] == protocol['condition'],
+            'Delayed training differs from the frozen weighted configuration')
+    require(arm == 'T2' and dialogues == 1000 and length == 2048 and steps == 1235,
+            'Delayed training requires the full single T2 epoch')
+    require(protocol['resources'] == dict(gpus=1, cpus=8, memory_gib=32, workers=0,
+            concurrent_jobs=1, max_wall_seconds=28800, training_output_gib=5,
+            total_output_gib=6, min_free_gib=5), 'Delayed resource budget changed')
+    audit_path = root / 'reports/layer1_training/issue040-delayed-start-data-20261020/audit.json'
+    audit = json.loads(audit_path.read_text())
+    require(sha256_file(audit_path) == protocol['data_audit_sha256'] and audit['machine_passed']
+            and audit['manifest_sha256'] == protocol['data_manifest_sha256']
+            and audit['response_start_timing'] == 'next_no_voice'
+            and audit['baseline_comparison']['content_and_random_events_unchanged'],
+            'Latest delayed dataset audit changed')
+    index_path = root / protocol['training']['full_train_index']
+    require(protocol.get('full_train_index_sha256') and
+            sha256_file(index_path) == protocol['full_train_index_sha256'], 'Delayed full index changed')
+    index = json.loads(index_path.read_text())
+    effective = {**parent, 'training': {**parent['training'], **protocol['training']}}
+    validate_index(index, effective)
+    for row in index.values():
+        require(row['manifest_sha256'] == protocol['data_manifest_sha256']
+                and row['audit_sha256'] == protocol['data_audit_sha256'], 'Index uses an older dataset')
+    require(effective['training']['checkpoint_selection'] == 'final_epoch', 'Final epoch selection required')
+    return effective
+
+
 def build_plan(protocol_path, config_path, root=ROOT):
     protocol = yaml.safe_load(protocol_path.read_text())
     config = yaml.safe_load(config_path.read_text())

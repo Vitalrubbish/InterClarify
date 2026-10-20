@@ -47,12 +47,16 @@ def validate_sequence(row):
 class ProbeDataset:
     """Index verified train-only dialogue windows without loading all token arrays."""
 
-    def __init__(self, directory, audit_path, tokenizer_dir, count, length, arm, seed):
+    def __init__(self, directory, audit_path, tokenizer_dir, count, length, arm, seed,
+                 delayed_start_index=False):
         self.directory, self.arm, self.cache = Path(directory), arm, None
         manifest_path = self.directory / 'manifest.json'
         manifest = json.loads(manifest_path.read_text())
         audit = json.loads(Path(audit_path).read_text())
-        require(manifest['complete'] and audit['machine_passed'] and audit['parent_issue_complete'],
+        require(not delayed_start_index or manifest['identity']['config']['generation'].get(
+                'response_start_timing') == 'next_no_voice', 'Machine-only index requires delayed-start data')
+        require(manifest['complete'] and audit['machine_passed'] and
+                (audit['parent_issue_complete'] or delayed_start_index),
                 'A completed and accepted machine audit is required')
         require(audit['manifest_sha256'] == sha256_file(manifest_path), 'Audit manifest mismatch')
         require(count in (32, 100, 1000), 'Only registered probes or full train indexing are allowed')
@@ -234,17 +238,22 @@ def protocol_probe(loaded, row):
 
 def train(args):
     config = yaml.safe_load(args.config.read_text())
-    alignment = config['purpose'] == 'issue036_alignment'
+    delayed = config['purpose'] == 'issue040_delayed_start'
+    alignment = config['purpose'] in ('issue036_alignment', 'issue040_delayed_start')
     alignment_probe = getattr(args, 'alignment_probe', False)
-    require(not alignment_probe or alignment, 'Probe flag is exclusive to alignment configuration')
+    require(not alignment_probe or (alignment and not delayed), 'Probe flag is exclusive to alignment configuration')
     formal = config['purpose'] == 'issue006_round1' or (alignment and not alignment_probe)
     protocol = None
     if alignment:
-        from prepare_layer1_adaptation import validate_alignment_config
+        from prepare_layer1_adaptation import validate_alignment_config, validate_delayed_config
         alignment_protocol = yaml.safe_load(args.protocol.read_text())
         root = Path(__file__).resolve().parents[2]
-        protocol = validate_alignment_config(config, alignment_protocol, root, args.arm,
-                    args.dialogues, args.length, args.steps, alignment_probe)
+        if delayed:
+            protocol = validate_delayed_config(config, alignment_protocol, root, args.arm,
+                        args.dialogues, args.length, args.steps)
+        else:
+            protocol = validate_alignment_config(config, alignment_protocol, root, args.arm,
+                        args.dialogues, args.length, args.steps, alignment_probe)
         require(sha256_file(args.config) == alignment_protocol['training_config_sha256'],
                 'Alignment training config digest mismatch')
         require(sha256_file(args.inventory) == sha256_file(root / protocol['assets']['verified_inventory']),
@@ -282,7 +291,7 @@ def train(args):
     torch.cuda.manual_seed_all(config['seed'])
     assets = verify_asset_inventory(args.inventory, args.checkpoint, args.base_model, args.official_source)
     dataset = ProbeDataset(args.dataset, args.audit, args.checkpoint / 'tokenizer', args.dialogues,
-                           args.length, config['arm'], config['seed'])
+                           args.length, config['arm'], config['seed'], delayed_start_index=delayed)
     if formal or alignment:
         from prepare_layer1_adaptation import validate_index
         root = Path(__file__).resolve().parents[2]
@@ -511,6 +520,8 @@ def parser():
     for name in ('dataset', 'audit', 'tokenizer', 'output'):
         index.add_argument('--' + name, type=Path, required=True)
     index.add_argument('--length', type=int, required=True)
+    index.add_argument('--delayed-start-index', action='store_true',
+                       help='Index machine-audited delayed data without claiming human review')
     return result
 
 
@@ -519,7 +530,8 @@ if __name__ == '__main__':
     try:
         if arguments.command == 'index':
             report = {arm: ProbeDataset(arguments.dataset, arguments.audit, arguments.tokenizer,
-                      1000, arguments.length, arm, 20261020).identity for arm in ('T1', 'T2', 'T3')}
+                      1000, arguments.length, arm, 20261020,
+                      delayed_start_index=arguments.delayed_start_index).identity for arm in ('T1', 'T2', 'T3')}
             write_json(arguments.output, report)
         else:
             report = train(arguments) if arguments.command == 'train' else compare(arguments)
