@@ -1,0 +1,51 @@
+{
+  "checked_at": "2026-10-20",
+  "passed": true,
+  "scope": "paper non-beta token design, released tokenizer IDs, current code/config and served identity",
+  "paper": "https://arxiv.org/html/2603.09180v1#S3.SS2",
+  "official_source_revision": "42893024ca90c8de8ac3ed624467ebc123512ff8",
+  "token_ids": {
+    "<|endoftext|>": 151643,
+    "<|im_start|>": 151644,
+    "<|im_end|>": 151645,
+    "<|no voice|>": 151646,
+    "<|user is talking|>": 151647,
+    "<|user finish talking|>": 151648,
+    "<|user is thinking|>": 151649,
+    "<|user interruption|>": 151650,
+    "<|user backchannel|>": 151651
+  },
+  "wire_control_mapping": {
+    "<|user is talking|>": "USER_IS_SPEAKING",
+    "<|user finish talking|>": "USER_FINISH_SPEAKING",
+    "<|user interruption|>": "USER_IS_INTERRUPTING",
+    "<|user backchannel|>": "USER_BACKCHANNEL",
+    "<|user is thinking|>": "USER_IS_THINKING"
+  },
+  "checks": {
+    "six_duplex_tokens_match_verified_tokenizer": true,
+    "five_system_controls_match_runtime": true,
+    "protocol_wire_mapping_matches": true,
+    "served_ids_match_training_config": true,
+    "all_six_marked_special_in_verified_metadata": true,
+    "no_system_backchannel_enabled": true,
+    "eos_im_end_bos_absent": true,
+    "loader_code_matches_executed_training": true
+  },
+  "scope_limits": [
+    "Paper names and wire spellings differ; IDs come from released tokenizer, not paper",
+    "Current audit uses frozen tokenizer metadata and actual served identity; no new GPU model load",
+    "Token semantics match ordinary variant; does not establish beta support or full runtime/training reproduction",
+    "Delayed response start is a proposed supervision timing change; no implementation or training submitted"
+  ],
+  "source_sha256": {
+    "configs/layer1_data.yaml": "c1503b92fe34c8c7ec26651b8529c811f0232876b2d463f756b18dee6902ae04",
+    "configs/layer1_adaptation_protocol.yaml": "6162fc0ada3a4370672a017f95b523cb56307eed39454c7e17aa0a8104b7aa61",
+    "scripts/training/layer1_model.py": "d2bc951658eaf24af38314fed411008d1f17387243cd30e6da4abc6061571622",
+    "scripts/remote/duplex_model_service.py": "3f89ca040f04d9725f5c2ef6a7de9843c9ed9f2b167a07bd6a161e645cef0341",
+    "xtalk/src/xtalk/duplex_control/protocol.py": "5121d481061c4b1b398bde454994ee256e018c2326b6cae3e6a49b536ff38aa7",
+    "xtalk/src/xtalk/duplex_control/runtime_adapter.py": "a8413c8abc7c88291261ea74a001e283838410302bfa72d94ae7a60486ab41bc",
+    "reports/layer1_training/issue001-inventory-20261018/inventory_summary.json": "ca93ed2e34df36acf9bce1ee8be869f78f0105a18a7e9cbfd10f7fcda0d7b424",
+    "reports/layer1_training/issue037-t2-round2-20261020/test_startup.json": "856345b79f8ba6ff36113a515b11946d291b08c37390df422af5025ebd7f92ed"
+  }
+}

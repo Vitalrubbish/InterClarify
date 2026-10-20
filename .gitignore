@@ -78,3 +78,6 @@ openai_use.example
 # Independent X-Talk fork checkout. Its commits are tracked in its own repo;
 # InterClarify records the selected revision in configs and run manifests.
 /xtalk/
+
+# Machine-specific SSH connection instructions (local only).
+remote_connection.local.md

@@ -10,4 +10,6 @@
 
 本地`ml-hw1` conda 的加权loss/候选10项和新条件4项测试通过；`paratalker-dev`缺PyTorch的初次相关测试未通过，因此转到有PyTorch的现有conda完成核验。数据管线32项在上一阶段本地/远端均通过，新作业启动时再执行全部32项及14项训练契约/梯度检查。没有运行模型短跑。
 
-提交和实际训练启动证据待调度器返回后更新。
+调度器已接收作业 `job-179250231441693568614-xuan-zhang`，run_id `issue040-delayed-start-r1`，冻结源码 `91b7eb260933272c8c82f73176a855e508bf57af`；目前观察为 Pending，尚未记录实际optimizer更新。精确路径、配置及预算见 [submission.json](submission.json)。
+
+前轮实测单份恢复checkpoint为60,735,744字节，本轮同样112个LoRA/AdamW状态及六个保存点，约364.4MB，5GiB训练/6GiB总目录足够覆盖；这仅作预算依据，实际占用与资源仍记录本轮值。

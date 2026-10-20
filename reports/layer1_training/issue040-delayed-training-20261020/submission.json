@@ -1,0 +1,32 @@
+{
+  "job_id": "job-179250231441693568614-xuan-zhang",
+  "run_id": "issue040-delayed-start-r1",
+  "condition": "T2_R3_delayed_start",
+  "source_commit": "91b7eb260933272c8c82f73176a855e508bf57af",
+  "source_checkout": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/source/91b7eb2",
+  "output": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue040-delayed-start-r1",
+  "dataset": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue040-delayed-start-data/dataset",
+  "conda_prefix": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training",
+  "image": "docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4",
+  "partition": "pdgpu-4090",
+  "resources": {
+    "gpus": 1,
+    "cpus": 8,
+    "memory_gib": 32,
+    "workers": 0,
+    "concurrent_jobs": 1,
+    "max_wall_seconds": 28800,
+    "training_output_gib": 5,
+    "total_output_gib": 6,
+    "min_free_gib": 5
+  },
+  "config_sha256": "049eaee17d6876e9254a72f5694708b69c8b1631a0742fbf061bd43ff126b78e",
+  "protocol_sha256": "28937ea0a0e7087a9fe610c00560f800f2aef58aa5ad2b2703f898ffb1d251c0",
+  "full_train_index_sha256": "9032074e05eeb1de7c1c93c396f1e61f0b1e59df67ee21b2c618d167eca9bbfc",
+  "data_manifest_sha256": "86c0faca1e1a12d3c7cf1fa0144e53a6a83166a8454ad48d986b24d40a97761d",
+  "submitted": true,
+  "execution_status": "submitted_waiting_actual_training_step",
+  "pretraining_model_probe": "not_executed_user_direct_training",
+  "fdb_submitted": false,
+  "final_exit_code": null
+}
