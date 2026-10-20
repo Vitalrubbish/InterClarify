@@ -1,0 +1,81 @@
+{
+  "observed_at": "2026-10-20T05:29:51.429388+00:00",
+  "round_output": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue006-round1-r1",
+  "status": {
+    "job_id": "job-179247270604284962674-xuan-zhang",
+    "arms": {
+      "T1": {
+        "status": "running",
+        "updated_at": "2026-10-20T05:05:36.612678+00:00"
+      },
+      "T2": {
+        "status": "pending"
+      },
+      "T3": {
+        "status": "pending"
+      }
+    },
+    "B0": {
+      "status": "registered_untrained_baseline",
+      "optimizer_steps": 0
+    },
+    "training_order": [
+      "T1",
+      "T2",
+      "T3"
+    ],
+    "evaluation_status": "not_run",
+    "status": "running",
+    "updated_at": "2026-10-20T05:05:36.612678+00:00"
+  },
+  "arms": {
+    "T1": {
+      "recorded_steps": 875,
+      "checkpoints": [
+        {
+          "name": "checkpoint-step-000203.pt",
+          "bytes": 60740680
+        },
+        {
+          "name": "checkpoint-step-000406.pt",
+          "bytes": 60740680
+        },
+        {
+          "name": "checkpoint-step-000609.pt",
+          "bytes": 60740680
+        },
+        {
+          "name": "checkpoint-step-000812.pt",
+          "bytes": 60740680
+        }
+      ],
+      "last_step": 875,
+      "cursor": 1750,
+      "progress_fraction": 0.7207578253706755,
+      "last_loss": 0.8020837951790203,
+      "first50_loss_mean": 0.9123682711746787,
+      "last50_loss_mean": 0.7559558142340778,
+      "last100_step_seconds": 1.4954399380274117,
+      "effective_tokens": 868497,
+      "finite_loss_and_grad": true,
+      "memory": {
+        "allocated_bytes": 17571129344,
+        "reserved_bytes": 23110615040,
+        "peak_allocated_bytes": 21758021120,
+        "peak_reserved_bytes": 24685576192,
+        "device_free_bytes": 1599995904,
+        "device_total_bytes": 25262096384,
+        "max_rss_kib": 16393032
+      }
+    },
+    "T2": {
+      "recorded_steps": 0,
+      "checkpoints": []
+    },
+    "T3": {
+      "recorded_steps": 0,
+      "checkpoints": []
+    }
+  },
+  "round_exit_code": null
+}
