@@ -31,7 +31,8 @@ def collect(run, condition, baseline):
                   if timeline_path and timeline_path.is_file() else [])
         parsed = [r for r in events if r['event_type'] == 'duplex.protocol_parsed']
         ticks = [r for r in events if r['event_type'] == 'duplex.micro_turn_ready']
-        final_asr = record.get('asr_final') or ''
+        asr_events = [r for r in events if r['event_type'] in ('asr.result_partial', 'asr.result_final')]
+        final_asr = asr_events[-1]['text'] if asr_events else (record.get('asr_final') or '')
         final_prefix = ticks[-1]['text'] if ticks else None
         stable = next((i for i in range(len(ticks)) if
                        all(t['text'] == final_prefix for t in ticks[i:])), None)
