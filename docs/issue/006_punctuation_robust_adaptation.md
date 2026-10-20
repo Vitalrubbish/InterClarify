@@ -4,7 +4,7 @@
 
 ## 2026-10-20 进度核对
 
-按用户指令启动B0/T1/T2/T3执行准备，工作单元见[027](027_layer1_adaptation_launch.md)。协议已登记现有q/v LoRA更新范围、数据规模及两轮预算上限，并补齐首轮正式AdamW/线性调度/检查点间隔。新增四配置计划器、正式训练配置与单臂远端入口；B0不训练。尚未执行三组正式训练。001运行时对照、004数据审计及005零更新/真实更新/完整恢复均已完成；007开训前准备仍未完成，`configs/layer1_adaptation_protocol.yaml`中`training_released: false`。005只交付短跑checkpoint，不是正式候选；没有三臂正式run或dev报告。
+按用户指令启动B0/T1/T2/T3执行准备，工作单元[027](archive/027_layer1_adaptation_launch.md)已完成归档，见[报告](../../reports/layer1_training/issue006-preparation-20261020/README.md)。协议已登记现有q/v LoRA更新范围、数据规模及两轮预算上限，并补齐首轮正式AdamW/线性调度/检查点间隔。新增四配置计划器、正式训练配置与单臂远端入口；B0不训练。远端17项契约/张量测试全通过，未放行门禁按预期退出2；尚未执行三组正式训练。001运行时对照、004数据审计及005零更新/真实更新/完整恢复均已完成；007开训前准备仍未完成，`configs/layer1_adaptation_protocol.yaml`中`training_released: false`。005只交付短跑checkpoint，不是正式候选；没有三臂正式run或dev报告。
 
 ## 实验目标
 
