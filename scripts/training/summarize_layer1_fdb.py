@@ -39,6 +39,16 @@ def collect(run, condition, baseline):
         tail = [r for r in parsed if r['monotonic_timestamp'] >= threshold]
         controls = Counter(r['state_token'] for r in parsed if r.get('state_token'))
         tail_controls = Counter(r['state_token'] for r in tail if r.get('state_token'))
+        first_chunks = [r['monotonic_timestamp'] for r in events if r['event_type'] == 'llm.first_chunk']
+        finish_without_body = 0
+        for control in parsed:
+            if control.get('state_token') != '<|user finish talking|>':
+                continue
+            begin = control['monotonic_timestamp']
+            end = min((t for t in first_chunks if t > begin), default=float('inf'))
+            body = [r for r in events if begin <= r['monotonic_timestamp'] < end and
+                    r['event_type'] == 'turn.tts_text_append_requested' and r.get('text', '').strip()]
+            finish_without_body += not body
         reference, ref_source = reference_text(baseline['references'][sample])
         score = edit_counts(words(reference), words(final_asr)) if reference else None
         metrics = record.get('client_measurements', {})
@@ -61,8 +71,7 @@ def collect(run, condition, baseline):
             'new_response_playback_delay_seconds': delay,
             'new_response_playback_in_original_window': onset is not None and delay >= 0 and onset <= duration,
             'new_response_playback_in_diagnostic_tail': onset is not None and delay >= 0 and onset > duration,
-            'finish_without_body': sum(r.get('state_token') == '<|user finish talking|>' and
-                                       not r.get('text', '').strip() for r in parsed),
+            'finish_without_body': finish_without_body,
             'response_text': record.get('response', ''), 'client_measurements': metrics,
             'non_talking_events': [{k: r.get(k) for k in ('request_id', 'response_id', 'state_token', 'text', 'raw_output')}
                                    for r in parsed if r.get('state_token') != TALKING],
