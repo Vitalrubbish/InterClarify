@@ -22,10 +22,10 @@
   "protocol_sha256": "10427d03ecc3870dfab70b7ea62b23750f8a4fffe7f364d6181998345820084a",
   "pretraining_probe": "waived_by_user_not_executed",
   "submitted": true,
-  "execution_status": "running_optimizer_steps_confirmed",
+  "execution_status": "training_complete_reload_metadata_failed_revalidation_in_test",
   "fdb_submitted": false,
-  "last_observed_step": 24,
-  "last_observed_cursor": 48,
-  "final_exit_code": null,
-  "training_complete": false
+  "last_observed_step": 1214,
+  "last_observed_cursor": 2428,
+  "final_exit_code": 1,
+  "training_complete": true
 }

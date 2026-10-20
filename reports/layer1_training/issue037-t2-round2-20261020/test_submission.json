@@ -1,0 +1,18 @@
+{
+  "job_id": "job-179249282996234249654-xuan-zhang",
+  "run_id": "issue037-t2-fdb-r1",
+  "source_commit": "3f65d7d",
+  "output": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1",
+  "condition": "T2_R2_paper_aligned",
+  "expected_sessions": 25,
+  "resources": {
+    "gpus": 2,
+    "cpus": 16,
+    "memory_gib": 64,
+    "max_wall_seconds": 14400,
+    "max_output_gib": 10,
+    "min_free_gib": 15
+  },
+  "status": "submitted",
+  "requires_clean_candidate_revalidation": true
+}
