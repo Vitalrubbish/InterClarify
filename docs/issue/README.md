@@ -18,7 +18,7 @@
 | [006](006_punctuation_robust_adaptation.md) | 四配置基线与三组有限适配 | 进行中；首轮三臂训练、候选重载及100会话测试完成，效果不足；后续调整待决定，未改变本轮loss |
 | [007](007_turn_control_evaluation.md) | 四配置FDB小子集能力报告 | 进行中；034交付四配置能力观察及输入ASR核查，官方评分/人工复核待办 |
 | [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 执行/验收 | 进行中；033测试Completed/退出0但接话不足，官方评分/音频复核与完整FDB留后续 |
-| [036](036_layer1_paper_alignment.md) | 论文配置对齐实现 | 待办；类别加权、1e-5学习率、10% warmup及完整embedding/head训练范围，先完成资源/保存恢复门禁；保留1k数据与2048窗口 |
+| [036](036_layer1_paper_alignment.md) | 论文配置对齐实现 | 进行中；类别加权、10% warmup；学习率保持2e-5；保持仅训练已有q/v LoRA，先完成资源/保存恢复门禁；保留1k数据与2048窗口 |
 | [037](037_layer1_t2_retraining_retest.md) | T2重训与重测 | 待办，依赖036；从官方权重重新训练新T2，按同一25会话全链路对比旧T2，交付报告与后续决定 |
 
 远端执行见 [001 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/001_remote_execution.md)与 [002/003 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_003_remote_execution.md)。001 只验证一套官方配置：Kyutai Word 逐词 strip、每拍空格连接、首非空 Word 起拍、600ms、BF16、64-token 贪心。raw 字符增量和 160ms 超时释放残词均不等同官方 Word；不展开时钟、发布粒度与句读矩阵。旧 raw/超时残词报告只作诊断；新原生 Word 五例全部通过，结果见 [001 验收报告](../../reports/layer1_training/issue001-word-20261019/README.md)。
@@ -52,6 +52,8 @@
 - 001/004/007 在候选结果前冻结数据和评价门槛；005 实测冻结训练配置。不得用 test/FDB 调参，不以成功样本均值掩盖漏答。音频目标均值约 1s、上限 1.5s，简单问题亚秒，008 补齐实际停播与 FDB 门槛。
 
 ## 归档
+
+[036a删除参数范围对齐目标](archive/036a_remove_parameter_alignment.md)完成：036/037保持仅训练已有q/v LoRA，embedding/head冻结；未修改运行配置。
 
 [035训练模式重核](archive/035_official_training_comparison.md)完成：见[完整对照](../layer1_training_comparison.md)，区分论文加权声明与公开推理包装器普通CE，列出除上下文长度外的已确认差异和未公开项。未修改首轮配置或启动新训练。
 

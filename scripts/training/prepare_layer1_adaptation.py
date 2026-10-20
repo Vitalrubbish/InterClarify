@@ -89,6 +89,53 @@ def validate_index(index, protocol):
             index['T3']['statistics'].get('view_unpunctuated') == 500, 'T3 must contain 500/500 dialogues')
 
 
+def validate_alignment_config(config, protocol, root, arm, dialogues, length, steps, probe=False):
+    """Freeze the second-round deltas and require actual recovery/resource evidence."""
+    from layer1_loss import CONTROL_WEIGHTS
+    require(config.get('purpose') == 'issue036_alignment' and config['schema_version'] == 1,
+            'Invalid alignment purpose/schema')
+    require(protocol['schema_version'] == 1 and protocol['issue'] == '036', 'Invalid alignment protocol')
+    require(config['condition'] == protocol['condition'] == 'T2_R2_paper_aligned', 'Condition mismatch')
+    require(arm == 'T2' and dialogues == config['dialogues'] == 1000 and
+            length == config['sequence_length'] == 2048, 'Alignment requires the frozen full T2 index')
+    parent_path = root / protocol['parent_protocol']
+    require(sha256_file(parent_path) == protocol['parent_protocol_sha256'], 'Parent protocol changed')
+    parent = yaml.safe_load(parent_path.read_text())
+    index = root / parent['training']['full_train_index']
+    require(sha256_file(index) == protocol['full_train_index_sha256'], 'Frozen full index changed')
+    validate_index(json.loads(index.read_text()), parent)
+    baseline = yaml.safe_load((root / 'configs/layer1_adaptation_training.yaml').read_text())
+    expected = {**baseline, 'purpose': 'issue036_alignment', 'condition': 'T2_R2_paper_aligned',
+                'warmup_steps': math.ceil(baseline['scheduler_steps'] * 0.1),
+                'loss': {'type': 'control_weighted_ce', 'control_weights': CONTROL_WEIGHTS, 'chunk_size': 64}}
+    require(config == expected, 'Alignment differs outside registered loss/warmup deltas')
+    # Use canonical YAML identity only at the input path; the caller checks the actual file digest.
+    require(not release_blockers(parent, root), 'Parent technical release gates are closed')
+    require(protocol['probe'] == dict(max_steps=100, max_wall_seconds=3600, max_output_gib=16,
+            min_free_gib=15, gpus=1, cpus=8, memory_gib=32, workers=0), 'Probe resource budget changed')
+    if probe:
+        require(0 < steps <= protocol['probe']['max_steps'], 'Alignment probe is limited to 100 steps')
+    else:
+        require(steps == config['scheduler_steps'], 'Formal alignment must complete the final epoch')
+        require(protocol.get('training_released') is True, 'Alignment training blocked: resource release pending')
+        path = root / protocol['resource_report']
+        require(protocol.get('resource_report_sha256') and path.is_file() and
+                sha256_file(path) == protocol['resource_report_sha256'], 'Alignment release evidence missing/changed')
+        report = json.loads(path.read_text())
+        require(all(report.get(key) is True for key in
+                    ('passed', 'recovery_passed', 'inference_reload_passed', 'resource_passed')),
+                'Alignment release checks failed')
+        require(report.get('config_sha256') == protocol['training_config_sha256'] and
+                report.get('index_sha256') == protocol['full_train_index_sha256'],
+                'Alignment release identity mismatch')
+        for name, value in report.get('code', {}).items():
+            require(sha256_file(root / 'scripts/training' / name) == value, 'Released training code changed')
+        require(set(report.get('code', {})) == {'train_layer1.py', 'layer1_data.py', 'layer1_model.py',
+                'number_surface.py', 'layer1_loss.py', 'prepare_layer1_adaptation.py', 'layer1_candidate.py'},
+                'Incomplete released source identity')
+    return parent
+
+
 def build_plan(protocol_path, config_path, root=ROOT):
     protocol = yaml.safe_load(protocol_path.read_text())
     config = yaml.safe_load(config_path.read_text())
