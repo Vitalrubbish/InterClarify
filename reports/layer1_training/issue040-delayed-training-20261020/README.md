@@ -10,7 +10,7 @@
 
 本地`ml-hw1` conda 的加权loss/候选10项和新条件4项测试通过；`paratalker-dev`缺PyTorch的初次相关测试未通过，因此转到有PyTorch的现有conda完成核验。数据管线32项在上一阶段本地/远端均通过，新作业启动时再执行全部32项及14项训练契约/梯度检查。没有运行模型短跑。
 
-调度器已接收作业 `job-179250231441693568614-xuan-zhang`，run_id `issue040-delayed-start-r1`，冻结源码 `91b7eb260933272c8c82f73176a855e508bf57af`；训练及候选重载均已完成，作业退出0。精确路径、配置及预算见 [submission.json](submission.json)。
+调度器已接收作业 `job-179250231441693568614-xuan-zhang`，run_id `issue040-delayed-start-r1`，冻结源码 `91b7eb260933272c8c82f73176a855e508bf57af`；训练及候选重载均已完成，作业退出0。精确路径、配置及预算原始调度文件已按精简要求删除。
 
 前轮实测单份恢复checkpoint为60,735,744字节，本轮同样112个LoRA/AdamW状态及六个保存点，约364.4MB，5GiB训练/6GiB总目录足够覆盖；这仅作预算依据，实际占用与资源仍记录本轮值。
 
@@ -18,6 +18,6 @@
 
 最终1235步、2469序列、1000条train全部曝光，有效监督token为1201531。逐行检查1235条训练记录，加权目标均有限且与实际loss一致；最后一步仅消费剩余一个序列。112个LoRA张量变化、冻结参数不变，最终checkpoint实际SHA256与summary及重载报告一致：`266a37a28699d0c3f36b6a6305374bc89a1a2ff2af7a37fd1eb4caf1ad915346`。
 
-干净进程完整推理权重及生成IDs复现通过，`inference_eligible=true`。训练耗时约2441.6秒（40.7分钟），CUDA allocated峰值约19.11GiB、reserved约21.81GiB，进程RSS峰值约15.63GiB；目录占用约350MiB，均在预算内。完整证据见[训练summary](completed/training_summary.json)、[manifest](completed/training_manifest.json)、[重载核验](completed/candidate_reload.json)及[逐步目标/尾批核查](completed/training_step_check.json)。训练作业内的10项加权/候选、4项新条件及32项数据回归全部通过。
+干净进程完整推理权重及生成IDs复现通过，`inference_eligible=true`。训练耗时约2441.6秒（40.7分钟），CUDA allocated峰值约19.11GiB、reserved约21.81GiB，进程RSS峰值约15.63GiB；目录占用约350MiB，均在预算内。保留证据见[训练summary](completed/training_summary.json)与[重载核验](completed/candidate_reload.json)；manifest及逐步目标/尾批核查原始文件已按精简要求删除。训练作业内的10项加权/候选、4项新条件及32项数据回归全部通过。
 
 040b完成归档。用户本次要求提交测试，转[040c](../../../docs/issue/archive/040c_delayed_start_fdb_test.md)按同一25个历史输入检查新候选；训练执行及重载通过不代表接话质量已通过。

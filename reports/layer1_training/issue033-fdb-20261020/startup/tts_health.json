@@ -1,1 +1,0 @@
-{"status":"ok","backend":"kokoro","snapshot":"/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/models/hf/hub/models--hexgrad--Kokoro-82M/snapshots/f3ff3571791e39611d31c381e3a41a3af07b4987","voice":"af_heart","sample_rate":48000,"format":"pcm_s16le","channels":1,"torch":"2.11.0+cu128","load_seconds":109.29633242823184,"warmed_up":true,"peak_rss_kib":1692508}

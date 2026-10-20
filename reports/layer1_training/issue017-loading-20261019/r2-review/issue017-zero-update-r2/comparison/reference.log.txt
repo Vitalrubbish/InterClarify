@@ -1,19 +1,0 @@
-Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.42it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:02,  1.28it/s]
-Traceback (most recent call last):
-  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/source/493404b/scripts/training/check_layer1_zero_update.py", line 217, in <module>
-    worker(args)
-  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/source/493404b/scripts/training/check_layer1_zero_update.py", line 99, in worker
-    model, wrapper, tokenizer, audit = load_reference(args, inventory)
-  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/source/493404b/scripts/training/check_layer1_zero_update.py", line 57, in load_reference
-    reference = module.Model(tokenizer=tokenizer, model_name=str(args.base_model),
-  File "/hpc_stor03/sjtu_home/xuan.zhang/DuplexCascade/model.py", line 36, in __init__
-    self.llm = AutoModelForCausalLM.from_pretrained(model_name, **from_pretrained_kwargs)
-  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/transformers/models/auto/auto_factory.py", line 564, in from_pretrained
-    return model_class.from_pretrained(
-  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/transformers/modeling_utils.py", line 4225, in from_pretrained
-    ) = cls._load_pretrained_model(
-  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/transformers/modeling_utils.py", line 4706, in _load_pretrained_model
-    state_dict = load_state_dict(
-  File "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training/lib/python3.10/site-packages/transformers/modeling_utils.py", line 555, in load_state_dict
-    with safe_open(checkpoint_file, framework="pt") as f:
-RuntimeError: unable to mmap 3864726352 bytes from file </hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/Qwen--Qwen2-7B-Instruct/8dce1f8a2d3286a7adf09b977e661350ad67e40a/model-00002-of-00004.safetensors>: Cannot allocate memory (12)

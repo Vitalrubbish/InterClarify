@@ -1,9 +1,0 @@
-test_changed_audit_and_stale_index_are_rejected (test_layer1_delayed_training.DelayedTrainingTests) ... ok
-test_full_weighted_epoch_is_released (test_layer1_delayed_training.DelayedTrainingTests) ... ok
-test_ordinary_loss_and_changed_weights_are_rejected (test_layer1_delayed_training.DelayedTrainingTests) ... ok
-test_partial_epoch_and_old_authorization_are_rejected (test_layer1_delayed_training.DelayedTrainingTests) ... ok
-
-----------------------------------------------------------------------
-Ran 4 tests in 0.163s
-
-OK

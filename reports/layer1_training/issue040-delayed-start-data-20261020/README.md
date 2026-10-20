@@ -10,7 +10,7 @@
 
 本次只交付数据变更。未启动第三轮训练或 FDB 重测，未继承 r5 的人审豁免；新数据人审保持 pending，`training_allowed=false`。2048 序列清点和步数预估仅供后续实验冻结，不替代训练器放行索引。Issue 040 的 GPU 预算、正式配置、候选恢复和质量验收仍需后续完成。
 
-机器审计见 [audit.json](audit.json)，train 清点见 [summary.json](summary.json)，远端测试原件见 [remote_tests.txt](remote_tests.txt)。相同 r5 的 1,000/200/300 对话及全部来源身份不变；选中对话 SHA256 仍为 `98fe4d085a8258566f3e08eeee119f324b5708eb68b4a31f5f4de2d82a75f401`。
+机器审计见 [audit.json](audit.json)，train 清点见 [summary.json](summary.json)；远端测试原件已按精简要求删除。相同 r5 的 1,000/200/300 对话及全部来源身份不变；选中对话 SHA256 仍为 `98fe4d085a8258566f3e08eeee119f324b5708eb68b4a31f5f4de2d82a75f401`。
 
 | 检查 | 结果 |
 | --- | --- |

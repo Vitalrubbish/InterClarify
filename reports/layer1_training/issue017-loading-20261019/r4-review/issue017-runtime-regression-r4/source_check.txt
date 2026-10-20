@@ -1,7 +1,0 @@
-scripts/remote/duplex_model_service.py: OK
-scripts/training/layer1_model.py: OK
-scripts/remote/compare_layer1_runtime.py: OK
-scripts/remote/run_layer1_zero_update.sh: OK
-scripts/remote/run_layer1_runtime_comparison.sh: OK
-scripts/training/check_layer1_zero_update.py: OK
-configs/layer1_zero_update.yaml: OK

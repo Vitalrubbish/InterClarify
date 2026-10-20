@@ -1,1 +1,0 @@
-{"training_released": false, "blockers": ["training_released is not true", "issue007_pretraining_preparation is not passed", "acceptance.sample_manifest is missing", "evaluation_assets.sample_manifest is not frozen", "evaluation_assets.acceptance_config is not frozen", "evaluation_assets.evaluator is not frozen"]}

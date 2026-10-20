@@ -16,7 +16,7 @@
 | [003](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003_kokoro_playback_integration.md) | Kokoro 分段播放 | 完成，已归档；[003d修复](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003d_segment_continuity.md)及[003c用户复听](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/003c_audio_listening_review.md)通过 |
 | [004](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 完成归档；r5全量机器审计通过，用户明确免除复审后关闭 |
 | [005](archive/005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 完成归档；024真实恢复精确一致，025资源测量完成；当时保守选择512，现006按用户要求改为2048 |
-| [017](../../reports/layer1_training/issue017-loading-20261019/README.md) | 完整训练加载与零更新 | 完成、已归档；零更新通过，回归拍界抖动由用户明确接受 |
+| 017 | 完整训练加载与零更新 | 完成、已归档；零更新通过，回归拍界抖动由用户明确接受；过程报告已按精简要求删除 |
 | [006](archive/006_punctuation_robust_adaptation.md) | 四配置基线与三组有限适配 | 完成，已归档；三轮有限训练和最终候选交付，用户决定停止继续训练 |
 | [007](archive/007_turn_control_evaluation.md) | 四配置FDB小子集能力报告 | 完成，已归档；四配置及后续两轮T2的阶段能力报告交付 |
 | [008](archive/008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 执行/验收 | 完成，按当前阶段范围归档；固定子集执行交付，完整FDB/官方评分未执行 |
@@ -30,7 +30,7 @@
 
 ## 依赖与交付
 
-004工具实现[013](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/013_layer1_data_pipeline_implementation.md)、[来源恢复](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004a_source_download_recovery.md)与[016来源隔离](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/016_external_data_exclusion.md)已完成归档；用户取消FDB补转写及其训练前置条件。[完整数据任务](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_remote_data_execution.md)已完成，与[017加载/零更新](../../reports/layer1_training/issue017-loading-20261019/README.md)分别跟踪数据及权重证据，不能把代码或来源验真当正式训练放行。
+004工具实现[013](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/013_layer1_data_pipeline_implementation.md)、[来源恢复](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004a_source_download_recovery.md)与[016来源隔离](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/016_external_data_exclusion.md)已完成归档；用户取消FDB补转写及其训练前置条件。[完整数据任务](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_remote_data_execution.md)已完成，与017加载/零更新分别跟踪数据及权重证据，不能把代码或来源验真当正式训练放行。
 
 [018正式数据交付](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/018_layer1_data_delivery.md)按用户决定先有限抽取最多6000原始对话再过滤/去重/切分。r3监督冲突由[019](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/019_duplex_data_alignment_audit.md)修复，旧产物已删除；r5在调试机1CPU/nice10/2GiB硬限完成，正式切分、32/100子集、机器审计及用户免除复审的记录见[r5报告](../../reports/layer1_training/issue004-build-20261019-r5/README.md)。
 
@@ -89,3 +89,5 @@
 [040c延后启动候选测试](archive/040c_delayed_start_fdb_test.md)已完成归档；25/25会话执行成功，退出0，自然接话新回复3/5、合成插话后新回复5/5。用户要求结束当前阶段并停止继续训练，已知限制及未执行项保留在正式报告。
 
 [045删除reports旧路线证据](archive/045_remove_retired_route_reports.md)已完成归档：删除issue005 probe-only报告目录，512索引仅保留为`tests/fixtures`回归基线；维护记录按用户确认保留。
+
+[046精简Layer1报告](archive/046_minimize_layer1_reports.md)已完成归档：`reports/layer1_training`只保留配置/测试直接依赖与正式报告引用证据，由约9.6MiB降至约1.5MiB。

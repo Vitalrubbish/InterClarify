@@ -8,7 +8,7 @@
 
 训练summary通过，循环2,207.64秒、总2,358.69秒，冻结参数不变；CUDA allocated峰值约19.107GiB、reserved约23.005GiB，进程RSS峰值约15.641GiB。最终checkpoint为60,735,744字节，训练run总输出约350MiB，未突破5GiB额度。首作业因训练后候选可服务标记缺陷退出1，原失败证据保留；权重未重训。修复加载器后，测试服务重新验证完整推理参数与训练最终指纹一致、生成IDs完全一致，正式候选身份与checkpoint摘要均通过。
 
-训练源码`cf56856`，测试源码`3f65d7d`。测试作业`job-179249282996234249654-xuan-zhang`完成，轮次和条件退出0，五子集各5会话均完成，无传输、组件或协议错误。独立2×4090/16CPU/64GiB、单作业，测试输出约172MiB。远端35项契约测试全部通过、无跳过；GPU采样峰值占用18,296MiB，原始验证日志见[test_validation.json](test_validation.json)。原始WAV、timeline和服务日志仍留远端，不覆盖首轮。
+训练源码`cf56856`，测试源码`3f65d7d`。测试作业`job-179249282996234249654-xuan-zhang`完成，轮次和条件退出0，五子集各5会话均完成，无传输、组件或协议错误。独立2×4090/16CPU/64GiB、单作业，测试输出约172MiB。远端35项契约测试全部通过、无跳过；GPU采样峰值占用18,296MiB，原始验证日志已按精简要求删除。原始WAV、timeline和服务日志仍留远端，不覆盖首轮。
 
 候选SHA256：`e94af4bd939e1a8b33a00e2125009bc801b2aeb612080b370cf52a1766f21d9e`。驱动、ASR/TTS服务及运行配置与033一致；25会话、70原始音频/标注和134个X-Talk源文件再次校验。旧T2直接引用033/034同口径结果，未重跑基线。
 
@@ -44,4 +44,4 @@ Candor接话仍只有样本`1`启动新响应，代理延迟约0.996秒；其他
 
 Issue037继续登记人工复核与官方评分状态；训练、测试执行、完整候选重载和原始能力计数已交付。
 
-逐例文本、最终ASR、客户端时延、远端官方/诊断WAV试听路径见[test_samples.csv](test_samples.csv)。完整结果见[test_completion.json](test_completion.json)，输入与加载证据见[test_startup.json](test_startup.json)，训练资产/原失败见[training_completion.json](training_completion.json)，调度身份见[test_submission.json](test_submission.json)。
+逐例文本、最终ASR、客户端时延、远端官方/诊断WAV试听路径及完整结果/训练资产/调度身份原始文件已按精简要求删除；本轮结果以上表及正文计数为准。

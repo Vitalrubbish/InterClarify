@@ -1,3 +1,0 @@
-pid 1884976's current affinity list: 0-79
-pid 1884976's new affinity list: 0
-1884976 (process ID) old priority 0, new priority 10

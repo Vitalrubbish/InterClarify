@@ -4,7 +4,7 @@
 
 后续用户明确要求后，029已将006正式窗口登记为2048并重建全量索引，见[切换报告](../issue029-window2048-20261020/README.md)。下文“仍为512”描述本次探针完成时的状态。
 
-作业`job-179246481842203719990-xuan-zhang`，冻结源码`8a03f76`，1×24GB4090、8CPU、32GiB物理内存、线程4；独立conda为训练根`envs/training`。训练根`/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019`，源码`source/8a03f76`，输出`data/runs/issue026-2048-r1`。单作业已结束，[退出码](r1/run/exit_code.txt)为0。
+作业`job-179246481842203719990-xuan-zhang`，冻结源码`8a03f76`，1×24GB4090、8CPU、32GiB物理内存、线程4；独立conda为训练根`envs/training`。训练根`/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019`，源码`source/8a03f76`，输出`data/runs/issue026-2048-r1`。单作业已结束，退出码为0（原始资源文件已按精简要求删除）。
 
 完整恢复官方DuplexCascade checkpoint，仅更新原112个q/v LoRA张量；BF16、batch1、累积2、梯度检查点、固定seed20261020、默认allocator，与005训练计算一致。没有量化、多卡、主动清缓存或allocator调优。沿用短跑scheduler总100步，本次只验证资源和执行，不作为训练质量实验。
 
@@ -28,7 +28,7 @@
 | CPU进程峰值RSS | 15.627GiB |
 | checkpoint保存 | 0.075秒，约60.72MB |
 
-证据：[逐步长度和显存](r1/run/training/steps.jsonl)、[训练汇总](r1/run/training/summary.json)、[资源记录](r1/run/resources.json)、[独立复核](r1/review_decision.json)。全部loss/梯度有限，只有原112个LoRA张量改变，冻结模型参数前后摘要不变，单片段协议生成通过。
+原始逐步长度/显存、训练汇总、资源记录及独立复核已按精简要求删除；全部loss/梯度有限，只有原112个LoRA张量改变，冻结模型参数前后摘要不变，单片段协议生成通过。
 
 ## 解释与限制
 
