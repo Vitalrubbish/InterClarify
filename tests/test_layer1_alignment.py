@@ -181,27 +181,29 @@ class WeightedLossTests(unittest.TestCase):
         model = SimpleNamespace(parameters=lambda: iter([value]), eval=lambda: None,
                                 generate=lambda **kwargs: torch.tensor([[1, 2, 9]]))
         loaded = SimpleNamespace(wrapper=wrapper, model=model, token_ids={'<|im_end|>': 9})
-        config = {'purpose': 'issue036_alignment', 'condition': 'T2_R2_paper_aligned',
-                  'arm': 'T2', 'scheduler_steps': 1214}
-        identity = {'config': config, 'alignment_probe': False, 'assets': {},
-                    'data': {'statistics': {'sequences': 2428}}}
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            path = root / 'checkpoint.pt'
-            torch.save({'identity': identity, 'step': 1214, 'cursor': 2428, 'lora': {name: value.detach()}}, path)
-            summary = {'passed': True, 'formal_training_released': True, 'frozen_tensors_unchanged': True,
-                       'final_step': 1214, 'cursor': 2428, 'checkpoint': {'sha256': candidate.sha256_file(path)},
-                       'protocol_probe': {'prompt_ids': [1, 2], 'generated_ids': [9]}}
-            manifest = {'identity': identity, 'formal_training_released': True,
-                        'arguments': {'inventory': 'inventory', 'official_source': 'official'}}
-            for file, data in [('summary.json', summary), ('manifest.json', manifest),
-                               ('weights_before.json', {}), ('weights_after.json', {})]:
-                (root / file).write_text(json.dumps(data))
-            with patch.object(candidate, 'verify_asset_inventory', return_value={}), \
-                 patch.object(candidate, 'state_fingerprints', return_value={}):
-                report = candidate.load_candidate(loaded, path, root, root)
-            self.assertTrue(report['inference_eligible'])
-            self.assertTrue(report['clean_process_probe_ids_match'])
+        for purpose, condition, steps, sequences in (
+                ('issue036_alignment', 'T2_R2_paper_aligned', 1214, 2428),
+                ('issue040_delayed_start', 'T2_R3_delayed_start', 1235, 2469)):
+            config = {'purpose': purpose, 'condition': condition, 'arm': 'T2', 'scheduler_steps': steps}
+            identity = {'config': config, 'alignment_probe': False, 'assets': {},
+                        'data': {'statistics': {'sequences': sequences}}}
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                path = root / 'checkpoint.pt'
+                torch.save({'identity': identity, 'step': steps, 'cursor': sequences, 'lora': {name: value.detach()}}, path)
+                summary = {'passed': True, 'formal_training_released': True, 'frozen_tensors_unchanged': True,
+                           'final_step': steps, 'cursor': sequences, 'checkpoint': {'sha256': candidate.sha256_file(path)},
+                           'protocol_probe': {'prompt_ids': [1, 2], 'generated_ids': [9]}}
+                manifest = {'identity': identity, 'formal_training_released': True,
+                            'arguments': {'inventory': 'inventory', 'official_source': 'official'}}
+                for file, data in [('summary.json', summary), ('manifest.json', manifest),
+                                   ('weights_before.json', {}), ('weights_after.json', {})]:
+                    (root / file).write_text(json.dumps(data))
+                with patch.object(candidate, 'verify_asset_inventory', return_value={}), \
+                     patch.object(candidate, 'state_fingerprints', return_value={}):
+                    report = candidate.load_candidate(loaded, path, root, root)
+                self.assertTrue(report['inference_eligible'])
+                self.assertTrue(report['clean_process_probe_ids_match'])
 
 
 if __name__ == '__main__':
