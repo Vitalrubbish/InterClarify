@@ -118,6 +118,12 @@ def validate_alignment_config(config, protocol, root, arm, dialogues, length, st
     else:
         require(steps == config['scheduler_steps'], 'Formal alignment must complete the final epoch')
         require(protocol.get('training_released') is True, 'Alignment training blocked: resource release pending')
+        if protocol.get('release_policy') == 'user_waived_alignment_probe':
+            require(protocol.get('probe_waiver') == {
+                'date': '2026-10-20', 'decision': 'skip_alignment_probe_and_start_formal_t2',
+                'scope': 'alignment_resource_recovery_inference_short_runs_only'},
+                'Invalid explicit user probe waiver')
+            return parent
         path = root / protocol['resource_report']
         require(protocol.get('resource_report_sha256') and path.is_file() and
                 sha256_file(path) == protocol['resource_report_sha256'], 'Alignment release evidence missing/changed')

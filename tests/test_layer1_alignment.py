@@ -42,12 +42,23 @@ class AlignmentConfigTests(unittest.TestCase):
             self.validate(loss=loss)
 
     def test_full_training_requires_current_resource_evidence(self):
+        self.protocol['release_policy'] = 'measured_alignment_probe'
         self.protocol['training_released'] = False
         with self.assertRaisesRegex(ValueError, 'resource release pending'):
             self.validate(False, 1214)
         self.protocol['training_released'] = True
         self.protocol['resource_report_sha256'] = None
         with self.assertRaisesRegex(ValueError, 'evidence missing'):
+            self.validate(False, 1214)
+
+    def test_explicit_user_waiver_releases_only_the_frozen_formal_condition(self):
+        self.validate(False, 1214)
+        with self.assertRaisesRegex(ValueError, 'registered loss/warmup'):
+            self.validate(False, 1214, learning_rate=1e-5)
+        with self.assertRaisesRegex(ValueError, 'final epoch'):
+            self.validate(False, 8)
+        self.protocol['probe_waiver'] = {'decision': 'skip_every_check'}
+        with self.assertRaisesRegex(ValueError, 'explicit user'):
             self.validate(False, 1214)
 
     def test_probe_and_scope_cannot_expand(self):

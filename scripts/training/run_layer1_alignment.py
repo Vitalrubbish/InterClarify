@@ -15,13 +15,14 @@ from layer1_model import load_official_checkpoint, sha256_file
 from train_layer1 import check_disk
 
 
-def verify_probe(args):
-    """Reload diagnostic assets without promoting a short run to a served candidate."""
+def verify_candidate(args):
+    """Check full candidates or explicitly diagnostic probes without changing eligibility."""
     from layer1_candidate import load_candidate
     loaded = load_official_checkpoint(args.checkpoint, args.base_model, training=False)
-    report = load_candidate(loaded, args.candidate, args.checkpoint, args.base_model, verification_only=True)
-    if report['inference_eligible']:
-        raise ValueError('Expected a diagnostic probe, not a formal candidate')
+    report = load_candidate(loaded, args.candidate, args.checkpoint, args.base_model,
+                            verification_only=not args.formal)
+    if report['inference_eligible'] != args.formal:
+        raise ValueError('Candidate eligibility differs from the requested verification mode')
     write_json(args.output, report)
     return report
 
@@ -132,6 +133,7 @@ if __name__ == '__main__':
     verify = sub.add_parser('verify')
     for key in ('checkpoint', 'base-model', 'candidate', 'output'):
         verify.add_argument('--' + key, type=Path, required=True)
+    verify.add_argument('--formal', action='store_true', help='Require a complete formal final-epoch candidate')
     args = parser.parse_args()
-    report = verify_probe(args) if args.command == 'verify' else main(args)
+    report = verify_candidate(args) if args.command == 'verify' else main(args)
     print(json.dumps(report), flush=True)
