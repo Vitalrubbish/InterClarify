@@ -22,26 +22,17 @@ def require(condition, message):
 
 
 def release_blockers(protocol, root):
-    """Require synthetic dev assets; real-ASR migration data is evaluated later."""
+    """Release training from technical evidence and a fixed final-epoch policy."""
     blockers = []
     if protocol.get('training_released') is not True:
         blockers.append('training_released is not true')
     gates = protocol.get('gates', {})
     for key in ('issue001_runtime_comparison', 'issue004_data_audit',
-                'issue005_zero_update_and_recovery', 'issue007_pretraining_preparation'):
+                'issue005_zero_update_and_recovery'):
         if gates.get(key) != 'passed':
             blockers.append(key + ' is not passed')
-    assets = protocol.get('evaluation_assets', {})
-    for key in ('text_dev_manifest', 'dev_selection_config', 'evaluator'):
-        item = assets.get(key) or {}
-        if not isinstance(item, dict) or not item.get('path') or not item.get('sha256'):
-            blockers.append('evaluation_assets.' + key + ' is not frozen')
-            continue
-        path = root / item['path']
-        if not path.is_file() or sha256_file(path) != item['sha256']:
-            blockers.append('evaluation_assets.' + key + ' digest mismatch or missing file')
-        if key == 'text_dev_manifest' and item['path'] != protocol.get('data', {}).get('audited_dataset_manifest'):
-            blockers.append('synthetic dev manifest references disagree')
+    if protocol.get('training', {}).get('checkpoint_selection') != 'final_epoch':
+        blockers.append('checkpoint_selection must be final_epoch')
     return blockers
 
 
@@ -116,19 +107,22 @@ def build_plan(protocol_path, config_path, root=ROOT):
     checkpoints.append(config['scheduler_steps'])
     inventory = root / protocol['assets']['verified_inventory']
     conditions = {'B0': {'updates': False, 'initialization': 'complete_official_checkpoint',
-                          'checkpoint_steps': [0], 'dev_views': ['original', 'unpunctuated']}}
+                          'checkpoint_steps': [0], 'evaluation_checkpoint_step': 0,
+                          'test_input': 'frozen_prior_fdb_audio_native_asr'}}
     for arm in ARMS:
         conditions[arm] = {'updates': True, 'initialization': 'complete_official_checkpoint',
                            'index': index[arm], 'checkpoint_steps': checkpoints,
-                           'dev_views': ['original', 'unpunctuated'],
+                           'evaluation_checkpoint_step': config['scheduler_steps'],
+                           'intermediate_checkpoint_role': 'recovery_and_debug_only',
+                           'test_input': 'frozen_prior_fdb_audio_native_asr',
                            'max_gpu_hours': protocol['training']['max_gpu_hours_per_condition'][0]}
     return {'schema_version': 1, 'issue': '006', 'training_released': not blockers,
             'blockers': blockers, 'conditions': conditions, 'training_config': config,
             'inputs': {str(path.relative_to(root) if path.is_relative_to(root) else path): sha256_file(path) for path in
                        (protocol_path, config_path, index_path, inventory)},
             'assets': protocol['assets'], 'data': protocol['data'],
-            'runtime': protocol['runtime'], 'evaluation_assets': protocol.get('evaluation_assets', {}),
-            'selection': 'dev only; each model generates its own history; no test/FDB selection',
+            'runtime': protocol['runtime'], 'post_training_evaluation': protocol['post_training_evaluation'],
+            'selection': 'fixed final epoch; each model generates its own history; no test-based checkpoint selection',
             'resources': {'gpus': 1, 'cpus': 8, 'memory_gib': 32, 'concurrent_jobs': 1,
                           'max_output_gib_per_arm': config['max_output_gib']}}
 

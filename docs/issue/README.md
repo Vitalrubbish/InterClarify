@@ -11,9 +11,9 @@
 | [004](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 完成归档；r5全量机器审计通过，用户明确免除复审后关闭 |
 | [005](archive/005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 完成归档；024真实恢复精确一致，025资源测量完成；当时保守选择512，现006按用户要求改为2048 |
 | [017](../../reports/layer1_training/issue017-loading-20261019/README.md) | 完整训练加载与零更新 | 完成、已归档；零更新通过，回归拍界抖动由用户明确接受 |
-| [006](006_punctuation_robust_adaptation.md) | 四配置基线与三组有限适配 | 进行中；[029](archive/029_layer1_round1_2048_window.md)将首轮改为2048，每臂2,428序列/1,214步；028已移除真实清单开训要求，仍待合成dev评测与选择配置，training_released=false |
-| [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |
-| [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 验收 | 进行中；B0完整链路0/5，候选及FDB待验收 |
+| [006](006_punctuation_robust_adaptation.md) | 四配置基线与三组有限适配 | 进行中；2048/1,214步已冻结，[030](archive/030_layer1_fdb_subset_protocol.md)固定最终权重并放行技术前置；正式三臂训练尚未执行 |
+| [007](007_turn_control_evaluation.md) | 四配置FDB小子集能力报告 | 待办；训练后在同一历史25会话上比较B0/T1/T2/T3，内容人工检查，不实现独立回放器/自动内容计分 |
+| [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 执行/验收 | 进行中；当前负责四配置新组合小子集测试，完整FDB及底座冻结留后续；历史五例B0为0/5 |
 
 远端执行见 [001 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/001_remote_execution.md)与 [002/003 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_003_remote_execution.md)。001 只验证一套官方配置：Kyutai Word 逐词 strip、每拍空格连接、首非空 Word 起拍、600ms、BF16、64-token 贪心。raw 字符增量和 160ms 超时释放残词均不等同官方 Word；不展开时钟、发布粒度与句读矩阵。旧 raw/超时残词报告只作诊断；新原生 Word 五例全部通过，结果见 [001 验收报告](../../reports/layer1_training/issue001-word-20261019/README.md)。
 
@@ -29,7 +29,7 @@
 
 [015 调试机资源实测](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/015_debug_node_data_validation.md)完成：32条诊断在1CPU下约6.9秒、峰值约150MiB；同规模轻量检查直接在调试机受限执行。r4测试/诊断及完整来源下载最终均通过退出0。
 
-文本训练路径为 001 → 004/005 → 006 → 007 → 008。004 数据工具、005 加载准备和 007 评价规则可在正式训练前推进；005 最终短跑依赖 004 最小集。002 轨迹用于 007 独立迁移评测，003 接入与人工试听已完成归档。006 交付训练资产及 dev 报告后由 007 选择和验收候选，008 最后完成新组合音频及 FDB；不重开选型、不实现 Layer 2/3。
+当前路径为001/004/005通过 → 006正式训练与最终权重交付 → 008执行同一历史FDB小子集全链路测试 → 007生成四配置能力报告并人工检查内容。030移除独立回放器/dev选择的开训要求；后续完整FDB与底座冻结另行推进，不重开组件选型、不实现Layer2/3。
 
 | 已确定路线 | 必须交付的证据 | 主责 |
 | --- | --- | --- |
@@ -47,7 +47,7 @@
 
 ## 归档
 
-[026 单卡2048持续训练检查](archive/026_layer1_2048_stability.md)完成：100步/200序列未OOM，实际曝光95条对话，显存分配峰值20.262GiB；详见[报告](../../reports/layer1_training/issue026-2048-20261020/README.md)。029依据该证据将正式窗口切换2048并重建完整索引；007合成dev准备门禁未变。
+[026 单卡2048持续训练检查](archive/026_layer1_2048_stability.md)完成：100步/200序列未OOM，实际曝光95条对话，显存分配峰值20.262GiB；详见[报告](../../reports/layer1_training/issue026-2048-20261020/README.md)。029据此切换正式窗口和索引；030按用户路线移除dev评测器开训要求。
 
 [023 研究场景修订](archive/023_research_scenario_revision.md)已完成：以复试通知适用性和打印机诊断替换 [idea 草稿](../research_idea.md)的人员排班示例，保留共同前缀、续说分支及收益/负面影响评级；测量场景仅作扩展示例。
 

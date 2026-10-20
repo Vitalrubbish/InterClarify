@@ -1,7 +1,7 @@
 schema_version: 1
 issue: '001'
 status: complete
-training_released: false
+training_released: true
 seed: 20261018
 runtime:
   asr: nvidia/nemotron-speech-streaming-en-0.6b
@@ -101,6 +101,8 @@ training:
   resource_report: reports/layer1_training/issue026-2048-20261020/README.md
   full_train_index: reports/layer1_training/issue029-window2048-20261020/full_train_index.json
   resource_owner: issue029
+  checkpoint_selection: final_epoch
+  intermediate_checkpoint_role: recovery_and_debug_only
   round1_optimizer:
     learning_rate: 0.00002
     weight_decay: 0.01
@@ -110,12 +112,18 @@ training:
     scheduler_steps: 1214
     warmup_steps: 37
     save_every_steps: 203
-evaluation_assets:
-  text_dev_manifest:
-    path: reports/layer1_training/issue004-build-20261019-r5/completed/dataset/manifest.json
-    sha256: 4876c0940379259756c4709fe603cf7a6c9d77bc2248a1a5d1c0abdcad4c5115
-  dev_selection_config: null
-  evaluator: null
+post_training_evaluation:
+  mode: prior_fdb_subset_full_chain
+  conditions: [B0, T1, T2, T3]
+  sample_manifest: reports/layer1_training/issue030-fdb-protocol-20261020/fdb_subset_manifest.json
+  sample_manifest_sha256: d5885326eedab8f450843d3737ce08ccf98ebe6de89d7958b5628a8ba731cc40
+  checkpoint_selection: final_epoch
+  asr_input_view: native_unchanged
+  new_text_replay_evaluator: false
+  automatic_content_quality_scorer: false
+  content_review: manual_after_inference
+  historical_subset_role: regression_capability_report
+  independent_acceptance_claim: false
 diagnostic:
   historical_samples: 5
   input_contract: kyutai_word_strip_then_space_join
@@ -150,11 +158,9 @@ acceptance:
   premature_reply_max: 0.05
   backchannel_false_stop_max: 0.05
   interruption_stop_intent_min: 0.90
-  interruption_relevant_new_answer_min: 0.90
   protocol_errors_allowed: 0
-  content_blind_acceptable_fraction_min: 0.90
-  content_acceptable_fraction_drop_vs_b0_max: 0.05
-  critical_datetime_or_negation_errors_max: 0
+  scope: future_independent_acceptance_not_round1_fdb_regression_gate
+  content_review: manual_after_inference
   decision_uses: point_thresholds_and_grouped_uncertainty_review
   inconclusive_interval_action: collect_independent_samples_without_lowering_thresholds
   audio_latency_owner: issue008
@@ -165,6 +171,5 @@ gates:
   issue001_runtime_comparison: passed
   issue004_data_audit: passed
   issue005_zero_update_and_recovery: passed
-  issue007_pretraining_preparation: pending
   issue007_independent_real_asr_test: pending
   issue008_audio_and_fdb: pending

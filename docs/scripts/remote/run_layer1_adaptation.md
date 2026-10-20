@@ -6,6 +6,6 @@
 
 调度申请1×4090、8CPU、32GiB物理内存，最多一个并发作业；线程数4，禁core dump，子进程8小时后TERM、30秒后KILL。物理主存由调度器cgroup限制，不限制CUDA虚拟地址空间。每臂输出上限5GiB、磁盘至少保留5GiB；保存源码提交/文件摘要、环境、设备、训练日志和退出码。
 
-入口环境变量沿用`LAYER1_TRAIN_ROOT`、`LAYER1_TRAINING_ROOT`、`LAYER1_TRAINING_ENV`、`LAYER1_TRAIN_OUTPUT`，新增必填`LAYER1_ARM`；模型与官方源码路径允许显式指定。未通过007开训前准备时退出2，不能用于绕开`training_released=false`。
+入口环境变量沿用`LAYER1_TRAIN_ROOT`、`LAYER1_TRAINING_ROOT`、`LAYER1_TRAINING_ENV`、`LAYER1_TRAIN_OUTPUT`，新增必填`LAYER1_ARM`；模型与官方源码路径允许显式指定。030移除独立dev评测器门禁，001/004/005和正式参数仍必须通过，不能绕开失败的技术前置。
 
-007合成文本dev评测与选择规则准备好后，在冻结源码根运行，逐臂使用不同的新输出目录；不等待真实录音清单。三臂不能从其他臂checkpoint初始化。恢复可直接使用训练器`--resume`并提供相同正式参数和新输出目录，源码/配置/评测资产身份必须完全一致。本脚本用于每臂从官方权重首次启动。
+在冻结源码根运行，逐臂使用不同的新输出目录；三臂不能从其他臂checkpoint初始化。恢复可直接使用训练器`--resume`并提供相同正式参数和新输出目录，源码/配置/测试计划身份必须完全一致。本脚本用于每臂从官方权重首次启动，不执行FDB；训练后固定最终checkpoint交给全链路测试。

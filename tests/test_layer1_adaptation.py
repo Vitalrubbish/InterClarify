@@ -1,6 +1,7 @@
 """Reject premature adaptation and inconsistent first-round comparisons."""
 
 import copy
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -20,8 +21,6 @@ class AdaptationTests(unittest.TestCase):
     def setUp(self):
         self.protocol = yaml.safe_load((ROOT / 'configs/layer1_adaptation_protocol.yaml').read_text())
         self.protocol['training_released'] = False
-        self.protocol['gates']['issue007_pretraining_preparation'] = 'pending'
-        self.protocol['evaluation_assets'] = dict.fromkeys(('text_dev_manifest', 'dev_selection_config', 'evaluator'))
         self.protocol['acceptance']['sample_manifest'] = None
         self.config_path = ROOT / 'configs/layer1_adaptation_training.yaml'
         self.config = yaml.safe_load(self.config_path.read_text())
@@ -33,13 +32,6 @@ class AdaptationTests(unittest.TestCase):
 
     def release(self, root):
         self.protocol['training_released'] = True
-        self.protocol['gates']['issue007_pretraining_preparation'] = 'passed'
-        for key in ('text_dev_manifest', 'dev_selection_config', 'evaluator'):
-            path = root / (key + '.fixture')
-            path.write_text('fixture for ' + key)
-            self.protocol['evaluation_assets'][key] = {'path': path.name,
-                                                       'sha256': preparation.sha256_file(path)}
-        self.protocol['data']['audited_dataset_manifest'] = 'text_dev_manifest.fixture'
 
     def test_closed_gate_fails_before_output_or_model_loading(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -52,31 +44,27 @@ class AdaptationTests(unittest.TestCase):
                 training.train(args)
             self.assertFalse(output.exists())
 
-    def test_release_flag_alone_cannot_bypass_evaluation_assets(self):
+    def test_release_flag_alone_cannot_bypass_technical_evidence(self):
         self.protocol['training_released'] = True
-        with self.assertRaisesRegex(ValueError, 'issue007_pretraining_preparation'):
+        self.protocol['gates']['issue001_runtime_comparison'] = 'pending'
+        with self.assertRaisesRegex(ValueError, 'issue001_runtime_comparison'):
             self.validate(ROOT)
 
-    def test_frozen_assets_are_verified_and_test_acceptance_is_not_a_training_gate(self):
+    def test_dev_evaluator_and_content_judge_are_not_training_gates(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             self.release(root)
+            self.assertNotIn('evaluation_assets', self.protocol)
             for arm in preparation.ARMS:
                 self.validate(root, arm)
-            (root / 'evaluator.fixture').write_text('changed')
-            with self.assertRaisesRegex(ValueError, 'digest mismatch'):
-                self.validate(root)
 
-    def test_missing_or_disagreeing_synthetic_dev_manifest_is_rejected(self):
+    def test_test_scores_cannot_select_intermediate_checkpoints(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             self.release(root)
-            self.protocol['data']['audited_dataset_manifest'] = 'another.fixture'
-            with self.assertRaisesRegex(ValueError, 'references disagree'):
+            self.protocol['training']['checkpoint_selection'] = 'best_fdb_score'
+            with self.assertRaisesRegex(ValueError, 'final_epoch'):
                 self.validate(root)
-            self.protocol['data']['audited_dataset_manifest'] = 'text_dev_manifest.fixture'
-            (root / 'text_dev_manifest.fixture').unlink()
-            self.assertTrue(preparation.release_blockers(self.protocol, root))
 
     def test_real_recordings_are_not_required_for_synthetic_adaptation(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -87,9 +75,6 @@ class AdaptationTests(unittest.TestCase):
                     self.protocol['acceptance']['sample_manifest'] = real_manifest
                     self.validate(root)
                     self.assertEqual(preparation.release_blockers(self.protocol, root), [])
-            (root / 'dev_selection_config.fixture').unlink()
-            with self.assertRaisesRegex(ValueError, 'dev_selection_config'):
-                self.validate(root)
 
     def test_baseline_and_changed_optimizer_or_budget_are_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -124,6 +109,12 @@ class AdaptationTests(unittest.TestCase):
         self.assertFalse(plan['conditions']['B0']['updates'])
         self.assertFalse(plan['training_released'])
         self.assertEqual(plan['conditions']['T3']['checkpoint_steps'], [203, 406, 609, 812, 1015, 1214])
+        for arm in preparation.ARMS:
+            self.assertEqual(plan['conditions'][arm]['evaluation_checkpoint_step'], 1214)
+            self.assertEqual(plan['conditions'][arm]['test_input'], plan['conditions']['B0']['test_input'])
+            self.assertNotIn('dev_views', plan['conditions'][arm])
+        self.assertEqual(plan['post_training_evaluation']['mode'], 'prior_fdb_subset_full_chain')
+        self.assertFalse(plan['post_training_evaluation']['automatic_content_quality_scorer'])
 
     def test_2048_rewindowing_preserves_dialogues_and_all_supervision(self):
         previous = json.loads((ROOT / 'reports/layer1_training/issue005-probe-20261020/r1/run/full_train_index.json').read_text())
@@ -134,6 +125,22 @@ class AdaptationTests(unittest.TestCase):
                              previous[arm]['statistics']['effective_tokens'])
             self.assertEqual(self.index[arm]['length'], 2048)
             self.assertEqual(self.index[arm]['statistics']['sequences'], 2428)
+
+    def test_fdb_subset_is_frozen_and_excluded_from_training(self):
+        evaluation = self.protocol['post_training_evaluation']
+        path = ROOT / evaluation['sample_manifest']
+        self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), evaluation['sample_manifest_sha256'])
+        manifest = json.loads(path.read_text())
+        self.assertEqual((manifest['directories'], manifest['sessions']), (25, 25))
+        self.assertEqual(manifest['input_variants'], ['input.wav'])
+        self.assertEqual(len({s['input'] for s in manifest['samples']}), 25)
+        expected = {'1', '10', '100', '101', '102'}
+        for subset in ('candor_pause_handling', 'synthetic_pause_handling', 'candor_turn_taking',
+                       'synthetic_user_interruption', 'icc_backchannel'):
+            ids = {s['sample_id'] for s in manifest['samples'] if s['subset'] == subset}
+            self.assertEqual(ids, {'0', '1', '10', '11', '12'} if subset == 'icc_backchannel' else expected)
+        self.assertTrue(manifest['training_excluded'])
+        self.assertIn('full_fdb', self.protocol['data']['exclusions'])
 
     def test_old_window_and_step_requests_are_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:

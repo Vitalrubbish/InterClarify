@@ -286,7 +286,7 @@ def train(args):
         identity['release'] = {'protocol': sha256_file(args.protocol), 'index': sha256_file(index_path),
                                'config': sha256_file(args.config),
                                'validator': sha256_file(Path(__file__).with_name('prepare_layer1_adaptation.py')),
-                               'evaluation_assets': protocol['evaluation_assets']}
+                               'post_training_evaluation': protocol['post_training_evaluation']}
     write_json(args.output / 'manifest.json', {'identity': identity, 'purpose': config['purpose'],
                'formal_training_released': formal, 'source_commit': subprocess.check_output(
                    ['git', 'rev-parse', 'HEAD'], text=True).strip(), 'arguments': vars_for_json(args),

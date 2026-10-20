@@ -1,0 +1,702 @@
+{
+  "schema_version": 1,
+  "role": "historical_fdb_regression_subset",
+  "historical_run": "20261015T180154Z",
+  "historical_report_commit": "6ca5eea",
+  "fdb_revision": "3e799c45a045256f47d5f1c9cda90157e2d2ec9e",
+  "remote_root": "/hpc_stor03/sjtu_home/xuan.zhang/STS/data/fdb/v1_0",
+  "directories": 25,
+  "sessions": 25,
+  "training_excluded": true,
+  "input_variants": [
+    "input.wav"
+  ],
+  "samples": [
+    {
+      "subset": "candor_pause_handling",
+      "sample_id": "1",
+      "input": "candor_pause_handling/1/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 16000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 432640,
+        "seconds": 27.04
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 865324,
+          "sha256": "f39531da9ad4ef315b997957db59c0141a90eb8b0bb277beeff8ace7b792522c"
+        },
+        "pause.json": {
+          "bytes": 274,
+          "sha256": "9372350c2854a50791c32eb6604b17f57aa6af8c15670cd1cdf4b5907c4d2770"
+        },
+        "transcription.json": {
+          "bytes": 15836,
+          "sha256": "6a398aa086e4fdbe7659a8b27b1653c14190cd9a77bac96ed1cf7eb3a8aaf3b1"
+        }
+      }
+    },
+    {
+      "subset": "candor_pause_handling",
+      "sample_id": "10",
+      "input": "candor_pause_handling/10/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 16000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 215040,
+        "seconds": 13.44
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 430124,
+          "sha256": "625d1e9824156db6648804293cc0bbe63a0601d9cdac80d5c889d8991921b830"
+        },
+        "pause.json": {
+          "bytes": 272,
+          "sha256": "2468e1677e678a137f8d5fb9b4654c68315056e01d22cb377023011da0a2281f"
+        },
+        "transcription.json": {
+          "bytes": 4170,
+          "sha256": "63500d3ea9237d7b414c3c52b158f0b22023edc3372134e49bcc4e350c30c312"
+        }
+      }
+    },
+    {
+      "subset": "candor_pause_handling",
+      "sample_id": "100",
+      "input": "candor_pause_handling/100/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 16000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 460800,
+        "seconds": 28.8
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 921644,
+          "sha256": "a3bab604f98fb4a43b78f714d779bcf3d84347f35576b4c6cfd1e5f7c33c1d1a"
+        },
+        "pause.json": {
+          "bytes": 259,
+          "sha256": "ee828aee5175916dd03b641f3420319fe76f9e9974a98e6bec03e5f47d7799c1"
+        },
+        "transcription.json": {
+          "bytes": 13878,
+          "sha256": "f70eeb4ddb5167a0831953a2a018a14e3aab9f2aebf424ae4c957d19ac9fdbef"
+        }
+      }
+    },
+    {
+      "subset": "candor_pause_handling",
+      "sample_id": "101",
+      "input": "candor_pause_handling/101/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 16000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 166400,
+        "seconds": 10.4
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 332844,
+          "sha256": "9d483abbc9c10ffab966402b83194f405a573e4dc43db43e3ba4171ad5a6dc93"
+        },
+        "pause.json": {
+          "bytes": 271,
+          "sha256": "16c940ade217351f9039884ab4c6590c3a4f623efc7cd8d20be5167fca79e426"
+        },
+        "transcription.json": {
+          "bytes": 4035,
+          "sha256": "f9d8c29f3f9cb17ea135da72485890f07ef882a8f75505ed72f8bad77321345b"
+        }
+      }
+    },
+    {
+      "subset": "candor_pause_handling",
+      "sample_id": "102",
+      "input": "candor_pause_handling/102/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 16000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 117760,
+        "seconds": 7.36
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 235564,
+          "sha256": "67e3503ff010f67e86a4a0eb32615a8ebf5811611a9321b29ac5fa93167d4b12"
+        },
+        "pause.json": {
+          "bytes": 271,
+          "sha256": "0b9a88d9ed5d919c5df6400f45bb413c39bce0aa9f24b87e73fb15e82d8d3373"
+        },
+        "transcription.json": {
+          "bytes": 2364,
+          "sha256": "ed2c70356a994a95d52e8011be63a3f1109b1c82068603fa8fdf5bbefbf54ad7"
+        }
+      }
+    },
+    {
+      "subset": "synthetic_pause_handling",
+      "sample_id": "1",
+      "input": "synthetic_pause_handling/1/input.wav",
+      "audio": {
+        "format_tag": 3,
+        "sample_rate": 24000,
+        "channels": 1,
+        "bits_per_sample": 32,
+        "frames": 180480,
+        "seconds": 7.52
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 722000,
+          "sha256": "34f12900cebed60812c858a8b123132973612bcba7d652afbb69c4b6909e33fc"
+        },
+        "pause.json": {
+          "bytes": 61,
+          "sha256": "9143e3ef7ccfcfbff53dd763c07dfb8e93643e2a82002bb1f407c352a8fa78f9"
+        },
+        "transcription.json": {
+          "bytes": 1219,
+          "sha256": "f927982ce3a4531b2c831e8cd19eafead99ee6328a3a99bd6d694a173bfa5dba"
+        }
+      }
+    },
+    {
+      "subset": "synthetic_pause_handling",
+      "sample_id": "10",
+      "input": "synthetic_pause_handling/10/input.wav",
+      "audio": {
+        "format_tag": 3,
+        "sample_rate": 24000,
+        "channels": 1,
+        "bits_per_sample": 32,
+        "frames": 212736,
+        "seconds": 8.864
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 851024,
+          "sha256": "9b114077e670f91656b77191f7cc99e332a34d9da9f2b3b1363161692c2464d5"
+        },
+        "pause.json": {
+          "bytes": 61,
+          "sha256": "e9c331ede16aa17a980ce4479d48d894315758573a9de3f93ded4847fb7f6848"
+        },
+        "transcription.json": {
+          "bytes": 1366,
+          "sha256": "18903fb8a5c10abb9ada7bc1cea4ca8f2e27e1080f8e8e709cdb2679595b3685"
+        }
+      }
+    },
+    {
+      "subset": "synthetic_pause_handling",
+      "sample_id": "100",
+      "input": "synthetic_pause_handling/100/input.wav",
+      "audio": {
+        "format_tag": 3,
+        "sample_rate": 24000,
+        "channels": 1,
+        "bits_per_sample": 32,
+        "frames": 203008,
+        "seconds": 8.458666666666666
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 812112,
+          "sha256": "8c3d50c547defde84ad8c1bdbbd59bbcbbaac9f5e91c576cfdcf5da1bd1b18f7"
+        },
+        "pause.json": {
+          "bytes": 61,
+          "sha256": "891b8d52c8a019c9468d80c8a7ce3b0c001ea6ecd94fb76d3cf9323024b69499"
+        },
+        "transcription.json": {
+          "bytes": 1310,
+          "sha256": "296611fd1df01c8b1cd791654572c028ef51e09bd094ba4b34cd9e6eb6192255"
+        }
+      }
+    },
+    {
+      "subset": "synthetic_pause_handling",
+      "sample_id": "101",
+      "input": "synthetic_pause_handling/101/input.wav",
+      "audio": {
+        "format_tag": 3,
+        "sample_rate": 24000,
+        "channels": 1,
+        "bits_per_sample": 32,
+        "frames": 227584,
+        "seconds": 9.482666666666667
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 910416,
+          "sha256": "f87da57ef72eceab78fc3c8d166aa104c0fc5498d8046271759f5368df58ba57"
+        },
+        "pause.json": {
+          "bytes": 48,
+          "sha256": "fa5b393cee290bc73cafa9c8d9ee7ac18637ba62d402e0f17e8047a717809fce"
+        },
+        "transcription.json": {
+          "bytes": 1359,
+          "sha256": "745fb92aa0614c9c5d0543c18cc0cf0598eba1898777c912a367ca07b385477d"
+        }
+      }
+    },
+    {
+      "subset": "synthetic_pause_handling",
+      "sample_id": "102",
+      "input": "synthetic_pause_handling/102/input.wav",
+      "audio": {
+        "format_tag": 3,
+        "sample_rate": 24000,
+        "channels": 1,
+        "bits_per_sample": 32,
+        "frames": 179456,
+        "seconds": 7.477333333333333
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 717904,
+          "sha256": "098b30a4e2886307a65ea5c59689b9cf09487287065cb7655fb03bf08d5ff088"
+        },
+        "pause.json": {
+          "bytes": 76,
+          "sha256": "468178d37b2aae14af0d0a17005fcb8c01cdbb86e87a48da648ffb06ae459537"
+        },
+        "transcription.json": {
+          "bytes": 1123,
+          "sha256": "60911f8990976d24818fbc580180ab8a321f1759403b5904a2df57da3eaa2e53"
+        }
+      }
+    },
+    {
+      "subset": "candor_turn_taking",
+      "sample_id": "1",
+      "input": "candor_turn_taking/1/input.wav",
+      "audio": {
+        "format_tag": 3,
+        "sample_rate": 16000,
+        "channels": 1,
+        "bits_per_sample": 32,
+        "frames": 174399,
+        "seconds": 10.8999375
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 697676,
+          "sha256": "e52512b40f8011ecdb93e923f82b64ef04d9187c6f76c65a1f7ead7d2e1cc481"
+        },
+        "turn_taking.json": {
+          "bytes": 142,
+          "sha256": "c8617679c6d2a8634ca5f041e135a73deaaf68b24a07f1d9afca6d73e68419d6"
+        }
+      }
+    },
+    {
+      "subset": "candor_turn_taking",
+      "sample_id": "10",
+      "input": "candor_turn_taking/10/input.wav",
+      "audio": {
+        "format_tag": 3,
+        "sample_rate": 16000,
+        "channels": 1,
+        "bits_per_sample": 32,
+        "frames": 153600,
+        "seconds": 9.6
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 614480,
+          "sha256": "3d1a920c6ca9fda470c38dda672b61da326407d6a65eb4be2211298ec80be718"
+        },
+        "turn_taking.json": {
+          "bytes": 142,
+          "sha256": "7295a58896dfad4ffbc93320b8c36a52a025e3fb6204abfde1f1b0cf998fcee4"
+        }
+      }
+    },
+    {
+      "subset": "candor_turn_taking",
+      "sample_id": "100",
+      "input": "candor_turn_taking/100/input.wav",
+      "audio": {
+        "format_tag": 3,
+        "sample_rate": 16000,
+        "channels": 1,
+        "bits_per_sample": 32,
+        "frames": 158560,
+        "seconds": 9.91
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 634320,
+          "sha256": "57d169e117a37a83a05029ea2bb6ef34a4e6f95a9397e522d95b851bed33fe1c"
+        },
+        "turn_taking.json": {
+          "bytes": 142,
+          "sha256": "2d72572da846ecb7bf13807b4f7eefa31ac8c5c12091b75298cc5ccaee279b9f"
+        }
+      }
+    },
+    {
+      "subset": "candor_turn_taking",
+      "sample_id": "101",
+      "input": "candor_turn_taking/101/input.wav",
+      "audio": {
+        "format_tag": 3,
+        "sample_rate": 16000,
+        "channels": 1,
+        "bits_per_sample": 32,
+        "frames": 172639,
+        "seconds": 10.7899375
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 690636,
+          "sha256": "fd8357db318c3fc45568a15253151cb6f6eb4e2320b09b54ffdffce13bf06f77"
+        },
+        "turn_taking.json": {
+          "bytes": 142,
+          "sha256": "09a1fe8b48c52841e9c104dc456c84ee4ee5a9c57dc17114fca4ea2713b3c97d"
+        }
+      }
+    },
+    {
+      "subset": "candor_turn_taking",
+      "sample_id": "102",
+      "input": "candor_turn_taking/102/input.wav",
+      "audio": {
+        "format_tag": 3,
+        "sample_rate": 16000,
+        "channels": 1,
+        "bits_per_sample": 32,
+        "frames": 188799,
+        "seconds": 11.7999375
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 755276,
+          "sha256": "97a02d18006c09cc7b27571236e0dd5e4d5777cc77ef23e618f82e95fc621a54"
+        },
+        "turn_taking.json": {
+          "bytes": 143,
+          "sha256": "38310645c52009ebe7193b3360f4cbb21c0a98a9629a467a5041da3830777dae"
+        }
+      }
+    },
+    {
+      "subset": "synthetic_user_interruption",
+      "sample_id": "1",
+      "input": "synthetic_user_interruption/1/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 24000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 661632,
+        "seconds": 27.568
+      },
+      "files": {
+        "context.wav": {
+          "bytes": 250960,
+          "sha256": "c1e1fe838c7cc2d8211b94d00a035a13408e92c54e389d89e78e2c47843ce023"
+        },
+        "input.wav": {
+          "bytes": 1323308,
+          "sha256": "75b561dada4bd7d57720546c6bf9d0fc6fb458f8a727fcb3aaece62408b6eeb8"
+        },
+        "interrupt.json": {
+          "bytes": 167,
+          "sha256": "a11929cf89dc55c0baee926e3d979aaba0af44acab19e5d766049136a39e71c4"
+        },
+        "interrupt.wav": {
+          "bytes": 283728,
+          "sha256": "1419c4c941a87969ebd6ca48c456c63ecc1c6c159ff4cf7dad0d61aab0878150"
+        }
+      }
+    },
+    {
+      "subset": "synthetic_user_interruption",
+      "sample_id": "10",
+      "input": "synthetic_user_interruption/10/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 24000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 647296,
+        "seconds": 26.970666666666666
+      },
+      "files": {
+        "context.wav": {
+          "bytes": 214096,
+          "sha256": "1cd66fe07360f61ab380f895794be7f80861822704e7971653ac1e04805c3fc4"
+        },
+        "input.wav": {
+          "bytes": 1294636,
+          "sha256": "f20f5bb4a4c55eceb1631e0cddb14e956ab94b076a1e3bb993998e9c800cbfe8"
+        },
+        "interrupt.json": {
+          "bytes": 169,
+          "sha256": "e7573c8773567f2939d4dddc1225fe07a57f9201b072d132bde878c3af3ca369"
+        },
+        "interrupt.wav": {
+          "bytes": 263248,
+          "sha256": "a5da87dd04b1da8fd12b3a6cad7ca835daaf372a961ef4c8cd9959d5d99e9356"
+        }
+      }
+    },
+    {
+      "subset": "synthetic_user_interruption",
+      "sample_id": "100",
+      "input": "synthetic_user_interruption/100/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 24000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 678016,
+        "seconds": 28.250666666666667
+      },
+      "files": {
+        "context.wav": {
+          "bytes": 271440,
+          "sha256": "c806ad48d3fba91511f32d866f074b69b3d7604846941b0e9495f46ff4671399"
+        },
+        "input.wav": {
+          "bytes": 1356076,
+          "sha256": "79c679544bb93e0e7db34223e98e1b297f957736651376cc5615a63f1a38d4ca"
+        },
+        "interrupt.json": {
+          "bytes": 186,
+          "sha256": "70a6a76c8fb2966e299023632da18925f8a9cdd2a278b1199fdfaa229a2c0cfc"
+        },
+        "interrupt.wav": {
+          "bytes": 328784,
+          "sha256": "8ebc052d0e40b34cf17c8b0bd88e2f6de38e193783c3030da2aaf515403b37b5"
+        }
+      }
+    },
+    {
+      "subset": "synthetic_user_interruption",
+      "sample_id": "101",
+      "input": "synthetic_user_interruption/101/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 24000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 678528,
+        "seconds": 28.272
+      },
+      "files": {
+        "context.wav": {
+          "bytes": 230480,
+          "sha256": "b54312c2c4bffce64ba7808c14a1a1a2e016c771e8035b83121b35cbf293bb62"
+        },
+        "input.wav": {
+          "bytes": 1357100,
+          "sha256": "03a369fd8ea9723c55be721bcf2441b076e7a0b3c10d63a6f7c1474898933b9e"
+        },
+        "interrupt.json": {
+          "bytes": 150,
+          "sha256": "f28685701b4995c18187dbc484c23ca38def971a304b20eab8b134317d5d5a62"
+        },
+        "interrupt.wav": {
+          "bytes": 371792,
+          "sha256": "48bb8c19eeb48261d42b12122213b82fe05b5d016706837ecc7a3679e31706f3"
+        }
+      }
+    },
+    {
+      "subset": "synthetic_user_interruption",
+      "sample_id": "102",
+      "input": "synthetic_user_interruption/102/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 24000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 682112,
+        "seconds": 28.421333333333333
+      },
+      "files": {
+        "context.wav": {
+          "bytes": 238672,
+          "sha256": "2f6795180a635e93871a188677df04987da5c41e5f73f08ceb1d6372601d9839"
+        },
+        "input.wav": {
+          "bytes": 1364268,
+          "sha256": "3fb9c87735933fa475a135f83c0978b030cac2b2b38b0f7d3257d95699d0d925"
+        },
+        "interrupt.json": {
+          "bytes": 195,
+          "sha256": "6e4f1ef4723b922aa95d76ab30be433745879b593dda682097be8dab43f49513"
+        },
+        "interrupt.wav": {
+          "bytes": 377936,
+          "sha256": "38f1bad900ed8a1d1f4ff4c95257fc4338199db127af70869ab0b3315f22e415"
+        }
+      }
+    },
+    {
+      "subset": "icc_backchannel",
+      "sample_id": "0",
+      "input": "icc_backchannel/0/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 48000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 1053696,
+        "seconds": 21.952
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 2107470,
+          "sha256": "3f12291b7073d463b9a3717f18a690a8fa09f575ed1f299973784dd0f91033ac"
+        },
+        "transcription.json": {
+          "bytes": 3809,
+          "sha256": "94ee6ae48274df5f9c4a33fc3d97d82c1d65c886b46f1c73e3f89cce1756e326"
+        }
+      }
+    },
+    {
+      "subset": "icc_backchannel",
+      "sample_id": "1",
+      "input": "icc_backchannel/1/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 48000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 1318609,
+        "seconds": 27.471020833333334
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 2637296,
+          "sha256": "a15fce865e69f6ce57864e07dfce0e286ff7f3fc4fe31e2ae69e8618a6a238f0"
+        },
+        "transcription.json": {
+          "bytes": 5095,
+          "sha256": "f9ca0650038076dc9c760d89d2a67992c3fcb99f1560ca477814e6f6d620151b"
+        }
+      }
+    },
+    {
+      "subset": "icc_backchannel",
+      "sample_id": "10",
+      "input": "icc_backchannel/10/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 48000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 1059889,
+        "seconds": 22.081020833333334
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 2119856,
+          "sha256": "1644a5d3dca133e86d646291eee6df43515d5e47d6fef1f4f8f2a05d25a3d3c0"
+        },
+        "transcription.json": {
+          "bytes": 4133,
+          "sha256": "10d746dfaf9e483bf181d072b52330a3814af9576dc973c85f33cc7ac383b3de"
+        }
+      }
+    },
+    {
+      "subset": "icc_backchannel",
+      "sample_id": "11",
+      "input": "icc_backchannel/11/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 48000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 1134721,
+        "seconds": 23.640020833333335
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 2269520,
+          "sha256": "be763b725ee82bf71ec20c420ff3727a35a5dbb38296c534bdfd33d32ec76f25"
+        },
+        "transcription.json": {
+          "bytes": 4047,
+          "sha256": "57d495f1a5d0290519fb5946cd58b36c3da5684fe01f65c9a98477699097680c"
+        }
+      }
+    },
+    {
+      "subset": "icc_backchannel",
+      "sample_id": "12",
+      "input": "icc_backchannel/12/input.wav",
+      "audio": {
+        "format_tag": 1,
+        "sample_rate": 48000,
+        "channels": 1,
+        "bits_per_sample": 16,
+        "frames": 1985521,
+        "seconds": 41.36502083333333
+      },
+      "files": {
+        "input.wav": {
+          "bytes": 3971120,
+          "sha256": "09af01a9a019bd28addbe40a747c54b99db99f7adb166df09f552c2ade4497c9"
+        },
+        "transcription.json": {
+          "bytes": 6110,
+          "sha256": "fcf8ad38afdbb0ee75c8f56199e5b26a1357b33423e9dfd4b6e1675bd7f8d078"
+        }
+      }
+    }
+  ],
+  "freeze": {
+    "wall_seconds": 0.4315779130120063,
+    "max_rss_kib": 24952,
+    "cpu_affinity": [
+      0
+    ],
+    "address_space_limit_bytes": 2147483648,
+    "gpu_enabled": false
+  },
+  "historical_source_reports": [
+    {
+      "path": "reports/duplex_acceptance/20261015T180154Z/pause_handling_candor_pause_handling_fdb_summary.json",
+      "sha256": "d8956fa3aec8a189d8744cf35b4498e08da6d7c7df33161eeeee6964df4233ec"
+    },
+    {
+      "path": "reports/duplex_acceptance/20261015T180154Z/pause_handling_synthetic_pause_handling_fdb_summary.json",
+      "sha256": "8a3791d0dc4456f0f20ae8177f9450a48ad274ff6771ec0d4e521a7dc22a8e97"
+    },
+    {
+      "path": "reports/duplex_acceptance/20261015T180154Z/smooth_turn_taking_candor_turn_taking_fdb_summary.json",
+      "sha256": "b888862b1adb510f9c5aa8223f8158db3fe2eca0025f8a9cac97cc01f43697d0"
+    },
+    {
+      "path": "reports/duplex_acceptance/20261015T180154Z/user_interruption_synthetic_user_interruption_fdb_summary.json",
+      "sha256": "10d86d87bdfd845996e4355dccb895f143911e5993b3f531b9e8998d4bc934d2"
+    },
+    {
+      "path": "reports/duplex_acceptance/20261015T180154Z/backchannel_icc_backchannel_fdb_summary.json",
+      "sha256": "9285f8f47445f6fc3474a68986835b3bda3e19826c735dba035ab9fe29d917a5"
+    }
+  ]
+}

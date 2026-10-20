@@ -14,7 +14,7 @@
 
 2026-10-20的005单卡试跑完成，完整状态恢复精确一致，issue005_zero_update_and_recovery更新为passed。当时按缓存保留后至少2GiB余量选择512，后续用户要求通过029切换2048；005原结果保留作历史依据。训练采样seed为20261020，数据生成seed仍为20261018，原4096事件计划不变。
 
-029完成2048全量重编码：每臂2,428序列、1,193,875监督token及1,214优化器步，batch1/累积2。基于026实际100步循环149.910秒，首轮循环外推约0.5055GPU小时/臂；不含启动、checkpoint选择和评价。第二轮数据未构建，旧512估算撤下，耗时与round2_exact_steps保持null。原8/16小时及72总上限保留。007合成dev准备未完成，training_released保持false。
+029完成2048全量重编码：每臂2,428序列、1,193,875监督token及1,214优化器步，batch1/累积2。基于026实际100步循环149.910秒，首轮循环外推约0.5055GPU小时/臂；不含启动和评价。第二轮数据未构建，旧512估算撤下，耗时与round2_exact_steps保持null。原8/16小时及72总上限保留。030按用户选择移除独立dev评测开训要求，001/004/005已通过，training_released改为true；此值不表示正式训练已执行。
 
 资源依据改为026单张4090/2048持续100步实测，`resource_policy=issue026_sustained_2048_user_selected`。`resource_min_headroom_gib=null`表示不再使用005缓存保留后2GiB的筛选策略，不表示显存无限或已验证全量长跑。正式索引指向029报告；每步继续记录显存与RSS，失败保留证据。
 
@@ -24,6 +24,8 @@ r5登记user_numeric_surface=english_numeric_v1，完整用户轮先转换数值
 
 ## 2026-10-20 四配置启动准备
 
-006首轮现为2048窗口；`training.round1_optimizer`登记正式AdamW、1,214步线性调度、37步warmup及每203步保存（加最终步共六个候选），不沿用005短跑100步scheduler。`gates.issue007_pretraining_preparation`与最终真实test门禁分离。
+006首轮现为2048窗口；`training.round1_optimizer`登记正式AdamW、1,214步线性调度、37步warmup及每203步保存。030固定最终1,214步checkpoint用于训练后FDB测试，其他保存点仅作恢复与排错，不再是dev选择候选。
 
-按用户澄清，`evaluation_assets`仅登记合成文本dev资产：`text_dev_manifest`引用004已审计r5 manifest，包含既有200条文本dev；`dev_selection_config`和`evaluator`待交付。每项使用仓库相对`path`及完整`sha256`，文本manifest路径须与`data.audited_dataset_manifest`相同。正式入口检查这些资产、开训前门禁及`training_released`。真实`acceptance.sample_manifest`允许为空，不参与006开训校验，在后续真实迁移验收前冻结。原协议顶层`issue/status`继续表示001历史登记状态，不表示006训练已完成。
+030删除已不适用的`evaluation_assets`和`issue007_pretraining_preparation`开训门禁，不实现独立回放器或内部自动内容质量计分。`post_training_evaluation`登记B0/T1/T2/T3在同一历史FDB小子集上运行当前Nemotron/Kokoro全链路；清单含25个历史input.wav会话及原始文件摘要，继续排除在训练外。输入使用原生ASR，不增加句读视图。`content_review=manual_after_inference`记录测试后的人工检查。原`acceptance`数值条目标注为后续独立验收范围，不作为本轮旧小子集能力报告门禁；内部内容计分阈值移除。
+
+历史小子集用于回归与能力描述，不通过其分数更换checkpoint或宣称独立泛化验收。真实`acceptance.sample_manifest`仍可为空。原协议顶层`issue/status`继续表示001历史登记状态，不表示006训练已完成。
