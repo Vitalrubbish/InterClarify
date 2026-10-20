@@ -6,7 +6,7 @@
 
 [039 ASR 首文本指标移除](archive/039_remove_asr_first_text_metric.md)已完成归档；按用户要求移除正式报告中的该列及相关表述，保留原始测量证据。
 
-更新：2026-10-20。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**。首轮三臂训练和四配置FDB小子集测试已完成，接话效果不足；036实现完成并按用户豁免短跑归档；037启动第二轮T2训练。完成任务移入`archive/`，父任务仅在全部条件满足后归档。
+更新：2026-10-20。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**。首轮三臂训练和四配置FDB小子集测试已完成，接话效果不足；036实现完成并按用户豁免短跑归档；037第二轮T2训练及25会话重测已完成，人工复核/官方评分待办。完成任务移入`archive/`，父任务仅在全部条件满足后归档。
 
 | 编号 | 任务 | 当前状态与剩余工作 |
 | --- | --- | --- |
@@ -21,7 +21,7 @@
 | [007](007_turn_control_evaluation.md) | 四配置FDB小子集能力报告 | 进行中；034交付四配置能力观察及输入ASR核查，官方评分/人工复核待办 |
 | [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 执行/验收 | 进行中；033测试Completed/退出0但接话不足，官方评分/音频复核与完整FDB留后续 |
 | [036](archive/036_layer1_paper_alignment.md) | 论文配置对齐实现 | 完成归档；类别加权及10% warmup，保持2e-5及已有LoRA；用户豁免开训前短跑 |
-| [037](037_layer1_t2_retraining_retest.md) | T2重训与重测 | 进行中；036已归档，从官方权重重新训练新T2，按同一25会话全链路对比旧T2，交付报告与后续决定 |
+| [037](037_layer1_t2_retraining_retest.md) | T2重训与重测 | 进行中；训练及25会话重测完成，合成插话2/5→4/5、自然接话仍1/5；不自动第三轮，人工复核/官方评分待办 |
 
 远端执行见 [001 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/001_remote_execution.md)与 [002/003 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_003_remote_execution.md)。001 只验证一套官方配置：Kyutai Word 逐词 strip、每拍空格连接、首非空 Word 起拍、600ms、BF16、64-token 贪心。raw 字符增量和 160ms 超时释放残词均不等同官方 Word；不展开时钟、发布粒度与句读矩阵。旧 raw/超时残词报告只作诊断；新原生 Word 五例全部通过，结果见 [001 验收报告](../../reports/layer1_training/issue001-word-20261019/README.md)。
 

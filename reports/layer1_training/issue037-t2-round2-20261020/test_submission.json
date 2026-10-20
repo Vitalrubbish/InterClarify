@@ -13,6 +13,11 @@
     "max_output_gib": 10,
     "min_free_gib": 15
   },
-  "status": "submitted",
-  "requires_clean_candidate_revalidation": true
+  "status": "completed",
+  "requires_clean_candidate_revalidation": true,
+  "exit_code": 0,
+  "condition_exit_code": 0,
+  "actual_sessions": 25,
+  "missing_or_failed_samples": 0,
+  "clean_candidate_revalidation_passed": true
 }

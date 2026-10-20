@@ -1,0 +1,2631 @@
+{
+  "results.json": {
+    "observed_at": "2026-10-20T11:00:00.819108+00:00",
+    "run": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1",
+    "condition": "T2_R2_paper_aligned",
+    "exit_code": "0",
+    "condition_exit_code": "0",
+    "health": {
+      "status": "ok",
+      "checkpoint": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/sbintuitions--DuplexCascade/c3dd51ce9a5a7d27f810ffd5dab309f132a94d28",
+      "base_model": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/Qwen--Qwen2-7B-Instruct/8dce1f8a2d3286a7adf09b977e661350ad67e40a",
+      "load_seconds": 58.24878368526697,
+      "token_ids": {
+        "<|no voice|>": 151646,
+        "<|user is talking|>": 151647,
+        "<|user finish talking|>": 151648,
+        "<|user is thinking|>": 151649,
+        "<|user interruption|>": 151650,
+        "<|user backchannel|>": 151651,
+        "<|im_end|>": 151645
+      },
+      "context_length": 32768,
+      "torch": "2.4.1+cu121",
+      "tokenizer_class": "Qwen2TokenizerFast",
+      "dtype": "torch.bfloat16",
+      "bos_token_id": null,
+      "adaptation": {
+        "condition": "T2_R2_paper_aligned",
+        "inference_eligible": true,
+        "checkpoint_sha256": "e94af4bd939e1a8b33a00e2125009bc801b2aeb612080b370cf52a1766f21d9e",
+        "final_step": 1214,
+        "cursor": 2428,
+        "summary_sha256": "e0d8882703a685f51da71a6ded6ca5020310abf3fabe00673387ba525d5050de",
+        "train_manifest_sha256": "6cd1d879c22a3ab472e4f315b4d437cd77f55e78411319258726cebf1aa82fb1",
+        "complete_inference_weights_match_training": true,
+        "clean_process_probe_ids_match": true,
+        "generated_ids": [
+          151647,
+          151645
+        ]
+      }
+    },
+    "summary": {
+      "all": {
+        "samples": 25,
+        "voice_samples_any_time": 9,
+        "new_response_playback_in_original_window_samples": 5,
+        "only_talking_samples": 15,
+        "only_talking_after_final_asr_samples": 19,
+        "prefix_delivery_mismatches": 0,
+        "asr_reference_samples": 20,
+        "asr_missing_reference_samples": 5,
+        "reference_words": 952,
+        "word_errors": 70,
+        "wer": 0.07352941176470588,
+        "controls": {
+          "<|user is talking|>": 797,
+          "<|user finish talking|>": 17,
+          "<|user interruption|>": 11,
+          "<|user backchannel|>": 2,
+          "<|user is thinking|>": 27
+        }
+      },
+      "subsets": {
+        "candor_pause_handling": {
+          "samples": 5,
+          "voice_samples_any_time": 1,
+          "new_response_playback_in_original_window_samples": 0,
+          "only_talking_samples": 4,
+          "only_talking_after_final_asr_samples": 5,
+          "prefix_delivery_mismatches": 0,
+          "asr_reference_samples": 5,
+          "asr_missing_reference_samples": 0,
+          "reference_words": 308,
+          "word_errors": 42,
+          "wer": 0.13636363636363635,
+          "controls": {
+            "<|user is talking|>": 201,
+            "<|user finish talking|>": 1,
+            "<|user interruption|>": 1
+          }
+        },
+        "candor_turn_taking": {
+          "samples": 5,
+          "voice_samples_any_time": 1,
+          "new_response_playback_in_original_window_samples": 1,
+          "only_talking_samples": 4,
+          "only_talking_after_final_asr_samples": 4,
+          "prefix_delivery_mismatches": 0,
+          "asr_reference_samples": 0,
+          "asr_missing_reference_samples": 5,
+          "reference_words": 0,
+          "word_errors": 0,
+          "wer": null,
+          "controls": {
+            "<|user is talking|>": 129,
+            "<|user finish talking|>": 1
+          }
+        },
+        "icc_backchannel": {
+          "samples": 5,
+          "voice_samples_any_time": 1,
+          "new_response_playback_in_original_window_samples": 0,
+          "only_talking_samples": 4,
+          "only_talking_after_final_asr_samples": 5,
+          "prefix_delivery_mismatches": 0,
+          "asr_reference_samples": 5,
+          "asr_missing_reference_samples": 0,
+          "reference_words": 435,
+          "word_errors": 25,
+          "wer": 0.05747126436781609,
+          "controls": {
+            "<|user is talking|>": 278,
+            "<|user finish talking|>": 3,
+            "<|user backchannel|>": 1,
+            "<|user interruption|>": 3
+          }
+        },
+        "synthetic_pause_handling": {
+          "samples": 5,
+          "voice_samples_any_time": 1,
+          "new_response_playback_in_original_window_samples": 0,
+          "only_talking_samples": 3,
+          "only_talking_after_final_asr_samples": 5,
+          "prefix_delivery_mismatches": 0,
+          "asr_reference_samples": 5,
+          "asr_missing_reference_samples": 0,
+          "reference_words": 120,
+          "word_errors": 3,
+          "wer": 0.025,
+          "controls": {
+            "<|user is talking|>": 124,
+            "<|user finish talking|>": 2,
+            "<|user interruption|>": 2
+          }
+        },
+        "synthetic_user_interruption": {
+          "samples": 5,
+          "voice_samples_any_time": 5,
+          "new_response_playback_in_original_window_samples": 4,
+          "only_talking_samples": 0,
+          "only_talking_after_final_asr_samples": 0,
+          "prefix_delivery_mismatches": 0,
+          "asr_reference_samples": 5,
+          "asr_missing_reference_samples": 0,
+          "reference_words": 89,
+          "word_errors": 0,
+          "wer": 0.0,
+          "controls": {
+            "<|user is talking|>": 65,
+            "<|user finish talking|>": 10,
+            "<|user interruption|>": 5,
+            "<|user is thinking|>": 27,
+            "<|user backchannel|>": 1
+          }
+        }
+      }
+    },
+    "rows": [
+      {
+        "sample": "candor_pause_handling/1",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "fe63884ea0d10a1db827884e950268b9ac5e1585730283bd5de39dd9dcc2d040",
+        "timeline_sha256": "7dbd2a9d9fbf0741da30dce6655459324f1dfa8f89d2225187cf3d5111adca26",
+        "duration_seconds": 27.04,
+        "final_asr": "I never like I know like a lot of people like my age they watch like the makeup vlogs or like I don't know a lot of my friends would watch like the mommy vloggers but I always thought that was like kind of weird cause I was like I don't want to like I don't wanna like know like how people are raising their kids or whatever like that like that's not really interesting to me and I also like feel like it's weird because your kids are being filmed all the time and it's like what are they like they're gonna grow up and be like oh my gosh my whole life was on the internet like everyone could see what I was doing",
+        "final_model_prefix": "I never like I know like a lot of people like my age they watch like the makeup vlogs or like I don't know a lot of my friends would watch like the mommy vloggers but I always thought that was like kind of weird cause I was like I don't want to like I don't wanna like know like how people are raising their kids or whatever like that like that's not really interesting to me and I also like feel like it's weird because your kids are being filmed all the time and it's like what are they like they're gonna grow up and be like oh my gosh my whole life was on the internet like everyone could see what I was doing",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 57
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 10
+        },
+        "micro_turns": 57,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": "never like I know like a lot of people like my age they watch like the makeup vlogs or like I don't know a lot of my friends would watch like the mommy bloggers but I always thought that was kind of weird because I was like I don't want to like I'm gonna like know how people are raising their kids or whatever like that Like that's not really interesting to me And I also feel like it's weird because your kids are being filmed all the time and it's like what are they like they're gonna grow up and be like oh my gosh my whole life was on the internet like everyone could see what I was doing",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 121,
+          "hypothesis_words": 126,
+          "substitutions": 4,
+          "deletions": 0,
+          "insertions": 5,
+          "errors": 9,
+          "wer": 0.0743801652892562,
+          "alignment_errors": [
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "i"
+            },
+            {
+              "op": "substitution",
+              "reference": "bloggers",
+              "hypothesis": "vloggers"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "like"
+            },
+            {
+              "op": "substitution",
+              "reference": "because",
+              "hypothesis": "cause"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "i"
+            },
+            {
+              "op": "substitution",
+              "reference": "i'm",
+              "hypothesis": "don't"
+            },
+            {
+              "op": "substitution",
+              "reference": "gonna",
+              "hypothesis": "wanna"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "like"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "like"
+            }
+          ]
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_pause_handling/1/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/candor_pause_handling/diagnostics/1/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_pause_handling/1/a4_report.json"
+      },
+      {
+        "sample": "candor_pause_handling/10",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "1a5d056bf0ff9fb6b21574a4fc2e318cd07f9bc714560f6bd70c5a428f99f7a0",
+        "timeline_sha256": "c4738fae98225281208727929089bc02786f1f64764cae64830223b32c126645",
+        "duration_seconds": 13.44,
+        "final_asr": "She just like stopped what she was doing and turned to look at me when I was describing her chirping. He was like maybe, but she she's not like a pet cat Rachel",
+        "final_model_prefix": "She just like stopped what she was doing and turned to look at me when I was describing her chirping. He was like maybe, but she she's not like a pet cat Rachel",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 34
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 8
+        },
+        "micro_turns": 34,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": "she just like stopped what she was doing and turned to look at me when I was describing her tripping He was like anybody but she she's not like good cat Rachel",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 32,
+          "hypothesis_words": 33,
+          "substitutions": 3,
+          "deletions": 0,
+          "insertions": 1,
+          "errors": 4,
+          "wer": 0.125,
+          "alignment_errors": [
+            {
+              "op": "substitution",
+              "reference": "tripping",
+              "hypothesis": "chirping"
+            },
+            {
+              "op": "substitution",
+              "reference": "anybody",
+              "hypothesis": "maybe"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "a"
+            },
+            {
+              "op": "substitution",
+              "reference": "good",
+              "hypothesis": "pet"
+            }
+          ]
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_pause_handling/10/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/candor_pause_handling/diagnostics/10/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_pause_handling/10/a4_report.json"
+      },
+      {
+        "sample": "candor_pause_handling/100",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "879f1321e8778d72e2a7e94c9ceff02db5ce7716f01f4b185a8d2fd7b887fad9",
+        "timeline_sha256": "857b50505ef094d48d9813d7c2b05b82e8ee856c695f1bcca0e43a6ef5e1b957",
+        "duration_seconds": 28.8,
+        "final_asr": "Well, it was like a one of the coworkers we got was new test suppository for COVID and the uh the the people were kind of like they didn't quite breast under the table but they were like didn't seem to have like a policy for it and I was kind of a annoyed and I kind of like I I wasn't really enjoying the job too much and was planning on saving up to the end of the year and in qu in leaving so I had had decent amount of savings especially once once COVID started I just started saving all my money like stop spending it or anything just in case",
+        "final_model_prefix": "Well, it was like a one of the coworkers we got was new test suppository for COVID and the uh the the people were kind of like they didn't quite breast under the table but they were like didn't seem to have like a policy for it and I was kind of a annoyed and I kind of like I I wasn't really enjoying the job too much and was planning on saving up to the end of the year and in qu in leaving so I had had decent amount of savings especially once once COVID started I just started saving all my money like stop spending it or anything just in case",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 60
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 9
+        },
+        "micro_turns": 60,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": "well it was like a one of the co workers we got with new tested positive for Covid and the people who work I like they didn't quite brushed under the table but they were like didn't seem to have like a policy for it And I was kind of annoyed and I kind of like I wasn't really enjoying the job too much and was planning on saving up till the end of the year and input and leaving So I had the somebody's savings especially once once Covid started I just started saving all my money like stop spinning into anything just in case",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 106,
+          "hypothesis_words": 114,
+          "substitutions": 15,
+          "deletions": 1,
+          "insertions": 9,
+          "errors": 25,
+          "wer": 0.2358490566037736,
+          "alignment_errors": [
+            {
+              "op": "deletion",
+              "reference": "co",
+              "hypothesis": ""
+            },
+            {
+              "op": "substitution",
+              "reference": "workers",
+              "hypothesis": "coworkers"
+            },
+            {
+              "op": "substitution",
+              "reference": "with",
+              "hypothesis": "was"
+            },
+            {
+              "op": "substitution",
+              "reference": "tested",
+              "hypothesis": "test"
+            },
+            {
+              "op": "substitution",
+              "reference": "positive",
+              "hypothesis": "suppository"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "the"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "uh"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "the"
+            },
+            {
+              "op": "substitution",
+              "reference": "who",
+              "hypothesis": "were"
+            },
+            {
+              "op": "substitution",
+              "reference": "work",
+              "hypothesis": "kind"
+            },
+            {
+              "op": "substitution",
+              "reference": "i",
+              "hypothesis": "of"
+            },
+            {
+              "op": "substitution",
+              "reference": "brushed",
+              "hypothesis": "breast"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "a"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "i"
+            },
+            {
+              "op": "substitution",
+              "reference": "till",
+              "hypothesis": "to"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "in"
+            },
+            {
+              "op": "substitution",
+              "reference": "input",
+              "hypothesis": "qu"
+            },
+            {
+              "op": "substitution",
+              "reference": "and",
+              "hypothesis": "in"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "had"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "decent"
+            },
+            {
+              "op": "substitution",
+              "reference": "the",
+              "hypothesis": "amount"
+            },
+            {
+              "op": "substitution",
+              "reference": "somebody's",
+              "hypothesis": "of"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "spending"
+            },
+            {
+              "op": "substitution",
+              "reference": "spinning",
+              "hypothesis": "it"
+            },
+            {
+              "op": "substitution",
+              "reference": "into",
+              "hypothesis": "or"
+            }
+          ]
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_pause_handling/100/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/candor_pause_handling/diagnostics/100/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_pause_handling/100/a4_report.json"
+      },
+      {
+        "sample": "candor_pause_handling/101",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "142040dd26094aa93efa812327ee0a0c6c7c3deacbac2f31c8161266c459f33e",
+        "timeline_sha256": "4c283bd1930086674da36ed472cc775cc5e900e29a28d32d3a0664fc2720aecd",
+        "duration_seconds": 10.4,
+        "final_asr": "Yeah giant sequoias I've never I've never been there like to the redwoods and sequoia national park but I've never been over there but that's somewhere I'd like to go maybe",
+        "final_model_prefix": "Yeah giant sequoias I've never I've never been there like to the redwoods and sequoia national park but I've never been over there but that's somewhere I'd like to go maybe",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 29
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 8
+        },
+        "micro_turns": 29,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": "yeah giant sequoias I've never I've never been there like to the redwoods and Sequoia National Park but I've never been over there But that's somewhere I'd like to go Maybe",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 31,
+          "hypothesis_words": 31,
+          "substitutions": 0,
+          "deletions": 0,
+          "insertions": 0,
+          "errors": 0,
+          "wer": 0.0,
+          "alignment_errors": []
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_pause_handling/101/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/candor_pause_handling/diagnostics/101/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_pause_handling/101/a4_report.json"
+      },
+      {
+        "sample": "candor_pause_handling/102",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "7c8d83060e258cd591cdf10010d4a342b1f1ea927fef44e98d087be6781f2c74",
+        "timeline_sha256": "62d84549246cbe096650f6f14c2e32ed20f785e0b0bbd0353645bfaa44ba1344",
+        "duration_seconds": 7.36,
+        "final_asr": "The movie you spoke about the movie you spoke of about is it on Netflix? Is it on Netflix",
+        "final_model_prefix": "The movie you spoke about the movie you spoke of about is it on Netflix? Is it on Netflix",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 21,
+          "<|user finish talking|>": 1,
+          "<|user interruption|>": 1
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 9
+        },
+        "micro_turns": 24,
+        "only_talking": false,
+        "only_talking_after_final_asr": true,
+        "has_voice": true,
+        "tts_audio_bytes": 13646,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [
+            {
+              "response_id": "e6d079b8f83a46a79a487d0a0a69f86c",
+              "start_tts_seconds": 5.877909267321229,
+              "pcm_received_seconds": 6.994808876886964,
+              "playback_started_seconds": 6.994946975260973,
+              "stop_tts_seconds": 7.141103036701679,
+              "played_audio_bytes": 13646,
+              "playback_started_in_tail": false
+            }
+          ],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": false,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [
+          {
+            "request_id": "72954fc9607f4fc88117e7c8d548e892",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "ad8fc7fa6e0b47539506daaddf49c639",
+            "response_id": "e6d079b8f83a46a79a487d0a0a69f86c",
+            "state_token": "<|user interruption|>",
+            "text": "",
+            "raw_output": "<|user interruption|>"
+          }
+        ],
+        "reference": "the movie you spoke about it the movie you spoke of about is your netflix is on netflix",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 18,
+          "hypothesis_words": 19,
+          "substitutions": 1,
+          "deletions": 1,
+          "insertions": 2,
+          "errors": 4,
+          "wer": 0.2222222222222222,
+          "alignment_errors": [
+            {
+              "op": "deletion",
+              "reference": "it",
+              "hypothesis": ""
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "it"
+            },
+            {
+              "op": "substitution",
+              "reference": "your",
+              "hypothesis": "on"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "it"
+            }
+          ]
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_pause_handling/102/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/candor_pause_handling/diagnostics/102/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_pause_handling/102/a4_report.json"
+      },
+      {
+        "sample": "candor_turn_taking/1",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "8f2bedd86fb42ecd2b702fbf489037d4d34bc5c884ebe6e701e5129f92056bd4",
+        "timeline_sha256": "e287a567778c253b4e43b30bcc253df128576a9a79c7a7ea1f617fc501b686d2",
+        "duration_seconds": 10.8999375,
+        "final_asr": "Ten companies that let you teach English online without a degree",
+        "final_model_prefix": "Ten companies that let you teach English online without a degree",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 12,
+          "<|user finish talking|>": 1
+        },
+        "controls_after_final_asr": {
+          "<|user finish talking|>": 1
+        },
+        "micro_turns": 30,
+        "only_talking": false,
+        "only_talking_after_final_asr": false,
+        "has_voice": true,
+        "tts_audio_bytes": 910840,
+        "new_response_playback_delay_seconds": 0.9963536568732252,
+        "new_response_playback_in_original_window": true,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "1 VIPKid - This company hires English teachers to teach one-on-one classes to children in China\n\n2 Italki - It",
+        "client_measurements": {
+          "responses": [
+            {
+              "response_id": "e28e9c319c7f4908b02159c761bb12f3",
+              "start_tts_seconds": 5.880329752340913,
+              "pcm_received_seconds": 6.626327170059085,
+              "playback_started_seconds": 6.626353656873107,
+              "played_audio_bytes": 910840,
+              "playback_started_in_tail": false
+            }
+          ],
+          "anchors": {
+            "turn_taking": 5.629999999999882
+          },
+          "latencies": {
+            "turn_taking": {
+              "anchor_seconds": 5.629999999999882,
+              "response_id": "e28e9c319c7f4908b02159c761bb12f3",
+              "to_pcm_received_seconds": 0.9963271700592031,
+              "to_playback_started_seconds": 0.9963536568732252
+            }
+          },
+          "no_played_audio": false,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [
+          {
+            "request_id": "7d01af25c1e34c4aa71a0064e74dae5b",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          }
+        ],
+        "reference": null,
+        "reference_source": null,
+        "asr_score": null,
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_turn_taking/1/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/candor_turn_taking/diagnostics/1/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_turn_taking/1/a4_report.json"
+      },
+      {
+        "sample": "candor_turn_taking/10",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "15a3b3af2f737cbf66ce36a93e22c1503e67517792ffadbce06963fb5266ee57",
+        "timeline_sha256": "7191ae1360c85a62ffc03bcba5963ec5f970c6c2fd2fd8fc996ee651657fa2ba",
+        "duration_seconds": 9.6,
+        "final_asr": "Yeah, he's never really gonna get better, you know, this is gonna kill him",
+        "final_model_prefix": "Yeah, he's never really gonna get better, you know, this is gonna kill him",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 28
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 18
+        },
+        "micro_turns": 28,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {
+            "turn_taking": 4.230000000000018
+          },
+          "latencies": {
+            "turn_taking": {
+              "anchor_seconds": 4.230000000000018,
+              "response_id": null,
+              "to_pcm_received_seconds": null,
+              "to_playback_started_seconds": null
+            }
+          },
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": null,
+        "reference_source": null,
+        "asr_score": null,
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_turn_taking/10/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/candor_turn_taking/diagnostics/10/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_turn_taking/10/a4_report.json"
+      },
+      {
+        "sample": "candor_turn_taking/100",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "b6581eb49295983a9b5e00e9a1bbb8ee6790d5aab6aa5eb5580c88dd22277521",
+        "timeline_sha256": "88912cd17e3d4c5c2eb449e01c63784226b77e57afd3d0e2452c64c0733400ce",
+        "duration_seconds": 9.91,
+        "final_asr": "Get paired with I totally did not see that that was gonna happen",
+        "final_model_prefix": "Get paired with I totally did not see that that was gonna happen",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 28
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 18
+        },
+        "micro_turns": 28,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {
+            "turn_taking": 4.829999999999927
+          },
+          "latencies": {
+            "turn_taking": {
+              "anchor_seconds": 4.829999999999927,
+              "response_id": null,
+              "to_pcm_received_seconds": null,
+              "to_playback_started_seconds": null
+            }
+          },
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": null,
+        "reference_source": null,
+        "asr_score": null,
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_turn_taking/100/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/candor_turn_taking/diagnostics/100/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_turn_taking/100/a4_report.json"
+      },
+      {
+        "sample": "candor_turn_taking/101",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "ac90b5f29da342b368aaa5bd63ad3365f529a04ff12a0a2eea383228d1dcbc1f",
+        "timeline_sha256": "ae93f24b888b9b839ade6f10418d9ec2b383e5063236c45b541eaeed55f14eeb",
+        "duration_seconds": 10.7899375,
+        "final_asr": "Been like constantly going from my room to like sitting in the bathroom with like the steam on",
+        "final_model_prefix": "Been like constantly going from my room to like sitting in the bathroom with like the steam on",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 30
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 20
+        },
+        "micro_turns": 30,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {
+            "turn_taking": 5.789999999999964
+          },
+          "latencies": {
+            "turn_taking": {
+              "anchor_seconds": 5.789999999999964,
+              "response_id": null,
+              "to_pcm_received_seconds": null,
+              "to_playback_started_seconds": null
+            }
+          },
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": null,
+        "reference_source": null,
+        "asr_score": null,
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_turn_taking/101/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/candor_turn_taking/diagnostics/101/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_turn_taking/101/a4_report.json"
+      },
+      {
+        "sample": "candor_turn_taking/102",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "de46133939f1612f83940775f9c8f013cf7496817e104b8b2a13ae5da6e644e0",
+        "timeline_sha256": "010aeeb795142f1364eb52583f749d769e1beb0f8369f46dacad70e350ad0321",
+        "duration_seconds": 11.7999375,
+        "final_asr": "Like TR the majority of people who are going to vote for Trump don't care that he said that you know",
+        "final_model_prefix": "Like TR the majority of people who are going to vote for Trump don't care that he said that you know",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 31
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 17
+        },
+        "micro_turns": 31,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {
+            "turn_taking": 6.519999999999982
+          },
+          "latencies": {
+            "turn_taking": {
+              "anchor_seconds": 6.519999999999982,
+              "response_id": null,
+              "to_pcm_received_seconds": null,
+              "to_playback_started_seconds": null
+            }
+          },
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": null,
+        "reference_source": null,
+        "asr_score": null,
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_turn_taking/102/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/candor_turn_taking/diagnostics/102/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/candor_turn_taking/102/a4_report.json"
+      },
+      {
+        "sample": "icc_backchannel/0",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "90aaab7f56f8f2c84f3ef19c914d2c6535f8eb207bbd58869c8d64b4a83dd19a",
+        "timeline_sha256": "a013dd5b7855d30864fba8ce50aef47bc9ba94c3c83a2d0943332d83dd548f95",
+        "duration_seconds": 21.952,
+        "final_asr": "There have been times in like my friends and I checked beforehand like going to a party to see if there were Ubers around that person's house cause a lot of times they lived in the middle of nowhere and like there just wasn't so that we'd have to drive because we knew we wouldn't be able to get Uber that late but like I don't think that's gonna happen",
+        "final_model_prefix": "There have been times in like my friends and I checked beforehand like going to a party to see if there were Ubers around that person's house cause a lot of times they lived in the middle of nowhere and like there just wasn't so that we'd have to drive because we knew we wouldn't be able to get Uber that late but like I don't think that's gonna happen",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 48
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 10
+        },
+        "micro_turns": 48,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": "There have been times when like my friends and I checked beforehand like going to a party to see if there were Ubers around that person's house 'cause a lot of times they'd lived in the middle of nowhere and like there just wasn't so then we'd have to drive because we knew we wouldn't be able to get an Uber that late but like I don't think that's gonna happen.",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 71,
+          "hypothesis_words": 70,
+          "substitutions": 3,
+          "deletions": 1,
+          "insertions": 0,
+          "errors": 4,
+          "wer": 0.056338028169014086,
+          "alignment_errors": [
+            {
+              "op": "substitution",
+              "reference": "when",
+              "hypothesis": "in"
+            },
+            {
+              "op": "substitution",
+              "reference": "they'd",
+              "hypothesis": "they"
+            },
+            {
+              "op": "substitution",
+              "reference": "then",
+              "hypothesis": "that"
+            },
+            {
+              "op": "deletion",
+              "reference": "an",
+              "hypothesis": ""
+            }
+          ]
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/icc_backchannel/0/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/icc_backchannel/diagnostics/0/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/icc_backchannel/0/a4_report.json"
+      },
+      {
+        "sample": "icc_backchannel/1",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "1ff72ac0d69c7fefacb018442b32426a223c65d134daf77093bedc7b9a230d16",
+        "timeline_sha256": "6f8b2522e633c1b24743a50eee4232d0969ed8eff85f6f7c5e2305545f5d7f4b",
+        "duration_seconds": 27.471,
+        "final_asr": "Yeah, and so I was like I was sitting we were sitting there and the professor goes where's Danny and we're like um we don't know and we're like I don't know and then all of a sudden Danny walks in he like hurt himself and he's like he's in like limping in on his like he had like a little like thing splint on his leg and I was like and I meant to ask him what happened but then like I had to run to the next class so I was like um",
+        "final_model_prefix": "Yeah, and so I was like I was sitting we were sitting there and the professor goes where's Danny and we're like um we don't know and we're like I don't know and then all of a sudden Danny walks in he like hurt himself and he's like he's in like limping in on his like he had like a little like thing splint on his leg and I was like and I meant to ask him what happened but then like I had to run to the next class so I was like um",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 58
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 9
+        },
+        "micro_turns": 58,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": "Yeah. And so I was like, I was sitting, we were sitting there and [UM] the professor goes, where is Danny? And we're like, [UM] we don't know. And we're like, I don't know. And then all of a sudden, Danny walks in. He like hurt himself. And he's like, he's like limping in on his leg. He had like a little like thing splint on his leg. And I was like, and I meant to ask him what happened, but then like I had to run to the next class. So I was like.",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 95,
+          "hypothesis_words": 95,
+          "substitutions": 2,
+          "deletions": 2,
+          "insertions": 2,
+          "errors": 6,
+          "wer": 0.06315789473684211,
+          "alignment_errors": [
+            {
+              "op": "deletion",
+              "reference": "um",
+              "hypothesis": ""
+            },
+            {
+              "op": "deletion",
+              "reference": "where",
+              "hypothesis": ""
+            },
+            {
+              "op": "substitution",
+              "reference": "is",
+              "hypothesis": "where's"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "in"
+            },
+            {
+              "op": "substitution",
+              "reference": "leg",
+              "hypothesis": "like"
+            },
+            {
+              "op": "insertion",
+              "reference": "",
+              "hypothesis": "um"
+            }
+          ]
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/icc_backchannel/1/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/icc_backchannel/diagnostics/1/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/icc_backchannel/1/a4_report.json"
+      },
+      {
+        "sample": "icc_backchannel/10",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "ff892c53e7c8e067f3e49f72fe4e6294d7832a2e9d6b7c407782fd9bc3d8ad98",
+        "timeline_sha256": "fa0f442cfbf6dba31678712590367cb6cf06362eca3e5bccf785d4442a7b06ac",
+        "duration_seconds": 22.081,
+        "final_asr": "Like I think we have it really good because we know so many people and like we make the best out of a situation and like we're fun and we like to like go like honestly the stuff that happens here is totally our scene and I understand if like you don't like that stuff that maybe it's not as fun for you like I don't think will really like to go out that much",
+        "final_model_prefix": "Like I think we have it really good because we know so many people and like we make the best out of a situation and like we're fun and we like to like go like honestly the stuff that happens here is totally our scene and I understand if like you don't like that stuff that maybe it's not as fun for you like I don't think will really like to go out that much",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 49
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 11
+        },
+        "micro_turns": 49,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": "Like I think we have it really good because we know so many people and like we make the best out of a situation and like we're fine and we like to like go like honestly the stuff that happens here is totally our scene. And I understand if like you don't like that stuff that maybe it's not as fun for you. Like I don't think Will really likes to go out that much.",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 75,
+          "hypothesis_words": 75,
+          "substitutions": 2,
+          "deletions": 0,
+          "insertions": 0,
+          "errors": 2,
+          "wer": 0.02666666666666667,
+          "alignment_errors": [
+            {
+              "op": "substitution",
+              "reference": "fine",
+              "hypothesis": "fun"
+            },
+            {
+              "op": "substitution",
+              "reference": "likes",
+              "hypothesis": "like"
+            }
+          ]
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/icc_backchannel/10/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/icc_backchannel/diagnostics/10/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/icc_backchannel/10/a4_report.json"
+      },
+      {
+        "sample": "icc_backchannel/11",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "93e4d75fb2c6e3f398d241c1349e8dc7d3da4701042e72c953f70639868dca9e",
+        "timeline_sha256": "36d0d9737d6d688fc0e841b6366b44bc9030b947a64a27570b521b6ab32e6ff6",
+        "duration_seconds": 23.64,
+        "final_asr": "Didn't I tell you that freak I like it's so hard I feel like I'm uh I have so much to tell you all the time but I never get to tell you anymore see you oh my god this is good for us we keep finally catch up yeah so okay you know how Will is like now like been talking to that girl from back home and stuff and like Jack is like really rude about",
+        "final_model_prefix": "Didn't I tell you that freak I like it's so hard I feel like I'm uh I have so much to tell you all the time but I never get to tell you anymore see you oh my god this is good for us we keep finally catch up yeah so okay you know how Will is like now like been talking to that girl from back home and stuff and like Jack is like really rude about",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 42,
+          "<|user finish talking|>": 3,
+          "<|user backchannel|>": 1,
+          "<|user interruption|>": 3
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 10
+        },
+        "micro_turns": 51,
+        "only_talking": false,
+        "only_talking_after_final_asr": true,
+        "has_voice": true,
+        "tts_audio_bytes": 143586,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "It",
+        "client_measurements": {
+          "responses": [
+            {
+              "response_id": "9373c5f3d79744b1b2894cec5b48b40f",
+              "start_tts_seconds": 9.488920602947474,
+              "pcm_received_seconds": 10.196739431470633,
+              "playback_started_seconds": 10.196762850508094,
+              "stop_tts_seconds": 11.269119275733829,
+              "played_audio_bytes": 100170,
+              "playback_started_in_tail": false
+            },
+            {
+              "response_id": "3b2d7f4c5fc34ca4bf48f5f15e61a4f0",
+              "start_tts_seconds": 13.096316190436482,
+              "pcm_received_seconds": 13.802178846672177,
+              "playback_started_seconds": 13.802202606573701,
+              "stop_tts_seconds": 14.26839797385037,
+              "played_audio_bytes": 43416,
+              "playback_started_in_tail": false
+            },
+            {
+              "response_id": "62a8cbd28ee54a6f9d5d6d74a00a7b72",
+              "start_tts_seconds": 16.714002519845963,
+              "stop_tts_seconds": 17.288923421874642,
+              "played_audio_bytes": 0,
+              "playback_started_in_tail": false
+            }
+          ],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": false,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [
+          {
+            "request_id": "09061c53d1274bc5825ca1f7eeb9f6ca",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "e1c133b0b71944e1911d119a56153217",
+            "response_id": "9373c5f3d79744b1b2894cec5b48b40f",
+            "state_token": "<|user backchannel|>",
+            "text": "",
+            "raw_output": "<|user backchannel|>"
+          },
+          {
+            "request_id": "99015eb24f2d418ea1a8c4ad9f4767d8",
+            "response_id": "9373c5f3d79744b1b2894cec5b48b40f",
+            "state_token": "<|user interruption|>",
+            "text": "",
+            "raw_output": "<|user interruption|>"
+          },
+          {
+            "request_id": "f92e4737decb442abb8ce550f58da72f",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "86794ea4bec7448ea8e7c578e2e2fef3",
+            "response_id": "3b2d7f4c5fc34ca4bf48f5f15e61a4f0",
+            "state_token": "<|user interruption|>",
+            "text": "",
+            "raw_output": "<|user interruption|>"
+          },
+          {
+            "request_id": "c59fc035ce3b4ffab04d07bb21670f13",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "78530cc5e83046bb95f8bf73a0750b5a",
+            "response_id": "62a8cbd28ee54a6f9d5d6d74a00a7b72",
+            "state_token": "<|user interruption|>",
+            "text": "",
+            "raw_output": "<|user interruption|>"
+          }
+        ],
+        "reference": "I did not tell you that. Freak, I like, it's so hard, I feel like I'm [UH] I have so much to tell you all the time, but I never get to tell you anymore. Oh, see, oh my God, this is good for us, we can finally catch up. Yeah, so, okay, you know how Will is like now like been talking to that girl from back home and stuff, and like, Jack is like really rude about",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 79,
+          "hypothesis_words": 78,
+          "substitutions": 5,
+          "deletions": 1,
+          "insertions": 0,
+          "errors": 6,
+          "wer": 0.0759493670886076,
+          "alignment_errors": [
+            {
+              "op": "deletion",
+              "reference": "i",
+              "hypothesis": ""
+            },
+            {
+              "op": "substitution",
+              "reference": "did",
+              "hypothesis": "didn't"
+            },
+            {
+              "op": "substitution",
+              "reference": "not",
+              "hypothesis": "i"
+            },
+            {
+              "op": "substitution",
+              "reference": "oh",
+              "hypothesis": "see"
+            },
+            {
+              "op": "substitution",
+              "reference": "see",
+              "hypothesis": "you"
+            },
+            {
+              "op": "substitution",
+              "reference": "can",
+              "hypothesis": "keep"
+            }
+          ]
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/icc_backchannel/11/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/icc_backchannel/diagnostics/11/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/icc_backchannel/11/a4_report.json"
+      },
+      {
+        "sample": "icc_backchannel/12",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "cf4317463343df61329b6a8f8c0ccd0a52e3f3c67a96223d5c827fed5794cb46",
+        "timeline_sha256": "04d7b1a7843266bd3f178151d3102f02f4cdacb058f962d51fac5f396816bdb6",
+        "duration_seconds": 41.365,
+        "final_asr": "Yes, cause I remember I was on I was literally sitting on the bus and this happened literally both times where everyone was staying on the bus and then they there must have been some like mix up with them directing people because like we were supposed to leave and then this like guy came on and just started like yelling this is not the bus to conquer to trying to get to conquered get off the bus and get on this other bus and yelled it so loud at least fifteen times like there's no way this is a small like this is a small space there's no way anyone didn't hear",
+        "final_model_prefix": "Yes, cause I remember I was on I was literally sitting on the bus and this happened literally both times where everyone was staying on the bus and then they there must have been some like mix up with them directing people because like we were supposed to leave and then this like guy came on and just started like yelling this is not the bus to conquer to trying to get to conquered get off the bus and get on this other bus and yelled it so loud at least fifteen times like there's no way this is a small like this is a small space there's no way anyone didn't hear",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 81
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 10
+        },
+        "micro_turns": 81,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": "Yes, 'cause I remember I was on I was literally sitting on the bus and this happened literally both times where everyone was sitting on the bus and then they there must have been some like mix up with them directing people because like we were supposed to leave and then this like guy came on and just started like yelling, this is not the bus to Concord, If trying to get to Concord, get off the bus and get on this other bus. And he yelled it so loud at least 15 times [UH] like there's no way this is a small like this is a small space. There's no way anyone didn't hear.",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 115,
+          "hypothesis_words": 113,
+          "substitutions": 5,
+          "deletions": 2,
+          "insertions": 0,
+          "errors": 7,
+          "wer": 0.06086956521739131,
+          "alignment_errors": [
+            {
+              "op": "substitution",
+              "reference": "sitting",
+              "hypothesis": "staying"
+            },
+            {
+              "op": "substitution",
+              "reference": "concord",
+              "hypothesis": "conquer"
+            },
+            {
+              "op": "substitution",
+              "reference": "if",
+              "hypothesis": "to"
+            },
+            {
+              "op": "substitution",
+              "reference": "concord",
+              "hypothesis": "conquered"
+            },
+            {
+              "op": "deletion",
+              "reference": "he",
+              "hypothesis": ""
+            },
+            {
+              "op": "substitution",
+              "reference": "15",
+              "hypothesis": "fifteen"
+            },
+            {
+              "op": "deletion",
+              "reference": "uh",
+              "hypothesis": ""
+            }
+          ]
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/icc_backchannel/12/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/icc_backchannel/diagnostics/12/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/icc_backchannel/12/a4_report.json"
+      },
+      {
+        "sample": "synthetic_pause_handling/1",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "f064388acae0d4baa6b9ed0c75c0351bbaddd3c00c8b54a8f808fb2d65d4fbb0",
+        "timeline_sha256": "d07a3a97a1fc9a5f14957112dc30bb78950377e00b0a40547fc0918b173f4f1c",
+        "duration_seconds": 7.52,
+        "final_asr": "I've been thinking about switching jobs lately. I might consider a role in tech or maybe something more in line with my hobbies",
+        "final_model_prefix": "I've been thinking about switching jobs lately. I might consider a role in tech or maybe something more in line with my hobbies",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 24
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 8
+        },
+        "micro_turns": 24,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": "I've been thinking about switching jobs lately. I might consider a role in tech or maybe something more in line with my hobby.",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 23,
+          "hypothesis_words": 23,
+          "substitutions": 1,
+          "deletions": 0,
+          "insertions": 0,
+          "errors": 1,
+          "wer": 0.043478260869565216,
+          "alignment_errors": [
+            {
+              "op": "substitution",
+              "reference": "hobby",
+              "hypothesis": "hobbies"
+            }
+          ]
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_pause_handling/1/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/synthetic_pause_handling/diagnostics/1/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_pause_handling/1/a4_report.json"
+      },
+      {
+        "sample": "synthetic_pause_handling/10",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "b1dcc049b9ddcc7e7c4a5e60379877a6b76b989c0f764ca2515910bd509a432d",
+        "timeline_sha256": "0c197719a8809eaaf45e2bf82cfcdd3132abb1d554a7c064beccef3e7f2a123e",
+        "duration_seconds": 8.864,
+        "final_asr": "I have a checkup appointment that needs rescheduling. Is there any way to change it to next week on Ah let's see Wednesday or Thursday",
+        "final_model_prefix": "I have a checkup appointment that needs rescheduling. Is there any way to change it to next week on Ah let's see Wednesday or Thursday",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 24,
+          "<|user finish talking|>": 1,
+          "<|user interruption|>": 1
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 9
+        },
+        "micro_turns": 27,
+        "only_talking": false,
+        "only_talking_after_final_asr": true,
+        "has_voice": true,
+        "tts_audio_bytes": 43380,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [
+            {
+              "response_id": "40c80dc353eb4a2ba99048751e7f235f",
+              "start_tts_seconds": 5.881940707564354,
+              "pcm_received_seconds": 6.602371795102954,
+              "playback_started_seconds": 6.602435439825058,
+              "stop_tts_seconds": 7.06759019009769,
+              "played_audio_bytes": 43380,
+              "playback_started_in_tail": false
+            }
+          ],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": false,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [
+          {
+            "request_id": "803c2a456641414ab689a5baa5df94c8",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "433c0d53879c48d6a1d4a1451e5d0be6",
+            "response_id": "40c80dc353eb4a2ba99048751e7f235f",
+            "state_token": "<|user interruption|>",
+            "text": "",
+            "raw_output": "<|user interruption|>"
+          }
+        ],
+        "reference": "I have a checkup appointment that needs rescheduling. Is there any way to change it to next week on [UH] let's see Wednesday or Thursday.",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 25,
+          "hypothesis_words": 25,
+          "substitutions": 1,
+          "deletions": 0,
+          "insertions": 0,
+          "errors": 1,
+          "wer": 0.04,
+          "alignment_errors": [
+            {
+              "op": "substitution",
+              "reference": "uh",
+              "hypothesis": "ah"
+            }
+          ]
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_pause_handling/10/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/synthetic_pause_handling/diagnostics/10/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_pause_handling/10/a4_report.json"
+      },
+      {
+        "sample": "synthetic_pause_handling/100",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "0fe3543545711d1a7208ec575fda32f4459841113e363812258b62fa5004107f",
+        "timeline_sha256": "b0364e8d82eeb93fb18dbd0c6eb2336f7a9cb7c6ce215391b2cb1fb00a757715",
+        "duration_seconds": 8.4586875,
+        "final_asr": "Did you get to the part about the villain's backstory yet? Yes, and I thought it was kind of unexpected how they revealed that information",
+        "final_model_prefix": "Did you get to the part about the villain's backstory yet? Yes, and I thought it was kind of unexpected how they revealed that information",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 24,
+          "<|user finish talking|>": 1,
+          "<|user interruption|>": 1
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 9
+        },
+        "micro_turns": 26,
+        "only_talking": false,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [
+            {
+              "response_id": "5eda1eaa843f47938132ea2ef0311916",
+              "start_tts_seconds": 3.4762007258832455,
+              "stop_tts_seconds": 4.061216214671731,
+              "played_audio_bytes": 0,
+              "playback_started_in_tail": false
+            }
+          ],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [
+          {
+            "request_id": "00bd3f125d2942e6afe60916cde73d16",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "92c80aa2461e4ce1997145b30990ba55",
+            "response_id": "5eda1eaa843f47938132ea2ef0311916",
+            "state_token": "<|user interruption|>",
+            "text": "",
+            "raw_output": "<|user interruption|>"
+          }
+        ],
+        "reference": "Did you get to the part about the villain's backstory yet? Yes. And I thought it was kind of unexpected how they revealed that information.",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 25,
+          "hypothesis_words": 25,
+          "substitutions": 0,
+          "deletions": 0,
+          "insertions": 0,
+          "errors": 0,
+          "wer": 0.0,
+          "alignment_errors": []
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_pause_handling/100/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/synthetic_pause_handling/diagnostics/100/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_pause_handling/100/a4_report.json"
+      },
+      {
+        "sample": "synthetic_pause_handling/101",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "ce7614c7cc7177a0b56ec978b0b0795c34ddce70b068c3d526277b6786270cc2",
+        "timeline_sha256": "a4573e1d8a7caebf131a51b91b989eca3fc6e2888e9a39f02e8db35080fa2895",
+        "duration_seconds": 9.4826875,
+        "final_asr": "Let me tell you about my trip last weekend. We ended up getting lost and found this little cafe, uh, which was surprisingly so quaint and cozy",
+        "final_model_prefix": "Let me tell you about my trip last weekend. We ended up getting lost and found this little cafe, uh, which was surprisingly so quaint and cozy",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 28
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 8
+        },
+        "micro_turns": 28,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": "Let me tell you about my trip last weekend. We ended up getting lost and found this little cafe [UH] which was surprisingly so quaint and cost.",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 27,
+          "hypothesis_words": 27,
+          "substitutions": 1,
+          "deletions": 0,
+          "insertions": 0,
+          "errors": 1,
+          "wer": 0.037037037037037035,
+          "alignment_errors": [
+            {
+              "op": "substitution",
+              "reference": "cost",
+              "hypothesis": "cozy"
+            }
+          ]
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_pause_handling/101/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/synthetic_pause_handling/diagnostics/101/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_pause_handling/101/a4_report.json"
+      },
+      {
+        "sample": "synthetic_pause_handling/102",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "ff98f48e64209bc039473801732c1a497aec259874a95eedb7103dd4d3c3454a",
+        "timeline_sha256": "ed968fb5f145e37b8e82be963eaca3884f1c803f6f82d36db6b78df80fb9e0c9",
+        "duration_seconds": 7.4773125,
+        "final_asr": "I've been thinking about a career switch lately, maybe something in the tech field like software development, or maybe cybersecurity",
+        "final_model_prefix": "I've been thinking about a career switch lately, maybe something in the tech field like software development, or maybe cybersecurity",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 24
+        },
+        "controls_after_final_asr": {
+          "<|user is talking|>": 8
+        },
+        "micro_turns": 24,
+        "only_talking": true,
+        "only_talking_after_final_asr": true,
+        "has_voice": false,
+        "tts_audio_bytes": 0,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "",
+        "client_measurements": {
+          "responses": [],
+          "anchors": {},
+          "latencies": {},
+          "no_played_audio": true,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [],
+        "reference": "I've been thinking about a career switch lately. Maybe something in the tech field like software development or maybe cybersecurity.",
+        "reference_source": "transcription.json",
+        "asr_score": {
+          "reference_words": 20,
+          "hypothesis_words": 20,
+          "substitutions": 0,
+          "deletions": 0,
+          "insertions": 0,
+          "errors": 0,
+          "wer": 0.0,
+          "alignment_errors": []
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_pause_handling/102/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/synthetic_pause_handling/diagnostics/102/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_pause_handling/102/a4_report.json"
+      },
+      {
+        "sample": "synthetic_user_interruption/1",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "cf1c376d1df19034e29adfa33966e5d2723eba0ee094c9c5753bc21298d30d81",
+        "timeline_sha256": "8b6a6c7cf642ec02e59765b984ace807eb6fb8cd1ec4f61f3469ac64abdc7e59",
+        "duration_seconds": 27.568,
+        "final_asr": "How can I save money more effectively? Actually, what are some financial goals I should set",
+        "final_model_prefix": "How can I save money more effectively? Actually, what are some financial goals I should set",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 22,
+          "<|user finish talking|>": 2,
+          "<|user interruption|>": 1,
+          "<|user is thinking|>": 2
+        },
+        "controls_after_final_asr": {
+          "<|user finish talking|>": 1,
+          "<|user is thinking|>": 2
+        },
+        "micro_turns": 58,
+        "only_talking": false,
+        "only_talking_after_final_asr": false,
+        "has_voice": true,
+        "tts_audio_bytes": 1796820,
+        "new_response_playback_delay_seconds": 1.2419346309900288,
+        "new_response_playback_in_original_window": true,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "Setting financial goals is an essential step in achieving financial success Here are some financial goals you may want to consider:\n\n1 Build an emergency fund: An emergency fund is a savings account that you can use to cover unexpected expenses such as medical bills, car repairs, or job loss Aim to save at least three to ",
+        "client_measurements": {
+          "responses": [
+            {
+              "response_id": "37b256fdeab244a984e2b5b0f6e9f062",
+              "start_tts_seconds": 2.872802399098873,
+              "stop_tts_seconds": 3.4493393395096064,
+              "played_audio_bytes": 0,
+              "playback_started_in_tail": false
+            },
+            {
+              "response_id": "a2368445fd934a41b24996f9a31ee930",
+              "start_tts_seconds": 13.094418304041028,
+              "pcm_received_seconds": 13.809909911826253,
+              "playback_started_seconds": 13.809934630990028,
+              "played_audio_bytes": 1796820,
+              "playback_started_in_tail": false
+            }
+          ],
+          "anchors": {
+            "interruption_start": 9.613333333333333,
+            "interruption_end": 12.568
+          },
+          "latencies": {
+            "interruption_end": {
+              "anchor_seconds": 12.568,
+              "response_id": "a2368445fd934a41b24996f9a31ee930",
+              "to_pcm_received_seconds": 1.2419099118262533,
+              "to_playback_started_seconds": 1.2419346309900288
+            },
+            "interruption_stop": []
+          },
+          "no_played_audio": false,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [
+          {
+            "request_id": "724f84851f2e4241bb41ac16a00b8b81",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "4c6ddc2225c74828b826740a564d50ed",
+            "response_id": "37b256fdeab244a984e2b5b0f6e9f062",
+            "state_token": "<|user interruption|>",
+            "text": "",
+            "raw_output": "<|user interruption|>"
+          },
+          {
+            "request_id": "d4b83eafeb674b858dc782b7071d5c79",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "a91bc92a7c0646189d9cb2107a4e47a3",
+            "response_id": "a2368445fd934a41b24996f9a31ee930",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "ee8fb73b4c23477bba2a844db38b2d4c",
+            "response_id": "a2368445fd934a41b24996f9a31ee930",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          }
+        ],
+        "reference": "How can I save money more effectively? Actually, what are some financial goals I should set?",
+        "reference_source": "interrupt.json context+interrupt",
+        "asr_score": {
+          "reference_words": 16,
+          "hypothesis_words": 16,
+          "substitutions": 0,
+          "deletions": 0,
+          "insertions": 0,
+          "errors": 0,
+          "wer": 0.0,
+          "alignment_errors": []
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_user_interruption/1/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/synthetic_user_interruption/diagnostics/1/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_user_interruption/1/a4_report.json"
+      },
+      {
+        "sample": "synthetic_user_interruption/10",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "9273d47e0eb30bedab5388a5c3152a1b7a9d12edeef2e075314501caa88847da",
+        "timeline_sha256": "ec66b872cde53307b44da051e30051e58cef2c0c58563fa316fd9f903e022ae0",
+        "duration_seconds": 26.9706875,
+        "final_asr": "How can I reduce stress quickly? Can we switch to talking about sleep improvement",
+        "final_model_prefix": "How can I reduce stress quickly? Can we switch to talking about sleep improvement",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 9,
+          "<|user finish talking|>": 2,
+          "<|user interruption|>": 1,
+          "<|user is thinking|>": 8
+        },
+        "controls_after_final_asr": {
+          "<|user finish talking|>": 1,
+          "<|user is thinking|>": 8
+        },
+        "micro_turns": 57,
+        "only_talking": false,
+        "only_talking_after_final_asr": false,
+        "has_voice": true,
+        "tts_audio_bytes": 2463612,
+        "new_response_playback_delay_seconds": null,
+        "new_response_playback_in_original_window": false,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "Sure! Improving sleep quality is an important aspect of overall health and well-being Here are some tips for improving your sleep:\n\n1 Establish a regular sleep schedule: Go to bed and wake up at the same time every day, even on weekends\n\n2 Create a relaxing bedtime routine: Wind down before bed by engaging ",
+        "client_measurements": {
+          "responses": [
+            {
+              "response_id": "c793d26262f6497797dcff33b6df221f",
+              "start_tts_seconds": 2.877333579584956,
+              "pcm_received_seconds": 3.579927608370781,
+              "playback_started_seconds": 3.5799620915204287,
+              "stop_tts_seconds": 10.070840802043676,
+              "played_audio_bytes": 605760,
+              "playback_started_in_tail": false
+            },
+            {
+              "response_id": "7526203c75e44ad7a61cdfc36ff3d2ac",
+              "start_tts_seconds": 11.897708462551236,
+              "pcm_received_seconds": 12.600350297987461,
+              "playback_started_seconds": 12.600376337766647,
+              "played_audio_bytes": 1857852,
+              "playback_started_in_tail": false
+            }
+          ],
+          "anchors": {
+            "interruption_start": 9.229333333333333,
+            "interruption_end": 11.970666666666666
+          },
+          "latencies": {
+            "interruption_end": {
+              "anchor_seconds": 11.970666666666666,
+              "response_id": null,
+              "to_pcm_received_seconds": null,
+              "to_playback_started_seconds": null
+            },
+            "interruption_stop": [
+              {
+                "response_id": "c793d26262f6497797dcff33b6df221f",
+                "seconds": 0.8415074687103434
+              }
+            ]
+          },
+          "no_played_audio": false,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [
+          {
+            "request_id": "e81331e175354a95a388b26e9651d3e6",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "e137d6ba490d446693021731bda23c70",
+            "response_id": "c793d26262f6497797dcff33b6df221f",
+            "state_token": "<|user interruption|>",
+            "text": "",
+            "raw_output": "<|user interruption|>"
+          },
+          {
+            "request_id": "e9a88453f3754a6c88dbbd2d928f25a5",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "e6a1136d71504a53a06aafcad0701b32",
+            "response_id": "7526203c75e44ad7a61cdfc36ff3d2ac",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "76bde52f97c9435bb9d64eb5b6602acb",
+            "response_id": "7526203c75e44ad7a61cdfc36ff3d2ac",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "3c2b887267164e85b7c17ce39657643d",
+            "response_id": "7526203c75e44ad7a61cdfc36ff3d2ac",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "b147041a20264adc84262a140d3e44dd",
+            "response_id": "7526203c75e44ad7a61cdfc36ff3d2ac",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "52982032e5c64393955ac4fe27e64ed5",
+            "response_id": "7526203c75e44ad7a61cdfc36ff3d2ac",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "81a66f9e518d4aa4bca71b5d6b5a791d",
+            "response_id": "7526203c75e44ad7a61cdfc36ff3d2ac",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "23a139d73bb940e8895f78e5b3e997c7",
+            "response_id": "7526203c75e44ad7a61cdfc36ff3d2ac",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "57620b4404c34eb59959ddc97b11ef59",
+            "response_id": "7526203c75e44ad7a61cdfc36ff3d2ac",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          }
+        ],
+        "reference": "How can I reduce stress quickly? Can we switch to talking about sleep improvement?",
+        "reference_source": "interrupt.json context+interrupt",
+        "asr_score": {
+          "reference_words": 14,
+          "hypothesis_words": 14,
+          "substitutions": 0,
+          "deletions": 0,
+          "insertions": 0,
+          "errors": 0,
+          "wer": 0.0,
+          "alignment_errors": []
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_user_interruption/10/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/synthetic_user_interruption/diagnostics/10/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_user_interruption/10/a4_report.json"
+      },
+      {
+        "sample": "synthetic_user_interruption/100",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "f1db722cc7d13e948a8eb11731bf0d3192f298893a4f75e2a02b5e0497689d4b",
+        "timeline_sha256": "85be759795c9ba12ffc678a14a3c44a018e5c644c83f1a392a611b947bd8ccc3",
+        "duration_seconds": 28.2506875,
+        "final_asr": "What should I know before getting a new puppy? Hold on, how do I choose the right type of pet food",
+        "final_model_prefix": "What should I know before getting a new puppy? Hold on, how do I choose the right type of pet food",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 12,
+          "<|user finish talking|>": 2,
+          "<|user interruption|>": 1,
+          "<|user backchannel|>": 1,
+          "<|user is thinking|>": 6
+        },
+        "controls_after_final_asr": {
+          "<|user backchannel|>": 1,
+          "<|user is thinking|>": 6
+        },
+        "micro_turns": 59,
+        "only_talking": false,
+        "only_talking_after_final_asr": false,
+        "has_voice": true,
+        "tts_audio_bytes": 2412868,
+        "new_response_playback_delay_seconds": 1.1717256345947593,
+        "new_response_playback_in_original_window": true,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "Choosing the right type of pet depends on various factors such as lifestyle, living situation, and personal preferences Here are some things to consider when choosing a pet:\n\n1 Lifestyle: Consider your daily routine and how much time you can dedicate to caring for a pet Some pets require more attention than others, so it's important to choose a ",
+        "client_measurements": {
+          "responses": [
+            {
+              "response_id": "c5f97419cdd04876b67674a26e02d63d",
+              "start_tts_seconds": 3.4697817973792553,
+              "pcm_received_seconds": 4.171580221503973,
+              "playback_started_seconds": 4.171603741124272,
+              "stop_tts_seconds": 10.666162740439177,
+              "played_audio_bytes": 606580,
+              "playback_started_in_tail": false
+            },
+            {
+              "response_id": "3896513d4eb94d69af5c05157a83364e",
+              "start_tts_seconds": 13.715991720557213,
+              "pcm_received_seconds": 14.422367548570037,
+              "playback_started_seconds": 14.422392301261425,
+              "played_audio_bytes": 1806288,
+              "playback_started_in_tail": false
+            }
+          ],
+          "anchors": {
+            "interruption_start": 9.826666666666666,
+            "interruption_end": 13.250666666666666
+          },
+          "latencies": {
+            "interruption_end": {
+              "anchor_seconds": 13.250666666666666,
+              "response_id": "3896513d4eb94d69af5c05157a83364e",
+              "to_pcm_received_seconds": 1.1717008819033712,
+              "to_playback_started_seconds": 1.1717256345947593
+            },
+            "interruption_stop": [
+              {
+                "response_id": "c5f97419cdd04876b67674a26e02d63d",
+                "seconds": 0.8394960737725103
+              }
+            ]
+          },
+          "no_played_audio": false,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [
+          {
+            "request_id": "b93ef9aa538a4c1395aee328d8c78545",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "a2ccfc62a76746ba9fa5c05bfd95d20e",
+            "response_id": "c5f97419cdd04876b67674a26e02d63d",
+            "state_token": "<|user interruption|>",
+            "text": "",
+            "raw_output": "<|user interruption|>"
+          },
+          {
+            "request_id": "258abb0e29af4df88d4ea1babb4e0aaf",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "ca715846d18d45d7b73f32968c58a37d",
+            "response_id": "3896513d4eb94d69af5c05157a83364e",
+            "state_token": "<|user backchannel|>",
+            "text": "",
+            "raw_output": "<|user backchannel|>"
+          },
+          {
+            "request_id": "b5bea37c6b604e3cb2b45b35a70c4abf",
+            "response_id": "3896513d4eb94d69af5c05157a83364e",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "a7e07500be2a46129b67f088c2f0d241",
+            "response_id": "3896513d4eb94d69af5c05157a83364e",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "71c9f0c078fe4afaa2b72a5980b939b7",
+            "response_id": "3896513d4eb94d69af5c05157a83364e",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "729164fd3337456e9584cd9e490d09a9",
+            "response_id": "3896513d4eb94d69af5c05157a83364e",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "2ef8c2f4316442d58eb8dc44ce5250d8",
+            "response_id": "3896513d4eb94d69af5c05157a83364e",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "ff3a10412fbe4f28ba7496f67727bbd7",
+            "response_id": "3896513d4eb94d69af5c05157a83364e",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          }
+        ],
+        "reference": "What should I know before getting a new puppy? Hold on, how do I choose the right type of pet food?",
+        "reference_source": "interrupt.json context+interrupt",
+        "asr_score": {
+          "reference_words": 21,
+          "hypothesis_words": 21,
+          "substitutions": 0,
+          "deletions": 0,
+          "insertions": 0,
+          "errors": 0,
+          "wer": 0.0,
+          "alignment_errors": []
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_user_interruption/100/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/synthetic_user_interruption/diagnostics/100/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_user_interruption/100/a4_report.json"
+      },
+      {
+        "sample": "synthetic_user_interruption/101",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "b30a9dd50fe45ea38392a197d900a8d9b2e95a17e2a126f6887a4acbd4dbd7d7",
+        "timeline_sha256": "794630a5065969823abad396e805c9bc37211f2bb817976826708d0f204aad64",
+        "duration_seconds": 28.272,
+        "final_asr": "What's the best time to plant tomatoes? Oh, before I forget, how do I fix a leaky faucet",
+        "final_model_prefix": "What's the best time to plant tomatoes? Oh, before I forget, how do I fix a leaky faucet",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 10,
+          "<|user finish talking|>": 2,
+          "<|user interruption|>": 1,
+          "<|user is thinking|>": 5
+        },
+        "controls_after_final_asr": {
+          "<|user finish talking|>": 1,
+          "<|user is thinking|>": 5
+        },
+        "micro_turns": 59,
+        "only_talking": false,
+        "only_talking_after_final_asr": false,
+        "has_voice": true,
+        "tts_audio_bytes": 2526344,
+        "new_response_playback_delay_seconds": 1.7411862703710792,
+        "new_response_playback_in_original_window": true,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "Fixing a leaky faucet can save you money on water bills and prevent damage to your home Here are some steps you can take to fix a leaky faucet:\n\n1 Turn off the water supply: Before you begin fixing the faucet, turn off the water supply to the sink You can usually find the shut-off valves under the sink or ",
+        "client_measurements": {
+          "responses": [
+            {
+              "response_id": "747f477d1e80409bbbada64eda5338b8",
+              "start_tts_seconds": 2.2725173626095057,
+              "pcm_received_seconds": 2.9788072537630796,
+              "playback_started_seconds": 2.978830298408866,
+              "stop_tts_seconds": 11.286635883152485,
+              "played_audio_bytes": 776016,
+              "playback_started_in_tail": false
+            },
+            {
+              "response_id": "f5a3b83d26144547bb5002d69adc262a",
+              "start_tts_seconds": 14.310923462733626,
+              "pcm_received_seconds": 15.013158906251192,
+              "playback_started_seconds": 15.01318627037108,
+              "played_audio_bytes": 1750328,
+              "playback_started_in_tail": false
+            }
+          ],
+          "anchors": {
+            "interruption_start": 9.4,
+            "interruption_end": 13.272
+          },
+          "latencies": {
+            "interruption_end": {
+              "anchor_seconds": 13.272,
+              "response_id": "f5a3b83d26144547bb5002d69adc262a",
+              "to_pcm_received_seconds": 1.7411589062511919,
+              "to_playback_started_seconds": 1.7411862703710792
+            },
+            "interruption_stop": [
+              {
+                "response_id": "747f477d1e80409bbbada64eda5338b8",
+                "seconds": 1.8866358831524845
+              }
+            ]
+          },
+          "no_played_audio": false,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [
+          {
+            "request_id": "184bcea429d14601b210f9001f5dab3f",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "b2f38dc9632342fc9c796c842ff019e5",
+            "response_id": "747f477d1e80409bbbada64eda5338b8",
+            "state_token": "<|user interruption|>",
+            "text": "",
+            "raw_output": "<|user interruption|>"
+          },
+          {
+            "request_id": "071516f02b2540188186a369a6e51e4b",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "56e4bf3dc6e74db08fef7c72703ec50d",
+            "response_id": "f5a3b83d26144547bb5002d69adc262a",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "0a88cc9d161d481ea3753aff553dcc70",
+            "response_id": "f5a3b83d26144547bb5002d69adc262a",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "e0a440d0e76d46d3bb8d8a39f5fc58d9",
+            "response_id": "f5a3b83d26144547bb5002d69adc262a",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "74c642b4da4d4960afc675b6d919b431",
+            "response_id": "f5a3b83d26144547bb5002d69adc262a",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "a8994a290afa4137a44bafa1d6fb4cc3",
+            "response_id": "f5a3b83d26144547bb5002d69adc262a",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          }
+        ],
+        "reference": "What's the best time to plant tomatoes? Oh, before I forget, how do I fix a leaky faucet?",
+        "reference_source": "interrupt.json context+interrupt",
+        "asr_score": {
+          "reference_words": 18,
+          "hypothesis_words": 18,
+          "substitutions": 0,
+          "deletions": 0,
+          "insertions": 0,
+          "errors": 0,
+          "wer": 0.0,
+          "alignment_errors": []
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_user_interruption/101/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/synthetic_user_interruption/diagnostics/101/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_user_interruption/101/a4_report.json"
+      },
+      {
+        "sample": "synthetic_user_interruption/102",
+        "status": "PASS",
+        "errors": [],
+        "protocol_errors": [],
+        "missing": false,
+        "report_sha256": "6b043f9e0d34afcb701399c3b18cd5256fbec820191d87f7d1e5900a81a301a2",
+        "timeline_sha256": "d6c39bcc7a135b09ad4a24e6884cc5478c27494d3e3426baa726c3e8e4019b1d",
+        "duration_seconds": 28.4213125,
+        "final_asr": "What are some good snacks for weight loss? Oh, can we talk about something else? How about some travel tips",
+        "final_model_prefix": "What are some good snacks for weight loss? Oh, can we talk about something else? How about some travel tips",
+        "final_prefix_matches_asr": true,
+        "controls": {
+          "<|user is talking|>": 12,
+          "<|user finish talking|>": 2,
+          "<|user interruption|>": 1,
+          "<|user is thinking|>": 6
+        },
+        "controls_after_final_asr": {
+          "<|user finish talking|>": 1,
+          "<|user is thinking|>": 6
+        },
+        "micro_turns": 59,
+        "only_talking": false,
+        "only_talking_after_final_asr": false,
+        "has_voice": true,
+        "tts_audio_bytes": 2434764,
+        "new_response_playback_delay_seconds": 0.9858893679032725,
+        "new_response_playback_in_original_window": true,
+        "new_response_playback_in_diagnostic_tail": false,
+        "finish_without_body": 0,
+        "response_text": "Sure! Traveling can be a great way to explore new places, experience different cultures, and create unforgettable memories Here are some travel tips that may help you plan your next trip:\n\n1 Research your destination: Before you go, research the place you're visiting so you know what to expect Check out local customs, weather conditions, and tourist ",
+        "client_measurements": {
+          "responses": [
+            {
+              "response_id": "81efaf78b5e140e6bbbf605837c99e4b",
+              "start_tts_seconds": 3.46775053627789,
+              "pcm_received_seconds": 4.117575224488974,
+              "playback_started_seconds": 4.117598943412304,
+              "stop_tts_seconds": 10.6722796484828,
+              "played_audio_bytes": 611870,
+              "playback_started_in_tail": false
+            },
+            {
+              "response_id": "deee0cbbe09b494bb71d1da9856e065f",
+              "start_tts_seconds": 13.706152506172657,
+              "pcm_received_seconds": 14.407198069617152,
+              "playback_started_seconds": 14.407222701236606,
+              "played_audio_bytes": 1822894,
+              "playback_started_in_tail": false
+            }
+          ],
+          "anchors": {
+            "interruption_start": 9.485333333333333,
+            "interruption_end": 13.421333333333333
+          },
+          "latencies": {
+            "interruption_end": {
+              "anchor_seconds": 13.421333333333333,
+              "response_id": "deee0cbbe09b494bb71d1da9856e065f",
+              "to_pcm_received_seconds": 0.9858647362838191,
+              "to_playback_started_seconds": 0.9858893679032725
+            },
+            "interruption_stop": [
+              {
+                "response_id": "81efaf78b5e140e6bbbf605837c99e4b",
+                "seconds": 1.1869463151494664
+              }
+            ]
+          },
+          "no_played_audio": false,
+          "aligned_first_word_seconds": null,
+          "note": "PCM and playback onset are not aligned speech onset; run official alignment separately."
+        },
+        "non_talking_events": [
+          {
+            "request_id": "297ad8483fc54ba085c982dc66991928",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "72a0e40613ff41c981f285eb880aa00e",
+            "response_id": "81efaf78b5e140e6bbbf605837c99e4b",
+            "state_token": "<|user interruption|>",
+            "text": "",
+            "raw_output": "<|user interruption|>"
+          },
+          {
+            "request_id": "657a6fde53e8444c9e8227c27ccc5ab6",
+            "response_id": "",
+            "state_token": "<|user finish talking|>",
+            "text": "",
+            "raw_output": "<|user finish talking|>"
+          },
+          {
+            "request_id": "bec632a954b74204b1394b4210adb56a",
+            "response_id": "deee0cbbe09b494bb71d1da9856e065f",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "80fa95e6bc274dbc9bc13fdd2a00ddca",
+            "response_id": "deee0cbbe09b494bb71d1da9856e065f",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "d4d57d4f18df4528bf96b7eb22440098",
+            "response_id": "deee0cbbe09b494bb71d1da9856e065f",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "5420ca1daa974cac909f8cf09fcc2f20",
+            "response_id": "deee0cbbe09b494bb71d1da9856e065f",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "718df7e112194a4e9d497668c1cbc217",
+            "response_id": "deee0cbbe09b494bb71d1da9856e065f",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          },
+          {
+            "request_id": "6984b82fe9594feb972c2ca5f995c27e",
+            "response_id": "deee0cbbe09b494bb71d1da9856e065f",
+            "state_token": "<|user is thinking|>",
+            "text": "",
+            "raw_output": "<|user is thinking|>"
+          }
+        ],
+        "reference": "What are some good snacks for weight loss? Oh, can we talk about something else? How about some travel tips?",
+        "reference_source": "interrupt.json context+interrupt",
+        "asr_score": {
+          "reference_words": 20,
+          "hypothesis_words": 20,
+          "substitutions": 0,
+          "deletions": 0,
+          "insertions": 0,
+          "errors": 0,
+          "wer": 0.0,
+          "alignment_errors": []
+        },
+        "asr_equal_to_old_t2": true,
+        "output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_user_interruption/102/output.wav",
+        "diagnostic_output_wav": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/driver/synthetic_user_interruption/diagnostics/102/output.wav",
+        "sample_report": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-fdb-r1/T2_R2_paper_aligned/replay/fdb/synthetic_user_interruption/102/a4_report.json"
+      }
+    ],
+    "expected_samples": 25,
+    "failed_or_missing_samples": [],
+    "transport_passed": true,
+    "asr_equal_to_old_t2_samples": 25,
+    "coverage_changes": [
+      {
+        "sample": "synthetic_user_interruption/1",
+        "old": false,
+        "new": true
+      },
+      {
+        "sample": "synthetic_user_interruption/101",
+        "old": false,
+        "new": true
+      }
+    ],
+    "official_scoring": "pending",
+    "manual_content_audio_review": "pending",
+    "physical_playback_measured": false
+  },
+  "T2_R2_paper_aligned/replay/summary.json": {
+    "transport_passed": true,
+    "subsets": [
+      {
+        "subset": "candor_pause_handling",
+        "status": "PASS",
+        "sessions": 5
+      },
+      {
+        "subset": "synthetic_pause_handling",
+        "status": "PASS",
+        "sessions": 5
+      },
+      {
+        "subset": "candor_turn_taking",
+        "status": "PASS",
+        "sessions": 5
+      },
+      {
+        "subset": "synthetic_user_interruption",
+        "status": "PASS",
+        "sessions": 5
+      },
+      {
+        "subset": "icc_backchannel",
+        "status": "PASS",
+        "sessions": 5
+      }
+    ],
+    "sessions": 25,
+    "official_scoring": "pending",
+    "manual_content_review": "pending",
+    "physical_playback_measured": false
+  },
+  "T2_R2_paper_aligned/model_health.json": {
+    "status": "ok",
+    "checkpoint": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/sbintuitions--DuplexCascade/c3dd51ce9a5a7d27f810ffd5dab309f132a94d28",
+    "base_model": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/Qwen--Qwen2-7B-Instruct/8dce1f8a2d3286a7adf09b977e661350ad67e40a",
+    "load_seconds": 58.24878368526697,
+    "token_ids": {
+      "<|no voice|>": 151646,
+      "<|user is talking|>": 151647,
+      "<|user finish talking|>": 151648,
+      "<|user is thinking|>": 151649,
+      "<|user interruption|>": 151650,
+      "<|user backchannel|>": 151651,
+      "<|im_end|>": 151645
+    },
+    "context_length": 32768,
+    "torch": "2.4.1+cu121",
+    "tokenizer_class": "Qwen2TokenizerFast",
+    "dtype": "torch.bfloat16",
+    "bos_token_id": null,
+    "adaptation": {
+      "condition": "T2_R2_paper_aligned",
+      "inference_eligible": true,
+      "checkpoint_sha256": "e94af4bd939e1a8b33a00e2125009bc801b2aeb612080b370cf52a1766f21d9e",
+      "final_step": 1214,
+      "cursor": 2428,
+      "summary_sha256": "e0d8882703a685f51da71a6ded6ca5020310abf3fabe00673387ba525d5050de",
+      "train_manifest_sha256": "6cd1d879c22a3ab472e4f315b4d437cd77f55e78411319258726cebf1aa82fb1",
+      "complete_inference_weights_match_training": true,
+      "clean_process_probe_ids_match": true,
+      "generated_ids": [
+        151647,
+        151645
+      ]
+    }
+  },
+  "exit_code": "0\n",
+  "analysis_resources": "\nreal\t0m0.574s\nuser\t0m0.180s\nsys\t0m0.032s\n",
+  "disk_bytes": 179933074
+}
