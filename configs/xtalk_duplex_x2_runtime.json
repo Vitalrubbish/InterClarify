@@ -1,0 +1,30 @@
+{
+  "asr": {
+    "type": "X2StreamingClient",
+    "params": {
+      "base_url": "http://127.0.0.1:8005",
+      "chunk_ms": 80
+    }
+  },
+  "tts": {
+    "type": "MossTTSRealtime",
+    "params": {
+      "base_url": "http://127.0.0.1:8004",
+      "voices": [
+        {
+          "name": "round1",
+          "path": "/hpc_stor03/sjtu_home/xuan.zhang/xtalk-round1/audio/reference.wav"
+        }
+      ]
+    }
+  },
+  "service_config": {
+    "duplex_enabled": true,
+    "duplex_model_url": "http://127.0.0.1:8006",
+    "duplex_micro_turn_seconds": 0.6,
+    "duplex_max_new_tokens": 64,
+    "duplex_timeout_seconds": 30,
+    "duplex_timeline_enabled": true,
+    "duplex_timeline_dir": "data/duplex_timeline"
+  }
+}

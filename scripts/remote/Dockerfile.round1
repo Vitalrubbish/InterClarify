@@ -1,0 +1,67 @@
+# Round-one X-Talk model-service acceptance image.
+#
+# Built on the flattened, stripped xtalk base (CUDA 12.8.1, conda at
+# /opt/conda, ffmpeg, sudo, vLLM 0.16.0, torch 2.9.1+cu128).  The base is
+# `xtalk:v0.17` flattened to one layer and stripped of components this stack
+# does not use (see docs/xtalk_baseline_stack.md); it is ~22 GB
+# instead of ~32 GB.  The model-serving LLM and turn detector reuse the base
+# environment's vLLM 0.16.0. ASR uses an independent external conda prefix.
+#
+# A single consolidated RUN layer creates the remaining conda environments
+# and installs the MOSS/client stacks.  The pinned source trees are
+# copied in; the wheelhouse and sources arrive as named build contexts, so the
+# huge model cache under $XTALK_ROUND1_ROOT is never part of the context.  The
+# wheelhouse is used as a local cache via --find-links while remaining
+# dependencies come from pypi.org (the aliyun mirror stalled on some wheels);
+# the resolved versions are archived after the job so the stack stays pinned.
+#
+# Build (see build_xtalk_round1_image.sh; naming per image_use.md, the
+# registry rejects tag reuse):
+#   bash scripts/remote/build_xtalk_round1_image.sh
+FROM docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-lean:v0.1
+
+# Prevent user-site leakage through mounted homes (image_use.md note).
+ENV PYTHONNOUSERSITE=True
+
+# Pinned sources for editable installs from the named contexts.
+COPY --from=moss-source . /opt/src/moss-source
+COPY --from=xtalk . /opt/src/xtalk
+
+# Vendored, pinned TurnSense ONNX service (scripts/remote/turnsense/UPSTREAM.md
+# records the upstream commit). The model assets are staged from
+# $XTALK_ROUND1_MODEL_ROOT at runtime, not baked into the image.
+COPY scripts/remote/turnsense /opt/src/xtalk-TurnSense
+
+# One consolidated layer.  The base env (/opt/conda) keeps vLLM 0.16.0 for
+# LLM/turn_detector.  The MOSS env keeps the upstream torch 2.9.1+cu128 pin and
+# adds the matching official prebuilt flash-attn 2.8.3 wheel
+# (cu12torch2.9/cp312/cxx11abiTRUE) staged in the wheelhouse, so MOSS can take
+# the attn_impl=flash_attention_2 DynamicCache path without torch.compile
+# latency.  No CUDA compilation happens at build time; the MOSS env stays fully
+# isolated from the base/client environments. ASR assets are prepared separately.
+RUN --mount=type=bind,from=wheels,target=/wheelhouse,ro \
+    set -eux; \
+    CONDA=/opt/conda/bin/conda; \
+    MAIN=https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main; \
+    for env in xtalk-round1-tools xtalk-round1-moss xtalk-round1-client xtalk-round1-turnsense; do \
+        "$CONDA" create --override-channels -c "$MAIN" -n "$env" python=3.12 pip -y; \
+    done; \
+    PY() { local env="$1"; shift; local py; \
+        if [ "$env" = base ]; then py=/opt/conda/bin/python; \
+        else py="/opt/conda/envs/$env/bin/python"; fi; \
+        "$py" -m pip install --find-links /wheelhouse \
+             --index-url https://pypi.org/simple/ \
+             --extra-index-url https://download.pytorch.org/whl/cu128 "$@"; }; \
+    PY xtalk-round1-tools PyYAML==6.0.3 huggingface_hub; \
+    PY xtalk-round1-moss setuptools; \
+    PY xtalk-round1-moss --no-build-isolation -e "/opt/src/moss-source[torch-runtime]" "torch==2.9.1+cu128" "torchaudio==2.9.1+cu128" transformers==5.0.0 fastapi uvicorn requests soxr websockets "flash-attn==2.8.3"; \
+    PY xtalk-round1-client setuptools; \
+    # silero-vad brings onnxruntime: the duplex runtime loads the backend VAD
+    # in the client process, and VADManager disables itself when no VAD model is
+    # configured, which silently delays the ASR segment boundary to the end of
+    # the audio stream.  Pin the version the turn-detector env already uses.
+    PY xtalk-round1-client --no-build-isolation -e "/opt/src/xtalk[example,dev,silero-vad]" "onnxruntime==1.31.0" PyYAML==6.0.3 aiohttp soundfile soxr; \
+    PY xtalk-round1-turnsense "numpy==2.2.6" "librosa==0.11.0" "soundfile==0.13.1" "kaldi-native-fbank==1.22.3" "fastapi==0.116.1" "uvicorn[standard]==0.35.0" "python-multipart==0.0.20" "onnxruntime==1.23.2" "PyYAML==6.0.3"; \
+    "$CONDA" clean -afy
+
+WORKDIR /opt/interclarify

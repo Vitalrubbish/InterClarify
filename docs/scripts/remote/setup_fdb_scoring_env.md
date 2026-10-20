@@ -51,4 +51,4 @@ bash scripts/remote/setup_fdb_scoring_env.sh
 
 ## 与其它脚本的关系
 
-环境修好后，用 [run_fdb_llm_judge.py](run_fdb_llm_judge.md) 跑官方对齐与 judge；判据与既有 FDB 记录一致。旧 A4 节点作业的 `DUPLEX_A4_FDB_SCORING=1` 分支已随 A4 组件栈移除，历史执行见固定 Git 提交。
+环境修好后，用 [run_fdb_llm_judge.py](run_fdb_llm_judge.md) 跑官方对齐与 judge；节点作业 [run_xtalk_duplex_a4_node_job.sh](run_xtalk_duplex_a4_node_job.md) 的 `DUPLEX_A4_FDB_SCORING=1` 分支复用同一套官方命令，二者的判据一致。

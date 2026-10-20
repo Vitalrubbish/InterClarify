@@ -1,0 +1,83 @@
+# Shared model preparation; ASR is configured independently.
+schema_version: 1
+baseline_status: historical_link_asr_retired
+target: duplexcascade_without_system_backchannel
+sources:
+  xtalk:
+    repo_url: https://github.com/Vitalrubbish/xtalk.git
+    commit: d9303c819c96230e527ea5159e7c74f1b5841a3e
+    base_commit: 5f0d9959edf1026588246efbed827b078cbb114c
+    branch: feature/qwen3-asr-adapter
+  moss_service:
+    repo_url: https://github.com/xcc-zach/xtalk-moss-tts-realtime.git
+    commit: b3306b97f8a64c1a2f25b9803c070ff32ecff6b1
+  moss_source:
+    repo_url: https://github.com/OpenMOSS/MOSS-TTS.git
+    commit: 58b20a0d5fcc6766658d50967a90a9d890009a46
+models:
+  llm:
+    model_id: Qwen/Qwen3-8B-AWQ
+    revision: 4da05a8edb55c6046cce958586c33b61da07bb79
+  tts:
+    model_id: OpenMOSS-Team/MOSS-TTS-Realtime
+    revision: null
+  codec:
+    model_id: OpenMOSS-Team/MOSS-Audio-Tokenizer
+    revision: null
+environments:
+  prepare: xtalk-round1-tools
+  llm: base
+  turn_detector: xtalk-round1-turnsense
+  tts: xtalk-round1-moss
+  client: xtalk-round1-client
+dependency_candidates:
+  llm_vllm: 0.16.0
+  moss_torch: 2.9.1+cu128
+  moss_transformers: 5.0.0
+  moss_flash_attn: 2.8.3
+  turnsense_onnxruntime: 1.23.2
+  turnsense_kaldi_native_fbank: 1.22.3
+services:
+  llm:
+    gpu_index: 0
+    host: 127.0.0.1
+    port: 8000
+    served_model_name: xtalk-round1-llm
+    max_model_len: 4096
+    gpu_memory_utilization: 0.85
+    quantization: awq
+  turn_detector:
+    kind: turnsense
+    gpu_index: 1
+    host: 127.0.0.1
+    port: 8003
+    source_dir: scripts/remote/turnsense
+    onnx_file: turnsense/model_int8.onnx
+    cmvn_file: turnsense/am.mvn
+    onnx_sha256: d5105b9ad4df677578b8b7bbbdc360946ae64dc2fc8b208386c5b544b65a5e4c
+    cmvn_sha256: 29b3c740a2c0cfc6b308126d31d7f265fa2be74f3bb095cd2f143ea970896ae5
+    upstream_repo: https://github.com/xcc-zach/xtalk-TurnSense
+    upstream_commit: cc0681c85771117958785faf3d6a7f402018a83e
+    use_cuda: false
+    clip_mode: tail
+    max_concurrency: 8
+    max_workers: 4
+  tts:
+    gpu_index: 3
+    host: 127.0.0.1
+    port: 8004
+    attn_impl: flash_attention_2
+    local_attn: sdpa
+    local_compile: inductor
+    output_sample_rate: 48000
+    concurrency: 1
+    torch_compile: default
+runtime:
+  integration_status: verified_remote_link
+  micro_turn_seconds: 0.6
+  system_backchannel_enabled: false
+  backchannel_model: null
+  backchannel_source_dir: null
+  frontend_vad_enabled: true
+  llm_temperature: 0
+  llm_max_tokens: 256
