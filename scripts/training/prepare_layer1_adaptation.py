@@ -22,7 +22,7 @@ def require(condition, message):
 
 
 def release_blockers(protocol, root):
-    """Require preregistered evaluation assets before any formal optimization."""
+    """Require synthetic dev assets; real-ASR migration data is evaluated later."""
     blockers = []
     if protocol.get('training_released') is not True:
         blockers.append('training_released is not true')
@@ -31,10 +31,8 @@ def release_blockers(protocol, root):
                 'issue005_zero_update_and_recovery', 'issue007_pretraining_preparation'):
         if gates.get(key) != 'passed':
             blockers.append(key + ' is not passed')
-    if not protocol.get('acceptance', {}).get('sample_manifest'):
-        blockers.append('acceptance.sample_manifest is missing')
     assets = protocol.get('evaluation_assets', {})
-    for key in ('sample_manifest', 'acceptance_config', 'evaluator'):
+    for key in ('text_dev_manifest', 'dev_selection_config', 'evaluator'):
         item = assets.get(key) or {}
         if not isinstance(item, dict) or not item.get('path') or not item.get('sha256'):
             blockers.append('evaluation_assets.' + key + ' is not frozen')
@@ -42,8 +40,8 @@ def release_blockers(protocol, root):
         path = root / item['path']
         if not path.is_file() or sha256_file(path) != item['sha256']:
             blockers.append('evaluation_assets.' + key + ' digest mismatch or missing file')
-        if key == 'sample_manifest' and item['path'] != protocol.get('acceptance', {}).get('sample_manifest'):
-            blockers.append('evaluation sample manifest references disagree')
+        if key == 'text_dev_manifest' and item['path'] != protocol.get('data', {}).get('audited_dataset_manifest'):
+            blockers.append('synthetic dev manifest references disagree')
     return blockers
 
 

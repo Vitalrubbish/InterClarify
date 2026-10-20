@@ -24,4 +24,4 @@ r5登记user_numeric_surface=english_numeric_v1，完整用户轮先转换数值
 
 006进入执行准备，首轮仍为512窗口。新增`training.round1_optimizer`登记正式AdamW、5,763步线性调度、173步warmup及每1,000步保存；不沿用005短跑100步scheduler。新增`gates.issue007_pretraining_preparation`，与最终真实test门禁分离。
 
-`evaluation_assets`的`sample_manifest`、`acceptance_config`、`evaluator`初始为空；007交付后，每项填入仓库相对`path`及完整`sha256`，样本清单路径须与`acceptance.sample_manifest`相同。正式入口同时检查文件存在和摘要、开训前门禁及`training_released`。空资产不能放行，也不要求最终test结果先通过。原协议顶层`issue/status`继续表示001历史登记状态，不表示006训练已完成。
+按用户澄清，`evaluation_assets`仅登记合成文本dev资产：`text_dev_manifest`引用004已审计r5 manifest，包含既有200条文本dev；`dev_selection_config`和`evaluator`待交付。每项使用仓库相对`path`及完整`sha256`，文本manifest路径须与`data.audited_dataset_manifest`相同。正式入口检查这些资产、开训前门禁及`training_released`。真实`acceptance.sample_manifest`允许为空，不参与006开训校验，在后续真实迁移验收前冻结。原协议顶层`issue/status`继续表示001历史登记状态，不表示006训练已完成。

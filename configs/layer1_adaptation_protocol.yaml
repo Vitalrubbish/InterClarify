@@ -110,8 +110,10 @@ training:
     warmup_steps: 173
     save_every_steps: 1000
 evaluation_assets:
-  sample_manifest: null
-  acceptance_config: null
+  text_dev_manifest:
+    path: reports/layer1_training/issue004-build-20261019-r5/completed/dataset/manifest.json
+    sha256: 4876c0940379259756c4709fe603cf7a6c9d77bc2248a1a5d1c0abdcad4c5115
+  dev_selection_config: null
   evaluator: null
 diagnostic:
   historical_samples: 5

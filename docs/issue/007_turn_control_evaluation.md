@@ -1,10 +1,14 @@
 # Issue 007：独立评估话轮控制并选择候选权重
 
-状态：待办。优先级：P0。依赖：002、006 的训练资产交付；评测器和门槛须在 006 正式训练前准备并冻结，不要求先完成本 issue 的最终验收。
+状态：待办。优先级：P0。依赖：002、006 的训练资产交付；合成文本dev评测器和checkpoint选择规则须在006正式训练前准备并冻结，真实轨迹清单和最终迁移验收不作为006开训条件。
+
+## 2026-10-20 范围修正
+
+按用户澄清，006先在模仿Nemotron输入形式的合成轨迹上适配，开发监控使用004已经审计的200条文本dev。027要求开训前具备独立真实录音清单过严，现由028移除此限制。开训资产为合成dev数据manifest、dev评价/选择配置及评测器；`acceptance.sample_manifest`仅用于后续真实迁移验收，允许在文本适配期间为空，不要求用户现在提供录音路径。
 
 ## 2026-10-18 进度核对
 
-[002](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_nemotron_streaming_integration.md)已交付接入诊断轨迹；协议已预登记行为分层、覆盖/质量阈值与 bootstrap 种子，但 `acceptance.sample_manifest` 仍为 null。现有轨迹来自同一条 FLEURS dev 录音及构造变体，不满足独立 dev/test 样本要求。未见 `scripts/evaluation/evaluate_layer1.py`、`configs/layer1_acceptance.yaml` 或候选独立评测报告；006 尚无训练资产。保持待办，先准备评测器和独立样本清单，不能把历史五例或组件通过作为本项验收。
+[002](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_nemotron_streaming_integration.md)已交付接入诊断轨迹；协议已预登记行为分层、覆盖/质量阈值与 bootstrap 种子，但 `acceptance.sample_manifest` 仍为 null。现有轨迹来自同一条 FLEURS dev 录音及构造变体，不满足后续真实迁移评测的独立dev/test要求。未见 `scripts/evaluation/evaluate_layer1.py`、`configs/layer1_acceptance.yaml` 或候选独立评测报告；006 尚无训练资产。保持待办，先准备合成dev评测器与选择规则；独立真实样本清单在迁移评测前准备，不能把历史五例或组件通过作为本项验收。
 
 ## 目标与实验设计
 
@@ -14,7 +18,7 @@
 
 ## 工作项
 
-- [ ] 在训练前冻结 dev/test 划分、样本数、行为分层、允许动作、观察窗与质量审查方法；最终 test 只在模型选择后开启。
+- [ ] 在训练前冻结合成文本dev划分、样本数、允许动作、观察窗及checkpoint选择规则。真实dev/test清单、行为分层与质量审查方法在真实迁移评测前另行冻结；最终test只在模型选择后开启。
 - [ ] 引用 001 的运行时对照结论及 002 的在线交付契约。固定轨迹评测与真实在线服务测试分别标识；运行时或交付策略改变时重验受影响的对照，并用相同版本重跑 B0，不能将接口修复收益计入权重适配收益。
 - [ ] T1/T2/T3 各自仅用 dev 确定待报告 checkpoint，并在最终 test 前冻结选择和主候选；test 可报告预登记对照，但不能据此换 checkpoint、改阈值或挑选另一组后宣称其通过。同一真实录音的全部句读视图和衍生轨迹必须位于同一集合。
 - [ ] 配对比较 B0 与候选 T1/T2/T3，报告原始计数、分母、按说话人/对话分组的不确定区间，不将同录音多个变体算作独立录音。

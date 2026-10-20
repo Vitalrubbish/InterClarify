@@ -21,7 +21,7 @@ class AdaptationTests(unittest.TestCase):
         self.protocol = yaml.safe_load((ROOT / 'configs/layer1_adaptation_protocol.yaml').read_text())
         self.protocol['training_released'] = False
         self.protocol['gates']['issue007_pretraining_preparation'] = 'pending'
-        self.protocol['evaluation_assets'] = dict.fromkeys(('sample_manifest', 'acceptance_config', 'evaluator'))
+        self.protocol['evaluation_assets'] = dict.fromkeys(('text_dev_manifest', 'dev_selection_config', 'evaluator'))
         self.protocol['acceptance']['sample_manifest'] = None
         self.config_path = ROOT / 'configs/layer1_adaptation_training.yaml'
         self.config = yaml.safe_load(self.config_path.read_text())
@@ -34,12 +34,12 @@ class AdaptationTests(unittest.TestCase):
     def release(self, root):
         self.protocol['training_released'] = True
         self.protocol['gates']['issue007_pretraining_preparation'] = 'passed'
-        for key in ('sample_manifest', 'acceptance_config', 'evaluator'):
+        for key in ('text_dev_manifest', 'dev_selection_config', 'evaluator'):
             path = root / (key + '.fixture')
             path.write_text('fixture for ' + key)
             self.protocol['evaluation_assets'][key] = {'path': path.name,
                                                        'sha256': preparation.sha256_file(path)}
-        self.protocol['acceptance']['sample_manifest'] = 'sample_manifest.fixture'
+        self.protocol['data']['audited_dataset_manifest'] = 'text_dev_manifest.fixture'
 
     def test_closed_gate_fails_before_output_or_model_loading(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -67,15 +67,29 @@ class AdaptationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'digest mismatch'):
                 self.validate(root)
 
-    def test_missing_or_disagreeing_sample_manifest_is_rejected(self):
+    def test_missing_or_disagreeing_synthetic_dev_manifest_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             self.release(root)
-            self.protocol['acceptance']['sample_manifest'] = 'another.fixture'
+            self.protocol['data']['audited_dataset_manifest'] = 'another.fixture'
             with self.assertRaisesRegex(ValueError, 'references disagree'):
                 self.validate(root)
-            (root / 'sample_manifest.fixture').unlink()
+            self.protocol['data']['audited_dataset_manifest'] = 'text_dev_manifest.fixture'
+            (root / 'text_dev_manifest.fixture').unlink()
             self.assertTrue(preparation.release_blockers(self.protocol, root))
+
+    def test_real_recordings_are_not_required_for_synthetic_adaptation(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.release(root)
+            for real_manifest in (None, 'not-collected-yet.json'):
+                with self.subTest(real_manifest=real_manifest):
+                    self.protocol['acceptance']['sample_manifest'] = real_manifest
+                    self.validate(root)
+                    self.assertEqual(preparation.release_blockers(self.protocol, root), [])
+            (root / 'dev_selection_config.fixture').unlink()
+            with self.assertRaisesRegex(ValueError, 'dev_selection_config'):
+                self.validate(root)
 
     def test_baseline_and_changed_optimizer_or_budget_are_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
