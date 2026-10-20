@@ -81,3 +81,5 @@
 [040a回答启动数据后移](archive/040a_delayed_response_data.md)已完成归档；代码、配置、审计与同路径文档同步，32项本地/远端数据测试通过，实际重建和审计退出0，见[数据交付](../../reports/layer1_training/issue040-delayed-start-data-20261020/README.md)。
 
 [040b全量加权训练](040b_delayed_start_full_training.md)按用户直接训练授权执行独立第三轮，作业`job-179250231441693568614-xuan-zhang`，最新数据1000条T2/1235步，详见[启动记录](../../reports/layer1_training/issue040-delayed-training-20261020/README.md)。
+
+[043撤销最近两次清理提交](archive/043_revert_cleanup_commits.md)已完成归档：用反向提交恢复旧训练探针及X2/MOSS/TurnSense组件，未触碰正在运行的训练作业，保留原有未提交改动。
