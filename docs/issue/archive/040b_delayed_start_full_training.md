@@ -1,6 +1,6 @@
 # Issue 040b：最新延后启动数据全量加权训练
 
-状态：进行中。父任务：[040](040_layer1_delayed_response_start.md)。
+状态：完成，归档。父任务：[040](../040_layer1_delayed_response_start.md)。
 
 依据用户本次直接训练指令，执行独立条件 T2_R3_delayed_start。数据为已完成 040a 的 issue040-delayed-start-data，不使用旧 r5 或前两轮最终权重续训。全部 1000 条 train、2048、单 epoch、2469 序列/1235 步，最后一步为一个序列，不丢弃或重复曝光。学习率 2e-5，warmup124，talking/finish/interruption/backchannel/thinking 权重 1/10/5/2/1，普通正文和 EOS 权重1。累积批按全批权重和归一化。保存步206/412/618/824/1030/1235，最终权重固定，不按测试选点。
 
@@ -8,4 +8,6 @@
 
 工作：独立配置/协议、三臂完整索引、新条件入口及回归、冻结源码、远端调度提交、确认实际加权更新。完成训练后自动干净进程完整重载。FDB重测不在本次自动提交范围。提交和实际启动后记录作业ID与证据；训练未完成前不归档。
 
-调度器已接受作业 `job-179250231441693568614-xuan-zhang`，run_id `issue040-delayed-start-r1`，冻结源码 `91b7eb260933272c8c82f73176a855e508bf57af`。独立训练器索引及完整配置核验通过，实际运行状态见[启动记录](../../reports/layer1_training/issue040-delayed-training-20261020/README.md)。尚未填写训练完成或最终候选通过。
+调度器已接受作业 `job-179250231441693568614-xuan-zhang`，run_id `issue040-delayed-start-r1`，冻结源码 `91b7eb260933272c8c82f73176a855e508bf57af`。独立训练器索引及完整配置核验通过，实际运行状态见[训练记录](../../../reports/layer1_training/issue040-delayed-training-20261020/README.md)。训练及干净进程候选核验均退出0，完成1235步/2469序列/1000条，112个LoRA更新且冻结参数不变；完整权重及生成IDs复现通过。
+
+完成证据见[训练报告](../../../reports/layer1_training/issue040-delayed-training-20261020/README.md)。用户已另行授权提交测试，由[040c](../040c_delayed_start_fdb_test.md)继续跟踪，不把训练执行通过当作FDB能力通过。

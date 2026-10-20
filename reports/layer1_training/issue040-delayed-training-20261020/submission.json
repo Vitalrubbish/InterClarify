@@ -25,8 +25,13 @@
   "full_train_index_sha256": "9032074e05eeb1de7c1c93c396f1e61f0b1e59df67ee21b2c618d167eca9bbfc",
   "data_manifest_sha256": "86c0faca1e1a12d3c7cf1fa0144e53a6a83166a8454ad48d986b24d40a97761d",
   "submitted": true,
-  "execution_status": "submitted_waiting_actual_training_step",
+  "execution_status": "completed_and_clean_candidate_verified",
   "pretraining_model_probe": "not_executed_user_direct_training",
   "fdb_submitted": false,
-  "final_exit_code": null
+  "final_exit_code": 0,
+  "last_observed_step": 1235,
+  "last_observed_cursor": 2469,
+  "training_complete": true,
+  "clean_candidate_revalidation_passed": true,
+  "final_checkpoint_sha256": "266a37a28699d0c3f36b6a6305374bc89a1a2ff2af7a37fd1eb4caf1ad915346"
 }

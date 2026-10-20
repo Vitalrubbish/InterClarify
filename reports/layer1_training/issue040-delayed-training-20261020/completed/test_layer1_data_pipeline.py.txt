@@ -1,0 +1,37 @@
+test_actual_tokenizer_metadata_and_single_token_validation (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_all_behaviors_and_interruption_abandons_tail (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_candidate_sampling_scans_all_sources_and_is_order_independent (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_dedup_before_selection_and_exclusion_log (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_delayed_start_preserves_old_random_events_and_content (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_delayed_start_targets_and_source_conservation (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_end_to_end_resume_and_corruption_rejection (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_eval_views_frozen_across_training_epochs (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_exact_prefix_filter_has_threshold_pair_recall (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_explicit_user_waiver_closes_data_without_faking_signatures (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_frozen_baseline_comparison_preserves_selection_and_content (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_incomplete_download_cannot_be_used (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_invalid_configuration_and_unicode_fail_closed (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_last_turn_never_fabricates_interruption (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_mixed_assignment_no_duplicate_exposure (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_never_exposes_future_user_input (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_numeric_protection_across_micro_turn_boundaries (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_optional_fdb_text_coverage_does_not_add_training_data_review_gate (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_punctuation_only_boundaries_do_not_turn_into_no_voice (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_punctuation_only_user_turn_is_rejected (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_punctuation_protects_words_numbers_and_specials (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_raw_window_sampling_does_not_repeat_rows_to_fill_small_sources (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_raw_window_sampling_is_bounded_reproducible_and_traceable (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_rejects_partial_event_instead_of_truncating (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_rejects_unreviewed_claim_without_external_sources (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_seed_replay_and_epoch_variation (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_single_chunk_interruption_has_separate_finish (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_source_tamper_and_incomplete_download_rejected (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_spoken_number_forms_share_a_duplicate_group (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_three_views_share_events_targets_and_supervise_once (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_timing_audit_rejects_misalignment_and_duplicate_source (test_layer1_data_pipeline.DataPipelineTests) ... ok
+test_user_32_signoff_closes_data_issue_without_releasing_training (test_layer1_data_pipeline.DataPipelineTests) ... ok
+
+----------------------------------------------------------------------
+Ran 32 tests in 11.165s
+
+OK

@@ -6,9 +6,10 @@ OUTPUT="${LAYER1_FDB_OUTPUT:?set new output}"
 XTALK_ROOT="${LAYER1_XTALK_ROOT:?set frozen X-Talk source}"
 TRAIN_RUN="${LAYER1_TRAIN_RUN:?set completed round directory}"
 MODE="${LAYER1_FDB_MODE:-round1}"
-[[ "$MODE" == round1 || "$MODE" == round2_t2 ]] || exit 2
+[[ "$MODE" == round1 || "$MODE" == round2_t2 || "$MODE" == delayed_t2 ]] || exit 2
 CONDITIONS=(B0 T1 T2 T3)
 if [[ "$MODE" == round2_t2 ]]; then CONDITIONS=(T2_R2_paper_aligned); fi
+if [[ "$MODE" == delayed_t2 ]]; then CONDITIONS=(T2_R3_delayed_start); fi
 HOME_ROOT=/hpc_stor03/sjtu_home/xuan.zhang
 MODEL_ENV="$HOME_ROOT/interclarify-layer1-training-20261019/envs/training"
 CLIENT_ENV="$HOME_ROOT/miniconda3/envs/xtalk-round1-client"
@@ -83,6 +84,10 @@ from pathlib import Path
 import sys
 p = Path(sys.argv[1])
 second_round = sys.argv[3] == 'round2_t2'
+delayed = sys.argv[3] == 'delayed_t2'
+single = second_round or delayed
+condition = 'T2_R3_delayed_start' if delayed else 'T2_R2_paper_aligned'
+steps, sequences = (1235, 2469) if delayed else (1214, 2428)
 exit_code = (p / 'exit_code.txt').read_text().strip()
 known_reload_failure = (second_round and exit_code == '1' and
     not (p / 'training/failure.json').exists() and (p / 'candidate_reload.log').is_file() and
@@ -91,22 +96,43 @@ known_reload_failure = (second_round and exit_code == '1' and
 assert exit_code == '0' or known_reload_failure
 report = {'conditions': {}, 'original_train_job_exit_code': exit_code,
           'known_reload_metadata_failure': known_reload_failure}
-if not second_round:
+if not single:
     report['round_status'] = json.loads((p / 'status.json').read_text())
 elif not known_reload_failure:
     reload = json.loads((p / 'candidate_reload.json').read_text())
-    assert reload['condition'] == 'T2_R2_paper_aligned' and reload['inference_eligible']
+    assert reload['condition'] == condition and reload['inference_eligible']
     assert reload['complete_inference_weights_match_training'] and reload['clean_process_probe_ids_match']
     report['candidate_reload'] = reload
 else:
     report['candidate_reload'] = 'required_again_in_clean_model_service_before_test'
 initial = None
-for arm in (('T2_R2_paper_aligned',) if second_round else ('T1', 'T2', 'T3')):
-    root = p / 'training' if second_round else p / arm / 'training'
+for arm in ((condition,) if single else ('T1', 'T2', 'T3')):
+    root = p / 'training' if single else p / arm / 'training'
     summary = json.loads((root / 'summary.json').read_text())
-    assert summary['passed'] and summary['final_step'] == 1214 and summary['cursor'] == 2428
+    assert summary['passed'] and summary['final_step'] == steps and summary['cursor'] == sequences
+    if delayed:
+        import yaml
+        manifest = json.loads((root / 'manifest.json').read_text())
+        identity = manifest['identity']
+        assert reload['final_step'] == steps and reload['cursor'] == sequences
+        assert reload['checkpoint_sha256'] == summary['checkpoint']['sha256']
+        assert reload['train_manifest_sha256'] == hashlib.sha256((root / 'manifest.json').read_bytes()).hexdigest()
+        assert reload['summary_sha256'] == hashlib.sha256((root / 'summary.json').read_bytes()).hexdigest()
+        protocol = yaml.safe_load(Path('configs/layer1_delayed_protocol.yaml').read_text())
+        assert summary['formal_training_released'] and manifest['formal_training_released']
+        assert summary['exposed_dialogues'] == 1000
+        assert identity['config']['purpose'] == 'issue040_delayed_start'
+        assert identity['config']['condition'] == condition
+        assert identity['data']['manifest_sha256'] == protocol['data_manifest_sha256']
+        assert identity['data']['audit_sha256'] == protocol['data_audit_sha256']
+        assert identity['release']['config'] == protocol['training_config_sha256']
+        assert identity['release']['protocol'] == hashlib.sha256(
+            Path('configs/layer1_delayed_protocol.yaml').read_bytes()).hexdigest()
+        assert identity['config']['loss']['type'] == 'control_weighted_ce'
+        assert identity['config']['loss']['control_weights'] == dict(
+            speaking=1, finish=10, interruption=5, backchannel=2, thinking=1)
     assert summary['frozen_tensors_unchanged'] and len(summary['changed_tensors']) == 112
-    if not second_round:
+    if not single:
         assert (p / arm / 'exit_code.txt').read_text().strip() == '0'
     assert hashlib.sha256((root / 'checkpoint.pt').read_bytes()).hexdigest() == summary['checkpoint']['sha256']
     before = hashlib.sha256((root / 'weights_before.json').read_bytes()).hexdigest()
@@ -176,7 +202,7 @@ for condition in "${CONDITIONS[@]}"; do
   check_budget
   mkdir "$OUTPUT/$condition"
   ADAPTATION=()
-  if [[ "$MODE" == round2_t2 ]]; then
+  if [[ "$MODE" == round2_t2 || "$MODE" == delayed_t2 ]]; then
     ADAPTATION=(--adaptation "$TRAIN_RUN/training/checkpoint.pt")
   elif [[ "$condition" != B0 ]]; then
     ADAPTATION=(--adaptation "$TRAIN_RUN/$condition/training/checkpoint.pt")
