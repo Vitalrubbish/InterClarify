@@ -1,0 +1,31 @@
+{
+  "job_id": "job-179248995834872020112-xuan-zhang",
+  "run_id": "issue037-t2-round2-r1",
+  "condition": "T2_R2_paper_aligned",
+  "source_commit": "cf568568830a5e33f6185f6a3e92625c878d478a",
+  "source_checkout": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/source/cf56856",
+  "output": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue037-t2-round2-r1",
+  "submit_log": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/submit_logs/issue037-t2-round2-r1.log",
+  "conda_prefix": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/envs/training",
+  "resources": {
+    "gpus": 1,
+    "cpus": 8,
+    "memory_gib": 32,
+    "workers": 0,
+    "concurrent_jobs": 1,
+    "max_wall_seconds": 28800,
+    "training_output_gib": 5,
+    "total_output_gib": 6,
+    "min_free_gib": 5
+  },
+  "config_sha256": "77faea809e403b7259deb30dce2065cdb22c97b8f536cdc4d5529bfeb67a9865",
+  "protocol_sha256": "10427d03ecc3870dfab70b7ea62b23750f8a4fffe7f364d6181998345820084a",
+  "pretraining_probe": "waived_by_user_not_executed",
+  "submitted": true,
+  "execution_status": "running_optimizer_steps_confirmed",
+  "fdb_submitted": false,
+  "last_observed_step": 24,
+  "last_observed_cursor": 48,
+  "final_exit_code": null,
+  "training_complete": false
+}
