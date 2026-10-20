@@ -1,0 +1,33 @@
+{
+  "test_source_commit": "12fbd0a",
+  "test_mode": "round2_t2",
+  "condition": "T2_R2_paper_aligned",
+  "resources": {
+    "gpus": 2,
+    "cpus": 16,
+    "memory_gib": 64,
+    "max_wall_seconds": 14400,
+    "max_output_gib": 10,
+    "min_free_gib": 15,
+    "concurrent_jobs": 1
+  },
+  "frozen_driver_same_as_issue033": true,
+  "driver_files_compared": [
+    "scripts/remote/duplex_a4_replay.py",
+    "scripts/remote/layer1_fdb.py",
+    "scripts/remote/nemotron_asr_service.py",
+    "scripts/remote/kokoro_tts_service.py",
+    "scripts/remote/duplex_model_service.py",
+    "configs/xtalk_duplex_english_runtime.json"
+  ],
+  "old_t2_collection_validation": {
+    "passed": true,
+    "assertion": "summary identical to issue034 analysis T2; all 25 final ASR strings identical",
+    "voice_samples": 6,
+    "new_response_samples": 3,
+    "only_talking_after_final_asr_samples": 21,
+    "reference_words": 952,
+    "word_errors": 70
+  },
+  "test_submission": "waiting_for_training_and_candidate_reload"
+}

@@ -82,16 +82,24 @@ import json
 from pathlib import Path
 import sys
 p = Path(sys.argv[1])
-assert (p / 'exit_code.txt').read_text().strip() == '0'
 second_round = sys.argv[3] == 'round2_t2'
-report = {'conditions': {}}
+exit_code = (p / 'exit_code.txt').read_text().strip()
+known_reload_failure = (second_round and exit_code == '1' and
+    not (p / 'training/failure.json').exists() and (p / 'candidate_reload.log').is_file() and
+    (p / 'candidate_reload.log').read_text().rstrip().endswith(
+        'ValueError: Candidate eligibility differs from the requested verification mode'))
+assert exit_code == '0' or known_reload_failure
+report = {'conditions': {}, 'original_train_job_exit_code': exit_code,
+          'known_reload_metadata_failure': known_reload_failure}
 if not second_round:
     report['round_status'] = json.loads((p / 'status.json').read_text())
-else:
+elif not known_reload_failure:
     reload = json.loads((p / 'candidate_reload.json').read_text())
     assert reload['condition'] == 'T2_R2_paper_aligned' and reload['inference_eligible']
     assert reload['complete_inference_weights_match_training'] and reload['clean_process_probe_ids_match']
     report['candidate_reload'] = reload
+else:
+    report['candidate_reload'] = 'required_again_in_clean_model_service_before_test'
 initial = None
 for arm in (('T2_R2_paper_aligned',) if second_round else ('T1', 'T2', 'T3')):
     root = p / 'training' if second_round else p / arm / 'training'

@@ -68,14 +68,14 @@ def load_candidate(loaded, path, checkpoint, base_model, *, verification_only=Fa
     loaded.wrapper.requires_grad_(False)
     loaded.model.eval()
     require(state_fingerprints(loaded.wrapper) == after, 'Candidate inference weights differ from training final state')
-    probe = summary['protocol_probe']
+    generation_probe = summary['protocol_probe']
     device = next(loaded.model.parameters()).device
-    prompt = torch.tensor([probe['prompt_ids']], dtype=torch.long, device=device)
+    prompt = torch.tensor([generation_probe['prompt_ids']], dtype=torch.long, device=device)
     with torch.no_grad():
         generated = loaded.model.generate(input_ids=prompt, attention_mask=torch.ones_like(prompt),
             do_sample=False, max_new_tokens=64, eos_token_id=loaded.token_ids['<|im_end|>'],
             pad_token_id=loaded.token_ids['<|im_end|>'], use_cache=True)[0, prompt.shape[1]:].tolist()
-    require(generated == probe['generated_ids'], 'Clean-process generation differs from final training probe')
+    require(generated == generation_probe['generated_ids'], 'Clean-process generation differs from final training probe')
     return {'condition': identity['config'].get('condition', identity['config']['arm']),
             'inference_eligible': not probe, 'checkpoint_sha256': sha256_file(path),
             'final_step': summary['final_step'], 'cursor': summary['cursor'],

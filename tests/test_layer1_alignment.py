@@ -8,6 +8,7 @@ import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
+from unittest.mock import patch
 
 import yaml
 
@@ -170,6 +171,37 @@ class WeightedLossTests(unittest.TestCase):
                 training.restore_checkpoint(path, model, optimizer, scheduler,
                                             {**identity, 'warmup_steps': 37})
             self.assertEqual(training.tree_digest(model.state_dict()), before)
+
+    def test_formal_generation_probe_does_not_override_candidate_eligibility(self):
+        torch = self.torch
+        import layer1_candidate as candidate
+        name = 'llm.base_model.model.model.layers.0.self_attn.q_proj.lora_A.default.weight'
+        value = torch.nn.Parameter(torch.ones(2, 3))
+        wrapper = SimpleNamespace(named_parameters=lambda: [(name, value)], requires_grad_=lambda _: None)
+        model = SimpleNamespace(parameters=lambda: iter([value]), eval=lambda: None,
+                                generate=lambda **kwargs: torch.tensor([[1, 2, 9]]))
+        loaded = SimpleNamespace(wrapper=wrapper, model=model, token_ids={'<|im_end|>': 9})
+        config = {'purpose': 'issue036_alignment', 'condition': 'T2_R2_paper_aligned',
+                  'arm': 'T2', 'scheduler_steps': 1214}
+        identity = {'config': config, 'alignment_probe': False, 'assets': {},
+                    'data': {'statistics': {'sequences': 2428}}}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = root / 'checkpoint.pt'
+            torch.save({'identity': identity, 'step': 1214, 'cursor': 2428, 'lora': {name: value.detach()}}, path)
+            summary = {'passed': True, 'formal_training_released': True, 'frozen_tensors_unchanged': True,
+                       'final_step': 1214, 'cursor': 2428, 'checkpoint': {'sha256': candidate.sha256_file(path)},
+                       'protocol_probe': {'prompt_ids': [1, 2], 'generated_ids': [9]}}
+            manifest = {'identity': identity, 'formal_training_released': True,
+                        'arguments': {'inventory': 'inventory', 'official_source': 'official'}}
+            for file, data in [('summary.json', summary), ('manifest.json', manifest),
+                               ('weights_before.json', {}), ('weights_after.json', {})]:
+                (root / file).write_text(json.dumps(data))
+            with patch.object(candidate, 'verify_asset_inventory', return_value={}), \
+                 patch.object(candidate, 'state_fingerprints', return_value={}):
+                report = candidate.load_candidate(loaded, path, root, root)
+            self.assertTrue(report['inference_eligible'])
+            self.assertTrue(report['clean_process_probe_ids_match'])
 
 
 if __name__ == '__main__':
