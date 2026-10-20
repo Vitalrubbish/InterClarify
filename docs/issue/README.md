@@ -1,5 +1,14 @@
 # 开发与测试 issue 索引
 
+## 当前待办
+
+| 编号 | 工作单元 | 状态与范围 |
+| --- | --- | --- |
+| [047](047_tts_first_segment_latency.md) | 首段 TTS 聚合期限降至 300ms | 待办；后续段保持 1,200ms、micro-turn 保持 600ms，比较延迟、连续性与听感 |
+| [048](048_cross_request_kv_cache.md) | 跨 micro-turn 请求复用 KV cache | 待办；按会话复用匹配前缀，验证正确性、时延与显存，不改变拍长或重启训练 |
+
+两项独立比较，本轮仅登记 issue，尚未修改运行实现或启动远端作业。
+
 [035 ASR 正式选型报告](archive/035_asr_selection_report.md)已完成归档；报告汇总 2026-10-16 测量及后续输入复核，见 [正式报告](../asr_selection_report.md)。
 
 [038 TTS 正式选型报告与旧决策文档清理](archive/038_tts_selection_report.md)已完成归档；见 [TTS 报告](../tts_selection_report.md)。两份旧 decision 文档已由正式报告取代，当前链接已迁移。
