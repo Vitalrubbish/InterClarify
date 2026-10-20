@@ -4,6 +4,8 @@
 
 [038 TTS 正式选型报告与旧决策文档清理](archive/038_tts_selection_report.md)已完成归档；见 [TTS 报告](../tts_selection_report.md)。两份旧 decision 文档已由正式报告取代，当前链接已迁移。
 
+[039 ASR 首文本指标移除](archive/039_remove_asr_first_text_metric.md)已完成归档；按用户要求移除正式报告中的该列及相关表述，保留原始测量证据。
+
 更新：2026-10-20。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**。首轮三臂训练和四配置FDB小子集测试已完成，接话效果不足；036实现完成并按用户豁免短跑归档；037启动第二轮T2训练。完成任务移入`archive/`，父任务仅在全部条件满足后归档。
 
 | 编号 | 任务 | 当前状态与剩余工作 |
