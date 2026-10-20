@@ -1,0 +1,7 @@
+# 正式适配权重加载
+
+`scripts/training/layer1_candidate.py`在完整官方模型恢复之后加载006最终checkpoint，不创建新LoRA，不恢复optimizer或训练RNG，不拥有音频播放。
+
+`load_candidate`要求正式训练summary成功、最终步数/游标与manifest一致、条件为T1/T2/T3且checkpoint摘要匹配；复核训练引用的固定资产，核对当前完整官方参数摘要等于训练前摘要。只接受完整既有q/v LoRA白名单及相同shape/dtype，全部验证后再复制。加载后完整参数摘要须与训练最终摘要相同，拒绝冻结参数改变或部分adapter。
+
+干净进程使用训练末尾保存的prompt IDs按相同BF16/贪心/EOS/64-token预算生成，要求原始生成IDs完全一致；这证明候选重载，不证明FDB效果。返回摘要、条件、步数、完整还原及复现结论供服务健康信息和报告使用。大张量仍留远端，不复制完整基础模型。

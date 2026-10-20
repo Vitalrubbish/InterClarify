@@ -305,6 +305,25 @@ class A4ReplayTests(unittest.TestCase):
 class PlaybackTests(unittest.IsolatedAsyncioTestCase):
     """Exercise paced playback and partial stop acknowledgements."""
 
+    async def test_diagnostic_silence_drain_preserves_original_fdb_duration(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            client = MODULE.A4ReplayClient('http://localhost', 'ws://localhost', 1,
+                Path(tmp) / 'out.wav', fdb_tail_seconds=0.08, fdb_tail_audio=True)
+            client._started = 10.0
+            sent = []
+
+            async def send(ws, pcm, index):
+                sent.append(pcm)
+                return 10.0, 10.18
+
+            client._send_turn_input = send
+            original = b'\x01\x00' * 1600
+            report, passed = await client._run_fdb(None, original)
+            self.assertTrue(passed)
+            self.assertEqual(sent, [original + b'\x00\x00' * 1280])
+            self.assertEqual(report['input_audio_seconds'], 0.1)
+            self.assertTrue(report['diagnostic_tail_audio'])
+
     async def test_stop_keeps_played_prefix_and_discards_tail(self):
         """A stop during a chunk retains its heard prefix in WAV and receipt."""
         with tempfile.TemporaryDirectory() as tmp:

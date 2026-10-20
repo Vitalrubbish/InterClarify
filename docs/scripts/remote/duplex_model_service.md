@@ -6,6 +6,8 @@
 
 ## 类设计与核心方法
 
+033增加可选`--adaptation <formal-training/checkpoint.pt>`。OfficialDuplexModel先完整恢复官方状态，再调用`layer1_candidate.load_candidate`严格恢复最终LoRA，核验完整训练前/后参数摘要并在干净进程复现保存的生成IDs。健康信息新增`adaptation`条件、摘要和复现结论；不提供参数时明确为B0。raw ChatML、控制/正文协议、取消和播放路径保持原行为。
+
 005训练加载实施将完整权重恢复、键迁移及prompt范围检查提取到 `scripts/training/layer1_model.py`。OfficialDuplexModel构造时调用公共加载器的training=False，再建立原有ChatML字段；模型/health/流式协议不改。旧validate_state_keys/normalize_state_dict/validate_prompt_ids名称继续重导出，已有调用和测试保留。新增统一shape检查在复制前拒收不完整资产，审计语义比原服务更明确；真实服务回归与001受影响对照另留证据，不把此重构自动标为已通过。
 
 OfficialDuplexModel 按 train_cfg.json 加载本地 Qwen2-7B-Instruct，resize token embedding，创建 q/v LoRA 与 embed_tokens/lm_head 保存层，装载官方 model_state.safetensors。tokenizer 与官方 server.py 一致使用 fast 实现（`use_fast=True`）：官方 tokenizer.json 含 `ignore_merges` 等字段，需要 `tokenizers>=0.20`，因此 `interclarify-dev` 已升级到 transformers 4.46.3 / tokenizers 0.20.3 / peft 0.13.2（torch 保持 2.4.1+cu121 未动）。升级前已记录 pip freeze 快照，且实测 fast 与 slow 在本权重上的分词结果完全一致。核验 tokenizer token 单 ID 与权重键，normalize_state_dict 对发布 q_proj/v_proj 的 weight/bias 增加 PEFT base_layer 层级；只做键名迁移并核验映射无碰撞，缺失或不匹配直接失败；CUDA 使用 BF16（24GB 4090 部署参数，区别于官方 demo 未显式指定 dtype 的默认加载），冻结推理、do_sample=False，以实际 im_end ID 结束。

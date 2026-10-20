@@ -61,7 +61,8 @@ class OfficialDuplexModel:
         Allocated CUDA device or explicit CPU for inspection.
     """
 
-    def __init__(self, checkpoint: Path, base_model: Path, device: str = 'cuda') -> None:
+    def __init__(self, checkpoint: Path, base_model: Path, device: str = 'cuda',
+                 adaptation: Path | None = None) -> None:
         import resource
         started = time.monotonic()
         def phase(name):
@@ -69,6 +70,11 @@ class OfficialDuplexModel:
                 'seconds': time.monotonic()-started,
                 'peak_rss_kib': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss}}), flush=True)
         loaded = load_official_checkpoint(checkpoint, base_model, device, training=False, phase=phase)
+        if adaptation is not None:
+            from layer1_candidate import load_candidate
+            loaded.info['adaptation'] = load_candidate(loaded, adaptation, checkpoint, base_model)
+        else:
+            loaded.info['adaptation'] = {'condition': 'B0', 'updated': False}
         self.tokenizer = loaded.tokenizer
         self.token_ids = loaded.token_ids
         self.model = loaded.model
@@ -311,11 +317,12 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--checkpoint', type=Path, required=True)
     parser.add_argument('--base-model', type=Path, required=True)
+    parser.add_argument('--adaptation', type=Path)
     parser.add_argument('--device', default='cuda')
     parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('--port', type=int, default=8006)
     args = parser.parse_args()
-    model = OfficialDuplexModel(args.checkpoint, args.base_model, args.device)
+    model = OfficialDuplexModel(args.checkpoint, args.base_model, args.device, args.adaptation)
     uvicorn.run(create_app(model), host=args.host, port=args.port)
 
 

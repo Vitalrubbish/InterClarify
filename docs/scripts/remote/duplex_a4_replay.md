@@ -1,5 +1,7 @@
 # `scripts/remote/duplex_a4_replay.py`
 
+033在A4ReplayClient增加默认关闭的`fdb_tail_audio`选项，仅四配置FDB入口启用：原始音频后连续发送5秒记账静音以便流式ASR排出尾词，不将人工边界或未来文本送入模型。报告明确`diagnostic_tail_audio=true`，总发送耗时含该尾窗，而`input_audio_seconds`仍为原始长度。官方WAV仍截断/补齐到原始输入长度，尾窗只保留在独立diagnostics文件；不把尾窗回复计入官方窗口结果。历史调用保持原先只等待尾窗的行为。
+
 2026-10-15 测量修复：summarize_timeline 按 monotonic_timestamp 排序，response_latencies 按 response_id/request_id 匹配回答首 token，缺失关联留 null，不用全会话最早倾听事件代替。response.update 只是已播文本确认，不是首音频或首词。客户端新增带 response_id 的 pcm_received 和 playback_started。FDB 的 --fdb-tail-seconds 默认 5 秒，独立诊断 WAV 保留尾部，官方 WAV 仍严格输入等长。诊断输出存 driver 的 diagnostics 目录，避免被官方递归评分识别。传输成功不证明静默正确，semantic_status 需官方评分。
 
 在已启动的模型服务前创建 X-Talk WebSocket 会话，实时发送真实 WAV，保存播放确认下的 PCM 和 JSONL 摘要。复用 `xtalk_link_check.py` 的登录、服务启动、PCM 加载和输入传输；`A4ReplayClient` 扩展接收与播放模拟，并实现各语义场景。

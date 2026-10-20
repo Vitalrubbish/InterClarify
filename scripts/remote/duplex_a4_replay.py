@@ -81,11 +81,13 @@ class A4ReplayClient(LinkClient):
         output_wav: Path,
         output_rate: int = 48_000,
         fdb_tail_seconds: float = 5.0,
+        fdb_tail_audio: bool = False,
     ) -> None:
         super().__init__(http_base, ws_base, timeout)
         self.output_wav = output_wav
         self.output_rate = output_rate
         self.fdb_tail_seconds = fdb_tail_seconds
+        self.fdb_tail_audio = fdb_tail_audio
         self._pcm_received_ids: set[str] = set()
         self._playback_started_ids: set[str] = set()
         self.session_id: str | None = None
@@ -213,12 +215,17 @@ class A4ReplayClient(LinkClient):
         audio_pcm: bytes,
     ) -> tuple[dict[str, Any], bool]:
         """Stream one complete FDB input without requiring the system to answer."""
-        started, ended = await self._send_turn_input(ws, audio_pcm, 0)
-        await asyncio.sleep(self.fdb_tail_seconds)
+        replay_pcm = audio_pcm
+        if self.fdb_tail_audio:
+            replay_pcm += b'\x00\x00' * round(SAMPLE_RATE * self.fdb_tail_seconds)
+        started, ended = await self._send_turn_input(ws, replay_pcm, 0)
+        if not self.fdb_tail_audio:
+            await asyncio.sleep(self.fdb_tail_seconds)
         result = {
             "scenario": "fdb",
             "input_start_seconds": started - self._started,
             "diagnostic_tail_seconds": self.fdb_tail_seconds,
+            "diagnostic_tail_audio": self.fdb_tail_audio,
             "input_audio_seconds": len(audio_pcm) / (2 * SAMPLE_RATE),
             "send_seconds": ended - started,
             "response_ids": list(self._start_resp_ids),
@@ -934,6 +941,7 @@ async def run_fdb_batch(args: argparse.Namespace) -> dict[str, Any]:
                 args.timeout,
                 output_path,
                 fdb_tail_seconds=args.fdb_tail_seconds,
+                fdb_tail_audio=getattr(args, 'fdb_tail_audio', False),
             )
             pcm = _load_pcm16(input_path)
             report = await client.run(pcm, 1, scenario="fdb")
