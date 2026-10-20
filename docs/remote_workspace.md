@@ -17,3 +17,5 @@
 维护操作串行执行，优先同文件系统rename，避免复制大模型和音频或高并发整盘扫描。现役环境先查软链接和conda注册，不移动嵌入绝对prefix的环境；当前任务、磁盘/内存和作业配额均须先核对。其他项目、共享包缓存和原始研究结果不因名称过时而删除。
 
 014进一步直接删除旧选型的Nemotron多语/Python Kyutai/Pocket权重及前两者专用环境，还有已结束TTS实验的编译缓存；只保留来源和配置，现役模型/环境种子及原始结果仍在。此项释放与012归拢分开计量，见[014记录](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/014_remote_cache_reclamation.md)。
+
+2026-10-21 延迟测试依赖检查：最终候选训练manifest仍引用 `interclarify-layer1-training-20261019/source/91b7eb2/reports/layer1_training/issue001-inventory-20261018/inventory_summary.json`。该清单是现役权重加载依赖，误删后已按训练登记SHA256恢复；使用当前加载器期间保留此文件。延迟测试独立快照位于 `interclarify-latency-20261021-r2/source`，不可在对应作业运行中删除；恢复与重提见Issue 050。

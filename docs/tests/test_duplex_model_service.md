@@ -12,3 +12,5 @@ DuplexModelServiceTests 使用 FakeModel 与 FastAPI TestClient 检查实际 wir
 Issue001独立参考对照增加generate_ids诊断端点，使用同一权重、锁、精度及生成预算，仅绕过集成history renderer；逐token附带generated_token_id供原版参考解码器消费。产品generate保持原契约，原始IDs越界拒绝；本端点不证明独立checkpoint恢复。
 
 test_prompt_bounds_use_one_vocabulary_lookup用1000个有效ID验证词表仅查询一次，同时保留负ID和上界越界拒绝，防止旧tokenizer上校验开销随prompt长度重复放大。
+
+2026-10-21：PrefixCacheTests 验证前缀命中/改写、容量/字节/TTL淘汰；tiny Qwen 用实际 DynamicCache 检查增量与完整历史生成ID、会话隔离、取消后清除。缺少本地 transformers 时仅跳过 tiny Qwen，远端模型conda必须执行。

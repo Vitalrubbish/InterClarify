@@ -20,7 +20,7 @@ class FakeModel:
 
     info = {'token_ids': {'<|im_end|>': 151645}}
 
-    async def stream_ids(self, ids, max_new_tokens):
+    async def stream_ids(self, ids, max_new_tokens, **kwargs):
         """Echo independently constructed IDs for the diagnostic endpoint test."""
         yield {'prompt_token_ids': ids, 'generated_token_id': 151645}
         yield {'finish_reason': 'stop', 'token_ids': [151645]}
@@ -147,3 +147,81 @@ class DuplexModelServiceTests(unittest.TestCase):
             service.normalize_state_dict({original: weight, target: weight}, {target})
         with self.assertRaises(ValueError):
             service.normalize_state_dict({'unknown': weight}, {target})
+
+
+class PrefixCacheTests(unittest.TestCase):
+    """Exercise cache bounds and token-equivalent incremental Qwen inference."""
+
+    def test_pool_prefix_revision_and_limits(self):
+        class Tensor:
+            def numel(self):
+                return 8
+            def element_size(self):
+                return 2
+        class Cache:
+            def get_seq_length(self):
+                return 2
+            def __iter__(self):
+                return iter([(Tensor(), Tensor())])
+        pool = service.PrefixCachePool(max_sessions=1, max_tokens=2, max_bytes=32)
+        self.assertTrue(pool.store('a', Cache(), [1, 2, 3]))
+        cache, count, status = pool.take('a', [1, 2, 4])
+        self.assertEqual((count, status), (2, 'hit'))
+        self.assertEqual(pool.bytes_used(), 0)
+        pool.store('a', cache, [1, 2])
+        self.assertEqual(pool.take('a', [1, 9, 4])[2], 'prefix_invalidated')
+        pool.store('a', Cache(), [1, 2])
+        pool.store('b', Cache(), [1, 2])
+        self.assertNotIn('a', pool.entries)
+        pool.ttl = -1
+        self.assertEqual(pool.take('b', [1, 2, 3])[2], 'cold')
+        pool.max_bytes = 31
+        self.assertFalse(pool.store('a', Cache(), [1, 2]))
+
+    def test_tiny_qwen_cached_ids_and_cancellation(self):
+        import asyncio
+        try:
+            import torch
+            from transformers import Qwen2Config, Qwen2ForCausalLM
+        except ImportError:
+            self.skipTest('Tiny Qwen check runs in remote model conda environment')
+        torch.manual_seed(7)
+        config = Qwen2Config(vocab_size=32, hidden_size=32, intermediate_size=48,
+            num_hidden_layers=2, num_attention_heads=4, num_key_value_heads=2,
+            max_position_embeddings=256, eos_token_id=31, pad_token_id=31)
+        config._attn_implementation = 'eager'
+        model = service.OfficialDuplexModel.__new__(service.OfficialDuplexModel)
+        model.model = Qwen2ForCausalLM(config).eval()
+        model.device, model.eos_id, model.context_length = 'cpu', 31, 256
+        model.cache_pool, model.trace_path = service.PrefixCachePool(), None
+        class Tokenizer:
+            def __len__(self):
+                return 32
+            def decode(self, ids, **kwargs):
+                return ''.join(chr(65 + i) for i in ids)
+        model.tokenizer = Tokenizer()
+        async def collect(ids, enabled, session='one'):
+            rows = [r async for r in model.stream_ids(ids, 3, False,
+                session_id=session, use_cache=enabled)]
+            self.assertFalse(any('error' in r for r in rows), rows)
+            return next(r for r in rows if 'finish_reason' in r)
+        async def check():
+            first = await collect([1, 2, 3], True)
+            ids = [1, 2, 3] + first['token_ids'] + [4, 5]
+            cached = await collect(ids, True)
+            plain = await collect(ids, False)
+            self.assertEqual(cached['token_ids'], plain['token_ids'])
+            self.assertEqual(cached['metrics']['cache_status'], 'hit')
+            self.assertGreater(cached['metrics']['cached_tokens'], 0)
+            rewritten = [1, 9] + ids[2:]
+            rebuilt = await collect(rewritten, True)
+            self.assertEqual(rebuilt['token_ids'], (await collect(rewritten, False))['token_ids'])
+            self.assertEqual(rebuilt['metrics']['cache_status'], 'prefix_invalidated')
+            self.assertEqual((await collect([1, 2], True, 'two'))['metrics']['cache_status'], 'cold')
+            stream = model.stream_ids(rewritten + rebuilt['token_ids'] + [8], 64, False,
+                                      session_id='one', use_cache=True)
+            await anext(stream)
+            await stream.aclose()
+            self.assertNotIn('one', model.cache_pool.entries)
+            self.assertIn('two', model.cache_pool.entries)
+        asyncio.run(check())

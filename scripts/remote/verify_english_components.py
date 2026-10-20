@@ -157,7 +157,8 @@ async def verify_tts(args):
              ('slow_text_supply','Yes, Tuesday at nine thirty works.',3,.6)]
     rows = []
     for name,text,chars,interval in texts:
-        client = KokoroSegmented(args.url)
+        client = KokoroSegmented(args.url, max_wait_ms=args.tts_first_wait_ms,
+                                 continuation_wait_ms=args.tts_continuation_wait_ms)
         started = time.monotonic()
         chunks, audio_events = [], []
         await client.start()
@@ -327,6 +328,8 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--backend',choices=['asr','tts'],required=True)
     parser.add_argument('--url',required=True)
+    parser.add_argument('--tts-first-wait-ms',type=float,default=600)
+    parser.add_argument('--tts-continuation-wait-ms',type=float,default=1200)
     parser.add_argument('--audio',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
     raise SystemExit(asyncio.run(run(parser.parse_args())))

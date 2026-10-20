@@ -39,3 +39,9 @@ Issue001独立参考对照增加generate_ids诊断端点，使用同一权重、
 Issue001d：结构构建后先移到实际设备，再strict恢复发布state，避免CPU同时驻留两套完整模型；记录base加载、GPU结构、state打开和strict恢复四个阶段的耗时与峰值RSS。无完整恢复则不开HTTP服务，参数映射和实际精度不变。
 
 Issue001e：validate_prompt_ids每个请求只取一次词表大小，之后仍逐ID严格检查上下界。旧tokenizers0.20.3的len可能较慢，禁止在逐token表达式中反复调用。duplex_request日志新增validation_seconds，与原有生成seconds分开，完整请求耗时仍由客户端时间线衡量。
+
+## Issue 048 实现设计（2026-10-21）
+
+服务按显式 session_id 保存有界 DynamicCache；请求开关默认关闭，在线配置显式启用。缓存池管理匹配前缀、会话淘汰、字节/token/会话数上限及 TTL；取出后独占使用，成功结束且实际缓存长度核对通过才归还。历史改写先清空重建，取消或错误丢弃在用缓存。会话释放接口在全局推理锁内执行，不影响其他会话。完整历史与原始生成 ID 仍是事实来源。
+
+stream_ids 仅计算未缓存后缀，attention mask 覆盖全部历史，cache_position 从实际缓存长度起算；generate 最后一个输出可能尚未入缓存，保存时仅登记实际 get_seq_length 对应的 token 前缀。生成统计增加 session/request 标识、匹配 token 数、输入长度、模型首 token 和生成耗时；可选 trace 文件记录请求输入/输出 ID、缓存状态和单调时钟，用于固定请求对照。

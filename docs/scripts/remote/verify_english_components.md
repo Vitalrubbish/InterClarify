@@ -7,3 +7,5 @@
 `verify_native_playback` 使用真实Kokoro和脚本控制，经原有RuntimeAdapter、TTSManager、协调器和播放管理器核验附和、插话及新响应代际；headless确认不等同扬声器实播。`run` 保留独立输出、manifest、失败和非零退出，传输自动通过不等于听感或全链路通过；`write_json` 保存本次产物。无类。
 
 资源记录沿用health、进程RSS和GPU采样。底层GPU取消释放不由网络取消耗时证明，人工读法和韵律仍须试听。真实模型和集群测试使用远端独立conda环境与单卡调度作业。
+
+2026-10-21：TTS CLI 独立接受 --tts-first-wait-ms 与 --tts-continuation-wait-ms，固定相同供给轨迹比较600/1200和300/1200ms；其余连续性与取消诊断保持。

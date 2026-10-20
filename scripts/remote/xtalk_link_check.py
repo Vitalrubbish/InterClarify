@@ -71,6 +71,15 @@ def _serve(config: dict, host: str, port: int) -> None:
     its port leaves the caller with nothing but "server did not start in time"
     and no way to tell a crash from a stall (observed 2026-10-15).
     """
+    import logging
+    handler = logging.FileHandler(str(_serve_log_path()) + '.latency.log')
+    handler.setFormatter(logging.Formatter('%(message)s'))
+    handler.addFilter(lambda record: str(record.msg).startswith('latency_'))
+    for name in ('xtalk.duplex_control.runtime_adapter', 'xtalk.duplex_control.model_client',
+                 'xtalk.models.tts.kokoro_segmented'):
+        logger = logging.getLogger(name)
+        logger.setLevel(logging.INFO)
+        logger.addHandler(handler)
     _note_serve(f"start host={host} port={port}")
     try:
         import uvicorn

@@ -46,3 +46,5 @@ headless 客户端收到音频后立即回执属于模拟播放确认，只验�
 ## 现行会话能力
 
 duplex 会话的 `acoustic_vad_enabled=false` 由服务端按连续 ASR 能力确定：禁用声学 VAD 检测与 pause/resume 调度，保持会话级连续 PCM 与每拍文本读取；轮次仲裁由 DuplexCascade 协议执行。旧 Qwen/X2 路线的相关描述已随其实现移除，历史细节见固定 Git 提交。
+
+2026-10-21：_serve 为三个延迟观测 logger 添加独立文件处理器，文件为 XTALK_SERVE_LOG 后缀 .latency.log，仅保留 latency_ 记录，确保无应用日志配置时仍可按ID合并时间线。

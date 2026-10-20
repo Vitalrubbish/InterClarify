@@ -1,13 +1,13 @@
 # 开发与测试 issue 索引
 
-## 当前待办
+## 当前工作
 
 | 编号 | 工作单元 | 状态与范围 |
 | --- | --- | --- |
-| [047](047_tts_first_segment_latency.md) | 首段 TTS 聚合期限降至 300ms | 待办；后续段保持 1,200ms、micro-turn 保持 600ms，比较延迟、连续性与听感 |
-| [048](048_cross_request_kv_cache.md) | 跨 micro-turn 请求复用 KV cache | 待办；按会话复用匹配前缀，验证正确性、时延与显存，不改变拍长或重启训练 |
+| [047](047_tts_first_segment_latency.md) | 首段 TTS 聚合期限降至 300ms | 进行中；后续段保持 1,200ms、micro-turn 保持 600ms，比较延迟、连续性与听感 |
+| [048](048_cross_request_kv_cache.md) | 跨 micro-turn 请求复用 KV cache | 进行中；按会话复用匹配前缀，验证正确性、时延与显存，不改变拍长或重启训练 |
 
-两项独立比较，本轮仅登记 issue，尚未修改运行实现或启动远端作业。
+两项已实现并完成本地回归，[049 延迟对照](049_latency_decomposition_validation.md)已提交远端任务 `job-179251495575111326759-xuan-zhang`，结果待回收。
 
 [035 ASR 正式选型报告](archive/035_asr_selection_report.md)已完成归档；报告汇总 2026-10-16 测量及后续输入复核，见 [正式报告](../asr_selection_report.md)。
 
@@ -65,6 +65,12 @@
 
 ## 归档
 
+[052 研究架构讨论整理](archive/052_research_discussion_consolidation.md)已完成归档：研究草稿汇总今日共识，思考模块倾向先提示词原型再专项训练，同时保留仅提示词与直接训练方案；更新架构未决问题，未修改实现。
+
+[051 独立思考模块架构](archive/051_thinking_module_architecture.md)已完成归档：记录思考模块提交介入意图、保留完整问句方案，以及表达模块通过 special token 按需唤醒的方向；仅更新研究草稿，未修改运行协议或模型。
+
+[050 剩余表达时长隐式学习](archive/050_implicit_duration_learning.md)已完成归档：研究草稿记录隐式学习与混合线索数据方向；仅确认研究设计选择，未实现数据或启动训练，时长是否为必要条件仍待讨论。
+
 [036a删除参数范围对齐目标](archive/036a_remove_parameter_alignment.md)完成：036/037保持仅训练已有q/v LoRA，embedding/head冻结；未修改运行配置。
 
 [035训练模式重核](archive/035_official_training_comparison.md)完成：见[完整对照](../layer1_training_comparison.md)，区分论文加权声明与公开推理包装器普通CE，列出除上下文长度外的已确认差异和未公开项。未修改首轮配置或启动新训练。
@@ -102,3 +108,7 @@
 [046精简Layer1报告](archive/046_minimize_layer1_reports.md)已完成归档：`reports/layer1_training`只保留配置/测试直接依赖与正式报告引用证据，由约9.6MiB降至约1.5MiB。
 
 [049删除旧训练设计](archive/049_remove_legacy_training_switches.md)已完成归档：只保留T2_R3最终路线，删除036探针、旧时序兼容、006/037条件、FDB旧模式及三个离线分析脚本。
+
+[049 延迟分解对照测试](049_latency_decomposition_validation.md)进行中：实现047/048后，按原始基线、仅300ms、300ms加KV cache三组串行重测固定25会话，并交付整体与分段延迟。用户已授权执行，不重启训练。
+
+[050 远端测试依赖恢复与重提](archive/050_restore_latency_test_dependencies.md)已完成归档：r1快照完整，已恢复误删的现役训练资产清单并以独立r2重提原测试；保留旧任务证据。

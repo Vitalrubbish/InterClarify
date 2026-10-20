@@ -37,3 +37,7 @@ python scripts/remote/duplex_a4_replay.py --config configs/xtalk_duplex_english_
 
 
 duplex 会话的 `acoustic_vad_enabled=false` 由服务端按连续 ASR 能力确定：禁用声学 VAD 检测与 pause/resume 调度，保持会话级连续 PCM 与每拍文本读取；轮次仲裁由 DuplexCascade 协议执行。
+
+## 2026-10-21 延迟分解观测
+
+A4ReplayClient 报告会话身份与输入单调时钟；在实际播放 PCM 上按 10ms 窗连续30ms超过-45dBFS检测首可听代理，保留原始起点时间，并记录同回复音频播放缺口。取消后只检测实际越过播放边界的样本。此观测为无声卡回放代理，不等于物理发声。原有回复身份、停止与官方输出时长规则保持。

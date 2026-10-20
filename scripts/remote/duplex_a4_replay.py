@@ -99,11 +99,35 @@ class A4ReplayClient(LinkClient):
         self._finish_pending: set[str] = set()
         self._playing: tuple[str, bytes, float] | None = None
         self._stop_signal = asyncio.Event()
+        self._audible_states = {}
+        self._last_play_end = {}
 
     def _capture_played(self, response_id: str, pcm: bytes, started: float) -> None:
         """Retain only PCM that crossed the simulated playback boundary."""
         if not pcm:
             return
+        import numpy as np
+        state = self._audible_states.setdefault(response_id, {'count': 0, 'onset': None, 'found': False})
+        last = self._last_play_end.get(response_id)
+        if last is not None and started - last > .025:
+            state['count'] = 0
+        self._last_play_end[response_id] = started + len(pcm) / (2 * self.output_rate)
+        if not state['found']:
+            values = np.frombuffer(pcm, dtype='<i2').astype(np.float64) / 32768
+            window = self.output_rate // 100
+            for offset in range(0, len(values) - window + 1, window):
+                active = np.sqrt(np.mean(values[offset:offset + window] ** 2)) > 10 ** (-45 / 20)
+                if active:
+                    if not state['count']:
+                        state['onset'] = started + offset / self.output_rate
+                    state['count'] += 1
+                    if state['count'] >= 3:
+                        state['found'] = True
+                        self._record('audible_proxy', None, {'response_id': response_id,
+                            'audible_monotonic': state['onset']})
+                        break
+                else:
+                    state['count'] = 0
         if self._first_audio is None:
             self._first_audio = started - self._started
         if self._capture is not None:
@@ -179,6 +203,8 @@ class A4ReplayClient(LinkClient):
                 receiver.cancel()
                 await asyncio.gather(receiver, return_exceptions=True)
             report = {
+                "session_id": self.session_id,
+                "client_origin_monotonic": self._started,
                 "status": "COMPLETE" if passed and not self._errors else "FAILED",
                 "errors": self._errors,
                 **result,
@@ -392,6 +418,10 @@ class A4ReplayClient(LinkClient):
                     continue
                 duration = len(pcm) / (2 * self.output_rate)
                 started = time.monotonic()
+                previous_end = self._last_play_end.get(response_id)
+                if previous_end is not None and started - previous_end > .02:
+                    self._record('playback_gap', None, {'response_id': response_id,
+                        'seconds': started - previous_end})
                 if response_id not in self._playback_started_ids:
                     self._playback_started_ids.add(response_id)
                     self._record("playback_started", None, {"response_id": response_id})

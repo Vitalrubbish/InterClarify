@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import OrderedDict
 import asyncio
 import json
 import queue
@@ -25,6 +26,64 @@ from layer1_model import (
 )
 
 
+class PrefixCachePool:
+    """Own bounded, exclusive session caches; all access holds the service lock.
+
+    Parameters
+    ----------
+    max_sessions : int
+        Maximum idle session caches.
+    max_tokens : int
+        Maximum tokens per retained cache.
+    max_bytes : int
+        Total retained tensor byte limit.
+    ttl : float
+        Idle expiry in seconds.
+    """
+
+    def __init__(self, max_sessions=2, max_tokens=8192, max_bytes=512 * 1024**2, ttl=300):
+        self.entries = OrderedDict()
+        self.max_sessions, self.max_tokens = max_sessions, max_tokens
+        self.max_bytes, self.ttl = max_bytes, ttl
+
+    def discard(self, session_id):
+        """Remove one session, including during explicit release."""
+        self.entries.pop(session_id, None)
+
+    def take(self, session_id, ids):
+        """Check out an exact prefix or rebuild after history revision."""
+        now = time.monotonic()
+        for key in list(self.entries):
+            if now - self.entries[key]['at'] > self.ttl:
+                self.discard(key)
+        entry = self.entries.pop(session_id, None)
+        if entry is None:
+            return None, 0, 'cold'
+        prefix = entry['ids']
+        if len(prefix) < len(ids) and ids[:len(prefix)] == prefix:
+            return entry['cache'], len(prefix), 'hit'
+        return None, 0, 'prefix_invalidated'
+
+    def store(self, session_id, cache, ids):
+        """Retain only verified materialized tokens within all memory limits."""
+        count = int(cache.get_seq_length())
+        size = sum(t.numel() * t.element_size() for layer in cache for t in layer)
+        if count <= 0 or count > len(ids):
+            raise RuntimeError('Cache length does not match completed token history')
+        if count > self.max_tokens or size > self.max_bytes:
+            return False
+        self.discard(session_id)
+        self.entries[session_id] = dict(cache=cache, ids=list(ids[:count]), bytes=size,
+                                       at=time.monotonic())
+        while len(self.entries) > self.max_sessions or self.bytes_used() > self.max_bytes:
+            self.entries.popitem(last=False)
+        return session_id in self.entries
+
+    def bytes_used(self):
+        """Return retained tensor bytes, excluding the exclusively checked-out cache."""
+        return sum(e['bytes'] for e in self.entries.values())
+
+
 class HistoryTurn(BaseModel):
     """One prior micro-turn: user text or the assistant's generated token ids."""
 
@@ -36,6 +95,9 @@ class HistoryTurn(BaseModel):
 class GenerateRequest(BaseModel):
     """One official micro-turn history and its system micro-turn budget."""
 
+    session_id: str = Field(default='', max_length=128, pattern=r'^[A-Za-z0-9_-]*$')
+    request_id: str = Field(default='', max_length=128)
+    use_cache: bool = False
     history: list[HistoryTurn] = Field(default_factory=list)
     max_new_tokens: int = Field(default=64, ge=1, le=256)
     audit_prompt: bool = False
@@ -44,6 +106,9 @@ class GenerateRequest(BaseModel):
 class GenerateIDsRequest(BaseModel):
     """Accept independent reference prompt IDs for offline runtime diagnostics."""
 
+    session_id: str = Field(default='', max_length=128, pattern=r'^[A-Za-z0-9_-]*$')
+    request_id: str = Field(default='', max_length=128)
+    use_cache: bool = False
     prompt_token_ids: list[int] = Field(min_length=1)
     max_new_tokens: int = Field(default=64, ge=1, le=256)
 
@@ -87,6 +152,8 @@ class OfficialDuplexModel:
         self.eos_id = self.token_ids['<|im_end|>']
         self.context_length = loaded.info['context_length']
         self.info = loaded.info
+        self.cache_pool = PrefixCachePool()
+        self.trace_path = None
 
     def build_prompt_ids(self, history: list[HistoryTurn]) -> list[int]:
         """Flatten one micro-turn history into the official raw ChatML id run.
@@ -134,10 +201,13 @@ class OfficialDuplexModel:
             Raw micro-turn history and generation limit.
         """
         ids = self.build_prompt_ids(request.history)
-        async for item in self.stream_ids(ids, request.max_new_tokens, request.audit_prompt):
+        async for item in self.stream_ids(ids, request.max_new_tokens, request.audit_prompt,
+                                          session_id=request.session_id, request_id=request.request_id,
+                                          use_cache=request.use_cache):
             yield item
 
-    async def stream_ids(self, ids: list[int], max_new_tokens: int, audit_prompt: bool = True) -> AsyncIterator[dict[str, Any]]:
+    async def stream_ids(self, ids: list[int], max_new_tokens: int, audit_prompt: bool = True, *, session_id: str = "",
+                         request_id: str = "", use_cache: bool = False) -> AsyncIterator[dict[str, Any]]:
         """Run the same inference kernel on independently constructed reference IDs.
 
         Parameters
@@ -160,7 +230,17 @@ class OfficialDuplexModel:
             raise ValueError(f'Raw micro-turn history exceeds model context length: '
                              f'{len(ids)} prompt tokens + {max_new_tokens} new tokens '
                              f'> {self.context_length}')
+        if use_cache and not session_id:
+            raise ValueError('Caching requires an explicit session_id')
+        cached, prefix_length, cache_status = (self.cache_pool.take(session_id, ids)
+            if use_cache else (None, 0, 'disabled'))
+        if use_cache and cached is None:
+            from transformers import DynamicCache
+            cached = DynamicCache()
+        # Transformers 4.46 derives cache_position from the full input length,
+        # then prepare_inputs_for_generation slices the unprocessed suffix.
         tensor = torch.tensor([ids], dtype=torch.long, device=self.device)
+        request_started = time.monotonic()
         items: queue.Queue[dict[str, Any]] = queue.Queue()
         stop = threading.Event()
         tokenizer = self.tokenizer
@@ -179,12 +259,15 @@ class OfficialDuplexModel:
                 self.prompt = True
                 self.ids = []
                 self.previous = ''
+                self.first_token_at = None
 
             def put(self, value):
                 """Skip prompt tokens and expose generated markers verbatim."""
                 if self.prompt:
                     self.prompt = False
                     return
+                if self.first_token_at is None:
+                    self.first_token_at = time.monotonic()
                 self.ids.extend(int(value) for value in value.reshape(-1).tolist())
                 for token_id in value.reshape(-1).tolist():
                     items.put({'generated_token_id': int(token_id)})
@@ -221,20 +304,43 @@ class OfficialDuplexModel:
             started = time.monotonic()
             try:
                 with torch.inference_mode():
-                    self.model.generate(input_ids=tensor, attention_mask=torch.ones_like(tensor),
+                    self.model.generate(input_ids=tensor,
+                        attention_mask=torch.ones((1, len(ids)), dtype=torch.long, device=self.device),
                         max_new_tokens=max_new_tokens, eos_token_id=eos_id,
                         pad_token_id=eos_id, do_sample=False, streamer=streamer,
-                        num_logits_to_keep=1,
+                        num_logits_to_keep=1, use_cache=True,
+                        **({"past_key_values": cached}
+                           if use_cache else {}),
                         stopping_criteria=StoppingCriteriaList([Cancellation()]))
                 reason = 'stop' if streamer.ids and streamer.ids[-1] == eos_id else 'length'
                 peak = torch.cuda.max_memory_allocated() / 2 ** 30 if self.device.startswith('cuda') else 0.0
-                print(json.dumps({'duplex_request': {
+                completed = time.monotonic()
+                retained = False
+                if use_cache and not stop.is_set():
+                    retained = self.cache_pool.store(session_id, cached, ids + streamer.ids)
+                metrics = {
+                    'session_id': session_id, 'request_id': request_id,
                     'prompt_tokens': len(ids), 'generated_tokens': len(streamer.ids),
-                    'validation_seconds': round(validation_seconds, 6),
-                    'finish_reason': reason, 'seconds': round(time.monotonic() - started, 3),
-                    'peak_gpu_gib': round(peak, 3)}}), flush=True)
+                    'cached_tokens': prefix_length, 'new_input_tokens': len(ids) - prefix_length,
+                    'cache_status': cache_status, 'cache_retained': retained,
+                    'cache_bytes': self.cache_pool.bytes_used(),
+                    'request_started_monotonic': request_started,
+                    'model_started_monotonic': started, 'model_finished_monotonic': completed,
+                    'first_token_monotonic': streamer.first_token_at,
+                    'request_to_first_token_seconds': (streamer.first_token_at - request_started
+                                                      if streamer.first_token_at else None),
+                    'model_to_first_token_seconds': (streamer.first_token_at - started
+                                                    if streamer.first_token_at else None),
+                    'validation_seconds': validation_seconds, 'finish_reason': reason,
+                    'seconds': completed - started, 'peak_gpu_gib': peak,
+                }
+                print(json.dumps({'duplex_request': metrics}), flush=True)
+                if self.trace_path is not None:
+                    with self.trace_path.open('a') as trace:
+                        trace.write(json.dumps({**metrics, 'prompt_token_ids': ids,
+                                               'token_ids': streamer.ids}) + '\n')
                 completion = {'finish_reason': reason, 'token_ids': list(streamer.ids),
-                              'prompt_tokens': len(ids)}
+                              'prompt_tokens': len(ids), 'metrics': metrics}
                 if audit_prompt:
                     completion['prompt_token_ids'] = ids
                 items.put(completion)
@@ -248,6 +354,7 @@ class OfficialDuplexModel:
 
         thread = threading.Thread(target=generate, daemon=True)
         thread.start()
+        consumed = False
         try:
             while True:
                 try:
@@ -256,11 +363,14 @@ class OfficialDuplexModel:
                     await asyncio.sleep(0.005)
                     continue
                 if item.get('done'):
+                    consumed = True
                     break
                 yield item
         finally:
             stop.set()
             await asyncio.to_thread(thread.join)
+            if use_cache and not consumed:
+                self.cache_pool.discard(session_id)
 
 
 def create_app(model: OfficialDuplexModel) -> FastAPI:
@@ -296,13 +406,22 @@ def create_app(model: OfficialDuplexModel) -> FastAPI:
 
         return StreamingResponse(rows(), media_type='application/x-ndjson')
 
+    @app.delete('/cache/{session_id}')
+    async def release_cache(session_id: str):
+        """Release one idle session under the generation lock."""
+        async with lock:
+            model.cache_pool.discard(session_id)
+        return {'released': session_id}
+
     @app.post('/generate_ids')
     async def generate_ids(request: GenerateIDsRequest):
         """Execute reference IDs without using the integration history renderer."""
         async def rows():
             async with lock:
                 try:
-                    async for item in model.stream_ids(request.prompt_token_ids, request.max_new_tokens):
+                    async for item in model.stream_ids(request.prompt_token_ids, request.max_new_tokens,
+                            session_id=request.session_id, request_id=request.request_id,
+                            use_cache=request.use_cache):
                         yield json.dumps(item, ensure_ascii=False) + '\n'
                 except (ValueError, RuntimeError) as exc:
                     yield json.dumps({'error': str(exc)}) + '\n'
@@ -321,8 +440,10 @@ def main() -> None:
     parser.add_argument('--device', default='cuda')
     parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('--port', type=int, default=8006)
+    parser.add_argument('--trace-path', type=Path)
     args = parser.parse_args()
     model = OfficialDuplexModel(args.checkpoint, args.base_model, args.device, args.adaptation)
+    model.trace_path = args.trace_path
     uvicorn.run(create_app(model), host=args.host, port=args.port)
 
 
