@@ -22,7 +22,7 @@
 | [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 执行/验收 | 进行中；033测试Completed/退出0但接话不足，官方评分/音频复核与完整FDB留后续 |
 | [036](archive/036_layer1_paper_alignment.md) | 论文配置对齐实现 | 完成归档；类别加权及10% warmup，保持2e-5及已有LoRA；用户豁免开训前短跑 |
 | [037](037_layer1_t2_retraining_retest.md) | T2重训与重测 | 进行中；训练及25会话重测完成，合成插话2/5→4/5、自然接话仍1/5；不自动第三轮，人工复核/官方评分待办 |
-| [040](040_layer1_delayed_response_start.md) | 回答启动后移一拍 | 进行中；040a数据完成；040b全量加权训练完成归档（1235步、重载通过）；040c准备提交测试 |
+| [040](040_layer1_delayed_response_start.md) | 回答启动后移一拍 | 进行中；040a数据完成；040b训练完成归档（1235步、重载通过）；040c固定25会话测试Running |
 
 远端执行见 [001 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/001_remote_execution.md)与 [002/003 任务单](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/002_003_remote_execution.md)。001 只验证一套官方配置：Kyutai Word 逐词 strip、每拍空格连接、首非空 Word 起拍、600ms、BF16、64-token 贪心。raw 字符增量和 160ms 超时释放残词均不等同官方 Word；不展开时钟、发布粒度与句读矩阵。旧 raw/超时残词报告只作诊断；新原生 Word 五例全部通过，结果见 [001 验收报告](../../reports/layer1_training/issue001-word-20261019/README.md)。
 
@@ -83,3 +83,5 @@
 [040b全量加权训练](archive/040b_delayed_start_full_training.md)按用户直接训练授权执行独立第三轮，作业`job-179250231441693568614-xuan-zhang`，最新数据1000条T2/1235步，详见[启动记录](../../reports/layer1_training/issue040-delayed-training-20261020/README.md)。
 
 [043撤销最近两次清理提交](archive/043_revert_cleanup_commits.md)已完成归档：用反向提交恢复旧训练探针及X2/MOSS/TurnSense组件，未触碰正在运行的训练作业，保留原有未提交改动。
+
+[040c延后启动候选测试](040c_delayed_start_fdb_test.md)已提交，作业`job-179250639360566170646-xuan-zhang`为Running；完整训练及候选重载通过，测试结果待交付。

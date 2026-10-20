@@ -27,11 +27,12 @@
   "submitted": true,
   "execution_status": "completed_and_clean_candidate_verified",
   "pretraining_model_probe": "not_executed_user_direct_training",
-  "fdb_submitted": false,
+  "fdb_submitted": true,
   "final_exit_code": 0,
   "last_observed_step": 1235,
   "last_observed_cursor": 2469,
   "training_complete": true,
   "clean_candidate_revalidation_passed": true,
-  "final_checkpoint_sha256": "266a37a28699d0c3f36b6a6305374bc89a1a2ff2af7a37fd1eb4caf1ad915346"
+  "final_checkpoint_sha256": "266a37a28699d0c3f36b6a6305374bc89a1a2ff2af7a37fd1eb4caf1ad915346",
+  "fdb_job_id": "job-179250639360566170646-xuan-zhang"
 }
