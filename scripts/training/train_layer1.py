@@ -233,11 +233,24 @@ def protocol_probe(loaded, row):
 
 
 def train(args):
+    config = yaml.safe_load(args.config.read_text())
+    formal = config['purpose'] == 'issue006_round1'
+    protocol = None
+    if formal:
+        from prepare_layer1_adaptation import validate_formal_config
+        protocol = yaml.safe_load(args.protocol.read_text())
+        validate_formal_config(config, protocol, Path(__file__).resolve().parents[2], args.arm,
+                               args.dialogues, args.length, args.steps)
+        root = Path(__file__).resolve().parents[2]
+        require(sha256_file(args.inventory) == sha256_file(root / protocol['assets']['verified_inventory']),
+                'Official inventory differs from preregistered initialization')
+        config['arm'] = args.arm
+    else:
+        require(config['purpose'] == 'issue005_probe_only' and config['schema_version'] == 1,
+                'Unknown training purpose')
+        require(args.dialogues in (32, 100) and args.arm is None, 'Probe-only dialogue/arm scope')
     import numpy as np
     import torch
-    config = yaml.safe_load(args.config.read_text())
-    require(config['purpose'] == 'issue005_probe_only' and config['schema_version'] == 1,
-            'Only issue005 probes are authorized')
     require(config['batch_size'] == 1 and config['gradient_accumulation'] > 0, 'Invalid probe batch')
     require(0 < args.steps <= config['scheduler_steps'], 'Invalid step limit')
     require(torch.cuda.is_available() and torch.cuda.device_count() == 1, 'One allocated CUDA device required')
@@ -256,12 +269,26 @@ def train(args):
     assets = verify_asset_inventory(args.inventory, args.checkpoint, args.base_model, args.official_source)
     dataset = ProbeDataset(args.dataset, args.audit, args.checkpoint / 'tokenizer', args.dialogues,
                            args.length, config['arm'], config['seed'])
+    if formal:
+        from prepare_layer1_adaptation import validate_index
+        root = Path(__file__).resolve().parents[2]
+        index_path = root / protocol['training']['full_train_index']
+        full_index = json.loads(index_path.read_text())
+        validate_index(full_index, protocol)
+        require(dataset.identity == full_index[args.arm], 'Actual dataset differs from frozen full index')
+        require(args.steps == (len(dataset.order) + config['gradient_accumulation'] - 1) //
+                config['gradient_accumulation'], 'Single-epoch step count mismatch')
     source_files = [Path(__file__), Path(__file__).with_name('layer1_data.py'),
                     Path(__file__).with_name('layer1_model.py'), Path(__file__).with_name('number_surface.py')]
     identity = {'config': config, 'data': dataset.identity, 'assets': assets,
                 'code': {p.name: sha256_file(p) for p in source_files}}
-    write_json(args.output / 'manifest.json', {'identity': identity, 'purpose': 'issue005_probe_only',
-               'formal_training_released': False, 'source_commit': subprocess.check_output(
+    if formal:
+        identity['release'] = {'protocol': sha256_file(args.protocol), 'index': sha256_file(index_path),
+                               'config': sha256_file(args.config),
+                               'validator': sha256_file(Path(__file__).with_name('prepare_layer1_adaptation.py')),
+                               'evaluation_assets': protocol['evaluation_assets']}
+    write_json(args.output / 'manifest.json', {'identity': identity, 'purpose': config['purpose'],
+               'formal_training_released': formal, 'source_commit': subprocess.check_output(
                    ['git', 'rev-parse', 'HEAD'], text=True).strip(), 'arguments': vars_for_json(args),
                'device': torch.cuda.get_device_name(), 'torch': torch.__version__})
     loaded = load_official_checkpoint(args.checkpoint, args.base_model, training=True)
@@ -296,10 +323,14 @@ def train(args):
     metrics, exposed = [], set()
     loop_started = time.monotonic()
     while step < args.steps:
+        if formal:
+            require(time.monotonic() - started < config['max_wall_seconds'], 'Formal wall-time budget exhausted')
         check_disk(args.output, config)
         torch.cuda.synchronize()
         tick = time.monotonic()
-        rows = dataset.rows(cursor, config['gradient_accumulation'] * config['batch_size'])
+        count = accumulation_count(len(dataset.order), cursor, config['gradient_accumulation'] *
+                                   config['batch_size'], formal)
+        rows = dataset.rows(cursor, count)
         wait = time.monotonic() - tick
         tokens = sum(row['effective_tokens'] for row in rows)
         weighted_loss = 0.0
@@ -339,6 +370,11 @@ def train(args):
         with (args.output / 'steps.jsonl').open('a') as stream:
             stream.write(json.dumps(entry) + '\n')
         print(json.dumps(entry), flush=True)
+        if formal and step % config['save_every_steps'] == 0 and step < args.steps:
+            saved = save_checkpoint(args.output / f'checkpoint-step-{step:06d}.pt', loaded.wrapper,
+                                    optimizer, scheduler, identity, step, cursor)
+            write_json(args.output / f'checkpoint-step-{step:06d}.json', saved)
+            check_disk(args.output, config)
     loop_seconds = time.monotonic() - loop_started
     checkpoint = save_checkpoint(args.output / 'checkpoint.pt', loaded.wrapper, optimizer, scheduler,
                                  identity, step, cursor)
@@ -357,9 +393,17 @@ def train(args):
               'peak_allocated_bytes': torch.cuda.max_memory_allocated(),
               'peak_reserved_bytes': torch.cuda.max_memory_reserved(),
               'max_rss_kib': resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
-              'data_statistics': dict(dataset.statistics), 'formal_training_released': False}
+              'data_statistics': dict(dataset.statistics), 'formal_training_released': formal}
     write_json(args.output / 'summary.json', report)
     return report
+
+
+def accumulation_count(total, cursor, batch, partial):
+    """Consume the final partial batch once without repeating or dropping targets."""
+    remaining = total - cursor
+    require(batch > 0 and remaining > 0, 'Single-epoch sequence budget exhausted')
+    require(partial or remaining >= batch, 'Probe exhausted its single-epoch sequence budget')
+    return min(batch, remaining)
 
 
 def vars_for_json(args):
@@ -401,7 +445,9 @@ def parser():
     for name in ('checkpoint', 'base-model', 'official-source', 'inventory', 'dataset', 'audit', 'output'):
         run.add_argument('--' + name, type=Path, required=True)
     run.add_argument('--config', type=Path, default=Path('configs/layer1_training.yaml'))
-    run.add_argument('--dialogues', type=int, choices=(32, 100), required=True)
+    run.add_argument('--dialogues', type=int, choices=(32, 100, 1000), required=True)
+    run.add_argument('--arm', choices=('T1', 'T2', 'T3'))
+    run.add_argument('--protocol', type=Path, default=Path('configs/layer1_adaptation_protocol.yaml'))
     run.add_argument('--length', type=int, required=True)
     run.add_argument('--steps', type=int, required=True)
     run.add_argument('--resume', type=Path)

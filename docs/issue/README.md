@@ -11,7 +11,7 @@
 | [004](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/004_training_data_and_annotation.md) | UltraChat micro-turn 数据管线 | 完成归档；r5全量机器审计通过，用户明确免除复审后关闭 |
 | [005](archive/005_training_runtime_and_resource_probe.md) | 训练恢复与资源短跑 | 完成归档；[024](archive/024_layer1_training_state.md)真实恢复精确一致，[025](archive/025_layer1_remote_probe.md)资源边界测量完成；512窗口/batch1/累积2、首轮每臂5,763步 |
 | [017](../../reports/layer1_training/issue017-loading-20261019/README.md) | 完整训练加载与零更新 | 完成、已归档；零更新通过，回归拍界抖动由用户明确接受 |
-| [006](006_punctuation_robust_adaptation.md) | 三组有限适配 | 待办；001/004/005已完成，仍待007开训前准备；training_released=false |
+| [006](006_punctuation_robust_adaptation.md) | 四配置基线与三组有限适配 | 进行中；[027](027_layer1_adaptation_launch.md)执行准备，正式训练仍待007开训前准备；training_released=false |
 | [007](007_turn_control_evaluation.md) | 独立话轮评测 | 待办；评测器、独立样本与候选报告未交付 |
 | [008](008_full_chain_fdb_acceptance.md) | 真实音频与 FDB 验收 | 进行中；B0完整链路0/5，候选及FDB待验收 |
 

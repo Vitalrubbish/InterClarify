@@ -1,0 +1,18 @@
+schema_version: 1
+purpose: issue006_round1
+seed: 20261020
+learning_rate: 0.00002
+weight_decay: 0.01
+adam_betas: [0.9, 0.999]
+adam_eps: 0.00000001
+gradient_accumulation: 2
+batch_size: 1
+max_grad_norm: 1.0
+scheduler_steps: 5763
+warmup_steps: 173
+save_every_steps: 1000
+max_wall_seconds: 28800
+gradient_checkpointing: true
+deterministic: true
+max_output_gib: 5
+min_free_gib: 5

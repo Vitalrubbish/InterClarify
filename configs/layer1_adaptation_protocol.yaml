@@ -100,6 +100,19 @@ training:
   resource_report: reports/layer1_training/issue005-probe-20261020/README.md
   full_train_index: reports/layer1_training/issue005-probe-20261020/r1/run/full_train_index.json
   resource_owner: issue005
+  round1_optimizer:
+    learning_rate: 0.00002
+    weight_decay: 0.01
+    adam_betas: [0.9, 0.999]
+    adam_eps: 0.00000001
+    max_grad_norm: 1.0
+    scheduler_steps: 5763
+    warmup_steps: 173
+    save_every_steps: 1000
+evaluation_assets:
+  sample_manifest: null
+  acceptance_config: null
+  evaluator: null
 diagnostic:
   historical_samples: 5
   input_contract: kyutai_word_strip_then_space_join
@@ -149,5 +162,6 @@ gates:
   issue001_runtime_comparison: passed
   issue004_data_audit: passed
   issue005_zero_update_and_recovery: passed
+  issue007_pretraining_preparation: pending
   issue007_independent_real_asr_test: pending
   issue008_audio_and_fdb: pending

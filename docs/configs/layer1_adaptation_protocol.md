@@ -1,6 +1,6 @@
 # Layer 1 适配协议登记
 
-`configs/layer1_adaptation_protocol.yaml` 是实验登记文件，不是产品启动配置；无类或方法，现有远端入口不会自动读取它。`runtime` 记录组件和生成设置，`assets` 记录来源与核验状态，`data/training` 固定数据和有限继续训练方案，`diagnostic` 登记 001 单套参考对照，`acceptance/gates` 记录候选门槛和未完成证据。
+`configs/layer1_adaptation_protocol.yaml` 是实验登记文件，不是产品启动配置；无类或方法，006正式训练入口读取它进行门禁与预算校验。`runtime` 记录组件和生成设置，`assets` 记录来源与核验状态，`data/training` 固定数据和有限继续训练方案，`diagnostic` 登记 001 单套参考对照，`acceptance/gates` 记录候选门槛和未完成证据。
 
 001 的官方输入依据是 [server.py](https://github.com/sbintuitions/DuplexCascade/blob/42893024ca90c8de8ac3ed624467ebc123512ff8/server.py#L422-L499)：接收 Kyutai Word，逐词 strip、每拍空格连接；首个非空 Word 起拍，600ms、64-token 贪心，推理精度保持本项目冻结的 BF16。`diagnostic.input_contract` 指定该语义，`input_manifest` 和 `evidence_report` 已指向 2026-10-19 验收证据；原件摘要与紧凑副本摘要分开保存，五例 136 拍通过，`issue001_runtime_comparison: passed`。
 
@@ -19,3 +19,9 @@
 r5登记user_numeric_surface=english_numeric_v1，完整用户轮先转换数值读法再分拍；decimal/time原始形式保存在映射，不再承诺模型输入保留原数字字符串。audited_dataset_manifest指向正式r5清单，human_review_policy明确记录用户豁免。原样/去句读/混合三臂共享这一前处理。
 
 真实 dev 每行为至少 30 例，test 每行为至少 100 例、至少 20 位说话人且 dev/test 说话人不交叉；报告按说话人分组的 95% bootstrap 区间，样本不足时补充独立样本。004/007 在候选结果前交付清单，数值门槛见 YAML，不事后降低。质量使用盲标签评审；音频延迟归 008，均值上限 1.5 秒、简单问题亚秒覆盖下限 90%，漏答保留分母。
+
+## 2026-10-20 四配置启动准备
+
+006进入执行准备，首轮仍为512窗口。新增`training.round1_optimizer`登记正式AdamW、5,763步线性调度、173步warmup及每1,000步保存；不沿用005短跑100步scheduler。新增`gates.issue007_pretraining_preparation`，与最终真实test门禁分离。
+
+`evaluation_assets`的`sample_manifest`、`acceptance_config`、`evaluator`初始为空；007交付后，每项填入仓库相对`path`及完整`sha256`，样本清单路径须与`acceptance.sample_manifest`相同。正式入口同时检查文件存在和摘要、开训前门禁及`training_released`。空资产不能放行，也不要求最终test结果先通过。原协议顶层`issue/status`继续表示001历史登记状态，不表示006训练已完成。

@@ -1,0 +1,9 @@
+# 单训练臂正式适配入口
+
+`scripts/remote/run_layer1_adaptation.sh`无类。每个调度作业只运行T1/T2/T3中的一臂，拒绝B0；B0由007评测器直接加载官方权重。输出目录拒绝覆盖，先调用四配置计划器检查放行，再验证独立conda、JobID和实际单张24GiB4090/BF16设备，最后执行正式训练器。
+
+调度申请1×4090、8CPU、32GiB物理内存，最多一个并发作业；线程数4，禁core dump，子进程8小时后TERM、30秒后KILL。物理主存由调度器cgroup限制，不限制CUDA虚拟地址空间。每臂输出上限5GiB、磁盘至少保留5GiB；保存源码提交/文件摘要、环境、设备、训练日志和退出码。
+
+入口环境变量沿用`LAYER1_TRAIN_ROOT`、`LAYER1_TRAINING_ROOT`、`LAYER1_TRAINING_ENV`、`LAYER1_TRAIN_OUTPUT`，新增必填`LAYER1_ARM`；模型与官方源码路径允许显式指定。未通过007开训前准备时退出2，不能用于绕开`training_released=false`。
+
+007准备好后，在冻结源码根运行，逐臂使用不同的新输出目录；三臂不能从其他臂checkpoint初始化。恢复可直接使用训练器`--resume`并提供相同正式参数和新输出目录，源码/配置/评测资产身份必须完全一致。本脚本用于每臂从官方权重首次启动。
