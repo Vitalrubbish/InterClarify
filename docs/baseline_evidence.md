@@ -12,7 +12,7 @@
 
 X-Talk 上游基座 `5f0d9959edf1026588246efbed827b078cbb114c`，首次连接提交 `d9303c819c96230e527ea5159e7c74f1b5841a3e`；官方控制服务后续经 fork 独立演进。历史 X2 客户端提交 `48c5952`，X2 源码 `0aca80597bb1399c0be4002de5bc62c0a779c542`、权重 `4c8df16b8d7f8b50c95590c4d7907436ebe4aa08`。新实验须重新冻结实际两仓库提交，不从这些历史值推断当前版本。
 
-Qwen3-ASR 因回写与前缀冻结导致交付停滞而退役，X2 仅作诊断。MOSS 保留为现存脚本的历史依赖，不是当前 TTS 目标。首次连接与历史 headless 回执仅证明服务交付和响应生命周期，不能代替声卡实播质量。
+Qwen3-ASR 因回写与前缀冻结导致交付停滞而退役；X2、MOSS、TurnSense 及 round1/A4 旧组件栈实现已于 2026-10-20 按用户确认从仓库移除，历史证据按固定 Git 提交追溯。首次连接与历史 headless 回执仅证明服务交付和响应生命周期，不能代替声卡实播质量。
 
 | 运行 | 主要证据与限制 |
 | --- | --- |
@@ -25,6 +25,6 @@ Pause 保持沉默是预期行为，不能作为漏答。官方 TOR 不能代替
 
 ## 本轮文档清理
 
-删除八份已被新路线取代的根级文档：`asr_measurement_retest.md`、`fdb_latency_diagnosis.md`、`x2streaming_asr_retest.md`、`xtalk_a4_remote_acceptance.md`、`xtalk_baseline_stack.md`、`xtalk_modification_plan.md`、`fdb_subset_retest_plan.md`、`asr_next_step_analysis.md`。其有效要求合并到工程方案、当前决策、对齐证据和 issue，避免继续执行 Qwen/X2/MOSS/Pocket 旧路线。
+删除八份已被新路线取代的根级文档：`asr_measurement_retest.md`、`fdb_latency_diagnosis.md`、`x2streaming_asr_retest.md`、`xtalk_a4_remote_acceptance.md`、`xtalk_baseline_stack.md`、`xtalk_modification_plan.md`、`fdb_subset_retest_plan.md`、`asr_next_step_analysis.md`。其有效要求合并到当前配置、对齐证据和 issue，避免继续执行 Qwen/X2/MOSS/Pocket 旧路线。
 
-已跟踪旧文档可从 [清理前固定提交 c614d55](https://github.com/Vitalrubbish/InterClarify/tree/c614d55) 恢复；上一轮未提交的 `asr_next_step_analysis.md` 的建议已合并进当前工程方案与 issue，不宣称它存在于旧提交。脚本和测试仍存在时保留同路径说明。清理仅涉及文档，不删除远端权重、conda 环境、运行结果或 fork 源码。
+已跟踪旧文档可从 [清理前固定提交 c614d55](https://github.com/Vitalrubbish/InterClarify/tree/c614d55) 恢复；上一轮未提交的 `asr_next_step_analysis.md` 的建议已合并进当前配置与 issue，不宣称它存在于旧提交。旧组件栈实现已于 2026-10-20 从当前树移除，历史执行按固定提交追溯。清理仅涉及文档与仓库内实现，不删除远端权重、conda 环境、运行结果或 fork 源码。

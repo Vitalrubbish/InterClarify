@@ -38,6 +38,6 @@ r4作业`job-179242557114450383845-xuan-zhang`，源码`12d478a`，节点d6-hpc-
 | r3 | job-179242541424100807674-xuan-zhang / 12d478a | 提交命令使用容器不存在的/usr/bin/time，入口未执行、退出127；[原件](r3-review/retrieval.json) |
 | r4 | job-179242557114450383845-xuan-zhang / 12d478a | 零更新通过，服务回归4/5；用户接受拍界抖动后关闭017、取消022，原始差异保留；[原件](r4-review/retrieval.json) |
 
-入口先安装退出处理再验证环境；兼容两种GPU可见性变量并验证真实CUDA单卡/BF16，不覆盖设备编号。移除28GiB虚拟地址限制以允许CUDA地址预留和safetensors映射，物理主存仍受调度器32GiB硬限。bash语法、无分配退出2并保留日志、旧输出不被覆盖均已验证。代码与[同路径说明](../../../docs/scripts/remote/run_layer1_zero_update.md)同步。
+入口先安装退出处理再验证环境；兼容两种GPU可见性变量并验证真实CUDA单卡/BF16，不覆盖设备编号。移除28GiB虚拟地址限制以允许CUDA地址预留和safetensors映射，物理主存仍受调度器32GiB硬限。bash语法、无分配退出2并保留日志、旧输出不被覆盖均已验证。该一次性 launcher 与同路径说明已于 2026-10-20 随旧路线清理从当前树移除，历史执行按本报告固定证据追溯。
 
 先前远端CPU小张量及依赖恢复证据保留：[加载测试](loading_tests.txt)、[HTTP测试](service_tests.txt)、[CPU资源](cpu_contract.json)、[HTTP资源](service_contract.json)、[依赖安装](test_dependency_install.txt)、[依赖版本](dependency_versions.json)。004已按r5机器审计及用户授权关闭；005仍待训练器、梯度/保存恢复短跑，006和007前置条件不因零更新通过而自动满足。

@@ -7,7 +7,7 @@ requires-python = ">=3.10"
 # local runs use conda environments (environment.yml + requirements.txt), and the
 # former P0 `src/interclarify` scaffold was removed in the 2026-10-14 cleanup.
 # This file now only keeps project metadata, the dependency groups and pytest
-# settings.  See docs/engineering_implementation.md section 11.
+# settings.  See docs/scripts/check_env.md.
 dependencies = [
     "PyYAML>=6.0",
 ]

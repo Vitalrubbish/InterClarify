@@ -4,7 +4,7 @@ name: interclarify-dev
 # 使用：
 #   conda env create -f environment.yml
 #   conda run -n interclarify-dev python -m pip install -r requirements.txt
-# 说明见 docs/p0/dependency_inventory.md。
+# 说明见 docs/scripts/check_env.md 与 docs/scripts/remote/setup_env.md。
 channels:
   - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge
   - nodefaults

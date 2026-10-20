@@ -62,7 +62,7 @@ async def run(args):
     subsets = ('candor_pause_handling', 'synthetic_pause_handling', 'candor_turn_taking',
                'synthetic_user_interruption', 'icc_backchannel')
     for subset in subsets:
-        parameters = SimpleNamespace(config=config_path, model_url=args.model_url, native=False,
+        parameters = SimpleNamespace(config=config_path, model_url=args.model_url,
             out=args.output / 'driver' / subset, fdb_input_root=args.input / subset,
             fdb_output_root=args.output / 'fdb' / subset, fdb_limit=0, fdb_tail_seconds=5.0,
             fdb_tail_audio=True, timeout=240.0, server_timeout=120.0)

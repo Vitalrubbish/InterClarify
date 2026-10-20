@@ -8,7 +8,7 @@
 | `interclarify-layer1-training-20261019` | 当前数据获取、独立训练环境与后续训练准备 |
 | `interclarify-asr-selection`、`interclarify-tts-selection-20261018` | 实际模型、数据和环境种子；名字虽旧，当前仍被依赖 |
 | `interclarify-english-integration-20261018-v1`、`v6` | v1承载实际组件conda，v6是现行路径入口，不能移动绝对prefix |
-| `interclarify-p0-models`、`interclarify-kyutai`、`interclarify-x2` | 官方/base资产、Kyutai参考及X2历史诊断 |
+| `interclarify-p0-models`、`interclarify-kyutai`、`interclarify-x2` | 官方/base资产、Kyutai参考及X2历史诊断（仓库内实现已移除） |
 | `interclarify-archive/runs/<原目录名>` | 已结束的对齐、集成快照、TTS修复和B0诊断原件 |
 | `interclarify-archive/maintenance/`、`transfers/` | 清理/迁移记录及恢复档、历史传输包 |
 

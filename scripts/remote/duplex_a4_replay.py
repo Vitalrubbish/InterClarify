@@ -807,11 +807,11 @@ def scenario_audio_paths(
     return list(mapping.get(scenario) or [default])
 
 
-def serve_config(config_path: Path, out: Path, model_url: str, native: bool = False) -> dict[str, Any]:
+def serve_config(config_path: Path, out: Path, model_url: str) -> dict[str, Any]:
     """Prepare an isolated runtime config for the child X-Talk process."""
     config = json.loads(config_path.read_text(encoding="utf-8"))
     service_config = config.setdefault("service_config", {})
-    service_config.update({"duplex_enabled": not native, "duplex_timeline_enabled": True, "duplex_timeline_dir": str(out / "timelines"), "duplex_model_url": model_url})
+    service_config.update({"duplex_enabled": True, "duplex_timeline_enabled": True, "duplex_timeline_dir": str(out / "timelines"), "duplex_model_url": model_url})
     return config
 
 
@@ -909,7 +909,7 @@ async def run_fdb_batch(args: argparse.Namespace) -> dict[str, Any]:
     if args.fdb_output_root == args.fdb_input_root or args.fdb_input_root in args.fdb_output_root.parents:
         raise ValueError("FDB output must be outside the input tree")
     args.fdb_output_root.mkdir(parents=True, exist_ok=False)
-    config = serve_config(args.config, args.out, args.model_url, args.native)
+    config = serve_config(args.config, args.out, args.model_url)
     inputs = [
         path
         for path in sorted(args.fdb_input_root.rglob("*input.wav"))
@@ -1009,7 +1009,7 @@ async def run_fdb_batch(args: argparse.Namespace) -> dict[str, Any]:
 async def run(args: argparse.Namespace) -> dict[str, Any]:
     """Run all selected scenarios against one X-Talk process."""
     args.out.mkdir(parents=True, exist_ok=False)
-    config = serve_config(args.config, args.out, args.model_url, args.native)
+    config = serve_config(args.config, args.out, args.model_url)
     port = _pick_free_port()
     context = multiprocessing.get_context("spawn")
     os.environ["XTALK_SERVE_LOG"] = str(args.out / "xtalk_serve.log")
@@ -1106,12 +1106,9 @@ def main() -> None:
     parser.add_argument("--fdb-output-root", type=Path)
     parser.add_argument("--fdb-limit", type=int, default=5)
     parser.add_argument("--fdb-tail-seconds", type=float, default=5.0)
-    parser.add_argument("--native", action="store_true", help="keep native semantic managers for FDB comparison")
     args = parser.parse_args()
     if not 0 <= args.fdb_tail_seconds <= 60:
         parser.error("--fdb-tail-seconds must be between 0 and 60")
-    if args.native and args.fdb_input_root is None:
-        parser.error("--native is supported only in FDB mode")
     args.config = args.config.resolve()
     args.out = args.out.resolve()
     if args.fdb_input_root is not None:

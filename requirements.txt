@@ -1,7 +1,7 @@
 # InterClarify P0 pinned third-party dependencies.
 #
-# Rationale and provenance are recorded in docs/engineering_implementation.md
-# (第 4 节 P0 工作项) and scripts/remote/setup_env.sh.
+# Rationale and provenance are recorded in scripts/remote/setup_env.sh and
+# docs/scripts/check_env.md.
 # P0 only carries the generic GPU, audio, transport and service stack used by
 # the current repository.  X-Talk and model-specific extras are pinned after
 # the P1.0 component audit instead of inheriting the removed DuplexCascade

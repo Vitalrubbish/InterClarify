@@ -115,8 +115,6 @@ def build(args):
             if dialogue['split'] == 'train' and len(review_rows) < 32:
                 review_rows.append({'dialogue_id': dialogue['dialogue_id'], 'artifact': relative,
                                     'sha256': file_digest(target), 'reviewer': None, 'accepted': None})
-        write_json(args.output / 'smoke_subsets.json', {
-            str(n): [d['dialogue_id'] for d in selected if d['split'] == 'train'][:n] for n in (32, 100)})
         review_path = args.output / 'human_review.json'
         if not review_path.exists():
             write_json(review_path, {'schema_version': 1, 'minimum_set': review_rows,

@@ -48,7 +48,7 @@
 
 ## 共用约束
 
-- 遵循[工程方案](../engineering_implementation.md)和[研究范围](../research_design.md)。状态使用待办、进行中、阻塞、完成，完成时记录提交、run_id、结果路径和遗留问题。
+- 遵循[研究 idea](../research_idea.md)与[当前 issue 索引](README.md)。状态使用待办、进行中、阻塞、完成，完成时记录提交、run_id、结果路径和遗留问题。
 - 修改现有文档时直接维护当前版本；实验过程和失败保留在报告，避免重复追加互相更正的计划。实现优先修改现有模块，代码与同路径中文说明同步，文件名、注释和提交消息使用英文。
 - 本地和远端使用 conda；真实模型及集群测试在远端调度作业执行，冻结两仓库源码、资产、数据、种子、时钟和预算，独立 run_id，保留失败及退出码。
 - 保持五类控制 token、完整生成历史、唯一协议执行/仲裁路径与唯一播放所有权；已播放内容不可撤销，Layer 3 仅能修订未提交片段。
@@ -83,5 +83,7 @@
 [040b全量加权训练](archive/040b_delayed_start_full_training.md)按用户直接训练授权执行独立第三轮，作业`job-179250231441693568614-xuan-zhang`，最新数据1000条T2/1235步，详见[启动记录](../../reports/layer1_training/issue040-delayed-training-20261020/README.md)。
 
 [043撤销最近两次清理提交](archive/043_revert_cleanup_commits.md)已完成归档：用反向提交恢复旧训练探针及X2/MOSS/TurnSense组件，未触碰正在运行的训练作业，保留原有未提交改动。
+
+[044仓库瘦身](archive/044_repository_slimdown.md)已完成归档：经用户重新确认，删除X2/MOSS/TurnSense/round1-A4旧组件栈、issue005探针训练路线、`--native`对照开关及已归档任务的一次性工具，并清理文档悬空引用。保留当前FDB驱动、`xtalk_link_check.py`、T1/T2/T3参考条件和延迟启动数据协议。
 
 [040c延后启动候选测试](archive/040c_delayed_start_fdb_test.md)已完成归档；25/25会话执行成功，退出0，自然接话新回复3/5、合成插话后新回复5/5。用户要求结束当前阶段并停止继续训练，已知限制及未执行项保留在正式报告。

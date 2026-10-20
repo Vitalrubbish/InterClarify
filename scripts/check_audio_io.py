@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """P0 audio I/O capability probe.
 
-Records the audio input/output conditions required by
-``docs/engineering_implementation.md`` section 4.2: devices, sample rate,
-channels, block size and echo-cancellation assumptions.
+Records the audio input/output conditions used by the local playback gate:
+devices, sample rate, channels, block size and echo-cancellation assumptions.
 
 The probe is informational: a headless cluster node legitimately reports zero
 devices.  Pass ``--require-devices`` to treat that as a failure, and

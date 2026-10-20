@@ -261,25 +261,6 @@ class A4ReplayTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             MODULE.parse_scenario_audio(["broken-without-equals"])
 
-    def test_source_manifest_is_deterministic(self):
-        """Manifest hashing is stable for a temporary source tree."""
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            (root / "configs").mkdir()
-            (root / "scripts/remote").mkdir(parents=True)
-            (root / "xtalk/src/xtalk/duplex_control").mkdir(parents=True)
-            (root / "configs/xtalk_duplex_x2_runtime.json").write_text("{}")
-            (root / "scripts/remote/duplex_model_service.py").write_text("x")
-            (root / "xtalk/src/xtalk/duplex_control/runtime.py").write_text("x")
-            spec = importlib.util.spec_from_file_location("manifest", Path(__file__).resolve().parents[1] / "scripts/remote/create_duplex_source_manifest.py")
-            manifest_module = importlib.util.module_from_spec(spec)
-            assert spec.loader is not None
-            spec.loader.exec_module(manifest_module)
-            first = manifest_module.build_manifest(root)
-            second = manifest_module.build_manifest(root)
-            self.assertEqual(first["snapshot"], second["snapshot"])
-            self.assertEqual(len(first["files"]), 3)
-
     def test_missing_session_never_reads_another_timeline(self):
         """Keep old session evidence from entering the next verdict."""
         with tempfile.TemporaryDirectory() as tmp:

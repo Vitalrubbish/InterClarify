@@ -2,7 +2,7 @@
 
 ## 作用
 
-P0 环境验收脚本：确认当前解释器能导入核心依赖、打印版本，并在需要时确认 PyTorch 能看到预期 GPU。对应 [engineering_implementation.md](../engineering_implementation.md) 第 4.3 节验收门槛。
+环境验收脚本：确认当前解释器能导入核心依赖、打印版本，并在需要时确认 PyTorch 能看到预期 GPU。运行方式与环境创建见 [setup_env.sh](remote/setup_env.md)。
 
 ## 输入
 

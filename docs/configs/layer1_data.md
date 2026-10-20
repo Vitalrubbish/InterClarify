@@ -4,7 +4,7 @@
 
 `sampling.raw_source_dialogues=6000`限定实际解析/过滤的原始对话总数；固定种子跨shard定位完整JSONL窗口，只抽取该部分。candidate_pool_dialogues=6000是过滤后候选上限；候选分组后选1000/200/300。保留原始字节位置，不伪造绝对行号。它是可复现的有限窗口抽样，不声称全库逐对话等概率；用户已取消全库过滤，不为未抽取对话建立ID/近重复索引。
 
-来源为 `stingning/ultrachat` 固定 revision，原始 `id/data` 字段。默认 train/dev/test 为 1000/200/300 条，T3 每个训练 epoch 恰好 500/500。32/100 子集从已切分 train 的稳定顺序取出，不借用 dev/test。
+来源为 `stingning/ultrachat` 固定 revision，原始 `id/data` 字段。默认 train/dev/test 为 1000/200/300 条，T3 每个训练 epoch 恰好 500/500。正式训练读取已切分 train 稳定顺序的前 1,000 条，不借用 dev/test；005 探针用的 32/100 子集已随旧路线清理停止生成。
 
 过滤要求交替成对、无空文本/保留标记、总长 20–12000 字符；字母中 ASCII 比例至少 0.95。这是可审计的英文启发式，不能准确识别全部语言，排除原因落盘。近重复按 NFKC、小写、词归一化后的 5-gram Jaccard≥0.85，短文本以全文作一个 shingle。候选池先分组、后选代表与切分，不将句读变体拆进不同集合；最终跨集合另做逐对检查。
 

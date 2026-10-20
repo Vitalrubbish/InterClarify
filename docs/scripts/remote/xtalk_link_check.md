@@ -2,9 +2,11 @@
 
 ## 整体作用
 
-T3/T4 的最小连接检查：从运行配置启动 X-Talk 服务（其 ASR/LLM/TTS/turn detector 指向外部模型服务），再以“前端”身份用 WebSocket 驱动一次会话——发送 `vad_speech_start`、按 16 kHz 单声道 PCM16 实时分帧送入一段 WAV、发送 `vad_speech_end`，接收并模拟播放 TTS 音频，记录事件时间线。用于验证真实 ASR→LLM→TTS→播放链路。
+headless X-Talk 会话基础驱动：从运行配置启动 X-Talk 服务（其 ASR/LLM/TTS 指向外部模型服务），再以“前端”身份用 WebSocket 驱动一次会话——发送 `vad_speech_start`、按 16 kHz 单声道 PCM16 实时分帧送入一段 WAV、发送 `vad_speech_end`，接收并模拟播放 TTS 音频，记录事件时间线。
 
-两个场景：**顺序**（默认，`--rounds` 轮次依次进行）与 **插话**（`--barge-in`，先起一段长回复、播放中再送入第二段话，要求 turn detector 停止当前回复并让第二次发言完成）。
+本脚本同时是当前 FDB 重放驱动 [duplex_a4_replay.py](duplex_a4_replay.md) 的基类：`LinkClient`、`_load_pcm16`、`_pick_free_port`、`_serve`、`_wait_for_server` 由后者直接复用，`layer1_fdb.py` 的全链路重测间接依赖本文件。为保持“相同驱动对比旧/新候选”的可比性，实现不随旧路线清理改动。其独立 CLI 场景（顺序多轮、插话）保留为连接诊断用途。
+
+两个场景：**顺序**（默认，`--rounds` 轮次依次进行）与 **插话**（`--barge-in`，先起一段长回复、播放中再送入第二段话，要求当前回复停止并让第二次发言完成）。
 
 ## 协议依据
 
@@ -12,15 +14,15 @@ T3/T4 的最小连接检查：从运行配置启动 X-Talk 服务（其 ASR/LLM/
 
 ## 参数与流程
 
-- `--config`：运行配置（默认 `configs/xtalk_round1_runtime.json`）。
+- `--config`：运行配置（必填；当前路线使用 `configs/xtalk_duplex_english_runtime.json`）。
 - `--audio`：输入 WAV（16 kHz 单声道）。
 - `--out`：报告 JSON 路径。
 - `--rounds`：轮数（默认 2）。
-- `--timeout`：每轮等待 `finish_resp` 的超时（默认 120 s；node job 的 `link` 模式传 240 s，因为“讲一个很长的故事”回复的模拟播放可达 ~2–3 分钟）。
+- `--timeout`：每轮等待 `finish_resp` 的超时（默认 120 s）。
 - `--barge-in`：切换到插话场景。
 - `--barge-in-audio`：插话用的 WAV（`--barge-in` 必填）。
 - `--barge-in-after-seconds`：播放开始后多久送入插话（默认 15 s）。
-- `--drop-turn-detector`：仅调试用。启动前从配置移除 `turn_detector`；移除后 `vad_speech_end` 直接收尾、`vad_speech_start` 打断。切换到音频式 TurnSense 后，正常 `link` 不再使用该开关，走真实 turn detector 路径。
+- `--drop-turn-detector`：仅调试用。启动前从配置移除 `turn_detector`；当前 duplex 路线配置不含 turn detector，正常使用不需要该开关。
 
 流程：`_serve` 在子进程里 `Xtalk.from_config(config).mount_routes(app)` 起 uvicorn；`LinkClient` 先 `/api/auth/login` 取 token，连 `ws://.../ws?access_token=...`。`_send_turn_input` 发送一段 VAD 界定的发言；`_receive` 并发收集 `update_asr`/`finish_asr`/`update_resp`/`finish_resp`/`start_tts`/`stop_tts`/`tts_finished` 与二进制 TTS 音频，并对每个音频块回 `tts_chunk_played`、在 `tts_finished` 时回 `tts_playback_finished`。顺序场景下 `_run_turn` 等到本轮的 `finish_resp`；插话场景下 `_run_barge_in` 先播放 `--audio` 的长回复，等首个音频到达并再等 `--barge-in-after-seconds`，然后送入插话 WAV，等待 `stop_tts` 与“插话后新起并有 `finish_resp`”的回复，报告 `barge_in_stop_observed`、`continuation_finished`、`tts_audio_after_barge_in`。报告含每轮/场景读数与完整事件列表。node job 会校验 `barge_in_stop_observed` 与 `continuation_finished` 均为 true。
 
@@ -41,5 +43,6 @@ headless 客户端收到音频后立即回执属于模拟播放确认，只验�
 
 `duplex_a4_replay.py` 会把该日志指到 `<--out>/xtalk_serve.log`，因此回放产物目录里就有服务启动日志。
 
+## 现行会话能力
 
-X2 duplex 的会话能力 `acoustic_vad_enabled=false` 由服务端按连续 ASR 能力确定。禁用声学 VAD 检测、声学开始/结束信号及 pause/resume 调度；保持会话级连续 PCM 与每拍文本读取。浏览器在握手后创建关闭 VAD 的输入设备，旧客户端声学信号在网关被忽略。Qwen 与内部文本提交边界保持原行为。验证覆盖残留 VAD 信号不触发 ASR 控制、静音和播放期间连续输入、同一解码会话及握手能力。
+duplex 会话的 `acoustic_vad_enabled=false` 由服务端按连续 ASR 能力确定：禁用声学 VAD 检测与 pause/resume 调度，保持会话级连续 PCM 与每拍文本读取；轮次仲裁由 DuplexCascade 协议执行。旧 Qwen/X2 路线的相关描述已随其实现移除，历史细节见固定 Git 提交。

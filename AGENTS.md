@@ -2,7 +2,7 @@
 
 1. 开发阶段文档统一先使用中文撰写。
 2. git 提交时的 commit message、实现代码的注释以及文件名用英文撰写。
-3. 后续实现必须遵循 [docs/engineering_implementation.md](docs/engineering_implementation.md)，并以 [docs/research_design.md](docs/research_design.md) 确认研究范围；实现行为与文档不一致时，先更新相应文档并说明原因，再改代码。
+3. 后续实现以 [docs/issue](docs/issue/README.md) 中当前工作单和 [docs/research_idea.md](docs/research_idea.md) 确认研究范围；实现行为与文档不一致时，先更新相应文档并说明原因，再改代码。
 4. 不擅自扩大当前 MVP 范围。保持 Layer 0/1/2/3 的动作边界、单一仲裁器和单一 TTS 播放所有权；已被用户听到的内容不可撤销，Layer 3 只能提交针对未提交片段的版本化修订补丁。
 5. 每实现一份代码，请你在 `docs` 下方也新建一份相应的文档解释实现；每修改一处代码，请你也需要更新相关的文档；`docs` 下方的文件树应当要与实现的文件树保持一致；文档中的内容应当包含：文件的整体功能作用，类的设计以及核心方法；
 6. 文档的语言应当简洁、清晰的自然语言为主，适当辅以代码的实现，但是不应含有过量实现代码内容；

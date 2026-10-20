@@ -10,7 +10,6 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts/training'))
 import layer1_model as model
-import check_layer1_zero_update as zero
 
 
 class Tensor:
@@ -102,21 +101,8 @@ class LoadingTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'content mismatch'):
                 model.verify_asset_inventory(inventory, root, root)
 
-    def test_prompt_fixture_is_frozen_from_independent_historical_records(self):
-        config = {'cases': ['historical-1'], 'reference_report_root': 'ref',
-                  'max_prompt_tokens': 3, 'prompts_per_case': 3}
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            (root / 'ref').mkdir()
-            path = root / 'ref/historical-1-independent_free_replay.json'
-            path.write_text(json.dumps({'reference': {'requests': [
-                {'prompt_token_ids': [i + 1]} for i in range(5)]}}))
-            rows = zero.freeze_prompts(config, root)
-            self.assertEqual([r['request_index'] for r in rows], [0, 2, 4])
-            self.assertTrue(all(r['source_sha256'] == model.sha256_file(path) for r in rows))
 
-
-@unittest.skipUnless(importlib.util.find_spec('torch') and importlib.util.find_spec('safetensors'),
+@unittest.skipUnless(importlib.util.find_spec('torch'),
                      'Real tensor tests run in the remote conda environment')
 class TensorLoadingTests(unittest.TestCase):
     def test_tensor_hashes_detect_frozen_parameter_change(self):
@@ -126,33 +112,6 @@ class TensorLoadingTests(unittest.TestCase):
         with torch.no_grad():
             wrapper.weight[0, 0] += 1
         self.assertNotEqual(before, model.state_fingerprints(wrapper, block_elements=2))
-
-    def test_full_vocabulary_comparison_rejects_logit_and_control_changes(self):
-        import torch
-        from safetensors.torch import save_file
-        from layer1_data import write_json
-        with tempfile.TemporaryDirectory() as tmp:
-            root = Path(tmp)
-            for name in ('reference', 'candidate'):
-                path = root / name
-                path.mkdir()
-                save_file({'logits': torch.tensor([[1., 2., 3.]])}, str(path / '000.safetensors'))
-                write_json(path / 'weights.json', {'same': 'weights'})
-                write_json(path / 'report.json', {'rows': [{'case': 'case', 'prompt_sha256': 'same',
-                    'generated_ids': [2], 'logits_file': '000.safetensors',
-                    'logits_sha256': model.sha256_file(path / '000.safetensors')}],
-                    'weights_unchanged': True, 'trainable_audit': {'tensors': 4}})
-            config = {'logits_atol': 0.02, 'logits_rtol': 0.01}
-            self.assertTrue(zero.compare_outputs(root, config)['passed'])
-            path = root / 'candidate'
-            save_file({'logits': torch.tensor([[9., 2., 3.]])}, str(path / '000.safetensors'))
-            report = json.loads((path / 'report.json').read_text())
-            report['rows'][0]['logits_sha256'] = model.sha256_file(path / '000.safetensors')
-            write_json(path / 'report.json', report)
-            self.assertFalse(zero.compare_outputs(root, config)['passed'])
-            report['rows'][0]['generated_ids'] = [1]
-            write_json(path / 'report.json', report)
-            self.assertFalse(zero.compare_outputs(root, config)['rows'][0]['ids_equal'])
 
 
 if __name__ == '__main__':
