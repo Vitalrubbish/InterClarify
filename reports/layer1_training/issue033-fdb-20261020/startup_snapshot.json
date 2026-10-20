@@ -1,0 +1,77 @@
+{
+  "observed_at": "2026-10-20T07:38:56.218095+00:00",
+  "job_id": "job-179248155854367342168-xuan-zhang",
+  "node": "d6-hpc-gpu-059",
+  "scheduler_observed_status": "Running",
+  "resources": {
+    "gpus": 2,
+    "cpus": 16,
+    "memory_gib": 64
+  },
+  "round_output": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue033-fdb-r1",
+  "source_commit": "fb9e97f",
+  "order": [
+    "B0",
+    "T1",
+    "T2",
+    "T3"
+  ],
+  "files": {
+    "source_commit.txt": "fb9e97fc167036f1c3223b17edddaee48424de19\n",
+    "source_dirty_check.txt": "",
+    "xtalk_source_verification.json": "{\n  \"commit\": \"419f283e64e4de28b01f84586df779a94b18ede3\",\n  \"files_verified\": 134,\n  \"source_manifest_sha256\": \"0758942773883c787a9e4d4c8ff9f632e2cde547bfbe5094869c47af2fb039d4\",\n  \"root\": \"/hpc_stor03/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-full-chain-b0-20261019/xtalk\"\n}\n",
+    "input_verification.json": "{\"manifest_sha256\": \"d5885326eedab8f450843d3737ce08ccf98ebe6de89d7958b5628a8ba731cc40\", \"sessions\": 25, \"files\": 70}\n",
+    "gpu_preflight.json": "[\n  {\n    \"name\": \"NVIDIA GeForce RTX 4090\",\n    \"total_memory\": 25262096384\n  },\n  {\n    \"name\": \"NVIDIA GeForce RTX 4090\",\n    \"total_memory\": 25262096384\n  }\n]\n",
+    "asr_health.json": "{\"status\":\"ok\",\"backend\":\"nemotron_en\",\"model\":\"/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/models/nemotron_en\",\"chunk_ms\":160,\"dtype\":\"torch.float32\",\"torch\":\"2.11.0+cu128\",\"load_seconds\":90.04649943858385,\"warmup_sessions\":2,\"offline\":false,\"peak_rss_kib\":2941804}",
+    "tts_health.json": "{\"status\":\"ok\",\"backend\":\"kokoro\",\"snapshot\":\"/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/models/hf/hub/models--hexgrad--Kokoro-82M/snapshots/f3ff3571791e39611d31c381e3a41a3af07b4987\",\"voice\":\"af_heart\",\"sample_rate\":48000,\"format\":\"pcm_s16le\",\"channels\":1,\"torch\":\"2.11.0+cu128\",\"load_seconds\":109.29633242823184,\"warmed_up\":true,\"peak_rss_kib\":1692508}",
+    "B0/model_health.json": "{\"status\":\"ok\",\"checkpoint\":\"/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/sbintuitions--DuplexCascade/c3dd51ce9a5a7d27f810ffd5dab309f132a94d28\",\"base_model\":\"/hpc_stor03/sjtu_home/xuan.zhang/interclarify-p0-models/modelscope/Qwen--Qwen2-7B-Instruct/8dce1f8a2d3286a7adf09b977e661350ad67e40a\",\"load_seconds\":64.56837467290461,\"token_ids\":{\"<|no voice|>\":151646,\"<|user is talking|>\":151647,\"<|user finish talking|>\":151648,\"<|user is thinking|>\":151649,\"<|user interruption|>\":151650,\"<|user backchannel|>\":151651,\"<|im_end|>\":151645},\"context_length\":32768,\"torch\":\"2.4.1+cu121\",\"tokenizer_class\":\"Qwen2TokenizerFast\",\"dtype\":\"torch.bfloat16\",\"bos_token_id\":null,\"adaptation\":{\"condition\":\"B0\",\"updated\":false}}",
+    "test_layer1_candidate.py.txt": "test_altered_audio_is_rejected_before_creating_output (test_layer1_candidate.CandidateTests) ... ok\ntest_duplicate_and_unsafe_paths_are_rejected (test_layer1_candidate.CandidateTests) ... ok\ntest_exact_qv_whitelist_shape_and_dtype_are_required (test_layer1_candidate.CandidateTests) ... ok\ntest_staging_keeps_exactly_the_frozen_inputs_and_rejects_reuse (test_layer1_candidate.CandidateTests) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 0.017s\n\nOK\n",
+    "test_layer1_loading.py.txt": "test_inventory_digest_and_unsafe_paths_fail_closed (test_layer1_loading.LoadingTests) ... ok\ntest_missing_extra_collision_and_shape_are_rejected_before_copy (test_layer1_loading.LoadingTests) ... ok\ntest_only_complete_existing_qv_default_adapter_is_trainable (test_layer1_loading.LoadingTests) ... ok\ntest_prompt_fixture_is_frozen_from_independent_historical_records (test_layer1_loading.LoadingTests) ... ok\ntest_strict_mapping_keeps_every_tensor_and_reports_shapes (test_layer1_loading.LoadingTests) ... ok\ntest_full_vocabulary_comparison_rejects_logit_and_control_changes (test_layer1_loading.TensorLoadingTests) ... ok\ntest_tensor_hashes_detect_frozen_parameter_change (test_layer1_loading.TensorLoadingTests) ... ok\n\n----------------------------------------------------------------------\nRan 7 tests in 1.466s\n\nOK\n",
+    "test_duplex_model_service.py.txt": "test_checkpoint_validation (test_duplex_model_service.DuplexModelServiceTests)\nMissing or extra keys cannot silently initialize an invalid model. ... ok\ntest_health_and_raw_chatml_stream (test_duplex_model_service.DuplexModelServiceTests)\nHTTP preserves actual special markers and an explicit stop reason. ... ok\ntest_history_flattens_to_official_chatml_token_ids (test_duplex_model_service.DuplexModelServiceTests)\nUser text, silence markers and released ids reproduce the official run. ... ok\ntest_independent_raw_ids_endpoint (test_duplex_model_service.DuplexModelServiceTests)\nReference IDs bypass history rendering and preserve token identity. ... ok\ntest_prompt_bounds_use_one_vocabulary_lookup (test_duplex_model_service.DuplexModelServiceTests)\nLong prompts must retain strict bounds without repeated vocabulary scans. ... ok\ntest_published_qv_base_weights_are_mapped_without_ignoring_tensors (test_duplex_model_service.DuplexModelServiceTests)\nLegacy released base weights load into PEFT base_layer with no value changes. ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 0.213s\n\nOK\n",
+    "test_duplex_a4_replay.py.txt": "test_asr_updates_during_playback_window (test_duplex_a4_replay.A4ReplayTests.test_asr_updates_during_playback_window)\nOnly ASR updates inside the playback window are counted. ... ok\ntest_client_separates_old_answer_from_interruption_reply (test_duplex_a4_replay.A4ReplayTests.test_client_separates_old_answer_from_interruption_reply)\nA late old PCM cannot become the interruption reply. ... ok\ntest_interruption_requires_acoustic_silence (test_duplex_a4_replay.A4ReplayTests.test_interruption_requires_acoustic_silence)\nA reset receipt alone cannot pass while the response keeps speaking. ... ok\ntest_interruption_requires_wire_token_and_stop (test_duplex_a4_replay.A4ReplayTests.test_interruption_requires_wire_token_and_stop)\nThe official wire token, a matching reset and silence are all required. ... ok\ntest_interruption_stop_must_match_response (test_duplex_a4_replay.A4ReplayTests.test_interruption_stop_must_match_response)\nA stop for another response cannot satisfy interruption evidence. ... ok\ntest_interruption_teardown_stop_is_not_evidence (test_duplex_a4_replay.A4ReplayTests.test_interruption_teardown_stop_is_not_evidence)\nA session shutdown stop cannot be presented as an interruption reset. ... ok\ntest_interruption_without_model_token_is_inconclusive (test_duplex_a4_replay.A4ReplayTests.test_interruption_without_model_token_is_inconclusive)\nA normal response cannot be relabeled as an interruption pass. ... ok\ntest_missing_session_never_reads_another_timeline (test_duplex_a4_replay.A4ReplayTests.test_missing_session_never_reads_another_timeline)\nKeep old session evidence from entering the next verdict. ... ok\ntest_pause_scenario_passes_with_two_segments (test_duplex_a4_replay.A4ReplayTests.test_pause_scenario_passes_with_two_segments)\nA pause scenario with a settled answer passes the base gate. ... ok\ntest_played_text_must_be_monotonic (test_duplex_a4_replay.A4ReplayTests.test_played_text_must_be_monotonic)\nConfirmed playback text can only grow by prefix, never shrink. ... ok\ntest_protocol_error_is_failure (test_duplex_a4_replay.A4ReplayTests.test_protocol_error_is_failure)\nA protocol error cannot be hidden by otherwise valid audio. ... ok\ntest_response_latency_ignores_listening_and_record_order (test_duplex_a4_replay.A4ReplayTests.test_response_latency_ignores_listening_and_record_order)\nOnly the matching answer request contributes its first token. ... ok\ntest_scenario_audio_overrides_are_parsed (test_duplex_a4_replay.A4ReplayTests.test_scenario_audio_overrides_are_parsed)\nPer-scenario overrides name one path, or two for pause. ... ok\ntest_source_manifest_is_deterministic (test_duplex_a4_replay.A4ReplayTests.test_source_manifest_is_deterministic)\nManifest hashing is stable for a temporary source tree. ... ok\ntest_unplayed_tail_is_not_counted_as_played (test_duplex_a4_replay.A4ReplayTests.test_unplayed_tail_is_not_counted_as_played)\nFinal settlement text cannot exceed the last confirmed prefix. ... ok\ntest_wav_preserves_silence_and_exact_fdb_duration (test_duplex_a4_replay.A4ReplayTests.test_wav_preserves_silence_and_exact_fdb_duration)\nFDB audio stays aligned with input instead of concatenating speech. ... ok\ntest_diagnostic_silence_drain_preserves_original_fdb_duration (test_duplex_a4_replay.PlaybackTests.test_diagnostic_silence_drain_preserves_original_fdb_duration) ... ok\ntest_stop_keeps_played_prefix_and_discards_tail (test_duplex_a4_replay.PlaybackTests.test_stop_keeps_played_prefix_and_discards_tail)\nA stop during a chunk retains its heard prefix in WAV and receipt. ... ok\n\n----------------------------------------------------------------------\nRan 18 tests in 0.145s\n\nOK\n"
+  },
+  "completed_b0_sample_reports": [
+    {
+      "path": "B0/replay/fdb/candor_pause_handling/1/a4_report.json",
+      "status": "PASS",
+      "errors": [],
+      "input": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue033-fdb-r1/inputs/candor_pause_handling/1/input.wav",
+      "input_audio_seconds": 27.04,
+      "tts_audio_bytes": 0,
+      "protocol_errors": [],
+      "semantic_status": "PENDING_OFFICIAL_SCORING"
+    },
+    {
+      "path": "B0/replay/fdb/candor_pause_handling/10/a4_report.json",
+      "status": "PASS",
+      "errors": [],
+      "input": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue033-fdb-r1/inputs/candor_pause_handling/10/input.wav",
+      "input_audio_seconds": 13.44,
+      "tts_audio_bytes": 0,
+      "protocol_errors": [],
+      "semantic_status": "PENDING_OFFICIAL_SCORING"
+    },
+    {
+      "path": "B0/replay/fdb/candor_pause_handling/100/a4_report.json",
+      "status": "PASS",
+      "errors": [],
+      "input": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue033-fdb-r1/inputs/candor_pause_handling/100/input.wav",
+      "input_audio_seconds": 28.8,
+      "tts_audio_bytes": 0,
+      "protocol_errors": [],
+      "semantic_status": "PENDING_OFFICIAL_SCORING"
+    },
+    {
+      "path": "B0/replay/fdb/candor_pause_handling/101/a4_report.json",
+      "status": "PASS",
+      "errors": [],
+      "input": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue033-fdb-r1/inputs/candor_pause_handling/101/input.wav",
+      "input_audio_seconds": 10.4,
+      "tts_audio_bytes": 0,
+      "protocol_errors": [],
+      "semantic_status": "PENDING_OFFICIAL_SCORING"
+    }
+  ],
+  "official_scoring": "pending",
+  "manual_content_review": "pending"
+}
