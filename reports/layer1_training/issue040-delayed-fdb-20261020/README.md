@@ -1,6 +1,6 @@
 # Issue 040：延后启动候选 FDB 测试提交
 
-用户要求查看训练并提交测试，工作单元为 [040c](../../../docs/issue/archive/040c_delayed_start_fdb_test.md)。040训练及干净进程候选核验退出0，完整1235步/2469序列/1000条；最新数据和加权目标已核验，112个LoRA更新且冻结参数不变。[训练证据](../issue040-delayed-training-20261020/README.md)已保存。
+用户要求查看训练并提交测试，工作单元为 [040c](https://github.com/Vitalrubbish/InterClarify/blob/3f470719bb0958546cc3c75e506cfb043b3fe438/docs/issue/archive/040c_delayed_start_fdb_test.md)。040训练及干净进程候选核验退出0，完整1235步/2469序列/1000条；最新数据和加权目标已核验，112个LoRA更新且冻结参数不变。[训练证据](../issue040-delayed-training-20261020/README.md)已保存。
 
 测试只引用最终checkpoint，SHA256为 `266a37a28699d0c3f36b6a6305374bc89a1a2ff2af7a37fd1eb4caf1ad915346`，候选 `T2_R3_delayed_start`。新增`delayed_t2`入口只改变条件选择和训练预检；实际训练资产已通过本次预检，所有嵌入Python段及shell语法通过检查。测试服务仍再次完整恢复候选和复现生成。
 

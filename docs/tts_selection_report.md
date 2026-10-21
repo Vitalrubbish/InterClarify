@@ -127,7 +127,7 @@ Kokoro 首块音频时长中位数为 **4.45 秒**，P95 为 11.261 秒，说明
 
 2026-10-19 r3 的三条例子中，首可听代理分别为长回答 **0.425 秒**、时间澄清 **0.592 秒**、短确认 **0.893 秒**。它们属于不同输入时序与分段策略下的集成诊断，不能并入 60 条横向基准。长回答从六段改为四个完整句子，三处段边界低能量间隔约 0.26/0.20/0.21 秒；用户复听确认最新版效果很好，相关组件任务已归档。
 
-正常三例及 12 字符/600ms 供给诊断没有队列断流；3 字符/600ms 的慢供给仍有约 3.887 秒队列缺口。客户端取消代际与原生播放链路检查通过，但不能据此声称 GPU 计算可立即停止。上述测试和复听通过不代表整条 ASR→LLM→TTS 双工链路或声卡测量通过。来源：[r3 连续性与复听报告](../reports/tts_continuity/20261019-r3/README.md)、[客户端分段说明](scripts/remote/verify_english_components.md)、[组件任务](issue/archive/003_kokoro_playback_integration.md)。
+正常三例及 12 字符/600ms 供给诊断没有队列断流；3 字符/600ms 的慢供给仍有约 3.887 秒队列缺口。客户端取消代际与原生播放链路检查通过，但不能据此声称 GPU 计算可立即停止。上述测试和复听通过不代表整条 ASR→LLM→TTS 双工链路或声卡测量通过。来源：[r3 连续性与复听报告](../reports/tts_continuity/20261019-r3/README.md)、[客户端分段说明](scripts/remote/verify_english_components.md)、[组件任务](https://github.com/Vitalrubbish/InterClarify/blob/8235dc68ed9b22dd584ea96eda66c91c4b59cb80/docs/issue/archive/003_kokoro_playback_integration.md)。
 
 ## 7. 最终取舍与适用边界
 
@@ -138,10 +138,10 @@ Kokoro 首块音频时长中位数为 **4.45 秒**，P95 为 11.261 秒，说明
 | Kyutai TTS 1.6B | 当前不采用 | 本轮听感及首可听延迟未形成综合优势；双向增量接口未在本轮证明端到端收益。 |
 | 当时现役 MOSS 配置 | 不维持为当前英文低延迟主线 | 长尾编译等待与总体供音慢于实时同时存在；一条无持续非静音、包装作业失败，结论限于该配置。 |
 
-选型以既有用户决定及测量证据为依据，当前不重开候选比较。后续关注真实 LLM 输出下的首段等待、长回答连续性、数字读法、有效插话停播及过期音频隔离；由 [全链路验收任务](issue/archive/008_full_chain_fdb_acceptance.md)评价实际对话质量和延迟。TTS 已完成组件接入不代表控制模型会在适当时刻回复。
+选型以既有用户决定及测量证据为依据，当前不重开候选比较。后续关注真实 LLM 输出下的首段等待、长回答连续性、数字读法、有效插话停播及过期音频隔离；由 [全链路验收任务](https://github.com/Vitalrubbish/InterClarify/blob/3f470719bb0958546cc3c75e506cfb043b3fe438/docs/issue/archive/008_full_chain_fdb_acceptance.md)评价实际对话质量和延迟。TTS 已完成组件接入不代表控制模型会在适当时刻回复。
 
 ## 8. 证据与文档维护
 
 2026-10-18 原始远端任务根为 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-tts-selection-20261018/`；历史报告也记录该存储的 `/mnt/cloudstorfs/sjtu_home/xuan.zhang/` 路径。大型 WAV、逐包日志和依赖留远端；已从当前工作树清理的横向评测资料以固定提交 `3be4fc44d42d1163a7882eed116423e1f86b56a1` 追溯，本次使用本地 Git 对象读取复核，没有重新推理或联网重测。
 
-按用户要求，正式 [ASR 报告](asr_selection_report.md)与本文分别取代原 ASR、TTS decision 文档，更新当前仓库内链接；固定历史提交保持原样。文档交付与删除记录见 [Issue 038](issue/archive/038_tts_selection_report.md)。
+按用户要求，正式 [ASR 报告](asr_selection_report.md)与本文分别取代原 ASR、TTS decision 文档，更新当前仓库内链接；固定历史提交保持原样。文档交付与删除记录见 [Issue 038](https://github.com/Vitalrubbish/InterClarify/blob/3f470719bb0958546cc3c75e506cfb043b3fe438/docs/issue/archive/038_tts_selection_report.md)。

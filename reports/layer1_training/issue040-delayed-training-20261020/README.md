@@ -1,6 +1,6 @@
 # Issue 040：延后启动全量加权训练
 
-2026-10-20 用户明确要求直接启动全量训练，使用最新数据和加权 loss。本轮独立条件 `T2_R3_delayed_start`，一次性第三轮例外见 [040b](../../../docs/issue/archive/040b_delayed_start_full_training.md) 和006。原两轮协议及结果保留，不从第二轮最终权重续训。
+2026-10-20 用户明确要求直接启动全量训练，使用最新数据和加权 loss。本轮独立条件 `T2_R3_delayed_start`，一次性第三轮例外见 [040b](https://github.com/Vitalrubbish/InterClarify/blob/3f470719bb0958546cc3c75e506cfb043b3fe438/docs/issue/archive/040b_delayed_start_full_training.md) 和006。原两轮协议及结果保留，不从第二轮最终权重续训。
 
 输入为 `issue040-delayed-start-data`，清单 SHA256 `86c0faca1e1a12d3c7cf1fa0144e53a6a83166a8454ad48d986b24d40a97761d`。全部1000条train、T2去句读视图、2048、2469序列/1201531监督token；1epoch共1235步，最后一批只有1个序列，仍按实际目标权重和归一化。完整官方初始化、112个既有q/v LoRA、冻结embedding/head；AdamW 2e-5、warmup124后线性衰减。控制类别权重为talking/finish/interruption/backchannel/thinking=1/10/5/2/1，正文及EOS权重1。
 
@@ -20,4 +20,4 @@
 
 干净进程完整推理权重及生成IDs复现通过，`inference_eligible=true`。训练耗时约2441.6秒（40.7分钟），CUDA allocated峰值约19.11GiB、reserved约21.81GiB，进程RSS峰值约15.63GiB；目录占用约350MiB，均在预算内。保留证据见[训练summary](completed/training_summary.json)与[重载核验](completed/candidate_reload.json)；manifest及逐步目标/尾批核查原始文件已按精简要求删除。训练作业内的10项加权/候选、4项新条件及32项数据回归全部通过。
 
-040b完成归档。用户本次要求提交测试，转[040c](../../../docs/issue/archive/040c_delayed_start_fdb_test.md)按同一25个历史输入检查新候选；训练执行及重载通过不代表接话质量已通过。
+040b完成归档。用户本次要求提交测试，转[040c](https://github.com/Vitalrubbish/InterClarify/blob/3f470719bb0958546cc3c75e506cfb043b3fe438/docs/issue/archive/040c_delayed_start_fdb_test.md)按同一25个历史输入检查新候选；训练执行及重载通过不代表接话质量已通过。

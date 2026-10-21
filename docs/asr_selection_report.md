@@ -132,4 +132,4 @@ Qwen/X2 的历史 FDB 数秒延迟含控制和播放链，不能当成 ASR 延�
 
 主要远端原始目录为 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/runs/full100-parallel-13a846d`；音频、逐 token 日志和资产锁定信息留远端。本地保留的 JSON、Markdown 及历史脚本用于本报告复核，本文未重新读取远端大日志或执行模型推理。
 
-复核遵循“原始数据不改写、后续格式复测修正兼容性判断、开发决策与验收状态分开”的原则。2026-10-19/20 的后续接入与训练记录不并入 10-16 横向指标；本报告结论仅覆盖当前英文组件选型。文档交付记录见 [Issue 035](issue/archive/035_asr_selection_report.md)。
+复核遵循“原始数据不改写、后续格式复测修正兼容性判断、开发决策与验收状态分开”的原则。2026-10-19/20 的后续接入与训练记录不并入 10-16 横向指标；本报告结论仅覆盖当前英文组件选型。文档交付记录见 [Issue 035](https://github.com/Vitalrubbish/InterClarify/blob/3f470719bb0958546cc3c75e506cfb043b3fe438/docs/issue/archive/035_asr_selection_report.md)。
