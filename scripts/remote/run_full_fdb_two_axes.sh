@@ -27,7 +27,9 @@ export PYTHONNOUSERSITE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 TOKENIZERS_PAR
 export PYTHONPATH="$XTALK_ROOT/src:$ROOT/scripts/remote:$ROOT/scripts/training"
 export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4
 ulimit -c 0
-ulimit -f 1048576
+ulimit -f 8388608
+export TMPDIR="$OUTPUT/tmp"
+mkdir -p "$TMPDIR"
 IFS=',' read -r -a GPUS <<< "${CUDA_VISIBLE_DEVICES:-${NVIDIA_VISIBLE_DEVICES:-}}"
 [[ "${#GPUS[@]}" -eq 2 && "${GPUS[0]}" != all ]] || exit 2
 SCORE_ENV="$HOME_ROOT/miniconda3/envs/full-duplex-bench"

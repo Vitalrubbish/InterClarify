@@ -138,3 +138,5 @@
 [063 X-Talk运行实现发布](archive/063_publish_xtalk_runtime.md)完成归档：`d6dc3bf`已推送origin/dev，子仓库工作区干净；当前选定提交见configs/xtalk_runtime_source.json。
 
 [064 分段延迟报告与backchannel方向](archive/064_latency_report_and_backchannel_plan.md)完成归档：见[正式报告](../latency_analysis_report.md)，包含分段测量、版本口径和降低首反馈延迟/感知等待的后续计划，模块未上线。
+
+[065 完整FDB两轴评测](065_full_fdb_two_axes.md)进行中：当前微调模型、300ms与KV复用，完整119例Smooth Turn-Taking及200例User Interruption，任务job-179255450314330572677-xuan-zhang已运行，评分结果待回收。
