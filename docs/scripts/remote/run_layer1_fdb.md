@@ -1,7 +1,9 @@
-# T2_R3 固定 FDB 子集测试作业
+# 原1k ASR候选固定FDB子集任务
 
-`scripts/remote/run_layer1_fdb.sh` 在调度的 2 张 4090 上启动 Nemotron/Kokoro 组件服务及唯一模型服务，只测试最终候选 `T2_R3_delayed_start`。独立 conda、冻结源码和 xtalk 快照必须存在，输出目录拒绝覆盖；候选固定为 040 训练目录的最终 checkpoint，不通过小子集结果挑选权重。
+`scripts/remote/run_layer1_fdb.sh`在调度的2张4090上执行081固定25例回归，无类。要求冻结`LAYER1_FDB_ROOT`源码、`LAYER1_XTALK_ROOT`及新`LAYER1_FDB_OUTPUT`，`LAYER1_TRAIN_RUN`指向已完成078目录。逐项核对训练退出0、1240步/2480序列/1000对话、112个LoRA变化、冻结参数不变、独立078配置/协议摘要及最终checkpoint和重载身份。
 
-脚本先核验训练退出 0、1,235 步/2,469 序列、1,000 条对话、112 个 LoRA 变化、冻结参数不变、干净进程重载和生成 IDs 复现；再复用 008a 的 134 文件 X-Talk 源快照与 030 的 25 会话 FDB 清单。`layer1_fdb.py prepare` 只复制冻结输入作为只读副本，`run` 调用 `duplex_a4_replay.run_fdb_batch`，固定英语运行配置、原生 ASR、独立会话、5 秒诊断尾窗和官方等长输出 WAV。
+原030清单25会话/70份音频标注逐文件验证后暂存。X-Talk采用d6dc3bf干净src（本轮复用065 r4的只读checkout），不使用旧134文件快照；运行配置为300/1200ms TTS、600ms micro-turn、会话KV复用，模型health核对duplex_greedy_v1与repetition_penalty=1.0。每例独立会话、原生ASR输入、官方等长输出及独立5秒诊断尾窗，不人工补点。
 
-请求 2×4090/16CPU/64GiB、线程 4、单并发、4 小时上限，输出 10GiB、空闲盘 15GiB；LLM 与 ASR/TTS 分卡，子进程退出时清理。入口只做推理和数据回收，不调用官方 judge；官方评分、完整 FDB 和人工音频复核未执行，不能用 transport PASS 代替语义正确性。旧 round1、round2_t2 模式及 B0/T1/T2/T3/T2_R2 条件选择已删除。
+评分环境先对3秒语音和2秒静音做官方对齐预检；ASR→TTS→模型串行启动，ASR warmup180秒，health等待核对进程存活。回放结束停推理服务后，对Smooth和Interruption各5例做官方对齐与TOR/Latency；GPT保持暂缓。`fdb_subset_report.py`另核对25例输出时长和原窗/尾窗播放，不能把transport通过当作语义正确。
+
+单作业2GPU/16CPU/64GiB、线程4、worker0、并发1、4小时硬限；输出20GiB/空闲盘50GiB/单文件8GiB，现役conda、不复制模型，失败与退出码保留。旧T2训练路径已缺失，不尝试重训或重新恢复；两轴旧对照从065同运行配置结果提取相同5例，其他三类仅作本轮诊断。历史040报告仍代表当时旧配置和评分状态。
