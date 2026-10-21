@@ -7,3 +7,7 @@
 freeze验证两轴完整数量、输入时长与标注，计算input.wav和必要标注SHA256，生成远端独立manifest；stage先完整核对源文件再复制到新目录，排除旧output/rating。infer调用现有run_fdb_batch，逐轴复用当前ASR/LLM/TTS链路，检查全部例数，保留漏答与原音频等长官方输出及独立诊断尾窗。
 
 preflight_judge只验证现有judge端点和模型可用性，不打印凭据。score复用run_fdb_llm_judge的工作副本、密钥读取和指标解析；用评分conda直接运行官方asr.py与evaluate.py，两个轴都实际调用评分，Smooth轴不需要API。官方子进程输出流式写日志、限制时长，失败与超时进入summary；返回逐轴预期/实际转写/评分数量，原始音频和大trace留远端。
+
+## 067：用户决定暂缓GPT评分
+
+timing_metrics按冻结官方脚本的相同TOR规则逐例统计：无词或总词跨度不足1秒且词数不超过3判为未接话；接话延迟按官方口径将负值归零，同时保存原始负值，零接话时延迟为null。score的--defer-judge跳过User Interruption的API判题，输出TOR/Latency及明确的GPT待补状态；Smooth仍运行官方评估并与同规则重算核对。结果分别标注请求范围执行通过、完整评分是否完成，不混用两种状态。

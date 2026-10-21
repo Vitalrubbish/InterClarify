@@ -21,5 +21,7 @@
   },
   "source_manifest_sha256": "641996cfa5d1ac97f8eb42632491963a52febbf7f0b542c7672691d9d51c655f",
   "remote_root": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-fdb-two-axes-20261021-r1",
-  "status": "Running; scoring preflight"
+  "status": "Failed in scoring preflight before formal replay",
+  "exit_code": 1,
+  "error": "OSError Errno27: 1GiB file limit during NeMo archive extraction"
 }

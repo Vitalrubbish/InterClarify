@@ -140,9 +140,15 @@ env -u PYTHONNOUSERSITE NUMBA_CUDA_USE_NVIDIA_BINDING=0 CUDA_VISIBLE_DEVICES="${
   timeout --signal=TERM --kill-after=30 900 "$SCORE_ENV/bin/python" \
   "$FDB_REPO/v1_v1.5/get_transcript/asr.py" --root_dir "$OUTPUT/scorer_preflight" --task default \
   > "$OUTPUT/scorer_preflight.log" 2>&1
-env -u PYTHONNOUSERSITE NUMBA_CUDA_USE_NVIDIA_BINDING=0 CUDA_VISIBLE_DEVICES='' \
-  timeout 90 "$SCORE_ENV/bin/python" scripts/remote/full_fdb_two_axes.py preflight-judge \
-  --key-file "$KEY_FILE" > "$OUTPUT/judge_preflight.json" 2> "$OUTPUT/judge_preflight.log"
+JUDGE_ARGS=()
+if [[ "${FULL_FDB_DEFER_JUDGE:-1}" == 1 ]]; then
+  JUDGE_ARGS=(--defer-judge)
+  printf '%s\n' '{"judge_status":"deferred_by_user","api_called":false}' > "$OUTPUT/judge_preflight.json"
+else
+  env -u PYTHONNOUSERSITE NUMBA_CUDA_USE_NVIDIA_BINDING=0 CUDA_VISIBLE_DEVICES='' \
+    timeout 90 "$SCORE_ENV/bin/python" scripts/remote/full_fdb_two_axes.py preflight-judge \
+    --key-file "$KEY_FILE" > "$OUTPUT/judge_preflight.json" 2> "$OUTPUT/judge_preflight.log"
+fi
 for pattern in test_full_fdb_two_axes.py test_duplex_model_service.py; do
   CUDA_VISIBLE_DEVICES='' "$MODEL_ENV/bin/python" -m unittest discover -s tests -p "$pattern" -v \
     > "$OUTPUT/$pattern.txt" 2>&1
@@ -204,7 +210,16 @@ SCORE_RC=0
 env -u PYTHONNOUSERSITE NUMBA_CUDA_USE_NVIDIA_BINDING=0 CUDA_VISIBLE_DEVICES="${GPUS[0]}" \
   "$MODEL_ENV/bin/python" -u scripts/remote/full_fdb_two_axes.py score \
   --input "$OUTPUT/replay/fdb" --output "$OUTPUT/scoring" --fdb-repo "$FDB_REPO" \
-  --scorer-python "$SCORE_ENV/bin/python" --key-file "$KEY_FILE" > "$OUTPUT/scoring.log" 2>&1 || SCORE_RC=$?
+  --scorer-python "$SCORE_ENV/bin/python" --key-file "$KEY_FILE" "${JUDGE_ARGS[@]}" > "$OUTPUT/scoring.log" 2>&1 || SCORE_RC=$?
 printf '%s\n' "$SCORE_RC" > "$OUTPUT/scoring_exit_code.txt"
 check_budget
+"$MODEL_ENV/bin/python" - "$OUTPUT" "$INFER_RC" "$SCORE_RC" <<'PYFINAL'
+import json,sys
+from pathlib import Path
+p=Path(sys.argv[1]);score_path=p/'scoring/summary.json'
+result={'inference_rc':int(sys.argv[2]),'scoring_rc':int(sys.argv[3]),
+        'requested_scope_passed':sys.argv[2]=='0' and sys.argv[3]=='0',
+        'scoring':json.loads(score_path.read_text()) if score_path.exists() else None}
+(p/'summary.json').write_text(json.dumps(result,indent=2)+'\n')
+PYFINAL
 [[ "$INFER_RC" -eq 0 && "$SCORE_RC" -eq 0 ]]

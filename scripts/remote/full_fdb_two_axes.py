@@ -162,8 +162,27 @@ def official_step(command, log, environment, cwd, seconds=1800):
             return 124
 
 
+def timing_metrics(root, task):
+    """Apply the pinned official TOR/latency rules and retain per-case evidence."""
+    annotation='interrupt.json' if task=='user_interruption' else 'turn_taking.json'
+    rows=[]
+    for output in sorted(root.glob('*/output.json')):
+        metadata=json.loads((output.parent/annotation).read_text())
+        anchor=float(metadata[0]['timestamp'][1 if task=='user_interruption' else 0])
+        chunks=json.loads(output.read_text())['chunks']
+        duration=(chunks[-1]['timestamp'][-1]-chunks[0]['timestamp'][0]) if chunks else 0
+        take_turn=bool(chunks) and (duration>=1 or len(chunks)>3)
+        raw=chunks[0]['timestamp'][0]-anchor if take_turn else None
+        rows.append({'sample':output.parent.name,'take_turn':int(take_turn),
+            'raw_latency':raw,'official_latency':max(0,raw) if raw is not None else None})
+    latencies=[r['official_latency'] for r in rows if r['take_turn']]
+    return {'samples':rows,'scores':{
+        'average_take_turn':sum(r['take_turn'] for r in rows)/len(rows) if rows else None,
+        'average_latency':sum(latencies)/len(latencies) if latencies else None}}
+
+
 def score(args):
-    """Align outputs and execute both official task evaluators sequentially."""
+    """Align complete outputs, score timing, and honor explicitly deferred judging."""
     from run_fdb_llm_judge import prepare_work_repo, read_api_key, parse_scores
     args.output.mkdir(parents=True,exist_ok=False)
     rows=[]
@@ -184,21 +203,42 @@ def score(args):
             out/'alignment.log',environment,str(out))
         aligned=len(list(root.glob('*/output.json')))
         evaluation=None
+        timings=None
+        scores={}
+        deferred=task=='user_interruption' and args.defer_judge
+        judge_status='deferred_by_user' if deferred else ('not_required' if task=='smooth_turn_taking' else 'pending')
         if align==0 and aligned==count:
-            if task=='user_interruption':
-                environment['OPENAI_API_KEY']=read_api_key(args.key_file,os.environ)
-                environment['OPENAI_BASE_URL']=args.base_url
-            evaluation=official_step([str(args.scorer_python),str(work/'evaluation/evaluate.py'),
-                '--task',task,'--root_dir',str(root)],out/'evaluation.log',environment,str(out))
+            timings=timing_metrics(root,task)
+            write_json(out/'timing_metrics.json',timings)
+            scores=dict(timings['scores'])
+            if deferred:
+                scores['average_rating']=None
+            else:
+                if task=='user_interruption':
+                    environment['OPENAI_API_KEY']=read_api_key(args.key_file,os.environ)
+                    environment['OPENAI_BASE_URL']=args.base_url
+                evaluation=official_step([str(args.scorer_python),str(work/'evaluation/evaluate.py'),
+                    '--task',task,'--root_dir',str(root)],out/'evaluation.log',environment,str(out))
+                official=parse_scores(out/'evaluation.log')
+                for name in ('average_take_turn','average_latency'):
+                    if name in official and scores[name] is not None and abs(official[name]-scores[name])>1e-8:
+                        raise ValueError('Official/recomputed timing discrepancy: '+name)
+                scores.update(official)
+                if task=='user_interruption':
+                    judge_status='complete' if evaluation==0 and 'average_rating' in official else 'failed'
+        timing_passed=align==0 and aligned==count and timings is not None and len(timings['samples'])==count
         row={'task':task,'subset':subset,'expected':count,'aligned':aligned,'alignment_rc':align,
              'evaluation_rc':evaluation,'ratings':len(list(root.glob('*/rating.json'))),
-             'judge_model':args.judge_model if task=='user_interruption' else None,
-             'scores':parse_scores(out/'evaluation.log')}
-        row['passed']=align==0 and aligned==count and evaluation==0 and bool(row['scores'])
+             'judge_model':args.judge_model if task=='user_interruption' and not deferred else None,
+             'judge_status':judge_status,'scores':scores,'timing_passed':timing_passed,
+             'timing_source':'recomputed_pinned_official_rules' if deferred else 'official_evaluator_and_rule_crosscheck'}
+        row['requested_scope_passed']=timing_passed and (deferred or evaluation==0)
         rows.append(row)
-        write_json(args.output/'summary.json',{'axes':rows,'passed':all(r['passed'] for r in rows)})
+        write_json(args.output/'summary.json',{'axes':rows,
+            'requested_scope_passed':all(r['requested_scope_passed'] for r in rows),
+            'full_scoring_complete':all(r['requested_scope_passed'] and r['judge_status']!='deferred_by_user' for r in rows)})
         print(json.dumps(row),flush=True)
-    return 0 if all(r['passed'] for r in rows) else 1
+    return 0 if all(r['requested_scope_passed'] for r in rows) else 1
 
 
 def main():
@@ -223,6 +263,7 @@ def main():
         target.add_argument('--base-url',default=DEFAULT_BASE_URL)
         target.add_argument('--judge-model',default=DEFAULT_JUDGE_MODEL)
         if command=='score':
+            target.add_argument('--defer-judge',action='store_true')
             for name in ('input','output','fdb-repo','scorer-python'):
                 target.add_argument('--'+name,type=Path,required=True)
     args=parser.parse_args()
