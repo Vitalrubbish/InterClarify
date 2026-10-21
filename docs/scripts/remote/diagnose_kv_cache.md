@@ -1,0 +1,13 @@
+# diagnose_kv_cache.py
+
+## 功能与设计
+
+对051固定分歧输入执行真实服务缓存复现与受控数值对照，保留完整token身份和首正文logits。独立诊断脚本不改变运行服务行为。main载入当前最终候选，冻结参数，分别运行BF16原attention、BF16 eager及双卡FP32 eager。
+
+核心方法：replay通过原stream_ids重放前五拍，使用Qwen主模块forward hook记录实际input_ids/cache_position/position_ids/attention_mask形状及前两步logits；compare_forward以完整输入与固定切分的前向比较KV和输出，固定相同finish token以隔离首正文差异；summarize_logits记录top候选、差距及向量误差。所有缓存通过实际get_seq_length核对，完整前缀与后缀不重编码。诊断结果包含精度、attention后端、模型/输入身份及显存；精度和后端改变仅用于诊断，不自动进入在线配置。
+
+## 执行约束
+
+使用训练conda与调度分配GPU，FP32阶段先迁CPU再按整层分配双卡，不创建第二份模型。2×4090/8CPU/64GiB、2小时、输出2GiB、单并发。原始JSON与摘要留独立run目录，错误与退出码不得覆盖。
+
+第二轮补充：第一轮已复现真实分歧，原始logits的argmax相同。模型继承Qwen generation_config中的repetition_penalty=1.05，需进一步记录generate返回的output_scores（即处理后的实际贪心分数），以及对受控前向施加同一RepetitionPenaltyLogitsProcessor后的分数。诊断仅开启返回观测，不改生成配置；BF16/FP32比较均包含该处理步骤。

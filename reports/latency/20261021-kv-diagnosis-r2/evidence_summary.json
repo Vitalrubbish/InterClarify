@@ -1,0 +1,78 @@
+{
+  "conclusion": "BF16 partition-dependent rounding changes greedy ranking after inherited repetition_penalty=1.05",
+  "repetition_penalty": 1.05,
+  "cached_prefix_tokens": 140,
+  "cached_prefix_ids_match": true,
+  "raw_first_text_logits": {
+    "full": {
+      "ids": [
+        40,
+        2121
+      ],
+      "values": [
+        14.4375,
+        13.75
+      ]
+    },
+    "cached": {
+      "ids": [
+        40,
+        2121
+      ],
+      "values": [
+        14.4375,
+        13.8125
+      ]
+    }
+  },
+  "actual_greedy_scores": {
+    "full": {
+      "ids": [
+        40,
+        2121
+      ],
+      "values": [
+        13.750000953674316,
+        13.75
+      ],
+      "top_margin": 9.5367431640625e-07
+    },
+    "cached": {
+      "ids": [
+        2121,
+        40
+      ],
+      "values": [
+        13.8125,
+        13.750000953674316
+      ],
+      "top_margin": 0.062499046325683594
+    }
+  },
+  "fp32_eager": {
+    "single_boundary": {
+      "max_abs_logit_difference": 4.673004150390625e-05,
+      "processed_argmax_equal": true
+    },
+    "micro_boundaries": {
+      "max_abs_logit_difference": 5.269050598144531e-05,
+      "processed_argmax_equal": true
+    }
+  },
+  "runs": [
+    {
+      "run": "r1",
+      "exit_code": 0,
+      "remote_root": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-kv-diagnosis-20261021-r1/",
+      "local_results_sha256": "5351080807b5223839ee8077547b80186d9c43d1f8c5cf4228ee239cba38a746",
+      "local_results_bytes": 334079
+    },
+    {
+      "run": "r2",
+      "exit_code": 0,
+      "remote_root": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-kv-diagnosis-20261021-r2/",
+      "local_results_sha256": "8342a09feaba3b8c62e54bcdac9aa7223f68c281b47fe45618c740b17a564b2a",
+      "local_results_bytes": 349042
+    }
+  ]
+}

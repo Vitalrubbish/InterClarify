@@ -45,3 +45,7 @@ Issue001e：validate_prompt_ids每个请求只取一次词表大小，之后仍�
 服务按显式 session_id 保存有界 DynamicCache；请求开关默认关闭，在线配置显式启用。缓存池管理匹配前缀、会话淘汰、字节/token/会话数上限及 TTL；取出后独占使用，成功结束且实际缓存长度核对通过才归还。历史改写先清空重建，取消或错误丢弃在用缓存。会话释放接口在全局推理锁内执行，不影响其他会话。完整历史与原始生成 ID 仍是事实来源。
 
 stream_ids 仅计算未缓存后缀，attention mask 覆盖全部历史，cache_position 从实际缓存长度起算；generate 最后一个输出可能尚未入缓存，保存时仅登记实际 get_seq_length 对应的 token 前缀。生成统计增加 session/request 标识、匹配 token 数、输入长度、模型首 token 和生成耗时；可选 trace 文件记录请求输入/输出 ID、缓存状态和单调时钟，用于固定请求对照。
+
+## 2026-10-21 数值与生成语义核查
+
+实际继承的Qwen generation_config含repetition_penalty=1.05；即使do_sample=False，贪心选择也在该处理之后执行。不能将原始logit最高值当作最终选择。跨请求缓存保持相同token前缀与位置，但BF16完整/分段计算可产生数值偏差；049的一个输入在重复惩罚后近乎并列，导致首正文不同。051已用实际generate分数及FP32对照确认原因，见[诊断报告](../../../reports/latency/20261021-kv-diagnosis-r2/README.md)。服务参数未因诊断而修改，BF16下不承诺完整重算和缓存增量逐token恒等。

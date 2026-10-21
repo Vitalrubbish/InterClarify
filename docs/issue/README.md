@@ -7,7 +7,7 @@
 | [047](047_tts_first_segment_latency.md) | 首段 TTS 聚合期限降至 300ms | 进行中；后续段保持 1,200ms、micro-turn 保持 600ms，比较延迟、连续性与听感 |
 | [048](048_cross_request_kv_cache.md) | 跨 micro-turn 请求复用 KV cache | 进行中；按会话复用匹配前缀，验证正确性、时延与显存，不改变拍长或重启训练 |
 
-两项已实现并完成本地回归，[049 延迟对照](archive/049_latency_decomposition_validation.md)已提交远端任务 `job-179251495575111326759-xuan-zhang`，已完成，结果见[分段报告](../../reports/latency/20261021-r2/results.md)。047待人工复听，048待051排查固定请求生成分歧。
+两项已实现并完成本地回归，[049 延迟对照](archive/049_latency_decomposition_validation.md)已提交远端任务 `job-179251495575111326759-xuan-zhang`，已完成，结果见[分段报告](../../reports/latency/20261021-r2/results.md)。047待人工复听，051已查明BF16分段计算与重复惩罚造成近并列排名翻转，048继续正式采用验收。
 
 [035 ASR 正式选型报告](archive/035_asr_selection_report.md)已完成归档；报告汇总 2026-10-16 测量及后续输入复核，见 [正式报告](../asr_selection_report.md)。
 
@@ -113,4 +113,6 @@
 
 [050 远端测试依赖恢复与重提](archive/050_restore_latency_test_dependencies.md)已完成归档：r1快照完整，已恢复误删的现役训练资产清单并以独立r2重提原测试；保留旧任务证据。
 
-[051 缓存生成分歧排查](051_kv_cache_generation_divergence.md)待办：同一150-token输入三次重复首正文ID不同，需区分数值效应与实现问题；048等价性验收保持未完成。
+[051 缓存生成分歧排查](archive/051_kv_cache_generation_divergence.md)完成归档：确认BF16分段数值差异与重复惩罚后的近并列排名翻转；位置/mask/前缀核对通过。048继续负责正式采用及更广在线行为验收。
+
+[055 原始延迟证据忽略规则](archive/055_ignore_raw_latency_evidence.md)已完成归档：完整诊断JSON保留本地/远端，Git提交关键摘要及追溯哈希，减少本轮提交体积。

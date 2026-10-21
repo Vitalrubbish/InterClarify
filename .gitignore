@@ -81,3 +81,8 @@ openai_use.example
 
 # Machine-specific SSH connection instructions (local only).
 remote_connection.local.md
+
+# Raw latency evidence stays local or on the cluster; commit concise summaries.
+/reports/latency/*/results.json
+/reports/latency/**/raw/
+/reports/latency/**/output/
