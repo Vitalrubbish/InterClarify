@@ -6,9 +6,8 @@
 
 | 工作单 | 状态 | 范围与入口 |
 | --- | --- | --- |
-| [078：新ASR视图1k训练](078_layer1_delayed_punctuation_training.md) | 已提交远端调度 | 077已交付并归档；同一官方初始化、单卡单epoch1240步，训练与重载待完成 |
-| [074：训练集扩充至3k并保证多样性](074_layer1_diverse_3k_dataset.md) | 待执行 | 073已交付；保留原1k来源与固定dev/test，新增2k独立对话，按ASR表面形式冻结新视图 |
-| [075：远端多卡训练可行性调研](075_layer1_multigpu_feasibility.md) | 待执行 | 远端资源与环境核查、训练器差距、单卡/多卡成本比较；可与073独立推进 |
+| [074：训练集扩充至3k并保证多样性](074_layer1_diverse_3k_dataset.md) | 暂缓执行 | 先评估078原1k新ASR候选；后续保留原1k来源与固定dev/test，新增2k独立对话 |
+| [075：远端多卡训练可行性调研](075_layer1_multigpu_feasibility.md) | 暂缓执行 | 用户当前先训练原1k；多卡资源、训练器差距和成本调研留后续 |
 
 任务完成后归档；执行、传输通过和模型能力通过分别记录。归档清理不会改变当前远端作业或把未执行项记为通过。
 
@@ -23,8 +22,8 @@
 | 生成策略 | duplex_greedy_v1，显式greedy/单beam/repetition_penalty=1.0；固定108对回归一致，不外推全部BF16输入恒等，[061](archive/061_explicit_generation_policy.md) |
 | 运行源码 | [选定X-Talk版本](../../configs/xtalk_runtime_source.json)：`d6dc3bf`已推送origin/dev；[当前配置](../configs/xtalk_duplex_english_runtime.md) |
 | 延迟与后续方向 | [分段延迟报告](../latency_analysis_report.md)；完整链路历史时延与新策略固定请求回归分别标注，backchannel可降低首反馈延迟/感知等待，实际收益待测 |
-| 当前候选与下一阶段 | T2_R3_delayed_start保留1k基线；用户现已授权077重建原1k与078重训，先检验新ASR视图；074的3k扩充、075多卡调研暂不执行 |
-| 训练文本与ASR形式 | [073审计](archive/073_layer1_pause_punctuation_audit.md)确认T2过度删除内部句读；用户补充句末标点常在下一句开始后才出现。074需按标点到达可见性构造增量，迟到标点不提前泄漏、不回填已消费历史，并补核符号种类及上下文重置。原数据未改，人审pending，新训练尚未放行 |
+| 当前候选与下一阶段 | [078](archive/078_layer1_delayed_punctuation_training.md)原1k ASR_R4已完成1240步及干净进程重载，退出0；尚未切换线上或运行新FDB，T2_R3保留旧对照；074的3k扩充、075多卡调研暂不执行 |
+| 训练文本与ASR形式 | [077](archive/077_layer1_delayed_punctuation_rebuild.md)固定原1000/200/300来源与事件目标，增加延后句读ASR视图，已用于078训练；[080分析](archive/080_layer1_asr_loss_analysis.md)确认训练loss改善但不能证明接话率提升。旧数据保留、人审pending，真实ASR精确时序和符号种类仍有近似偏差 |
 | 完整FDB两轴结果 | 319例回放和官方转写完成，退出码均0；Smooth TOR 59/119、平均延迟1.023秒，Interruption TOR 160/200、平均延迟1.183秒；延迟只含有效接话，GPT相关性待补，[最终报告](../../reports/fdb/20261021-full-two-axes-r4/README.md) |
 
 ## 共用约束

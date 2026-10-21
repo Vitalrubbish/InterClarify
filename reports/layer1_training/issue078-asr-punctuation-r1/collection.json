@@ -1,0 +1,10 @@
+{
+  "source_commit": "179ac8811843658b86181b8f596e68e265474434",
+  "analysis_exit_code": 0,
+  "training_exit_code": 0,
+  "sha256": {
+    "loss_analysis.json": "3d587b6d43c11321d01fa9823d71c4f47b20fb259cb6db7b9741fe50cf219c94",
+    "training_summary.json": "ccd8c9a7f0d329aa830c9d664dc25d6f7bec06abf70479f39273bc7d9366468d",
+    "candidate_reload.json": "034125d292d806ce4d33a067f8d576f4dd92c4a63302a1b969aa9ad12d1ac64a"
+  }
+}
