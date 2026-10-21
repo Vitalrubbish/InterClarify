@@ -6,7 +6,9 @@
 
 | 工作单 | 状态 | 范围与入口 |
 | --- | --- | --- |
-| 暂无进行中工作单 | — | [065完整FDB两轴](archive/065_full_fdb_two_axes.md)已完成授权范围并归档；GPT相关性评分待后续配置，尚未执行 |
+| [073：现有训练数据句读与停顿审计](073_layer1_pause_punctuation_audit.md) | 待执行 | 区分文本句读、句内停顿和语义续说，核验当前1k数据；为074提供依据 |
+| [074：训练集扩充至3k并保证多样性](074_layer1_diverse_3k_dataset.md) | 待073结论 | 保留原1k train和固定dev/test，新增2k独立对话，交付分层分布、审查与新索引 |
+| [075：远端多卡训练可行性调研](075_layer1_multigpu_feasibility.md) | 待执行 | 远端资源与环境核查、训练器差距、单卡/多卡成本比较；可与073独立推进 |
 
 任务完成后归档；执行、传输通过和模型能力通过分别记录。归档清理不会改变当前远端作业或把未执行项记为通过。
 
@@ -21,7 +23,7 @@
 | 生成策略 | duplex_greedy_v1，显式greedy/单beam/repetition_penalty=1.0；固定108对回归一致，不外推全部BF16输入恒等，[061](archive/061_explicit_generation_policy.md) |
 | 运行源码 | [选定X-Talk版本](../../configs/xtalk_runtime_source.json)：`d6dc3bf`已推送origin/dev；[当前配置](../configs/xtalk_duplex_english_runtime.md) |
 | 延迟与后续方向 | [分段延迟报告](../latency_analysis_report.md)；完整链路历史时延与新策略固定请求回归分别标注，backchannel可降低首反馈延迟/感知等待，实际收益待测 |
-| 当前候选 | T2_R3_delayed_start；停止继续训练的既有决定保持，当前用户授权完整两轴评测不隐含新训练 |
+| 当前候选与下一阶段 | T2_R3_delayed_start继续作为1k基线；2026-10-21用户提出3k数据扩充、句读检查及远端多卡调研，本轮先登记073–075。新训练与多卡实现待方案形成后单独立单，尚未启动 |
 | 完整FDB两轴结果 | 319例回放和官方转写完成，退出码均0；Smooth TOR 59/119、平均延迟1.023秒，Interruption TOR 160/200、平均延迟1.183秒；延迟只含有效接话，GPT相关性待补，[最终报告](../../reports/fdb/20261021-full-two-axes-r4/README.md) |
 
 ## 共用约束
