@@ -86,3 +86,6 @@ remote_connection.local.md
 /reports/latency/*/results.json
 /reports/latency/**/raw/
 /reports/latency/**/output/
+
+# Listening bundles include WAV files, ZIP packages and transfer manifests.
+/reports/latency/**/listening/

@@ -116,3 +116,5 @@
 [051 缓存生成分歧排查](archive/051_kv_cache_generation_divergence.md)完成归档：确认BF16分段数值差异与重复惩罚后的近并列排名翻转；位置/mask/前缀核对通过。048继续负责正式采用及更广在线行为验收。
 
 [055 原始延迟证据忽略规则](archive/055_ignore_raw_latency_evidence.md)已完成归档：完整诊断JSON保留本地/远端，Git提交关键摘要及追溯哈希，减少本轮提交体积。
+
+[057 自然度复评音频交付](archive/057_audio_review_delivery.md)完成归档：300/600ms各5条原始组件WAV已取回并校验，试听包不入Git；047等待用户复听反馈。
