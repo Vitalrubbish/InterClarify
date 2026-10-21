@@ -1,0 +1,9 @@
+# full_fdb_two_axes.py
+
+## 功能与设计
+
+完整FDB v1.0两轴的输入冻结、暂存、现有回放驱动调用及官方评分调度；不新增产品模型或播放通路。AXES映射119例candor_turn_taking到smooth_turn_taking、200例synthetic_user_interruption到user_interruption。
+
+freeze验证两轴完整数量、输入时长与标注，计算input.wav和必要标注SHA256，生成远端独立manifest；stage先完整核对源文件再复制到新目录，排除旧output/rating。infer调用现有run_fdb_batch，逐轴复用当前ASR/LLM/TTS链路，检查全部例数，保留漏答与原音频等长官方输出及独立诊断尾窗。
+
+preflight_judge只验证现有judge端点和模型可用性，不打印凭据。score复用run_fdb_llm_judge的工作副本、密钥读取和指标解析；用评分conda直接运行官方asr.py与evaluate.py，两个轴都实际调用评分，Smooth轴不需要API。官方子进程输出流式写日志、限制时长，失败与超时进入summary；返回逐轴预期/实际转写/评分数量，原始音频和大trace留远端。
