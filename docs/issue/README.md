@@ -134,3 +134,7 @@
 [061 显式线上生成策略](archive/061_explicit_generation_policy.md)完成归档：统一greedy/单beam/repetition_penalty=1.0，health/响应自动核对规则；远端108/108对固定请求一致，主源码已同步。
 
 [062 采用单一延迟路线](archive/062_adopt_streaming_latency_defaults.md)完成归档：默认300/1200ms、KV复用，日常仅执行current条件，保留历史证据及显式诊断。
+
+[063 X-Talk运行实现发布](archive/063_publish_xtalk_runtime.md)完成归档：`d6dc3bf`已推送origin/dev，子仓库工作区干净；当前选定提交见configs/xtalk_runtime_source.json。
+
+[064 分段延迟报告与backchannel方向](archive/064_latency_report_and_backchannel_plan.md)完成归档：见[正式报告](../latency_analysis_report.md)，包含分段测量、版本口径和降低首反馈延迟/感知等待的后续计划，模块未上线。

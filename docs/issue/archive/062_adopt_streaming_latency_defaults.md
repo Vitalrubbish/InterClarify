@@ -17,4 +17,4 @@
 
 本地conda的11项TTS、24项双工运行和3项延迟分析测试通过；脚本bash语法通过。远端新运行快照已同步并通过配置、AST默认值和传输摘要核查，稳定入口为`/hpc_stor03/sjtu_home/xuan.zhang/interclarify-runtime-current`，源码身份见[记录](../../../reports/latency/20261021-adopted/source_identity.json)。未重复启动GPU测试。
 
-X-Talk独立仓库遵循其禁止自行提交的约定；本轮默认值变更另存为[小型补丁](../../../configs/xtalk_latency_defaults.patch)，原实现与文档变更留本地及远端运行快照。历史实验快照和用户其他工作区修改不改写。
+采用时X-Talk按其约定保留未提交改动；后续用户在063明确授权发布，现以[正式提交登记](../../../configs/xtalk_runtime_source.json)替代临时默认值补丁。历史实验快照和用户其他工作区修改不改写。
