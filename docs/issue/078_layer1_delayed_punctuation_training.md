@@ -1,6 +1,6 @@
 # Issue 078：在重建的原1k上训练ASR延后句读条件
 
-状态：准备提交远端训练，2026-10-21。077机器审计和60条代理复核已完成，用户已明确授权先在该1k上训练，无需再次询问。人工签署保持pending，不伪造人审通过或继承040豁免。
+状态：远端调度已接收，2026-10-21，训练及候选重载待完成。077机器审计和60条代理复核已完成，用户已明确授权先在该1k上训练，无需再次询问。人工签署保持pending，不伪造人审通过或继承040豁免。
 
 独立条件`ASR_R4_delayed_punctuation`，只用原1000条train的新ASR视图，dev/test不训练。完整官方初始化、既有112个q/v LoRA、冻结base/embedding/head；不从旧1k候选续训。单epoch、2048、batch1/累积2，加权CE及1/10/5/2/1控制权重、AdamW 2e-5等优化器参数沿用040；步数按新索引ceil(sequences/2)，warmup为10%向上取整，每约1/6 epoch保存，固定最终候选。
 
@@ -14,3 +14,5 @@
 - [ ] 报告、最终权重摘要、资源和退出码回收，完成后归档；训练执行通过不代表FDB能力提升。
 
 已冻结ASR train2480个2048窗口、1201531监督token，单epoch1240步、warmup124、每207步保存；配置与协议见`configs/layer1_asr_training.yaml`和`configs/layer1_asr_protocol.yaml`。共享入口移除当前重载脚本已不支持的`verify`子命令，改用现有直接参数入口。原040 T2协议仍按原授权验证，本次不续训旧权重或自动评测。
+
+源码`179ac88`已推送，远端采用独立worktree；执行路径和预算见[本轮报告](../../reports/layer1_training/issue078-asr-punctuation-r1/README.md)，待实际训练及重载完成后回收。
