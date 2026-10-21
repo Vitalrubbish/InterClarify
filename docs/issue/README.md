@@ -15,7 +15,7 @@
 | 内容 | 采用范围与依据 |
 | --- | --- |
 | 研究范围 | [research_idea.md](../research_idea.md)；模型自主发现任务信息缺口并判断澄清时机，系统backchannel为后续方向，尚未接入 |
-| 思考调用方向 | Layer 1 在倾听或表达时均可通过独立 special token 请求异步思考，结果写回 Layer 1；调用 token 不进入 TTS，表达经过统一仲裁和单一播放路径；具体协议未定、尚未实现，见[研究草稿第 7.1 节](../research_idea.md#71-思考与表达的模块关系) |
+| 思考调用方向 | Layer 1 在倾听或表达时均可通过独立 special token 请求异步思考，每会话最多一个请求在途，合并重复触发；结果写回 Layer 1，调用 token 不进入 TTS，表达经过统一仲裁和单一播放路径；其余协议未定、尚未实现，见[研究草稿第 7.1 节](../research_idea.md#71-思考与表达的模块关系) |
 | ASR / TTS | Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart；[ASR报告](../asr_selection_report.md)、[TTS报告](../tts_selection_report.md) |
 | TTS / KV | 首段300ms、后续1200ms，600ms micro-turn，跨请求按会话KV复用；用户接受自然度略逊600ms但整体差异不大，[047](archive/047_tts_first_segment_latency.md)、[048](archive/048_cross_request_kv_cache.md) |
 | 生成策略 | duplex_greedy_v1，显式greedy/单beam/repetition_penalty=1.0；固定108对回归一致，不外推全部BF16输入恒等，[061](archive/061_explicit_generation_policy.md) |

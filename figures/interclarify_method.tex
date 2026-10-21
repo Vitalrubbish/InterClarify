@@ -35,7 +35,7 @@
   \path[lane,fill=violet!8] (2.25,5.39) rectangle (18.0,5.91);
   \node at (\a,5.65) {idle};
   \node at (\b,5.65) {request accepted};
-  \node at (\c,5.65) {reasoning in flight};
+  \node at (\c,5.65) {same request in flight};
   \node at (\d,5.65) {result ready};
   \node at (\e,5.65) {idle};
   \draw[reasoning] (\d,5.39)--(\d,5.06);
@@ -45,11 +45,13 @@
   \path[lane,fill=blue!8] (2.25,4.54) rectangle (18.0,5.06);
   \node at (\a,4.80) {SILENCE};
   \node at (\b,4.80) {SILENCE + REQUEST*};
-  \node at (\c,4.80) {SILENCE (tool pending)};
+  \node at (\c,4.80) {SILENCE + REQUEST*};
   \node at (\d,4.80) {use tool result};
   \node at (\e,4.80) {ANSWER};
   \draw[reasoning] (\b,5.06)--(\b,5.39);
   \node[anchor=east,font=\tiny,text=violet!75!black] at (6.65,5.22) {async call};
+  \draw[reasoning] (\c,5.06)--(\c,5.39);
+  \node[anchor=east,font=\tiny,text=violet!75!black] at (9.85,5.22) {duplicate: coalesced};
   \draw[next] (18.0,4.80)--(18.45,4.80)--(18.45,6.56)--(18.0,6.56);
   \node[rotate=90,font=\tiny,text=black!65] at (18.63,5.65) {L1 actions + text};
 
@@ -83,6 +85,6 @@
   \node at (10.1,1.33) {Continuous listening across fixed micro-turn windows; clarification answer updates the same task};
   \foreach \x in {3.6,6.8,10.0,13.2,16.4} {\draw[next] (\x,1.55)--(\x,1.91);}
   \node[anchor=west,font=\tiny,text=black!55] at (2.25,.64) {*REQUEST denotes an internal special token; name and sequence position TBD. Never sent to TTS.};
-  \node[anchor=west,font=\tiny,text=black!55] at (2.25,.32) {Callable while listening or speaking; this trace shows a silent call. Runtime integration pending.};
-  \node[anchor=west,font=\tiny,text=black!55] at (2.25,.00) {Illustrative events; return format, timing, validity policy, and other example details remain under discussion.};
+  \node[anchor=west,font=\tiny,text=black!55] at (2.25,.32) {Callable while listening or speaking; one in-flight request per session; duplicate triggers coalesce.};
+  \node[anchor=west,font=\tiny,text=black!55] at (2.25,.00) {Runtime integration pending; return format, timing, validity policy, and other example details remain under discussion.};
 \end{tikzpicture}
