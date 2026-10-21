@@ -130,3 +130,5 @@
 [055 原始延迟证据忽略规则](archive/055_ignore_raw_latency_evidence.md)已完成归档：完整诊断JSON保留本地/远端，Git提交关键摘要及追溯哈希，减少本轮提交体积。
 
 [057 自然度复评音频交付](archive/057_audio_review_delivery.md)完成归档：300/600ms各5条原始组件WAV已取回并校验，试听包不入Git；047等待用户复听反馈。
+
+[061 显式线上生成策略](061_explicit_generation_policy.md)进行中：统一greedy/单beam/repetition_penalty=1.0，服务和探针自动核对规则，远端固定请求回归已提交。

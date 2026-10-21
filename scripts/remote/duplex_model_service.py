@@ -26,6 +26,31 @@ from layer1_model import (
 )
 
 
+GENERATION_POLICY = {
+    'id': 'duplex_greedy_v1',
+    'do_sample': False,
+    'num_beams': 1,
+    'repetition_penalty': 1.0,
+    'no_repeat_ngram_size': 0,
+    'temperature': None,
+    'top_p': None,
+    'top_k': None,
+}
+
+
+def build_generation_config(eos_id):
+    """Build an independent online policy without checkpoint generation defaults.
+
+    Parameters
+    ----------
+    eos_id : int
+        Released end-of-message token, also used for padding.
+    """
+    from transformers import GenerationConfig
+    return GenerationConfig(**{k:v for k,v in GENERATION_POLICY.items() if k != 'id'},
+                            eos_token_id=eos_id, pad_token_id=eos_id, use_cache=True)
+
+
 class PrefixCachePool:
     """Own bounded, exclusive session caches; all access holds the service lock.
 
@@ -152,6 +177,7 @@ class OfficialDuplexModel:
         self.eos_id = self.token_ids['<|im_end|>']
         self.context_length = loaded.info['context_length']
         self.info = loaded.info
+        self.info['generation_policy'] = dict(GENERATION_POLICY)
         self.cache_pool = PrefixCachePool()
         self.trace_path = None
 
@@ -307,7 +333,8 @@ class OfficialDuplexModel:
                     self.model.generate(input_ids=tensor,
                         attention_mask=torch.ones((1, len(ids)), dtype=torch.long, device=self.device),
                         max_new_tokens=max_new_tokens, eos_token_id=eos_id,
-                        pad_token_id=eos_id, do_sample=False, streamer=streamer,
+                        pad_token_id=eos_id, generation_config=build_generation_config(eos_id),
+                        streamer=streamer,
                         num_logits_to_keep=1, use_cache=True,
                         **({"past_key_values": cached}
                            if use_cache else {}),
@@ -320,6 +347,7 @@ class OfficialDuplexModel:
                     retained = self.cache_pool.store(session_id, cached, ids + streamer.ids)
                 metrics = {
                     'session_id': session_id, 'request_id': request_id,
+                    'generation_policy': dict(GENERATION_POLICY),
                     'prompt_tokens': len(ids), 'generated_tokens': len(streamer.ids),
                     'cached_tokens': prefix_length, 'new_input_tokens': len(ids) - prefix_length,
                     'cache_status': cache_status, 'cache_retained': retained,

@@ -11,3 +11,5 @@
 使用训练conda与调度分配GPU，FP32阶段先迁CPU再按整层分配双卡，不创建第二份模型。2×4090/8CPU/64GiB、2小时、输出2GiB、单并发。原始JSON与摘要留独立run目录，错误与退出码不得覆盖。
 
 第二轮补充：第一轮已复现真实分歧，原始logits的argmax相同。模型继承Qwen generation_config中的repetition_penalty=1.05，需进一步记录generate返回的output_scores（即处理后的实际贪心分数），以及对受控前向施加同一RepetitionPenaltyLogitsProcessor后的分数。诊断仅开启返回观测，不改生成配置；BF16/FP32比较均包含该处理步骤。
+
+Issue061：后续诊断的processed_comparison默认采用线上GENERATION_POLICY中的重复惩罚，结果分别登记有效生成配置和checkpoint原配置；历史1.05仅可作为显式离线对照参数。旧051冻结快照不改写，避免后续诊断仍错误地按模型目录默认值解释新线上输出。

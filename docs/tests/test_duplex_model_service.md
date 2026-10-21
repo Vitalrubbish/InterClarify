@@ -14,3 +14,5 @@ Issue001独立参考对照增加generate_ids诊断端点，使用同一权重、
 test_prompt_bounds_use_one_vocabulary_lookup用1000个有效ID验证词表仅查询一次，同时保留负ID和上界越界拒绝，防止旧tokenizer上校验开销随prompt长度重复放大。
 
 2026-10-21：PrefixCacheTests 验证前缀命中/改写、容量/字节/TTL淘汰；tiny Qwen 用实际 DynamicCache 检查增量与完整历史生成ID、会话隔离、取消后清除。缺少本地 transformers 时仅跳过 tiny Qwen，远端模型conda必须执行。
+
+Issue061新增策略测试：模型generation_config故意保留1.05重复惩罚，实际stream_ids请求必须传入独立的greedy/1.0配置；完成统计策略可追溯，历史模型配置保持不变。tiny Qwen继续覆盖缓存、改写和取消。

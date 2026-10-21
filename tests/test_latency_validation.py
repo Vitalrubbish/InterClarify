@@ -39,3 +39,15 @@ class LatencyBreakdownTests(unittest.TestCase):
         missing = latency.response_rows(report,timeline[1:],diagnostics,models)[0]
         self.assertIsNone(missing['parts_seconds']['anchor_to_asr_visible'])
         self.assertIsNone(missing['decomposition_residual_seconds'])
+
+
+class GenerationPolicyTests(unittest.TestCase):
+    """Fail comparisons when service policy metadata is absent or changes."""
+
+    def test_explicit_policy_is_required_and_stable(self):
+        policy = {'id':'duplex_greedy_v1','repetition_penalty':1.0}
+        latency.require_generation_policy(policy,dict(policy))
+        for expected,actual in [(None,None),({},{}),(policy,None),
+                                (policy,dict(policy,repetition_penalty=1.05))]:
+            with self.assertRaises(ValueError):
+                latency.require_generation_policy(expected,actual)

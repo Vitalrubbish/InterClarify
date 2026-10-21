@@ -160,9 +160,21 @@ def analyze(root):
     print(json.dumps({'conditions':conditions}),flush=True)
 
 
+def require_generation_policy(expected, actual):
+    """Reject absent or mixed online policies before comparing generated IDs."""
+    if not isinstance(expected, dict) or not expected.get('id'):
+        raise ValueError('Model health must expose an explicit generation_policy')
+    if actual != expected:
+        raise ValueError('Generation policy changed or is missing from completion metrics')
+
+
 def probe(root, url):
     """Replay identical successive prompt IDs, preserving numerical divergences."""
     import requests
+    health = requests.get(url+'/health', timeout=10)
+    health.raise_for_status()
+    policy = health.json().get('generation_policy')
+    require_generation_policy(policy, policy)
     trace = [json.loads(line) for line in (root/'model_trace.jsonl').read_text().splitlines()]
     groups = {}
     for r in trace:
@@ -187,6 +199,7 @@ def probe(root, url):
                     if any('error' in e for e in events):
                         raise RuntimeError(events)
                     end = next(e for e in events if 'finish_reason' in e)
+                    require_generation_policy(policy, end.get('metrics', {}).get('generation_policy'))
                     if not enabled:
                         outputs[index] = end['token_ids']
                     rows.append({'group':group_index,'repeat':repetition,'index':index,'use_cache':enabled,
@@ -200,7 +213,7 @@ def probe(root, url):
             if subset:
                 summary[f'{enabled}_{status}'] = {k:stats([r[k] for r in subset]) for k in
                     ('prompt_tokens','cached_tokens','model_to_first_token_seconds','seconds')}
-    result = {'rows':rows,'summary':summary,'all_ids_match':all(r['ids_match_uncached'] for r in rows)}
+    result = {'generation_policy':policy,'rows':rows,'summary':summary,'all_ids_match':all(r['ids_match_uncached'] for r in rows)}
     (root/'cache_probe.json').write_text(json.dumps(result,indent=2)+'\n')
     if not result['all_ids_match']:
         print('CACHE_NUMERICAL_DIVERGENCE: inspect per-request rows',flush=True)

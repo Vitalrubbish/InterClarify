@@ -22,7 +22,8 @@ class ProcessedScoreTests(unittest.TestCase):
             generation_config=SimpleNamespace(repetition_penalty=1.05),
             get_input_embeddings=lambda:SimpleNamespace(weight=torch.zeros(1))),tokenizer=tokenizer)
         self.assertTrue(summarize_logits(full,cached,tokenizer)['argmax_equal'])
-        result = processed_comparison(model,[40,12],full,cached)
+        self.assertTrue(processed_comparison(model,[40,12],full,cached)['argmax_equal'])
+        result = processed_comparison(model,[40,12],full,cached,repetition_penalty=1.05)
         self.assertFalse(result['argmax_equal'])
         self.assertEqual(result['full']['ids'][0],40)
         self.assertEqual(result['cached']['ids'][0],2121)

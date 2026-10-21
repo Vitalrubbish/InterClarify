@@ -46,6 +46,10 @@ Issue001e：validate_prompt_ids每个请求只取一次词表大小，之后仍�
 
 stream_ids 仅计算未缓存后缀，attention mask 覆盖全部历史，cache_position 从实际缓存长度起算；generate 最后一个输出可能尚未入缓存，保存时仅登记实际 get_seq_length 对应的 token 前缀。生成统计增加 session/request 标识、匹配 token 数、输入长度、模型首 token 和生成耗时；可选 trace 文件记录请求输入/输出 ID、缓存状态和单调时钟，用于固定请求对照。
 
-## 2026-10-21 数值与生成语义核查
+## 2026-10-21 变更前的数值与生成语义核查
 
-实际继承的Qwen generation_config含repetition_penalty=1.05；即使do_sample=False，贪心选择也在该处理之后执行。不能将原始logit最高值当作最终选择。跨请求缓存保持相同token前缀与位置，但BF16完整/分段计算可产生数值偏差；049的一个输入在重复惩罚后近乎并列，导致首正文不同。051已用实际generate分数及FP32对照确认原因，见[诊断报告](../../../reports/latency/20261021-kv-diagnosis-r2/README.md)。服务参数未因诊断而修改，BF16下不承诺完整重算和缓存增量逐token恒等。
+Issue061变更前继承的Qwen generation_config含repetition_penalty=1.05；即使do_sample=False，贪心选择也在该处理之后执行。不能将原始logit最高值当作最终选择。跨请求缓存保持相同token前缀与位置，但BF16完整/分段计算可产生数值偏差；049的一个输入在重复惩罚后近乎并列，导致首正文不同。051已用实际generate分数及FP32对照确认原因，见[诊断报告](../../../reports/latency/20261021-kv-diagnosis-r2/README.md)。服务参数未因诊断而修改，BF16下不承诺完整重算和缓存增量逐token恒等。
+
+## Issue 061：显式线上生成策略
+
+新增generation_policy常量与build_generation_config方法，使用独立GenerationConfig，显式固定greedy、单beam及repetition_penalty=1.0；EOS/PAD按当前官方ID设置，max_new_tokens由请求预算提供。两个HTTP推理入口共用stream_ids，因此自动使用相同规则；每次请求传入独立配置，不读取base目录中的1.05重复惩罚。服务health、完成统计和trace登记策略身份与值。历史candidate加载校验保留原生成probe，随后线上策略生效，两种用途分别记录。参数变更不保证BF16所有输入逐token相同。

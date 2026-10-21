@@ -192,6 +192,7 @@ class PrefixCacheTests(unittest.TestCase):
         config._attn_implementation = 'eager'
         model = service.OfficialDuplexModel.__new__(service.OfficialDuplexModel)
         model.model = Qwen2ForCausalLM(config).eval()
+        model.model.generation_config.repetition_penalty = 1.05
         model.device, model.eos_id, model.context_length = 'cpu', 31, 256
         model.cache_pool, model.trace_path = service.PrefixCachePool(), None
         class Tokenizer:
@@ -200,11 +201,20 @@ class PrefixCacheTests(unittest.TestCase):
             def decode(self, ids, **kwargs):
                 return ''.join(chr(65 + i) for i in ids)
         model.tokenizer = Tokenizer()
+        original_generate = model.model.generate
+        def checked_generate(*args, **kwargs):
+            self.assertEqual(kwargs['generation_config'].repetition_penalty, 1.0)
+            self.assertFalse(kwargs['generation_config'].do_sample)
+            return original_generate(*args, **kwargs)
+        model.model.generate = checked_generate
         async def collect(ids, enabled, session='one'):
             rows = [r async for r in model.stream_ids(ids, 3, False,
                 session_id=session, use_cache=enabled)]
             self.assertFalse(any('error' in r for r in rows), rows)
-            return next(r for r in rows if 'finish_reason' in r)
+            completion = next(r for r in rows if 'finish_reason' in r)
+            self.assertEqual(completion['metrics']['generation_policy'], service.GENERATION_POLICY)
+            self.assertEqual(model.model.generation_config.repetition_penalty, 1.05)
+            return completion
         async def check():
             first = await collect([1, 2, 3], True)
             ids = [1, 2, 3] + first['token_ids'] + [4, 5]
@@ -225,3 +235,18 @@ class PrefixCacheTests(unittest.TestCase):
             self.assertNotIn('one', model.cache_pool.entries)
             self.assertIn('two', model.cache_pool.entries)
         asyncio.run(check())
+
+
+class ExplicitGenerationPolicyTests(unittest.TestCase):
+    """Prevent inherited repetition penalties from altering the online policy."""
+
+    def test_independent_generation_configuration(self):
+        config = service.build_generation_config(151645)
+        self.assertFalse(config.do_sample)
+        self.assertEqual(config.num_beams, 1)
+        self.assertEqual(config.repetition_penalty, 1.0)
+        self.assertEqual(config.no_repeat_ngram_size, 0)
+        self.assertEqual(config.eos_token_id, 151645)
+        self.assertEqual(config.pad_token_id, 151645)
+        config.repetition_penalty = 1.5
+        self.assertEqual(service.build_generation_config(151645).repetition_penalty, 1.0)

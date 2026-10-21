@@ -12,7 +12,8 @@ import time
 import torch
 from transformers import DynamicCache, RepetitionPenaltyLogitsProcessor
 
-from duplex_model_service import OfficialDuplexModel, PrefixCachePool
+from duplex_model_service import (OfficialDuplexModel, PrefixCachePool,
+                                  GENERATION_POLICY, build_generation_config)
 
 
 def summarize_logits(left, right, tokenizer):
@@ -32,10 +33,11 @@ def summarize_logits(left, right, tokenizer):
     return result
 
 
-def processed_comparison(model, ids, left, right):
-    """Apply the inherited repetition penalty on the actual score dtype/device."""
+def processed_comparison(model, ids, left, right, *, repetition_penalty=None):
+    """Apply online policy by default, with an explicit historical override."""
     device = model.model.get_input_embeddings().weight.device
-    processor = RepetitionPenaltyLogitsProcessor(model.model.generation_config.repetition_penalty)
+    penalty = GENERATION_POLICY['repetition_penalty'] if repetition_penalty is None else repetition_penalty
+    processor = RepetitionPenaltyLogitsProcessor(penalty)
     inputs = torch.tensor([ids], device=device)
     a = processor(inputs, left.to(device).float().unsqueeze(0))[0]
     b = processor(inputs, right.to(device).float().unsqueeze(0))[0]
@@ -125,7 +127,8 @@ async def replay(model, requests):
                 'stored_prefix_check':stored_prefix_check,
                 'target_generation_scores':[summarize_logits(a,b,model.tokenizer) for a,b in
                     zip(scores[f'False_{target}'],scores[f'True_{target}'])],
-                'generation_config':model.model.generation_config.to_dict()}
+                'generation_config':build_generation_config(model.eos_id).to_dict(),
+                'checkpoint_generation_config':model.model.generation_config.to_dict()}
     finally:
         base.generate = original_generate
         handle.remove()
