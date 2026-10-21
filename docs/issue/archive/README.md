@@ -11,6 +11,7 @@
 | [062](062_adopt_streaming_latency_defaults.md) / [063](063_publish_xtalk_runtime.md) | 单一路线与X-Talk d6dc3bf发布 |
 | [064](064_latency_report_and_backchannel_plan.md) | 分段延迟报告与后续首反馈优化方向 |
 | [066](066_fdb_alignment_file_limit.md) / [067](067_defer_unavailable_fdb_judge.md) / [068](068_serialize_fdb_service_warmup.md) | FDB文件上限、GPT暂缓和独立预热 |
+| [070](070_async_thinking_result_return.md) | 确认思考工具异步调用、结果回写 Layer 1；已同步研究草稿与图，具体协议继续讨论 |
 | [022回放边界](022_runtime_replay_boundary_ordering.md) / [041连接记录](041_local_remote_connection_documentation.md) | 原文尚无Git历史副本，本次保留并登记 |
 
 完整FDB状态以[065](../065_full_fdb_two_axes.md)为准；归档不代表任务完成。当前研究范围见[研究草稿](../../research_idea.md)。

@@ -1,4 +1,5 @@
-% InterClarify three-layer reference implementation and clarification loop.
+% Proposed InterClarify architecture with asynchronous thinking-tool returns.
+% Other example details remain under discussion; runtime integration is pending.
 % Requires \usepackage{tikz} and \usetikzlibrary{arrows.meta}.
 \begin{tikzpicture}[x=1cm,y=1cm,font=\sffamily\scriptsize,
   >={Latex[length=1.7mm]},
@@ -10,7 +11,7 @@
   \def\a{3.6} \def\b{6.8} \def\c{10.0} \def\d{13.2} \def\e{16.4}
   \node[anchor=east,font=\bfseries] at (1.95,8.15) {System audio};
   \path[lane,fill=gray!10] (2.25,7.94) rectangle (18.0,8.36);
-  \node at (10.1,8.15) {Streaming TTS; user audio continues to be received during playback};
+  \node at (10.1,8.15) {Streaming TTS; one playback owner; user audio continues during playback};
 
   \node[anchor=east,font=\bfseries] at (1.95,7.32) {Selected output};
   \path[cell,fill=cyan!12] (2.25,7.02) rectangle (4.95,7.62);
@@ -20,33 +21,37 @@
   \path[cell,fill=blue!10] (8.65,7.02) rectangle (11.35,7.62);
   \node at (\c,7.32) {L1: continue};
   \path[cell,fill=violet!12] (11.85,7.02) rectangle (14.55,7.62);
-  \node at (\d,7.32) {L2: Which Alex?};
+  \node at (\d,7.32) {L1: Which Alex?};
   \path[cell,fill=green!11] (15.05,7.02) rectangle (17.75,7.62);
   \node at (\e,7.32) {resume original task};
   \foreach \x in {3.6,6.8,10.0,13.2,16.4} {\draw[next] (\x,7.62)--(\x,7.94);}
 
-  \node[anchor=east,font=\bfseries] at (1.95,6.56) {Output selector};
+  \node[anchor=east,font=\bfseries] at (1.95,6.56) {Unified arbiter};
   \path[lane,fill=orange!12] (2.25,6.32) rectangle (18.0,6.80);
-  \node at (10.1,6.56) {Valid Layer 2 text overrides Layer 1; otherwise Layer 1, then Layer 0. Discard stale requests.};
+  \node at (10.1,6.56) {Coordinate output actions and text; Layer 2 tool results return through Layer 1};
   \foreach \x in {3.6,6.8,10.0,13.2,16.4} {\draw[next] (\x,6.80)--(\x,7.02);}
 
-  \node[anchor=east,font=\bfseries,text=violet!75!black] at (1.95,5.65) {Layer 2};
+  \node[anchor=east,align=right,font=\bfseries,text=violet!75!black] at (1.95,5.65) {Layer 2\\Async thinking tool};
   \path[lane,fill=violet!8] (2.25,5.39) rectangle (18.0,5.91);
   \node at (\a,5.65) {idle};
   \node at (\b,5.65) {request accepted};
-  \node at (\c,5.65) {ambiguity + timing};
-  \node at (\d,5.65) {CLARIFY, valid};
-  \node at (\e,5.65) {no override};
-  \draw[reasoning] (\d,5.91)--(\d,6.32);
+  \node at (\c,5.65) {reasoning in flight};
+  \node at (\d,5.65) {result ready};
+  \node at (\e,5.65) {idle};
+  \draw[reasoning] (\d,5.39)--(\d,5.06);
+  \node[anchor=west,font=\tiny,text=violet!75!black] at (13.35,5.22) {tool result to L1 context};
 
-  \node[anchor=east,font=\bfseries,text=blue!70!black] at (1.95,4.80) {Layer 1};
+  \node[anchor=east,align=right,font=\bfseries,text=blue!70!black] at (1.95,4.80) {Layer 1\\Expression module};
   \path[lane,fill=blue!8] (2.25,4.54) rectangle (18.0,5.06);
   \node at (\a,4.80) {SILENCE};
-  \node at (\b,4.80) {ANSWER + CALL L2};
-  \node at (\c,4.80) {ANSWER};
-  \node at (\d,4.80) {SILENCE};
+  \node at (\b,4.80) {duplex + CALL L2};
+  \node at (\c,4.80) {duplex loop runs};
+  \node at (\d,4.80) {use tool result};
   \node at (\e,4.80) {ANSWER};
   \draw[reasoning] (\b,5.06)--(\b,5.39);
+  \node[anchor=east,font=\tiny,text=violet!75!black] at (6.65,5.22) {async call};
+  \draw[next] (18.0,4.80)--(18.45,4.80)--(18.45,6.56)--(18.0,6.56);
+  \node[rotate=90,font=\tiny,text=black!65] at (18.63,5.65) {L1 actions + text};
 
   \node[anchor=east,font=\bfseries,text=cyan!55!black] at (1.95,3.95) {Layer 0};
   \path[lane,fill=cyan!8] (2.25,3.69) rectangle (18.0,4.21);
@@ -77,5 +82,6 @@
   \path[lane,fill=gray!10] (2.25,1.11) rectangle (18.0,1.55);
   \node at (10.1,1.33) {Continuous listening across fixed micro-turn windows; clarification answer updates the same task};
   \foreach \x in {3.6,6.8,10.0,13.2,16.4} {\draw[next] (\x,1.55)--(\x,1.91);}
-  \node[anchor=west,font=\tiny,text=black!55] at (2.25,.64) {Reference system: retain general duplex behavior; evaluate FDB before and after adding clarification.};
+  \node[anchor=west,font=\tiny,text=black!55] at (2.25,.64) {Proposed architecture: L1 calls an async thinking tool; results return to L1. Runtime integration pending.};
+  \node[anchor=west,font=\tiny,text=black!55] at (2.25,.32) {Illustrative events; return format, timing, validity policy, and other example details remain under discussion.};
 \end{tikzpicture}
