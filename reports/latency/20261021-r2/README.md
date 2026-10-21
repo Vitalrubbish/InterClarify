@@ -10,4 +10,4 @@
 
 ## 用户自然度复评
 
-已取回300/600ms两组各5条组件原始WAV，48kHz、未剪辑停顿；本地目录`listening/tts-300/`和`listening/tts-600/`，打包为`listening/tts_300_vs_600.zip`。10条WAV逐一校验通过，ZIP SHA256为`8b805a7d6845c410d73609ba87ce13bdc96e6beebee26394510661b6250b1ab4`。音频及ZIP由gitignore排除，原件继续留远端，主观验收等待用户反馈。
+已取回300/600ms两组各5条组件原始WAV，48kHz、未剪辑停顿；本地目录`listening/tts-300/`和`listening/tts-600/`，打包为`listening/tts_300_vs_600.zip`。10条WAV逐一校验通过，ZIP SHA256为`8b805a7d6845c410d73609ba87ce13bdc96e6beebee26394510661b6250b1ab4`。音频及ZIP由gitignore排除，原件继续留远端，用户已反馈300ms自然度略逊600ms但整体差异不大，明确采用300ms与KV复用，047/048按该接受范围归档。

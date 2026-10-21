@@ -1,0 +1,26 @@
+--- a/src/xtalk/models/tts/kokoro_segmented.py
++++ b/src/xtalk/models/tts/kokoro_segmented.py
+@@ -70,2 +70,2 @@
+-    continuation_wait_ms : float | None
+-        Later-segment deadline, defaulting to twice max_wait_ms.
++    continuation_wait_ms : float
++        Independent later-segment deadline, defaulting to 1200ms.
+@@ -78,2 +78,2 @@
+-                 max_chars: int = 160, max_wait_ms: float = 600,
+-                 continuation_wait_ms: float | None = None):
++                 max_chars: int = 160, max_wait_ms: float = 300,
++                 continuation_wait_ms: float = 1200):
+@@ -84,2 +83,0 @@
+-        if continuation_wait_ms is None:
+-            continuation_wait_ms = 2 * max_wait_ms
+--- a/src/xtalk/duplex_control/runtime_adapter.py
++++ b/src/xtalk/duplex_control/runtime_adapter.py
+@@ -48 +48 @@
+-            session_id=session_id, use_cache=bool(self.config.get("duplex_kv_cache_enabled", False)),
++            session_id=session_id, use_cache=bool(self.config.get("duplex_kv_cache_enabled", True)),
+--- a/tests/test_kokoro_segmented.py
++++ b/tests/test_kokoro_segmented.py
+@@ -168 +168,2 @@
+-        self.assertEqual(KokoroSegmented(max_wait_ms=20).continuation_wait_ms, 40)
++        self.assertEqual(KokoroSegmented().max_wait_ms, 300)
++        self.assertEqual(KokoroSegmented(max_wait_ms=20).continuation_wait_ms, 1200)

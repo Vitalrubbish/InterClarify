@@ -11,3 +11,5 @@ analyze 按 session/request/response 关联模型trace、适配器/TTS诊断、�
 ## Issue 061：自动核对生成规则
 
 probe先读取health中的generation_policy，再用require_generation_policy核对每个完成响应携带的规则。缺失或变化即失败，结果记录本轮实际策略；旧trace仍可作为固定prompt输入来源，不将旧输出当新策略标准答案。缓存有/无请求使用同一模型服务的新显式策略，继续保留实际token分歧。
+
+Issue062：analyze按实际存在的`*/replay`目录发现条件，当前运行只生成current；旧三条件结果仍可原样分析。probe保留为显式正确性诊断，日常运行入口不自动执行无缓存对照。

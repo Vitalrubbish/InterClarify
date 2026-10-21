@@ -19,3 +19,5 @@
 014进一步直接删除旧选型的Nemotron多语/Python Kyutai/Pocket权重及前两者专用环境，还有已结束TTS实验的编译缓存；只保留来源和配置，现役模型/环境种子及原始结果仍在。此项释放与012归拢分开计量，见[014记录](https://github.com/Vitalrubbish/InterClarify/blob/6ca5eea/docs/issue/archive/014_remote_cache_reclamation.md)。
 
 2026-10-21 延迟测试依赖检查：最终候选训练manifest仍引用 `interclarify-layer1-training-20261019/source/91b7eb2/reports/layer1_training/issue001-inventory-20261018/inventory_summary.json`。该清单是现役权重加载依赖，误删后已按训练登记SHA256恢复；使用当前加载器期间保留此文件。延迟测试独立快照位于 `interclarify-latency-20261021-r2/source`，不可在对应作业运行中删除；恢复与重提见Issue 050。
+
+2026-10-21用户采用300ms首段及KV复用后，当前可用运行快照为`interclarify-runtime-20261021-adopted/source`，稳定入口`interclarify-runtime-current`指向该快照。后续延迟任务将`LATENCY_SOURCE`设为该入口、`LAYER1_XTALK_ROOT`设为其`xtalk`子目录，并使用独立输出目录；脚本只执行current条件。旧049/051/061冻结实验源码不改写，远端旧`xtalk`工作区的其他修改保持原样。本次只同步默认值和脚本，未启动新GPU测试。

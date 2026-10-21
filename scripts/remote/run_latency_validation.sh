@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Compare latency settings on frozen FDB audio with bounded resources.
+# Validate adopted latency settings on frozen FDB audio with bounded resources.
 set -euo pipefail
 ROOT="${LATENCY_SOURCE:?set frozen source}"
 OUTPUT="${LATENCY_OUTPUT:?set new output}"
@@ -166,37 +166,31 @@ CUDA_VISIBLE_DEVICES="${GPUS[0]}" setsid "$MODEL_ENV/bin/python" -u scripts/remo
   > "$OUTPUT/model.log" 2>&1 &
 MODEL_PID="$!"
 wait_ready "$MODEL_PORT" "$OUTPUT/model_health.json"
-FAILED=0
-for condition in A_baseline B_first300 C_first300_cache; do
-  check_budget
-  mkdir "$OUTPUT/$condition"
-  "$MODEL_ENV/bin/python" - "$condition" "$OUTPUT/$condition/runtime.json" <<'PYCONFIG'
+condition=current
+check_budget
+mkdir "$OUTPUT/$condition"
+"$MODEL_ENV/bin/python" - "$OUTPUT/$condition/runtime.json" <<'PYCONFIG'
 import json
 from pathlib import Path
 import sys
 config = json.loads(Path('configs/xtalk_duplex_english_runtime.json').read_text())
-config['tts']['params'].update(max_wait_ms=600 if sys.argv[1]=='A_baseline' else 300,
-                               continuation_wait_ms=1200)
-config['service_config']['duplex_kv_cache_enabled'] = sys.argv[1]=='C_first300_cache'
-Path(sys.argv[2]).write_text(json.dumps(config, indent=2)+'\n')
+assert config['tts']['params']['max_wait_ms'] == 300
+assert config['tts']['params']['continuation_wait_ms'] == 1200
+assert config['service_config']['duplex_kv_cache_enabled'] is True
+assert config['service_config']['duplex_micro_turn_seconds'] == 0.6
+Path(sys.argv[1]).write_text(json.dumps(config, indent=2)+'\n')
 PYCONFIG
-  rc=0
-  CUDA_VISIBLE_DEVICES='' "$CLIENT_ENV/bin/python" -u scripts/remote/layer1_fdb.py run \
-    --input "$OUTPUT/inputs" --output "$OUTPUT/$condition/replay" \
-    --config "$OUTPUT/$condition/runtime.json" --asr-url "http://127.0.0.1:$ASR_PORT" \
-    --tts-url "http://127.0.0.1:$TTS_PORT" --model-url "http://127.0.0.1:$MODEL_PORT" \
-    > "$OUTPUT/$condition/client.log" 2>&1 || rc=$?
-  printf '%s\n' "$rc" > "$OUTPUT/$condition/exit_code.txt"
-  if [[ "$rc" -ne 0 ]]; then FAILED=1; fi
-done
-for wait_ms in 600 300; do
-  CUDA_VISIBLE_DEVICES='' "$CLIENT_ENV/bin/python" scripts/remote/verify_english_components.py \
-    --backend tts --url "http://127.0.0.1:$TTS_PORT" --audio "$WARMUP" \
-    --tts-first-wait-ms "$wait_ms" --tts-continuation-wait-ms 1200 \
-    --output "$OUTPUT/tts-$wait_ms" > "$OUTPUT/tts-$wait_ms.log" 2>&1
-done
-CUDA_VISIBLE_DEVICES='' "$MODEL_ENV/bin/python" scripts/remote/latency_validation.py probe \
-  --root "$OUTPUT" --url "http://127.0.0.1:$MODEL_PORT" > "$OUTPUT/cache_probe.log" 2>&1
+FAILED=0
+CUDA_VISIBLE_DEVICES='' "$CLIENT_ENV/bin/python" -u scripts/remote/layer1_fdb.py run \
+  --input "$OUTPUT/inputs" --output "$OUTPUT/$condition/replay" \
+  --config "$OUTPUT/$condition/runtime.json" --asr-url "http://127.0.0.1:$ASR_PORT" \
+  --tts-url "http://127.0.0.1:$TTS_PORT" --model-url "http://127.0.0.1:$MODEL_PORT" \
+  > "$OUTPUT/$condition/client.log" 2>&1 || FAILED=$?
+printf '%s\n' "$FAILED" > "$OUTPUT/$condition/exit_code.txt"
+CUDA_VISIBLE_DEVICES='' "$CLIENT_ENV/bin/python" scripts/remote/verify_english_components.py \
+  --backend tts --url "http://127.0.0.1:$TTS_PORT" --audio "$WARMUP" \
+  --tts-first-wait-ms 300 --tts-continuation-wait-ms 1200 \
+  --output "$OUTPUT/tts-300" > "$OUTPUT/tts-300.log" 2>&1
 "$MODEL_ENV/bin/python" scripts/remote/latency_validation.py analyze --root "$OUTPUT" \
   > "$OUTPUT/latency_summary.log" 2>&1
 check_budget

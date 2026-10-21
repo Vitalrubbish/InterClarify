@@ -1,0 +1,22 @@
+{
+  "remote_source": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-runtime-20261021-adopted/source",
+  "current_entry": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-runtime-current",
+  "base_snapshot": "interclarify-generation-policy-20261021-r1/source",
+  "overlay_sha256": "d9d9ef53308a388e581eace40498cd6ef83da317491a4bea5194028d3c026259",
+  "source_files": {
+    "configs/xtalk_duplex_english_runtime.json": "489aec07a4ef931884e7afb5f818687ac87461b43ce156bdc2d38d1fad0bdae2",
+    "scripts/remote/run_latency_validation.sh": "1a15304b2265a8b72cb9abb5aca0be56effefa189c3a11dc5bea06115493c851",
+    "scripts/remote/latency_validation.py": "7a14afa42401b75f99196c9bbad7bc7ea00a3754907f2aee502e29291ec95bc5",
+    "scripts/remote/verify_english_components.py": "19beb6ae1140cfa150125dfcd2d3512f6dd1d04cbccd691e973c7d7b407a6530",
+    "xtalk/src/xtalk/models/tts/kokoro_segmented.py": "89a762f8b012dd75bba1b128421c093ca1a82d978e8e900f207e69dc07e8f0aa",
+    "xtalk/src/xtalk/duplex_control/runtime_adapter.py": "68082636d435d1eae18daddabed8f44e1fe74c5838a2d254f0f7f20482d844cd",
+    "xtalk/tests/test_kokoro_segmented.py": "de8875dbb14482c071d84b335934d5c4d4a7893b820208a031b8110df66c8896"
+  },
+  "local_checks": {
+    "kokoro_tests": 11,
+    "duplex_runtime_tests": 24,
+    "latency_tests": 3,
+    "bash_syntax": "passed"
+  },
+  "gpu_job_started": false
+}

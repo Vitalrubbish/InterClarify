@@ -112,11 +112,13 @@ def response_rows(report, timeline, diagnostics, models):
 
 
 def analyze(root):
-    """Persist per-response data plus coverage-aware paired condition summaries."""
+    """Persist per-response data plus coverage-aware condition summaries."""
     models = [json.loads(line) for line in (root / 'model_trace.jsonl').read_text().splitlines()]
     all_rows, conditions = [], {}
-    for condition in ('A_baseline', 'B_first300', 'C_first300_cache'):
-        directory = root / condition / 'replay'
+    for directory in sorted(root.glob('*/replay')):
+        if not directory.is_dir():
+            continue
+        condition = directory.parent.name
         diagnostics = logged_events(directory)
         rows, sessions = [], []
         for path in sorted((directory / 'fdb').rglob('a4_report.json')):

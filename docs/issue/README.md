@@ -4,10 +4,10 @@
 
 | 编号 | 工作单元 | 状态与范围 |
 | --- | --- | --- |
-| [047](047_tts_first_segment_latency.md) | 首段 TTS 聚合期限降至 300ms | 进行中；后续段保持 1,200ms、micro-turn 保持 600ms，比较延迟、连续性与听感 |
-| [048](048_cross_request_kv_cache.md) | 跨 micro-turn 请求复用 KV cache | 进行中；按会话复用匹配前缀，验证正确性、时延与显存，不改变拍长或重启训练 |
+| [047](archive/047_tts_first_segment_latency.md) | 首段 TTS 聚合期限降至 300ms | 完成归档；用户接受自然度略逊但差异不大，默认300/1200ms |
+| [048](archive/048_cross_request_kv_cache.md) | 跨 micro-turn 请求复用 KV cache | 完成归档；用户决定采用KV复用，保留失效重建与诊断入口 |
 
-两项已实现并完成本地回归，[049 延迟对照](archive/049_latency_decomposition_validation.md)已提交远端任务 `job-179251495575111326759-xuan-zhang`，已完成，结果见[分段报告](../../reports/latency/20261021-r2/results.md)。047待人工复听，051已查明BF16分段计算与重复惩罚造成近并列排名翻转，048继续正式采用验收。
+两项已实现并完成本地回归，[049 延迟对照](archive/049_latency_decomposition_validation.md)已提交远端任务 `job-179251495575111326759-xuan-zhang`，已完成，结果见[分段报告](../../reports/latency/20261021-r2/results.md)。用户已复听并明确采用300ms与KV复用，047/048按接受范围归档；未执行的更广评测如实保留。
 
 [035 ASR 正式选型报告](archive/035_asr_selection_report.md)已完成归档；报告汇总 2026-10-16 测量及后续输入复核，见 [正式报告](../asr_selection_report.md)。
 
@@ -132,3 +132,5 @@
 [057 自然度复评音频交付](archive/057_audio_review_delivery.md)完成归档：300/600ms各5条原始组件WAV已取回并校验，试听包不入Git；047等待用户复听反馈。
 
 [061 显式线上生成策略](archive/061_explicit_generation_policy.md)完成归档：统一greedy/单beam/repetition_penalty=1.0，health/响应自动核对规则；远端108/108对固定请求一致，主源码已同步。
+
+[062 采用单一延迟路线](archive/062_adopt_streaming_latency_defaults.md)完成归档：默认300/1200ms、KV复用，日常仅执行current条件，保留历史证据及显式诊断。
