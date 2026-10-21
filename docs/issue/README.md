@@ -23,7 +23,7 @@
 | 运行源码 | [选定X-Talk版本](../../configs/xtalk_runtime_source.json)：`d6dc3bf`已推送origin/dev；[当前配置](../configs/xtalk_duplex_english_runtime.md) |
 | 延迟与后续方向 | [分段延迟报告](../latency_analysis_report.md)；完整链路历史时延与新策略固定请求回归分别标注，backchannel可降低首反馈延迟/感知等待，实际收益待测 |
 | 当前候选与下一阶段 | T2_R3_delayed_start继续作为1k基线；用户已授权073审计并完成，074数据扩充与075远端多卡调研待执行。新训练与多卡实现待方案形成后单独立单，尚未启动 |
-| 训练文本与ASR形式 | [073审计](archive/073_layer1_pause_punctuation_audit.md)完成归档：当前T2删除内部句读，实际EN160保留内部句读且末尾点号稀少；074需冻结保留内部句读的ASR视图，并补核轮末问号/感叹号。原数据未改，人审pending，新训练尚未放行 |
+| 训练文本与ASR形式 | [073审计](archive/073_layer1_pause_punctuation_audit.md)确认T2过度删除内部句读；用户补充句末标点常在下一句开始后才出现。074需按标点到达可见性构造增量，迟到标点不提前泄漏、不回填已消费历史，并补核符号种类及上下文重置。原数据未改，人审pending，新训练尚未放行 |
 | 完整FDB两轴结果 | 319例回放和官方转写完成，退出码均0；Smooth TOR 59/119、平均延迟1.023秒，Interruption TOR 160/200、平均延迟1.183秒；延迟只含有效接话，GPT相关性待补，[最终报告](../../reports/fdb/20261021-full-two-axes-r4/README.md) |
 
 ## 共用约束
