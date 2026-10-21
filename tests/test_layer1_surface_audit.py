@@ -5,10 +5,18 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts/training'))
-from audit_layer1_surface import boundary_kind, select_cards, strip_terminal, text_statistics
+from audit_layer1_surface import boundary_kind, select_cards, strip_terminal, text_statistics, transcript_views
 
 
 class SurfaceAuditTests(unittest.TestCase):
+    def test_eof_only_text_is_counted_without_inventing_online_text(self):
+        self.assertEqual(transcript_views([{'text': 'At last', 'eof': True}]), ('', 'At last'))
+        self.assertEqual(transcript_views([{'text': 'Stop', 'eof': False}, {'text': 'Stop.', 'eof': True}]),
+                         ('Stop', 'Stop.'))
+        for broken in ([], [{'text': 'Invalid', 'eof': 'false'}]):
+            with self.assertRaises(ValueError):
+                transcript_views(broken)
+
     def test_internal_punctuation_survives_terminal_period_candidate(self):
         text = 'First, wait. Then ask "ready?".'
         self.assertEqual(strip_terminal(text), 'First, wait. Then ask "ready?"')

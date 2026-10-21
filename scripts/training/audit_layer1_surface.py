@@ -205,20 +205,27 @@ def audit_dataset(args, inputs):
             'machine_passed': machine['machine_passed'], 'human_review_complete': False}
 
 
+def transcript_views(rows):
+    """Keep recordings whose first text arrives after EOF in the denominator."""
+    require(bool(rows), 'Empty ASR trace')
+    require(all(isinstance(r.get('text'), str) and type(r.get('eof')) is bool for r in rows),
+            'Unexpected trace schema')
+    online_rows = [r['text'] for r in rows if not r['eof']]
+    return (online_rows[-1] if online_rows else ''), rows[-1]['text']
+
+
 def audit_asr(root, inputs):
     """Summarize native cumulative transcripts without rerunning ASR."""
     paths = sorted(root.glob('shard-*/repeat-*/nemotron_en-160/sample-*.jsonl'))
     require(bool(paths), 'No historical EN160 traces')
     totals = {name: Counter() for name in ('online', 'final', 'delta')}
     per_sample = defaultdict(list)
-    examples, rewrites = [], 0
+    examples, rewrites, eof_only = [], 0, 0
     for path in paths:
         inputs[str(path)] = file_digest(path)
         rows = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
-        require(bool(rows) and any(not r['eof'] for r in rows), 'Empty online trace')
-        require(all(isinstance(r['text'], str) and isinstance(r['eof'], bool) for r in rows), 'Unexpected trace schema')
-        online = [r['text'] for r in rows if not r['eof']][-1]
-        final = rows[-1]['text']
+        online, final = transcript_views(rows)
+        eof_only += int(not online.strip() and bool(final.strip()))
         totals['online'].update(text_statistics(online))
         totals['final'].update(text_statistics(final))
         old = ''
@@ -241,6 +248,7 @@ def audit_asr(root, inputs):
     return {'trace_files': len(paths), 'distinct_sample_names': len(per_sample),
             'repeat_counts': dict(Counter(len(v) for v in per_sample.values())),
             'all_runs': totals, 'one_run_per_sample': unique_first, 'prefix_rewrites': rewrites,
+            'eof_only_text_runs': eof_only,
             'examples': examples, 'scope': 'historical recordings; no new model run; deltas include EOF',
             'independence_note': 'sample filenames identify the shared fixed recording set; first sorted run retained for deduplication'}
 

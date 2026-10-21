@@ -8,4 +8,6 @@
 
 `audit_asr`只读取明确指定目录内的历史EN160轨迹，区分EOF前最后累计文本、EOF后文本与每次增量，按重复运行和独立音频分别统计各类内部/末尾标点；摘要记录每个输入文件SHA256及失败/覆盖数。它不运行模型，不估计新的流式时延，也不把重复录音计作新的独立样本。
 
+首轮发现一份轨迹仅在EOF后产生文本。`transcript_views`将其在线文本计为空并单列`eof_only_text_runs`，最终文本照常纳入；真正空文件或字段异常仍失败。不能因EOF前没有输出而删除样本或缩小分母。
+
 输出包括`summary.json`、`machine_audit.json`、`input_files.json`和`review_cards.json`。`main`拒绝已有输出目录，核对既有审计与manifest摘要，执行中检查输出2GiB/空闲盘10GiB上限，异常非零退出并保留失败状态。候选文本比较仅为统计，不写回数据。资源限制与远端任务入口见[任务说明](../remote/run_layer1_surface_audit.md)。
