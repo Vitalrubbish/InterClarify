@@ -3,7 +3,6 @@
 import argparse
 import json
 from pathlib import Path
-import wave
 
 import full_fdb_two_axes as full
 
@@ -25,6 +24,7 @@ def score_subset(args):
 
 def summarize(root, output):
     """Separate transport, received playback, tail-only output and timing scores."""
+    import soundfile as sf
     rows, groups = [], []
     subsets = ('candor_pause_handling', 'synthetic_pause_handling', 'candor_turn_taking',
                'synthetic_user_interruption', 'icc_backchannel')
@@ -36,8 +36,8 @@ def summarize(root, output):
         for path in reports:
             lengths = []
             for name in ('input.wav', 'output.wav'):
-                with wave.open(str(path.parent / name), 'rb') as audio:
-                    lengths.append(audio.getnframes() / audio.getframerate())
+                info = sf.info(str(path.parent / name))
+                lengths.append(info.frames / info.samplerate)
             if abs(lengths[0] - lengths[1]) > 1 / 16000:
                 raise ValueError('Official output includes a diagnostic tail: ' + str(path))
             report = json.loads(path.read_text())

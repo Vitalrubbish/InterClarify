@@ -7,3 +7,5 @@
 评分环境先对3秒语音和2秒静音做官方对齐预检；ASR→TTS→模型串行启动，ASR warmup180秒，health等待核对进程存活。回放结束停推理服务后，对Smooth和Interruption各5例做官方对齐与TOR/Latency；GPT保持暂缓。`fdb_subset_report.py`另核对25例输出时长和原窗/尾窗播放，不能把transport通过当作语义正确。
 
 单作业2GPU/16CPU/64GiB、线程4、worker0、并发1、4小时硬限；输出20GiB/空闲盘50GiB/单文件8GiB，现役conda、不复制模型，失败与退出码保留。旧T2训练路径已缺失，不尝试重训或重新恢复；两轴旧对照从065同运行配置结果提取相同5例，其他三类仅作本轮诊断。历史040报告仍代表当时旧配置和评分状态。
+
+082将诊断和音频格式回归放在已有soundfile的客户端conda执行；r1已完成回放的恢复评分由独立`run_layer1_fdb_scoring.sh`处理，不重复推理。

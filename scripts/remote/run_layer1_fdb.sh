@@ -169,12 +169,14 @@ env -u PYTHONNOUSERSITE NUMBA_CUDA_USE_NVIDIA_BINDING=0 CUDA_VISIBLE_DEVICES="${
   timeout --signal=TERM --kill-after=30 900 "$SCORE_ENV/bin/python" \
   "$FDB_REPO/v1_v1.5/get_transcript/asr.py" --root_dir "$OUTPUT/scorer_preflight" --task default \
   > "$OUTPUT/scorer_preflight.log" 2>&1
-for pattern in test_layer1_candidate.py test_layer1_loading.py test_duplex_model_service.py test_fdb_subset_report.py; do
+for pattern in test_layer1_candidate.py test_layer1_loading.py test_duplex_model_service.py; do
   CUDA_VISIBLE_DEVICES='' "$MODEL_ENV/bin/python" -m unittest discover -s tests -p "$pattern" -v \
     > "$OUTPUT/$pattern.txt" 2>&1
 done
 CUDA_VISIBLE_DEVICES='' "$CLIENT_ENV/bin/python" -m unittest discover -s tests -p test_duplex_a4_replay.py -v \
   > "$OUTPUT/test_duplex_a4_replay.py.txt" 2>&1
+CUDA_VISIBLE_DEVICES='' "$CLIENT_ENV/bin/python" -m unittest discover -s tests -p test_fdb_subset_report.py -v \
+  > "$OUTPUT/test_fdb_subset_report.py.txt" 2>&1
 read -r MODEL_PORT ASR_PORT TTS_PORT < <("$MODEL_ENV/bin/python" - <<'PY'
 import socket
 sockets = [socket.socket() for _ in range(3)]
@@ -240,7 +242,7 @@ for pid in "${PIDS[@]}"; do kill -TERM -- "-$pid" 2>/dev/null || true; done
 for pid in "${PIDS[@]}"; do wait "$pid" 2>/dev/null || true; done
 PIDS=()
 check_budget
-"$MODEL_ENV/bin/python" scripts/remote/fdb_subset_report.py summarize \
+"$CLIENT_ENV/bin/python" scripts/remote/fdb_subset_report.py summarize \
   --root "$OUTPUT/$CONDITION/replay" --output "$OUTPUT/diagnostics.json"
 SCORE_RC=0
 env -u PYTHONNOUSERSITE NUMBA_CUDA_USE_NVIDIA_BINDING=0 CUDA_VISIBLE_DEVICES="${GPUS[0]}" \

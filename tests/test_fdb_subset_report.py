@@ -58,6 +58,16 @@ class SubsetReportTests(unittest.TestCase):
                 self.assertEqual(group['played_in_original_window'], 1)
                 self.assertEqual(group['played_only_in_tail'], 4)
 
+    def test_float_input_and_pcm_output_are_both_valid_wav_formats(self):
+        import numpy as np
+        import soundfile as sf
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self.fixture(root)
+            sf.write(root / 'fdb/candor_turn_taking/0/input.wav', np.zeros(16000), 16000, subtype='FLOAT')
+            report = subset.summarize(root, root / 'float.json')
+            self.assertEqual(report['official_wav_durations_verified'], 25)
+
     def test_missing_case_or_tail_in_official_wav_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
