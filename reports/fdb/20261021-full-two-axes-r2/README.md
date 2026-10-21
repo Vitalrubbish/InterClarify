@@ -1,6 +1,6 @@
 # 完整FDB两轴r2：修复评分模型解包限额
 
-状态：评分ASR预检通过；随后原judge返回503，任务退出1，未开始正式回放。对应[065](../../../docs/issue/065_full_fdb_two_axes.md)与[066](../../../docs/issue/archive/066_fdb_alignment_file_limit.md)。
+状态：评分ASR预检通过；随后原judge返回503，任务退出1，未开始正式回放。对应[065](../../../docs/issue/archive/065_full_fdb_two_axes.md)与[066](../../../docs/issue/archive/066_fdb_alignment_file_limit.md)。
 
 r1在官方Parakeet解包预检触发单文件1GiB限制，退出1，未跑正式319例。r2将单文件上限调至8GiB，临时目录纳入输出/tmp；输出总量30GiB、空闲盘50GiB、2×4090/16CPU/64GiB、8小时、单并发保持。保留r1日志与失败身份，不覆盖旧输出。
 

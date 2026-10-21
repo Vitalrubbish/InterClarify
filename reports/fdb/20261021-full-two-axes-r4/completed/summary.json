@@ -1,0 +1,48 @@
+{
+  "inference_rc": 0,
+  "scoring_rc": 0,
+  "requested_scope_passed": true,
+  "scoring": {
+    "axes": [
+      {
+        "task": "smooth_turn_taking",
+        "subset": "candor_turn_taking",
+        "expected": 119,
+        "aligned": 119,
+        "alignment_rc": 0,
+        "evaluation_rc": 0,
+        "ratings": 0,
+        "judge_model": null,
+        "judge_status": "not_required",
+        "scores": {
+          "average_take_turn": 0.4957983193277311,
+          "average_latency": 1.023050847457639
+        },
+        "timing_passed": true,
+        "timing_source": "official_evaluator_and_rule_crosscheck",
+        "requested_scope_passed": true
+      },
+      {
+        "task": "user_interruption",
+        "subset": "synthetic_user_interruption",
+        "expected": 200,
+        "aligned": 200,
+        "alignment_rc": 0,
+        "evaluation_rc": null,
+        "ratings": 0,
+        "judge_model": null,
+        "judge_status": "deferred_by_user",
+        "scores": {
+          "average_take_turn": 0.8,
+          "average_latency": 1.1830000000000003,
+          "average_rating": null
+        },
+        "timing_passed": true,
+        "timing_source": "recomputed_pinned_official_rules",
+        "requested_scope_passed": true
+      }
+    ],
+    "requested_scope_passed": true,
+    "full_scoring_complete": false
+  }
+}

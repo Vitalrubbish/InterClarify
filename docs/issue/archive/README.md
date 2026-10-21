@@ -1,6 +1,6 @@
 # 已完成工作单归档
 
-本目录保留当前采用决定、正在运行的FDB任务所需修复，以及尚未进入Git历史的两份原始记录。旧执行任务、研究草稿修改和一次性清理记录统一在下表追溯；每个历史链接都已核对对应Git对象与删除前原文一致。历史命令、参数和未勾选项仅反映当时阶段。
+本目录保留当前采用决定、完整FDB评测及其修复，以及尚未进入Git历史的两份原始记录。旧执行任务、研究草稿修改和一次性清理记录统一在下表追溯；每个历史链接都已核对对应Git对象与删除前原文一致。历史命令、参数和未勾选项仅反映当时阶段。
 
 ## 当前直接入口
 
@@ -10,13 +10,14 @@
 | [051](051_kv_cache_generation_divergence.md) / [061](061_explicit_generation_policy.md) | BF16分歧原因；显式生成策略1.0，固定108对通过 |
 | [062](062_adopt_streaming_latency_defaults.md) / [063](063_publish_xtalk_runtime.md) | 单一路线与X-Talk d6dc3bf发布 |
 | [064](064_latency_report_and_backchannel_plan.md) | 分段延迟报告与后续首反馈优化方向 |
+| [065](065_full_fdb_two_axes.md) | 完整319例回放、官方转写和两轴时序评分完成，三个退出码均0；Smooth TOR 49.58%、Interruption TOR 80.00%，GPT相关性按用户决定待补 |
 | [066](066_fdb_alignment_file_limit.md) / [067](067_defer_unavailable_fdb_judge.md) / [068](068_serialize_fdb_service_warmup.md) | FDB文件上限、GPT暂缓和独立预热 |
 | [070](070_async_thinking_result_return.md) | 确认思考工具异步调用、结果回写 Layer 1；已同步研究草稿与图，具体协议继续讨论 |
 | [071](071_independent_thinking_request_token.md) | 思考请求采用独立 special token，倾听和表达时均可调用；已同步静默调用图示，运行协议待实现 |
 | [072](072_single_inflight_thinking_request.md) | 每会话最多一个思考请求在途，重复触发合并、不重启；已同步研究草稿与图，取消和更新机制待讨论 |
 | [022回放边界](022_runtime_replay_boundary_ordering.md) / [041连接记录](041_local_remote_connection_documentation.md) | 原文尚无Git历史副本，本次保留并登记 |
 
-完整FDB状态以[065](../065_full_fdb_two_axes.md)为准；归档不代表任务完成。当前研究范围见[研究草稿](../../research_idea.md)。
+完整FDB结果与评分范围以[065](065_full_fdb_two_axes.md)为准；执行通过不表示模型能力验收通过。当前研究范围见[研究草稿](../../research_idea.md)。
 
 ## 历史原文索引
 

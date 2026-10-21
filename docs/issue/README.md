@@ -6,7 +6,7 @@
 
 | 工作单 | 状态 | 范围与入口 |
 | --- | --- | --- |
-| [065 完整FDB两轴评测](065_full_fdb_two_axes.md) | 进行中 | 当前微调模型，Smooth Turn-Taking 119例、User Interruption 200例；r4任务`job-179256336071350402616-xuan-zhang`已正式回放，结果待回收；GPT相关性评分按用户决定暂缓，[运行记录](../../reports/fdb/20261021-full-two-axes-r4/README.md) |
+| 暂无进行中工作单 | — | [065完整FDB两轴](archive/065_full_fdb_two_axes.md)已完成授权范围并归档；GPT相关性评分待后续配置，尚未执行 |
 
 任务完成后归档；执行、传输通过和模型能力通过分别记录。归档清理不会改变当前远端作业或把未执行项记为通过。
 
@@ -22,6 +22,7 @@
 | 运行源码 | [选定X-Talk版本](../../configs/xtalk_runtime_source.json)：`d6dc3bf`已推送origin/dev；[当前配置](../configs/xtalk_duplex_english_runtime.md) |
 | 延迟与后续方向 | [分段延迟报告](../latency_analysis_report.md)；完整链路历史时延与新策略固定请求回归分别标注，backchannel可降低首反馈延迟/感知等待，实际收益待测 |
 | 当前候选 | T2_R3_delayed_start；停止继续训练的既有决定保持，当前用户授权完整两轴评测不隐含新训练 |
+| 完整FDB两轴结果 | 319例回放和官方转写完成，退出码均0；Smooth TOR 59/119、平均延迟1.023秒，Interruption TOR 160/200、平均延迟1.183秒；延迟只含有效接话，GPT相关性待补，[最终报告](../../reports/fdb/20261021-full-two-axes-r4/README.md) |
 
 ## 共用约束
 

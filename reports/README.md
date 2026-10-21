@@ -1,6 +1,6 @@
 # 当前证据索引
 
-2026-10-19。`reports`按验证链保留最新有效结果；来源清单、资产摘要、外部隔离和路径迁移记录是当前构建依赖，不能仅因日期较早而删除。以下目录为当前保留范围。
+2026-10-21。`reports`按验证链保留最新有效结果；来源清单、资产摘要、外部隔离和路径迁移记录是当前构建依赖，不能仅因日期较早而删除。以下目录为当前保留范围。
 
 | 验证链 | 最新证据与用途 |
 | --- | --- |
@@ -14,6 +14,7 @@
 | 正式训练数据 | [r5全量机器验收](layer1_training/issue004-build-20261019-r5/README.md)，004已按用户豁免授权关闭 |
 | 来源验证与评测隔离 | [来源验真摘要](layer1_training/issue016-source-and-exclusions-20261019/source_verification.json) |
 | Layer 1 训练与 FDB | [四配置及延后启动阶段报告（历史版本）](https://github.com/Vitalrubbish/InterClarify/blob/717fcf037d471d07be41172b5b69b0dd404cfcb6/docs/layer1_training_fdb_report.md)，固定小子集结果不等同完整 FDB |
+| 当前候选完整FDB两轴 | [r4最终结果](fdb/20261021-full-two-axes-r4/README.md)：319例官方转写完成，Smooth TOR 49.58%/1.023秒，Interruption TOR 80.00%/1.183秒；GPT相关性待补 |
 | 缓存及退役资产清理 | [当前回收记录](maintenance/20261019-cache-reclamation/README.md) |
 | 远端路径映射 | [当前目录迁移清单](maintenance/20261019-home-consolidation/README.md) |
 | 退役组件清理 | [退役资产及恢复信息](maintenance/20261019-retired-selection/README.md) |

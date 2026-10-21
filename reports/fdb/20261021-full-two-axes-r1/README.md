@@ -1,6 +1,6 @@
 # 当前微调模型完整FDB两轴任务
 
-状态：预检失败，退出1；官方Parakeet解包触发单文件1GiB限制（Errno27），未开始正式回放，未生成指标。工作单见[065](../../../docs/issue/065_full_fdb_two_axes.md)。
+状态：预检失败，退出1；官方Parakeet解包触发单文件1GiB限制（Errno27），未开始正式回放，未生成指标。工作单见[065](../../../docs/issue/archive/065_full_fdb_two_axes.md)。
 
 使用T2_R3_delayed_start最终checkpoint（SHA256：266a37a28699d0c3f36b6a6305374bc89a1a2ff2af7a37fd1eb4caf1ad915346），采用300/1200ms TTS、KV复用、600ms拍长及duplex_greedy_v1/重复惩罚1.0。冻结InterClarify f25d9d1、X-Talk d6dc3bff0a512d13f4352bce6105aec80b7f9960、官方FDB 3e799c45a045256f47d5f1c9cda90157e2d2ec9e。
 
