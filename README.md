@@ -7,6 +7,7 @@ InterClarify 研究全双工语音代理在用户话轮内是否应主动澄清�
 | 内容 | 位置 |
 | --- | --- |
 | 研究方案与评测范围 | [docs/research_design.md](docs/research_design.md) |
+| 工程第一步：Layer 0 与 FDB 测试计划 | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
 | 本地 conda 环境 | [docs/local_environment.md](docs/local_environment.md)（`interclarify-dev`） |
 | 当前采用决定与工作单 | [docs/issue](docs/issue/README.md) |
 | 已采用的运行时配置 | [docs/runtime_baseline.md](docs/runtime_baseline.md) |

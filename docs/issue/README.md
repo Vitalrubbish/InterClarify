@@ -1,10 +1,20 @@
 # 开发与测试工作单
 
-更新：2026-10-21。这里只列当前工作与采用决定；研究范围以 [正式研究方案](../research_design.md) 为准。
+更新：2026-10-22。这里只列当前工作与采用决定；研究范围以 [正式研究方案](../research_design.md) 为准，第一步安排见 [工程实施计划](../engineering_implementation.md)。
 
 ## 当前工作
 
-当前尚无进行中的实现工作单。后续按正式研究方案拆分数据、标注、Layer 0/1、Layer 2、运行时协议与 benchmark 工作单元。
+第一步先实现 Layer 0，再用 FDB 对话音频验证。以下为已拆分、尚未执行的工作单；本轮完成的调研与计划已归档为 [083](archive/083_layer0_implementation_plan.md)。
+
+| 工作单 | 状态 | 依赖与交付 |
+| --- | --- | --- |
+| [084：候选与五类合同](084_layer0_candidates_and_contract.md) | 待执行 | XTurnix/Smart Turn 资产冻结、独立开发验证、确定能力缺口 |
+| [085：Layer 0 与仲裁接入](085_layer0_runtime_integration.md) | 待执行 | 依赖 084；外部状态、版本处理与唯一执行路径 |
+| [086：训练准备与能力补足](086_layer0_training_fallback.md) | 条件待执行 | 084 不满足时触发；数据核查、小规模训练与完整五类输出 |
+| [087：FDB 数据与评测入口](087_layer0_fdb_protocol.md) | 待执行 | 冻结 v1.0/v1.5，准备因果回放、正确分母及远端脚本 |
+| [088：远端 FDB 验证](088_layer0_remote_fdb_validation.md) | 待执行 | 依赖模型与入口完成；分类器和系统两层测试、匹配对照与报告 |
+
+已完成单元直接归入 [归档索引](archive/README.md)。Layer 1/2 后续实现待本步骤结果后另行拆单。
 
 ## 当前采用决定
 
@@ -17,6 +27,7 @@
 | 异步训练参考 | 外部结果块屏蔽损失，后续动作与正文监督方案待定，见[第5.8节](../research_design.md#58-异步调用与结果利用的训练参考) |
 | 思考调用方向 | Layer 1 在倾听或表达时均可通过独立 special token 请求异步思考；每会话最多一个请求在途，重复触发合并；结果写回 Layer 1 后经统一仲裁与单一播放路径表达，见[第7.2—7.4节](../research_design.md#72-思考请求与任务调度) |
 | 组件与运行时 | Nemotron EN160 + Kokoro `af_heart`；300/1200ms 分段、600ms micro-turn、会话 KV 复用、`duplex_greedy_v1`；X-Talk `ca9b23c`，见[运行时配置](../runtime_baseline.md) |
+| Layer 0 第一步 | 优先验证现成 XTurnix-PT 与 Smart Turn 声学对照；完整五类不足时补充训练，保持外部状态来源与单一仲裁，见[工程计划](../engineering_implementation.md)；目前仅为计划 |
 | FDB 评测 | 保留冻结子集与完整两轴回放、官方词级对齐和 TOR/Latency 评分脚本；FDB 作为辅助工程与能力评测，不替代主动澄清 benchmark，结果见[reports/fdb](../../reports/README.md) |
 
 ## 共用约束
