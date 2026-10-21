@@ -8,7 +8,7 @@
 
 该结论遵循 2026-10-18 已确定的开发路线，取舍是优先保证识别质量和典型增量交付速度，并承担 Layer 1 适配成本。Nemotron 几乎不在在线文本末尾输出句末标点，且未经适配的官方控制权重接话不足。组件选定不代表端到端双工能力或全链路延迟已验收；如果限定完全不调整官方控制权重，现有五例证据更支持 Kyutai 的接话兼容性。
 
-决策依据见[原始选型报告](../reports/asr_selection/20261016-results/summary.md)与[官方输入对齐复测](asr_official_input_retest.md)。原决策文档已按用户要求由本文取代；英文主线与兼容性限制汇总于下文。
+决策依据见[原始选型报告](../reports/asr_selection/20261016-results/summary.md)与[官方输入对齐复测（历史版本）](https://github.com/Vitalrubbish/InterClarify/blob/717fcf037d471d07be41172b5b69b0dd404cfcb6/docs/asr_official_input_retest.md)。原决策文档已按用户要求由本文取代；英文主线与兼容性限制汇总于下文。
 
 ## 2. 选型要求
 
@@ -109,7 +109,7 @@ official 已保存的 1,275 次请求全部通过 prompt token 级审计；正�
 
 official 将观察窗延长至 12 秒没有增加新回复。Kyutai 原样五例的新正文启动约为用户标注结束后 0.215–1.504 秒，尚未包含 TTS 与播放。这里“新正文”排除仅 finish token 和跨边界旧正文续写；统计未回复的完整样本时保留分母。五例不足以估计一般接话成功率，也不是正式 FDB TOR 或有声验收。
 
-Kyutai 去句读后从 5/5 降至 3/5，支持控制权重存在句读依赖；EN160 去句读仍为 0/5，说明删标点不能解决兼容性问题。官方 Kyutai Word 事件与 Nemotron 原始字符／词内增量、起拍时钟仍有差异，因此不能把全部接话差异唯一归因于句号。来源：[原始接话报告](../reports/asr_selection/20261016-results/summary.md)、[官方输入对齐复测](asr_official_input_retest.md)。
+Kyutai 去句读后从 5/5 降至 3/5，支持控制权重存在句读依赖；EN160 去句读仍为 0/5，说明删标点不能解决兼容性问题。官方 Kyutai Word 事件与 Nemotron 原始字符／词内增量、起拍时钟仍有差异，因此不能把全部接话差异唯一归因于句号。来源：[原始接话报告](../reports/asr_selection/20261016-results/summary.md)、[官方输入对齐复测（历史版本）](https://github.com/Vitalrubbish/InterClarify/blob/717fcf037d471d07be41172b5b69b0dd404cfcb6/docs/asr_official_input_retest.md)。
 
 ## 7. 历史方案及最终取舍
 

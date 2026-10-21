@@ -13,7 +13,7 @@
 | 官方输入对齐 | [原生Word最终验收](layer1_training/issue001-word-20261019/README.md)，替代旧raw/complete-word诊断 |
 | 正式训练数据 | [r5全量机器验收](layer1_training/issue004-build-20261019-r5/README.md)，004已按用户豁免授权关闭 |
 | 来源验证与评测隔离 | [来源验真摘要](layer1_training/issue016-source-and-exclusions-20261019/source_verification.json) |
-| Layer 1 训练与 FDB | [四配置及延后启动阶段报告](../docs/layer1_training_fdb_report.md)，固定小子集结果不等同完整 FDB |
+| Layer 1 训练与 FDB | [四配置及延后启动阶段报告（历史版本）](https://github.com/Vitalrubbish/InterClarify/blob/717fcf037d471d07be41172b5b69b0dd404cfcb6/docs/layer1_training_fdb_report.md)，固定小子集结果不等同完整 FDB |
 | 缓存及退役资产清理 | [当前回收记录](maintenance/20261019-cache-reclamation/README.md) |
 | 远端路径映射 | [当前目录迁移清单](maintenance/20261019-home-consolidation/README.md) |
 | 退役组件清理 | [退役资产及恢复信息](maintenance/20261019-retired-selection/README.md) |

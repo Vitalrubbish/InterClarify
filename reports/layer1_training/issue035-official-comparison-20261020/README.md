@@ -1,6 +1,6 @@
 # Issue 035：官方训练设置重核
 
-2026-10-20根据用户要求重新调研，范围排除上下文窗口长度。完整中文对照见[训练模式对照](../../../docs/layer1_training_comparison.md)。本项没有修改训练、模型或测试配置，没有申请GPU作业。
+2026-10-20根据用户要求重新调研，范围排除上下文窗口长度。完整中文对照见[训练模式对照（历史版本）](https://github.com/Vitalrubbish/InterClarify/blob/717fcf037d471d07be41172b5b69b0dd404cfcb6/docs/layer1_training_comparison.md)。本项没有修改训练、模型或测试配置，没有申请GPU作业。
 
 ## 证据
 

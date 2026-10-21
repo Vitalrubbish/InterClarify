@@ -8,7 +8,7 @@ InterClarify 研究全双工语音代理在用户话轮内主动澄清的时机�
 | --- | --- |
 | 最新开发与测试任务、依赖和完成条件 | [docs/issue](docs/issue/README.md) |
 | ASR 选型与测量依据 | [正式选型报告](docs/asr_selection_report.md)、[实测](reports/asr_selection/20261016-results/summary.md) |
-| 官方输入对齐后的接话证据 | [复测记录](docs/asr_official_input_retest.md) |
+| 官方输入对齐后的接话证据 | [复测记录（历史版本）](https://github.com/Vitalrubbish/InterClarify/blob/717fcf037d471d07be41172b5b69b0dd404cfcb6/docs/asr_official_input_retest.md) |
 | Kokoro 选择与 TTS 实测 | [正式选型报告](docs/tts_selection_report.md) |
 | 历史基线、运行结果与过时文档恢复 | [证据索引](docs/baseline_evidence.md) |
 

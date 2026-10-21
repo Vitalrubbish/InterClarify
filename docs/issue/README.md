@@ -15,7 +15,7 @@
 
 [039 ASR 首文本指标移除](archive/039_remove_asr_first_text_metric.md)已完成归档；按用户要求移除正式报告中的该列及相关表述，保留原始测量证据。
 
-更新：2026-10-20。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**。首轮四配置、第二轮T2及第三轮延后启动T2的固定FDB子集实验已交付。用户明确接受当前话轮控制误差，停止继续训练；006、007、008、037、040、040c已关闭归档。完整FDB、官方评分及全面人工音频复核未执行，不冒充通过。正式结果见[Layer 1训练与FDB阶段报告](../layer1_training_fdb_report.md)。
+更新：2026-10-20。目标组合为 **Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart**。首轮四配置、第二轮T2及第三轮延后启动T2的固定FDB子集实验已交付。用户明确接受当前话轮控制误差，停止继续训练；006、007、008、037、040、040c已关闭归档。完整FDB、官方评分及全面人工音频复核未执行，不冒充通过。正式结果见[Layer 1训练与FDB阶段报告（历史版本）](https://github.com/Vitalrubbish/InterClarify/blob/717fcf037d471d07be41172b5b69b0dd404cfcb6/docs/layer1_training_fdb_report.md)。
 
 | 编号 | 任务 | 当前状态与剩余工作 |
 | --- | --- | --- |
@@ -65,6 +65,18 @@
 
 ## 归档
 
+[060 文档清理同步](archive/060_document_cleanup_sync.md)已完成归档：保留用户删除的文档与评测章节，相关追溯引用改为固定历史版本，并同步研究草稿章节编号。
+
+[059 自主澄清任务确认](archive/059_autonomous_clarification_scope.md)已完成归档：模型自主发现信息缺口、确定澄清目标与介入决策；删除研究草稿的未决问题整节，调整章节编号并结束本轮提问。
+
+[058 主动澄清研究范围](archive/058_clarification_research_scope.md)已完成归档：首阶段聚焦询问缺失信息，主动纠错与其他任务引导留作后续扩展。
+
+[056 人类感知评价范围](archive/056_human_perception_evaluation.md)已完成归档：首阶段采用旁听感知实验，真人交互及组合方案保留为时间允许时的扩展，明确感知结论的适用范围。
+
+[054 研究贡献定位](archive/054_research_contribution_focus.md)已完成归档：明确主动插话价值为需证据支撑的前提，在线介入判断为核心研究目标，架构服务于该目标。
+
+[053 研究草稿结构调整](archive/053_research_document_structure.md)已完成归档：将系统架构与工程实现方向移至研究草稿文末第 9 节，更新交叉引用，保留研究方法及已有方案。
+
 [052 研究架构讨论整理](archive/052_research_discussion_consolidation.md)已完成归档：研究草稿汇总今日共识，思考模块倾向先提示词原型再专项训练，同时保留仅提示词与直接训练方案；更新架构未决问题，未修改实现。
 
 [051 独立思考模块架构](archive/051_thinking_module_architecture.md)已完成归档：记录思考模块提交介入意图、保留完整问句方案，以及表达模块通过 special token 按需唤醒的方向；仅更新研究草稿，未修改运行协议或模型。
@@ -73,9 +85,9 @@
 
 [036a删除参数范围对齐目标](archive/036a_remove_parameter_alignment.md)完成：036/037保持仅训练已有q/v LoRA，embedding/head冻结；未修改运行配置。
 
-[035训练模式重核](archive/035_official_training_comparison.md)完成：见[完整对照](../layer1_training_comparison.md)，区分论文加权声明与公开推理包装器普通CE，列出除上下文长度外的已确认差异和未公开项。未修改首轮配置或启动新训练。
+[035训练模式重核](archive/035_official_training_comparison.md)完成：见[完整对照（历史版本）](https://github.com/Vitalrubbish/InterClarify/blob/717fcf037d471d07be41172b5b69b0dd404cfcb6/docs/layer1_training_comparison.md)，区分论文加权声明与公开推理包装器普通CE，列出除上下文长度外的已确认差异和未公开项。未修改首轮配置或启动新训练。
 
-[026 单卡2048持续训练检查](archive/026_layer1_2048_stability.md)完成：100步/200序列未OOM，实际曝光95条对话，显存分配峰值20.262GiB；详见[报告](../../reports/layer1_training/issue026-2048-20261020/README.md)。029据此切换正式窗口和索引；030按用户路线移除dev评测器开训要求。
+[026 单卡2048持续训练检查（历史版本）](https://github.com/Vitalrubbish/InterClarify/blob/717fcf037d471d07be41172b5b69b0dd404cfcb6/docs/issue/archive/026_layer1_2048_stability.md)完成：100步/200序列未OOM，实际曝光95条对话，显存分配峰值20.262GiB；详见[报告](../../reports/layer1_training/issue026-2048-20261020/README.md)。029据此切换正式窗口和索引；030按用户路线移除dev评测器开训要求。
 
 [023 研究场景修订](archive/023_research_scenario_revision.md)已完成：以复试通知适用性和打印机诊断替换 [idea 草稿](../research_idea.md)的人员排班示例，保留共同前缀、续说分支及收益/负面影响评级；测量场景仅作扩展示例。
 

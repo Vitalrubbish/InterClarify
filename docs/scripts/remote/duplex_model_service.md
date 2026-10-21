@@ -29,7 +29,7 @@ conda run --no-capture-output -n interclarify-dev python scripts/remote/duplex_m
 
 参考官方仓库 42893024ca90c8de8ac3ed624467ebc123512ff8 的 model.py/server.py。运行不下载模型、不启动训练，记录源码、权重资产和环境版本。显存与延迟需真实 4090 作业验收。
 
-2026-10-18 官方输入复核：旧实现对非空 user micro-turn 编码原始字符串，会保留累计前缀后缀中的前导空格。官方 Word 接收先 strip 再按拍拼接，因此模型提交边界现在编码 `turn.text.strip()`，不改标点/大小写/词内空白；纯空白仍编码 no-voice。`bos_id` 从 tokenizer 获取，仅非空时在整个历史前加一次。参考格式及复测范围见 [输入对齐复核](../../asr_official_input_retest.md)。
+2026-10-18 官方输入复核：旧实现对非空 user micro-turn 编码原始字符串，会保留累计前缀后缀中的前导空格。官方 Word 接收先 strip 再按拍拼接，因此模型提交边界现在编码 `turn.text.strip()`，不改标点/大小写/词内空白；纯空白仍编码 no-voice。`bos_id` 从 tokenizer 获取，仅非空时在整个历史前加一次。参考格式及复测范围见 [输入对齐复核（历史版本）](https://github.com/Vitalrubbish/InterClarify/blob/717fcf037d471d07be41172b5b69b0dd404cfcb6/docs/asr_official_input_retest.md)。
 
 复测的可选 `audit_prompt` 字段默认关闭。开启后生成前的审计消息及最终 NDJSON 记录包含实际传入生成器的 `prompt_token_ids`，供外部 oracle 核对；生产调用不额外返回整段 prompt。health 增加实际 `bos_token_id`，只记录模型元信息，不改变生成。
 

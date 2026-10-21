@@ -16,6 +16,6 @@
 
 ## 结果与阶段关闭
 
-正式报告见[Layer 1训练与FDB阶段报告](../../../docs/layer1_training_fdb_report.md)。自然接话新回复播放由第二轮1/5增至3/5，合成插话后由4/5增至5/5；仍有漏答、提前播放、无finish正文启动及延迟增加。39次finish均在无新增文字拍，文字拍finish与finish无正文均为0。合成暂停新增出声中的4例仅在诊断尾窗，不计作原窗内抢话。
+正式报告见[Layer 1训练与FDB阶段报告（历史版本）](https://github.com/Vitalrubbish/InterClarify/blob/717fcf037d471d07be41172b5b69b0dd404cfcb6/docs/layer1_training_fdb_report.md)。自然接话新回复播放由第二轮1/5增至3/5，合成插话后由4/5增至5/5；仍有漏答、提前播放、无finish正文启动及延迟增加。39次finish均在无新增文字拍，文字拍finish与finish无正文均为0。合成暂停新增出声中的4例仅在诊断尾窗，不计作原窗内抢话。
 
 逐例证据见[results.json](completed/results.json)、[时间线审计](completed/timing_audit.json)、[启动控制](completed/response_start_controls.json)、[执行验证](completed/validation.json)和[25例CSV](test_samples.csv)。用户明确接受当前话轮控制误差，要求停止继续训练并关闭相关Issue。阶段决定为stop training / close current stage，见[关闭记录](closure.json)；官方评分、完整FDB与全面人工音频复核未执行，不补写为通过。
