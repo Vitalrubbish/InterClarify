@@ -8,3 +8,5 @@ HTTP `/v1/session` 分配、`/v1/recognize` 输入、`/v1/session/{id}/result` �
 
 
 资源与来源补充：health记录加载耗时和进程峰值RSS，作业收尾保留service /proc状态，GPU逐秒采样；ASR关闭记录等待worker释放耗时。采集manifest标为integration_diagnostic_only且禁止训练，保留源音频摘要与失败。TTS核验增加真实Kokoro经RuntimeAdapter、TTSManager、协调器和播放管理器执行短附和、有效插话停旧音频及新响应，headless确认不等同扬声器实播。
+
+068：warmup增加可选timeout，仅用于启动两次语音验证的done等待；默认仍使用服务原30秒。CLI --warmup-timeout由完整FDB任务显式设180秒；在线EOF等待与取消join继续使用原service.timeout。超过预热期限仍失败并隔离，不能把未完成预热当就绪。

@@ -247,7 +247,7 @@ class NemotronService:
                                  'release_seconds': time.monotonic()-started,
                                  'at_monotonic': time.monotonic()}))
 
-    def warmup(self, pcm):
+    def warmup(self, pcm, timeout=None):
         """Require real speech output and cleanup for two sequential sessions."""
         if not pcm or len(pcm) % 2 or not np.any(np.frombuffer(pcm, dtype='<i2')):
             raise ValueError('Warmup requires non-silent PCM16 speech')
@@ -256,7 +256,7 @@ class NemotronService:
             session = self.get(identity)
             try:
                 session.source.append(pcm, eof=True)
-                if not session.done.wait(self.timeout):
+                if not session.done.wait(self.timeout if timeout is None else timeout):
                     raise RuntimeError('ASR warmup timed out')
                 result = session.snapshot()
                 if not result['text'].strip():
@@ -343,6 +343,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--model', type=Path, required=True)
     parser.add_argument('--warmup-audio', type=Path, required=True)
+    parser.add_argument('--warmup-timeout', type=float, default=30)
     parser.add_argument('--port', type=int, default=8005)
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO)
@@ -351,7 +352,9 @@ def main():
                          'pcm16_sha256':hashlib.sha256(pcm).hexdigest()}))
     engine = NativeNemotron(str(args.model))
     service = NemotronService(engine)
-    service.warmup(pcm)
+    if not np.isfinite(args.warmup_timeout) or args.warmup_timeout <= 0:
+        parser.error('warmup-timeout must be positive and finite')
+    service.warmup(pcm, timeout=args.warmup_timeout)
     import uvicorn
     uvicorn.run(create_app(service), host='127.0.0.1', port=args.port)
 

@@ -7,3 +7,5 @@
 066修复：NeMo官方评分模型解包需要超过1GiB的单文件，调整至8GiB；临时文件放入输出/tmp，保持总磁盘和空闲盘限额。
 
 067：用户决定暂缓GPT评分，默认FULL_FDB_DEFER_JUDGE=1，预检写deferred_by_user且不调用API，评分命令显式传--defer-judge。回放/官方对齐正常执行，顶部summary整合推理/评分和GPT待补状态。之后有可用原judge时可显式关闭该开关补跑，不能自动换用其他模型。
+
+068：评分预检后按ASR→TTS→LLM串行启动并逐个等health；ASR启动预热单独180秒，在线会话规则不变。wait_ready检查实际服务PID，避免ASR失败后仍等待无关LLM。r3失败日志保留，修复使用独立r4。

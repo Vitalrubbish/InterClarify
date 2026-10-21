@@ -161,28 +161,28 @@ print(*(s.getsockname()[1] for s in sockets))
 for s in sockets:s.close()
 PYPORT
 )
-CUDA_VISIBLE_DEVICES="${GPUS[1]}" setsid "$COMPONENT_ROOT/envs/asr/bin/python" -u scripts/remote/nemotron_asr_service.py \
-  --model "$ASR" --warmup-audio "$WARMUP" --port "$ASR_PORT" > "$OUTPUT/asr.log" 2>&1 &
-PIDS+=("$!")
-CUDA_VISIBLE_DEVICES="${GPUS[1]}" setsid "$COMPONENT_ROOT/envs/tts/bin/python" -u scripts/remote/kokoro_tts_service.py \
-  --snapshot "$KOKORO" --port "$TTS_PORT" > "$OUTPUT/tts.log" 2>&1 &
-PIDS+=("$!")
-CUDA_VISIBLE_DEVICES="${GPUS[0]}" setsid "$MODEL_ENV/bin/python" -u scripts/remote/duplex_model_service.py \
-  --checkpoint "$CHECKPOINT" --base-model "$BASE" --adaptation "$TRAIN_RUN/training/checkpoint.pt" \
-  --port "$MODEL_PORT" --trace-path "$OUTPUT/model_trace.jsonl" > "$OUTPUT/model.log" 2>&1 &
-MODEL_PID="$!"
 wait_ready() {
-  local port="$1" target="$2"
+  local port="$1" target="$2" pid="$3"
   for attempt in $(seq 1 600); do
     if curl -sf --max-time 2 "http://127.0.0.1:$port/health" > "$target"; then return 0; fi
-    kill -0 "$MODEL_PID" || return 1
+    kill -0 "$pid" || return 1
     sleep 1
   done
   return 1
 }
-wait_ready "$ASR_PORT" "$OUTPUT/asr_health.json"
-wait_ready "$TTS_PORT" "$OUTPUT/tts_health.json"
-wait_ready "$MODEL_PORT" "$OUTPUT/model_health.json"
+CUDA_VISIBLE_DEVICES="${GPUS[1]}" setsid "$COMPONENT_ROOT/envs/asr/bin/python" -u scripts/remote/nemotron_asr_service.py \
+  --model "$ASR" --warmup-audio "$WARMUP" --warmup-timeout 180 --port "$ASR_PORT" > "$OUTPUT/asr.log" 2>&1 &
+PIDS+=("$!")
+wait_ready "$ASR_PORT" "$OUTPUT/asr_health.json" "${PIDS[0]}"
+CUDA_VISIBLE_DEVICES="${GPUS[1]}" setsid "$COMPONENT_ROOT/envs/tts/bin/python" -u scripts/remote/kokoro_tts_service.py \
+  --snapshot "$KOKORO" --port "$TTS_PORT" > "$OUTPUT/tts.log" 2>&1 &
+PIDS+=("$!")
+wait_ready "$TTS_PORT" "$OUTPUT/tts_health.json" "${PIDS[1]}"
+CUDA_VISIBLE_DEVICES="${GPUS[0]}" setsid "$MODEL_ENV/bin/python" -u scripts/remote/duplex_model_service.py \
+  --checkpoint "$CHECKPOINT" --base-model "$BASE" --adaptation "$TRAIN_RUN/training/checkpoint.pt" \
+  --port "$MODEL_PORT" --trace-path "$OUTPUT/model_trace.jsonl" > "$OUTPUT/model.log" 2>&1 &
+MODEL_PID="$!"
+wait_ready "$MODEL_PORT" "$OUTPUT/model_health.json" "$MODEL_PID"
 "$MODEL_ENV/bin/python" - "$OUTPUT/model_health.json" <<'PYHEALTH'
 import json,sys
 from pathlib import Path
