@@ -2,7 +2,7 @@
 
 2026-10-21。状态：已提交远端调度，回放和评分待完成。用户要求先重跑子集，本次只运行历史固定25例（五类各5例），不运行完整319例、不切换线上候选。
 
-候选`ASR_R4_delayed_punctuation`最终SHA256 `d1f4d05e4ed1b29dbe8550ffaa02be389673975f7929b33ec1420ef2d70c44a1`，训练/重载见[078报告](../../layer1_training/issue078-asr-punctuation-r1/README.md)。原030输入清单SHA256 `d5885326eedab8f450843d3737ce08ccf98ebe6de89d7958b5628a8ba731cc40`，25例70份音频标注，共457.83秒原音频，入场逐文件核验。
+候选`ASR_R4_delayed_punctuation`最终SHA256 `d1f4d05e4ed1b29dbe8550ffaa02be389673975f7929b33ec1420ef2d70c44a1`。原030输入清单SHA256 `d5885326eedab8f450843d3737ce08ccf98ebe6de89d7958b5628a8ba731cc40`，25例70份音频标注，共457.83秒原音频，入场逐文件核验。
 
 运行采用现役X-Talk d6dc3bf、Nemotron EN160/Kokoro af_heart、600ms、TTS首段300ms/后续1200ms、会话KV复用、duplex_greedy_v1和repetition_penalty=1.0。每例独立会话、原始ASR增量，正式output.wav严格等长，5秒尾窗仅作独立诊断。Smooth/Interruption各5例运行官方词级转写及冻结TOR/Latency，GPT相关性仍明确暂缓。
 

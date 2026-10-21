@@ -1,9 +1,14 @@
-# 固定FDB样本暂存与条件测试驱动
+# layer1_fdb.py
 
-`scripts/remote/layer1_fdb.py`复用既有音频全链路测试驱动，不创建独立文本回放器，不参与产品决策或播放。无产品类。
+## 功能与边界
 
-`file_hash`分块计算原始文件SHA256；`prepare`验证030清单恰好25个唯一input.wav、逐文件大小与摘要，拒绝目录穿越、生成输出混入及覆盖既有目录。全部验证后才复制音频和标注，原始测试集不变。
+`scripts/remote/layer1_fdb.py` 暂存冻结的 25 例 FDB 子集，并调用现有真实音频全链路回放驱动。它不创建独立文本回放器，不参与产品决策或播放。
 
-`run`读取固定英语运行配置，替换为本作业内服务URL，逐个执行五子集的全部冻结目录，调用已有`run_fdb_batch`而非重新实现播放协议。每例独立会话、当前原生Nemotron输入、5秒连续静音诊断尾窗，官方输出仍严格原始音频等长。逐子集progress和最终summary保留transport结果及25会话计数，官方评分和内容人工检查显式pending。
+## 核心方法
 
-`main`仅分发prepare/run两个子命令，真实模型/组件由`run_layer1_fdb.sh`在调度资源和独立conda中管理。测试输出路径、音频和时间线保留供007后续能力报告使用，不能将transport通过写成能力通过。
+- `file_hash` 分块计算原始文件 SHA256。
+- `prepare(manifest_path, output)` 验证清单恰好包含 25 个唯一 `input.wav`，逐文件核对大小与摘要；拒绝目录穿越、历史生成输出混入和覆盖既有目录。全部验证通过后才复制音频与标注，原始测试集不变。
+- `run` 读取当前英语运行配置，替换为作业内服务 URL，逐子集调用 `duplex_a4_replay.run_fdb_batch`。每例独立会话，使用原生 Nemotron 增量输入和 5 秒连续静音诊断尾窗；正式输出保持原始音频等长。
+- `main` 只分发 `prepare` 与 `run`，真实模型、ASR、TTS 与资源由远端作业管理。
+
+transport 通过不等于能力通过；官方评分与内容复核仍需独立执行。

@@ -1,8 +1,0 @@
-{
-  "root_base_commit": "8235dc68ed9b22dd584ea96eda66c91c4b59cb80",
-  "xtalk_commit": "419f283e64e4de28b01f84586df779a94b18ede3",
-  "source_snapshot": "source.sha256",
-  "training_gradient_updates_started": false,
-  "official_b0_new_text_12s": 0,
-  "official_b0_new_voice_12s": 0
-}

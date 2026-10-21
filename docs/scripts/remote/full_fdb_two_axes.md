@@ -1,13 +1,19 @@
 # full_fdb_two_axes.py
 
-## 功能与设计
+## 功能与边界
 
-完整FDB v1.0两轴的输入冻结、暂存、现有回放驱动调用及官方评分调度；不新增产品模型或播放通路。AXES映射119例candor_turn_taking到smooth_turn_taking、200例synthetic_user_interruption到user_interruption。
+完成 FDB v1.0 两轴的输入冻结、暂存、真实音频回放调度与官方评分；不新增产品模型或播放通路。`AXES` 将 119 例 `candor_turn_taking` 映射到 `smooth_turn_taking`，200 例 `synthetic_user_interruption` 映射到 `user_interruption`。
 
-freeze验证两轴完整数量、输入时长与标注，计算input.wav和必要标注SHA256，生成远端独立manifest；stage先完整核对源文件再复制到新目录，排除旧output/rating。infer调用现有run_fdb_batch，逐轴复用当前ASR/LLM/TTS链路，检查全部例数，保留漏答与原音频等长官方输出及独立诊断尾窗。
+## 核心方法
 
-preflight_judge只验证现有judge端点和模型可用性，不打印凭据。score复用run_fdb_llm_judge的工作副本、密钥读取和指标解析；用评分conda直接运行官方asr.py与evaluate.py，两个轴都实际调用评分，Smooth轴不需要API。官方子进程输出流式写日志、限制时长，失败与超时进入summary；返回逐轴预期/实际转写/评分数量，原始音频和大trace留远端。
+- `freeze`：验证两轴完整数量、输入时长与标注，计算 `input.wav` 和必要标注的 SHA256，生成远端独立 manifest。
+- `stage`：先完整核对源文件，再复制到新目录；排除旧 `output/rating`，不覆盖既有目录。
+- `infer`：调用 `duplex_a4_replay.run_fdb_batch`，逐轴复用当前 ASR/LLM/TTS 链路；检查全部例数，保留漏答、与原音频等长的官方输出及独立诊断尾窗。
+- `preflight_judge`：只验证 judge 端点与模型可用性，不打印凭据。
+- `score`：复用 `run_fdb_llm_judge` 的工作副本、密钥读取和指标解析，用评分 conda 直接运行官方 `asr.py` 与 `evaluate.py`。Smooth 轴不需要 API；`--defer-judge` 跳过 User Interruption 的 API 判题。
 
-## 067：用户决定暂缓GPT评分
+## 评分口径
 
-timing_metrics按冻结官方脚本的相同TOR规则逐例统计：无词或总词跨度不足1秒且词数不超过3判为未接话；接话延迟按官方口径将负值归零，同时保存原始负值，零接话时延迟为null。score的--defer-judge跳过User Interruption的API判题，输出TOR/Latency及明确的GPT待补状态；Smooth仍运行官方评估并与同规则重算核对。结果分别标注请求范围执行通过、完整评分是否完成，不混用两种状态。
+`timing_metrics` 按冻结官方脚本的相同 TOR 规则逐例统计：无词或总词跨度不足 1 秒且词数不超过 3 判为未接话；接话延迟按官方口径将负值归零，同时保存原始负值，零接话时延迟为 null。
+
+输出分别标注“请求范围执行通过”和“完整评分是否完成”，GPT 未执行时明确为 pending。原始音频与大 trace 留远端。

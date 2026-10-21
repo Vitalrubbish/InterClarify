@@ -9,7 +9,7 @@ from types import SimpleNamespace
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / 'scripts/training'))
+sys.path.insert(0, str(ROOT / 'scripts/runtime'))
 sys.path.insert(0, str(ROOT / 'scripts/remote'))
 from layer1_candidate import validate_lora
 from layer1_fdb import prepare

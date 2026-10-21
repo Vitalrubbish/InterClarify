@@ -1,24 +1,21 @@
-# 当前证据索引
+# FDB 评测结果
 
-2026-10-21。`reports`按验证链保留最新有效结果；来源清单、资产摘要、外部隔离和路径迁移记录是当前构建依赖，不能仅因日期较早而删除。以下目录为当前保留范围。
+更新：2026-10-21。FDB 作为辅助工程与能力评测保留；主动澄清专项 benchmark 另行构建，不能以 FDB 指标替代。
 
 | 验证链 | 最新证据与用途 |
 | --- | --- |
-| ASR选型 | [完整100条比较](asr_selection/20261016-results/summary.md)，替代旧25条smoke |
-| 当前ASR输入形式 | [大小写、缩写及数值探针](asr_text_surface/20261019/README.md) |
-| Nemotron服务接入 | [EN160集成验证](english_integration/20261018-r4/README.md)，旧TTS结果由continuity-r3替代 |
-| Kokoro连续语音 | [最终r3与用户试听结果](tts_continuity/20261019-r3/README.md) |
-| 当前完整链基线 | [Nemotron→DuplexCascade→Kokoro B0](full_chain/20261019-b0/README.md) |
-| 发布资产与来源 | [资产清单及UltraChat来源](layer1_training/issue001-inventory-20261018/README.md) |
-| 官方输入对齐 | [原生Word最终验收](layer1_training/issue001-word-20261019/README.md)，替代旧raw/complete-word诊断 |
-| 正式训练数据 | [r5全量机器验收](layer1_training/issue004-build-20261019-r5/README.md)，004已按用户豁免授权关闭 |
-| 来源验证与评测隔离 | [来源验真摘要](layer1_training/issue016-source-and-exclusions-20261019/source_verification.json) |
-| Layer 1 训练与 FDB | [四配置及延后启动阶段报告（历史版本）](https://github.com/Vitalrubbish/InterClarify/blob/717fcf037d471d07be41172b5b69b0dd404cfcb6/docs/layer1_training_fdb_report.md)，固定小子集结果不等同完整 FDB |
-| 当前候选完整FDB两轴 | [r4最终结果](fdb/20261021-full-two-axes-r4/README.md)：319例官方转写完成，Smooth TOR 49.58%/1.023秒，Interruption TOR 80.00%/1.183秒；GPT相关性待补 |
-| 缓存及退役资产清理 | [当前回收记录](maintenance/20261019-cache-reclamation/README.md) |
-| 远端路径映射 | [当前目录迁移清单](maintenance/20261019-home-consolidation/README.md) |
-| 退役组件清理 | [退役资产及恢复信息](maintenance/20261019-retired-selection/README.md) |
+| 完整两轴 | [r4 最终结果](fdb/20261021-full-two-axes-r4/README.md)：319 例回放、官方转写与时序评分完成；Smooth TOR 59/119、平均延迟 1.023 秒，Interruption TOR 160/200、平均延迟 1.183 秒；GPT 相关性待补 |
+| 固定子集 | [ASR_R4 子集回归](fdb/20261021-asr-subset-r1/README.md)：历史 25 例固定输入，两轴各 5 例官方对齐与时序评分 |
 
-已删除旧ASR契约、阶段A的Qwen/X2/MOSS报告、smoke25、issue005 probe-only报告、TTS旧连贯性版本及旧集成TTS输出、早期运行时/输入验证、数据管线实现和debug探针。保留目录中的来源摘要、失败说明和对照计数仍用于解释该次最新结果，不代表保留另一份过时完整运行。
+回放使用 X-Talk `d6dc3bf`、Nemotron EN160、Kokoro `af_heart`、600ms micro-turn、300/1200ms TTS 分段、会话 KV 复用与 `duplex_greedy_v1`。原始 WAV、trace 与完整日志留在远端。
 
-删除前的已提交证据可从[固定提交6ca5eea](https://github.com/Vitalrubbish/InterClarify/tree/6ca5eea/reports)查阅；本次不改写Git历史。远端服务器产物未因这次仓库清理删除。归档文档保留本地并受`.gitignore`管理，当前文档中的历史归档链接固定到该提交，保证从GitHub也能查阅。后续新结果替换同一验证链的旧版本，并同步更新本索引和引用。
+评测脚本位于 `scripts/remote/`：
+
+- `full_fdb_two_axes.py`：完整两轴输入冻结、暂存、回放调度与官方评分。
+- `fdb_subset_report.py`：固定子集评分与尾窗隔离。
+- `duplex_a4_replay.py`：真实音频会话回放与时间线证据。
+- `layer1_fdb.py`：25 例子集暂存与回放驱动。
+- `run_fdb_llm_judge.py`：官方 judge 工作副本与指标解析。
+- `setup_fdb_scoring_env.sh`：评分环境准备。
+
+执行通过不表示模型能力验收通过；GPT 评分未执行的结论保持 pending。

@@ -1,40 +1,29 @@
 # 开发与测试工作单
 
-更新：2026-10-21。这里只列当前工作与采用决定；已完成过程记录统一见[归档索引](archive/README.md)。
+更新：2026-10-21。这里只列当前工作与采用决定；研究范围以 [正式研究方案](../research_design.md) 为准。
 
 ## 当前工作
 
-| 工作单 | 状态 | 范围与入口 |
-| --- | --- | --- |
-| [074：训练集扩充至3k并保证多样性](074_layer1_diverse_3k_dataset.md) | 暂缓执行 | 先评估078原1k新ASR候选；后续保留原1k来源与固定dev/test，新增2k独立对话 |
-| [075：远端多卡训练可行性调研](075_layer1_multigpu_feasibility.md) | 暂缓执行 | 用户当前先训练原1k；多卡资源、训练器差距和成本调研留后续 |
-
-任务完成后归档；执行、传输通过和模型能力通过分别记录。归档清理不会改变当前远端作业或把未执行项记为通过。
+当前尚无进行中的实现工作单。后续按正式研究方案拆分数据、标注、Layer 0/1、Layer 2、运行时协议与 benchmark 工作单元。
 
 ## 当前采用决定
 
 | 内容 | 采用范围与依据 |
 | --- | --- |
-| 研究范围 | [research_idea.md](../research_idea.md)；模型自主发现任务信息缺口并判断澄清时机，系统backchannel为后续方向，尚未接入 |
-| 思考调用方向 | Layer 1 在倾听或表达时均可通过独立 special token 请求异步思考，每会话最多一个请求在途，合并重复触发；结果写回 Layer 1，调用 token 不进入 TTS，表达经过统一仲裁和单一播放路径；其余协议未定、尚未实现，见[研究草稿第 7.1 节](../research_idea.md#71-思考与表达的模块关系) |
-| ASR / TTS | Nemotron EN 0.6B/160ms + Kokoro 82M/af_heart；[ASR报告](../asr_selection_report.md)、[TTS报告](../tts_selection_report.md) |
-| TTS / KV | 首段300ms、后续1200ms，600ms micro-turn，跨请求按会话KV复用；用户接受自然度略逊600ms但整体差异不大，[047](archive/047_tts_first_segment_latency.md)、[048](archive/048_cross_request_kv_cache.md) |
-| 生成策略 | duplex_greedy_v1，显式greedy/单beam/repetition_penalty=1.0；固定108对回归一致，不外推全部BF16输入恒等，[061](archive/061_explicit_generation_policy.md) |
-| 运行源码 | [选定X-Talk版本](../../configs/xtalk_runtime_source.json)：`d6dc3bf`已推送origin/dev；[当前配置](../configs/xtalk_duplex_english_runtime.md) |
-| 延迟与后续方向 | [分段延迟报告](../latency_analysis_report.md)；完整链路历史时延与新策略固定请求回归分别标注，backchannel可降低首反馈延迟/感知等待，实际收益待测 |
-| 当前候选与下一阶段 | [078](archive/078_layer1_delayed_punctuation_training.md)原1k ASR_R4已完成1240步及干净进程重载，退出0；尚未切换线上或运行新FDB，T2_R3保留旧对照；074的3k扩充、075多卡调研暂不执行 |
-| 训练文本与ASR形式 | [077](archive/077_layer1_delayed_punctuation_rebuild.md)固定原1000/200/300来源与事件目标，增加延后句读ASR视图，已用于078训练；[080分析](archive/080_layer1_asr_loss_analysis.md)确认训练loss改善但不能证明接话率提升。旧数据保留、人审pending，真实ASR精确时序和符号种类仍有近似偏差 |
-| 完整FDB两轴结果 | 319例回放和官方转写完成，退出码均0；Smooth TOR 59/119、平均延迟1.023秒，Interruption TOR 160/200、平均延迟1.183秒；延迟只含有效接话，GPT相关性待补，[最终报告](../../reports/fdb/20261021-full-two-axes-r4/README.md) |
+| 研究范围 | 模型自主发现任务信息缺口，并判断继续倾听或主动澄清；系统 backchannel 为后续方向，尚未接入，见[研究方案第1—3节](../research_design.md#1-研究动机与范围) |
+| 首版 benchmark | 只评价决策合理性与澄清内容；不要求用户回答，不评价任务结果或实际交互成本，见[第5.6节](../research_design.md#56-首版-benchmark-的评测范围) |
+| 专项数据与标注 | 试标 200 条逐条人工标注；训练 2k—5k、测试 300 条采用模型标注加人工抽检；标注思考启动位置与必须/可选/不得介入事件窗口，不设置参考问句，内容采用 LLM judge 并人工抽检，见[第5.7节](../research_design.md#57-数据规模时序标注与内容审核) |
+| Layer 2 初期路线 | 冻结现成模型权重，以 system prompt 驱动持续判断和结构化输出，暂不专项训练；运行时记录真实观察、完成、返回与注入事件，见[第7节](../research_design.md#7-系统工程架构) |
+| 异步训练参考 | 外部结果块屏蔽损失，后续动作与正文监督方案待定，见[第5.8节](../research_design.md#58-异步调用与结果利用的训练参考) |
+| 思考调用方向 | Layer 1 在倾听或表达时均可通过独立 special token 请求异步思考；每会话最多一个请求在途，重复触发合并；结果写回 Layer 1 后经统一仲裁与单一播放路径表达，见[第7.2—7.4节](../research_design.md#72-思考请求与任务调度) |
+| 组件与运行时 | Nemotron EN160 + Kokoro `af_heart`；300/1200ms 分段、600ms micro-turn、会话 KV 复用、`duplex_greedy_v1`；X-Talk `d6dc3bf`，见[运行时配置](../runtime_baseline.md) |
+| FDB 评测 | 保留冻结子集与完整两轴回放、官方词级对齐和 TOR/Latency 评分脚本；FDB 作为辅助工程与能力评测，不替代主动澄清 benchmark，结果见[reports/fdb](../../reports/README.md) |
 
 ## 共用约束
 
 - 中文开发文档；英文文件名、实现注释与提交消息。实现修改同步同路径说明，先记录设计变更再改代码。
-- 保持Layer动作边界、单一仲裁器与单一TTS播放所有权；已听内容不可撤销，Layer3只修订未提交片段。
-- 本地和远端使用conda；真实模型与集群测试在远端调度执行，冻结源码/资产/输入及资源上限，独立run_id，保留失败与退出码。
-- 完整模型历史和生成ID保留；缓存改写/取消/淘汰时安全失效重建。数据和FDB不用于未授权训练或临时调参。
-- 未执行的官方评分、完整评测、人工复核继续如实标注；统计延迟时同时报告漏答与样本覆盖率。
-- 大模型、音频、逐请求日志留本地/远端；Git保留当前源码、简明报告、关键摘要与追溯哈希。
-
-## 历史追溯
-
-[归档索引](archive/README.md)保留已完成工作单的固定Git原文入口。训练/加载/组件接入、旧执行预算和研究草稿修改均按当时提交追溯，不作为当前运行前置。历史维护和远端路径另见[证据索引](../baseline_evidence.md)、[远端目录约定](../remote_workspace.md)。
+- 当前架构采用 Layer 0/1/2 职责分工，不设独立修订层；保持单一仲裁器与单一 TTS 播放所有权，已听内容不可撤销。
+- 本地和远端使用 conda；真实模型与集群测试在远端调度执行，冻结源码、资产、输入及资源上限，独立 run_id，保留失败与退出码。
+- 完整模型历史与生成 ID 保留；缓存改写、取消或淘汰时安全失效并重建。
+- 未执行的官方评分、完整评测与人工复核继续如实标注；统计延迟时同时报告漏答与样本覆盖率。
+- 大模型、音频与逐请求日志留本地或远端；Git 保留当前源码、简明报告、关键摘要与追溯哈希。

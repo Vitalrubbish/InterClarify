@@ -1,8 +1,0 @@
-{
-  "source_files": {
-    "scripts/remote/diagnose_kv_cache.py": "e6f6eaed1a04d2c212e88f1d2b03551ef544b10abbe05cf02773beb5d46df825",
-    "scripts/remote/run_kv_cache_diagnosis.sh": "2539efa832af2c28dcdbe0f88e0bcfe838024d104f21b9bfb3c75dfe493f879c"
-  },
-  "bundle_sha256": "f0384ceabf0c60f229fb5197d5cb0a9720068087a56fcdaddd9c142d47ef1a01",
-  "runtime_source_manifest_sha256": "74ce41bc90524e219808df7e4aebd5a41de08d13f1f72e96efa33243b2b44ca7"
-}

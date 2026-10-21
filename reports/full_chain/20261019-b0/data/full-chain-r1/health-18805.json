@@ -1,1 +1,0 @@
-{"status":"ok","backend":"nemotron_en","model":"/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/models/nemotron_en","chunk_ms":160,"dtype":"torch.float32","torch":"2.11.0+cu128","load_seconds":89.45530010946095,"warmup_sessions":2,"offline":false,"peak_rss_kib":2148844}

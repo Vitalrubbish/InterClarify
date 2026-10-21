@@ -8,7 +8,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / 'scripts/training'))
+sys.path.insert(0, str(ROOT / 'scripts/runtime'))
 import layer1_model as model
 
 

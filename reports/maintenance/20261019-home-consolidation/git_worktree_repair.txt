@@ -1,6 +1,0 @@
-repair: gitdir incorrect: .git/worktrees/interclarify-tts-analysis-20261017/gitdir
-repair: gitdir incorrect: .git/worktrees/interclarify-tts-combination-20261017/gitdir
-repair: gitdir incorrect: .git/worktrees/interclarify-tts-early-fix-20261017/gitdir
-repair: .git file broken: /mnt/cloudstorfs/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-analysis-20261017
-repair: .git file broken: /mnt/cloudstorfs/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-early-fix-20261017
-repair: .git file broken: /mnt/cloudstorfs/sjtu_home/xuan.zhang/interclarify-archive/runs/interclarify-tts-combination-20261017

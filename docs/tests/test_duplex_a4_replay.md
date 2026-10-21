@@ -10,6 +10,6 @@ conda run -n paratalker-dev env PYTHONPATH=src:. python -m unittest tests.test_d
 
 该离线测试验证驱动正确性；真实 ASR、官方权重和 FDB 由远端任务单执行。历史 A4 任务单见[固定快照](https://github.com/Vitalrubbish/InterClarify/blob/c614d55/docs/xtalk_a4_remote_acceptance.md)。
 
-# 033诊断尾窗回归
+# 诊断尾窗回归
 
 新增异步测试确认四配置测试启用的连续静音只追加到原音频之后，报告原始时长不变、诊断字段明确；不添加未来转写或人工让轮信号。已有播放取消测试继续确认只保留已经播放的音频前缀。

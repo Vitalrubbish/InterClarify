@@ -1,5 +1,0 @@
-# run_latency_validation.sh
-
-在双4090调度作业内验证当前唯一配置：模型独占GPU0，ASR/Kokoro共用GPU1；沿用现役conda和当前候选。读取英文运行配置并核对首段300ms、后续1200ms、缓存开启、600ms micro-turn，写入current条件，仅执行一次25会话与300ms固定文本供给，最后输出分段报告。显式缓存正确性探针单独由run_generation_policy_probe.sh运行，不随日常延迟测试自动执行无缓存对照。
-
-无类。check_budget控制输出与空闲磁盘，wait_ready确认服务启动，cleanup终止进程组并保留退出码。首次创建输出目录，外部timeout和调度器约束时长、CPU/GPU及内存，原历史三条件快照和结果不改写。

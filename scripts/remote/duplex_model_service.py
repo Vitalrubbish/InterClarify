@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 
 # Direct-script and test imports share the repository's normal training module.
 import sys
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'training'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'runtime'))
 from layer1_model import (
     WIRE_TOKENS, load_official_checkpoint, normalize_state_dict,
     validate_prompt_ids, validate_state_keys,
