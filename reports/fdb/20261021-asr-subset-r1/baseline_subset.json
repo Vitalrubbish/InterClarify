@@ -1,0 +1,86 @@
+{
+  "condition": "T2_R3_delayed_start",
+  "checkpoint_sha256": "266a37a28699d0c3f36b6a6305374bc89a1a2ff2af7a37fd1eb4caf1ad915346",
+  "source_run": "20261021-full-two-axes-r4",
+  "runtime_commit": "d6dc3bff0a512d13f4352bce6105aec80b7f9960",
+  "full_manifest_sha256": "b804734cc4a030e629b16891468259958b8170a4a495e8909227bf4f7116eb5be",
+  "input_annotation_identity_matches_verified_remotely": 10,
+  "axes": {
+    "smooth_turn_taking": {
+      "samples": [
+        {
+          "sample": "1",
+          "take_turn": 0,
+          "raw_latency": null,
+          "official_latency": null
+        },
+        {
+          "sample": "10",
+          "take_turn": 1,
+          "raw_latency": 1.2899999999999823,
+          "official_latency": 1.2899999999999823
+        },
+        {
+          "sample": "100",
+          "take_turn": 1,
+          "raw_latency": 0.6100000000000732,
+          "official_latency": 0.6100000000000732
+        },
+        {
+          "sample": "101",
+          "take_turn": 0,
+          "raw_latency": null,
+          "official_latency": null
+        },
+        {
+          "sample": "102",
+          "take_turn": 0,
+          "raw_latency": null,
+          "official_latency": null
+        }
+      ],
+      "source_sha256": "e5fa0e8994f4dfa7e8e91b11ea2524a1b18886a4eadaa3e981f4b0d77e7ce229",
+      "take_turns": 2,
+      "total": 5,
+      "mean_latency": 0.9500000000000277
+    },
+    "user_interruption": {
+      "samples": [
+        {
+          "sample": "1",
+          "take_turn": 1,
+          "raw_latency": 1.1999999999999993,
+          "official_latency": 1.1999999999999993
+        },
+        {
+          "sample": "10",
+          "take_turn": 1,
+          "raw_latency": 0.7200000000000006,
+          "official_latency": 0.7200000000000006
+        },
+        {
+          "sample": "100",
+          "take_turn": 1,
+          "raw_latency": 1.7599999999999998,
+          "official_latency": 1.7599999999999998
+        },
+        {
+          "sample": "101",
+          "take_turn": 1,
+          "raw_latency": 1.7599999999999998,
+          "official_latency": 1.7599999999999998
+        },
+        {
+          "sample": "102",
+          "take_turn": 1,
+          "raw_latency": 1.120000000000001,
+          "official_latency": 1.120000000000001
+        }
+      ],
+      "source_sha256": "13cf3e663c9cf5464054e97b2720c295f859a2dbe0ec294143444bc7bdccbe8b",
+      "take_turns": 5,
+      "total": 5,
+      "mean_latency": 1.312
+    }
+  }
+}
