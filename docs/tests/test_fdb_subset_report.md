@@ -4,4 +4,4 @@
 
 conda下运行`python -m unittest discover -s tests -p test_fdb_subset_report.py`，真实回放和官方对齐仍在远端调度完成。
 
-082新增FLOAT输入/PCM16输出的真实WAV容器回归，使用已有soundfile依赖；时长相同应通过，不能因编码格式不同而拒绝有效输入。远端该测试移入含音频依赖的客户端conda执行。
+浮点WAV回归：/PCM16输出的真实WAV容器回归，使用已有soundfile依赖；时长相同应通过，不能因编码格式不同而拒绝有效输入。远端该测试移入含音频依赖的客户端conda执行。

@@ -26,4 +26,5 @@
 ## 约束
 
 - 集群作业命令中需使用环境内 python 的**绝对路径**，避免误用基础环境解释器；
-- **不执行 `pip install --upgrade pip`**：pip 由 `environment.yml` 固定为 24.0，升级会造成实际环境版本漂移。
+- **不执行 `pip install --upgrade pip`**：pip 由 `environment.yml` 固定为 24.0，升级会造成实际环境版本漂移；
+- 本地环境同样使用 `interclarify-dev`，完整版本快照见 `environment.lock.yml`，说明见 [本地环境](../../local_environment.md)。
