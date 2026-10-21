@@ -7,7 +7,7 @@
 | [047](047_tts_first_segment_latency.md) | 首段 TTS 聚合期限降至 300ms | 进行中；后续段保持 1,200ms、micro-turn 保持 600ms，比较延迟、连续性与听感 |
 | [048](048_cross_request_kv_cache.md) | 跨 micro-turn 请求复用 KV cache | 进行中；按会话复用匹配前缀，验证正确性、时延与显存，不改变拍长或重启训练 |
 
-两项已实现并完成本地回归，[049 延迟对照](049_latency_decomposition_validation.md)已提交远端任务 `job-179251495575111326759-xuan-zhang`，结果待回收。
+两项已实现并完成本地回归，[049 延迟对照](archive/049_latency_decomposition_validation.md)已提交远端任务 `job-179251495575111326759-xuan-zhang`，已完成，结果见[分段报告](../../reports/latency/20261021-r2/results.md)。047待人工复听，048待051排查固定请求生成分歧。
 
 [035 ASR 正式选型报告](archive/035_asr_selection_report.md)已完成归档；报告汇总 2026-10-16 测量及后续输入复核，见 [正式报告](../asr_selection_report.md)。
 
@@ -109,6 +109,8 @@
 
 [049删除旧训练设计](archive/049_remove_legacy_training_switches.md)已完成归档：只保留T2_R3最终路线，删除036探针、旧时序兼容、006/037条件、FDB旧模式及三个离线分析脚本。
 
-[049 延迟分解对照测试](049_latency_decomposition_validation.md)进行中：实现047/048后，按原始基线、仅300ms、300ms加KV cache三组串行重测固定25会话，并交付整体与分段延迟。用户已授权执行，不重启训练。
+[049 延迟分解对照测试](archive/049_latency_decomposition_validation.md)已完成归档：实现047/048后，按原始基线、仅300ms、300ms加KV cache三组串行重测固定25会话，并交付整体与分段延迟。用户已授权执行，不重启训练。
 
 [050 远端测试依赖恢复与重提](archive/050_restore_latency_test_dependencies.md)已完成归档：r1快照完整，已恢复误删的现役训练资产清单并以独立r2重提原测试；保留旧任务证据。
+
+[051 缓存生成分歧排查](051_kv_cache_generation_divergence.md)待办：同一150-token输入三次重复首正文ID不同，需区分数值效应与实现问题；048等价性验收保持未完成。

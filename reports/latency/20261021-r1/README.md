@@ -1,6 +1,6 @@
 # Issue 047/048 延迟对照
 
-状态：Pending期间取消，已由r2替代。任务协议见 [Issue 049](../../../docs/issue/049_latency_decomposition_validation.md)。三臂为600ms首段/无缓存、300ms首段/无缓存、300ms首段/有缓存，micro-turn保持600ms，沿用T2_R3_delayed_start与固定25会话。
+状态：Pending期间取消，已由r2替代。任务协议见 [Issue 049](../../../docs/issue/archive/049_latency_decomposition_validation.md)。三臂为600ms首段/无缓存、300ms首段/无缓存、300ms首段/有缓存，micro-turn保持600ms，沿用T2_R3_delayed_start与固定25会话。
 
 本地conda：11项Kokoro客户端测试、24项双工运行/协议测试、8项模型服务/缓存测试（包含tiny Qwen真实缓存）及2项分段统计测试通过。真实权重/音频测试留远端调度执行；测试结果尚未生成，不提前填写性能结论。
 

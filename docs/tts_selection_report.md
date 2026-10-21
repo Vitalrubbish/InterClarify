@@ -121,7 +121,7 @@ Kokoro 首块音频时长中位数为 **4.45 秒**，P95 为 11.261 秒，说明
 
 ### 6.2 Kokoro 分段接入与复听
 
-2026-10-21：[Issue 047](issue/047_tts_first_segment_latency.md)已实现首段300ms与独立后续段1200ms的候选配置，当前按[Issue 049](issue/049_latency_decomposition_validation.md)远端对照验证；旧600ms方案作为基线保留。该候选的性能及听感结论待实测，不沿用旧r3复听作为通过依据。
+2026-10-21：[Issue 047](issue/047_tts_first_segment_latency.md)已实现首段300ms与独立后续段1200ms的候选配置，当前按[Issue 049](issue/archive/049_latency_decomposition_validation.md)远端对照验证；旧600ms方案作为基线保留。远端三臂结果已交付：相同8例首可听代理均值1.836→1.521秒，12字符/600ms供给诊断缺口57.9→252.4ms；[测量报告](../reports/latency/20261021-r2/results.md)披露具体口径。新分段人工复听尚未执行，不沿用旧r3复听作为通过依据。
 
 后续沿 X-Talk 原有接口聚合真实文本增量，由唯一播放管理路径提交 PCM，取消后隔离旧代际音频。2026-10-19 已验收分段策略为 12/160 字符，首段等待 600ms、后续段最多 1,200ms 等待句界；句界、finish 或长度上限可提前提交。到期交付完整词，残词继续等待，因而无词边界时不承诺 600ms 内提交。TTS 合成副本对明确时间语境中的合法 HH:MM 转成英文读法，不修改模型正文或历史。
 

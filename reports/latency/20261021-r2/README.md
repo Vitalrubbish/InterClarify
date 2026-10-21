@@ -2,6 +2,8 @@
 
 用户要求检查可能被误删的服务器源码。r1测试224个源码文件均校验通过；发现当前权重加载器引用的历史资产清单确实缺失，已从Git 91b7eb2恢复。清单SHA256 `ca93ed2e34df36acf9bce1ee8be869f78f0105a18a7e9cbfd10f7fcda0d7b424` 与训练manifest一致，40个官方源码/权重/base文件的存在性及大小检查通过；完整内容哈希仍由模型加载器在正式作业内复核。
 
-旧任务 `job-179251430615923992781-xuan-zhang` 在Pending状态取消，未产生测量，不记作性能失败。保留旧提交脚本。新根 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-latency-20261021-r2/` 从同一源码包解出，224个摘要复核通过；实验条件及预算沿用[Issue 049](../../../docs/issue/049_latency_decomposition_validation.md)，未改实现、权重或输入。
+旧任务 `job-179251430615923992781-xuan-zhang` 在Pending状态取消，未产生测量，不记作性能失败。保留旧提交脚本。新根 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-latency-20261021-r2/` 从同一源码包解出，224个摘要复核通过；实验条件及预算沿用[Issue 049](../../../docs/issue/archive/049_latency_decomposition_validation.md)，未改实现、权重或输入。
 
-状态：已重提，任务 `job-179251495575111326759-xuan-zhang`，run_id=`latency-047-048-r2`；测量结果待回收。
+状态：已重提，任务 `job-179251495575111326759-xuan-zhang`，run_id=`latency-047-048-r2`；已完成，退出码0。三臂各25会话通过执行检查，完整结果见[分段分析](results.md)和[原始结果摘要](results.json)。
+
+首可听代理均值A/B/C为1.836/1.521/1.471秒（相同8个原窗口成功回复；10个锚点会话中另2例漏答）。缓存固定对照有同一输入的三次生成分歧，048完整等价性验收未通过，见Issue 051；300ms的听感复听待执行。
