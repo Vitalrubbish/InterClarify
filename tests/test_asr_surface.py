@@ -31,6 +31,18 @@ class AsrSurfaceTests(unittest.TestCase):
         self.assertEqual(short['events'], long['events'][:2])
         self.assertEqual(short['asr_pending']['text'], '?')
 
+    def test_pending_format_fragment_becomes_no_voice_without_dropping_sources(self):
+        plan = apply_asr_surface({'events': [event(0, 'Ready?'), event(1, '**'), event(2, ' Yes.')]})
+        self.assertEqual(plan['events'][1]['user_asr'], '')
+        self.assertEqual(audit_asr_surface(plan)['sourced_no_voice_events'], 1)
+        config = copy.deepcopy(fixtures.CONFIG)
+        config['generation']['asr_surface'] = 'delayed_punctuation_v1'
+        tokenizer = fixtures.CharacterTokenizer()
+        encoder = SequenceEncoder(tokenizer, config, 256)
+        held = {**plan['events'][1], 'user_unpunctuated': '**', 'assistant_ids': [], 'control': 'speaking'}
+        prefix, _ = encoder.event_ids(held, 'asr_delayed')
+        self.assertIn(config['token_ids']['<|no voice|>'], prefix)
+
     def test_interruption_and_backchannel_release_previous_turn_punctuation(self):
         for origin in ({'turn': 2}, None):
             new = event(2, 'Actually, wait!', 2)

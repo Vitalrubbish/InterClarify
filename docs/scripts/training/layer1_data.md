@@ -2,6 +2,8 @@
 
 077新增可选ASR视图：`arms_for_config`在声明`delayed_punctuation_v1`时增加ASR臂，`arm_view`统一选择视图。`MicroTurnPlanner.plan`在原计划完成后调用`apply_asr_surface`追加可见文本和来源，不更改随机事件或目标；旧配置不调用该过程。`SequenceEncoder.event_ids`读取`user_asr`，窗口共同长度同时考虑ASR视图，用户文本仍全部mask。规则说明见[asr_surface.md](asr_surface.md)。
 
+ASR视图允许只有待发标点/非词字符的源拍暂时无新增识别文本，并编码为no-voice；来源仍在暂存或后续交付中核验，不丢弃事件、不改控制目标。原样/T2仍拒绝有来源片段被删空；ASR审计另要求包含字母/数字的当前源拍不能全部不可见。
+
 `scripts/training/layer1_data.py` 将已验真的 UltraChat 原始对话变为可追溯的事件计划及三组监督序列，不加载模型、不运行服务、不具有播放权。
 
 `ReleasedTokenizer` 只用发布 `tokenizer.json` 和配置，逐项验证实际特殊 token 单 ID、EOS、无 BOS，并记录文件摘要。`user_chunks` 使用原文字符 offsets 保留跨度，不经 decode/re-encode 重建原始用户文本；遇到 Unicode 多 token 共享字符时延长到合法字符边界，因此可超过抽样的 7 token，跨度与实际 token 数保留在事件中。assistant 直接保留编码 ID，每片段最多 10 个内容 token。

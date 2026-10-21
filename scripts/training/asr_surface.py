@@ -82,6 +82,9 @@ def audit_asr_surface(plan):
 
     for event in events:
         assert expand(event['asr_spans'], event['event_id']) == event['user_asr']
+        if event.get('user_origin') and not event['user_asr'].strip():
+            assert not any(c.isalnum() for c in event['user_text']), 'Lexical source unexpectedly invisible'
+            counts['sourced_no_voice_events'] += 1
         if not event['user_text']:
             assert not event['user_asr'] and not event['asr_spans'], 'No-voice flushed pending punctuation'
         if event['user_asr']:

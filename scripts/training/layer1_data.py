@@ -561,7 +561,7 @@ class SequenceEncoder:
             text = event['user_unpunctuated']
         elif view == 'asr_delayed':
             text = event['user_asr']
-        if event['user_origin'] and not text.strip():
+        if event['user_origin'] and view != 'asr_delayed' and not text.strip():
             raise ValueError('A sourced user micro-turn became no-voice')
         user = self.tokenizer.encode(text.strip()) if text.strip() else [self.config['token_ids']['<|no voice|>']]
         prefix = self.user_header + user + self.user_end + self.assistant_header
