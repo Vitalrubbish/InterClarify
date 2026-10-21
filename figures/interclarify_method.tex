@@ -17,9 +17,9 @@
   \path[cell,fill=cyan!12] (2.25,7.02) rectangle (4.95,7.62);
   \node at (\a,7.32) {L0: backchannel};
   \path[cell,fill=blue!10] (5.45,7.02) rectangle (8.15,7.62);
-  \node at (\b,7.32) {L1: brief response};
+  \node at (\b,7.32) {no system speech};
   \path[cell,fill=blue!10] (8.65,7.02) rectangle (11.35,7.62);
-  \node at (\c,7.32) {L1: continue};
+  \node at (\c,7.32) {no system speech};
   \path[cell,fill=violet!12] (11.85,7.02) rectangle (14.55,7.62);
   \node at (\d,7.32) {L1: Which Alex?};
   \path[cell,fill=green!11] (15.05,7.02) rectangle (17.75,7.62);
@@ -44,8 +44,8 @@
   \node[anchor=east,align=right,font=\bfseries,text=blue!70!black] at (1.95,4.80) {Layer 1\\Expression module};
   \path[lane,fill=blue!8] (2.25,4.54) rectangle (18.0,5.06);
   \node at (\a,4.80) {SILENCE};
-  \node at (\b,4.80) {duplex + CALL L2};
-  \node at (\c,4.80) {duplex loop runs};
+  \node at (\b,4.80) {SILENCE + REQUEST*};
+  \node at (\c,4.80) {SILENCE (tool pending)};
   \node at (\d,4.80) {use tool result};
   \node at (\e,4.80) {ANSWER};
   \draw[reasoning] (\b,5.06)--(\b,5.39);
@@ -82,6 +82,7 @@
   \path[lane,fill=gray!10] (2.25,1.11) rectangle (18.0,1.55);
   \node at (10.1,1.33) {Continuous listening across fixed micro-turn windows; clarification answer updates the same task};
   \foreach \x in {3.6,6.8,10.0,13.2,16.4} {\draw[next] (\x,1.55)--(\x,1.91);}
-  \node[anchor=west,font=\tiny,text=black!55] at (2.25,.64) {Proposed architecture: L1 calls an async thinking tool; results return to L1. Runtime integration pending.};
-  \node[anchor=west,font=\tiny,text=black!55] at (2.25,.32) {Illustrative events; return format, timing, validity policy, and other example details remain under discussion.};
+  \node[anchor=west,font=\tiny,text=black!55] at (2.25,.64) {*REQUEST denotes an internal special token; name and sequence position TBD. Never sent to TTS.};
+  \node[anchor=west,font=\tiny,text=black!55] at (2.25,.32) {Callable while listening or speaking; this trace shows a silent call. Runtime integration pending.};
+  \node[anchor=west,font=\tiny,text=black!55] at (2.25,.00) {Illustrative events; return format, timing, validity policy, and other example details remain under discussion.};
 \end{tikzpicture}
