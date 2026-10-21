@@ -139,4 +139,8 @@
 
 [064 分段延迟报告与backchannel方向](archive/064_latency_report_and_backchannel_plan.md)完成归档：见[正式报告](../latency_analysis_report.md)，包含分段测量、版本口径和降低首反馈延迟/感知等待的后续计划，模块未上线。
 
-[065 完整FDB两轴评测](065_full_fdb_two_axes.md)进行中：当前微调模型、300ms与KV复用，完整119例Smooth Turn-Taking及200例User Interruption，任务job-179255450314330572677-xuan-zhang已运行，评分结果待回收。
+[065 完整FDB两轴评测](065_full_fdb_two_axes.md)进行中：当前微调模型、300ms与KV复用，完整119例Smooth Turn-Taking及200例User Interruption，r1/r2在评分预检提前失败后，r4任务job-179256336071350402616-xuan-zhang已正式回放；用户明确暂缓GPT评分，继续完整回放/官方转写及两轴TOR/Latency，结果待回收。
+
+[067 暂缓不可用judge](archive/067_defer_unavailable_fdb_judge.md)完成归档：按用户决定不替换judge，独立r4已启动319例回放/时序评测，最终结果由065跟踪。
+
+[068 串行服务预热](archive/068_serialize_fdb_service_warmup.md)完成归档：ASR独立180秒预热、在线规则不变，r4全部health通过且首例报告已生成。

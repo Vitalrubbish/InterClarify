@@ -1,0 +1,12 @@
+{
+  "job_id": "job-179256291703117654931-xuan-zhang",
+  "run_id": "full-fdb-two-axes-065-r3",
+  "source_commit": "b4ab705",
+  "xtalk_commit": "d6dc3bff0a512d13f4352bce6105aec80b7f9960",
+  "fdb_commit": "3e799c45a045256f47d5f1c9cda90157e2d2ec9e",
+  "source_manifest_sha256": "83d6443978886b8320e30b091b7fcd302619f4d752b5e28dc7f77f7544be0c00",
+  "data_manifest_sha256": "b804734cc4a030e629b16891468259958b8170a4a495e8909227bf4f716eb5be",
+  "gpt_judge": "deferred_by_user",
+  "remote_root": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-fdb-two-axes-20261021-r3",
+  "status": "Cancelled before replay after Nemotron startup warmup timeout"
+}

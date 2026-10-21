@@ -14,4 +14,4 @@
 
 任务ID：`job-179255450314330572677-xuan-zhang`，run_id=`full-fdb-two-axes-065-r1`。源码、训练完成记录及319例/638个文件验证已通过；评分预检状态持续跟踪，不提前记为完成。
 
-修复由[066](../../../docs/issue/066_fdb_alignment_file_limit.md)跟踪：单文件改8GiB，总输出仍30GiB，独立r2重提。原r1的1GiB预算和失败日志保留为历史，不改写为新预算。
+修复由[066](../../../docs/issue/archive/066_fdb_alignment_file_limit.md)跟踪：单文件改8GiB，总输出仍30GiB，独立r2重提。原r1的1GiB预算和失败日志保留为历史，不改写为新预算。
