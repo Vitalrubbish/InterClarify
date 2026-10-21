@@ -1,5 +1,7 @@
 # Layer 1 最终训练器
 
+077/078新增ASR臂，`ProbeDataset`通过`arm_view`读取`asr_delayed`，独立统计`view_asr_delayed`；数据摘要、逐产物重编码和mask检查保持相同要求。078将使用独立协议及新索引，旧040训练身份不改写。
+
 `scripts/training/train_layer1.py` 只执行 `issue040_delayed_start` 的 T2_R3 全量单 epoch 训练。`--config`、`--protocol`、`--arm T2` 与 1,000 条 `--dialogues` 均为必填；入口先调用 `validate_delayed_config` 核验用户授权、加权 loss、数据 audit、完整索引、资产和预算，再加载官方权重。
 
 `ProbeDataset` 核验 r5 清单、机器审计、tokenizer、训练子集、逐对话缓存和事件计划，只读取 train 的 T2 去句读视图，单进程、无预取 worker。`validate_sequence` 逐 span 检查消息头/历史 mask、assistant 目标与 causal shift；`collate` 右侧 padding 并屏蔽 padding labels。

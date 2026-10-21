@@ -16,7 +16,7 @@ import time
 
 import yaml
 
-from layer1_data import ReleasedTokenizer, SequenceEncoder, digest, write_json
+from layer1_data import ReleasedTokenizer, SequenceEncoder, digest, write_json, arm_view
 from layer1_model import (LORA_NAME, load_official_checkpoint, sha256_file,
                           state_fingerprints, verify_asset_inventory)
 
@@ -81,7 +81,7 @@ class ProbeDataset:
             require(sha256_file(path) == expected, 'Dialogue artifact digest mismatch')
             artifact = json.loads(path.read_text())
             require(artifact['dialogue_id'] == identity and artifact['split'] == 'train', 'Non-train artifact')
-            view = {'T1': 'original', 'T2': 'unpunctuated', 'T3': assignments[identity]}[arm]
+            view = arm_view(arm, assignments[identity])
             original = [r for r in artifact['sequences'] if r['arm'] == arm]
             require(original == list(original_encoder.encode(artifact['plan'], 'train', arm, view)),
                     'Original audited sequence differs from the event plan')

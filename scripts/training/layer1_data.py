@@ -27,6 +27,14 @@ CONTROLS = {
 ARMS = ('T1', 'T2', 'T3')
 
 
+def arms_for_config(config):
+    return ARMS + (('ASR',) if config['generation'].get('asr_surface') else ())
+
+
+def arm_view(arm, assignment):
+    return {'T1': 'original', 'T2': 'unpunctuated', 'T3': assignment, 'ASR': 'asr_delayed'}[arm]
+
+
 def spoken_dialogue_texts(texts):
     """Preserve assistant turns while normalizing complete user turns."""
     return [text if i % 2 else normalize_user_text(text)['text'] for i, text in enumerate(texts)]
@@ -517,10 +525,14 @@ class MicroTurnPlanner:
                 for _ in range(rng.randint(*cfg['thinking_windows'])):
                     emit('post_response_thinking', control='thinking')
             turn += 2
-        return {'dialogue_id': dialogue['dialogue_id'], 'epoch': epoch, 'events': events,
+        plan = {'dialogue_id': dialogue['dialogue_id'], 'epoch': epoch, 'events': events,
                 'user_turns': user_turns,
                 'source_type': 'synthetic_ultrachat', 'clock_type': 'synthetic_window_only',
                 'sampling': dict(sampling)}
+        if cfg.get('asr_surface'):
+            from asr_surface import apply_asr_surface
+            apply_asr_surface(plan)
+        return plan
 
 
 def mixed_assignments(dialogues, seed, epoch):
@@ -547,6 +559,8 @@ class SequenceEncoder:
         text = event['user_text']
         if view == 'unpunctuated':
             text = event['user_unpunctuated']
+        elif view == 'asr_delayed':
+            text = event['user_asr']
         if event['user_origin'] and not text.strip():
             raise ValueError('A sourced user micro-turn became no-voice')
         user = self.tokenizer.encode(text.strip()) if text.strip() else [self.config['token_ids']['<|no voice|>']]
@@ -561,8 +575,9 @@ class SequenceEncoder:
         events = plan['events']
         blocks = [self.event_ids(event, view) for event in events]
         lengths = []
+        views = ('original', 'unpunctuated') + (('asr_delayed',) if self.config['generation'].get('asr_surface') else ())
         for event in events:
-            lengths.append(max(sum(map(len, self.event_ids(event, v))) for v in ('original', 'unpunctuated')))
+            lengths.append(max(sum(map(len, self.event_ids(event, v))) for v in views))
         if any(n > self.max_length for n in lengths):
             raise ValueError('A complete micro-turn exceeds the configured maximum length')
         cursor, index = 0, 0
@@ -598,6 +613,8 @@ def validate_config(config):
         raise ValueError('Only schema 1 without system backchannels is supported')
     if config['generation'].get('user_surface') != VERSION:
         raise ValueError('Unsupported user text surface version')
+    if config['generation'].get('asr_surface') not in (None, 'delayed_punctuation_v1'):
+        raise ValueError('Unsupported ASR surface version')
     if set(config['splits']) != {'train', 'dev', 'test'} or any(
             type(n) is not int or n < 0 for n in config['splits'].values()):
         raise ValueError('Invalid split sizes')

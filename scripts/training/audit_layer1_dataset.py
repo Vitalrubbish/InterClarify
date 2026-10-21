@@ -11,6 +11,7 @@ from pathlib import Path
 from layer1_data import (
     ARMS, CONTROLS, MicroTurnPlanner, ReleasedTokenizer, SequenceEncoder,
     canonical, digest, file_digest, mixed_assignments, shingles, similar, write_json, spoken_dialogue_texts,
+    arms_for_config, arm_view,
 )
 from number_surface import validate_surface
 
@@ -106,7 +107,7 @@ def audit(directory, tokenizer_dir):
     planner = MicroTurnPlanner(tokenizer, config)
     encoder = SequenceEncoder(tokenizer, config, manifest['identity']['max_length'])
     controls, kinds, lengths, sampling = Counter(), Counter(), [], Counter()
-    numeric_surfaces, response_timing = Counter(), Counter()
+    numeric_surfaces, response_timing, asr_surface = Counter(), Counter(), Counter()
     sequence_counts, token_counts, events_per_split = Counter(), Counter(), Counter()
     expected_artifacts = set()
     for dialogue in selected:
@@ -122,6 +123,9 @@ def audit(directory, tokenizer_dir):
         require(artifact['dialogue_id'] == dialogue['dialogue_id'] and artifact['split'] == dialogue['split'],
                 'Artifact provenance mismatch')
         events = plan['events']
+        if config['generation'].get('asr_surface'):
+            from asr_surface import audit_asr_surface
+            asr_surface.update(audit_asr_surface(plan))
         response_timing.update(audit_response_timing(plan, dialogue, tokenizer))
         for turn, surface in plan['user_turns'].items():
             require(surface['raw_text'] == dialogue['texts'][int(turn)], 'Raw user surface differs from source')
@@ -143,8 +147,8 @@ def audit(directory, tokenizer_dir):
             if event['kind'] == 'user_backchannel':
                 require(event['control'] == 'backchannel' and event['assistant_ids'], 'Backchannel stopped answer')
         events_per_split[dialogue['split']] += len(events)
-        for arm in ARMS:
-            view = {'T1': 'original', 'T2': 'unpunctuated', 'T3': assignments[dialogue['dialogue_id']]}[arm]
+        for arm in arms_for_config(config):
+            view = arm_view(arm, assignments[dialogue['dialogue_id']])
             actual = [s for s in artifact['sequences'] if s['arm'] == arm]
             expected = list(encoder.encode(plan, dialogue['split'], arm, view))
             require(actual == expected, 'Serialized IDs, labels or view differ from frozen plan')
@@ -163,7 +167,7 @@ def audit(directory, tokenizer_dir):
                 token_counts[f'{dialogue["split"]}/{arm}'] += row['effective_tokens']
                 lengths.append(len(row['input_ids']))
             require(coverage == Counter(range(len(events))), 'Missing or repeated event targets')
-        require(len(artifact['sequences']) == sum(1 for s in artifact['sequences'] if s['arm'] in ARMS),
+        require(len(artifact['sequences']) == sum(1 for s in artifact['sequences'] if s['arm'] in arms_for_config(config)),
                 'Unknown experimental arm')
     require(set(manifest['artifacts']) == expected_artifacts, 'Artifact coverage mismatch')
     require(file_digest(directory / 'exclusions.json') == manifest['identity']['exclusions_sha256'],
@@ -240,6 +244,7 @@ def audit(directory, tokenizer_dir):
             'sampling': dict(sampling),
             'response_start_timing': 'next_no_voice',
             'response_timing': dict(response_timing),
+            'asr_surface': {'version': config['generation'].get('asr_surface'), 'counts': dict(asr_surface)},
             'numeric_surface_replacements': dict(numeric_surfaces),
             'observed_rates': rates,
             'source': config['source'], 'source_manifest_sha256': manifest['identity']['source_manifest_sha256'],
