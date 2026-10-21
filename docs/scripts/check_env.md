@@ -19,4 +19,4 @@
 
 ## 依赖
 
-只依赖标准库与目标环境本身，避免“检查脚本自己装不上”的问题。X-Talk 和模型专属 extras 在 P1.0 固定后另行加入检查；不再沿用已删除的 DuplexCascade 专属依赖集合。
+只依赖标准库与目标环境本身，避免“检查脚本自己装不上”的问题。X-Talk 运行时依赖（LangChain/Chroma）已写入 `requirements.txt`，但 `check_env.py` 仍只检查通用核心；X-Talk 自身测试使用 `PYTHONPATH=src` 单独运行。

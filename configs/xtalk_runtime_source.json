@@ -1,6 +1,6 @@
 {
   "repository": "https://github.com/Vitalrubbish/xtalk.git",
   "branch": "dev",
-  "commit": "d6dc3bff0a512d13f4352bce6105aec80b7f9960",
-  "purpose": "accepted 300ms/1200ms TTS and session KV reuse"
+  "commit": "ca9b23c134b390107601bc98954ab16276d86db9",
+  "purpose": "generalized continuous ASR transport; runtime behavior equivalent to d6dc3bf"
 }

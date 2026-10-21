@@ -1,11 +1,10 @@
-# InterClarify P0 pinned third-party dependencies.
+# InterClarify pinned third-party dependencies.
 #
 # Rationale and provenance are recorded in scripts/remote/setup_env.sh and
 # docs/scripts/check_env.md.
-# P0 only carries the generic GPU, audio, transport and service stack used by
-# the current repository.  X-Talk and model-specific extras are pinned after
-# the P1.0 component audit instead of inheriting the removed DuplexCascade
-# dependency set.  torch 2.4.1 ships CUDA 12.1 wheels for RTX 4090 (sm_89).
+# The environment carries the GPU, audio, transport and service stack used by
+# the current repository plus the runtime dependencies of the X-Talk fork.
+# torch 2.4.1 ships CUDA 12.1 wheels for RTX 4090 (sm_89).
 #
 # Install with (see scripts/remote/setup_env.sh):
 #   python -m pip install -r requirements.txt
@@ -22,11 +21,20 @@ librosa==0.10.2.post1
 sounddevice==0.4.6
 
 # --- duplex transport / service ------------------------------------------
-websockets==12.0
+websockets==16.1.1
 fastapi==0.115.0
 uvicorn==0.30.6
 requests==2.32.3
-aiohttp==3.10.5
+aiohttp==3.14.5
+
+# --- X-Talk runtime -------------------------------------------------------
+# Importing xtalk.models pulls the agent and retrieval interfaces, so these
+# versions are part of the local runtime rather than optional examples.
+langchain==0.3.30
+langchain-core==0.3.86
+langchain-openai==0.3.35
+langchain-chroma==0.2.6
+chromadb==1.5.9
 
 # --- official DuplexCascade model service (scripts/remote/duplex_model_service.py) ---
 # The released tokenizer.json carries `ignore_merges` and needs tokenizers>=0.20
@@ -37,7 +45,8 @@ tokenizers==0.20.3
 peft==0.13.2
 
 # --- project / tooling ----------------------------------------------------
-PyYAML==6.0.2
+PyYAML==6.0.3
+packaging==25.0
 pytest==8.3.2
 # FastAPI TestClient requires httpx; 0.27 keeps the Starlette 0.38 TestClient API.
 httpx==0.27.2

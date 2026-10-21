@@ -16,7 +16,7 @@
 | Layer 2 初期路线 | 冻结现成模型权重，以 system prompt 驱动持续判断和结构化输出，暂不专项训练；运行时记录真实观察、完成、返回与注入事件，见[第7节](../research_design.md#7-系统工程架构) |
 | 异步训练参考 | 外部结果块屏蔽损失，后续动作与正文监督方案待定，见[第5.8节](../research_design.md#58-异步调用与结果利用的训练参考) |
 | 思考调用方向 | Layer 1 在倾听或表达时均可通过独立 special token 请求异步思考；每会话最多一个请求在途，重复触发合并；结果写回 Layer 1 后经统一仲裁与单一播放路径表达，见[第7.2—7.4节](../research_design.md#72-思考请求与任务调度) |
-| 组件与运行时 | Nemotron EN160 + Kokoro `af_heart`；300/1200ms 分段、600ms micro-turn、会话 KV 复用、`duplex_greedy_v1`；X-Talk `d6dc3bf`，见[运行时配置](../runtime_baseline.md) |
+| 组件与运行时 | Nemotron EN160 + Kokoro `af_heart`；300/1200ms 分段、600ms micro-turn、会话 KV 复用、`duplex_greedy_v1`；X-Talk `ca9b23c`，见[运行时配置](../runtime_baseline.md) |
 | FDB 评测 | 保留冻结子集与完整两轴回放、官方词级对齐和 TOR/Latency 评分脚本；FDB 作为辅助工程与能力评测，不替代主动澄清 benchmark，结果见[reports/fdb](../../reports/README.md) |
 
 ## 共用约束

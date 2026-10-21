@@ -36,6 +36,19 @@ conda run --no-capture-output -n interclarify-dev python -m unittest discover -s
 
 `check_env.py` 应输出 `status: PASS`，核心模块缺失数为 0。本地 WSL 环境当前可见 RTX 5070 Laptop GPU（sm_120，约 8GB）；真实模型推理仍在远端 GPU 作业执行。
 
+## X-Talk 测试
+
+`xtalk/` 是独立仓库，运行时依赖已纳入 `requirements.txt`。在 `xtalk/` 目录下运行：
+
+```bash
+PYTHONPATH=src conda run --no-capture-output -n interclarify-dev python -m unittest \
+  tests.test_continuous_streaming_client tests.test_nemotron_streaming_client \
+  tests.test_duplex_protocol tests.test_duplex_observability tests.test_duplex_runtime \
+  tests.test_kokoro_segmented tests.test_qwen3_asr_reconnect -v
+```
+
+完整 X-Talk 测试还包含可选模型依赖；缺少对应后端时相关用例应跳过，不以跳过冒充通过。
+
 ## 测试依赖
 
 FastAPI `TestClient` 需要 `httpx==0.27.2`；更高版本与当前 Starlette 0.38 的 TestClient 接口不兼容。该依赖已写入 `requirements.txt`，不随开发工具升级。

@@ -6,7 +6,7 @@
 
 | 模块 | 采用值 |
 | --- | --- |
-| 运行底座 | X-Talk fork，提交 `d6dc3bff0a512d13f4352bce6105aec80b7f9960`（`dev`） |
+| 运行底座 | X-Talk fork，提交 `ca9b23c`（`dev`） |
 | ASR | Nemotron EN 0.6B，流式 160ms 分块，音频传输 80ms |
 | TTS | Kokoro 82M，音色 `af_heart` |
 | 语言模型 | DuplexCascade 官方权重，Qwen2-7B-Instruct 基座 |
