@@ -31,9 +31,10 @@ def load_candidate(loaded, path, checkpoint, base_model):
     manifest = json.loads((directory / 'manifest.json').read_text())
     identity = manifest['identity']
     config = identity['config']
-    require(config['purpose'] == 'issue040_delayed_start'
-            and config['condition'] == 'T2_R3_delayed_start' and config['arm'] == 'T2',
-            'Only the registered T2_R3 delayed-start candidate can be served')
+    registered = {('issue040_delayed_start', 'T2_R3_delayed_start', 'T2'),
+                  ('issue078_asr_punctuation', 'ASR_R4_delayed_punctuation', 'ASR')}
+    require((config['purpose'], config['condition'], config['arm']) in registered,
+            'Only a registered final-epoch candidate can be served')
     require(summary['passed'] and summary['frozen_tensors_unchanged']
             and summary['formal_training_released'] and manifest['formal_training_released'],
             'Candidate training was not successfully completed')

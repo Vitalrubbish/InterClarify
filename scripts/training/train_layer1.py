@@ -265,7 +265,7 @@ def train(args):
     index_path = root / protocol['training']['full_train_index']
     full_index = json.loads(index_path.read_text())
     validate_index(full_index, protocol)
-    require(dataset.identity == full_index['T2'], 'Actual dataset differs from frozen full index')
+    require(dataset.identity == full_index[args.arm], 'Actual dataset differs from frozen full index')
     require(config['scheduler_steps'] == (len(dataset.order) + config['gradient_accumulation'] - 1) //
             config['gradient_accumulation'], 'Single-epoch step count mismatch')
     source_files = [Path(__file__), Path(__file__).with_name('layer1_data.py'),
@@ -273,6 +273,8 @@ def train(args):
                     Path(__file__).with_name('layer1_loss.py'),
                     Path(__file__).with_name('prepare_layer1_adaptation.py'),
                     Path(__file__).with_name('layer1_candidate.py')]
+    if args.arm == 'ASR':
+        source_files.append(Path(__file__).with_name('asr_surface.py'))
     identity = {'config': config, 'data': dataset.identity, 'assets': assets,
                 'code': {p.name: sha256_file(p) for p in source_files}}
     identity['release'] = {'protocol': sha256_file(args.protocol), 'index': sha256_file(index_path),
@@ -456,7 +458,7 @@ def parser():
         run.add_argument('--' + name, type=Path, required=True)
     run.add_argument('--config', type=Path, required=True)
     run.add_argument('--dialogues', type=int, choices=(1000,), required=True)
-    run.add_argument('--arm', choices=('T2',), required=True)
+    run.add_argument('--arm', choices=('T2', 'ASR'), required=True)
     run.add_argument('--protocol', type=Path, default=Path('configs/layer1_delayed_protocol.yaml'))
     run.add_argument('--length', type=int, required=True)
     run.add_argument('--steps', type=int, required=True)

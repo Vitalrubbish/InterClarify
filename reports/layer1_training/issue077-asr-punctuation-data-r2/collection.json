@@ -1,0 +1,12 @@
+{
+  "source_commit": "22382552e000711720cf5f2c248ee7272c8d54ce",
+  "exit_code": 0,
+  "remote_run": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer1-training-20261019/data/runs/issue077-asr-punctuation-data-r2",
+  "sha256": {
+    "summary.json": "69b5b2dcbb9fa35006675531e571860c5f8a999c2d134ada67bfbd96a484303d",
+    "audit.json": "9c6002e39e95542c4c4f97f70ab3852a2d5f9ceecafd4a073c665f0a13048732",
+    "full_train_index.json": "251c5190cd4ca79430477ec1b7ef8b71a27550383a2a2ca7b614ae5676c7831a",
+    "review_cards.json": "bd6dfbf582f80aa6c78255544e5a0183e883cce073c71e3479a14de415ebd9bb"
+  },
+  "output_bytes": 593304767
+}

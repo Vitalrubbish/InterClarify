@@ -1,0 +1,611 @@
+{
+  "reviewer": "Codex",
+  "review_type": "agent_semantic_reading",
+  "completed": true,
+  "human_review_complete": false,
+  "manifest_sha256": "865fc861b39534319c353a8333a3bc47ddd2ffdd05e728588077d69939bce62a",
+  "review_cards_sha256": "bd6dfbf582f80aa6c78255544e5a0183e883cce073c71e3479a14de415ebd9bb",
+  "scope": "读取60条卡片中目标事件前后2拍，与073语义上下文结合；完整因果来源及未显示的续说由全量机器审计核验。",
+  "rows": [
+    {
+      "dialogue_id": "940063",
+      "split": "train",
+      "turn": 2,
+      "group": "sentence_mark_then_continues",
+      "event_id": 91,
+      "artifact_sha256": "54753d56b9c227373be8ff16298291e51efa38c63ae1892e23dab6efd329c65f",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "713154",
+      "split": "train",
+      "turn": 4,
+      "group": "sentence_mark_then_continues",
+      "event_id": 220,
+      "artifact_sha256": "1a4674fef2f26227202de820d36a6b238a1b440db348b46dc0d1a38d5d08b5d8",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1099118",
+      "split": "train",
+      "turn": 2,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 61,
+      "artifact_sha256": "3ece744d58287def03745f5b0f54417eae58e643daa7e636ff354db8df8d1bc2",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1099136",
+      "split": "train",
+      "turn": 0,
+      "group": "turn_end",
+      "event_id": 14,
+      "artifact_sha256": "898b33210a2d343b831178e886ad35ee79d349fcccddca3b4e9acc9f88e11bea",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "271543",
+      "split": "train",
+      "turn": 12,
+      "group": "sentence_mark_then_continues",
+      "event_id": 268,
+      "artifact_sha256": "d8f976d1cfff652a44a4dd1db4b2bd0784bebbf513befa06a96e244f60b1af65",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1347887",
+      "split": "train",
+      "turn": 0,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 28,
+      "artifact_sha256": "733578e78bd4e4312b0cfcf055a1e0fd4e9d83387a1e420079fb0669b93fa926",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "271246",
+      "split": "train",
+      "turn": 10,
+      "group": "inside_word",
+      "event_id": 177,
+      "artifact_sha256": "1a0ebe69749ef0103972bed460472828338beca91690f88dcd1105e1c04c22ef",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "939761",
+      "split": "train",
+      "turn": 0,
+      "group": "sentence_mark_then_continues",
+      "event_id": 17,
+      "artifact_sha256": "df7e2ff4720f008ffe8d60a56b13ef2ac71658f3070ffe92000b7794d3097f9c",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1439034",
+      "split": "train",
+      "turn": 0,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 17,
+      "artifact_sha256": "b28945e331334a1c7705e4360713d5ab6ad202837ebf28241c8c447fb8a6e1f9",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "102132",
+      "split": "train",
+      "turn": 6,
+      "group": "sentence_mark_then_continues",
+      "event_id": 113,
+      "artifact_sha256": "d5dc5eb48a86599ea9099b731ac00523404dd133beeb09cb165f0ca31f440d49",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "500715",
+      "split": "train",
+      "turn": 10,
+      "group": "sentence_mark_then_continues",
+      "event_id": 173,
+      "artifact_sha256": "09afe168b79d2ebdff74efbcc72bb6363ac7f2185a85f2983fabb98a4c14f9e5",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1439270",
+      "split": "train",
+      "turn": 2,
+      "group": "turn_end",
+      "event_id": 188,
+      "artifact_sha256": "3c52e10c841268c2e5eada8259141f74ece222f50996dc742908c5ee69c8feae",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "353931",
+      "split": "train",
+      "turn": 8,
+      "group": "turn_end",
+      "event_id": 169,
+      "artifact_sha256": "b401b6a0caa51b6fcecd5e08cae5e67e29a584737165c4a0a5991e4e0359e88e",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1347782",
+      "split": "train",
+      "turn": 0,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 15,
+      "artifact_sha256": "5645ec86c14ecd7429f416af7a46540670c9f682ebf23b4baa7524ce5b41e8d7",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1438954",
+      "split": "train",
+      "turn": 0,
+      "group": "inside_word",
+      "event_id": 37,
+      "artifact_sha256": "d8fd61843376ace41297c7b38ffcde221403f6578917dcff020feddbc0da9c98",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "353657",
+      "split": "train",
+      "turn": 8,
+      "group": "turn_end",
+      "event_id": 85,
+      "artifact_sha256": "d2589550be5e863579ec4606697a2f584fda72c5c1c66e45b9b3516e0cc38fb7",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1348064",
+      "split": "train",
+      "turn": 0,
+      "group": "sentence_mark_then_continues",
+      "event_id": 14,
+      "artifact_sha256": "f5c8706ebcfa0611306f252067a1f3cfb2947be3731cbffde9b43da27045bac7",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1348105",
+      "split": "train",
+      "turn": 0,
+      "group": "sentence_mark_then_continues",
+      "event_id": 20,
+      "artifact_sha256": "05c32fa458ef1a6cb034ace49b5b5209f1534bdff23332b0b4e3a1b493a1dfcb",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "271341",
+      "split": "train",
+      "turn": 0,
+      "group": "inside_word",
+      "event_id": 10,
+      "artifact_sha256": "888dd4fca24ab500ff26da022bed73425b2e853e664bef66b8038bb57fe2d38f",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "353415",
+      "split": "train",
+      "turn": 4,
+      "group": "sentence_mark_then_continues",
+      "event_id": 34,
+      "artifact_sha256": "e3046b16e9ccd1fed401b7d651c19e0a4833ce9fd0546a7894bb7aab4a1d976e",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "102068",
+      "split": "train",
+      "turn": 0,
+      "group": "turn_end",
+      "event_id": 8,
+      "artifact_sha256": "b46cb7004a6a2718c42dda5cba59108ac1e9b5fa998acbe7ec861d0d2efff6dd",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1099075",
+      "split": "train",
+      "turn": 0,
+      "group": "sentence_mark_then_continues",
+      "event_id": 23,
+      "artifact_sha256": "8a0378ca182052880ca1c8228cecbdabda67d8216216ee73b4eb98ce8296bc21",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1348144",
+      "split": "train",
+      "turn": 0,
+      "group": "inside_word",
+      "event_id": 229,
+      "artifact_sha256": "5b9e8e6b0927f1b21a5b05ed5cc29128e1599c17ecf67ba54753defc224b042a",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1439029",
+      "split": "train",
+      "turn": 0,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 68,
+      "artifact_sha256": "1c9f0906de43f787e8e44993330f7c803623f6a9223b06e97e7717ec6562a46c",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1347849",
+      "split": "train",
+      "turn": 0,
+      "group": "inside_word",
+      "event_id": 14,
+      "artifact_sha256": "b68b50421ccd480aa7f10ca561f5abc274535dbb5387c54be771827977b1876d",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "271323",
+      "split": "train",
+      "turn": 8,
+      "group": "inside_word",
+      "event_id": 203,
+      "artifact_sha256": "cd563729afa29cc217d678f95d34a07f3d1021d75b489edf079989be1e61cae0",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1348309",
+      "split": "train",
+      "turn": 0,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 309,
+      "artifact_sha256": "95a3ce618916e50d3f946a4ffdf080f4969b6c9759538937449dbdfe9928a01a",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "713052",
+      "split": "train",
+      "turn": 0,
+      "group": "inside_word",
+      "event_id": 25,
+      "artifact_sha256": "1191386d738bd10765d9e628c7a5fe42e58085f6bfa41d89526df6b5baad580c",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "353573",
+      "split": "train",
+      "turn": 0,
+      "group": "turn_end",
+      "event_id": 13,
+      "artifact_sha256": "2a04c02b5a566bd536381868bb7741ea8a1d813f8f47f7ef3d3167d3a933efbe",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "712963",
+      "split": "train",
+      "turn": 0,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 35,
+      "artifact_sha256": "4830e8b03149564243bae6c8881fe8ee9ad3eaacb4d223fd955e2ef8b7d343aa",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1348151",
+      "split": "train",
+      "turn": 0,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 175,
+      "artifact_sha256": "42b58561860ffefd19ec524b9fdab9330c736cf27599a1276e2da23fed063ffb",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1099534",
+      "split": "train",
+      "turn": 4,
+      "group": "sentence_mark_then_continues",
+      "event_id": 154,
+      "artifact_sha256": "caeb937e1370c7a82285201fbcc38093ce1cee0e5c3759ed6dab635f3402daa4",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1099534",
+      "split": "train",
+      "turn": 2,
+      "group": "turn_end",
+      "event_id": 93,
+      "artifact_sha256": "caeb937e1370c7a82285201fbcc38093ce1cee0e5c3759ed6dab635f3402daa4",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1439164",
+      "split": "train",
+      "turn": 0,
+      "group": "inside_word",
+      "event_id": 132,
+      "artifact_sha256": "3ac09e51bc06e0b300f8674f857f505134fd093527ceb6227f34d831cf94fb4d",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1439296",
+      "split": "train",
+      "turn": 0,
+      "group": "sentence_mark_then_continues",
+      "event_id": 104,
+      "artifact_sha256": "2cb6216a0d6afb7654a90d0701281003c15cab3d119b04b5070e6c6e62191104",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1438981",
+      "split": "train",
+      "turn": 0,
+      "group": "inside_word",
+      "event_id": 117,
+      "artifact_sha256": "8b56747d3eefa2d7ff283bdebed069b4c0b4ab2b19e78a8d4f34bfb34f764da6",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "353913",
+      "split": "train",
+      "turn": 4,
+      "group": "turn_end",
+      "event_id": 55,
+      "artifact_sha256": "bb5397a6e78f9d18fd5d9ccb5b790fe437374de32d54ba2a0c8d2f284c0965b3",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "353852",
+      "split": "train",
+      "turn": 2,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 56,
+      "artifact_sha256": "d4804751b9a1c9f941b7066ba81ec51439372bc20f1d49fda72bf832e16e298c",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1347777",
+      "split": "train",
+      "turn": 0,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 156,
+      "artifact_sha256": "d231667aaf32440ac7f00cafa0dcf52fa0dc5acfc779369c1f8d0d96c6f209b0",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "271727",
+      "split": "train",
+      "turn": 8,
+      "group": "turn_end",
+      "event_id": 89,
+      "artifact_sha256": "db65932d681358932b6ab37cb731efd885f4722543f7bdf1426992b331ae2453",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1439276",
+      "split": "train",
+      "turn": 0,
+      "group": "inside_word",
+      "event_id": 25,
+      "artifact_sha256": "c047938a64f4faaac7e32c8d0f065cfad87356bc50967e8de2626333247f2952",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1439251",
+      "split": "train",
+      "turn": 0,
+      "group": "inside_word",
+      "event_id": 31,
+      "artifact_sha256": "b27abbbbd1639fe66fd1a367933a5716b3689974e942908dd4e7169e7a1f3ca7",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1439447",
+      "split": "dev",
+      "turn": 4,
+      "group": "turn_end",
+      "event_id": 100,
+      "artifact_sha256": "d0241063b4ec362c7dcc70da766d60595264e76b6addb0048ae96044901fcec3",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1347933",
+      "split": "dev",
+      "turn": 0,
+      "group": "inside_word",
+      "event_id": 7,
+      "artifact_sha256": "3bb3a1314cb9060f37d9947b6e62bcb2b6561e1a90b4dbc45e124ff777ced9cc",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "713132",
+      "split": "dev",
+      "turn": 4,
+      "group": "sentence_mark_then_continues",
+      "event_id": 147,
+      "artifact_sha256": "daf7c55fd15bad0273558a7c9b457fea164ab17cdd8afc57f0dc948c62733576",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "713132",
+      "split": "dev",
+      "turn": 6,
+      "group": "sentence_mark_then_continues",
+      "event_id": 210,
+      "artifact_sha256": "daf7c55fd15bad0273558a7c9b457fea164ab17cdd8afc57f0dc948c62733576",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1439319",
+      "split": "dev",
+      "turn": 0,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 113,
+      "artifact_sha256": "01fe7a7d38e768018982bb2be7f24ce430485866261d9e805e5cc2f4c6b19b8e",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "500385",
+      "split": "dev",
+      "turn": 8,
+      "group": "turn_end",
+      "event_id": 122,
+      "artifact_sha256": "f1ef009b7fa3a21cae87fd3022d65861126c144aac121646c44d6e3f21894939",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1347839",
+      "split": "dev",
+      "turn": 0,
+      "group": "inside_word",
+      "event_id": 34,
+      "artifact_sha256": "8542c7725bca20977fc01300d7b7f2f2463c42e30eef0c3f2f79a7ef2baddaf0",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1347749",
+      "split": "dev",
+      "turn": 0,
+      "group": "inside_word",
+      "event_id": 76,
+      "artifact_sha256": "87bc39a42579bc104cb9fee4d29cd25a868ab3b65e8ea20e55c58cee2534b297",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1347893",
+      "split": "dev",
+      "turn": 4,
+      "group": "turn_end",
+      "event_id": 358,
+      "artifact_sha256": "5e442000b1554ff6dd6e22350d22891189306fa6e847be4f68c3069320ad46d6",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "102026",
+      "split": "test",
+      "turn": 2,
+      "group": "inside_word",
+      "event_id": 40,
+      "artifact_sha256": "9bd85ab9390a7c14aafbcf733aedb2bba806cb55aee483e76b18a5ed561c19a2",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "500331",
+      "split": "test",
+      "turn": 6,
+      "group": "turn_end",
+      "event_id": 78,
+      "artifact_sha256": "09516cf42c071f8a238ba00b20d681a7f8b95d2df6768ded936d5ac23b4b2fa3",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1348042",
+      "split": "test",
+      "turn": 0,
+      "group": "sentence_mark_then_continues",
+      "event_id": 195,
+      "artifact_sha256": "2afad7f02de7876804215a5a8b0f084550512616db0ceeb76d02f6327096844e",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1347791",
+      "split": "test",
+      "turn": 0,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 101,
+      "artifact_sha256": "dc83118a16218dc01e3a085ce5207ee1dce16d731a749e07e684542bbb6aa470",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1347973",
+      "split": "test",
+      "turn": 6,
+      "group": "turn_end",
+      "event_id": 141,
+      "artifact_sha256": "dd714db4e5e344a72e5ba24f5a7c7e1a13883b4646f52e048360ea1777841d37",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1348101",
+      "split": "test",
+      "turn": 0,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 159,
+      "artifact_sha256": "fe2e8a828296a01f21304a979b3e312dbb2b1f4654a85fce160766cfceff6425",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1099116",
+      "split": "test",
+      "turn": 0,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 17,
+      "artifact_sha256": "6f20642da4f6314496f1c1c1547397c043ca3ac33e939cebd97f332ebbcbe825",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "1439260",
+      "split": "test",
+      "turn": 0,
+      "group": "enumeration_or_repair_cue",
+      "event_id": 59,
+      "artifact_sha256": "94e03649437ac44b0aa09e9e7e3171f6a8d91f2d98ee3b0b061a3e0ce21e455c",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    },
+    {
+      "dialogue_id": "940266",
+      "split": "test",
+      "turn": 0,
+      "group": "turn_end",
+      "event_id": 21,
+      "artifact_sha256": "0137b3eadafbdb38946ff550f56feb00ce6960c81bf97185bdd5803b01873acf",
+      "accepted": true,
+      "reason": "局部可见文本符合延后句读规则；等待拍无新增标点、词内分片保留、轮末下一空拍finish；不作为人工签署。"
+    }
+  ]
+}

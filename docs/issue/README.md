@@ -6,8 +6,7 @@
 
 | 工作单 | 状态 | 范围与入口 |
 | --- | --- | --- |
-| [077：延后句读重建原1k](077_layer1_delayed_punctuation_rebuild.md) | 进行中 | 固定原切分/事件监督，新增ASR因果可见视图，远端重建并审计 |
-| [078：新ASR视图1k训练](078_layer1_delayed_punctuation_training.md) | 等待077 | 用户已授权；同一官方初始化、单卡单epoch，索引重算并冻结后启动 |
+| [078：新ASR视图1k训练](078_layer1_delayed_punctuation_training.md) | 准备提交 | 077已交付并归档；同一官方初始化、单卡单epoch1240步，协议及证据已冻结 |
 | [074：训练集扩充至3k并保证多样性](074_layer1_diverse_3k_dataset.md) | 待执行 | 073已交付；保留原1k来源与固定dev/test，新增2k独立对话，按ASR表面形式冻结新视图 |
 | [075：远端多卡训练可行性调研](075_layer1_multigpu_feasibility.md) | 待执行 | 远端资源与环境核查、训练器差距、单卡/多卡成本比较；可与073独立推进 |
 

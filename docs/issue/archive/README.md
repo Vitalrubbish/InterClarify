@@ -17,6 +17,7 @@
 | [072](072_single_inflight_thinking_request.md) | 每会话最多一个思考请求在途，重复触发合并、不重启；已同步研究草稿与图，取消和更新机制待讨论 |
 | [073](073_layer1_pause_punctuation_audit.md) | 全量数据/200份ASR轨迹审计完成，60条代理语义阅读已记录；确认T2过度删内部句读，074接收ASR视图与语义覆盖建议，人工签署仍pending |
 | [076](076_delayed_asr_punctuation_visibility.md) | 根据用户观察及已有探针顺序，补充延后补点的输入可见性；074禁止提前发放或回填迟到标点，精确落窗与上下文规则待实现前核查 |
+| [077](077_layer1_delayed_punctuation_rebuild.md) | 原1000/200/300来源和事件监督不变，ASR延后句读视图全量审计完成，2480个train窗口、60条代理复核交078；原数据和失败r1保留 |
 | [022回放边界](022_runtime_replay_boundary_ordering.md) / [041连接记录](041_local_remote_connection_documentation.md) | 原文尚无Git历史副本，本次保留并登记 |
 
 完整FDB结果与评分范围以[065](065_full_fdb_two_axes.md)为准；执行通过不表示模型能力验收通过。当前研究范围见[研究草稿](../../research_idea.md)。
