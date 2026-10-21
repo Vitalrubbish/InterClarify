@@ -1,0 +1,419 @@
+{
+  "asr": {
+    "all_runs": {
+      "delta": {
+        "internal_chars_,": 234,
+        "internal_texts": 234,
+        "internal_texts_,": 234,
+        "nonempty": 10200,
+        "terminal_chars_.": 34,
+        "terminal_texts": 34,
+        "terminal_texts_.": 34,
+        "texts": 10224
+      },
+      "final": {
+        "internal_chars_,": 234,
+        "internal_chars_.": 32,
+        "internal_texts": 122,
+        "internal_texts_,": 100,
+        "internal_texts_.": 32,
+        "nonempty": 200,
+        "terminal_chars_.": 2,
+        "terminal_texts": 2,
+        "terminal_texts_.": 2,
+        "texts": 200
+      },
+      "online": {
+        "internal_chars_,": 232,
+        "internal_chars_.": 32,
+        "internal_texts": 122,
+        "internal_texts_,": 100,
+        "internal_texts_.": 32,
+        "nonempty": 199,
+        "terminal_chars_.": 1,
+        "terminal_texts": 1,
+        "terminal_texts_.": 1,
+        "texts": 200
+      }
+    },
+    "distinct_sample_names": 100,
+    "eof_only_text_runs": 1,
+    "independence_note": "sample filenames identify the shared fixed recording set; first sorted run retained for deduplication",
+    "one_run_per_sample": {
+      "final": {
+        "internal_chars_,": 117,
+        "internal_chars_.": 16,
+        "internal_texts": 61,
+        "internal_texts_,": 50,
+        "internal_texts_.": 16,
+        "nonempty": 100,
+        "terminal_chars_.": 1,
+        "terminal_texts": 1,
+        "terminal_texts_.": 1,
+        "texts": 100
+      },
+      "online": {
+        "internal_chars_,": 116,
+        "internal_chars_.": 16,
+        "internal_texts": 61,
+        "internal_texts_,": 50,
+        "internal_texts_.": 16,
+        "nonempty": 99,
+        "terminal_texts": 0,
+        "texts": 100
+      }
+    },
+    "prefix_rewrites": 0,
+    "repeat_counts": {
+      "2": 100
+    },
+    "scope": "historical recordings; no new model run; deltas include EOF",
+    "trace_files": 200
+  },
+  "dataset": {
+    "human_review_complete": false,
+    "machine_passed": true,
+    "manifest_sha256": "86c0faca1e1a12d3c7cf1fa0144e53a6a83166a8454ad48d986b24d40a97761d",
+    "review_coverage": {
+      "enumeration_or_repair_cue": {
+        "candidate_events": 1374,
+        "requested": 15,
+        "selected": 15
+      },
+      "inside_word": {
+        "candidate_events": 246,
+        "requested": 15,
+        "selected": 15
+      },
+      "sentence_mark_then_continues": {
+        "candidate_events": 244,
+        "requested": 15,
+        "selected": 15
+      },
+      "turn_end": {
+        "candidate_events": 5744,
+        "requested": 15,
+        "selected": 15
+      }
+    },
+    "splits": {
+      "dev": {
+        "counts": {
+          "dialogues": 200,
+          "dialogues_with_pauses": 188,
+          "internal_punctuation_lost_in_T2_turns": 607,
+          "interruption": 172,
+          "natural_pause": 2647,
+          "pause_seconds_synthetic": 1588.2,
+          "pause_triggers": 884,
+          "post_response_thinking": 6573,
+          "response_continuation": 18439,
+          "response_start": 793,
+          "user_backchannel": 195,
+          "user_continuation": 8301,
+          "user_final_wait": 793,
+          "user_turns": 793
+        },
+        "pause_boundaries": {
+          "after_clause_mark": 28,
+          "after_sentence_mark": 29,
+          "inside_word": 26,
+          "other": 801
+        },
+        "pause_windows_histogram": {
+          "1": 170,
+          "2": 186,
+          "3": 186,
+          "4": 163,
+          "5": 179
+        },
+        "punctuation": {
+          "T2": {
+            "internal_texts": 0,
+            "nonempty": 793,
+            "terminal_texts": 0,
+            "texts": 793
+          },
+          "original": {
+            "internal_chars_!": 127,
+            "internal_chars_,": 1005,
+            "internal_chars_.": 951,
+            "internal_chars_:": 43,
+            "internal_chars_;": 11,
+            "internal_chars_?": 209,
+            "internal_texts": 607,
+            "internal_texts_!": 113,
+            "internal_texts_,": 328,
+            "internal_texts_.": 398,
+            "internal_texts_:": 30,
+            "internal_texts_;": 5,
+            "internal_texts_?": 179,
+            "nonempty": 793,
+            "terminal_chars_!": 17,
+            "terminal_chars_.": 221,
+            "terminal_chars_?": 553,
+            "terminal_texts": 790,
+            "terminal_texts_!": 16,
+            "terminal_texts_.": 221,
+            "terminal_texts_?": 553,
+            "texts": 793
+          },
+          "terminal_period_removed_candidate": {
+            "internal_chars_!": 127,
+            "internal_chars_,": 1005,
+            "internal_chars_.": 951,
+            "internal_chars_:": 43,
+            "internal_chars_;": 11,
+            "internal_chars_?": 209,
+            "internal_texts": 607,
+            "internal_texts_!": 113,
+            "internal_texts_,": 328,
+            "internal_texts_.": 398,
+            "internal_texts_:": 30,
+            "internal_texts_;": 5,
+            "internal_texts_?": 179,
+            "nonempty": 793,
+            "terminal_chars_!": 17,
+            "terminal_chars_?": 553,
+            "terminal_texts": 569,
+            "terminal_texts_!": 16,
+            "terminal_texts_?": 553,
+            "texts": 793
+          },
+          "terminal_sentence_marks_removed_candidate": {
+            "internal_chars_!": 127,
+            "internal_chars_,": 1005,
+            "internal_chars_.": 951,
+            "internal_chars_:": 43,
+            "internal_chars_;": 11,
+            "internal_chars_?": 209,
+            "internal_texts": 607,
+            "internal_texts_!": 113,
+            "internal_texts_,": 328,
+            "internal_texts_.": 398,
+            "internal_texts_:": 30,
+            "internal_texts_;": 5,
+            "internal_texts_?": 179,
+            "nonempty": 793,
+            "terminal_texts": 0,
+            "texts": 793
+          }
+        }
+      },
+      "test": {
+        "counts": {
+          "dialogues": 300,
+          "dialogues_with_pauses": 286,
+          "internal_punctuation_lost_in_T2_turns": 884,
+          "interruption": 271,
+          "natural_pause": 4234,
+          "pause_seconds_synthetic": 2540.4,
+          "pause_triggers": 1421,
+          "post_response_thinking": 8667,
+          "response_continuation": 24936,
+          "response_start": 1123,
+          "user_backchannel": 253,
+          "user_continuation": 13179,
+          "user_final_wait": 1123,
+          "user_turns": 1123
+        },
+        "pause_boundaries": {
+          "after_clause_mark": 38,
+          "after_sentence_mark": 54,
+          "inside_word": 45,
+          "other": 1284
+        },
+        "pause_windows_histogram": {
+          "1": 285,
+          "2": 301,
+          "3": 278,
+          "4": 272,
+          "5": 285
+        },
+        "punctuation": {
+          "T2": {
+            "internal_texts": 0,
+            "nonempty": 1123,
+            "terminal_texts": 0,
+            "texts": 1123
+          },
+          "original": {
+            "internal_chars_!": 149,
+            "internal_chars_,": 1712,
+            "internal_chars_.": 1498,
+            "internal_chars_:": 65,
+            "internal_chars_;": 7,
+            "internal_chars_?": 295,
+            "internal_texts": 884,
+            "internal_texts_!": 142,
+            "internal_texts_,": 493,
+            "internal_texts_.": 616,
+            "internal_texts_:": 40,
+            "internal_texts_;": 6,
+            "internal_texts_?": 232,
+            "nonempty": 1123,
+            "terminal_chars_!": 14,
+            "terminal_chars_.": 334,
+            "terminal_chars_?": 773,
+            "terminal_texts": 1119,
+            "terminal_texts_!": 14,
+            "terminal_texts_.": 334,
+            "terminal_texts_?": 773,
+            "texts": 1123
+          },
+          "terminal_period_removed_candidate": {
+            "internal_chars_!": 149,
+            "internal_chars_,": 1712,
+            "internal_chars_.": 1498,
+            "internal_chars_:": 65,
+            "internal_chars_;": 7,
+            "internal_chars_?": 295,
+            "internal_texts": 884,
+            "internal_texts_!": 142,
+            "internal_texts_,": 493,
+            "internal_texts_.": 616,
+            "internal_texts_:": 40,
+            "internal_texts_;": 6,
+            "internal_texts_?": 232,
+            "nonempty": 1123,
+            "terminal_chars_!": 14,
+            "terminal_chars_?": 773,
+            "terminal_texts": 787,
+            "terminal_texts_!": 14,
+            "terminal_texts_?": 773,
+            "texts": 1123
+          },
+          "terminal_sentence_marks_removed_candidate": {
+            "internal_chars_!": 149,
+            "internal_chars_,": 1712,
+            "internal_chars_.": 1498,
+            "internal_chars_:": 65,
+            "internal_chars_;": 7,
+            "internal_chars_?": 295,
+            "internal_texts": 884,
+            "internal_texts_!": 142,
+            "internal_texts_,": 493,
+            "internal_texts_.": 616,
+            "internal_texts_:": 40,
+            "internal_texts_;": 6,
+            "internal_texts_?": 232,
+            "nonempty": 1123,
+            "terminal_texts": 0,
+            "texts": 1123
+          }
+        }
+      },
+      "train": {
+        "counts": {
+          "dialogues": 1000,
+          "dialogues_with_pauses": 940,
+          "internal_punctuation_lost_in_T2_turns": 2949,
+          "interruption": 805,
+          "natural_pause": 12826,
+          "pause_seconds_synthetic": 7695.6,
+          "pause_triggers": 4318,
+          "post_response_thinking": 31916,
+          "response_continuation": 88789,
+          "response_start": 3828,
+          "user_backchannel": 844,
+          "user_continuation": 41939,
+          "user_final_wait": 3828,
+          "user_turns": 3828
+        },
+        "pause_boundaries": {
+          "after_clause_mark": 119,
+          "after_sentence_mark": 161,
+          "inside_word": 175,
+          "other": 3863
+        },
+        "pause_windows_histogram": {
+          "1": 887,
+          "2": 918,
+          "3": 822,
+          "4": 818,
+          "5": 873
+        },
+        "punctuation": {
+          "T2": {
+            "internal_texts": 0,
+            "nonempty": 3828,
+            "terminal_texts": 0,
+            "texts": 3828
+          },
+          "original": {
+            "internal_chars_!": 592,
+            "internal_chars_,": 5238,
+            "internal_chars_.": 4860,
+            "internal_chars_:": 230,
+            "internal_chars_;": 32,
+            "internal_chars_?": 884,
+            "internal_texts": 2949,
+            "internal_texts_!": 522,
+            "internal_texts_,": 1658,
+            "internal_texts_.": 1995,
+            "internal_texts_:": 106,
+            "internal_texts_;": 14,
+            "internal_texts_?": 789,
+            "nonempty": 3828,
+            "terminal_chars_!": 63,
+            "terminal_chars_.": 1139,
+            "terminal_chars_?": 2618,
+            "terminal_texts": 3818,
+            "terminal_texts_!": 63,
+            "terminal_texts_.": 1137,
+            "terminal_texts_?": 2618,
+            "texts": 3828
+          },
+          "terminal_period_removed_candidate": {
+            "internal_chars_!": 592,
+            "internal_chars_,": 5238,
+            "internal_chars_.": 4860,
+            "internal_chars_:": 230,
+            "internal_chars_;": 32,
+            "internal_chars_?": 884,
+            "internal_texts": 2949,
+            "internal_texts_!": 522,
+            "internal_texts_,": 1658,
+            "internal_texts_.": 1995,
+            "internal_texts_:": 106,
+            "internal_texts_;": 14,
+            "internal_texts_?": 789,
+            "nonempty": 3828,
+            "terminal_chars_!": 63,
+            "terminal_chars_?": 2618,
+            "terminal_texts": 2681,
+            "terminal_texts_!": 63,
+            "terminal_texts_?": 2618,
+            "texts": 3828
+          },
+          "terminal_sentence_marks_removed_candidate": {
+            "internal_chars_!": 592,
+            "internal_chars_,": 5238,
+            "internal_chars_.": 4860,
+            "internal_chars_:": 230,
+            "internal_chars_;": 32,
+            "internal_chars_?": 884,
+            "internal_texts": 2949,
+            "internal_texts_!": 522,
+            "internal_texts_,": 1658,
+            "internal_texts_.": 1995,
+            "internal_texts_:": 106,
+            "internal_texts_;": 14,
+            "internal_texts_?": 789,
+            "nonempty": 3828,
+            "terminal_texts": 0,
+            "texts": 3828
+          }
+        }
+      }
+    },
+    "train_index_effective_tokens": 1201531,
+    "train_index_sequences": 2469
+  },
+  "elapsed_seconds": 86.29912103901734,
+  "input_files_sha256": "400bda1d9a4127c4bdad348e253993a0c6a61d908a282b027fbf872d406f63c7",
+  "peak_rss_kib": 523972,
+  "schema_version": 1,
+  "training_allowed": false,
+  "note": "统计摘录；省略逐条ASR原文，远端原始summary摘要见collection.json。"
+}
