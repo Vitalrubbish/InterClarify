@@ -189,6 +189,12 @@ for line in (output / "installed_files.tsv").read_text().splitlines():
     rel, digest = line.split("\t")
     installed[rel] = digest
 manifest = json.loads((bundle / "manifest.json").read_text())
+transfer = Path(root) / "source" / "x2_turn_sources.manifest.json"
+transfer_manifest = (
+    json.loads(transfer.read_text()).get("archive", {}).get("sha256")
+    if transfer.is_file()
+    else None
+)
 import_check = json.loads((output / "import_check.json").read_text())
 packages = {}
 for wanted in ("vllm", "torch", "mistral-common", "huggingface_hub", "websockets", "soundfile"):
@@ -209,7 +215,7 @@ lock = {
         "archive": str(archive),
         "sha256": bundle_sha,
         "manifest": str(bundle / "manifest.json"),
-        "manifest_archive_sha256": manifest.get("archive", {}).get("sha256"),
+        "manifest_archive_sha256": transfer_manifest,
         "x2_turn_commit": manifest["x2_turn"]["commit"],
         "vllm_commit": manifest["vllm"]["commit"],
         "vllm_tag": manifest["vllm"]["tag"],

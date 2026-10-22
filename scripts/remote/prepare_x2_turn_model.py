@@ -36,6 +36,7 @@ ALLOW_PATTERNS = [
 ]
 MODEL_DIR_NAME = "X2-Turn-4B-0812"
 EXPORT_DIR_NAME = "X2-Turn-4B-0812-vllm"
+USER_AGENT = "interclarify-x2-turn/1.0 (offline deployment)"
 
 
 def utc_now() -> str:
@@ -60,7 +61,8 @@ def sha256_file(path: Path) -> str:
 def tree_metadata(endpoint: str, repo: str, revision: str) -> dict[str, dict[str, object]]:
     """Return path -> {size, lfs_sha256} for one pinned revision."""
     url = f"{endpoint.rstrip('/')}/api/models/{repo}/tree/{revision}?recursive=true"
-    with urllib.request.urlopen(url, timeout=60) as response:
+    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    with urllib.request.urlopen(request, timeout=60) as response:
         entries = json.load(response)
     files: dict[str, dict[str, object]] = {}
     for entry in entries:
