@@ -1,6 +1,8 @@
-# Layer 0 候选与 ASR 标点依赖调研
+# 状态 ASR 候选与标点依赖调研
 
 更新：2026-10-22。依据用户提出的标点出现时序与转写回写问题补充调研，对应 [090 工作单](issue/archive/090_layer0_audio_and_asr_candidates.md)。本次仅核查公开论文、模型卡、作者推理代码和本地客户端，未执行真实推理。
+
+阶段更新：[091](issue/archive/091_x2_turn_and_system_backchannel_scope.md)确定当前接入 X2-Turn 作为独立 ASR/用户状态前端，暂不实现 Layer 0。Layer 0 的系统 backchannel 时机预测和训练保留在后续总计划；本文候选不承担系统附和预测器职责。
 
 ## 1. 需要验证的问题
 
@@ -57,9 +59,9 @@ FireRedChat 的模型与输入依据 [论文第 2.2.2、2.3.1 节](https://arxiv
 
 ## 4. 选用顺序与验证方法
 
-先比较 X2-Turn 的联合流式路线和 SoulX-Duplug + SenseVoice 的轻量主干路线；中文扩展再检查 Paraformer 配置。Smart Turn 保留纯音频结束对照，XTurnix + Nemotron 保留现有文本对照。FireRedChat EoT 作为较小文本结束对照，TEN + Paraformer 作为有公开组合证据的参考，不要求全部候选同时部署。
+当前先接入和验证 X2-Turn；SoulX-Duplug + SenseVoice、Smart Turn、XTurnix + Nemotron、FireRedChat EoT 和 TEN + Paraformer 保留为调研及必要对照，不再以全部候选比较作为当前前置条件。
 
-这是调研后的验证顺序调整，尚未决定替换现役 ASR。X2-Turn 先作为独立 Layer 0 音频后端运行，ASR 输出记作自身证据；如将其转写交给 Layer 1，需另列明确配置与同条件对照，不能同时改模型、ASR和仲裁再单独归因 Layer 0。
+X2-Turn 已作为计划采用的独立前端，当前尚未替换现役 ASR。转写与原生用户状态持续交给 Layer 1/统一仲裁器，单独记录其质量与时序，不能再称为 Layer 0 音频后端；Layer 0 留给后续系统附和预测。对照注明前端/控制的共同变化，不错误归因于附和模块。
 
 ### 4.1 标点影响与跨 ASR 影响分别测量
 
@@ -74,4 +76,4 @@ FireRedChat 的模型与输入依据 [论文第 2.2.2、2.3.1 节](https://arxiv
 
 每次对照重置会话或从相同快照重放，防止模型缓存污染。ASR 回写只影响后续判断；此前已执行的错误动作不能从统计或播放历史删除。模型状态原始结果和服务确认、等待回退、仲裁决策、实际停声分别记录，避免用最终文本的分类正确率代替在线控制正确率。
 
-首轮使用与 FDB 隔离的独立开发事件完成标点实验及模型/阈值选择；冻结后按 [工程计划](engineering_implementation.md#6-fdb-对话音频测试计划)做 FDB 对话音频测试。若原生状态控制已满足要求，不因 token 名称或类别数不同启动训练；完整研究五类语义的覆盖情况另列，不伪造缺失类别。
+首轮使用与 FDB 隔离的独立开发事件检查输入、用户状态和阈值；冻结后按 [工程计划](engineering_implementation.md#6-fdb-对话音频测试计划)做 FDB 对话音频测试。原生状态直接解释，不因 token 名称或类别数不同启动训练。后续系统附和训练属于独立职责，不以 X2-Turn 是否通过用户状态验收为条件。

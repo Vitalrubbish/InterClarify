@@ -1,6 +1,6 @@
 # 架构图预览入口说明
 
-对应文件：[figures/interclarify_method_preview.tex](../../figures/interclarify_method_preview.tex)。更新：2026-10-21。
+对应文件：[figures/interclarify_method_preview.tex](../../figures/interclarify_method_preview.tex)。更新：2026-10-22。预览显示总架构及虚线标出的后续 Layer 0；当前仅安排 X2-Turn 前端接入。
 
 ## 整体作用与结构
 

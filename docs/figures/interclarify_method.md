@@ -1,25 +1,19 @@
 # 架构图绘制说明
 
-对应文件：[figures/interclarify_method.tex](../../figures/interclarify_method.tex)。更新：2026-10-21。
+对应文件：[figures/interclarify_method.tex](../../figures/interclarify_method.tex)。更新：2026-10-22。
 
 ## 整体作用
 
-以 TikZ 模块图展示 Layer 0 小型话轮分类器、Layer 1 表达模型、Layer 2 异步思考，以及统一仲裁和播放路径。该图对应 [research_design.md 第 7 节](../research_design.md#7-系统工程架构)的系统工程架构，相关模型与协议尚未完成接入。
+TikZ 图展示总架构：X2-Turn 前端、Layer 0 系统附和时机预测、Layer 1 表达与调用、Layer 2 异步思考，以及唯一仲裁和播放。当前先接入 X2-Turn；Layer 0 以虚线表示后续保留，当前不实现或训练。图替换旧“Layer 0 话轮分类”分工，对应 [研究方案第 7 节](../research_design.md#7-系统工程架构)，不表示已经部署。
 
-## 绘图结构
+## 结构和职责
 
-文件没有运行时类或方法。`module` 绘制三个职责模块，`shared` 绘制共享可见输入，`output` 绘制仲裁和播放模块；`flow` 表示状态或内容路径，紫色虚线 `tool` 表示请求 token 与结构化结果回写。图不展开窗口序列、返回字段、模型规模或调度参数。
+文件没有运行时类或方法。input绘制音频输入，frontend绘制X2-Turn，shared绘制当前可见共享上下文，module绘制Layer 0/1/2，output绘制仲裁和播放；flow表示输入/状态/内容，tool表示请求与结果。
 
-Layer 0 输出基础话轮控制 token，作为外部状态供 Layer 1 使用，同时将控制信号送入统一仲裁器。Layer 1 生成待表达文本并以独立 token 请求思考，Layer 2 在活动期间持续接收新输入并将结构化结果写回 Layer 1。Layer 1 直接基于包含结果的上下文继续自回归，不增加额外语义复核。Layer 2 没有直达播放的路径。
+X2-Turn提供用户转写与原生状态，经共享上下文供后续模块消费，同时把用户状态提供给唯一仲裁器。Layer 0只预测系统附和时机，输出建议进入仲裁；它不重新输出用户话轮状态，也不生成或播放正文。Layer 1提供回答/附和/澄清正文，并请求Layer 2；结果在正常输入边界注入，不额外语义复核。
 
-仲裁器协调 Layer 0 的基础控制与 Layer 1 的待表达文本，再交给单一 TTS 播放路径；实际播放状态返回共享上下文。控制与请求 token 都是内部信息，不直接送入 TTS。具体观察范围和读取协议仍待实现，图中的输入箭头不表示所有模块使用相同上下文长度或所有输入模态。
+用户附和与系统附和方向不同。仲裁器协调X2状态、Layer 0建议和Layer 1内容，所有发声经过单一TTS/播放器。实际播放状态返回共享历史，已听内容不可撤销。Layer 0只附和，Layer 2判断主动澄清，不增设修订层。
 
-## 职责边界
+## 构建
 
-窗口、生命周期、结果回写、介入策略和失败处理由研究方案定义，图中不展开；具体实施参数集中列于该文第 7.8 节。
-
-Layer 0 不承担主动澄清价值判断，也不能仅凭用户仍持有话轮就阻断主动澄清。当前架构只有 Layer 0/1/2 三个职责层，不设独立修订层，也不启用系统 backchannel。初期 Layer 2 冻结权重，通过 system prompt 驱动判断；图中的结构化返回不表示新增返回 special token。
-
-## 预览与验证
-
-由 [预览入口](../../figures/interclarify_method_preview.tex) 包含本文件并生成 PDF。修改后编译预览、检查 LaTeX 报错与版面，并核对 Layer 0 控制、Layer 1 文本及思考请求与返回箭头方向，确保只有一个仲裁器和播放所有者。
+由 [预览入口](../../figures/interclarify_method_preview.tex)生成 [PDF](../../figures/interclarify_method_preview.pdf)。检查X2用户状态路径与Layer 0系统附和路径、表达/思考往返及唯一播放所有者。辅助文件放/tmp；编译图不等于运行实现验证。

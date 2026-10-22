@@ -2,12 +2,12 @@
 
 InterClarify 研究全双工语音代理在用户话轮内是否应主动澄清、何时介入，以及澄清内容是否合理。正式研究方案见 [docs/research_design.md](docs/research_design.md)，开发与测试工作单见 [issue 索引](docs/issue/README.md)。
 
-系统以 DuplexCascade 为运行底座，由 Layer 0 话轮分类、Layer 1 表达与思考调用、Layer 2 异步思考、统一仲裁器和单一 TTS 播放路径组成。运行底座来自独立维护的 [X-Talk fork](https://github.com/Vitalrubbish/xtalk)。
+系统以 DuplexCascade 为运行底座，计划由 X2-Turn 提供转写与用户话轮状态，Layer 1 负责表达与思考调用，Layer 2 异步思考，经统一仲裁器与单一 TTS 播放路径发声。当前先接入与测试 X2-Turn；Layer 0 的系统 backchannel 时机预测及训练保留在后续总计划。运行底座来自独立维护的 [X-Talk fork](https://github.com/Vitalrubbish/xtalk)。
 
 | 内容 | 位置 |
 | --- | --- |
 | 研究方案与评测范围 | [docs/research_design.md](docs/research_design.md) |
-| 工程第一步：Layer 0 与 FDB 测试计划 | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
+| 工程第一步：X2-Turn 接入与 FDB 测试计划 | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
 | 本地 conda 环境 | [docs/local_environment.md](docs/local_environment.md)（`interclarify-dev`） |
 | 当前采用决定与工作单 | [docs/issue](docs/issue/README.md) |
 | 已采用的运行时配置 | [docs/runtime_baseline.md](docs/runtime_baseline.md) |
