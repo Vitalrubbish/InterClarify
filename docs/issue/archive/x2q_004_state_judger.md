@@ -1,6 +1,6 @@
 # X2Q-004：状态 Judger 与参考时间投影
 
-状态：待实施。依赖：X2Q-002，以及 X2Q-003 的协议映射。协议：[质量测试计划第 7 节](../dev/X2-Turn/qualtity_test_on_fdb.md#7-judger构建参考状态而非评价自身输出)。
+状态：已取消，2026-10-22 归档。用户决定不再执行本轮 FDB 测试，以下为取消前的工作范围。后续数据核查见 [FLEURS 记录](../../dev/X2-Turn/fleurs_subset_verification.md)。
 
 ## 目标
 

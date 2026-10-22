@@ -1,6 +1,6 @@
 # X2Q-002：FDB 输入清单与核验参考
 
-状态：待实施。依赖：无。协议：[质量测试计划第 3、6 节](../dev/X2-Turn/qualtity_test_on_fdb.md#3-fdb-输入参考文本与覆盖范围)。
+状态：已取消，2026-10-22 归档。用户决定不再执行本轮 FDB 测试，以下为取消前的工作范围。后续数据核查见 [FLEURS 记录](../../dev/X2-Turn/fleurs_subset_verification.md)。
 
 ## 目标
 

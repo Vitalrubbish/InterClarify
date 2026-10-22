@@ -1,6 +1,6 @@
 # X2Q-003：X2-Turn 远端部署与实时回放
 
-状态：待实施。依赖：X2Q-002 输入清单。协议：[质量测试计划第 2、4、10 节](../dev/X2-Turn/qualtity_test_on_fdb.md#4-实时回放与记录)。
+状态：已取消，2026-10-22 归档。用户决定不再执行本轮 FDB 测试，以下为取消前的工作范围。后续数据核查见 [FLEURS 记录](../../dev/X2-Turn/fleurs_subset_verification.md)。
 
 ## 目标
 

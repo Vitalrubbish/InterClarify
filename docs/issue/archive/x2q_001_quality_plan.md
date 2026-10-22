@@ -10,7 +10,7 @@
 
 - 核查论文、固定提交的双头推理、六槽位状态输出、vLLM overlay、文件演示与控制器。
 - 定义参考文本/边界、真实流式回放、尾窗与 EOF 分离的计时、独立 Judger、帧/事件评分及资源上限。
-- 写入 [详细计划](../../dev/X2-Turn/qualtity_test_on_fdb.md)，同步工程入口，拆分 X2Q-002—006。
+- 当时写入详细计划，同步工程入口，拆分 X2Q-002—006。随后用户取消本轮 FDB 测试，原计划从当前工作区移除；历史正文可用 `git show 2afec88:docs/dev/X2-Turn/qualtity_test_on_fdb.md` 查看。
 
 ## 验证与限制
 

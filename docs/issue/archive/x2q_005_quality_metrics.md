@@ -1,6 +1,6 @@
 # X2Q-005：转写、末端延迟与状态评分
 
-状态：待实施。依赖：X2Q-002—004 的数据合同。协议：[质量测试计划第 5—8 节](../dev/X2-Turn/qualtity_test_on_fdb.md#5-转写-wer)。
+状态：已取消，2026-10-22 归档。用户决定不再执行本轮 FDB 测试，以下为取消前的工作范围。后续数据核查见 [FLEURS 记录](../../dev/X2-Turn/fleurs_subset_verification.md)。
 
 ## 目标
 
