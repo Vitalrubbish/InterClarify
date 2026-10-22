@@ -207,7 +207,7 @@ class DatasetPreparer:
 
     def copy_source(self, relative: str, path: Path) -> None:
         """Keep the small TSV files beside the manifest for offline auditing."""
-        destination = self.source_dir / relative
+        destination = self.source_dir / Path(relative).name
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(path, destination)
         digest = sha256_file(destination)
@@ -335,6 +335,8 @@ class DatasetPreparer:
             "data/en_us/audio/dev.tar.gz",
         ):
             sources[relative] = self.fetch_source(relative)
+        if self.source_dir.exists():
+            shutil.rmtree(self.source_dir)
         for relative in ("data/en_us/test.tsv", "data/en_us/dev.tsv"):
             self.copy_source(relative, sources[relative])
 
@@ -412,9 +414,11 @@ class DatasetPreparer:
         verification = verify_manifest(self.manifest_path, expected=self.expected)
 
         dataset_bytes = self.directory_bytes(self.data_dir)
-        if dataset_bytes > self.asset_limit_bytes:
+        downloaded_source_bytes = sum(int(record["bytes"]) for record in self.sources.values())
+        total_asset_bytes = dataset_bytes + downloaded_source_bytes
+        if total_asset_bytes > self.asset_limit_bytes:
             raise RuntimeError(
-                f"Dataset asset size {dataset_bytes / 1024**3:.2f} GiB exceeds the "
+                f"Dataset assets {total_asset_bytes / 1024**3:.2f} GiB exceed the "
                 f"{self.asset_limit_bytes / 1024**3:.0f} GiB budget"
             )
         capacity_after = self.disk_stats()
@@ -430,6 +434,8 @@ class DatasetPreparer:
                 "before": capacity_before,
                 "after": capacity_after,
                 "dataset_bytes": dataset_bytes,
+                "downloaded_source_bytes": downloaded_source_bytes,
+                "total_asset_bytes": total_asset_bytes,
                 "asset_limit_bytes": self.asset_limit_bytes,
                 "minimum_free_bytes_before": self.min_free_bytes,
             },
@@ -440,7 +446,12 @@ class DatasetPreparer:
             ),
         }
         write_json(self.report_path, report)
-        self.event("prepare_complete", dataset_bytes=dataset_bytes, elapsed_seconds=report["elapsed_seconds"])
+        self.event(
+            "prepare_complete",
+            dataset_bytes=dataset_bytes,
+            total_asset_bytes=total_asset_bytes,
+            elapsed_seconds=report["elapsed_seconds"],
+        )
         return report
 
 

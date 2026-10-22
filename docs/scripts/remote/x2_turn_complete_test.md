@@ -12,10 +12,10 @@
 
 ## 使用
 
-远端使用独立 conda 环境，例如：
+远端使用独立 conda 环境 `~/miniconda3/envs/interclarify-x2-turn-data`（Python 3.11、`whisper-normalizer==0.1.12`、`soundfile`、`huggingface_hub`），运行前设置 `PYTHONNOUSERSITE=1`，避免用户级 site-packages 混入版本。
 
 ```bash
-~/miniconda3/envs/interclarify-x2-turn-data/bin/python \
+PYTHONNOUSERSITE=1 ~/miniconda3/envs/interclarify-x2-turn-data/bin/python \
   scripts/remote/x2_turn_complete_test.py prepare-data \
   --root ~/interclarify-x2-turn-complete
 ```
@@ -23,7 +23,7 @@
 重新核验已恢复数据：
 
 ```bash
-~/miniconda3/envs/interclarify-x2-turn-data/bin/python \
+PYTHONNOUSERSITE=1 ~/miniconda3/envs/interclarify-x2-turn-data/bin/python \
   scripts/remote/x2_turn_complete_test.py verify-data \
   --root ~/interclarify-x2-turn-complete
 ```
@@ -59,7 +59,7 @@ dataset/fleurs_en_us/
 └── prepare_report.json       # 成功状态、容量统计与复核结果
 ```
 
-Git 只保存脚本、测试和说明，不保存音频、归档或远端 manifest。正式 WAV 和事件日志留在远端。
+`prepare_report.json` 分开记录数据目录、下载源文件与合计资产字节，三者都受整轮 70 GiB 预算约束。Git 只保存脚本、测试和说明，不保存音频、归档或远端 manifest。正式 WAV 和事件日志留在远端。
 
 ## 资源与边界
 
