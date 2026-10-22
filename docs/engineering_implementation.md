@@ -1,14 +1,14 @@
 # 工程实施计划
 
-更新：2026-10-22。状态：设计已更新；当前先计划 X2-Turn 接入与 FDB 测试；Layer 0 实现和训练留作后续，均尚未执行。研究范围以 [research_design.md](research_design.md) 为准，执行状态见 [issue 索引](issue/README.md)。
+更新：2026-10-22。状态：计划已同步，X2-Turn 接入与 FDB 测试尚未执行；Layer 0 实现和训练保留在后续总计划。研究范围以 [research_design.md](research_design.md) 为准。既有 issue 已清理，当前暂不创建新的工作单。
 
 ## 1. 第一步的目标与边界
 
 按用户最终决定，第一步只接入 X2-Turn 流式 ASR 与用户侧状态 token，经唯一仲裁器对接后续 LLM/TTS，再用 FDB 对话音频测试。当前不实现、采集数据或训练 Layer 0。系统 backchannel 保留在总计划，未来 Layer 0 只预测附和时机并开展专项训练。
 
-该决定取代此前 Layer 0 基础话轮分类及本轮尚未提交的“立即训练附和”安排，阶段与职责见 [091](issue/archive/091_x2_turn_and_system_backchannel_scope.md)。保留既有 DuplexCascade special token 设计，运行时可以直接解释 X2-Turn 原生状态，不为拼写差异转换或重训。
+保留既有 DuplexCascade special token 设计，运行时可以直接解释 X2-Turn 原生状态；不因 token 拼写不同要求转换或重训。系统附和与用户状态属于不同职责，当前接入不依赖 Layer 0。
 
-| 模块 | 本阶段职责 | 输出 |
+| 模块 | 项目职责与阶段安排 | 输出 |
 | --- | --- | --- |
 | X2-Turn 前端 | 持续转写，预测用户语音/话轮状态 | 转写、原生状态、分数与对应位置 |
 | Layer 0（后续） | 只判断系统此时是否适合简短附和；当前不实现 | 发出附和或继续等待的决策 |
@@ -24,9 +24,9 @@
 
 当前已实现底座仍为 X-Talk `ca9b23c134b390107601bc98954ab16276d86db9`、Nemotron EN160、Kokoro `af_heart`、600ms micro-turn、300/1200ms TTS 分段及会话 KV 复用，见 [运行配置](runtime_baseline.md)。这是现役配置，不代表 X2-Turn 或系统附和已经部署。
 
-双工路径通过 `duplex_control/service.py` 替换旧 `TurnDetectorManager/TurnTakingManager`，`DuplexRuntimeAdapter` 仍执行 DuplexCascade 生成的控制 token。实施时在该统一路径接入新的前端事件和附和建议，不能恢复第二套能独立开始/停止 TTS 的管理器。保留旧模型真实生成历史，其旧控制 token 在新模式只作诊断，不能同时执行。
+双工路径通过 `duplex_control/service.py` 替换旧 `TurnDetectorManager/TurnTakingManager`，`DuplexRuntimeAdapter` 仍执行 DuplexCascade 生成的控制 token。当前在该统一路径接入 X2-Turn 前端事件，系统附和结果后续接入同一仲裁器，不能恢复第二套能独立开始/停止 TTS 的管理器。保留旧模型真实生成历史，其旧控制 token 在新模式只作诊断，不能同时执行。
 
-当前小模型/训练及旧 X2 资产已按 089 清理；不能假定旧模型目录或 conda 环境仍存在。084 重新核查所需资产和环境，不恢复整个旧栈。
+旧训练与 X2 资产已清理，现存路径和环境见 [远端目录约定](remote_workspace.md)。接入前重新核查所需资产和隔离环境，不能假定旧模型目录或 conda 环境仍存在。
 
 ## 3. X2-Turn 前端与下游接口
 
@@ -38,7 +38,7 @@ X2-Turn 为本阶段采用的状态 ASR，先冻结权重、tokenizer、推理�
 
 原生状态包括 idle、noidle、incomplete/接口 speaking、complete/接口 turn_end、backchannel；发布接口另有 uncertain 回退，具体以冻结版本为准。它们描述用户状态，仲裁器结合实际播放状态解释接话和停止，不强造 DuplexCascade 的一一类别对应。
 
-完整项目中 Layer 0 的抽象结果直接交给同一个仲裁器，Layer 1 的待表达内容也直接进入仲裁器；X2 user state 决定当前可采用哪类输出。具体阈值、冲突优先级与 Layer 0 编码仍待明确，不新增 backchannel cue 协议。Layer 2 继续经 Layer 1 表达，不能成为第三个播放器。
+完整项目中 Layer 0 的抽象结果与 Layer 1 的待表达内容分别直接进入同一个仲裁器；仲裁器根据 X2 user state、可用结果与实际播放状态选择、等待或停止输出。具体阈值、冲突优先级与 Layer 0 编码仍待明确，不新增 backchannel cue 协议。Layer 2 继续经 Layer 1 表达，不直接提交播放。示意图展示完整项目，不标注实施阶段。
 
 文本持续送给 Layer 1，不等 complete 才传送。接话事件到达时可立即调度空闲的 Layer 1，避免再等待固定 600ms micro-turn；正在推理则在明确边界消费新观察，不逐帧取消重算。是否立即发声由仲裁器和冻结策略决定，complete 不是无条件抢话命令。Layer 2 返回仍按研究方案原有注入规则处理。
 
@@ -60,7 +60,7 @@ X2-Turn 不再输出过去修订，不表示后续状态永远不变。新一帧
 
 使用截至当前的语音特征/韵律、转写和 X2-Turn 状态、必要对话历史及系统实际播放记录，判断用户仍持有话轮时是否存在适合简短附和的机会。具体模态及上下文长度在开发集实验后冻结，不能预设只看 complete 或停顿就足够。
 
-未来训练输出为“发出系统附和”或“继续等待”，可附分数。原生决策与具体协议 token 编码分开，编码名称在后续 086 实施时冻结，不把用户 backchannel token 改成系统附和 token。Layer 0 不选择完整回答或澄清，也不负责措辞生成。附和正文从 Layer 1 表达路径提供，短语候选或生成方式在后续细化，不增加独立播放器。
+未来训练输出为“发出系统附和”或“继续等待”，可附分数。原生决策与具体协议 token 编码分开，编码在该模块实施前冻结，不把用户 backchannel token 改成系统附和 token。Layer 0 不选择完整回答或澄清，也不负责措辞生成。附和正文从 Layer 1 表达路径提供，短语候选或生成方式在后续细化，不增加独立播放器。
 
 ### 4.2 事件与仲裁
 
@@ -86,7 +86,7 @@ FDB ICC 及其他评测音频、其源对话和增强版本不用于训练或阈
 
 ### 5.2 模型、训练和开发检查
 
-初始方案为现成语音编码器上的小型时机分类头；比较声学输入和附加文本/用户状态的价值，必要时开放末端层。参数规模、特征与学习率在 086 的数据/资源预检后冻结，不默认训练 4B 的 X2-Turn。首轮最多 3 个配置、各最多 3 epoch、固定种子，micro-batch 1—4、worker≤2，保留最佳/最终两个 checkpoint。
+初始方案为现成语音编码器上的小型时机分类头；比较声学输入和附加文本/用户状态的价值，必要时开放末端层。参数规模、特征与学习率在未来数据/资源预检后冻结，不默认训练 4B 的 X2-Turn。首轮最多 3 个配置、各最多 3 epoch、固定种子，micro-batch 1—4、worker≤2，保留最佳/最终两个 checkpoint。
 
 因果输入窗口必须在当时音频可用点结束，禁止编码完整录音后切分特征。长历史保留原始事实与截断记录；状态输入使用真实 X2-Turn 预测，不能只用完美标签训练后宣称线上可用。
 
@@ -100,10 +100,10 @@ FDB ICC 及其他评测音频、其源对话和增强版本不用于训练或阈
 
 | 数据 | 数量 | 当前用途 |
 | --- | ---: | --- |
-| v1.0 candor_pause_handling | 216 | 用户停顿时是否错误抢话，区分合法短附和与普通回答 |
+| v1.0 candor_pause_handling | 216 | 当前检查用户停顿时是否错误接话；后续加入系统附和后再按输出类型诊断 |
 | v1.0 synthetic_pause_handling | 137 | 受控停顿及不完整表达处理 |
 | v1.0 candor_turn_taking | 119 | 普通接话、漏接话、提前接话与时延 |
-| v1.0 synthetic_user_interruption | 200 | 用户打断时停止，包括停止系统附和 |
+| v1.0 synthetic_user_interruption | 200 | 当前检查用户打断时停止普通回答；停止系统附和留后续联调 |
 | v1.0 icc_backchannel（后续） | 55 | Layer 0 实现后用于系统附和 Freq/JSD/TOR 与时机诊断；当前不要求发出附和 |
 | v1.5 user_backchannel | 99 | 用户附和时是否误停，不作为系统附和标签 |
 | v1.5 user_interruption | 200 | 真正打断与用户附和的控制区别 |
@@ -142,7 +142,7 @@ FDB ICC 及其他评测音频、其源对话和增强版本不用于训练或阈
 | scripts/remote/run_layer0_job.sh | docs/scripts/remote/run_layer0_job.md | 远端预检、串行预热、限额、退出清理 |
 | configs/x2_turn_runtime.json、layer0_runtime.json、layer0_fdb.json | docs/configs 同名说明 | 当前前端版本/delay、评测范围和资源清单；附和模型配置后续创建 |
 
-后续附和正文经 Layer 1 表达路径提供；固定短语候选还是受约束生成在后续工作单冻结。若旧表达模型无法提供可靠附和，记录该缺口并在该路径最小适配，不让 Layer 0 接管正文生成，也不新建播放所有者。
+后续附和正文经 Layer 1 表达路径提供；固定短语候选还是受约束生成在实施前确定。若旧表达模型无法提供可靠附和，记录该缺口并在该路径最小适配，不让 Layer 0 接管正文生成，也不新建播放所有者。
 
 ## 8. 远端资源与环境
 
@@ -159,16 +159,10 @@ FDB ICC 及其他评测音频、其源对话和增强版本不用于训练或阈
 
 当前 ASR前端→表达模型→TTS 按需串行预热，附和服务后续加入，记录真实 ready。输出保留源码/权重/输入哈希、配置、资源采样、运行/评分退出码。大音频与 trace 留远端，Git 收简明报告；结束确认无遗留作业。
 
-## 9. 工作单与执行顺序
+## 9. 实施顺序与未定参数
 
-[083](issue/archive/083_layer0_implementation_plan.md)、[090](issue/archive/090_layer0_audio_and_asr_candidates.md)保留原始计划/调研历史；分工以本次 [091](issue/archive/091_x2_turn_and_system_backchannel_scope.md)修订为准。
+当前按“前端资产/输入协议与独立验证 → X2-Turn 与 LLM/唯一仲裁接入 → FDB 回放入口与匹配对照 → 远端基础话轮评测”推进计划。Layer 0 系统附和的实现、训练和专项评测保留后续，不构成当前步骤的依赖。
 
-| 工作单 | 当前交付/安排 | 依赖 |
-| --- | --- | --- |
-| [084](issue/084_layer0_candidates_and_contract.md) | X2-Turn 前端协议、固定资产及独立验证 | 当前先行 |
-| [085](issue/085_layer0_runtime_integration.md) | X2 用户状态、LLM 与唯一仲裁接入 | 084；不依赖 Layer 0 |
-| [087](issue/087_layer0_fdb_protocol.md) | FDB 四项及 v1.5 数据与指标入口 | 084，最终入口接 085 |
-| [088](issue/088_layer0_remote_fdb_validation.md) | 远端基础话轮对照与报告 | 084、085、087 完成，资产/阈值冻结 |
-| [086](issue/086_layer0_training_fallback.md) | 系统附和时机预测、训练、接入和专项评测 | 后续保留，当前不执行且不阻塞前四单 |
+实施前需要确定 X2-Turn 固定版本、流式 delay、状态分数阈值、接话确认/取消规则、开发事件与正式输入清单、匹配表达模型、环境及资源峰值。Layer 0 的输出编码、训练特征、标注规模和冲突策略仍待确定，不由架构图提前规定。
 
-本次修订不代表模型已经接入或集群任务已经提交。完成单元直接归档，Layer 0、Layer 1/2 后续专项实施前再细化工作单。
+既有 issue 及其归档已按用户要求删除，本次不重新拆分或提交。当前状态仅为设计与实施计划更新，没有开始模型训练、接入或提交集群任务；相关调研证据仍保留在独立文档中。

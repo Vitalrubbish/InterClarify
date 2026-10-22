@@ -1,6 +1,6 @@
 # X2-Turn 句中停顿与接话策略核查
 
-更新：2026-10-22。对应 [093 工作单](issue/archive/093_arbiter_outputs_and_x2_pause_review.md)。本次核查作者论文、公开模型卡和实时控制器源码，未执行本项目远端音频实测。
+更新：2026-10-22。系统分工与阶段见 [研究方案](research_design.md)和[工程计划](engineering_implementation.md)。本次核查作者论文、公开模型卡和实时控制器源码，未执行本项目远端音频实测。
 
 ## 1. 能确认的结论
 

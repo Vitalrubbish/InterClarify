@@ -1,8 +1,8 @@
 # 状态 ASR 候选与标点依赖调研
 
-更新：2026-10-22。依据用户提出的标点出现时序与转写回写问题补充调研，对应 [090 工作单](issue/archive/090_layer0_audio_and_asr_candidates.md)。本次仅核查公开论文、模型卡、作者推理代码和本地客户端，未执行真实推理。
+更新：2026-10-22。依据用户提出的标点出现时序与转写回写问题补充调研。本次仅核查公开论文、模型卡、作者推理代码和本地客户端，未执行真实推理。
 
-阶段更新：[091](issue/archive/091_x2_turn_and_system_backchannel_scope.md)确定当前接入 X2-Turn 作为独立 ASR/用户状态前端，暂不实现 Layer 0。Layer 0 的系统 backchannel 时机预测和训练保留在后续总计划；本文候选不承担系统附和预测器职责。
+当前计划接入 X2-Turn 作为独立 ASR/用户状态前端，暂不实现 Layer 0。Layer 0 的系统 backchannel 时机预测和训练保留在后续总计划；本文候选不承担系统附和预测器职责。
 
 ## 1. 需要验证的问题
 
@@ -37,7 +37,7 @@ XTurnix 作者在[论文第 4.1 节](https://arxiv.org/html/2610.04400#S4.SS1)�
 
 [model/asr.py](https://github.com/Soul-AILab/SoulX-Duplug/blob/main/model/asr.py)中的 Paraformer 使用包含 vad/punc 的 ModelScope 模型包，SenseVoice 包装器对传入窗口调用识别。这里是滚动音频窗口辅助流式状态模型，不等于外部 ASR 本身使用严格追加的流式接口。去标点有明确代码证据，但其字符覆盖、标点尚未到达时的文本修订及稳定前缀仍须检查。
 
-本地 X-Talk 已有 `models/turn_detector/soulx_duplug.py` 客户端，但客户端包含等待确认和回退策略；接入双工路径仍需 085 的唯一仲裁，不直接启用第二个控制管理器。
+本地 X-Talk 已有 `models/turn_detector/soulx_duplug.py` 客户端，但客户端包含等待确认和回退策略；接入双工路径仍需保持唯一仲裁，不直接启用第二个控制管理器。
 
 ### 2.3 Easy Turn 与轻量声学对照
 

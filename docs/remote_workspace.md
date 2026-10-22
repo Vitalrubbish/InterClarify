@@ -29,6 +29,10 @@
 
 `paratalker-dev` 与 `sidecar` 属于其他项目，不纳入 InterClarify 清理。
 
+## 维护记录
+
+2026-10-22 已完成旧训练/选型资产、旧 X2 环境与缓存清理，记录释放约 301G。现役模型、ASR/TTS conda、评分环境、运行快照及 FDB 数据/最终结果保留，旧 X2 模型与环境不能假定仍存在。完整清理明细可从 Git 历史追溯；远端日志为 `~/cleanup_remote_assets.dry-run.log`、`~/cleanup_remote_assets.execute.log` 和 `~/cleanup_second.log`。这些是当时维护记录，新的作业仍须重新预检磁盘和环境。
+
 ## 运行约定
 
 - 会话、模型与环境使用 conda；模型和 conda 环境按只读方式复用，不复制权重。
