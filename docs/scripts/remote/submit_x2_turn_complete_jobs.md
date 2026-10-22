@@ -14,6 +14,7 @@
 | `X2_TURN_IMAGE` | 容器镜像，默认沿用现役 xtalk-round1 镜像 |
 | `X2_TURN_GPU_PARTITION` | 默认 `pdgpu-4090`，可换同规格 24 GiB 分区 |
 | `X2_TURN_CONDA_ENV` | conda 环境前缀，`model` 阶段用它调用 Python |
+| `X2_TURN_SOURCE_BUNDLE_SHA256` | `setup` 阶段必填，源码包的 SHA256 |
 | `X2_TURN_SETUP_TIMEOUT` / `X2_TURN_MODEL_TIMEOUT` / `X2_TURN_DEPLOY_TIMEOUT` | 默认各 14400 秒 |
 | `HF_ENDPOINT` | `model` 阶段下载入口，默认 `hf-mirror.com` |
 | `X2_TURN_SMOKE_AUDIO` | 可选，传给 deploy 作业 |
@@ -30,9 +31,9 @@
 ```bash
 export X2_TURN_ROOT=~/interclarify-x2-turn-complete
 export X2_TURN_SOURCE=~/interclarify-x2-turn-complete/source/InterClarify-<commit>
-# 1) 先在登录节点准备固定上游源码（调度节点无法访问 GitHub）
-bash "$X2_TURN_SOURCE/scripts/remote/prepare_x2_turn_sources.sh"
-# 2) 再依次提交三个阶段
+# 1) 在有 GitHub 访问的机器上构建并传送固定源码包（见 build_x2_turn_source_bundle.md）
+export X2_TURN_SOURCE_BUNDLE_SHA256=<sha256 of x2_turn_sources.tar.gz>
+# 2) 依次提交三个阶段
 for stage in setup model deploy; do
   X2_TURN_STAGE=$stage X2_TURN_TAG=deploy-20261022-r1 \
     bash "$X2_TURN_SOURCE/scripts/remote/submit_x2_turn_complete_jobs.sh"

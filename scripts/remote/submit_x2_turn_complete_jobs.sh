@@ -26,8 +26,9 @@ LOG="$ROOT/logs/$TAG-$STAGE.log"
 case "$STAGE" in
   setup)
     OUTPUT="$ROOT/runs/$TAG/setup"
-    printf -v COMMAND 'X2_TURN_ROOT=%q X2_TURN_SETUP_OUTPUT=%q timeout %q bash %q' \
-      "$ROOT" "$OUTPUT" "$SETUP_TIMEOUT" "$SOURCE/scripts/remote/setup_x2_turn_vllm_env.sh"
+    BUNDLE_SHA="${X2_TURN_SOURCE_BUNDLE_SHA256:?set the source bundle sha256 transferred to the remote}"
+    printf -v COMMAND 'X2_TURN_ROOT=%q X2_TURN_SETUP_OUTPUT=%q X2_TURN_SOURCE_BUNDLE_SHA256=%q timeout %q bash %q' \
+      "$ROOT" "$OUTPUT" "$BUNDLE_SHA" "$SETUP_TIMEOUT" "$SOURCE/scripts/remote/setup_x2_turn_vllm_env.sh"
     vc submit --image "$IMAGE" --partition pdcpu --job "x2-setup-$TAG" \
       --num-task 1 --cpu-per-task 4 --mem-per-task 16G --gpu-per-task 0 \
       JOB=1:1 "$LOG" --cmd "$COMMAND"

@@ -226,10 +226,10 @@ def prepare(args: argparse.Namespace) -> int:
     export_dir = root / "models" / EXPORT_DIR_NAME
     lock_path = root / "env" / "x2_turn_model_lock.json"
     events = root / "logs" / "x2_turn_model_events.jsonl"
-    x2_checkout = root / "source" / "X2-Turn"
-    if not (x2_checkout / ".git").exists():
+    x2_checkout = root / "source" / "x2_turn_sources" / "x2"
+    if not (x2_checkout / "voxtral-realtime").is_dir():
         raise FileNotFoundError(
-            f"missing pinned source checkout {x2_checkout}; run the environment setup first"
+            f"missing pinned source bundle at {x2_checkout}; run the environment setup first"
         )
 
     expected = tree_metadata(args.endpoint, MODEL_REPO, args.revision)

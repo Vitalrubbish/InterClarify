@@ -1,44 +1,40 @@
 #!/usr/bin/env bash
 # Install the pinned X2-Turn vLLM overlay into an isolated conda environment.
 #
-# vLLM is installed from the official 0.19.1 wheel instead of a local source
-# build: a source build needs a full CUDA toolchain and far more than the
-# 4 CPU / 16 GiB install budget of this work item.  The wheel and the pinned
-# source commit are compared file by file before the overlay is applied, and
-# every hash is written to the environment lock.
+# vLLM comes from the official 0.19.1 wheel.  A source build needs a full CUDA
+# toolchain and far more than the 4 CPU / 16 GiB install budget, and the
+# scheduler nodes cannot reach github.com, so the ten pinned source files are
+# supplied as a small verified bundle.  Every wheel file is checked against the
+# git blob id recorded in the overlay patch before the patch is applied, which
+# proves it is byte-identical to the pinned commit.
 set -euo pipefail
 
 ROOT="${X2_TURN_ROOT:?set frozen X2 Turn experiment root}"
 OUTPUT="${X2_TURN_SETUP_OUTPUT:?set a new setup output directory}"
+BUNDLE_SHA256="${X2_TURN_SOURCE_BUNDLE_SHA256:?set the expected source bundle sha256}"
 CONDA="${X2_TURN_CONDA:-$HOME/miniconda3/bin/conda}"
 ENV_PREFIX="${X2_TURN_CONDA_ENV:-$HOME/miniconda3/envs/interclarify-x2-turn-vllm}"
 CONDA_MIRROR="${X2_TURN_CONDA_MIRROR:-https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge}"
 PIP_INDEX="${X2_TURN_PIP_INDEX:-https://pypi.tuna.tsinghua.edu.cn/simple}"
-X2_TURN_COMMIT="67ec3fe49f1977ee3129f7eaed603c04d8ed23c5"
-VLLM_COMMIT="b1388b1fbf5aaef47937fabe98931211684666a6"
-VLLM_TAG="v0.19.1"
+ARCHIVE="$ROOT/source/x2_turn_sources.tar.gz"
+BUNDLE="$ROOT/source/x2_turn_sources"
 
 [ ! -e "$OUTPUT" ] || { echo "Output already exists: $OUTPUT" >&2; exit 2; }
-mkdir -p "$OUTPUT" "$ROOT/env" "$ROOT/source" "$ROOT/logs"
+mkdir -p "$OUTPUT" "$ROOT/env" "$ROOT/logs"
 
 export PYTHONNOUSERSITE=1
-export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 MAX_JOBS=4
-export HF_ENDPOINT="${HF_ENDPOINT:-https://hf-mirror.com}"
+export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4
 export PIP_NO_CACHE_DIR=1
-export GIT_TERMINAL_PROMPT=0
 
 log() { printf '[%s] %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$*"; }
-
-capacity() {
-  df -B1 --output=avail "$ROOT" | tail -1 | awk '{printf "%.1f", $1/1024/1024/1024}'
-}
+fail() { echo "FAILED: $*" >&2; exit 1; }
+capacity() { df -B1 --output=avail "$ROOT" | tail -1 | awk '{printf "%.1f", $1/1024/1024/1024}'; }
 
 FREE_GIB="$(capacity)"
 log "free disk on $ROOT: ${FREE_GIB} GiB"
 awk -v free="$FREE_GIB" 'BEGIN { if (free < 100) { print "Need >=100 GiB free"; exit 1 } }'
 
-# 1. Isolated conda environment.  The active component environments are never
-# reused or modified.
+# 1. Isolated conda environment.  Active component environments are untouched.
 if [ ! -x "$ENV_PREFIX/bin/python" ]; then
   log "creating conda environment $ENV_PREFIX"
   "$CONDA" create -y -p "$ENV_PREFIX" --override-channels -c "$CONDA_MIRROR" \
@@ -60,61 +56,93 @@ else
 fi
 "$PY" -m pip freeze >"$OUTPUT/pip_freeze.txt"
 
-# 3. Pinned upstream checkouts, prepared on a node that can reach GitHub.  The
-# scheduler CPU nodes have no GitHub access, so this stage only validates them.
-VLLM_DIR="$ROOT/source/vllm"
-X2_DIR="$ROOT/source/X2-Turn"
-[ -d "$VLLM_DIR/.git" ] && [ -d "$X2_DIR/.git" ] || {
-  echo "missing pinned checkouts; run scripts/remote/prepare_x2_turn_sources.sh on the login node" >&2
-  exit 1
-}
-[ "$(git -C "$VLLM_DIR" rev-parse HEAD)" = "$VLLM_COMMIT" ] || {
-  echo "vLLM checkout does not match $VLLM_COMMIT" >&2; exit 1; }
-[ "$(git -C "$VLLM_DIR" describe --tags --exact-match)" = "$VLLM_TAG" ] || {
-  echo "vLLM checkout is not at tag $VLLM_TAG" >&2; exit 1; }
-[ "$(git -C "$X2_DIR" rev-parse HEAD)" = "$X2_TURN_COMMIT" ] || {
-  echo "X2-Turn checkout does not match $X2_TURN_COMMIT" >&2; exit 1; }
-
-# 4. The overlay only touches Python modules.  Refuse to continue if the wheel
-# and the pinned commit disagree on any of those files, otherwise "0.19.1 +
-# overlay" would silently describe a different baseline.
-SITE="$("$PY" -c 'import vllm, pathlib; print(pathlib.Path(vllm.__file__).parent)')"
-PATCH="$X2_DIR/voxtral-realtime/patches/vllm-voxtral-mtp.patch"
-mapfile -t PATCHED < <(sed -n 's|^diff --git a/.* b/||p' "$PATCH")
-[ "${#PATCHED[@]}" -eq 10 ] || { echo "Expected 10 patched files, found ${#PATCHED[@]}" >&2; exit 1; }
-: >"$OUTPUT/wheel_vs_source.tsv"
-for rel in "${PATCHED[@]}"; do
-  wheel_sha="$(sha256sum "$SITE/$rel" | cut -d' ' -f1)"
-  commit_sha="$(git -C "$VLLM_DIR" show "HEAD:$rel" | sha256sum | cut -d' ' -f1)"
-  printf '%s\t%s\t%s\n' "$rel" "$wheel_sha" "$commit_sha" >>"$OUTPUT/wheel_vs_source.tsv"
-  if [ "$wheel_sha" != "$commit_sha" ]; then
-    echo "wheel file differs from $VLLM_COMMIT: $rel" >&2
-    exit 1
-  fi
-done
-log "wheel matches the pinned commit for all ${#PATCHED[@]} patched files"
-
-# 5. Apply the author overlay to the pinned checkout, then install exactly the
-# patched modules (and the new helper module) over the wheel.
-git -C "$VLLM_DIR" checkout -q -- .
-git -C "$VLLM_DIR" clean -qfd
-log "applying overlay"
-bash "$X2_DIR/voxtral-realtime/scripts/install_vllm_overlay.sh" "$VLLM_DIR" \
-  >"$OUTPUT/overlay_install.log" 2>&1
-: >"$OUTPUT/patched_files.tsv"
-for rel in "${PATCHED[@]}"; do
-  install -Dm644 "$VLLM_DIR/$rel" "$SITE/$rel"
-  patched_sha="$(sha256sum "$SITE/$rel" | cut -d' ' -f1)"
-  wheel_sha="$(awk -F'\t' -v key="$rel" '$1==key {print $2}' "$OUTPUT/wheel_vs_source.tsv")"
-  commit_sha="$(awk -F'\t' -v key="$rel" '$1==key {print $3}' "$OUTPUT/wheel_vs_source.tsv")"
-  printf '%s\t%s\t%s\t%s\n' "$rel" "$wheel_sha" "$commit_sha" "$patched_sha" \
-    >>"$OUTPUT/patched_files.tsv"
-done
+# 3. Verified source bundle.  It is built on a machine with GitHub access and
+# transferred once; the expected hash is passed in so corruption is detected.
+[ -f "$ARCHIVE" ] || fail "missing source bundle $ARCHIVE"
+ACTUAL_SHA="$(sha256sum "$ARCHIVE" | cut -d' ' -f1)"
+[ "$ACTUAL_SHA" = "$BUNDLE_SHA256" ] || fail "source bundle sha256 $ACTUAL_SHA != $BUNDLE_SHA256"
+if [ ! -d "$BUNDLE" ]; then
+  log "extracting source bundle"
+  tar -xzf "$ARCHIVE" -C "$ROOT/source" --no-same-owner
+fi
+PATCH="$BUNDLE/x2/voxtral-realtime/patches/vllm-voxtral-mtp.patch"
 UTILS_REL="vllm/model_executor/models/voxtral_mtp_utils.py"
-install -Dm644 "$VLLM_DIR/$UTILS_REL" "$SITE/$UTILS_REL"
-UTILS_SHA="$(sha256sum "$SITE/$UTILS_REL" | cut -d' ' -f1)"
+UTILS_SRC="$BUNDLE/x2/voxtral-realtime/integrations/vllm/$UTILS_REL"
+[ -f "$PATCH" ] || fail "missing overlay patch in the bundle"
+[ -f "$UTILS_SRC" ] || fail "missing turn-head helper in the bundle"
 
-# 6. Import check: the served model only reports turns if this module loads and
+SITE="$("$PY" -c 'import vllm, pathlib; print(pathlib.Path(vllm.__file__).parent)')"
+
+# 4. Compare every wheel file with the patch pre-image: the wheel is only
+# interchangeable with the pinned source if the git blob ids agree.
+"$PY" - "$PATCH" "$OUTPUT/patched_files.tsv" <<'PY'
+import re
+import sys
+
+patch, target = sys.argv[1], sys.argv[2]
+text = open(patch, encoding="utf-8").read()
+entries = re.findall(
+    r"^diff --git a/(\S+) b/\S+\nindex ([0-9a-f]+)\.\.([0-9a-f]+)", text, re.M
+)
+if len(entries) != 10:
+    raise SystemExit(f"expected 10 patched files, found {len(entries)}")
+with open(target, "w", encoding="utf-8") as stream:
+    for path, pre, post in entries:
+        stream.write(f"{path}\t{pre}\t{post}\n")
+PY
+: >"$OUTPUT/wheel_vs_source.tsv"
+while IFS=$'\t' read -r rel pre post; do
+  wheel_sha="$(git hash-object "$SITE/$rel")"
+  bundle_sha="$(git hash-object "$BUNDLE/vllm/$rel")"
+  printf '%s\t%s\t%s\t%s\n' "$rel" "$wheel_sha" "$bundle_sha" "$pre" >>"$OUTPUT/wheel_vs_source.tsv"
+  [ "$wheel_sha" = "$pre" ] || fail "$rel: wheel blob $wheel_sha != pinned pre-image $pre"
+  [ "$bundle_sha" = "$pre" ] || fail "$rel: bundle blob $bundle_sha != pinned pre-image $pre"
+done <"$OUTPUT/patched_files.tsv"
+log "wheel and bundle match the pinned pre-image for all 10 files"
+
+# 5. Apply the overlay in a throwaway git index so `git apply --index` verifies
+# both the pre-image and the post-image blob ids.
+STAGE="$OUTPUT/overlay_stage"
+rm -rf "$STAGE"
+mkdir -p "$STAGE"
+while IFS=$'\t' read -r rel _ _; do
+  install -Dm644 "$BUNDLE/vllm/$rel" "$STAGE/$rel"
+done <"$OUTPUT/patched_files.tsv"
+git init -q "$STAGE"
+git -C "$STAGE" add -A
+git -C "$STAGE" apply --index "$PATCH" >"$OUTPUT/overlay_install.log" 2>&1
+git -C "$STAGE" ls-files -s >"$OUTPUT/overlay_index.txt"
+"$PY" - "$OUTPUT/patched_files.tsv" "$OUTPUT/overlay_index.txt" <<'PY'
+import sys
+
+expected = {}
+for line in open(sys.argv[1], encoding="utf-8"):
+    rel, pre, post = line.rstrip("\n").split("\t")
+    expected[rel] = post
+actual = {}
+for line in open(sys.argv[2], encoding="utf-8"):
+    _, blob, _, rel = line.split()
+    actual[rel] = blob
+if set(actual) != set(expected):
+    raise SystemExit(f"staged file set differs: {sorted(actual)} vs {sorted(expected)}")
+bad = [rel for rel, post in expected.items() if actual[rel] != post]
+if bad:
+    raise SystemExit(f"post-image blob mismatch: {bad}")
+print("all post-image blob ids match the overlay patch")
+PY
+
+# 6. Install the patched modules and the new helper over the wheel.
+: >"$OUTPUT/installed_files.tsv"
+while IFS=$'\t' read -r rel _ _; do
+  install -Dm644 "$STAGE/$rel" "$SITE/$rel"
+  printf '%s\t%s\n' "$rel" "$(sha256sum "$SITE/$rel" | cut -d' ' -f1)" \
+    >>"$OUTPUT/installed_files.tsv"
+done <"$OUTPUT/patched_files.tsv"
+install -Dm644 "$UTILS_SRC" "$SITE/$UTILS_REL"
+UTILS_SHA="$(sha256sum "$SITE/$UTILS_REL" | cut -d' ' -f1)"
+[ "$UTILS_SHA" = "$(sha256sum "$UTILS_SRC" | cut -d' ' -f1)" ] || fail "helper copy mismatch"
+
+# 7. Import check: the served model only reports turns if this module loads and
 # the realtime protocol exposes turn.delta.
 "$PY" - >"$OUTPUT/import_check.json" 2>"$OUTPUT/import_check.log" <<'PY'
 import json
@@ -133,58 +161,78 @@ print(json.dumps({
 }, indent=2))
 PY
 
-"$PY" - "$OUTPUT" "$ROOT" "$ENV_PREFIX" "$VLLM_DIR" "$X2_DIR" "$SITE" \
-  "$VLLM_TAG" "$VLLM_COMMIT" "$X2_TURN_COMMIT" "$UTILS_REL" "$UTILS_SHA" \
-  "$PIP_INDEX" "$CONDA_MIRROR" "$HF_ENDPOINT" "$(capacity)" <<'PY'
+"$PY" - "$OUTPUT" "$ROOT" "$ENV_PREFIX" "$SITE" "$BUNDLE" "$ARCHIVE" \
+  "$BUNDLE_SHA256" "$UTILS_REL" "$UTILS_SHA" "$PIP_INDEX" "$CONDA_MIRROR" \
+  "$(capacity)" <<'PY'
 import json
 import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-(output, root, prefix, vllm_dir, x2_dir, site, tag, vllm_commit,
- x2_commit, utils_rel, utils_sha, pip_index, conda_mirror, endpoint, free_gib) = sys.argv[1:]
+(output, root, prefix, site, bundle, archive, bundle_sha, utils_rel, utils_sha,
+ pip_index, conda_mirror, free_gib) = sys.argv[1:]
 output = Path(output)
-patched = {}
+bundle = Path(bundle)
+
+pre = {}
 for line in (output / "patched_files.tsv").read_text().splitlines():
-    rel, wheel_sha, commit_sha, patched_sha = line.split("\t")
-    patched[rel] = {
-        "wheel_sha256": wheel_sha,
-        "pinned_commit_sha256": commit_sha,
-        "patched_sha256": patched_sha,
-    }
-import_check = json.loads((output / "import_check.json").read_text())
+    rel, pre_hash, post_hash = line.split("\t")
+    pre[rel] = {"pre_image_blob": pre_hash, "post_image_blob": post_hash}
+wheel = {}
+for line in (output / "wheel_vs_source.tsv").read_text().splitlines():
+    rel, wheel_hash, bundle_hash, expected = line.split("\t")
+    wheel[rel] = {"wheel_blob": wheel_hash, "bundle_blob": bundle_hash,
+                  "pinned_blob": expected}
 installed = {}
-for package in ("vllm", "torch", "mistral-common", "huggingface_hub", "websockets", "soundfile"):
+for line in (output / "installed_files.tsv").read_text().splitlines():
+    rel, digest = line.split("\t")
+    installed[rel] = digest
+manifest = json.loads((bundle / "manifest.json").read_text())
+import_check = json.loads((output / "import_check.json").read_text())
+packages = {}
+for wanted in ("vllm", "torch", "mistral-common", "huggingface_hub", "websockets", "soundfile"):
     for line in (output / "pip_freeze.txt").read_text().splitlines():
-        if line.lower().replace("_", "-").startswith(package.lower() + "=="):
-            installed[package] = line.split("==", 1)[1]
+        if line.lower().replace("_", "-").startswith(wanted.lower() + "=="):
+            packages[wanted] = line.split("==", 1)[1]
             break
 lock = {
     "created_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     "root": root,
     "conda_env": prefix,
     "python": (output / "python_version.txt").read_text().strip(),
-    "install_method": "official wheel + pinned overlay patch",
+    "install_method": "official wheel + overlay applied to pinned pre-image blobs",
     "pip_index": pip_index,
     "conda_mirror": conda_mirror,
-    "hf_endpoint": endpoint,
     "free_disk_gib_after": float(free_gib),
+    "source_bundle": {
+        "archive": str(archive),
+        "sha256": bundle_sha,
+        "manifest": str(bundle / "manifest.json"),
+        "manifest_archive_sha256": manifest.get("archive", {}).get("sha256"),
+        "x2_turn_commit": manifest["x2_turn"]["commit"],
+        "vllm_commit": manifest["vllm"]["commit"],
+        "vllm_tag": manifest["vllm"]["tag"],
+        "patched_files": {
+            rel: {**pre[rel], **wheel[rel], "installed_sha256": installed[rel]}
+            for rel in pre
+        },
+        "overlay_helper": {
+            "path": utils_rel,
+            "sha256": utils_sha,
+            "bundle_sha256": manifest["x2_turn"]["files"][
+                "voxtral-realtime/integrations/vllm/" + utils_rel
+            ]["sha256"],
+        },
+    },
     "vllm": {
         "version": import_check["vllm_version"],
-        "tag": tag,
-        "commit": vllm_commit,
-        "source_checkout": vllm_dir,
         "site_packages": site,
-        "patched_files": patched,
-        "overlay_helper": {"path": utils_rel, "sha256": utils_sha},
         "wheel_matches_pinned_commit": all(
-            item["wheel_sha256"] == item["pinned_commit_sha256"]
-            for item in patched.values()
+            item["wheel_blob"] == item["pinned_blob"] for item in wheel.values()
         ),
     },
-    "x2_turn_source": {"path": x2_dir, "commit": x2_commit},
-    "packages": installed,
+    "packages": packages,
     "import_check": import_check,
     "pip_freeze": (output / "pip_freeze.txt").read_text().splitlines(),
 }
