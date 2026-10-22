@@ -50,10 +50,14 @@ PY="$ENV_PREFIX/bin/python"
 "$PY" -V >"$OUTPUT/python_version.txt"
 
 # 2. Official vLLM wheel plus the runtime pieces the service and probes need.
-log "installing vllm==0.19.1 from $PIP_INDEX"
-"$PY" -m pip install --index-url "$PIP_INDEX" \
-  "vllm==0.19.1" mistral-common soundfile websockets huggingface_hub \
-  >"$OUTPUT/pip_install.log" 2>&1
+if "$PY" -c 'import vllm, sys; sys.exit(0 if vllm.__version__ == "0.19.1" else 1)' 2>/dev/null; then
+  log "vllm 0.19.1 already installed in $ENV_PREFIX"
+else
+  log "installing vllm==0.19.1 from $PIP_INDEX"
+  "$PY" -m pip install --index-url "$PIP_INDEX" \
+    "vllm==0.19.1" mistral-common soundfile websockets huggingface_hub \
+    >"$OUTPUT/pip_install.log" 2>&1
+fi
 "$PY" -m pip freeze >"$OUTPUT/pip_freeze.txt"
 
 # 3. Pinned upstream checkouts.  Only the two repositories this work item
