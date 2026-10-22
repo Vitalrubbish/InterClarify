@@ -35,7 +35,7 @@
 
 ## 实现和远端执行
 
-拟由 `scripts/remote/x2_turn_complete_test.py` 集中实现固定版本数据恢复、单会话实时回放、基本 WER、文本末端延迟与原生状态 trace 评分；对应说明为 `docs/scripts/remote/x2_turn_complete_test.md`。`scripts/remote/run_x2_turn_complete_job.sh` 管理调度分配 GPU 上的服务启动、预热、5 条冒烟、100 条正式回放与进程清理；对应镜像说明同路径创建。数据准备入口和说明已随 X2Q-009 创建，回放/评分与远端作业脚本待后续工作单实现，避免复活旧 ASR 选型框架。
+拟由 `scripts/remote/x2_turn_complete_test.py` 集中实现固定版本数据恢复、单会话实时回放、基本 WER、文本末端延迟与原生状态 trace 评分；对应说明为 `docs/scripts/remote/x2_turn_complete_test.md`。`scripts/remote/run_x2_turn_complete_job.sh` 管理调度分配 GPU 上的服务启动、预热、5 条冒烟、100 条正式回放与进程清理；对应镜像说明同路径创建。数据准备入口和说明已随 X2Q-009 创建；部署阶段的安装、模型准备、服务诊断与单卡作业已随 X2Q-010 创建，回放/评分与正式测试脚本待后续工作单实现，避免复活旧 ASR 选型框架。
 
 源码固定 X2-Turn `67ec3fe49f1977ee3129f7eaed603c04d8ed23c5`，作者 overlay 基于 vLLM 0.19.1 提交 `b1388b1fbf5aaef47937fabe98931211684666a6`。固定实际 HF 模型 revision、导出哈希、依赖版本和有效 delay；不能只给客户端报告字段写 480。原生六类状态持续保存，不自行平滑或门控。
 

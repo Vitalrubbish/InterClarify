@@ -8,7 +8,7 @@
 
 | 当前工作单 | 内容 | 依赖 | 状态 |
 | --- | --- | --- | --- |
-| [X2Q-010](x2q_010_x2_turn_deployment.md) | 远端 conda、模型及流式服务部署 | X2Q-008；预热需 X2Q-009 | 待实施 |
+| [X2Q-010](x2q_010_x2_turn_deployment.md) | 远端 conda、模型及流式服务部署 | X2Q-008；预热需 X2Q-009 | 进行中 |
 | [X2Q-011](x2q_011_streaming_replay.md) | 真实时钟回放与原始 trace | X2Q-009、010 的合同 | 待实施 |
 | [X2Q-012](x2q_012_asr_metrics.md) | 转写 WER 与平均末端文本延迟 | X2Q-009、011 的合同 | 待实施 |
 | [X2Q-013](x2q_013_complete_metrics.md) | complete 输出率与首次延迟 | X2Q-011 的合同 | 待实施 |

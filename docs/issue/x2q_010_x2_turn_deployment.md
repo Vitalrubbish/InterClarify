@@ -1,6 +1,6 @@
 # X2Q-010：部署冻结版本 X2-Turn 流式服务
 
-状态：待实施。依赖：[X2Q-008](archive/x2q_008_complete_protocol.md)；真实音频预热依赖 [X2Q-009](x2q_009_fleurs_data.md) 的 dev 输入。依据：[测试计划](../dev/X2-Turn/complete_test_on_fleurs.md)。
+状态：进行中（2026-10-22 启动）。依赖：[X2Q-008](archive/x2q_008_complete_protocol.md)；真实音频预热依赖 [X2Q-009](x2q_009_fleurs_data.md) 的 dev 输入。依据：[测试计划](../dev/X2-Turn/complete_test_on_fleurs.md)。
 
 ## 目标与工作内容
 
@@ -16,6 +16,19 @@
 ## 交付
 
 拟由 `scripts/remote/run_x2_turn_complete_job.sh` 管理服务生命周期，镜像说明为 `docs/scripts/remote/run_x2_turn_complete_job.md`，解释入口、阶段、参数和清理方法。远端保存模型/环境/源码锁、有效配置、日志与预热证据。
+
+## 实施记录
+
+2026-10-22 启动。预检确认：远端登录节点可连，旧 X2 模型与环境已清理，`interclarify-x2-turn-complete/dataset` 的固定 FLEURS 子集完好，`pdcpu` 与 GPU 分区可用，`pypi.org` 与 `conda.anaconda.org` 直连不可用，清华 PyPI/conda 镜像与 `hf-mirror.com`、`github.com` 可用。
+
+本轮确定：
+
+- 模型固定 revision `49c62a9b1170f2ab5168e763b84c2ac5c6b5e1ee`，仓库自带 `params.json` 与 `tekken.json`，不额外下载基底模型。
+- 有效延迟 480 ms 的来源为 `tekken.json` 的 `audio.transcription_delay_ms`、`frame_rate=12.5`（6 × 80 ms），部署作业会用 `mistral-common` 的 `get_num_delay_tokens()` 复核，不用客户端字段。
+- vLLM 采用官方 `0.19.1` wheel 加作者 overlay：源码构建超出安装阶段 4 CPU / 16 GiB 预算且需要完整 CUDA 工具链。安装脚本先逐文件核对 wheel 与固定提交 `b1388b1` 的 10 个 Python 文件哈希，不一致即中止，全部哈希写入环境锁。该差异已记录，不宣称等价于源码构建产物。
+- 安装/下载放入 `pdcpu` 作业，推理仍在单卡 24 GiB 作业中执行。
+
+入口：`setup_x2_turn_vllm_env.sh`、`prepare_x2_turn_model.py`、`x2_turn_service_probe.py`、`run_x2_turn_complete_job.sh`、`submit_x2_turn_complete_jobs.sh`，说明见 `docs/scripts/remote/` 同名文档。远端结果待作业完成后补充。
 
 ## 验收
 
