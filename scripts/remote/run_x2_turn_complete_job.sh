@@ -161,15 +161,18 @@ if length is not None:
     payload["ms_per_token_from_hops"] = from_hops
     payload["sources_agree_on_per_token"] = abs(from_hops - per_token_ms) < 1e-6
 try:
-    from mistral_common.tokens.tokenizers.mistral import MistralTokenizer
+    from vllm.tokenizers.registry import get_tokenizer
 
-    tokenizer = MistralTokenizer.from_file(str(model_dir / "tekken.json"))
-    payload["mistral_common_num_delay_tokens"] = int(
-        tokenizer.instruct.audio_encoder.audio_config.get_num_delay_tokens()
+    tokenizer = get_tokenizer(str(model_dir), tokenizer_mode="mistral")
+    audio_config = tokenizer.instruct.audio_encoder.audio_config
+    payload["vllm_tokenizer_num_delay_tokens"] = int(audio_config.get_num_delay_tokens())
+    payload["vllm_tokenizer_transcription_delay_ms"] = getattr(
+        audio_config, "transcription_delay_ms", None
     )
+    payload["vllm_tokenizer_frame_rate"] = getattr(audio_config, "frame_rate", None)
 except Exception as error:  # pragma: no cover - depends on installed version
-    payload["mistral_common_num_delay_tokens"] = None
-    payload["mistral_common_error"] = repr(error)
+    payload["vllm_tokenizer_num_delay_tokens"] = None
+    payload["vllm_tokenizer_error"] = repr(error)
 from vllm.model_executor.models.voxtral_mtp_utils import TURN_CLASS_IDS, TURN_CLASS_NAMES
 payload["turn_id_to_class"] = {str(i): n for i, n in zip(TURN_CLASS_IDS, TURN_CLASS_NAMES, strict=True)}
 target.write_text(json.dumps(payload, indent=2) + "\n")
@@ -187,9 +190,14 @@ if payload["delay_tokens"] != 6:
     raise SystemExit(f"delay tokens is {payload['delay_tokens']}, expected 6")
 if not payload["sources_agree_on_tokens"]:
     raise SystemExit("tekken.json and config.json disagree on the delay tokens")
-if payload.get("mistral_common_num_delay_tokens") != 6:
+if payload.get("vllm_tokenizer_num_delay_tokens") != 6:
     raise SystemExit(
-        f"mistral-common reports {payload.get('mistral_common_num_delay_tokens')} delay tokens"
+        f"the served tokenizer reports {payload.get('vllm_tokenizer_num_delay_tokens')} delay tokens"
+    )
+if payload.get("vllm_tokenizer_transcription_delay_ms") != 480:
+    raise SystemExit(
+        "the served tokenizer reports "
+        f"{payload.get('vllm_tokenizer_transcription_delay_ms')} ms, expected 480"
     )
 if payload["turn_id_to_class"].get("38") != "turn_end":
     raise SystemExit("turn id 38 is not mapped to turn_end")
