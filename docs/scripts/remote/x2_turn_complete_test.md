@@ -70,7 +70,7 @@ dataset/fleurs_en_us/
 
 ## 回放入口与合同
 
-X2Q-011、012、013 已实现；真实模型测试由 X2Q-014 执行。回放 Python 环境需要 `soundfile`、`websockets` 和 `whisper-normalizer==0.1.12`，推荐在冻结数据的独立 conda 环境补装 `websockets`，并保存 `pip freeze`；不要为回放重新恢复数据。模型所在环境与回放客户端可以独立。
+X2Q-011—013 已实现；X2Q-014 已于 2026-10-22 完成真实模型测试。回放与评分客户端仍由本脚本提供，单作业编排与提交分别由 `run_x2_turn_complete_job.sh` 和 `submit_x2_turn_complete_jobs.sh` 负责，说明见同目录同名文档。回放 Python 环境需要 `soundfile`、`websockets` 和 `whisper-normalizer==0.1.12`，推荐在冻结数据的独立 conda 环境补装 `websockets`，并保存 `pip freeze`；不要为回放重新恢复数据。模型所在环境与回放客户端可以独立。
 
 在远端已由调度作业启动并核验有效 delay=480 ms 的服务后执行：
 
@@ -88,7 +88,7 @@ python scripts/remote/x2_turn_complete_test.py score-complete \
 
 `StreamingReplay` 每条录音独立会话、batch=1，`run` 并行运行 `send_audio` 与 `receive`：
 
-- `read_replay_audio` 只接受原始单声道 16 kHz PCM16 WAV；不重采样、不裁剪。块在所含采样按源时钟到齐后发送，完整块为 80 ms，文件末块保留原长度。因此计划文件末端为起点加原始采样时长。
+- `read_replay_audio` 接受冻结的单声道 16 kHz WAV，PCM16、PCM24 与 IEEE float 编码均可读；不重采样、不裁剪。浮点样本按 ×32768 四舍五入并裁剪到 int16，与部署阶段协议诊断的转换一致。块在所含采样按源时钟到齐后发送，完整块为 80 ms，文件末块保留原长度。因此计划文件末端为起点加原始采样时长。
 - 每块发送 append 与非 final commit，最后一个原始块的发送完成时刻为 `t_end`。随后按同样时钟发送恰好 80,000 个静音采样，最后一个块为 40 ms，不通过快速上传提前完成尾窗。
 - `receive` 在解析 JSON、写日志前打客户端 monotonic 接收时戳，保存原始 payload（含全部状态、ID、概率）、累计文本与 UTC。发送等待期间接收持续运行，文本不受状态门控。
 - `window_end=t_end+5`；所有静音发完才记完整观察。`t_eof` 是 final commit 请求前的时刻，`t_eof_sent` 是发送完成时刻，`t_done` 是 `transcription.done` 接收时刻。按请求时刻切开 EOF 阶段，避免发送过程中收到的响应被当成在线输出。

@@ -2,31 +2,28 @@
 
 更新：2026-10-22。
 
-用户已取消 FDB 测试，现要求在历史 FLEURS 100 条上保留基本转写 WER 与末端文本延迟，只把控制测试简化为输入结束后的 complete 输出率和首次延迟。X2Q-009 已完成固定输入恢复；X2Q-010 已完成模型部署与 dev 协议诊断；X2Q-011、012、013 已完成回放与独立评分逻辑及本地模拟验证，真实模型测试尚未执行。[当前协议](../dev/X2-Turn/complete_test_on_fleurs.md)。
+用户已取消 FDB 测试，现要求在历史 FLEURS 100 条上保留基本转写 WER 与末端文本延迟，只把控制测试简化为输入结束后的 complete 输出率和首次延迟。X2Q-009 已完成固定输入恢复；X2Q-010 已完成模型部署与 dev 协议诊断；X2Q-011、012、013 已完成回放与独立评分逻辑及本地模拟验证；X2Q-014 已完成远端冒烟、100 条正式回放和报告。[当前协议](../dev/X2-Turn/complete_test_on_fleurs.md)。
 
-按确认后的范围重新拆分为六个工作单元，沿用尚未实施的编号 X2Q-009—011 并细化职责，新增 X2Q-012—014；不保留重复的旧入口。
+按确认后的范围重新拆分为六个工作单元，沿用尚未实施的编号 X2Q-009—011 并细化职责，新增 X2Q-012—014；不保留重复的旧入口。当前无待执行工作单。
 
-| 当前工作单 | 内容 | 依赖 | 状态 |
-| --- | --- | --- | --- |
-| [X2Q-014](x2q_014_fleurs_evaluation.md) | 远端冒烟、100 条正式测试及报告 | X2Q-009—013 完成 | 待执行 |
+X2Q-014 正式结果为语料 WER 22.53%、在线末端文本延迟均值 -1,027.86 ms、输入末端 complete 输出率 1.0%，逐例记录与限制见[正式报告](../../reports/x2_turn_fleurs_evaluation.md)。X2Q-010—013 已完成并归档；模拟或 dev 诊断结果不视为正式测试。
 
-默认按表中顺序推进；合同确定后可以用模拟记录先验证逻辑，正式模型结果统一在 X2Q-014 生成。各单完成后直接归档并更新索引。X2Q-010—013 已完成并归档；现可进入 X2Q-014，不将模拟或 dev 诊断结果视为正式测试。
-
-简化协议 [X2Q-008](archive/x2q_008_complete_protocol.md) 已完成归档。以下为历史记录。
+简化协议 [X2Q-008](archive/x2q/x2q_008_complete_protocol.md) 已完成归档。以下为历史记录。
 
 | 工作单 | 工作单元 | 状态 | 归档说明 |
 | --- | --- | --- | --- |
-| [X2Q-010](archive/x2q_010_x2_turn_deployment.md) | 冻结版本 vLLM 服务部署 | 已完成 | wheel+overlay、480 ms delay、dev 协议诊断 |
-| [X2Q-011](archive/x2q_011_streaming_replay.md) | 真实时钟回放与原始 trace | 已完成 | 80 ms 输入、5 秒尾窗、EOF 排空与失败留账 |
-| [X2Q-012](archive/x2q_012_asr_metrics.md) | 转写 WER 与平均末端文本延迟 | 已完成 | 固定标准化、语料 WER、在线与 EOF 后时序 |
-| [X2Q-013](archive/x2q_013_complete_metrics.md) | complete 输出率与首次延迟 | 已完成 | 原生帧闭区间评分、失败覆盖与 null |
-| [X2Q-002](archive/x2q_002_fdb_references.md) | FDB 清单与参考 | 已取消 | 用户取消 FDB 测试 |
-| [X2Q-003](archive/x2q_003_streaming_replay.md) | 部署与 FDB 回放 | 已取消 | 尚未实施 |
-| [X2Q-004](archive/x2q_004_state_judger.md) | FDB 状态 Judger | 已取消 | 尚未实施 |
-| [X2Q-005](archive/x2q_005_quality_metrics.md) | FDB 质量评分 | 已取消 | 尚未实施 |
-| [X2Q-006](archive/x2q_006_remote_quality_run.md) | FDB 正式测试 | 已取消 | 尚未执行 |
-| [X2Q-007](archive/x2q_007_fleurs_verification.md) | 历史 FLEURS 与远端现状核查 | 已完成 | 未下载数据或启动模型 |
+| [X2Q-014](archive/x2q/x2q_014_fleurs_evaluation.md) | 远端冒烟、正式测试与报告 | 已完成 | 真实模型 100 条、两类评分、报告归档 |
+| [X2Q-010](archive/x2q/x2q_010_x2_turn_deployment.md) | 冻结版本 vLLM 服务部署 | 已完成 | wheel+overlay、480 ms delay、dev 协议诊断 |
+| [X2Q-011](archive/x2q/x2q_011_streaming_replay.md) | 真实时钟回放与原始 trace | 已完成 | 80 ms 输入、5 秒尾窗、EOF 排空与失败留账 |
+| [X2Q-012](archive/x2q/x2q_012_asr_metrics.md) | 转写 WER 与平均末端文本延迟 | 已完成 | 固定标准化、语料 WER、在线与 EOF 后时序 |
+| [X2Q-013](archive/x2q/x2q_013_complete_metrics.md) | complete 输出率与首次延迟 | 已完成 | 原生帧闭区间评分、失败覆盖与 null |
+| [X2Q-002](archive/x2q/x2q_002_fdb_references.md) | FDB 清单与参考 | 已取消 | 用户取消 FDB 测试 |
+| [X2Q-003](archive/x2q/x2q_003_streaming_replay.md) | 部署与 FDB 回放 | 已取消 | 尚未实施 |
+| [X2Q-004](archive/x2q/x2q_004_state_judger.md) | FDB 状态 Judger | 已取消 | 尚未实施 |
+| [X2Q-005](archive/x2q/x2q_005_quality_metrics.md) | FDB 质量评分 | 已取消 | 尚未实施 |
+| [X2Q-006](archive/x2q/x2q_006_remote_quality_run.md) | FDB 正式测试 | 已取消 | 尚未执行 |
+| [X2Q-007](archive/x2q/x2q_007_fleurs_verification.md) | 历史 FLEURS 与远端现状核查 | 已完成 | 未下载数据或启动模型 |
 
-已完成并归档：[X2Q-001：实现机制调研与评测计划](archive/x2q_001_quality_plan.md)。[X2Q-009：恢复并冻结 FLEURS 英文子集](archive/x2q_009_fleurs_data.md) 已于 2026-10-22 完成远端恢复与复核；证据见 [报告](../../reports/x2_turn_complete/20261022-fleurs-subset/README.md) 与 [脚本说明](../../docs/scripts/remote/x2_turn_complete_test.md)。
+已完成并归档：[X2Q-001：实现机制调研与评测计划](archive/x2q/x2q_001_quality_plan.md)。[X2Q-009：恢复并冻结 FLEURS 英文子集](archive/x2q/x2q_009_fleurs_data.md) 已于 2026-10-22 完成远端恢复与复核；证据见 [报告](../../reports/x2_turn_complete/20261022-fleurs-subset/README.md) 与 [脚本说明](../../docs/scripts/remote/x2_turn_complete_test.md)。
 
 历史数据依据见 [FLEURS 子集核查](../dev/X2-Turn/fleurs_subset_verification.md)。研究范围与模块职责仍以 [research_design.md](../research_design.md)、[engineering_implementation.md](../engineering_implementation.md) 为准。

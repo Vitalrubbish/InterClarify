@@ -1,6 +1,6 @@
 # FLEURS 转写 WER 与输入末端 complete 测试
 
-更新：2026-10-22。状态：已按用户澄清更新测试计划；X2Q-009 已完成固定输入恢复与复核，X2Q-011—013 已完成回放与独立评分逻辑、本地模拟验证；真实模型测试尚未执行。
+更新：2026-10-22。状态：已按用户澄清更新测试计划；X2Q-009 已完成固定输入恢复与复核，X2Q-011—013 已完成回放与独立评分逻辑、本地模拟验证；X2Q-014 已完成远端真实模型正式测试，结果见[报告](../../../reports/x2_turn_fleurs_evaluation.md)。
 
 ## 范围
 
@@ -43,4 +43,4 @@
 
 针对时窗两端、重复 complete、仅提前/EOF 后出现、缺失与运行错误实现可人工核算的小型 trace 测试，并用模拟服务核对真实接收时戳与 EOF 顺序。之后远端先预检与冒烟再正式运行；报告保存 100 条逐例结论和完整分母，不用模拟结果冒充模型实测。
 
-工作单见 [入口](../../issue/README.md)。X2Q-008 简化协议、X2Q-009 固定数据恢复、[X2Q-010 模型部署](../../issue/archive/x2q_010_x2_turn_deployment.md)、[X2Q-011 实时回放](../../issue/archive/x2q_011_streaming_replay.md)、[X2Q-012 ASR 指标](../../issue/archive/x2q_012_asr_metrics.md) 与 [X2Q-013 complete 指标](../../issue/archive/x2q_013_complete_metrics.md) 均已完成并归档；现进入 [X2Q-014 远端正式测试](../../issue/x2q_014_fleurs_evaluation.md)。两类评分共用同一批原始 trace，实施与说明随各工作单同步提交。
+工作单见 [入口](../../issue/README.md)。X2Q-008 简化协议、X2Q-009 固定数据恢复、[X2Q-010 模型部署](../../issue/archive/x2q/x2q_010_x2_turn_deployment.md)、[X2Q-011 实时回放](../../issue/archive/x2q/x2q_011_streaming_replay.md)、[X2Q-012 ASR 指标](../../issue/archive/x2q/x2q_012_asr_metrics.md)、[X2Q-013 complete 指标](../../issue/archive/x2q/x2q_013_complete_metrics.md) 与 [X2Q-014 正式测试](../../issue/archive/x2q/x2q_014_fleurs_evaluation.md) 均已完成并归档。两类评分共用同一批原始 trace，实施与说明随各工作单同步提交；正式结果为 WER 22.53%、在线末端文本延迟均值 -1,027.86 ms、输入末端 complete 输出率 1.0%。

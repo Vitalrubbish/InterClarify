@@ -693,15 +693,20 @@ class StreamingReplay:
 
 
 def read_replay_audio(path: Path) -> bytes:
-    import wave
+    import numpy as np
+    import soundfile as sf
 
-    with wave.open(str(path), "rb") as audio:
-        if (audio.getnchannels(), audio.getsampwidth(), audio.getframerate()) != (1, 2, SAMPLE_RATE):
-            raise ValueError("Replay requires original mono PCM16 16000 Hz WAV")
-        pcm = audio.readframes(audio.getnframes())
-    if not pcm:
+    info = sf.info(str(path))
+    if (info.channels, info.samplerate) != (1, SAMPLE_RATE):
+        raise ValueError("Replay requires mono 16000 Hz WAV without resampling or channel changes")
+    data, _ = sf.read(str(path), dtype="float32", always_2d=True)
+    if not data.size:
         raise ValueError("Empty input audio")
-    return pcm
+    # FLEURS keeps some inputs as 32-bit float.  Scale to the PCM16 the
+    # realtime API expects without resampling or trimming the frozen samples.
+    scaled = np.rint(data[:, 0].astype(np.float32) * 32768.0)
+    pcm = np.clip(scaled, -32768, 32767).astype("<i2")
+    return pcm.tobytes()
 
 
 def distribution(values: list[float]) -> dict:

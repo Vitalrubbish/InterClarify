@@ -57,4 +57,4 @@ FLEURS 是朗读语音，适合固定同集比较转写 WER 与末端文本交�
 - 历史选样脚本及数据 revision：`git show 6c75f38:scripts/remote/prepare_asr_selection.py`、`git show 6c75f38:docs/asr_selection_benchmark.md`。
 - 汇总口径与 100 条/969.26 秒/2,162 词：`git show f6ad9d9:docs/asr_selection_report.md` 第 3.2 节，以及同提交的 `reports/asr_selection/20261016-results/summary.md`。
 - 远端检查为本次 SSH 只读会话，未在服务器写入资产或提交作业。
-- 本次工作单：[X2Q-007](../../issue/archive/x2q_007_fleurs_verification.md)。旧 FDB 计划及工作单已取消，历史内容可从 Git 追溯。
+- 本次工作单：[X2Q-007](../../issue/archive/x2q/x2q_007_fleurs_verification.md)。旧 FDB 计划及工作单已取消，历史内容可从 Git 追溯。

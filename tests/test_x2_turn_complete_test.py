@@ -130,6 +130,30 @@ class FleursDataTests(unittest.TestCase):
 
 
 
+class ReplayAudioTests(unittest.TestCase):
+    def test_float32_input_is_scaled_without_resampling(self):
+        import numpy as np
+        import soundfile as sf
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'float.wav'
+            sf.write(str(path), np.array([-1., -.5, 0., .5, 1.], dtype='float32'),
+                     16000, subtype='FLOAT')
+            pcm = x2.read_replay_audio(path)
+        self.assertEqual(np.frombuffer(pcm, dtype='<i2').tolist(),
+                         [-32768, -16384, 0, 16384, 32767])
+
+    def test_rejects_wrong_rate_or_channels(self):
+        import numpy as np
+        import soundfile as sf
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'stereo.wav'
+            sf.write(str(path), np.zeros((10, 2), dtype='float32'), 16000, subtype='FLOAT')
+            with self.assertRaisesRegex(ValueError, 'mono 16000 Hz'):
+                x2.read_replay_audio(path)
+
+
 def event(received, kind="turn.delta", **fields):
     payload = {"type": kind, **fields}
     if kind == "turn.delta":
