@@ -10,6 +10,10 @@
 
 调度节点无法访问 `github.com`，因此固定源码由 [源码包](build_x2_turn_source_bundle.md) 离线提供，安装阶段不联网克隆。
 
+## 依赖固定
+
+除 `vllm==0.19.1` 外，`transformers` 固定为 `5.5.1`。transformers 5.10 起在 `ProcessingMixin.prepare_inputs_layout` 中调用 `fetch_audio()`，而 vLLM 0.19.1 自带的 `MistralCommonFeatureExtractor` 没有该方法，服务会在引擎初始化阶段报 `AttributeError`；vLLM 0.19.1 的依赖声明也显式排除 `5.5.0`，因此取 `5.5.1`。版本检查与安装结果写入环境锁的 `packages` 与 `pip freeze`。
+
 ## 为什么用 wheel 而不是源码构建
 
 作者指南要求 clone 固定提交后源码安装。源码构建 vLLM 需要完整 CUDA 工具链和远高于本工作单安装预算（4 CPU、16 GiB RAM）的编译资源，在远端集群不现实，因此改为安装官方 `vllm==0.19.1` wheel，再把作者 overlay 应用到这个 wheel 上。

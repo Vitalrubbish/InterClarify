@@ -16,6 +16,10 @@ CONDA="${X2_TURN_CONDA:-$HOME/miniconda3/bin/conda}"
 ENV_PREFIX="${X2_TURN_CONDA_ENV:-$HOME/miniconda3/envs/interclarify-x2-turn-vllm}"
 CONDA_MIRROR="${X2_TURN_CONDA_MIRROR:-https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge}"
 PIP_INDEX="${X2_TURN_PIP_INDEX:-https://pypi.tuna.tsinghua.edu.cn/simple}"
+# transformers 5.10 added a fetch_audio() call in ProcessingMixin that the
+# pinned vLLM 0.19.1 Voxtral processor does not implement; vLLM 0.19.1 itself
+# excludes 5.5.0, so 5.5.1 is the supported pairing.
+TRANSFORMERS_VERSION="5.5.1"
 ARCHIVE="$ROOT/source/x2_turn_sources.tar.gz"
 BUNDLE="$ROOT/source/x2_turn_sources"
 
@@ -51,8 +55,14 @@ if "$PY" -c 'import vllm, sys; sys.exit(0 if vllm.__version__ == "0.19.1" else 1
 else
   log "installing vllm==0.19.1 from $PIP_INDEX"
   "$PY" -m pip install --index-url "$PIP_INDEX" \
-    "vllm==0.19.1" mistral-common soundfile websockets huggingface_hub \
+    "vllm==0.19.1" "transformers==$TRANSFORMERS_VERSION" mistral-common \
+    soundfile websockets huggingface_hub \
     >"$OUTPUT/pip_install.log" 2>&1
+fi
+if ! "$PY" -c "import transformers, sys; sys.exit(0 if transformers.__version__ == \"$TRANSFORMERS_VERSION\" else 1)" 2>/dev/null; then
+  log "installing transformers==$TRANSFORMERS_VERSION"
+  "$PY" -m pip install --index-url "$PIP_INDEX" \
+    "transformers==$TRANSFORMERS_VERSION" >>"$OUTPUT/pip_install.log" 2>&1
 fi
 "$PY" -m pip freeze >"$OUTPUT/pip_freeze.txt"
 
@@ -217,7 +227,7 @@ transfer_manifest = (
 )
 import_check = json.loads((output / "import_check.json").read_text())
 packages = {}
-for wanted in ("vllm", "torch", "mistral-common", "huggingface_hub", "websockets", "soundfile"):
+for wanted in ("vllm", "torch", "transformers", "mistral-common", "huggingface_hub", "websockets", "soundfile"):
     for line in (output / "pip_freeze.txt").read_text().splitlines():
         if line.lower().replace("_", "-").startswith(wanted.lower() + "=="):
             packages[wanted] = line.split("==", 1)[1]
