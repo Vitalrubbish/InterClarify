@@ -91,28 +91,45 @@ with open(target, "w", encoding="utf-8") as stream:
         stream.write(f"{path}\t{pre}\t{post}\n")
 PY
 : >"$OUTPUT/wheel_vs_source.tsv"
+FRESH=0
+PATCHED=0
 while IFS=$'\t' read -r rel pre post; do
   wheel_sha="$(git hash-object "$SITE/$rel")"
   bundle_sha="$(git hash-object "$BUNDLE/vllm/$rel")"
-  printf '%s\t%s\t%s\t%s\n' "$rel" "$wheel_sha" "$bundle_sha" "$pre" >>"$OUTPUT/wheel_vs_source.tsv"
-  [ "$wheel_sha" = "$pre" ] || fail "$rel: wheel blob $wheel_sha != pinned pre-image $pre"
+  printf '%s\t%s\t%s\t%s\t%s\n' "$rel" "$wheel_sha" "$bundle_sha" "$pre" "$post" \
+    >>"$OUTPUT/wheel_vs_source.tsv"
   [ "$bundle_sha" = "$pre" ] || fail "$rel: bundle blob $bundle_sha != pinned pre-image $pre"
+  case "$wheel_sha" in
+    "$pre") FRESH=$((FRESH + 1)) ;;
+    "$post") PATCHED=$((PATCHED + 1)) ;;
+    *) fail "$rel: wheel blob $wheel_sha matches neither pinned pre-image $pre nor post-image $post" ;;
+  esac
 done <"$OUTPUT/patched_files.tsv"
-log "wheel and bundle match the pinned pre-image for all 10 files"
+if [ "$FRESH" -ne 0 ] && [ "$PATCHED" -ne 0 ]; then
+  fail "site-packages is in a mixed overlay state ($FRESH fresh, $PATCHED patched)"
+fi
+if [ "$PATCHED" -ne 0 ]; then
+  MODE=patched
+  log "wheel files already carry the pinned overlay; skipping patch application"
+else
+  MODE=fresh
+  log "wheel and bundle match the pinned pre-image for all ${FRESH} files"
+fi
 
 # 5. Apply the overlay in a throwaway git index so `git apply --index` verifies
 # both the pre-image and the post-image blob ids.
 STAGE="$OUTPUT/overlay_stage"
-rm -rf "$STAGE"
-mkdir -p "$STAGE"
-while IFS=$'\t' read -r rel _ _; do
-  install -Dm644 "$BUNDLE/vllm/$rel" "$STAGE/$rel"
-done <"$OUTPUT/patched_files.tsv"
-git init -q "$STAGE"
-git -C "$STAGE" add -A
-git -C "$STAGE" apply --index "$PATCH" >"$OUTPUT/overlay_install.log" 2>&1
-git -C "$STAGE" ls-files -s >"$OUTPUT/overlay_index.txt"
-"$PY" - "$OUTPUT/patched_files.tsv" "$OUTPUT/overlay_index.txt" <<'PY'
+if [ "$MODE" = fresh ]; then
+  rm -rf "$STAGE"
+  mkdir -p "$STAGE"
+  while IFS=$'\t' read -r rel _ _; do
+    install -Dm644 "$BUNDLE/vllm/$rel" "$STAGE/$rel"
+  done <"$OUTPUT/patched_files.tsv"
+  git init -q "$STAGE"
+  git -C "$STAGE" add -A
+  git -C "$STAGE" apply --index "$PATCH" >"$OUTPUT/overlay_install.log" 2>&1
+  git -C "$STAGE" ls-files -s >"$OUTPUT/overlay_index.txt"
+  "$PY" - "$OUTPUT/patched_files.tsv" "$OUTPUT/overlay_index.txt" <<'PY'
 import sys
 
 expected = {}
@@ -131,10 +148,13 @@ if bad:
 print("all post-image blob ids match the overlay patch")
 PY
 
-# 6. Install the patched modules and the new helper over the wheel.
+  # 6. Install the patched modules and the new helper over the wheel.
+  while IFS=$'\t' read -r rel _ _; do
+    install -Dm644 "$STAGE/$rel" "$SITE/$rel"
+  done <"$OUTPUT/patched_files.tsv"
+fi
 : >"$OUTPUT/installed_files.tsv"
 while IFS=$'\t' read -r rel _ _; do
-  install -Dm644 "$STAGE/$rel" "$SITE/$rel"
   printf '%s\t%s\n' "$rel" "$(sha256sum "$SITE/$rel" | cut -d' ' -f1)" \
     >>"$OUTPUT/installed_files.tsv"
 done <"$OUTPUT/patched_files.tsv"
@@ -163,7 +183,7 @@ PY
 
 "$PY" - "$OUTPUT" "$ROOT" "$ENV_PREFIX" "$SITE" "$BUNDLE" "$ARCHIVE" \
   "$BUNDLE_SHA256" "$UTILS_REL" "$UTILS_SHA" "$PIP_INDEX" "$CONDA_MIRROR" \
-  "$(capacity)" <<'PY'
+  "$(capacity)" "$MODE" <<'PY'
 import json
 import os
 import sys
@@ -171,7 +191,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 (output, root, prefix, site, bundle, archive, bundle_sha, utils_rel, utils_sha,
- pip_index, conda_mirror, free_gib) = sys.argv[1:]
+ pip_index, conda_mirror, free_gib, mode) = sys.argv[1:]
 output = Path(output)
 bundle = Path(bundle)
 
@@ -181,9 +201,9 @@ for line in (output / "patched_files.tsv").read_text().splitlines():
     pre[rel] = {"pre_image_blob": pre_hash, "post_image_blob": post_hash}
 wheel = {}
 for line in (output / "wheel_vs_source.tsv").read_text().splitlines():
-    rel, wheel_hash, bundle_hash, expected = line.split("\t")
+    rel, wheel_hash, bundle_hash, expected, post = line.split("\t")
     wheel[rel] = {"wheel_blob": wheel_hash, "bundle_blob": bundle_hash,
-                  "pinned_blob": expected}
+                  "pinned_blob": expected, "post_image_blob": post}
 installed = {}
 for line in (output / "installed_files.tsv").read_text().splitlines():
     rel, digest = line.split("\t")
@@ -208,6 +228,7 @@ lock = {
     "conda_env": prefix,
     "python": (output / "python_version.txt").read_text().strip(),
     "install_method": "official wheel + overlay applied to pinned pre-image blobs",
+    "overlay_state": mode,
     "pip_index": pip_index,
     "conda_mirror": conda_mirror,
     "free_disk_gib_after": float(free_gib),
