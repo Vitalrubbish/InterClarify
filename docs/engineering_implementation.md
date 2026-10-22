@@ -26,16 +26,22 @@ Layer 0 只判断基础话轮状态，不判断主动澄清是否值得发生。
 
 以下为 2026-10-22 对作者仓库、模型卡及官方文档的核查；没有在本项目硬件或 FDB 上实际运行。上游结果不视为本项目验收证据。
 
+根据用户对 ASR 标点时序和回写依赖的补充，优先级调整为先比较音频输入的 X2-Turn 与 SoulX-Duplug，不再默认采用 XTurnix 主线。核查证据、外部 ASR 来源和敏感性实验见 [Layer 0 候选调研](layer0_candidates.md)。此调整仅更新选型计划，现役 ASR 尚未替换。
+
 | 候选 | 已公开能力与资产 | 对 Layer 0 的适配判断 | 计划用途 |
 | --- | --- | --- | --- |
-| XTurnix-PT，0.6B | 文本对话与系统 `listening/speaking` 状态输入；分别预测 `keep/start` 和 `keep/stop`；公开权重，Apache-2.0，提供 Transformers/vLLM 路径 | 同时覆盖接话与让出话轮的动作，且当前 fork 已有客户端；不原生输出完整五类，不直接读取韵律 | 优先验证的控制模型，先冻结权重 |
+| X2-Turn-4B-0812，约 4B | 音频输入，ASR 与状态头并行，每 80ms 产生状态；公开中英权重 | 最接近联合流式 ASR/状态需求；仍依赖此前 ASR token，80ms 帧间隔不等于实际动作延迟 | 优先验证，先单卡预检与冻结 delay |
+| SoulX-Duplug，0.6B 语言主干 | 音频与外部 ASR 文本共同预测状态；论文使用 SenseVoice，作者部署支持 Paraformer/SenseVoice；代码有去标点处理 | 有五类原生状态，但服务存在合并及回退；另计语音 tokenizer、ASR 资源 | 优先比较的轻量主干路线，英文先核对 SenseVoice |
+| Easy Turn，约 0.85B | 音频输入，转写后生成 complete/incomplete/backchannel/wait 标签 | 有公开权重与四类输出；原方案按分段音频推理，WAIT 不等同思考停顿 | 分段音频对照，不作为首个连续流式实现 |
+| FireRedChat EoT / TEN | 分别有 FireRedASR 系统、Paraformer 转写评测证据；读取文本作结束判断 | 具备非 Qwen3-ASR 的公开组合，但仍需检查标点；TEN 为 7B，FireRed 为 mBERT ONNX | 备用文本结束对照，候选不同时部署 |
+| XTurnix-PT，0.6B | 文本对话与系统 `listening/speaking` 状态输入；分别预测 `keep/start` 和 `keep/stop`；公开权重，Apache-2.0，提供 Transformers/vLLM 路径 | 同时覆盖接话与让出话轮的动作，且当前 fork 已有客户端；不原生输出完整五类，不直接读取韵律 | 保留 Nemotron 转写上的文本控制对照，检查标点和回写敏感性 |
 | Smart Turn v3.2，约 8M | Whisper Tiny 编码器及分类头；16kHz 单声道，最多最近 8 秒，结合 VAD 检测话轮是否结束；BSD-2-Clause，公开权重和训练代码 | 适合暂停/结束区分，部署轻；单独不能完成用户附和/插话分类 | 首选声学对照及训练初始化候选 |
 | LiveKit Turn Detector | 当前官方文档区分音频模型 `v1`、本地 CPU `v1-mini`，并保留文本检测器 | 可提供话轮结束对照；需固定具体型号、权重获取方式和许可证，不能沿用旧版文本模型的规格描述音频模型 | 备用结束检测器，不迁移到 LiveKit 会话框架 |
 | Voice Activity Projection（VAP） | 作者提供预训练推理示例，根据双说话人声道预测后续语音活动；训练数据获取存在额外要求 | 可提供话轮转移声学线索；当前 FDB 输入与在线系统播放需构造因果对齐声道，且需核查与 Candor 的来源重叠 | 保留研究对照，不作为首个集成依赖 |
 
 来源：[XTurnix 作者仓库](https://github.com/xcc-zach/xturnix)、[XTurnix-PT 模型卡](https://huggingface.co/xcczach/xturnix-pt)、[Smart Turn 作者仓库](https://github.com/pipecat-ai/smart-turn)、[Smart Turn 权重](https://huggingface.co/pipecat-ai/smart-turn-v3)、[LiveKit 官方文档](https://docs.livekit.io/agents/logic/turns/turn-detector/)、[VAP 作者仓库](https://github.com/ErikEkstedt/VoiceActivityProjection)。
 
-**采用决定：先复用 XTurnix-PT 和现有客户端，增加 Smart Turn 的声学结束检测对照；先在独立开发数据上比较，再确定单模型或组合。当前没有核实到能直接满足本项目全部五类语义、在线协议和资源预算的现成方案，因此同步准备补充训练方案。** 不能把二分类结束检测器称为完整话轮控制器，也不能将 XTurnix 的所有 `speaking + keep` 直接标成用户附和。
+**采用决定：先在独立开发数据上比较 X2-Turn 与 SoulX-Duplug，保留 Smart Turn 声学结束对照、XTurnix 文本对照，再确定后端。先验证现成原生状态能否正确控制；只有实测能力缺口需要补足时才启动训练。** 不能把二分类结束检测器称为完整话轮控制器，也不能将 XTurnix 的所有 `speaking + keep` 直接标成用户附和。原生输出与 DuplexCascade 的 token 拼写不同不是训练理由。
 
 模型获取时固定仓库 commit、模型 revision、tokenizer、权重与自定义推理代码摘要。XTurnix 模型卡明确包含末尾标点处理和历史截断；适配器必须记录实际输入、被裁剪范围及配置，完整原始历史保留在运行时，不能静默改写事实记录。Smart Turn 只读取当前时刻以前的最近音频，其 8 秒窗口不限制其他模块保留历史。
 
@@ -45,13 +51,13 @@ Layer 0 只判断基础话轮状态，不判断主动澄清是否值得发生。
 
 输入包含截至当前的用户音频、VAD 状态、带版本的累计/增量 ASR、历史对话和真实系统播放状态。系统文本以已经确认播放的部分为依据；尚未播放的候选正文单独标记，不冒充用户已知内容。静音、ASR 暂无新文字、话轮结束是不同信号。
 
-音频按现有 80ms 分块接收，ASR 沿用 160ms。Layer 0 在新 ASR、真实语音暂停及播放状态变化时调度；音频模型按其输入要求积累前缀，不对每个小分块反复运行完整模型。Layer 1 仍按 600ms micro-turn 消费最新外部状态；用户打断的停止建议可直接送入同一个仲裁器，不等待 Layer 1 完成生成。
+音频按现有 80ms 分块接收，当前 Nemotron 文本对照保留 160ms ASR。联合流式后端按自身原生块处理音频并持续产生状态，不先等待外部 ASR；文本后端在新 ASR、真实语音暂停及播放状态变化时调度。音频模型按其要求保留流式缓存或积累前缀，不对每个小分块反复运行完整录音。Layer 1 仍按 600ms micro-turn 消费最新外部状态；用户打断的停止建议可直接送入同一个仲裁器，不等待 Layer 1 完成生成。
 
 每会话最多一个 Layer 0 推理在途，后续输入合并到最新待处理快照，完整事件历史仍保留。结果携带观察版本；ASR 被修订、播放对象已切换或结果已经过期时，不再用旧结果启动或停止新响应。先记录失败，再等待新观察；超时不能伪装成模型预测的继续倾听。
 
 ### 4.2 五类状态及 token
 
-沿用现有官方词表，不新增同义 token。下表为输出语义合同；具体阈值在独立开发集冻结。
+本项目的 special token 设计继续沿用 DuplexCascade。候选模型保留其原生 token、状态 ID 或分数，由同一个仲裁器直接解释并执行，不要求先转换成下面的 token，也不要求修改候选 tokenizer。只有下游接口实际使用 DuplexCascade 编码时才在该边界适配。下表描述研究语义及对应编码，不要求所有候选都原生输出五类；具体阈值在独立开发集冻结。
 
 | 状态 | 含义 | 控制 token | 仲裁器的基础处理 |
 | --- | --- | --- | --- |
@@ -63,13 +69,13 @@ Layer 0 只判断基础话轮状态，不判断主动澄清是否值得发生。
 
 `<|no voice|>` 只属于既有输入协议，不列为第六个预测类别。空输入、无有效证据、模型失败作为输出有效性或运行状态记录；不为凑齐五类而伪造语义标签。
 
-适配 XTurnix 时，`listening + start` 是让出话轮的候选证据；`listening + keep` 需结合当前语音活动区分持续表达与暂停；`speaking + stop` 是用户打断候选。`speaking + keep` 只支持继续播放的动作，不能单凭该动作确认附和。若开发集不能验证五类映射，进入第 5 节训练分支，完整五类能力保持未通过。
+适配 XTurnix 时，可直接用 `listening + start/keep` 和 `speaking + stop/keep` 控制。对五类语义作解释时，`listening + keep` 需结合当前语音活动区分持续表达与暂停；`speaking + keep` 只支持继续播放，不能单凭该动作确认附和。缺失语义保持未覆盖；是否训练按实际控制与研究需求判定，不为凑齐标签强制映射。
 
 每次输出记录 `session_id`、`observation_id`、`asr_version`、`response_id`、分类状态、token、原始模型分数、后端、输入音频截止点、输入构造/结果到达时间及有效性。组合模型保留各自证据，不把未校准的分数当成统一置信度。相同状态可重复观察，启动与停止动作按响应 ID 去重。
 
 ### 4.3 外部状态与单一执行权
 
-Layer 0 状态作为带 `source=layer0` 的外部事件保留，不写成 Layer 1 自己生成的历史 token。控制 token 在运行时转换和过滤，不送进 TTS。
+Layer 0 状态作为带 `source=layer0` 的外部事件保留，不写成 Layer 1 自己生成的历史 token。原生控制输出由仲裁器解释并过滤，不送进 TTS；需要下游编码时才执行协议转换。
 
 先提供影子模式：Layer 0 只记录结果，当前链路仍作为对照。启用 Layer 0 执行模式后，基础控制只采纳 Layer 0；旧 Layer 1 生成的同类 token 仍原样记入其真实生成历史并标记为诊断，不能作为第二条执行指令。当前 Layer 1 的文字作为过渡候选提交到统一仲裁器，是否真的能充分响应需单独报告。
 
@@ -77,7 +83,7 @@ Layer 0 状态作为带 `source=layer0` 的外部事件保留，不写成 Layer 
 
 ## 5. 没有合适现成方案时的训练准备
 
-触发条件为：候选缺少必要语义输出；暂停/结束或附和/插话在独立开发集上达不到冻结门槛；或者在线推理不满足资源与时延预算。优先补足缺失能力，不立即从零训练大模型。
+触发条件为：候选缺少研究所需且无法从已有证据验证的语义能力；暂停/结束或附和/插话在独立开发集上达不到冻结门槛；或者在线推理不满足资源与时延预算。优先补足缺失能力，不立即从零训练大模型。token 名称不同、输出为概率或类别数不同，本身均不构成训练理由。
 
 ### 5.1 数据与标注
 
@@ -148,7 +154,9 @@ FDB 的原始标注不是完整五类逐帧金标。缺少类别真值时只报�
 
 当前工具对部分官方延迟将负值归零，报告同时保留原始负值及提前接话数量；未接话延迟为 null，不填零。GPT 相关性评分沿用当前暂缓决定，只做官方词级对齐与时序评分，不能把 TOR 解释为回答内容正确。
 
-最小对照为同条件旧链路、VAD 固定静音阈值基线、XTurnix-PT、Smart Turn 的暂停/结束结果，以及最终完整 Layer 0。每个候选只报告其支持的任务，训练分支触发后补充训练前后对照。分类器对照共享音频、ASR 事件流和参考播放；全链路对照另行使用相同冻结组件重放。
+最小对照为同条件旧链路、VAD 固定静音阈值基线、XTurnix + Nemotron 文本对照、Smart Turn 暂停/结束对照，以及选定的 Layer 0。首轮完整控制候选为 X2-Turn 与 SoulX-Duplug，只在共同支持的任务上比较，训练分支触发后补充训练前后对照。分类器对照共享输入音频和参考播放；固定 ASR 影响的文本实验共享同一 ASR 事件流。联合模型自带 ASR 属于候选整体，另报其输入来源，不能宣称所有候选共享同一个 ASR。全链路对照使用相同冻结表达与播放组件重放。
+
+开发阶段按 [候选调研第 4 节](layer0_candidates.md#4-选用顺序与验证方法)加入固定词序列的标点干预和真实跨 ASR 回放：分别统计标点动作翻转、ASR 回写、决策时延及已执行误动作。比较完成冻结后再做正式 FDB。
 
 历史完整两轴报告为 59/119、160/200 有效接话，见 [r4 报告](../reports/fdb/20261021-full-two-axes-r4/README.md)。历史使用旧候选和旧快照，仅供定位问题；本轮重跑匹配基线后再判断改善。历史已使用的 FDB 样本明确标为已接触的工程测试，不能宣传成全新盲测。
 
@@ -159,7 +167,7 @@ FDB 的原始标注不是完整五类逐帧金标。缺少类别真值时只报�
 - 独立开发集五类 macro-F1 目标 ≥0.85，每类 recall ≥0.80；误接话率、用户附和误停率各 ≤5%，真实打断检出率 ≥90%。同时给出实际数量及区间，小样本不作稳定性能保证。
 - Layer 0 单次推理加排队 p95 目标 <200ms；超过 600ms 的结果必须明确过期处理。实际停声 p95 目标 ≤1 秒，并保留由输入音频、ASR 延迟和播放缓冲构成的分解。不得通过排除失败样本满足目标。
 - 全量回放每例有成功或失败记录，所有预期输出有身份与时长核验；单一执行者、控制 token 不入 TTS、已播内容不撤销等协议要求全部满足。
-- 若现成方案只能通过动作测试而缺少完整五类证据，转入补充训练；若训练后仍不满足目标，报告瓶颈和未通过项，不能以作业退出 0 宣布能力验收通过。
+- 现成方案通过动作测试但缺少完整五类证据时，分别报告动作通过与语义未覆盖，依据研究实际需求决定是否补充训练；若训练后仍不满足目标，报告瓶颈和未通过项，不能以作业退出 0 宣布能力验收通过。
 
 ## 7. 拟实现文件与类职责
 
@@ -167,7 +175,7 @@ FDB 的原始标注不是完整五类逐帧金标。缺少类别真值时只报�
 
 | 拟新增/修改位置 | 对应文档 | 职责及核心接口 |
 | --- | --- | --- |
-| `scripts/runtime/layer0_model.py` | `docs/scripts/runtime/layer0_model.md` | `Layer0Backend` 统一后端接口；XTurnix/Smart Turn 加载与版本核查，`predict` 返回原始证据，不直接执行播放 |
+| `scripts/runtime/layer0_model.py` | `docs/scripts/runtime/layer0_model.md` | `Layer0Backend` 统一后端接口；选定音频/文本后端加载与版本核查，`predict` 返回原生结果与原始证据，不直接执行播放 |
 | `scripts/remote/layer0_model_service.py` | `docs/scripts/remote/layer0_model_service.md` | `Layer0ModelService` 提供 `health/predict`，限制并发和输入预算，记录推理失败与耗时 |
 | `xtalk/src/xtalk/duplex_control/layer0.py` | `xtalk/docs/src/xtalk/duplex_control/layer0.zh.md` | `Layer0Observation`、`Layer0Decision` 定义合同；`Layer0Controller.observe/classify/reset` 管理会话状态、版本和证据，不拥有 TTS |
 | `xtalk/src/xtalk/duplex_control/runtime_adapter.py`、`service.py`、`protocol.py` 及必要事件定义 | X-Talk `docs` 下对应路径中文页 | 外部结果分发与唯一控制来源；仲裁更新、过期结果拒绝、实际播放状态回传，保留 Layer 1 真实历史 |
@@ -189,7 +197,7 @@ FDB 的原始标注不是完整五类逐帧金标。缺少类别真值时只报�
 | 条件训练 | 1×24GiB GPU、8 CPU、32GiB RAM | 每配置 4 小时硬限，最多 3 配置串行；DataLoader worker ≤2 |
 | 全链路回放与评分 | 最多 2×24GiB GPU、16 CPU、64GiB RAM | 每作业 8 小时；单会话串行，结束服务后再评分 |
 
-以上为计划上限，不是显存适配已通过。模型、ASR/TTS及评分预检测峰值；若无法在两卡上共存，先减小 XTurnix 服务预分配与缓存，在预算内分阶段运行。需要新增资源时先记录证据和预算修订，不静默增加工作数。
+以上为计划上限，不是显存适配已通过。模型、ASR/TTS及评分预检测峰值；X2-Turn 先单卡独立预检，SoulX 另计 tokenizer 与外部 ASR。若无法在两卡上共存，先调整服务预分配与缓存，在预算内分阶段运行。需要新增资源时先记录证据和预算修订，不静默增加工作数。
 
 每次新运行根采用 `/hpc_stor03/sjtu_home/xuan.zhang/interclarify-layer0-<date>-<run_id>/`。共享数据和权重只读引用；新增输出上限 30GiB，启动要求至少 50GiB 可用盘，单文件上限 8GiB，训练 checkpoint 额外预算在训练清单中列明。监测 RAM、VRAM、输出目录和文件系统配额，达到上限有序退出；不扫描或删除其他项目。
 
@@ -198,6 +206,8 @@ ASR→TTS→表达模型→Layer 0 按阶段串行预热，不以启动进程代
 ## 9. 工作单与执行顺序
 
 本次完成的计划工作归档为 [083](issue/archive/083_layer0_implementation_plan.md)。后续按以下单元推进；“待执行”不表示本次已经开始实现或提交集群作业。
+
+标点依赖和音频/其他 ASR 候选的补充调研归档为 [090](issue/archive/090_layer0_audio_and_asr_candidates.md)，结论已更新到 084；不代表完成候选实测。
 
 | 顺序 | 工作单 | 完成条件 |
 | --- | --- | --- |

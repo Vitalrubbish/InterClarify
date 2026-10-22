@@ -8,7 +8,7 @@
 
 | 工作单 | 状态 | 依赖与交付 |
 | --- | --- | --- |
-| [084：候选与五类合同](084_layer0_candidates_and_contract.md) | 待执行 | XTurnix/Smart Turn 资产冻结、独立开发验证、确定能力缺口 |
+| [084：候选与五类合同](084_layer0_candidates_and_contract.md) | 待执行 | X2-Turn/SoulX 音频候选与文本对照，标点/回写敏感性、资产冻结及独立开发验证 |
 | [085：Layer 0 与仲裁接入](085_layer0_runtime_integration.md) | 待执行 | 依赖 084；外部状态、版本处理与唯一执行路径 |
 | [086：训练准备与能力补足](086_layer0_training_fallback.md) | 条件待执行 | 084 不满足时触发；数据核查、小规模训练与完整五类输出 |
 | [087：FDB 数据与评测入口](087_layer0_fdb_protocol.md) | 待执行 | 冻结 v1.0/v1.5，准备因果回放、正确分母及远端脚本 |
@@ -16,6 +16,8 @@
 | [089：远端旧路线资产清理](089_remote_asset_cleanup.md) | dry-run 待执行 | 清理 xtalk 模型库、旧训练/选型环境、旧运行结果、缓存与旧 conda 环境；先 dry-run 再确认执行 |
 
 已完成单元直接归入 [归档索引](archive/README.md)。Layer 1/2 后续实现待本步骤结果后另行拆单。
+
+[090：音频与其他 ASR 候选调研](archive/090_layer0_audio_and_asr_candidates.md)已完成，见 [调研记录](../layer0_candidates.md)。原生输出可直接驱动唯一仲裁器，候选尚未实测。
 
 ## 当前采用决定
 
@@ -28,7 +30,7 @@
 | 异步训练参考 | 外部结果块屏蔽损失，后续动作与正文监督方案待定，见[第5.8节](../research_design.md#58-异步调用与结果利用的训练参考) |
 | 思考调用方向 | Layer 1 在倾听或表达时均可通过独立 special token 请求异步思考；每会话最多一个请求在途，重复触发合并；结果写回 Layer 1 后经统一仲裁与单一播放路径表达，见[第7.2—7.4节](../research_design.md#72-思考请求与任务调度) |
 | 组件与运行时 | Nemotron EN160 + Kokoro `af_heart`；300/1200ms 分段、600ms micro-turn、会话 KV 复用、`duplex_greedy_v1`；X-Talk `ca9b23c`，见[运行时配置](../runtime_baseline.md) |
-| Layer 0 第一步 | 优先验证现成 XTurnix-PT 与 Smart Turn 声学对照；完整五类不足时补充训练，保持外部状态来源与单一仲裁，见[工程计划](../engineering_implementation.md)；目前仅为计划 |
+| Layer 0 第一步 | 优先比较 X2-Turn 与 SoulX-Duplug，保留文本/纯音频结束对照；先测标点与 ASR 回写，原生输出可直接控制，实际能力不足再考虑训练，见[工程计划](../engineering_implementation.md)和[候选调研](../layer0_candidates.md)；目前仅为计划 |
 | FDB 评测 | 保留冻结子集与完整两轴回放、官方词级对齐和 TOR/Latency 评分脚本；FDB 作为辅助工程与能力评测，不替代主动澄清 benchmark，结果见[reports/fdb](../../reports/README.md) |
 
 ## 共用约束

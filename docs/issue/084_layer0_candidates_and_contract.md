@@ -4,9 +4,11 @@
 
 ## 目标与工作
 
-优先复用 XTurnix-PT 和 fork 中现有客户端，以 Smart Turn v3.2 提供声学结束检测对照。固定模型 revision、权重、tokenizer、自定义推理代码和环境，核查英文支持及许可。必要时再核查 LiveKit 本地模型；不同时接入所有候选。
+根据 [090 调研](archive/090_layer0_audio_and_asr_candidates.md)，优先比较 X2-Turn-4B-0812 与 SoulX-Duplug + SenseVoice，保留 XTurnix + Nemotron 的文本控制、Smart Turn 的纯音频结束对照。FireRedChat EoT/Paraformer + TEN 作为备用文本参考，不同时部署全部候选。固定模型 revision、权重、tokenizer、自定义推理代码和环境，核查英文支持及许可。
 
-定义五类状态、既有 token、实际播放状态和观察版本合同，明确 `speaking + keep` 不能直接证明附和。核查 ASR 修订、暂停信号、历史标点处理、截断和失效结果。
+定义原生输出、既有 DuplexCascade token、实际播放状态和观察版本合同，允许仲裁器直接解释候选原生结果，不强制转换或重训。研究五类语义覆盖分别报告，明确 `speaking + keep` 不能直接证明附和。核查 ASR 修订、暂停信号、历史标点处理、截断和失效结果。
+
+按 [候选调研](../layer0_candidates.md#4-选用顺序与验证方法)执行标点与跨 ASR 对照：固定词序列比较原标点/去末尾标点/去全部标点/延后标点，再比较真实 ASR 增量及回写。保留每次已执行动作，不以最终修订文本改写过去的评测。音频后端分别核对外部文本依赖、右侧上下文和算法 delay，不把帧间隔当响应时延。
 
 准备与 FDB 来源隔离的 200 个开发观察事件，远端测候选对暂停/结束、附和/插话的适配与资源占用。冻结开发阈值，登记现成方案通过范围及是否触发 086。
 
