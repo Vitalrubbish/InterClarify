@@ -19,16 +19,18 @@
 
 ## 实施记录
 
-2026-10-22 启动。预检确认：远端登录节点可连，旧 X2 模型与环境已清理，`interclarify-x2-turn-complete/dataset` 的固定 FLEURS 子集完好，`pdcpu` 与 GPU 分区可用，`pypi.org` 与 `conda.anaconda.org` 直连不可用，清华 PyPI/conda 镜像与 `hf-mirror.com`、`github.com` 可用。
+2026-10-22 启动。预检确认：远端登录节点可连，旧 X2 模型与环境已清理，`interclarify-x2-turn-complete/dataset` 的固定 FLEURS 子集完好，`pdcpu` 与 GPU 分区可用，`pypi.org` 与 `conda.anaconda.org` 直连不可用，清华 PyPI/conda 镜像、`hf-mirror.com` 可用。
+
+网络限制（实测）：调度节点完全无法访问 `github.com`（TLS 连接被中断）；登录节点 git 数据通道约 1.5 KB/s 且不稳定，`raw.githubusercontent.com` 不可达，codeload 约 115 KB/s；无 scp/sftp 通道。因此固定源码改为在有 GitHub 访问的机器上构建约 640 KB 的源码包，经交互 PTY 传入远端，再由安装阶段离线校验。
 
 本轮确定：
 
 - 模型固定 revision `49c62a9b1170f2ab5168e763b84c2ac5c6b5e1ee`，仓库自带 `params.json` 与 `tekken.json`，不额外下载基底模型。
-- 有效延迟 480 ms 的来源为 `tekken.json` 的 `audio.transcription_delay_ms`、`frame_rate=12.5`（6 × 80 ms），部署作业会用 `mistral-common` 的 `get_num_delay_tokens()` 复核，不用客户端字段。
-- vLLM 采用官方 `0.19.1` wheel 加作者 overlay：源码构建超出安装阶段 4 CPU / 16 GiB 预算且需要完整 CUDA 工具链。安装脚本先逐文件核对 wheel 与固定提交 `b1388b1` 的 10 个 Python 文件哈希，不一致即中止，全部哈希写入环境锁。该差异已记录，不宣称等价于源码构建产物。
-- 安装/下载放入 `pdcpu` 作业，推理仍在单卡 24 GiB 作业中执行。
+- 有效延迟 480 ms 的来源为 `tekken.json` 的 `audio.transcription_delay_ms`、`frame_rate=12.5`（6 × 80 ms）。服务作业用 vLLM 自己的 `MistralTokenizer` 读取 `get_num_delay_tokens()` 复核，不用客户端字段。
+- vLLM 采用官方 `0.19.1` wheel 加作者 overlay：源码构建超出安装预算且调度节点无法取源码。wheel 中 10 个待改文件的 git blob 必须等于补丁 `index <pre>..` 前置哈希，补丁在临时索引中用 `git apply --index` 应用并核对后置哈希；环境锁记录全部哈希。该差异已记录，不宣称等价于源码构建产物。
+- 安装与权重下载在调试机上串行执行（调试机可用内存约 295 GiB、80 核、922 GiB 空闲）；服务启动与协议诊断仍在 `vc` 单卡作业中执行。
 
-入口：`setup_x2_turn_vllm_env.sh`、`prepare_x2_turn_model.py`、`x2_turn_service_probe.py`、`run_x2_turn_complete_job.sh`、`submit_x2_turn_complete_jobs.sh`，说明见 `docs/scripts/remote/` 同名文档。远端结果待作业完成后补充。
+入口：`build_x2_turn_source_bundle.py`、`setup_x2_turn_vllm_env.sh`、`prepare_x2_turn_model.py`、`x2_turn_service_probe.py`、`run_x2_turn_complete_job.sh`、`submit_x2_turn_complete_jobs.sh`，说明见 `docs/scripts/remote/` 同名文档。远端结果待作业完成后补充。
 
 ## 验收
 

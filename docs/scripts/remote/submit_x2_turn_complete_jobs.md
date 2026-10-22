@@ -25,6 +25,19 @@
 - `model`：`pdcpu`，4 CPU、16 GiB、0 GPU；结果直接写入 `ROOT/models` 与 `ROOT/env`。
 - `deploy`：单卡 24 GiB、8 CPU、32 GiB；输出在 `ROOT/runs/<tag>/deploy`。
 - 提交日志为 `ROOT/logs/<tag>-<stage>.log`，已存在则拒绝覆盖，避免覆盖上一轮证据。
+- `pdcpu` 排队较长时，`setup` 与 `model` 也可以直接在调试机上串行执行（实测调试机 CPU 与内存余量充足，权重下载约 3–4 MB/s）。服务启动与协议诊断始终在 `vc` 单卡作业中运行，不在调试机加载 GPU 模型。
+
+调试机直接执行示例：
+
+```bash
+X2_TURN_ROOT=$X2_TURN_ROOT \
+X2_TURN_SETUP_OUTPUT=$X2_TURN_ROOT/runs/$TAG/setup \
+X2_TURN_SOURCE_BUNDLE_SHA256=$X2_TURN_SOURCE_BUNDLE_SHA256 \
+  nice -n 10 bash "$X2_TURN_SOURCE/scripts/remote/setup_x2_turn_vllm_env.sh"
+HF_ENDPOINT=https://hf-mirror.com HF_HUB_DISABLE_XET=1 nice -n 10 \
+  "$ENV_PREFIX/bin/python" "$X2_TURN_SOURCE/scripts/remote/prepare_x2_turn_model.py" \
+  --root "$X2_TURN_ROOT" prepare
+```
 
 ## 用法
 

@@ -42,4 +42,4 @@
 
 `X2_TURN_SETUP_OUTPUT` 下保存 `conda_create.log`、`pip_install.log`、`pip_freeze.txt`、`patched_files.tsv`、`wheel_vs_source.tsv`、`overlay_install.log`、`overlay_index.txt`、`installed_files.tsv`、`import_check.json`。环境锁记录 Python 版本、安装方式、镜像、源码包摘要、10 个文件的前后置哈希与安装哈希、overlay 新模块哈希、关键包版本和完整 `pip freeze`。
 
-脚本不重试、不加资源；conda 或 pip 失败时保留日志并让作业失败，后续由工作单决定是否调整镜像或版本。
+脚本不重试、不加资源；conda 或 pip 失败时保留日志并让作业失败，后续由工作单决定是否调整镜像或版本。脚本可以重复执行：已安装同版本 wheel 时跳过安装；site-packages 已带补丁时核对后置哈希后跳过打补丁；输出目录必须每次新建，旧证据不被覆盖。`pdcpu` 排队时可改为在调试机串行执行。
