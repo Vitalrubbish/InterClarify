@@ -1,6 +1,6 @@
 # 工程实施计划
 
-更新：2026-10-22。状态：用户已取消 FDB 测试，FLEURS 方案保留基本转写 WER 与末端文本延迟，仅将控制测试简化为输入结束后的 complete 输出率和首次延迟。[当前协议](dev/X2-Turn/complete_test_on_fleurs.md) 已更新，X2Q-009 已完成固定数据集恢复与复核；X2Q-011—013 已完成回放与评分逻辑、本地模拟验证，真实模型测试仍待 X2Q-010 部署就绪后按 X2Q-014 执行。Layer 0 实现和训练保留在后续总计划。研究范围以 [research_design.md](research_design.md) 为准，进度见 [工作单](issue/README.md)。
+更新：2026-10-22。状态：用户已取消 FDB 测试，FLEURS 方案保留基本转写 WER 与末端文本延迟，仅将控制测试简化为输入结束后的 complete 输出率和首次延迟。[当前协议](dev/X2-Turn/complete_test_on_fleurs.md) 已更新，X2Q-009 已完成固定数据集恢复与复核；X2Q-010 已完成冻结版本部署与 dev 协议诊断，X2Q-011—013 已完成回放与评分逻辑、本地模拟验证；真实模型测试按 X2Q-014 执行。Layer 0 实现和训练保留在后续总计划。研究范围以 [research_design.md](research_design.md) 为准，进度见 [工作单](issue/README.md)。
 
 ## 1. 第一步的目标与边界
 

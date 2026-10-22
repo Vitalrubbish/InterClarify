@@ -1,6 +1,6 @@
 # X2Q-010：部署冻结版本 X2-Turn 流式服务
 
-状态：进行中（2026-10-22 启动）。依赖：[X2Q-008](archive/x2q_008_complete_protocol.md)；真实音频预热依赖 [X2Q-009](x2q_009_fleurs_data.md) 的 dev 输入。依据：[测试计划](../dev/X2-Turn/complete_test_on_fleurs.md)。
+状态：已完成并归档（2026-10-22）。依赖：[X2Q-008](x2q_008_complete_protocol.md)；真实音频预热依赖 [X2Q-009](x2q_009_fleurs_data.md) 的 dev 输入。依据：[测试计划](../../dev/X2-Turn/complete_test_on_fleurs.md)。
 
 ## 目标与工作内容
 
@@ -30,13 +30,17 @@
 - vLLM 采用官方 `0.19.1` wheel 加作者 overlay：源码构建超出安装预算且调度节点无法取源码。wheel 中 10 个待改文件的 git blob 必须等于补丁 `index <pre>..` 前置哈希，补丁在临时索引中用 `git apply --index` 应用并核对后置哈希；环境锁记录全部哈希。该差异已记录，不宣称等价于源码构建产物。
 - 安装与权重下载在调试机上串行执行（调试机可用内存约 295 GiB、80 核、922 GiB 空闲）；服务启动与协议诊断仍在 `vc` 单卡作业中执行。
 
-入口：`build_x2_turn_source_bundle.py`、`setup_x2_turn_vllm_env.sh`、`prepare_x2_turn_model.py`、`x2_turn_service_probe.py`、`run_x2_turn_complete_job.sh`、`submit_x2_turn_complete_jobs.sh`，说明见 `docs/scripts/remote/` 同名文档。远端结果待作业完成后补充。
+入口：`build_x2_turn_source_bundle.py`、`setup_x2_turn_vllm_env.sh`、`prepare_x2_turn_model.py`、`x2_turn_service_probe.py`、`run_x2_turn_complete_job.sh`、`submit_x2_turn_complete_jobs.sh`，说明见 `docs/scripts/remote/` 同名文档。
+
+结果（2026-10-22）：`vc` 单卡 4090 作业退出码 0，服务 66.1 秒就绪，日志确认状态头加载；有效 delay 480 ms 由 vLLM tokenizer 复核（6 tokens × 80 ms）。dev 输入收到 91 条 `transcription.delta` 与 91 帧 `turn.delta`（idle 41、noidle 4、speaking 44、turn_end 2），`turn_id=38`/`turn_end` 映射成立；complete 帧均在输入结束前到达，观察窗内未再出现。权重加载 22.96 秒、9.13 GiB，GPU 峰值 20,904/24,564 MiB，KV 10.05 GiB。完整证据与失败修正见[部署报告](../../reports/x2_turn_complete/20261022-deploy/README.md)。
+
+执行偏差：安装与权重下载按用户指示在调试机执行，未放入 `pdcpu` 作业；安装/导出阶段的峰值内存未单独插桩，调试机当时可用内存约 295 GiB。其余资源上限与“失败不自动加卡”的要求保持。
 
 ## 验收
 
-- [ ] 独立 conda 可复现，未覆盖现役 ASR/TTS/评分环境。
-- [ ] 真实服务输出 ASR 和原生状态，验证 complete 映射与有效 delay。
-- [ ] 推理仅通过 vc，最多 1×24 GiB GPU、8 CPU、32 GiB RAM、单作业 4 小时；安装/下载最多 4 CPU、16 GiB RAM、并发 2。
-- [ ] 保存资源峰值并遵守整轮磁盘预算，失败不自动加卡或无限重试。
+- [x] 独立 conda 可复现，未覆盖现役 ASR/TTS/评分环境。
+- [x] 真实服务输出 ASR 和原生状态，验证 complete 映射与有效 delay。
+- [x] 推理仅通过 vc，最多 1×24 GiB GPU、8 CPU、32 GiB RAM、单作业 4 小时；安装/下载最多 4 CPU、16 GiB RAM、并发 2（执行位置按用户指示改为调试机）。
+- [x] 保存资源峰值并遵守整轮磁盘预算，失败不自动加卡或无限重试。
 
 服务启动或预热成功不等于正式测试完成。

@@ -1,6 +1,6 @@
 # X2Q-011：实现真实时钟回放与原始记录
 
-状态：已完成并归档（2026-10-22）。依赖：[X2Q-009](x2q_009_fleurs_data.md)、[X2Q-010](../x2q_010_x2_turn_deployment.md) 的数据和协议合同；本地可先用模拟服务验证。依据：[测试计划](../../dev/X2-Turn/complete_test_on_fleurs.md)。
+状态：已完成并归档（2026-10-22）。依赖：[X2Q-009](x2q_009_fleurs_data.md)、[X2Q-010](x2q_010_x2_turn_deployment.md) 的数据和协议合同；本地可先用模拟服务验证。依据：[测试计划](../../dev/X2-Turn/complete_test_on_fleurs.md)。
 
 ## 目标与工作内容
 
@@ -29,4 +29,4 @@
 
 已在 `scripts/remote/x2_turn_complete_test.py` 交付对应入口；实现说明见 [脚本说明](../../scripts/remote/x2_turn_complete_test.md)，测试说明见 [镜像测试文档](../../tests/test_x2_turn_complete_test.md)。本地 `interclarify-dev` conda 使用固定 `whisper-normalizer==0.1.12`，15 项 unittest 通过；连同既有部署测试共 22 项 pytest 通过。模拟 WebSocket 完整验证真实 80 ms 分块、5 秒静音与窗后 EOF，并覆盖故障及手算指标。
 
-本单仅完成回放和离线评分逻辑，不产生模型实测分数。X2Q-009 冻结输入未改写，X2Q-010 权重下载/部署继续进行；远端单卡预热、冒烟及正式 100 条测试由 X2Q-014 执行。
+本单仅完成回放和离线评分逻辑，不产生模型实测分数。X2Q-009 冻结输入未改写，X2Q-010 权重与部署已完成；远端单卡预热、冒烟及正式 100 条测试由 X2Q-014 执行。
