@@ -5,7 +5,8 @@
 ## 协议与计时
 
 - 连接后先收到 `session.created`，随后发送一次 `session.update` 指定模型名。
-- 音频为单声道 16 kHz 16-bit PCM，按 80 ms（1280 采样）切块；每块发送 `input_audio_buffer.append` 后紧跟 `input_audio_buffer.commit`，与作者 smoke 客户端一致。
+- 协议只接受单声道 16 kHz 16-bit PCM。固定 FLEURS 输入保留原始 32-bit float 编码，客户端用 `soundfile` 读取后按满量程转换为 PCM16，不重采样、不改声道；原始子类型记入 `probe.json`。
+- 音频按 80 ms（1280 采样）切块；每块发送 `input_audio_buffer.append` 后紧跟 `input_audio_buffer.commit`，与作者 smoke 客户端一致。
 - 发送按真实时钟排程，记录每块相对计划时间的迟到量；接收在独立协程中进行，每个事件立即打 monotonic 与服务端 UTC 时间戳。
 - 音频发送完毕记 `t_end`，继续接收 `--drain-seconds`（默认 5 秒）再关闭。
 

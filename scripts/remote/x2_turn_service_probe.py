@@ -14,11 +14,11 @@ import asyncio
 import base64
 import json
 import time
-import wave
 from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
+import soundfile as sf
 import websockets
 
 TURN_ID_TO_NAME = {
@@ -47,18 +47,30 @@ def write_json(path: Path, payload: object) -> None:
     temporary.replace(path)
 
 
+def float_to_pcm16(samples: np.ndarray) -> np.ndarray:
+    """Convert float samples in [-1, 1] to 16-bit PCM, clipping out-of-range."""
+    scaled = np.rint(np.asarray(samples, dtype=np.float32) * 32768.0)
+    return np.clip(scaled, -32768, 32767).astype(np.int16)
+
+
 def read_pcm16(path: Path) -> tuple[np.ndarray, dict[str, object]]:
-    with wave.open(str(path), "rb") as audio:
-        if audio.getsampwidth() != 2 or audio.getnchannels() != 1:
-            raise ValueError(f"{path}: expected mono 16-bit PCM WAV")
-        if audio.getframerate() != SAMPLE_RATE:
-            raise ValueError(f"{path}: expected {SAMPLE_RATE} Hz")
-        frames = audio.getnframes()
-        pcm = np.frombuffer(audio.readframes(frames), dtype=np.int16)
+    """Load a mono WAV and convert it to the PCM16 the realtime API expects.
+
+    The frozen FLEURS inputs keep their original 32-bit float encoding, so the
+    conversion happens here without resampling or channel changes.
+    """
+    info = sf.info(str(path))
+    if info.samplerate != SAMPLE_RATE:
+        raise ValueError(f"{path}: expected {SAMPLE_RATE} Hz, found {info.samplerate}")
+    if info.channels != 1:
+        raise ValueError(f"{path}: expected mono, found {info.channels} channels")
+    data, _ = sf.read(str(path), dtype="float32", always_2d=True)
+    pcm = float_to_pcm16(data[:, 0])
     return pcm, {
         "path": str(path),
-        "frames": int(frames),
-        "duration_seconds": round(frames / SAMPLE_RATE, 3),
+        "frames": int(pcm.size),
+        "duration_seconds": round(pcm.size / SAMPLE_RATE, 3),
+        "source_subtype": info.subtype,
     }
 
 

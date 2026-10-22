@@ -113,3 +113,10 @@ def test_chunk_pcm_keeps_tail_chunk():
         10,
     ]
     assert np.array_equal(np.concatenate(chunks), pcm)
+
+
+def test_float_to_pcm16_scales_and_clips():
+    samples = np.array([0.0, 0.5, -0.5, 1.0, -1.0, 2.0], dtype=np.float32)
+    pcm = x2_turn_service_probe.float_to_pcm16(samples)
+    assert pcm.dtype == np.int16
+    assert pcm.tolist() == [0, 16384, -16384, 32767, -32768, 32767]
