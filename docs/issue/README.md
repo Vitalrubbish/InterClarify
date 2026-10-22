@@ -13,6 +13,7 @@
 | [086：训练准备与能力补足](086_layer0_training_fallback.md) | 条件待执行 | 084 不满足时触发；数据核查、小规模训练与完整五类输出 |
 | [087：FDB 数据与评测入口](087_layer0_fdb_protocol.md) | 待执行 | 冻结 v1.0/v1.5，准备因果回放、正确分母及远端脚本 |
 | [088：远端 FDB 验证](088_layer0_remote_fdb_validation.md) | 待执行 | 依赖模型与入口完成；分类器和系统两层测试、匹配对照与报告 |
+| [089：远端旧路线资产清理](089_remote_asset_cleanup.md) | dry-run 待执行 | 清理 xtalk 模型库、旧训练/选型环境、旧运行结果、缓存与旧 conda 环境；先 dry-run 再确认执行 |
 
 已完成单元直接归入 [归档索引](archive/README.md)。Layer 1/2 后续实现待本步骤结果后另行拆单。
 
