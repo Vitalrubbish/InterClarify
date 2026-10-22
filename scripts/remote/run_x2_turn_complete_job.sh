@@ -17,6 +17,8 @@ PORT="${X2_TURN_PORT:-18011}"
 DEV_AUDIO="${X2_TURN_DEV_AUDIO:-$ROOT/dataset/fleurs_en_us/audio/dev}"
 SMOKE_AUDIO="${X2_TURN_SMOKE_AUDIO:-}"
 READY_TIMEOUT="${X2_TURN_READY_TIMEOUT:-1200}"
+MAX_MODEL_LEN="${X2_TURN_MAX_MODEL_LEN:-8192}"
+GPU_MEMORY_UTILIZATION="${X2_TURN_GPU_MEMORY_UTILIZATION:-0.85}"
 DRAIN_SECONDS="${X2_TURN_DRAIN_SECONDS:-5}"
 SOURCE_COMMIT="${X2_TURN_SOURCE_COMMIT:-unknown}"
 SOURCE="${X2_TURN_SOURCE:?set the frozen InterClarify source checkout}"
@@ -80,6 +82,8 @@ cat >"$OUTPUT/manifest.json" <<JSON
   "port": $PORT,
   "served_model_name": "$SERVED_NAME",
   "ready_timeout_seconds": $READY_TIMEOUT,
+  "max_model_len": $MAX_MODEL_LEN,
+  "gpu_memory_utilization": $GPU_MEMORY_UTILIZATION,
   "drain_seconds": $DRAIN_SECONDS,
   "free_disk_gib_before": $FREE_GIB
 }
@@ -95,7 +99,8 @@ log "starting vLLM service on 127.0.0.1:$PORT"
 setsid "$ENV_PREFIX/bin/vllm" serve "$MODEL" \
   --served-model-name "$SERVED_NAME" \
   --host 127.0.0.1 --port "$PORT" --tokenizer-mode mistral \
-  --enforce-eager --gpu-memory-utilization 0.8 \
+  --enforce-eager --gpu-memory-utilization "$GPU_MEMORY_UTILIZATION" \
+  --max-model-len "$MAX_MODEL_LEN" \
   >"$OUTPUT/service.log" 2>&1 &
 SERVER=$!
 

@@ -12,7 +12,7 @@
 
 1. 校验 conda 环境、导出权重、两份锁文件与磁盘空间，写 `manifest.json`。
 2. 保存 GPU 型号/驱动/显存，并按秒采样显存与利用率。
-3. `setsid` 启动 `vllm serve`：`--tokenizer-mode mistral --enforce-eager --gpu-memory-utilization 0.8`，只监听 `127.0.0.1:18011`。
+3. `setsid` 启动 `vllm serve`：`--tokenizer-mode mistral --enforce-eager --gpu-memory-utilization 0.85 --max-model-len 8192`，只监听 `127.0.0.1:18011`。上下文长度必须受限：vLLM 的 encoder cache 画像预算等于 `max_model_len`，默认 131072 会在 24 GiB 卡上与 9.1 GiB 权重叠加后没有 KV 空间（实测报 `No available memory for the cache blocks`）；8192 个音频 token 约合 11 分钟音频，足够单轮诊断与后续 FLEURS 输入。
 4. 轮询 `/health` 直到就绪（默认上限 1200 秒），同时确认进程未退出。
 5. 要求服务日志出现 `Loaded Voxtral MTP vad_lm_head`，证明状态头已加载而不是回退到 ASR 头。
 6. 读 `tekken.json` 与 `config.json` 推导延迟，并用 `mistral-common` 的 `get_num_delay_tokens()` 交叉核对；要求 6 个 delay token、480 ms，且 ID38 映射为 `turn_end`，结果写 `effective_config.json`。
@@ -30,6 +30,7 @@
 | `X2_TURN_CONDA_ENV` | conda 环境前缀 |
 | `X2_TURN_MODEL` | 导出权重目录 |
 | `X2_TURN_PORT` / `X2_TURN_READY_TIMEOUT` / `X2_TURN_DRAIN_SECONDS` | 服务端口、就绪上限、观察窗 |
+| `X2_TURN_MAX_MODEL_LEN` / `X2_TURN_GPU_MEMORY_UTILIZATION` | 上下文上限（默认 8192）与显存占比（默认 0.85） |
 | `X2_TURN_DEV_AUDIO` | dev WAV 目录（默认固定 FLEURS dev 音频目录） |
 | `X2_TURN_SMOKE_AUDIO` | 可选冒烟音频 |
 
