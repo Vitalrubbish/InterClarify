@@ -1,6 +1,6 @@
 # X2Q-013：complete 输出比例与首次延迟
 
-状态：待实施。依赖：[X2Q-011](x2q_011_streaming_replay.md) 的 trace 合同。依据：[测试计划](../dev/X2-Turn/complete_test_on_fleurs.md)。
+状态：已完成并归档（2026-10-22）。依赖：[X2Q-011](x2q_011_streaming_replay.md) 的 trace 合同。依据：[测试计划](../../dev/X2-Turn/complete_test_on_fleurs.md)。
 
 ## 目标与工作内容
 
@@ -19,7 +19,14 @@
 
 ## 验收
 
-- [ ] 手算 trace 与实现一致，只用实际接收时间评分。
-- [ ] 未命中/失败不产生零延迟，输出率与条件延迟同时报告。
-- [ ] 原生状态与控制器合成事件分开，不依赖语义金标或 LLM Judger。
-- [ ] 指标不宣称状态准确率或系统实际接话成功率。
+- [x] 手算 trace 与实现一致，只用实际接收时间评分。
+- [x] 未命中/失败不产生零延迟，输出率与条件延迟同时报告。
+- [x] 原生状态与控制器合成事件分开，不依赖语义金标或 LLM Judger。
+- [x] 指标不宣称状态准确率或系统实际接话成功率。
+
+
+## 完成记录
+
+已在 `scripts/remote/x2_turn_complete_test.py` 交付对应入口；实现说明见 [脚本说明](../../scripts/remote/x2_turn_complete_test.md)，测试说明见 [镜像测试文档](../../tests/test_x2_turn_complete_test.md)。本地 `interclarify-dev` conda 使用固定 `whisper-normalizer==0.1.12`，15 项 unittest 通过；连同既有部署测试共 22 项 pytest 通过。模拟 WebSocket 完整验证真实 80 ms 分块、5 秒静音与窗后 EOF，并覆盖故障及手算指标。
+
+本单仅完成回放和离线评分逻辑，不产生模型实测分数。X2Q-009 冻结输入未改写，X2Q-010 权重下载/部署继续进行；远端单卡预热、冒烟及正式 100 条测试由 X2Q-014 执行。

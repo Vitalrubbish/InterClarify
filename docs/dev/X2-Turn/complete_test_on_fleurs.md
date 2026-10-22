@@ -1,6 +1,6 @@
 # FLEURS 转写 WER 与输入末端 complete 测试
 
-更新：2026-10-22。状态：已按用户澄清更新测试计划；X2Q-009 已完成固定输入恢复与复核，回放、评分和模型测试尚未实现或部署。
+更新：2026-10-22。状态：已按用户澄清更新测试计划；X2Q-009 已完成固定输入恢复与复核，X2Q-011—013 已完成回放与独立评分逻辑、本地模拟验证；真实模型测试尚未执行。
 
 ## 范围
 
@@ -35,7 +35,7 @@
 
 ## 实现和远端执行
 
-拟由 `scripts/remote/x2_turn_complete_test.py` 集中实现固定版本数据恢复、单会话实时回放、基本 WER、文本末端延迟与原生状态 trace 评分；对应说明为 `docs/scripts/remote/x2_turn_complete_test.md`。`scripts/remote/run_x2_turn_complete_job.sh` 管理调度分配 GPU 上的服务启动、预热、5 条冒烟、100 条正式回放与进程清理；对应镜像说明同路径创建。数据准备入口和说明已随 X2Q-009 创建；部署阶段的安装、模型准备、服务诊断与单卡作业已随 X2Q-010 创建，回放/评分与正式测试脚本待后续工作单实现，避免复活旧 ASR 选型框架。
+由 `scripts/remote/x2_turn_complete_test.py` 集中实现固定版本数据恢复、单会话实时回放、基本 WER、文本末端延迟与原生状态 trace 评分；对应说明为 `docs/scripts/remote/x2_turn_complete_test.md`。`scripts/remote/run_x2_turn_complete_job.sh` 管理调度分配 GPU 上的服务启动、预热、5 条冒烟、100 条正式回放与进程清理；对应镜像说明同路径创建。数据准备入口和说明已随 X2Q-009 创建；部署阶段的安装、模型准备、服务诊断与单卡作业已随 X2Q-010 创建，回放及两类评分入口已随 X2Q-011—013 实现，正式测试的作业编排与执行留给 X2Q-014。
 
 源码固定 X2-Turn `67ec3fe49f1977ee3129f7eaed603c04d8ed23c5`，作者 overlay 基于 vLLM 0.19.1 提交 `b1388b1fbf5aaef47937fabe98931211684666a6`。固定实际 HF 模型 revision、导出哈希、依赖版本和有效 delay；不能只给客户端报告字段写 480。原生六类状态持续保存，不自行平滑或门控。
 
@@ -43,4 +43,4 @@
 
 针对时窗两端、重复 complete、仅提前/EOF 后出现、缺失与运行错误实现可人工核算的小型 trace 测试，并用模拟服务核对真实接收时戳与 EOF 顺序。之后远端先预检与冒烟再正式运行；报告保存 100 条逐例结论和完整分母，不用模拟结果冒充模型实测。
 
-工作单见 [入口](../../issue/README.md)。X2Q-008 简化协议已完成，X2Q-009 固定数据恢复已完成并归档；现继续 [X2Q-010 模型部署](../../issue/x2q_010_x2_turn_deployment.md)、[X2Q-011 实时回放](../../issue/x2q_011_streaming_replay.md)、[X2Q-012 ASR 指标](../../issue/x2q_012_asr_metrics.md)、[X2Q-013 complete 指标](../../issue/x2q_013_complete_metrics.md)、[X2Q-014 远端正式测试](../../issue/x2q_014_fleurs_evaluation.md)。两类评分共用同一批原始 trace，实施与说明随各工作单同步提交。
+工作单见 [入口](../../issue/README.md)。X2Q-008 简化协议已完成，X2Q-009 固定数据恢复已完成并归档；X2Q-011—013 已完成并归档；现继续 [X2Q-010 模型部署](../../issue/x2q_010_x2_turn_deployment.md)、[X2Q-011 实时回放](../../issue/archive/x2q_011_streaming_replay.md)、[X2Q-012 ASR 指标](../../issue/archive/x2q_012_asr_metrics.md)、[X2Q-013 complete 指标](../../issue/archive/x2q_013_complete_metrics.md)、[X2Q-014 远端正式测试](../../issue/x2q_014_fleurs_evaluation.md)。两类评分共用同一批原始 trace，实施与说明随各工作单同步提交。

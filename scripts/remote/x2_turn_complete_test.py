@@ -1,9 +1,4 @@
-"""Restore and verify the pinned FLEURS English subset for the X2-Turn test.
-
-This module currently owns the data stage only.  Replay and scoring stages are
-added by later work items; keeping the entry point here avoids reviving the old
-ASR-selection script with its unpinned revision fallback.
-"""
+"""Restore frozen FLEURS data, replay real-time sessions and score raw traces."""
 
 from __future__ import annotations
 
@@ -570,6 +565,371 @@ def verify_manifest(
     }
 
 
+TURN_CLASSES = {35: "idle", 36: "noidle", 37: "speaking", 38: "turn_end",
+                39: "backchannel", 40: "uncertain"}
+SAMPLE_RATE = 16000
+CHUNK_FRAMES = 1280
+WINDOW_SECONDS = 5.0
+DRAIN_SECONDS = 60.0
+
+
+class StreamingReplay:
+    """Own one paced input session and its independent receive journal."""
+
+    def __init__(self, url: str, model: str, journal=None):
+        self.url, self.model, self.journal = url, model, journal
+        self.trace = {"schema": "x2q-stream-v1", "events": [], "sends": [],
+                      "t_start": None, "t_end": None, "window_end": None,
+                      "window_observed": False, "t_eof": None,
+                      "t_eof_sent": None, "t_done": None,
+                      "online_text": "", "final_text": "", "errors": [],
+                      "status": "failed", "exit_code": 1}
+        self.text = ""
+
+    def record(self, kind: str, **fields) -> dict:
+        row = {"kind": kind, "monotonic": time.monotonic(), "utc": utc_now(), **fields}
+        if self.journal:
+            self.journal(row)
+        return row
+
+    async def receive(self, socket):
+        async for message in socket:
+            # Timestamp before JSON parsing or any file I/O.
+            received = time.monotonic()
+            try:
+                payload = json.loads(message)
+                if not isinstance(payload, dict):
+                    raise ValueError("Expected a JSON object")
+            except (ValueError, TypeError) as error:
+                self.trace["events"].append(self.record(
+                    "receive", received=received, raw=message, parse_error=str(error)))
+                raise ValueError("Invalid server JSON") from error
+            kind = payload.get("type")
+            if kind == "transcription.delta":
+                self.text += payload.get("delta", "")
+            elif kind == "transcription.done":
+                self.text = payload["text"]
+                self.trace["t_done"] = received
+            row = self.record("receive", received=received, payload=payload,
+                              cumulative_text=self.text)
+            self.trace["events"].append(row)
+            if kind == "error":
+                raise RuntimeError(f"Server error: {payload}")
+            if kind == "transcription.done":
+                if self.trace["t_eof"] is None:
+                    raise RuntimeError("transcription.done before EOF")
+                return
+        raise ConnectionError("Disconnected before transcription.done")
+
+    async def send_audio(self, socket, pcm: bytes):
+        import asyncio
+        import base64
+
+        await socket.send(json.dumps({"type": "session.update", "model": self.model}))
+        start = time.monotonic()
+        self.trace["t_start"] = start
+        self.trace["planned_file_end"] = start + len(pcm) / 2 / SAMPLE_RATE
+
+        async def send_chunk(chunk, phase, deadline):
+            await asyncio.sleep(max(0, deadline - time.monotonic()))
+            began = time.monotonic()
+            await socket.send(json.dumps({"type": "input_audio_buffer.append",
+                                          "audio": base64.b64encode(chunk).decode("ascii")}))
+            await socket.send(json.dumps({"type": "input_audio_buffer.commit", "final": False}))
+            self.trace["sends"].append(self.record(
+                "send", phase=phase, deadline=deadline, began=began,
+                frames=len(chunk) // 2, lateness_ms=max(0, began - deadline) * 1000))
+
+        for offset in range(0, len(pcm), CHUNK_FRAMES * 2):
+            chunk = pcm[offset:offset + CHUNK_FRAMES * 2]
+            await send_chunk(chunk, "input", start + (offset + len(chunk)) / 2 / SAMPLE_RATE)
+        end = time.monotonic()
+        self.trace.update(t_end=end, window_end=end + WINDOW_SECONDS)
+        self.record("input_end", t_end=end, window_end=end + WINDOW_SECONDS)
+        frames = int(WINDOW_SECONDS * SAMPLE_RATE)
+        for offset in range(0, frames, CHUNK_FRAMES):
+            count = min(CHUNK_FRAMES, frames - offset)
+            await send_chunk(b"\0\0" * count, "silence", end + (offset + count) / SAMPLE_RATE)
+        self.trace["window_observed"] = True
+        self.trace["online_text"] = next(
+            (event["cumulative_text"] for event in reversed(self.trace["events"])
+             if event["received"] <= self.trace["window_end"]), "")
+        self.trace["t_eof"] = time.monotonic()
+        self.record("eof_requested", online_text=self.text)
+        await socket.send(json.dumps({"type": "input_audio_buffer.commit", "final": True}))
+        self.trace["t_eof_sent"] = time.monotonic()
+        self.record("eof_sent")
+
+    async def run(self, pcm: bytes) -> dict:
+        import asyncio
+        import websockets
+
+        tasks = []
+        try:
+            async with websockets.connect(self.url, max_size=2 * 1024**2,
+                                          open_timeout=20, close_timeout=5) as socket:
+                receiver = asyncio.create_task(self.receive(socket))
+                sender = asyncio.create_task(self.send_audio(socket, pcm))
+                tasks = [receiver, sender]
+                finished, _ = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+                if receiver in finished:
+                    await receiver
+                    if not sender.done():
+                        raise RuntimeError("Receiver stopped before EOF completed")
+                await sender
+                await asyncio.wait_for(receiver, timeout=DRAIN_SECONDS)
+                self.trace.update(status="ok", exit_code=0)
+        except Exception as error:
+            self.trace["errors"].append({"type": type(error).__name__, "message": str(error)})
+        finally:
+            for task in tasks:
+                if not task.done():
+                    task.cancel()
+            if tasks:
+                await asyncio.gather(*tasks, return_exceptions=True)
+            self.trace["final_text"] = self.text
+            self.trace["t_exit"] = time.monotonic()
+        return self.trace
+
+
+def read_replay_audio(path: Path) -> bytes:
+    import wave
+
+    with wave.open(str(path), "rb") as audio:
+        if (audio.getnchannels(), audio.getsampwidth(), audio.getframerate()) != (1, 2, SAMPLE_RATE):
+            raise ValueError("Replay requires original mono PCM16 16000 Hz WAV")
+        pcm = audio.readframes(audio.getnframes())
+    if not pcm:
+        raise ValueError("Empty input audio")
+    return pcm
+
+
+def distribution(values: list[float]) -> dict:
+    ordered = sorted(values)
+
+    def percentile(q):
+        position = (len(ordered) - 1) * q
+        low = int(position)
+        high = min(low + 1, len(ordered) - 1)
+        return ordered[low] + (ordered[high] - ordered[low]) * (position - low)
+
+    return {"count": len(ordered), "mean_ms": sum(ordered) / len(ordered) if ordered else None,
+            "p50_ms": percentile(.5) if ordered else None,
+            "p95_ms": percentile(.95) if ordered else None,
+            "max_ms": max(ordered) if ordered else None}
+
+
+def score_complete(trace: dict) -> dict:
+    end, window, eof = (trace.get(key) for key in ("t_end", "window_end", "t_eof"))
+    before, inside, after_eof, outside, anomalies = [], [], [], [], []
+    for event in trace.get("events", []):
+        payload = event.get("payload", {})
+        if payload.get("type") != "turn.delta":
+            continue
+        identifier = payload.get("turn_id")
+        if type(identifier) is not int or TURN_CLASSES.get(identifier) != payload.get("turn_class"):
+            anomalies.append(event)
+            continue
+        if identifier != 38:
+            continue
+        received = event["received"]
+        if eof is not None and received >= eof:
+            after_eof.append(received)
+        elif end is not None and received < end:
+            before.append(received)
+        elif end is not None and window is not None and end <= received <= window:
+            inside.append(received)
+        else:
+            outside.append(received)
+    ok = trace.get("status") == "ok" and trace.get("window_observed", False) and not anomalies
+    return {"hit": bool(inside), "latency_ms": (min(inside) - end) * 1000 if inside else None,
+            "replay_ok": ok, "window_observed": trace.get("window_observed", False),
+            "before_count": len(before), "window_count": len(inside),
+            "after_eof_count": len(after_eof), "outside_count": len(outside),
+            "only_before": bool(before) and not (inside or after_eof or outside),
+            "only_after_eof": bool(after_eof) and not (before or inside or outside),
+            "never_observed": not (before or inside or after_eof or outside),
+            "protocol_anomalies": anomalies,
+            "complete_absent_full_window": not inside if trace.get("window_observed") else None}
+
+
+def word_errors(reference: list[str], hypothesis: list[str]) -> dict:
+    """Levenshtein counts with deterministic substitution/deletion/insertion ties."""
+    previous = [(j, 0, 0, j) for j in range(len(hypothesis) + 1)]
+    for i, ref in enumerate(reference, 1):
+        current = [(i, 0, i, 0)]
+        for j, hyp in enumerate(hypothesis, 1):
+            if ref == hyp:
+                current.append(previous[j - 1])
+                continue
+            cost, s, d, ins = previous[j - 1]
+            sub = (cost + 1, s + 1, d, ins)
+            cost, s, d, ins = previous[j]
+            delete = (cost + 1, s, d + 1, ins)
+            cost, s, d, ins = current[j - 1]
+            insert = (cost + 1, s, d, ins + 1)
+            current.append(min((sub, delete, insert), key=lambda row: row[0]))
+        previous = current
+    cost, s, d, ins = previous[-1]
+    return {"S": s, "D": d, "I": ins, "N_ref": len(reference),
+            "wer": cost / len(reference) if reference else None}
+
+
+def lexical_text(text: str) -> str:
+    import unicodedata
+
+    # Punctuation updates must not change the last lexical reception time.
+    return " ".join("".join(c for c in text.casefold()
+                            if not unicodedata.category(c).startswith("P")).split())
+
+
+def score_asr(trace: dict, reference: str, normalizer: Callable[[str], str]) -> dict:
+    ref = normalizer(reference)
+    final = trace.get("final_text", "")
+    hyp = normalizer(final)
+    ok = trace.get("status") == "ok"
+    last_online = None
+    online_text = ""
+    previous = ""
+    post_changes = []
+    end, window, eof = (trace.get(key) for key in ("t_end", "window_end", "t_eof"))
+    for event in trace.get("events", []):
+        if event.get("payload", {}).get("type") not in ("transcription.delta", "transcription.done"):
+            continue
+        text = event["cumulative_text"]
+        lexical = lexical_text(text)
+        received = event["received"]
+        changed = lexical != previous
+        previous = lexical
+        if window is not None and received <= window and (eof is None or received < eof):
+            online_text = text
+            if changed:
+                last_online = received
+        if changed and eof is not None and received >= eof:
+            post_changes.append({"received": received, "after_eof_ms": (received - eof) * 1000,
+                                 "after_end_ms": (received - end) * 1000 if end is not None else None,
+                                 "text": text})
+    latency = ((last_online - end) * 1000
+               if ok and hyp and end is not None and last_online is not None and lexical_text(online_text) else None)
+    errors = word_errors(ref.split(), hyp.split()) if ok else None
+    return {"scorable": ok, "reference": reference, "normalized_reference": ref,
+            "N_ref": len(ref.split()), "wer": errors["wer"] if errors else None,
+            "final_hypothesis": final, "normalized_hypothesis": hyp,
+            "errors": errors,
+            "online_text": online_text, "text_latency_ms": latency,
+            "eof_lexical_updates": post_changes,
+            "eof_last_update_ms": post_changes[-1]["after_eof_ms"] if post_changes else None,
+            "eof_text_changed": lexical_text(final) != lexical_text(online_text)}
+
+
+async def replay_run(args) -> dict:
+    manifest_path = args.root.expanduser().resolve() / "dataset/fleurs_en_us/manifest.json"
+    verify_manifest(manifest_path)
+    manifest = json.loads(manifest_path.read_text())
+    split, limit = {"formal": ("test", 100), "smoke": ("test", 5), "dev": ("dev", 1)}[args.mode]
+    samples = [s for s in manifest["samples"] if s["split"] == split][:limit]
+    if len(samples) != limit:
+        raise ValueError("Frozen manifest does not contain the planned samples")
+    if not args.run_id or Path(args.run_id).name != args.run_id or args.run_id in (".", ".."):
+        raise ValueError("run_id must be a single directory name")
+    output = manifest_path.parents[2] / "runs" / args.run_id
+    output.mkdir(parents=True, exist_ok=False)
+    shutil.copyfile(manifest_path, output / "manifest.json")
+    plan = {"schema": "x2q-run-v1", "mode": args.mode, "run_id": args.run_id,
+            "created_utc": utc_now(), "manifest_sha256": sha256_file(manifest_path),
+            "url": args.url, "model": args.model, "chunk_ms": 80,
+            "window_seconds": WINDOW_SECONDS, "drain_seconds": DRAIN_SECONDS,
+            "samples": [{"sample_id": s["sample_id"], "trace": f"{i:03d}.json"}
+                        for i, s in enumerate(samples)]}
+    write_json(output / "run.json", plan)
+    # Allocate a failure record for every planned input before opening any session.
+    for item in plan["samples"]:
+        write_json(output / item["trace"], {"schema": "x2q-stream-v1", "status": "failed",
+                   "sample_id": item["sample_id"], "exit_code": 1,
+                   "errors": [{"type": "NotStarted", "message": "Replay did not finish"}]})
+    used_bytes = sum(p.stat().st_size for p in output.iterdir() if p.is_file())
+    for item, sample in zip(plan["samples"], samples):
+        with (output / (item["trace"] + "l")).open("x", encoding="utf-8") as journal:
+            def append(row):
+                nonlocal used_bytes
+                encoded = json.dumps(row, ensure_ascii=False) + "\n"
+                used_bytes += len(encoded.encode("utf-8"))
+                # Reserve space for the finalized trace copies, across the whole run.
+                if used_bytes * 3 > 5 * 1024**3:
+                    raise RuntimeError("Run result budget exceeded (5 GiB)")
+                journal.write(encoded)
+                journal.flush()
+
+            replay = StreamingReplay(args.url, args.model, append)
+            try:
+                path = _resolve_audio(manifest_path.parent, sample["relative_path"])
+                pcm = read_replay_audio(path)
+                import asyncio
+                trace = await asyncio.wait_for(replay.run(pcm), len(pcm) / 2 / SAMPLE_RATE + 120)
+            except Exception as error:
+                trace = replay.trace
+                trace["errors"].append({"type": type(error).__name__, "message": str(error)})
+            trace["sample_id"] = item["sample_id"]
+            write_json(output / item["trace"], trace)
+    return {"run": str(output), "planned": len(samples)}
+
+
+def score_run(run: Path, metric: str) -> dict:
+    plan = json.loads((run / "run.json").read_text())
+    manifest = json.loads((run / "manifest.json").read_text())
+    if sha256_file(run / "manifest.json") != plan["manifest_sha256"]:
+        raise ValueError("Run manifest no longer matches the frozen input")
+    references = {s["sample_id"]: s for s in manifest["samples"]}
+    normalizer = load_english_normalizer() if metric == "asr" else None
+    if metric == "asr":
+        if manifest.get("normalizer") != {"package": NORMALIZER_PACKAGE, "version": NORMALIZER_VERSION}:
+            raise ValueError("Manifest normalizer version mismatch")
+        total = sum(len(normalizer(s["reference"]).split()) for s in manifest["samples"] if s["split"] == "test")
+        if total != EXPECTED_TEST_NORMALIZED_WORDS:
+            raise ValueError("Frozen test reference word count does not equal 2162")
+    rows = []
+    for item in plan["samples"]:
+        path = run / item["trace"]
+        trace = json.loads(path.read_text()) if path.exists() else {"status": "failed", "errors": [{"type": "MissingTrace"}]}
+        if trace.get("sample_id", item["sample_id"]) != item["sample_id"]:
+            raise ValueError("Trace sample identity mismatch")
+        score = (score_asr(trace, references[item["sample_id"]]["reference"], normalizer)
+                 if metric == "asr" else score_complete(trace))
+        rows.append({"sample_id": item["sample_id"], **score,
+                     "runtime_errors": trace.get("errors", []), "exit_code": trace.get("exit_code", 1)})
+    planned = len(rows)
+    summary = {"mode": plan["mode"], "planned": planned,
+               "formal_samples": planned if plan["mode"] == "formal" else 0}
+    if metric == "asr":
+        valid = [r for r in rows if r["scorable"]]
+        counts = {key: sum(r["errors"][key] for r in valid) for key in ("S", "D", "I", "N_ref")}
+        summary.update(scorable=len(valid), failed=planned - len(valid),
+                       planned_reference_words=sum(r["N_ref"] for r in rows),
+                       scorable_coverage=len(valid) / planned if planned else None,
+                       normalizer={"package": NORMALIZER_PACKAGE, "version": NORMALIZER_VERSION},
+                       counts=counts,
+                       corpus_wer=sum(counts[k] for k in ("S", "D", "I")) / counts["N_ref"] if counts["N_ref"] else None,
+                       text_latency=distribution([r["text_latency_ms"] for r in rows if r["text_latency_ms"] is not None]),
+                       eof_text_changed=sum(r["eof_text_changed"] for r in rows),
+                       eof_update_latency=distribution([r["eof_last_update_ms"] for r in rows if r["eof_last_update_ms"] is not None]))
+    else:
+        ok = [r for r in rows if r["replay_ok"]]
+        hits = sum(r["hit"] for r in rows)
+        summary.update(hits=hits, complete_rate=hits / planned if planned else None,
+                       runtime_failed=sum(r["exit_code"] != 0 for r in rows),
+                       replay_ok=len(ok), failed=planned - len(ok),
+                       complete_rate_given_replay_ok=sum(r["hit"] for r in ok) / len(ok) if ok else None,
+                       latency=distribution([r["latency_ms"] for r in rows if r["hit"]]),
+                       **{key: sum(bool(r[key]) for r in rows) for key in
+                          ("only_before", "only_after_eof", "never_observed", "protocol_anomalies")},
+                       window_observed=sum(r["window_observed"] for r in rows),
+                       no_hit_full_window=sum(r["complete_absent_full_window"] is True for r in rows),
+                       incomplete_windows=sum(not r["window_observed"] for r in rows))
+    report = {"schema": f"x2q-{metric}-score-v1", "summary": summary, "samples": rows}
+    write_json(run / f"{metric}_scores.json", report)
+    return report
+
+
 def summarize(report: dict[str, object]) -> None:
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
@@ -591,7 +951,30 @@ def main(argv: list[str] | None = None) -> None:
     verify = sub.add_parser("verify-data", help="recheck an existing frozen subset")
     verify.add_argument("--root", type=Path, required=True, help="remote workspace root")
 
+    replay = sub.add_parser("replay", help="paced independent sessions with native traces")
+    replay.add_argument("--root", type=Path, required=True)
+    replay.add_argument("--run-id", required=True)
+    replay.add_argument("--mode", choices=("dev", "smoke", "formal"), required=True)
+    replay.add_argument("--url", default="ws://127.0.0.1:18011/v1/realtime")
+    replay.add_argument("--model", default="x-square-robot/X2-Turn-4B-0812")
+    for metric in ("asr", "complete"):
+        score = sub.add_parser(f"score-{metric}", help=f"rescore frozen {metric} traces")
+        score.add_argument("--run", type=Path, required=True)
+
     args = parser.parse_args(argv)
+    if args.command == "replay":
+        import asyncio
+        result = asyncio.run(replay_run(args))
+        summarize(result)
+        plan = json.loads((Path(result["run"]) / "run.json").read_text())
+        failed = any(json.loads((Path(result["run"]) / s["trace"]).read_text())["status"] != "ok"
+                     for s in plan["samples"])
+        if failed:
+            raise SystemExit(1)
+        return
+    if args.command.startswith("score-"):
+        summarize(score_run(args.run, args.command.removeprefix("score-")))
+        return
     if args.command == "prepare-data":
         preparer = DatasetPreparer(
             args.root,
