@@ -60,31 +60,18 @@ else
 fi
 "$PY" -m pip freeze >"$OUTPUT/pip_freeze.txt"
 
-# 3. Pinned upstream checkouts.  Only the two repositories this work item
-# needs are cloned, shallow and single committed.
+# 3. Pinned upstream checkouts, prepared on a node that can reach GitHub.  The
+# scheduler CPU nodes have no GitHub access, so this stage only validates them.
 VLLM_DIR="$ROOT/source/vllm"
 X2_DIR="$ROOT/source/X2-Turn"
-if [ ! -d "$VLLM_DIR/.git" ]; then
-  git init -q "$VLLM_DIR"
-  git -C "$VLLM_DIR" remote add origin https://github.com/vllm-project/vllm
-fi
-if [ "$(git -C "$VLLM_DIR" rev-parse HEAD 2>/dev/null || true)" != "$VLLM_COMMIT" ]; then
-  log "fetching vLLM $VLLM_TAG ($VLLM_COMMIT)"
-  git -C "$VLLM_DIR" fetch -q --depth 1 origin \
-    "refs/tags/$VLLM_TAG:refs/tags/$VLLM_TAG"
-  git -C "$VLLM_DIR" checkout -q "$VLLM_TAG"
-fi
-if [ ! -d "$X2_DIR/.git" ]; then
-  git init -q "$X2_DIR"
-  git -C "$X2_DIR" remote add origin https://github.com/X-Square-Robot/X2-Turn
-fi
-if [ "$(git -C "$X2_DIR" rev-parse HEAD 2>/dev/null || true)" != "$X2_TURN_COMMIT" ]; then
-  log "fetching X2-Turn $X2_TURN_COMMIT"
-  git -C "$X2_DIR" fetch -q --depth 1 origin "$X2_TURN_COMMIT"
-  git -C "$X2_DIR" checkout -q FETCH_HEAD
-fi
+[ -d "$VLLM_DIR/.git" ] && [ -d "$X2_DIR/.git" ] || {
+  echo "missing pinned checkouts; run scripts/remote/prepare_x2_turn_sources.sh on the login node" >&2
+  exit 1
+}
 [ "$(git -C "$VLLM_DIR" rev-parse HEAD)" = "$VLLM_COMMIT" ] || {
   echo "vLLM checkout does not match $VLLM_COMMIT" >&2; exit 1; }
+[ "$(git -C "$VLLM_DIR" describe --tags --exact-match)" = "$VLLM_TAG" ] || {
+  echo "vLLM checkout is not at tag $VLLM_TAG" >&2; exit 1; }
 [ "$(git -C "$X2_DIR" rev-parse HEAD)" = "$X2_TURN_COMMIT" ] || {
   echo "X2-Turn checkout does not match $X2_TURN_COMMIT" >&2; exit 1; }
 

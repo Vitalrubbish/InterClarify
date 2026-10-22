@@ -30,6 +30,9 @@
 ```bash
 export X2_TURN_ROOT=~/interclarify-x2-turn-complete
 export X2_TURN_SOURCE=~/interclarify-x2-turn-complete/source/InterClarify-<commit>
+# 1) 先在登录节点准备固定上游源码（调度节点无法访问 GitHub）
+bash "$X2_TURN_SOURCE/scripts/remote/prepare_x2_turn_sources.sh"
+# 2) 再依次提交三个阶段
 for stage in setup model deploy; do
   X2_TURN_STAGE=$stage X2_TURN_TAG=deploy-20261022-r1 \
     bash "$X2_TURN_SOURCE/scripts/remote/submit_x2_turn_complete_jobs.sh"
