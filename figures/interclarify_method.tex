@@ -1,4 +1,4 @@
-% Proposed modular architecture; runtime integration is pending.
+% Overall project architecture; implementation stages are tracked separately.
 % Requires TikZ and the arrows.meta library.
 \begin{tikzpicture}[x=1cm,y=1cm,font=\sffamily\small,
   >={Latex[length=2mm]},
@@ -23,8 +23,8 @@
     {\textbf{Streaming input + shared dialogue context}\\
      Only currently available observations};
 
-  \node[module,dashed,fill=cyan!10] (l0) at (2,3)
-    {\textbf{Layer 0 (later)}\\Backchannel timing\\Future training};
+  \node[module,fill=cyan!10] (l0) at (2,3)
+    {\textbf{Layer 0}\\System backchannel\\Timing prediction};
   \node[module,fill=blue!9] (l1) at (7,3)
     {\textbf{Layer 1}\\Expression model\\Text + tool calls};
   \node[module,fill=violet!9] (l2) at (12,3)
@@ -36,21 +36,18 @@
     {\textbf{Streaming TTS + playback}\\Single playback owner};
 
   \draw[flow] (x2.north) -- (context.south);
-  \draw[flow,dashed] (l0.south |- context.north) -- (l0.south);
+  \draw[flow] (l0.south |- context.north) -- (l0.south);
   \draw[flow] (l1.south |- context.north) -- (l1.south);
   \draw[flow] (l2.south |- context.north) --
     node[label,right] {while active} (l2.south);
 
-  \draw[flow,dashed] (l0.east) -- node[label,above] {backchannel cue} (l1.west);
   \draw[flow] (context.west) -- (-.5,.5) -- (-.5,4.85) -|
-    node[label,above,pos=.35] {X2 user state} ([xshift=-3cm]arbiter.south);
+    node[label,below,pos=.35] {X2 user state} ([xshift=-3cm]arbiter.south);
   \draw[tool] ([yshift=3mm]l1.east) --
     node[label,above] {request token} ([yshift=3mm]l2.west);
   \draw[tool] ([yshift=-3mm]l2.west) --
     node[label,below] {result} ([yshift=-3mm]l1.east);
 
-  \draw[flow,dashed] (l0.north) --
-    node[label,right] {backchannel cue} (l0.north |- arbiter.south);
   \draw[flow] (l1.north) --
     node[label,right] {response text} (l1.north |- arbiter.south);
   \draw[flow] (arbiter.north) -- (playback.south);
@@ -58,6 +55,4 @@
   \draw[flow] (playback.east) -- (14.5,7.4) -- (14.5,.5) -- (context.east);
   \node[label,rotate=90,text=black!65] at (14.72,4.6) {actual playback state};
 
-  \node[font=\sffamily\scriptsize,text=black!55] at (7,-3.2)
-    {Target architecture; current step: X2-Turn integration. Dashed Layer 0: later.};
 \end{tikzpicture}
