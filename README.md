@@ -9,6 +9,7 @@ InterClarify 研究全双工语音代理在用户话轮内是否应主动澄清�
 | 研究方案与评测范围 | [docs/research_design.md](docs/research_design.md) |
 | 工程第一步：X2-Turn 接入与 FDB 测试计划 | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
 | X2-Turn 测试数据：历史 FLEURS 子集与远端现状 | [核查记录](docs/dev/X2-Turn/fleurs_subset_verification.md) |
+| X2-Turn 测试计划：转写质量与末端 complete | [简化计划](docs/dev/X2-Turn/complete_test_on_fleurs.md) |
 | 本地 conda 环境 | [docs/local_environment.md](docs/local_environment.md)（`interclarify-dev`） |
 | 工作单管理 | [docs/issue](docs/issue/README.md)（本轮 FDB 测试已取消，FLEURS 核查已完成） |
 | 已采用的运行时配置 | [docs/runtime_baseline.md](docs/runtime_baseline.md) |
