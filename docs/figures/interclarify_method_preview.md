@@ -1,6 +1,6 @@
 # 架构图预览入口说明
 
-对应文件：[figures/interclarify_method_preview.tex](../../figures/interclarify_method_preview.tex)。更新：2026-10-22。预览展示完整项目架构，不标注实施阶段；Layer 0 保留为系统附和时机模块，具体输出接口未定，不绘制 backchannel cue 连线。
+对应文件：[figures/interclarify_method_preview.tex](../../figures/interclarify_method_preview.tex)。更新：2026-10-22。预览展示完整项目架构，不标注实施阶段；Layer 0 结果与 Layer 1 待表达内容分别进入 Unified Arbiter，由 X2 user state 提供仲裁依据。Layer 0 的具体编码未定，不引入 backchannel cue 协议。
 
 ## 整体作用与结构
 

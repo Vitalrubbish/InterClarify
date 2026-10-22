@@ -31,7 +31,7 @@
     {\textbf{Layer 2}\\Async thinking\\Structured results};
 
   \node[output,fill=orange!12] (arbiter) at (4.5,5.6)
-    {\textbf{Unified arbiter}\\Control and text coordination};
+    {\textbf{Unified arbiter}\\Select output using X2 user state};
   \node[output,fill=gray!10] (playback) at (4.5,7.4)
     {\textbf{Streaming TTS + playback}\\Single playback owner};
 
@@ -48,6 +48,8 @@
   \draw[tool] ([yshift=-3mm]l2.west) --
     node[label,below] {result} ([yshift=-3mm]l1.east);
 
+  \draw[flow] (l0.north) --
+    node[label,right] {Layer 0 result} (l0.north |- arbiter.south);
   \draw[flow] (l1.north) --
     node[label,right] {response text} (l1.north |- arbiter.south);
   \draw[flow] (arbiter.north) -- (playback.south);
