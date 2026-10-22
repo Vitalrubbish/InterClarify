@@ -206,12 +206,20 @@ def export_for_vllm(source_dir: Path, target_dir: Path, x2_checkout: Path) -> di
 def inspect_tokenizer_delay(model_dir: Path) -> dict[str, object]:
     """Read the delay exactly where the served model reads it."""
     try:
-        from mistral_common.tokens.tokenizers.mistral import MistralTokenizer
+        try:
+            from vllm.tokenizers.registry import get_tokenizer
 
-        tokenizer = MistralTokenizer.from_file(str(model_dir / "tekken.json"))
-        audio_config = tokenizer.instruct.audio_encoder.audio_config
+            tokenizer = get_tokenizer(str(model_dir), tokenizer_mode="mistral")
+            audio_config = tokenizer.instruct.audio_encoder.audio_config
+            source = "vllm.tokenizers MistralTokenizer"
+        except Exception:
+            from mistral_common.tokens.tokenizers.mistral import MistralTokenizer
+
+            tokenizer = MistralTokenizer.from_file(str(model_dir / "tekken.json"))
+            audio_config = tokenizer.instruct_tokenizer.audio_encoder.audio_config
+            source = "mistral_common tekken.json audio_config"
         result: dict[str, object] = {
-            "source": "mistral_common tekken.json audio_config",
+            "source": source,
             "num_delay_tokens": int(audio_config.get_num_delay_tokens()),
         }
         for attribute in ("transcription_delay_ms", "sampling_rate", "frame_rate"):
@@ -219,7 +227,7 @@ def inspect_tokenizer_delay(model_dir: Path) -> dict[str, object]:
                 result[attribute] = getattr(audio_config, attribute)
         return result
     except Exception as error:  # pragma: no cover - depends on installed version
-        return {"source": "mistral_common tekken.json audio_config", "error": repr(error)}
+        return {"source": "tokenizer audio config", "error": repr(error)}
 
 
 def prepare(args: argparse.Namespace) -> int:
