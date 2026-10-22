@@ -71,7 +71,7 @@ UTILS_SRC="$BUNDLE/x2/voxtral-realtime/integrations/vllm/$UTILS_REL"
 [ -f "$PATCH" ] || fail "missing overlay patch in the bundle"
 [ -f "$UTILS_SRC" ] || fail "missing turn-head helper in the bundle"
 
-SITE="$("$PY" -c 'import vllm, pathlib; print(pathlib.Path(vllm.__file__).parent)')"
+SITE="$("$PY" -c 'import vllm, pathlib; print(pathlib.Path(vllm.__file__).parent.parent)')"
 
 # 4. Compare every wheel file with the patch pre-image: the wheel is only
 # interchangeable with the pinned source if the git blob ids agree.
