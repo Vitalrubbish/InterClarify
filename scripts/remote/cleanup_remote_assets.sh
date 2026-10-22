@@ -141,6 +141,11 @@ CONDA_ENVS=(
   xtalk-x2-asr
 )
 
+CONDA_ENV_PATHS=(
+  "$HOME/.conda/envs/verify312"
+  "$HOME/.conda/envs/xtalk"
+)
+
 safe_target() {
   local target="$1" real keep
   real="$(readlink -m "$target")"
@@ -190,6 +195,22 @@ for env in "${CONDA_ENVS[@]}"; do
   else
     log "REMOVE conda env $env"
     "$CONDA_BIN" env remove -n "$env" -y
+  fi
+done
+
+for env_path in "${CONDA_ENV_PATHS[@]}"; do
+  if [[ ! -d "$env_path" ]]; then
+    continue
+  fi
+  if ! safe_target "$env_path"; then
+    continue
+  fi
+  if [[ "$MODE" == dry-run ]]; then
+    log "WOULD REMOVE conda env path $env_path"
+  else
+    log "REMOVE conda env path $env_path"
+    "$CONDA_BIN" env remove -p "$env_path" -y
+    rmdir "$env_path" 2>/dev/null || true
   fi
 done
 

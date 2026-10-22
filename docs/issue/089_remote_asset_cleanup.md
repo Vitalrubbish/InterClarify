@@ -1,6 +1,6 @@
 # Issue 089：清理远端服务器旧路线资产
 
-状态：dry-run 待执行，2026-10-22。用户已确认清理范围与“任务单 + dry-run”执行方式；本单不执行删除，先列出目标、大小和保留项。
+状态：完成，2026-10-22。dry-run 与执行均完成；磁盘由约 430G used / 595G avail 降至 129G used / 896G avail，释放约 301G。保留项已核验存在，组件与评分环境可导入。
 
 ## 范围
 
@@ -65,10 +65,29 @@ CLEANUP_CONFIRM=YES sh scripts/remote/cleanup_remote_assets.sh --execute
 - conda 环境通过 `conda env remove` 删除，不直接 `rm -rf`；最后执行 `conda clean -a -y`。
 - 不跟随符号链接；`interclarify-runtime-current` 只删除链接本身（若纳入），不删除目标。
 
+## 执行结果
+
+dry-run 与执行日志位于远端：
+
+- `~/cleanup_remote_assets.dry-run.log`
+- `~/cleanup_remote_assets.execute.log`
+- `~/cleanup_second.log`（`.conda/envs` 下的 `verify312`、`xtalk` 与 `.conda/pkgs`）
+
+执行后固定环境：
+
+| 用途 | 环境 |
+| --- | --- |
+| 通用/模型服务 | `~/miniconda3/envs/interclarify-dev`（torch 2.4.1+cu121，transformers 4.46.3，peft 0.13.2） |
+| FDB 官方评分 | `~/miniconda3/envs/full-duplex-bench`（torch 2.6.0+cu126） |
+| ASR 组件 | `~/interclarify-english-integration-20261018-v1/envs/asr`（torch 2.11.0+cu128，transformers 5.15.1） |
+| TTS 组件 | `~/interclarify-english-integration-20261018-v1/envs/tts`（torch 2.11.0+cu128） |
+
+保留的 `paratalker-dev`、`sidecar` 属于其他项目；`STS`、`Paratalker`、`ParaTalker` 等未触碰。`vc list` 为空，未启动新作业。
+
 ## 验收
 
-- [ ] dry-run 输出目标清单与大小，人工确认无保留项。
-- [ ] 执行后 `df -h` 显示释放空间；脚本退出码 0。
-- [ ] `interclarify-p0-models/modelscope`、`interclarify-asr-selection/models`、`interclarify-tts-selection-20261018/models`、`v1/envs`、`v6`、`runtime` 快照、FDB r4、`benchmark` 仍存在。
-- [ ] `full-duplex-bench` 与 `interclarify-dev` 可启动；组件 ASR/TTS env 的 `conda-meta/history` 存在。
-- [ ] 不把 dry-run 或执行通过写成模型能力验收。
+- [x] dry-run 输出目标清单与大小，人工确认无保留项。
+- [x] 执行后 `df -h` 显示释放空间；脚本退出码 0。
+- [x] `interclarify-p0-models/modelscope`、`interclarify-asr-selection/models`、`interclarify-tts-selection-20261018/models`、`v1/envs`、`v6`、`runtime` 快照、FDB r4、`benchmark` 仍存在。
+- [x] `full-duplex-bench` 与 `interclarify-dev` 可启动；组件 ASR/TTS env 的 `conda-meta/history` 存在。
+- [x] 不把 dry-run 或执行通过写成模型能力验收。
