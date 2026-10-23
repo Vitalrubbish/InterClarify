@@ -1,6 +1,6 @@
 # XTX-008：冻结 VAD 辅助输入协议与隔离训练环境
 
-状态：条件性后续，等待 XTX-007 分析结论与用户讨论。前置：[XTX-007](xtx_007_training_feasibility.md)明确同意进入本项后，复用并重新核验 [XTX-002 冻结资产](../../../reports/xturnix_fleurs/20261023-xtx-002-protocol/README.md)。依据：[训练可行性方案](../../dev/XTurnix/training_feasibility.md)，共同资源与范围见[工作单入口](README.md#训练阶段共同边界)。
+状态：条件性后续，尚未授权实施；XTX-007 已完成，用户本次仅同意 XTX-009 首轮来源审核。前置：[XTX-007](../archive/XTurnix/xtx_007_training_feasibility.md)明确同意进入本项后，复用并重新核验 [XTX-002 冻结资产](../../../reports/xturnix_fleurs/20261023-xtx-002-protocol/README.md)。依据：[训练可行性方案](../../dev/XTurnix/training_feasibility.md)，共同资源与范围见[工作单入口](README.md#训练阶段共同边界)。
 
 ## 目标
 

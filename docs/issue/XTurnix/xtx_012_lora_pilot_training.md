@@ -1,6 +1,6 @@
 # XTX-012：执行受限 LoRA 试训并冻结候选模型
 
-状态：条件性后续，等待 XTX-007 分析结论与用户讨论。前置：[XTX-007](xtx_007_training_feasibility.md)明确同意进入后续范围；依赖：[XTX-011](xtx_011_lora_resource_probe.md)，复用 [XTX-009 数据](xtx_009_training_data_freeze.md)及 [XTX-010 评分合同](xtx_010_control_baseline_calibration.md)。共同资源与范围见[工作单入口](README.md#训练阶段共同边界)。
+状态：条件性后续，尚未授权实施；XTX-007 已完成，用户本次仅同意 XTX-009 首轮来源审核。前置：[XTX-007](../archive/XTurnix/xtx_007_training_feasibility.md)明确同意进入后续范围；依赖：[XTX-011](xtx_011_lora_resource_probe.md)，复用 [XTX-009 数据](xtx_009_training_data_freeze.md)及 [XTX-010 评分合同](xtx_010_control_baseline_calibration.md)。共同资源与范围见[工作单入口](README.md#训练阶段共同边界)。
 
 ## 目标
 

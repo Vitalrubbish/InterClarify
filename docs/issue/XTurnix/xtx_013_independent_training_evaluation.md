@@ -1,6 +1,6 @@
 # XTX-013：独立验证试训效果并形成继续或停止结论
 
-状态：条件性后续，等待 XTX-007 分析结论与用户讨论。前置：[XTX-007](xtx_007_training_feasibility.md)明确同意进入后续范围；依赖：[XTX-010](xtx_010_control_baseline_calibration.md)、[XTX-012](xtx_012_lora_pilot_training.md)。依据：[训练可行性方案第 7 节](../../dev/XTurnix/training_feasibility.md#7-评价标准与继续条件)，共同资源与范围见[工作单入口](README.md#训练阶段共同边界)。
+状态：条件性后续，尚未授权实施；XTX-007 已完成，用户本次仅同意 XTX-009 首轮来源审核。前置：[XTX-007](../archive/XTurnix/xtx_007_training_feasibility.md)明确同意进入后续范围；依赖：[XTX-010](xtx_010_control_baseline_calibration.md)、[XTX-012](xtx_012_lora_pilot_training.md)。依据：[训练可行性方案第 7 节](../../dev/XTurnix/training_feasibility.md#7-评价标准与继续条件)，共同资源与范围见[工作单入口](README.md#训练阶段共同边界)。
 
 ## 目标
 

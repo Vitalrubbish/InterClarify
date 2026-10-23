@@ -1,0 +1,37 @@
+{
+  "reviewed_conversations": 48,
+  "source_counts": {
+    "dailytalk": 24,
+    "swda": 24
+  },
+  "eligible_training_records": 0,
+  "human_reviewers": 0,
+  "ai_review_passes": 1,
+  "independent_interrater_agreement": null,
+  "source_speaker_counts": {
+    "dailytalk": 2,
+    "swda": 42
+  },
+  "selection_fallbacks": 8,
+  "collector_network_body_bytes": 888955,
+  "cache_bytes": 993379,
+  "packets_sha256": "ebb2456a91ee16714d4e3f87e24dc41ef998124a6454da5422d0a3d8cb0989c1",
+  "reviews_sha256": "c331d817efa3007b9702067828946bf644c55c892a8fec34db0cfcd9d797efc3",
+  "local_raw_packet_path": "artifacts/xturnix_source_audit/20261023-first-review-r2/packets.json",
+  "raw_audio_downloaded": false,
+  "model_execution": false,
+  "scope": "source_audit_only",
+  "review_outcomes": {
+    "Listen/start": 23,
+    "ambiguous": 18,
+    "Speak/keep": 3,
+    "Listen/keep": 4
+  },
+  "conditional_candidates": {
+    "Listen/start": 23,
+    "Speak/keep": 3,
+    "Listen/keep": 4,
+    "Speak/stop": 0
+  },
+  "ambiguous_records": 18
+}
