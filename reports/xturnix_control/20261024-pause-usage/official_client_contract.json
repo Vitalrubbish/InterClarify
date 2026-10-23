@@ -1,0 +1,140 @@
+{
+  "scope": "official_client_contract_with_mock_model_not_model_quality",
+  "raw_start_trace": [
+    {
+      "call": {
+        "speech_start": true
+      },
+      "mapped_action": "DO_NOTHING",
+      "model_calls": 0,
+      "rendered_dialogue": [],
+      "gate": false,
+      "pending_offset": null
+    },
+    {
+      "call": {
+        "text": "What time should we leave tomorrow?"
+      },
+      "mapped_action": "DO_NOTHING",
+      "model_calls": 1,
+      "rendered_dialogue": [
+        {
+          "role": "user",
+          "content": "What time should we leave tomorrow"
+        }
+      ],
+      "gate": false,
+      "pending_offset": null
+    },
+    {
+      "call": {
+        "speech_pause": true
+      },
+      "mapped_action": "DO_NOTHING",
+      "model_calls": 1,
+      "rendered_dialogue": [
+        {
+          "role": "user",
+          "content": "What time should we leave tomorrow"
+        }
+      ],
+      "gate": true,
+      "pending_offset": 35
+    },
+    {
+      "call": {
+        "text": "What time should we leave tomorrow?",
+        "speech_pause": true
+      },
+      "mapped_action": "START_GENERATION",
+      "model_calls": 1,
+      "rendered_dialogue": [
+        {
+          "role": "user",
+          "content": "What time should we leave tomorrow"
+        }
+      ],
+      "gate": true,
+      "pending_offset": 35
+    },
+    {
+      "call": {
+        "text": "What time should we leave tomorrow?",
+        "speech_pause": true
+      },
+      "mapped_action": "DO_NOTHING",
+      "model_calls": 1,
+      "rendered_dialogue": [
+        {
+          "role": "user",
+          "content": "What time should we leave tomorrow"
+        }
+      ],
+      "gate": true,
+      "pending_offset": 35
+    }
+  ],
+  "raw_keep_resume_trace": [
+    {
+      "call": {
+        "text": "Could you help me"
+      },
+      "mapped_action": "DO_NOTHING",
+      "model_calls": 1,
+      "rendered_dialogue": [
+        {
+          "role": "user",
+          "content": "Could you help me"
+        }
+      ],
+      "gate": false,
+      "pending_offset": null
+    },
+    {
+      "call": {
+        "text": "Could you help me",
+        "speech_pause": true
+      },
+      "mapped_action": "DO_NOTHING",
+      "model_calls": 1,
+      "rendered_dialogue": [
+        {
+          "role": "user",
+          "content": "Could you help me"
+        }
+      ],
+      "gate": true,
+      "pending_offset": 17
+    },
+    {
+      "call": {
+        "speech_start": true
+      },
+      "mapped_action": "DO_NOTHING",
+      "model_calls": 1,
+      "rendered_dialogue": [
+        {
+          "role": "user",
+          "content": "Could you help me"
+        }
+      ],
+      "gate": false,
+      "pending_offset": 17
+    },
+    {
+      "call": {
+        "text": "Could you help me move this table?"
+      },
+      "mapped_action": "DO_NOTHING",
+      "model_calls": 2,
+      "rendered_dialogue": [
+        {
+          "role": "user",
+          "content": "Could you help me<|pause|> move this table"
+        }
+      ],
+      "gate": false,
+      "pending_offset": null
+    }
+  ]
+}

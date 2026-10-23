@@ -1,0 +1,22 @@
+{
+  "scheduler_job_id": "job-179277747271132523843-xuan-zhang",
+  "run_id": "xtx-014-pause-usage-20261024-r3",
+  "node": "d6-hpc-cpu-005",
+  "requested_resources": {
+    "cpu": 4,
+    "ram_gib": 16,
+    "gpu": 0,
+    "timeout_seconds": 1800
+  },
+  "source_commit": "123b9e124fd175e4b74c272024ac6d70ef70b326",
+  "executed_script_sha256": "35da935eb9faaf2b807c8de8d7f1fb6a8c6ec7b7ee2987c748039cb57226c3c7",
+  "raw_result_hashes": {
+    "case_manifest.json": "adabd198910a666389509c1659095c79086365edb20c805b83e33eb189d593a6",
+    "summary.json": "c9fa5fe3326b2182567885c0d77252b84ebceb7f9631db3440e93f799c96c0de",
+    "events.jsonl": "7ab9bd4a3b080e1468636ddc10eff3b83046eac3ab6abdd5046add39050e8a83"
+  },
+  "cancelled_pending_jobs": [
+    "job-179277595040143133715-xuan-zhang",
+    "job-179277675198310775624-xuan-zhang"
+  ]
+}

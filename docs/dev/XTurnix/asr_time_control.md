@@ -1,6 +1,6 @@
 # ASR 时间信息辅助的无训练话轮控制路线
 
-更新：2026-10-24。用户明确决定先利用 ASR 提供的时间信息、不训练模型，并归档训练相关工作单。本路线由 [XTX-014](../../issue/XTurnix/xtx_014_asr_time_control.md) 承接；随后用户要求检查并尝试原生 pause，当前先进行[pause 机制诊断](pause_usage.md)，完整 ASR 时间适配尚未完成。先验证 Listen 下 keep/start，Speak 校准继续后置。
+更新：2026-10-24。用户明确决定先利用 ASR 提供的时间信息、不训练模型，并归档训练相关工作单。本路线由 [XTX-014](../../issue/XTurnix/xtx_014_asr_time_control.md) 承接；随后用户要求检查并尝试原生 pause，[pause 机制诊断](pause_usage.md)已完成真实 CPU 前向，未见末端覆盖提升；完整 ASR 时间适配尚未完成。先验证 Listen 下 keep/start，Speak 校准继续后置。
 
 ## 1. 为什么调整
 

@@ -10,6 +10,7 @@
 | XTurnix pause 诊断 | [句末 pause 探针](xturnix_fleurs/20261023-pause-token-probe/README.md)：5 条 ASR＋100 条参考＋sanity；句末/中段 pause 均 0 次 start，无 pause 仅 1/100；sanity 中英文问句无 pause 可 start、加 pause 全灭，说明调用格式有效，问题是把话轮模型当端点检测用 |
 | XTurnix 首轮来源审核 | [48 会话审核](xturnix_training/20261023-source-audit/README.md)：DailyTalk/SwDA 各 24 个会话，30 个条件候选、18 个歧义；当前可直接冻结记录为 0，非双人人工试标 |
 | XTurnix Listen 校准 | [真实远端阈值验证](xturnix_training/20261023-listen-calibration/README.md)：dev/test 按原会话隔离，test 167 话轮误抢话 10.78%→5.39%，末端召回 44.31%→28.74%；未达 5% 预算，Speak 校准后置 |
+| XTurnix 原生 pause 用法 | [源码与真实模型诊断](xturnix_control/20261024-pause-usage/README.md)：远端 CPU FP32 完成 11 轨迹、246 事件、103 次前向；pending/gate 可用，直接末尾插入抑制 start，小样例未见末端覆盖提升 |
 | 完整两轴 | [r4 最终结果](fdb/20261021-full-two-axes-r4/README.md)：319 例回放、官方转写与时序评分完成；Smooth TOR 59/119、平均延迟 1.023 秒，Interruption TOR 160/200、平均延迟 1.183 秒；GPT 相关性待补 |
 | 固定子集 | [ASR_R4 子集回归](fdb/20261021-asr-subset-r1/README.md)：历史 25 例固定输入，两轴各 5 例官方对齐与时序评分 |
 

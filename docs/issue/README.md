@@ -4,7 +4,7 @@
 
 ## 当前路线
 
-[XTX-014：ASR 时间观测与无训练 Listen 控制](XTurnix/xtx_014_asr_time_control.md)已进入原生 pause 核查与机制诊断，具体方案见[路线文档](../dev/XTurnix/asr_time_control.md)。先使用文字无增量时长、ASR 接收/消费进度与冻结 XTurnix 分数，验证能否在误抢话受控、等待有界时提高末端接话召回。归档与路线已补充；按用户随后明确指令，先核查并尝试[原生 pause](../dev/XTurnix/pause_usage.md)，当前不训练。
+[XTX-014：ASR 时间观测与无训练 Listen 控制](XTurnix/xtx_014_asr_time_control.md)已完成原生 pause 子诊断，完整 ASR 时间适配尚未完成；具体方案见[路线文档](../dev/XTurnix/asr_time_control.md)。先使用文字无增量时长、ASR 接收/消费进度与冻结 XTurnix 分数，验证能否在误抢话受控、等待有界时提高末端接话召回。归档与路线已补充；按用户随后明确指令，先核查并尝试[原生 pause](../dev/XTurnix/pause_usage.md)，当前不训练。
 
 [XTX-010](XTurnix/xtx_010_control_baseline_calibration.md)的 Listen 纯文本阶段已完成并保留为基线，Speak 校准后置。[真实结果](../../reports/xturnix_training/20261023-listen-calibration/README.md)为留出误抢话 10.78%→5.39%、末端召回 44.31%→28.74%，未达到预设工作点，新阈值未部署。XTX-014 不依赖 Speak 校准或完整四类训练数据。
 
@@ -14,7 +14,7 @@
 
 | 工作单组 | 当前状态 |
 | --- | --- |
-| [ASR 时间无训练控制](XTurnix/README.md#当前工作) | XTX-014 原生 pause 诊断进行中；XTX-010 保留 Listen 基线，Speak 后置 |
+| [ASR 时间无训练控制](XTurnix/README.md#当前工作) | XTX-014 原生 pause 子诊断完成，ASR 时间适配待完成；XTX-010 保留 Listen 基线，Speak 后置 |
 | [原分析及训练路线](XTurnix/README.md#vad-assisted-training) | XTX-007 已完成；008、009、011—013 搁置归档，不计完成率 |
 | [FLEURS 两组件测试](XTurnix/README.md#fleurs-evaluation) | XTX-001—005 已完成；006 正式作业已取消，pause 诊断已完成，正式成绩未产生 |
 

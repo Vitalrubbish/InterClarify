@@ -1,0 +1,13 @@
+{
+  "official_repo": "xcc-zach/xtalk",
+  "official_revision": "5f0d9959edf1026588246efbed827b078cbb114c",
+  "reference_files": {
+    "test_xturnix.py": "2fda6b5a23063f0c2b94436877b1f3f9f0a9b1f6a31e9e1e5e06f949ee7af107",
+    "xturnix.py": "6ca21ed5364b9d26a097e34d5f7653b3249d446861f4bf22b420520a98365392",
+    "turn_detector_design.md": "fc3d937a6a92b18a7a675d3aa71186bca44d1cb8428cd2cd3c5b188825cf7837"
+  },
+  "local_reference_file_matches_official": true,
+  "official_existing_tests_passed": 11,
+  "probe_contract_tests_passed": 3,
+  "scope": "unit_contract_checks_and_frozen_source_audit_not_live_asr"
+}

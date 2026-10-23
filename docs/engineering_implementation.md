@@ -1,6 +1,6 @@
 # 工程实施计划
 
-2026-10-24 最新路线：按用户要求暂不训练，先利用 ASR 文字无增量时长及处理进度辅助冻结 XTurnix 的 Listen 控制。训练相关 XTX-008、009、011—013 已搁置归档，XTX-010 保留已完成纯文本基线，Speak 校准后置。当前 [XTX-014](issue/XTurnix/xtx_014_asr_time_control.md)先按用户后续指令核查并尝试[原生 pause](dev/XTurnix/pause_usage.md)，ASR 时间完整适配尚未完成；不切换现役控制器。
+2026-10-24 最新路线：按用户要求暂不训练，先利用 ASR 文字无增量时长及处理进度辅助冻结 XTurnix 的 Listen 控制。训练相关 XTX-008、009、011—013 已搁置归档，XTX-010 保留已完成纯文本基线，Speak 校准后置。当前 [XTX-014](issue/XTurnix/xtx_014_asr_time_control.md)已完成[原生 pause 真实模型诊断](../reports/xturnix_control/20261024-pause-usage/README.md)：pending/gate 可用，末尾直接追加抑制 start，小样例未显示末端覆盖提升；ASR 时间完整适配尚未完成；不切换现役控制器。
 
 更新：2026-10-24。当前方案为 **Nemotron EN160 流式 ASR＋XTurnix 话轮控制**。本次将前端与控制分离：Nemotron 提供转写，XTurnix 根据转写历史和系统 Listen/Speak 状态预测动作。调整原因是此前前端方案已回退，现按用户决定验证 XTurnix 与现役 ASR 的组合。本文更新计划，不表示新链路已经部署或通过验收。
 

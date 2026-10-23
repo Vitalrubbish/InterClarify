@@ -1,12 +1,12 @@
 # XTurnix 工作单
 
-更新：2026-10-24。当前路线为 **ASR 时间信息＋冻结 XTurnix 的无训练 Listen 控制**。用户明确要求先利用 ASR 时间、不训练模型；已将 XTX-008、009、011—013 搁置归档，未完成内容不计为验收通过。当前实施入口为 [XTX-014](xtx_014_asr_time_control.md)，方案见[ASR 时间无训练路线](../../dev/XTurnix/asr_time_control.md)。随后用户要求检查并尝试原生 pause，XTX-014 正在进行使用核查与机制诊断；完整 ASR 时间适配尚未完成。
+更新：2026-10-24。当前路线为 **ASR 时间信息＋冻结 XTurnix 的无训练 Listen 控制**。用户明确要求先利用 ASR 时间、不训练模型；已将 XTX-008、009、011—013 搁置归档，未完成内容不计为验收通过。当前实施入口为 [XTX-014](xtx_014_asr_time_control.md)，方案见[ASR 时间无训练路线](../../dev/XTurnix/asr_time_control.md)。随后用户要求检查并尝试原生 pause，XTX-014 的原生 pause 子诊断已完成，完整 ASR 时间适配尚未完成。
 
 ## 当前工作
 
 | 编号 | 工作单 | 状态与依赖 |
 | --- | --- | --- |
-| XTX-014 | [ASR 时间观测与无训练 Listen 控制](xtx_014_asr_time_control.md) | 进行中；先核查并尝试原生 pause，完整 ASR 时间适配待验证 |
+| XTX-014 | [ASR 时间观测与无训练 Listen 控制](xtx_014_asr_time_control.md) | 进行中；pause 子诊断完成，ASR 时间适配与因果验证待完成 |
 | XTX-010 | [未训练基线、校准与评分](xtx_010_control_baseline_calibration.md) | Listen 纯文本阶段已完成，保留为对照；Speak 校准继续后置，本项整体未完成 |
 
 [Listen 校准结果](../../../reports/xturnix_training/20261023-listen-calibration/README.md)：留出误抢话 10.78%→5.39%，末端召回 44.31%→28.74%，未达预设 5% 工作点，不采用该阈值上线。新路线先使用文字无增量时长与 ASR 进度，在同一控制策略内联合语义分数选择动作，不更新权重或向官方 prompt 追加未验证时间字段。

@@ -1,0 +1,415 @@
+{
+  "natural_dev": {
+    "none": {
+      "planned_turns": 8,
+      "terminal_candidate_start": 2,
+      "early_first_start": 4,
+      "terminal_first_start": 1,
+      "no_emitted_start": 3
+    },
+    "pending": {
+      "planned_turns": 8,
+      "terminal_candidate_start": 1,
+      "early_first_start": 3,
+      "terminal_first_start": 1,
+      "no_emitted_start": 4
+    },
+    "eager": {
+      "planned_turns": 8,
+      "terminal_candidate_start": 0,
+      "early_first_start": 0,
+      "terminal_first_start": 0,
+      "no_emitted_start": 8
+    }
+  },
+  "case_results": [
+    {
+      "case_id": "en__982_2__user_turn_006",
+      "source": "reference_dev_diagnostic",
+      "mode": "none",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 0.37994372844696045,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__982_2__user_turn_006",
+      "source": "reference_dev_diagnostic",
+      "mode": "pending",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 0.34753453731536865,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__982_2__user_turn_006",
+      "source": "reference_dev_diagnostic",
+      "mode": "eager",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 1.4895952915594535e-07,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__633_9__user_turn_002",
+      "source": "reference_dev_diagnostic",
+      "mode": "none",
+      "first_start_target": "keep",
+      "pause_candidates": 1,
+      "terminal": {
+        "p_start": 0.16362272202968597,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__633_9__user_turn_002",
+      "source": "reference_dev_diagnostic",
+      "mode": "pending",
+      "first_start_target": "keep",
+      "pause_candidates": 1,
+      "terminal": {
+        "p_start": 0.07396715879440308,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__633_9__user_turn_002",
+      "source": "reference_dev_diagnostic",
+      "mode": "eager",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 0.00013044562365394086,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__209_55__user_turn_000",
+      "source": "reference_dev_diagnostic",
+      "mode": "none",
+      "first_start_target": "start",
+      "pause_candidates": 1,
+      "terminal": {
+        "p_start": 0.5521442890167236,
+        "candidate_start": true
+      }
+    },
+    {
+      "case_id": "en__209_55__user_turn_000",
+      "source": "reference_dev_diagnostic",
+      "mode": "pending",
+      "first_start_target": "start",
+      "pause_candidates": 1,
+      "terminal": {
+        "p_start": 0.5663703680038452,
+        "candidate_start": true
+      }
+    },
+    {
+      "case_id": "en__209_55__user_turn_000",
+      "source": "reference_dev_diagnostic",
+      "mode": "eager",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 8.000237272653976e-08,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__982_2__user_turn_010",
+      "source": "reference_dev_diagnostic",
+      "mode": "none",
+      "first_start_target": "keep",
+      "pause_candidates": 1,
+      "terminal": {
+        "p_start": 0.0009114331915043294,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__982_2__user_turn_010",
+      "source": "reference_dev_diagnostic",
+      "mode": "pending",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 0.000774182437453419,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__982_2__user_turn_010",
+      "source": "reference_dev_diagnostic",
+      "mode": "eager",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 0.00014346545503940433,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__608_52__user_turn_005",
+      "source": "reference_dev_diagnostic",
+      "mode": "none",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 0.39482197165489197,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__608_52__user_turn_005",
+      "source": "reference_dev_diagnostic",
+      "mode": "pending",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 0.36265066266059875,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__608_52__user_turn_005",
+      "source": "reference_dev_diagnostic",
+      "mode": "eager",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 2.6095472449583212e-08,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__1044_96__user_turn_001",
+      "source": "reference_dev_diagnostic",
+      "mode": "none",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 0.2537033259868622,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__1044_96__user_turn_001",
+      "source": "reference_dev_diagnostic",
+      "mode": "pending",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 0.16583822667598724,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__1044_96__user_turn_001",
+      "source": "reference_dev_diagnostic",
+      "mode": "eager",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 1.0884416496992344e-06,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__954_24__user_turn_007",
+      "source": "reference_dev_diagnostic",
+      "mode": "none",
+      "first_start_target": "keep",
+      "pause_candidates": 1,
+      "terminal": {
+        "p_start": 0.4477255940437317,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__954_24__user_turn_007",
+      "source": "reference_dev_diagnostic",
+      "mode": "pending",
+      "first_start_target": "keep",
+      "pause_candidates": 1,
+      "terminal": {
+        "p_start": 0.35996508598327637,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__954_24__user_turn_007",
+      "source": "reference_dev_diagnostic",
+      "mode": "eager",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 4.360635585953787e-08,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__719_50__user_turn_003",
+      "source": "reference_dev_diagnostic",
+      "mode": "none",
+      "first_start_target": "keep",
+      "pause_candidates": 2,
+      "terminal": {
+        "p_start": 0.5862159132957458,
+        "candidate_start": true
+      }
+    },
+    {
+      "case_id": "en__719_50__user_turn_003",
+      "source": "reference_dev_diagnostic",
+      "mode": "pending",
+      "first_start_target": "keep",
+      "pause_candidates": 1,
+      "terminal": {
+        "p_start": 0.46427059173583984,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en__719_50__user_turn_003",
+      "source": "reference_dev_diagnostic",
+      "mode": "eager",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 5.596444552224966e-08,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "en_question",
+      "source": "scripted_sanity",
+      "mode": "none",
+      "first_start_target": "start",
+      "pause_candidates": 2,
+      "terminal": {
+        "p_start": 0.5518121719360352,
+        "candidate_start": true
+      }
+    },
+    {
+      "case_id": "en_question",
+      "source": "scripted_sanity",
+      "mode": "pending",
+      "first_start_target": "start",
+      "pause_candidates": 2,
+      "terminal": {
+        "p_start": 0.5518121719360352,
+        "candidate_start": true
+      }
+    },
+    {
+      "case_id": "en_question",
+      "source": "scripted_sanity",
+      "mode": "eager",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 2.8872827684267577e-08,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "zh_question",
+      "source": "scripted_sanity",
+      "mode": "none",
+      "first_start_target": "start",
+      "pause_candidates": 2,
+      "terminal": {
+        "p_start": 0.8098756670951843,
+        "candidate_start": true
+      }
+    },
+    {
+      "case_id": "zh_question",
+      "source": "scripted_sanity",
+      "mode": "pending",
+      "first_start_target": "start",
+      "pause_candidates": 2,
+      "terminal": {
+        "p_start": 0.8098756670951843,
+        "candidate_start": true
+      }
+    },
+    {
+      "case_id": "zh_question",
+      "source": "scripted_sanity",
+      "mode": "eager",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 2.7620780329584704e-08,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "resume_request",
+      "source": "scripted_sanity",
+      "mode": "none",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 0.43876761198043823,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "resume_request",
+      "source": "scripted_sanity",
+      "mode": "pending",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 0.22823292016983032,
+        "candidate_start": false
+      }
+    },
+    {
+      "case_id": "resume_request",
+      "source": "scripted_sanity",
+      "mode": "eager",
+      "first_start_target": null,
+      "pause_candidates": 0,
+      "terminal": {
+        "p_start": 5.217897864895349e-07,
+        "candidate_start": false
+      }
+    }
+  ],
+  "actual_model_calls": 103,
+  "unique_inference_errors": 0,
+  "schema": "xtx014-pause-usage-probe-v1",
+  "official_revision": "5f0d9959edf1026588246efbed827b078cbb114c",
+  "model": {
+    "revision": "d4b0403e5a6744b46fa7602b6d77bbac2768d5b5",
+    "verified_files": 21,
+    "lock_sha256": "12184c9bde1968d33fd170a3b1fdc1c5685496e16d31df52819ef549ee7ee851"
+  },
+  "pause_token_ids": [
+    151674
+  ],
+  "dtype": "float32",
+  "source_commit": "123b9e124fd175e4b74c272024ac6d70ef70b326",
+  "transformers": "4.57.1",
+  "torch": "2.11.0+cu128",
+  "device": "cpu",
+  "torch_threads": 4,
+  "gpu": null,
+  "elapsed_seconds": 331.95895862579346,
+  "gpu_peak_allocated_bytes": null,
+  "gpu_peak_reserved_bytes": null,
+  "peak_rss_kib": 4102828,
+  "dev_input_sha256": "ef42fb05e90995d7e67439fcafa7e3a1b54b2d4f8f42754e4388353ac22981ea",
+  "scope": "reference_pause_contract_not_live_asr_or_full_xtalk"
+}

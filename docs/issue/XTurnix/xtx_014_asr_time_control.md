@@ -2,6 +2,10 @@
 
 状态：进行中；2026-10-24 用户先要求补充无训练路线，随后明确要求核查并尝试原生 pause。当前先执行[pause 使用机制诊断](../../dev/XTurnix/pause_usage.md)，ASR 时间观测、联合策略和完整因果验证尚未完成。依据：[ASR 时间无训练路线](../../dev/XTurnix/asr_time_control.md)。复用 XTX-002 组件与 [XTX-010 基线](xtx_010_control_baseline_calibration.md)，不依赖训练工作单或独立 VAD；Speak 校准继续后置。
 
+## 原生 pause 子诊断进展
+
+原生 pause 子诊断已完成：固定官方代码与本地参考文件一致，11 项官方已有测试、3 项回放测试及官方客户端合同轨迹通过。远端 CPU FP32 完成 8 个自然 dev 话轮＋3 个 sanity 的三条件对照，共 246 事件、103 次真实前向、0 错误，退出码 0。确认当前末尾 pending、续说后句内插入及 gate/cache/latch 行为；末尾直接追加会抑制 start，小样例未显示末端接话覆盖提升。[报告和原始分数](../../../reports/xturnix_control/20261024-pause-usage/README.md)已保存。A10、4090 排队尝试已撤销，本项整体的 ASR 时间适配和因果验证仍未完成，不提前归档。
+
 ## 目标
 
 在冻结 Nemotron EN160 与 XTurnix-PT 权重的条件下，利用有效文字无增量时长及 ASR 进度，检验能否在误抢话受控且等待有界时提高末端接话召回。先利用现有 ASR 信息，不将独立 VAD 或模型训练作为前置。
