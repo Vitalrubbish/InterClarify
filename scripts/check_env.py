@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""P0 environment acceptance check for InterClarify.
+"""P0 environment acceptance check for ParaThink.
 
 Verifies that the active Python environment can import the core dependency
 set, reports their versions, and (optionally) that an expected GPU is visible

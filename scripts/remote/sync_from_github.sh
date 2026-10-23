@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Synchronize the InterClarify checkout from the GitHub main branch.
+# Synchronize the ParaThink checkout from the GitHub main branch.
 #
 # The server uses this script as the only source-code transfer path.  It does
 # not copy files from the developer machine and refuses to overwrite a dirty
 # server checkout.
 set -euo pipefail
 
-REPO_ROOT="${INTERCLARIFY_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/InterClarify}"
-GIT_URL="${INTERCLARIFY_GIT_URL:-https://github.com/Vitalrubbish/InterClarify.git}"
-GIT_REF="${INTERCLARIFY_GIT_REF:-main}"
+REPO_ROOT="${PARATHINK_ROOT:-${INTERCLARIFY_ROOT:-/hpc_stor03/sjtu_home/xuan.zhang/InterClarify}}"
+GIT_URL="${PARATHINK_GIT_URL:-${INTERCLARIFY_GIT_URL:-https://github.com/Vitalrubbish/InterClarify.git}}"
+GIT_REF="${PARATHINK_GIT_REF:-${INTERCLARIFY_GIT_REF:-main}}"
 
 echo "[sync_from_github] repo=$REPO_ROOT ref=$GIT_REF"
 

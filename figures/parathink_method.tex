@@ -14,7 +14,7 @@
   label/.style={font=\sffamily\normalsize,align=center,fill=white,inner sep=3pt}
 ]
   \node[font=\sffamily\bfseries\LARGE] at (10.5,17)
-    {InterClarify: Shared Context, Parallel Thinking and Expression};
+    {ParaThink: Shared Context, Parallel Thinking and Expression};
   \node[font=\sffamily\normalsize,text=black!65] at (10.5,16.2)
     {Context-mediated coordination \quad / \quad Independent turn policy \quad / \quad One playback owner};
 
@@ -58,9 +58,9 @@
   \draw[thinking] (l1.east) -- node[label,above] {Request} (l2.west);
 
   \node[align=center,font=\sffamily\normalsize,text=orange!70!black] at (0,4.8)
-    {Independent control cycle\\Faster than Layer 1 micro-turns};
+    {Event-driven turn decisions\\On ASR updates / future CoT writes};
   \node[align=center,font=\sffamily\normalsize,text=violet!75!black] at (19,4.8)
-    {CoT shared with XTurnix + Layer 1\\Consumed at their next input boundary};
+    {CoT shared with XTurnix + Layer 1\\Layer 1 reads at its next input boundary};
 
   \node[wide,fill=blue!5] (fifo) at (10.5,2.4)
     {\textbf{Text FIFO}\\Submitted speech text / system backchannel, in order\\
@@ -96,7 +96,7 @@
   \draw[control] (ack.east) -- (restart.west);
 
   \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-8)
-    {CoT publication does not trigger an extra XTurnix call; the next control cycle reads the update.};
+    {ASR updates trigger XTurnix; future Layer 2 CoT writes also trigger a decision, never playback directly.};
   \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-8.7)
     {CoT-conditioned XTurnix requires training \enspace / \enspace Layer 2 CoT is internal, never playable text};
 \end{tikzpicture}

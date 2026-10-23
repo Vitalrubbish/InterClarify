@@ -1,8 +1,10 @@
 # cleanup_remote_assets.sh
 
+项目标识已更新为 ParaThink；清理清单中的旧名称对应真实服务器资产，保留原路径与保护规则。
+
 ## 作用
 
-在远端登录节点盘点或删除 InterClarify 旧路线资产。默认 `--dry-run`，只打印目标与大小；`--execute` 需要同时设置 `CLEANUP_CONFIRM=YES`。
+在远端登录节点盘点或删除 ParaThink 旧路线资产。默认 `--dry-run`，只打印目标与大小；`--execute` 需要同时设置 `CLEANUP_CONFIRM=YES`。
 
 ## 输入
 
@@ -15,7 +17,7 @@
 ## 安全边界
 
 - 所有目标必须位于当前 `$HOME` 下；拒绝 `/`、home 本身和保留前缀。
-- 保留当前权重、现役 ASR/TTS 环境、运行时快照、FDB r4、benchmark、`full-duplex-bench` 与 `interclarify-dev`。
+- 保留当前权重、现役 ASR/TTS 环境、运行时快照、FDB r4、benchmark、`full-duplex-bench` 与 `parathink-dev`。
 - 串行执行，不并发；不跟随符号链接；conda 环境用 `conda env remove` 删除，同时处理 `.conda/envs` 下的旧环境。
 - 执行前后记录 `df -h`，日志写入 `~/cleanup_remote_assets.<mode>.log`。
 - 不处理 `STS`、`Paratalker`、`ParaTalker`、`sidecar` 等其他项目。

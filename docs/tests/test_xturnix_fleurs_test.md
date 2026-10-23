@@ -24,5 +24,5 @@
 运行：
 
 ```bash
-conda run -n interclarify-dev python -m unittest tests.test_xturnix_fleurs_test -v
+conda run -n parathink-dev python -m unittest tests.test_xturnix_fleurs_test -v
 ```

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Inventory or remove legacy InterClarify assets on the remote login node.
+# Inventory or remove legacy ParaThink assets on the remote login node.
 #
 # Default is dry-run.  Execution requires both --execute and
 # CLEANUP_CONFIRM=YES.  Targets are explicit; the script refuses paths outside

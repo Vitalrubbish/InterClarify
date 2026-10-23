@@ -25,7 +25,7 @@ HTTP 接口：
 ## 远端启动
 
 ```bash
-conda run --no-capture-output -n interclarify-dev python scripts/remote/duplex_model_service.py \
+conda run --no-capture-output -n parathink-dev python scripts/remote/duplex_model_service.py \
   --checkpoint /path/to/DuplexCascade \
   --base-model /path/to/Qwen2-7B-Instruct \
   --port 8006

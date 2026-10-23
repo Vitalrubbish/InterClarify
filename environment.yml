@@ -1,9 +1,9 @@
-name: interclarify-dev
+name: parathink-dev
 # 仅声明 conda 层（解释器）依赖；所有 Python 第三方依赖由 pip 按 requirements.txt 固定。
 # conda 官方频道在集群不可达，固定使用清华 conda-forge 镜像并禁用 defaults。
 # 使用：
 #   conda env create -f environment.yml
-#   conda run -n interclarify-dev python -m pip install -r requirements.txt
+#   conda run -n parathink-dev python -m pip install -r requirements.txt
 # 说明见 docs/scripts/check_env.md 与 docs/scripts/remote/setup_env.md。
 channels:
   - https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge

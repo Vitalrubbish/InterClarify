@@ -1,11 +1,13 @@
 # 本地 conda 环境
 
-本地统一使用 `interclarify-dev`，Python 3.10，依赖由 `environment.yml` 与 `requirements.txt` 固定。`environment.lock.yml` 记录当前已验证的完整包版本，用于快速复现。
+项目已更名为 ParaThink，新建环境统一命名为 `parathink-dev`。已有 `interclarify-dev` 环境仍可复用，运行命令时替换环境名即可；本次未迁移或重建本机和服务器环境。锁文件仅更新环境名称，依赖版本不变。
+
+本地统一使用 `parathink-dev`，Python 3.10，依赖由 `environment.yml` 与 `requirements.txt` 固定。`environment.lock.yml` 记录当前已验证的完整包版本，用于快速复现。
 
 ## 创建
 
 ```bash
-cd /path/to/InterClarify
+cd /path/to/ParaThink
 bash scripts/remote/setup_env.sh
 ```
 
@@ -24,14 +26,14 @@ conda env create -f environment.lock.yml
 锁文件由当前环境导出，包含 conda 与 pip 的精确版本；日常开发仍以 `environment.yml` + `requirements.txt` 为准，修改依赖后重新导出：
 
 ```bash
-conda env export -n interclarify-dev --no-builds | grep -v '^prefix:' > environment.lock.yml
+conda env export -n parathink-dev --no-builds | grep -v '^prefix:' > environment.lock.yml
 ```
 
 ## 验收
 
 ```bash
-conda run --no-capture-output -n interclarify-dev python scripts/check_env.py
-conda run --no-capture-output -n interclarify-dev python -m unittest discover -s tests -v
+conda run --no-capture-output -n parathink-dev python scripts/check_env.py
+conda run --no-capture-output -n parathink-dev python -m unittest discover -s tests -v
 ```
 
 `check_env.py` 应输出 `status: PASS`，核心模块缺失数为 0。本地 WSL 环境当前可见 RTX 5070 Laptop GPU（sm_120，约 8GB）；真实模型推理仍在远端 GPU 作业执行。
@@ -41,7 +43,7 @@ conda run --no-capture-output -n interclarify-dev python -m unittest discover -s
 `xtalk/` 是独立仓库，运行时依赖已纳入 `requirements.txt`。在 `xtalk/` 目录下运行：
 
 ```bash
-PYTHONPATH=src conda run --no-capture-output -n interclarify-dev python -m unittest \
+PYTHONPATH=src conda run --no-capture-output -n parathink-dev python -m unittest \
   tests.test_continuous_streaming_client tests.test_nemotron_streaming_client \
   tests.test_duplex_protocol tests.test_duplex_observability tests.test_duplex_runtime \
   tests.test_kokoro_segmented tests.test_qwen3_asr_reconnect -v

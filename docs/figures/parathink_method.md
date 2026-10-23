@@ -1,6 +1,8 @@
 # 架构图绘制说明
 
-对应文件：[figures/interclarify_method.tex](../../figures/interclarify_method.tex)。更新：2026-10-23。
+项目名称已更新为 ParaThink，图源与预览文件统一使用 `parathink_method` 前缀，相关链接同步更新。
+
+对应文件：[figures/parathink_method.tex](../../figures/parathink_method.tex)。更新：2026-10-23。
 
 ## 整体作用
 
@@ -16,7 +18,7 @@
 
 Nemotron 将在线转写写入 Context。XTurnix、Layer 0、Layer 1、Layer 2 分别读取当前可用信息，再把话轮动作、附和时机建议、表达输出、CoT 写回 Context。Layer 2 只发布 CoT 正文，不附带继续倾听、建议澄清或 start/keep/stop 标签；任务标识、版本、观察截止点和任务生命周期作为运行时元数据另记。CoT 同时对 XTurnix 和 Layer 1 可见，分别用于独立控制和表达。Layer 1 到 Layer 2 的直接虚线仅代表思考请求。
 
-XTurnix 采用独立且比 Layer 1 micro-turn 更快的控制周期，具体周期尚未冻结。CoT 发布只更新 Context，不额外触发 XTurnix；各模块在下一次实际输入边界读取新信息。XTurnix 结合最新对话、已发布 CoT 和真实运行状态，独立判断全部话轮动作；决策写入 Context，由输出运行时及时消费。stop 不等待 Layer 1 推理完成，也不作为文本排入 FIFO。CoT 条件化控制仍需训练，不能视为原版权重已经具备。
+按用户对触发机制的确认，XTurnix 改为事件驱动：ASR 更新写入 Context 后触发决策；后续实现 Layer 2 后，CoT 写入 Context 也触发决策。不再按固定时间对未变化的输入重复调用。Layer 1 仍在下一次实际输入边界读取新增 CoT。XTurnix 结合最新对话、已发布 CoT 和真实运行状态，独立判断全部话轮动作；决策写入 Context，由输出运行时及时消费。stop 不等待 Layer 1 推理完成，也不作为文本排入 FIFO。CoT 条件化控制仍需训练，不能视为原版权重已经具备。
 
 Text FIFO 直接接收 Layer 0 路径的系统 backchannel 和 Layer 1 的表达文本；Context 不作为队列的文本来源。Layer 0 保留附和时机预测职责，具体附和措辞与编码本图不展开；两条提交路径仍共享唯一 TTS/播放器。每次连续输出分配 `output_id`，文本和音频块携带该标识与 `chunk_id`，FIFO 和播放器只接受当前有效输出。各模块对 Context 的读取和写回关系保留，Layer 1 的生成历史可见，但同一文本不重复注入模型输入。
 
@@ -33,4 +35,4 @@ Layer 1 在下一输入边界结合用户新输入和打断事件组织后续表
 
 ## 产物与验证
 
-[预览入口](../../figures/interclarify_method_preview.tex)生成[矢量 PDF](../../figures/interclarify_method_preview.pdf)和[高清 PNG](../../figures/interclarify_method_preview.png)。构建命令见[预览说明](interclarify_method_preview.md)。检查编译日志及渲染图中的文字、连线和裁切；此检查不属于模型或运行时测试。
+[预览入口](../../figures/parathink_method_preview.tex)生成[矢量 PDF](../../figures/parathink_method_preview.pdf)和[高清 PNG](../../figures/parathink_method_preview.png)。构建命令见[预览说明](parathink_method_preview.md)。检查编译日志及渲染图中的文字、连线和裁切；此检查不属于模型或运行时测试。

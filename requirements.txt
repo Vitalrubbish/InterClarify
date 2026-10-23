@@ -1,4 +1,4 @@
-# InterClarify pinned third-party dependencies.
+# ParaThink pinned third-party dependencies.
 #
 # Rationale and provenance are recorded in scripts/remote/setup_env.sh and
 # docs/scripts/check_env.md.

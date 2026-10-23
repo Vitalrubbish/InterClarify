@@ -1,8 +1,10 @@
 # `sync_from_github.sh`
 
+项目现名为 ParaThink。优先读取 `PARATHINK_ROOT`、`PARATHINK_GIT_URL`、`PARATHINK_GIT_REF`，兼容原 `INTERCLARIFY_*` 配置。默认服务器路径和 GitHub URL 保持真实的旧地址，尚未迁移外部仓库。
+
 ## 文件作用
 
-`scripts/remote/sync_from_github.sh` 是服务器端的代码同步入口。服务器从 GitHub `main` 分支更新 InterClarify 工作树，避免依赖开发机到集群的直接 SSH 或文件复制。脚本只更新干净工作树；发现服务器 checkout 有未提交改动时立即失败。
+`scripts/remote/sync_from_github.sh` 是服务器端的代码同步入口。服务器从 GitHub `main` 分支更新 ParaThink 工作树，避免依赖开发机到集群的直接 SSH 或文件复制。脚本只更新干净工作树；发现服务器 checkout 有未提交改动时立即失败。
 
 ## 核心步骤
 

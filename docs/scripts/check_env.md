@@ -1,5 +1,7 @@
 # `scripts/check_env.py`
 
+脚本文档标识已更新为 ParaThink，验收行为不变。项目元数据名称同步为 `parathink`，描述更新为全双工语音 Agent 的异步思考流；依赖清单标题同步更名，依赖版本不变。
+
 ## 作用
 
 环境验收脚本：确认当前解释器能导入核心依赖、打印版本，并在需要时确认 PyTorch 能看到预期 GPU。运行方式与环境创建见 [setup_env.sh](remote/setup_env.md)。

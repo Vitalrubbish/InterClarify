@@ -1,7 +1,7 @@
 [project]
-name = "interclarify"
+name = "parathink"
 version = "0.1.0"
-description = "Within-turn clarification policy for full-duplex voice agents"
+description = "Asynchronous thinking streams for full-duplex spoken agents"
 requires-python = ">=3.10"
 # The repository is not distributed as an installable package: the cluster and
 # local runs use conda environments (environment.yml + requirements.txt), and the
