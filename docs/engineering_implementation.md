@@ -1,5 +1,7 @@
 # 工程实施计划
 
+2026-10-23 最新调整：用户要求先验证 Listen/start–keep 校准，Speak/stop 校准后置。XTX-010 先执行[官方文本离线校准协议](dev/XTurnix/listen_calibration.md)，固定 PT 权重、FP32 与 Listen，不依赖新 VAD 输入或完整四类训练集。调整原因是阈值验证无需参数训练，不能被四类在线金标的前置条件阻塞。未放行训练、完整链路或现役替换。
+
 更新：2026-10-23。当前方案为 **Nemotron EN160 流式 ASR＋XTurnix 话轮控制**。本次将前端与控制分离：Nemotron 提供转写，XTurnix 根据转写历史和系统 Listen/Speak 状态预测动作。调整原因是此前前端方案已回退，现按用户决定验证 XTurnix 与现役 ASR 的组合。本文更新计划，不表示新链路已经部署或通过验收。
 
 研究背景和范围见[研究主文档](research_design.md)，模块合同见[架构设计](research_design/architecture.md)。本轮已按用户指令拆分为 [XTX-001—006](issue/XTurnix/README.md)；XTX-001 已完成 FLEURS 输入与历史 ASR 基线冻结；XTX-002 已完成隔离环境、模型与协议冻结及 dev 验证；XTX-003 已完成真实时钟回放器与模拟契约验证；XTX-004 已完成离线评分与合成 trace 验证；XTX-005 已完成 A10 远端作业入口与 5 条冒烟并归档；XTX-006 正式 100 条作业已按用户要求取消，随后完成 pause token 诊断，未产生正式成绩。

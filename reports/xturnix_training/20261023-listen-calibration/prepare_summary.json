@@ -1,0 +1,87 @@
+{
+  "schema": "xtx010-listen-data-v1",
+  "source_revision": "ca9d98a9686b920a2d8c9eb984224ba9be74e4dd",
+  "history_normalization": "drop_empty_merge_adjacent_drop_initial_assistant",
+  "reused_source_cache": "artifacts/xturnix_listen_calibration/20261023-listen-r1",
+  "source_rows": 400,
+  "split_seed": "xtx010-listen-v1:",
+  "inputs": {
+    "dev": {
+      "sha256": "ef42fb05e90995d7e67439fcafa7e3a1b54b2d4f8f42754e4388353ac22981ea",
+      "events": 728,
+      "turns": 225,
+      "conversations": 53,
+      "labels": {
+        "start": 225,
+        "keep": 503
+      }
+    },
+    "test": {
+      "sha256": "23f0412e98c00d41daa65b13942a3bb044ce97eac014c31063b973c9b41bad80",
+      "events": 504,
+      "turns": 167,
+      "conversations": 41,
+      "labels": {
+        "start": 167,
+        "keep": 337
+      }
+    }
+  },
+  "exclusions": [
+    {
+      "turn_id": "en__875_82__user_turn_007",
+      "reason": "previous_source_format_inspection"
+    },
+    {
+      "turn_id": "en__977_89__user_turn_010",
+      "reason": "previous_source_format_inspection"
+    },
+    {
+      "turn_id": "en__977_89__user_turn_004",
+      "reason": "previous_source_format_inspection"
+    },
+    {
+      "turn_id": "en__875_82__user_turn_006",
+      "reason": "previous_source_format_inspection"
+    },
+    {
+      "turn_id": "en__875_82__user_turn_002",
+      "reason": "previous_source_format_inspection"
+    },
+    {
+      "turn_id": "en__875_82__user_turn_004",
+      "reason": "previous_source_format_inspection"
+    },
+    {
+      "turn_id": "en__875_82__user_turn_000",
+      "reason": "previous_source_format_inspection"
+    },
+    {
+      "turn_id": "en__977_89__user_turn_002",
+      "reason": "previous_source_format_inspection"
+    }
+  ],
+  "source_metadata_sha256": "25ab88582221df70a44523fcb0355021e4d8f5fad4c91ae9d909645e3147c3ee",
+  "requests": [
+    {
+      "url": "https://datasets-server.huggingface.co/rows?dataset=livekit%2Feot-bench-data&config=en&split=validation&offset=0&length=100",
+      "bytes": 410839,
+      "sha256": "7da1efab196ed9aff604a9d1d75c02878e9a6dd34a9b6bd84b93235df2074599"
+    },
+    {
+      "url": "https://datasets-server.huggingface.co/rows?dataset=livekit%2Feot-bench-data&config=en&split=validation&offset=100&length=100",
+      "bytes": 360953,
+      "sha256": "c199a77c1db7b704b45897f946d7344aae636327b06f32b4756af5eef3f742ca"
+    },
+    {
+      "url": "https://datasets-server.huggingface.co/rows?dataset=livekit%2Feot-bench-data&config=en&split=validation&offset=200&length=100",
+      "bytes": 393100,
+      "sha256": "f4822b90fcc3fdc973998d6295bc90a7b8bc8a78e1891a9506da9d8596f0446c"
+    },
+    {
+      "url": "https://datasets-server.huggingface.co/rows?dataset=livekit%2Feot-bench-data&config=en&split=validation&offset=300&length=100",
+      "bytes": 435903,
+      "sha256": "60f2c7a1b160b744064fe0324c1eced5d4b59073cbb78efdb7a1a9dcd034196a"
+    }
+  ]
+}

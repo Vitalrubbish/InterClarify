@@ -1,6 +1,12 @@
 # XTX-010：建立未训练基线、开发集校准与评分入口
 
-状态：条件性后续，尚未授权实施；XTX-007 已完成，用户本次仅同意 XTX-009 首轮来源审核。前置：[XTX-007](../archive/XTurnix/xtx_007_training_feasibility.md)明确同意进入后续范围；依赖：[XTX-008](xtx_008_vad_input_contract.md)、[XTX-009](xtx_009_training_data_freeze.md)。依据：[训练可行性方案第 5、7 节](../../dev/XTurnix/training_feasibility.md)，共同资源与范围见[工作单入口](README.md#训练阶段共同边界)。
+状态：进行中。用户明确要求先验证 Listen 下 start/keep 校准，Speak 下 keep/stop 校准后置。本次先运行官方文本输入和冻结 PT 权重的离线校准，不依赖 XTX-008 的 VAD 扩展或 XTX-009 的完整四类训练集；原因是固定 Listen 状态的二分类阈值实验无需先取得四类训练监督。正式扩展输入与四类评价仍保留后续依赖，不能将此次结果当作其验收。范围见[Listen 校准协议](../../dev/XTurnix/listen_calibration.md)。
+
+## 本次已授权范围
+
+固定官方 prompt、tokenizer、FP32 和 2,048 token 合同，只读取英文对话历史与参考词前缀，开发集选 start 阈值，留出集只验证一次。优先采用带原生 hold/eot 停顿标注的 LiveKit EoT Bench 文本/时间元数据，按原会话分组隔离。预先固定 5% 开发集话轮级误抢话预算，比较默认阈值和校准阈值，并报告覆盖、失败、回归及会话级区间。该预算是本次探索实验工作点，不是生产质量承诺。
+
+不改变权重、不实现 VAD 观测块、不训练、不恢复 FLEURS/FDB。Speak 校准与在线音频/ASR 延迟验证后置；离线 Listen 校准不要求先补齐真实助手播放轨迹。新增采集、评分、远端作业及少量关键契约测试均配套同路径说明。
 
 ## 目标
 

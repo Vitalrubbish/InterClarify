@@ -1,5 +1,7 @@
 # XTurnix 工作单
 
+最新指令：XTX-010 已获准先做 Listen 下 start/keep 校准，Speak 下 keep/stop 校准后置。仅官方文本、固定 Listen 与未训练 PT 的离线对照，规则见[冻结协议](../../dev/XTurnix/listen_calibration.md)；本阶段不再以 XTX-008 或四类训练集冻结作为前置。
+
 更新：2026-10-23。XTX-001 已完成远端数据冻结与复核，XTX-002 已完成远端环境/协议冻结与 dev 验证，XTX-003 已完成回放器实现与模拟契约验证并归档，XTX-004 已完成离线评分实现与合成 trace 验证并归档；XTX-005 已完成 A10 远端作业入口与 5 条冒烟并归档，冒烟 0/5 仅作诊断。XTX-006 正式 100 条作业已按用户要求取消；随后完成 pause token 诊断，句末 `<|pause|>` 不触发 start。正式成绩尚未产生。总范围见[工程实施计划](../../engineering_implementation.md)，全局入口见[工作单管理](../README.md)。
 
 XTX-007—013 当前进度 1/7。[XTX-007 分析](../../dev/XTurnix/training_feasibility_assessment.md)已完成，用户明确同意先启动 40—60 个英文场景审核，工作单已归档。XTX-009 已完成[48 会话首轮来源审核](../../dev/XTurnix/source_audit.md)，目前没有可直接冻结的四类训练监督。本次只放行不依赖 VAD 实现的来源与可判定性审核，正式冻结仍依赖 XTX-008；双人试标、输入/环境、校准和训练尚未启动。

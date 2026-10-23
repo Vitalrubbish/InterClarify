@@ -2,6 +2,8 @@
 
 更新：2026-10-23。
 
+最新指令：先验证 [XTX-010 Listen/start–keep 校准](XTurnix/xtx_010_control_baseline_calibration.md)，Speak/stop 校准后置。当前已进入官方文本输入与冻结 PT 权重的离线阈值实验，不依赖 VAD 扩展或完整四类训练数据；[本次协议](../dev/XTurnix/listen_calibration.md)在打分前冻结，训练与现役替换继续不执行。
+
 按用户明确指令，依据[Nemotron＋XTurnix 的 FLEURS 质量测试计划](../dev/XTurnix/quality_test_on_fleurs.md)，在 [XTurnix 工作单目录](XTurnix/README.md)推进 XTX-001—006。XTX-001 已完成输入与历史基线冻结并归档；XTX-002 已完成隔离环境、模型与协议冻结及 dev 验证并归档；XTX-003 已完成真实时钟回放器与模拟契约验证并归档；XTX-004 已完成离线评分入口与合成 trace 验证并归档；XTX-005 已完成 A10 远端作业入口与 5 条冒烟并归档；XTX-006 正式 100 条作业已按用户要求取消，随后完成 pause token 诊断，未产生正式成绩。
 
 XTX-007 已完成[实际分析](../dev/XTurnix/training_feasibility_assessment.md)，用户同意先启动 40—60 个英文场景的来源与可判定性审核，[分析工作单](archive/XTurnix/xtx_007_training_feasibility.md)已归档。[XTX-009](XTurnix/xtx_009_training_data_freeze.md) 已交付[48 会话首轮审核](../dev/XTurnix/source_audit.md)：30 个条件候选、18 个歧义，当前可直接冻结的训练记录为 0。本次只放行来源审核，正式冻结仍依赖 XTX-008，约 200 场景双人试标、输入/环境、校准及训练均未启动；不切换现役控制路径。
