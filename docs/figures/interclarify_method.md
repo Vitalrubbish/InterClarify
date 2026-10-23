@@ -4,18 +4,22 @@
 
 ## 整体作用
 
-根据用户要求重新绘制英文架构图，替换旧 X2-Turn 标注，放大文字并拉开模块与连线间距。图展示当前研究设计的职责关系，不代表模块已完成接入。研究合同以[架构设计](../research_design/architecture.md)为准，本次不修改研究范围、不创建工作单。
+按用户本轮确认的方案更新英文架构图：共享 Context 连接独立模块，移除独立 Arbiter，增加 Text FIFO，保留单一 TTS/播放器。图展示讨论确认的目标结构，不代表已完成运行时实现。本次只更新图及配套说明，不创建工作单，不展开尚在讨论的打断执行协议。
+
+此前[研究架构文档](../research_design/architecture.md)仍描述单一仲裁器；本图依据本轮用户明确决定取消该独立模块。研究文档本次未修改，后续若启动工程实施，应先同步相关合同，不能将旧仲裁器描述与本图混用。
 
 ## 结构与绘图元素
 
-文件为 TikZ 绘图源码，没有运行时类或方法。`box` 定义模块，`wide` 定义共享上下文与执行路径；`flow` 为普通数据流，`control` 为橙色控制动作，`thinking` 为紫色虚线异步请求及结果，`feedback` 为青色实际播放反馈。`foreach` 为四个并列模块绘制上下文输入。
+文件为 TikZ 绘图源码，没有运行时类或方法。`box` 定义模块，`wide` 定义共享 Context 和输出路径。`flow` 表示读取或顺序消费；`write` 表示结果与文本写入；`control` 表示橙色话轮决策；`thinking` 表示紫色虚线思考请求与结果；`feedback` 表示运行状态回传。`foreach` 为四个并列模块绘制 Context 读取箭头。
 
-Nemotron 只提供在线转写。XTurnix 与 Layer 0/1/2 并列：分别负责话轮策略、系统附和时机、语言表达和异步分析。XTurnix 的 Listen 下 keep/start 与 Speak 下 keep/stop 输入统一仲裁器；Layer 0 的时机建议和 Layer 1 待表达内容也输入同一仲裁器。
+Nemotron 将在线转写写入 Context。XTurnix、Layer 0、Layer 1、Layer 2 分别读取当前可用信息，再把话轮动作、附和时机建议、表达输出、增量分析结果写回 Context。Layer 2 结果因此同时对 XTurnix 和 Layer 1 可见，不再画成只直接返回 Layer 1。Layer 1 到 Layer 2 的直接虚线仅代表思考请求。
 
-Layer 1 请求 Layer 2，分析结果在下一个正常输入边界注入 Layer 1 上下文；图中的返回箭头表示上下文注入，不表示直接生成或替换待播放文本。Layer 2 在听和说期间均可分析，但不拥有播放执行权。thinking 条件化话轮控制仍为后续适配事项，图底部单独说明，不绘制成已具备的能力。
+XTurnix 采用独立且比 Layer 1 micro-turn 更快的控制周期，具体周期尚未冻结。Layer 2 发布只更新 Context，不额外触发 XTurnix；各模块在下一次实际输入边界读取新信息。XTurnix 决策经 Context 驱动 Layer 1 表达，利用 thinking 条件的能力仍需适配，不能视为原版权重已经具备。
 
-所有可听输出经过唯一仲裁器和 TTS/播放路径。实际播放状态与已播历史反馈共享上下文；Listen/Speak 由真实运行状态维护。没有 Layer 3，已听内容不可撤销，Layer 2 不修改播放队列。
+Layer 0 保留时机预测职责，图以建议形式写入 Context，不将其画成独立音频来源。Layer 1 生成普通正文与系统 backchannel，输出写回 Context。已提交的发声文本进入 Text FIFO，TTS/播放器按顺序消费；播放器不从任意 Context 字段中自行挑选分析内容。Layer 1 的生成历史可见，但同一文本不重复注入模型输入。
+
+图中只回传 Listen/Speak 等运行状态，不把精确播放位置或已听文本对齐作为 Layer 1 的常规输入。生成历史保留，单一 TTS/播放所有权保留；没有 Layer 3，Layer 2 不生成待播放正文。图不规定 stop 的队列清理时点、在途生成处理或控制执行顺序，这些打断细节依用户要求暂不展开。
 
 ## 产物与验证
 
-[预览入口](../../figures/interclarify_method_preview.tex)生成[矢量 PDF](../../figures/interclarify_method_preview.pdf)和[高清 PNG](../../figures/interclarify_method_preview.png)。构建命令见[预览说明](interclarify_method_preview.md)。通过编译日志和渲染图检查文字、连线及裁切；此检查不属于模型或运行时测试。
+[预览入口](../../figures/interclarify_method_preview.tex)生成[矢量 PDF](../../figures/interclarify_method_preview.pdf)和[高清 PNG](../../figures/interclarify_method_preview.png)。构建命令见[预览说明](interclarify_method_preview.md)。检查编译日志及渲染图中的文字、连线和裁切；此检查不属于模型或运行时测试。

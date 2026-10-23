@@ -6,6 +6,8 @@
 
 使用 `standalone` 文档类加载 TikZ 库，通过 `input` 包含[架构图源码](../../figures/interclarify_method.tex)。外围保留 16pt 留白，图内使用较大英文文字。文件没有运行时类或方法，不包含模型调用或播放逻辑。模块职责和连线解释见[图示说明](interclarify_method.md)。
 
+本版展示各模块对共享 Context 的读取和写回、独立高频 XTurnix 周期，以及 Text FIFO 到单一播放器的输出路径；移除旧版独立 Arbiter，不展示打断处理时序。
+
 产物为可任意放大的[矢量 PDF](../../figures/interclarify_method_preview.pdf)，以及便于直接查看的[高清 PNG](../../figures/interclarify_method_preview.png)。两者来自同一次构建。
 
 ## 构建方式
