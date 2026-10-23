@@ -1,9 +1,11 @@
-% Context-mediated architecture; playback consumes a single text FIFO.
+% Shared-context architecture with priority interruption control.
 \begin{tikzpicture}[x=1cm,y=1cm,font=\sffamily\large,
   >={Latex[length=3mm,width=2mm]},
   box/.style={rounded corners=5pt,draw=black!55,line width=1pt,
     text width=5cm,minimum height=2.5cm,inner sep=10pt,align=center},
   wide/.style={box,text width=16cm,minimum height=1.5cm},
+  eventbox/.style={box,text width=5.2cm,minimum height=1.65cm,
+    font=\sffamily\normalsize,fill=orange!7},
   flow/.style={draw=black!65,-Latex,line width=1.2pt},
   write/.style={draw=blue!70!black,-Latex,line width=1.3pt},
   control/.style={draw=orange!85!black,-Latex,line width=1.3pt},
@@ -24,21 +26,22 @@
   \node[wide,fill=teal!6,text width=26cm,minimum height=1.8cm] (context) at (10.5,11.2)
     {\textbf{Currently Available Dialogue Context + Runtime State}\\[3pt]
      Transcript + generated history \enspace / \enspace Layer 2 results \enspace / \enspace XTurnix decisions\\
-     Backchannel timing suggestions \enspace / \enspace Layer 1 output \enspace / \enspace Listen--Speak state};
+     Backchannel timing suggestions \enspace / \enspace Layer 1 output \enspace / \enspace Listen--Speak state\\
+     Interruption events / generated, submitted, canceled and played records};
   \draw[flow] (asr.south) -- node[label,right] {Transcript updates} (context.north);
 
-  \node[box,fill=orange!11] (turn) at (0,7.2)
+  \node[box,fill=orange!11,minimum height=3.4cm] (turn) at (0,7.2)
     {\textbf{XTurnix}\\\textbf{Turn Policy}\\[3pt]
      Listen: keep / start\\Speak: keep / stop};
-  \node[box,fill=cyan!9] (l0) at (7,7.2)
+  \node[box,fill=cyan!9,minimum height=3.4cm] (l0) at (7,7.2)
     {\textbf{Layer 0}\\\textbf{Backchannel Timing}\\[3pt]
      System backchannel\\Timing prediction};
-  \node[box,fill=blue!8] (l1) at (14,7.2)
+  \node[box,fill=blue!8,minimum height=3.4cm] (l1) at (14,7.2)
     {\textbf{Layer 1}\\\textbf{Expression}\\[3pt]
-     Generate spoken text\\Request thinking};
-  \node[box,fill=violet!9] (l2) at (21,7.2)
+     Generate spoken text\\Request thinking\\Resume with new input};
+  \node[box,fill=violet!9,minimum height=3.4cm] (l2) at (21,7.2)
     {\textbf{Layer 2}\\\textbf{Async Thinking}\\[3pt]
-     Analyze gaps and tasks\\Publish incremental results};
+     Analyze gaps and tasks\\Publish incremental results\\Update one active task};
 
   \foreach \name in {turn,l0,l1,l2} {
     \draw[flow] ([xshift=-1.4cm]\name.north |- context.south) --
@@ -60,20 +63,40 @@
     {Results shared with XTurnix + Layer 1\\Consumed at their next input boundary};
 
   \node[wide,fill=blue!5] (fifo) at (10.5,2.4)
-    {\textbf{Text FIFO}\\Submitted speech text / system backchannel, in order};
+    {\textbf{Text FIFO}\\Submitted speech text / system backchannel, in order\\
+     Chunks carry output\_id + chunk\_id; accept active output only};
   \draw[write] (l0.south) -- node[label,left] {System backchannel} (l0.south |- fifo.north);
   \draw[write] (l1.south) -- node[label,right] {Speech text} (l1.south |- fifo.north);
 
-  \node[wide,fill=gray!8] (playback) at (10.5,-.7)
-    {\textbf{Streaming TTS + Player}\\Single owner of audible output};
+  \node[wide,fill=gray!8,minimum height=2.5cm] (playback) at (10.5,-1)
+    {\textbf{Output Runtime: Streaming TTS + Player}\\
+     Single arbitration point / single owner of audible output\\
+     Priority stop: halt audio + cancel pending output\\
+     Reject late text / audio carrying an invalid output\_id};
   \draw[flow] (fifo.south) -- node[label,right] {Consume in order} (playback.north);
-  \node[font=\sffamily\normalsize] (heard) at (10.5,-2.5) {Audio heard by the user};
+  \draw[control] (context.west) -- (-5.2,11.2) -- (-5.2,-1) --
+    node[label,above,text width=5.5cm] {start / stop control\\Bypass Text FIFO\\No Layer 1 wait} (playback.west);
+  \node[font=\sffamily\normalsize] (heard) at (10.5,-3.3) {Audio heard by the user: never revoked};
   \draw[flow] (playback.south) -- (heard.north);
-  \draw[feedback] (playback.east) -- (26,-.7) --
-    node[label,rotate=90,above] {Runtime state: Listen / Speak} (26,11.2) -- (context.east);
+  \draw[feedback] (playback.east) -- (26,-1) --
+    node[label,rotate=90,above] {Actual Listen / Speak state + interruption events} (26,11.2) -- (context.east);
 
-  \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-3.6)
+  \node[font=\sffamily\bfseries\large,text=orange!70!black] at (10.5,-4.6)
+    {On a valid stop: execution in the same output runtime};
+  \node[eventbox] (close) at (0,-6.1)
+    {\textbf{1. Close old output\_id}\\Block stale submissions};
+  \node[eventbox] (cancel) at (7,-6.1)
+    {\textbf{2. Halt + cancel}\\Cancel queued / buffered output\\Discard late text / audio};
+  \node[eventbox] (ack) at (14,-6.1)
+    {\textbf{3. Stop acknowledged}\\Publish Listen + interruption\\Keep generated history};
+  \node[eventbox] (restart) at (21,-6.1)
+    {\textbf{4. Wait for valid start}\\Fresh output\_id + new text\\Old queue stays canceled};
+  \draw[control] (close.east) -- (cancel.west);
+  \draw[control] (cancel.east) -- (ack.west);
+  \draw[control] (ack.east) -- (restart.west);
+
+  \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-8)
     {Layer 2 publication does not trigger an extra XTurnix call; the next control cycle reads the update.};
-  \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-4.3)
+  \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-8.7)
     {Thinking-conditioned XTurnix requires adaptation \enspace / \enspace Layer 2 results are analysis, not playable text};
 \end{tikzpicture}
