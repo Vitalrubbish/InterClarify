@@ -1,6 +1,6 @@
 # XTurnix FLEURS 数据与回放入口
 
-`scripts/remote/xturnix_fleurs_test.py` 是 XTX 系列共用的远端入口。`prepare-data` 与 `verify-data` 属于 XTX-001，负责固定 100 条英文 test 输入、1 条 dev 预热输入和历史 Nemotron ASR 基线来源；`replay` 属于 XTX-003，按真实时钟把音频流经 Nemotron 与 XTurnix，并保存可离线评分的因果 trace。回放本身不计算 start 延迟或 WER，指标由 XTX-004 独立完成。
+`scripts/remote/xturnix_fleurs_test.py` 是 XTX 系列共用的远端入口。`prepare-data` 与 `verify-data` 属于 XTX-001，负责固定 100 条英文 test 输入、1 条 dev 预热输入和历史 Nemotron ASR 基线来源；`replay` 属于 XTX-003，按真实时钟把音频流经 Nemotron 与 XTurnix，并保存可离线评分的因果 trace；`score` 属于 XTX-004，只读取已保存的回放目录与冻结 manifest，离线计算末端 start 延迟、窗口覆盖、WER 和链路估计，不加载任何模型。
 
 ## 固定范围
 
@@ -63,6 +63,31 @@
 ### 输入快照与 trace 边界
 
 `input_snapshot.json` 只记录配置摘要、manifest 摘要、计划样本的音频路径/哈希/格式和时序参数，不把参考答案送入在线回放。控制请求只接收 ASR 当时可见的文本；trace 中保留原始输入摘要和请求关联。参考答案由 XTX-004 在离线评分时从 manifest 读取。
+
+## 独立评分
+
+`score` 只读取 `<root>/runs/<run_id>/replay/` 下的 `config.json`、`input_snapshot.json`、`status.json` 和 `traces/`，再按快照中的 manifest 摘要读取冻结 manifest。评分不访问 ASR 或 XTurnix 服务，不加载权重，也不读取音频文件；参考答案只用于离线 WER，不回流到在线记录。
+
+### 评分口径与核心方法
+
+- `lexical_transition`：比较相邻累计文本的词形 token，区分 `append`、词内补全 `completion`（如 `D → Don't`）、纯回写 `rewrite` 与仅标点/空白变化 `none`。
+- `trace_lexical_summary`：只在线阶段（`file_audio`、`tail_silence`）寻找 `t_asr_last`。仅标点、空白、`post_cutoff`、EOF 排空或测试收尾的变化不移动锚点。在线文本为空记 `empty_transcript`；最后一次在线词汇变化是纯回写时记 `asr_rewrite`，主延迟为 null，不回退文件末端。
+- `score_trace_events`：主窗口为 `[t_asr_last, t_asr_last+5s]`，并截断到 `online_cutoff`。命中必须是锚点之后按事件序号返回的、`valid=true` 的首个 `<|start|>`，接收时间落在窗口内且不晚于在线截止，并且请求的 `input_version` 不低于锚点版本、`raw_input` 的 token 前缀包含锚点文本。提前 start、旧前缀迟到、窗外 start、截止后 start 和序号早于锚点的乱序结果分别计数；同时间戳按事件序号区分先后。
+- 每条记录保存首次原始 start 的有符号相对时间；提前 start 为负值，不归零。窗口未采满时 `window_complete=false`，已出现且有效的命中仍保留，但没有 start 的样本记 `incomplete_window`，不冒称已完整等待 5 秒。
+- `edit_distance`：以 `whisper-normalizer==0.1.12` 的 `EnglishTextNormalizer` 分别标准化参考、在线结束文本和 EOF 最终文本，计算 `(S+D+I)/N_ref`。正常空假设按删除计；运行失败、缺 trace 或无法评分时 WER 为 null，并在汇总中报告可评分覆盖。在线文本与最终文本分列。
+- `latency_summary` / `percentile`：命中样本的均值、P50、P95、最大值和样本数；P50/P95 使用线性插值。缺失保持 null，不填 0 或 5,000 ms。
+- `ScoreRunner`：先校验输入快照、状态、manifest 摘要、5 秒主窗口和参考标准化结果，再以 1—2 个线程逐例评分；`run_score` 负责解析 `--run-id` 或显式 `--input`，CLI 入口为 `score`。
+- 链路估计只对命中样本生成 `chain_estimated_ms = 413.582852 + control_latency_ms`，同时单列原始增量与历史常数。该值标为 `estimated`，不是实测音频末词到 start，也不是 Layer 1/TTS/播放后的整体延迟；汇总不把历史 ASR P95 与本轮控制 P95 相加。
+
+### 评分输出
+
+```text
+runs/<run_id>/replay/score/
+├── samples.csv     # 全部计划样本逐例结果，缺失为空格子
+└── summary.json    # 分母、覆盖、命中、延迟、WER、链路估计与输入摘要
+```
+
+`summary.json` 的 `counts` 覆盖全部计划分母；`main_metrics.latency_ms` 只统计命中样本；`chain_estimate` 另列历史常数、公式和限制。`samples.csv` 保留每条样本的锚点、窗口、首次原始 start、提前/过期/窗外/截止后计数、在线与最终文本、WER 和失败原因。
 
 ## 输出
 
@@ -127,6 +152,17 @@ PYTHONNOUSERSITE=1 ~/interclarify-xturnix-fleurs/envs/xturnix/bin/python \
 
 `--split` 可选 `test`、`dev`、`all`，`--limit` 只用于冒烟；正式 100 条由 XTX-006 按计划清单执行。输出目录已存在且非空时脚本直接失败，避免覆盖旧证据。完整的单作业启动、限额和退出清理属于 XTX-005 的 `run_xturnix_fleurs_job.sh`。
 
+回放结束、推理服务退出后，用数据环境离线评分；该步骤不需要 GPU，也不访问模型服务：
+
+```bash
+PYTHONNOUSERSITE=1 ~/miniconda3/envs/interclarify-x2-turn-data/bin/python \
+  scripts/remote/xturnix_fleurs_test.py score \
+  --root ~/interclarify-xturnix-fleurs \
+  --run-id xtx-005-smoke-20261023
+```
+
+`--input` 可直接指向回放目录；`--output` 默认为该目录下的 `score/`。已存在的评分目录默认拒绝覆盖，显式 `--overwrite` 才重写 `samples.csv` 与 `summary.json`。评分最多 2 个 worker；数据不一致、manifest 摘要不符或参考标准化结果与冻结 manifest 不同会直接失败，而不是静默重算分母。
+
 ## 资源与边界
 
-数据准备最多 4 CPU、8 GiB RAM、下载并发 1，单作业 1 小时，新增资产累计不超过 10 GiB，启动空闲盘至少 30 GiB。回放沿用 XTX-002 冻结的两组件配置，串行处理单条录音，不训练、不调阈值、不接入 Layer 1/TTS/播放器。trace 累计超过 2 GiB 时停止并保留失败，不自动扩容。单元测试中的模拟服务只验证协议与时序，不代表真实 Nemotron 或 XTurnix 成绩。
+数据准备最多 4 CPU、8 GiB RAM、下载并发 1，单作业 1 小时，新增资产累计不超过 10 GiB，启动空闲盘至少 30 GiB。回放沿用 XTX-002 冻结的两组件配置，串行处理单条录音，不训练、不调阈值、不接入 Layer 1/TTS/播放器。评分最多 4 CPU、8 GiB RAM、2 个 worker，只读 trace 与 manifest，不加载模型，不新增声学末词对齐；trace 累计超过 2 GiB 时停止并保留失败，不自动扩容。单元测试中的模拟服务只验证协议、时序与评分记法，不代表真实 Nemotron 或 XTurnix 成绩。

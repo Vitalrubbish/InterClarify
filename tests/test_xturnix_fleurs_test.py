@@ -1,6 +1,7 @@
 """Freeze/verify and replay-contract tests for the XTurnix FLEURS entry."""
 
 import importlib.util
+import csv
 import json
 import sys
 import tempfile
@@ -454,6 +455,374 @@ class ReplayContractTests(unittest.TestCase):
         appended, revised = fleurs.token_change(("Hello", "world"), ("Hello", "world"))
         self.assertEqual(appended, [])
         self.assertFalse(revised)
+
+
+class ScoringTests(unittest.TestCase):
+    """Check the offline anchor, window, null and WER rules by hand."""
+
+    def setUp(self):
+        self.normalizer = fleurs.load_english_normalizer()
+        self.p50 = float(fleurs.historical_baseline()["p50_ms"])
+
+    def events(self, observations, cutoff, starts=(), sample_id="test/sample.wav"):
+        events = [
+            {
+                "seq": 1,
+                "event": "trace_header",
+                "sample_id": sample_id,
+                "reference_included": False,
+                "main_window_seconds": 5.0,
+            }
+        ]
+        for at, text, phase, version in observations:
+            events.append(
+                {
+                    "seq": len(events) + 1,
+                    "event": "asr_observation",
+                    "monotonic": at,
+                    "receive_monotonic": at,
+                    "phase": phase,
+                    "text": text,
+                    "prefix_version": version,
+                }
+            )
+        events.append(
+            {
+                "seq": len(events) + 1,
+                "event": "online_cutoff",
+                "monotonic": cutoff,
+            }
+        )
+        for at, version, raw_input in starts:
+            events.append(
+                {
+                    "seq": len(events) + 1,
+                    "event": "control_completed",
+                    "monotonic": at,
+                    "receive_monotonic": at,
+                    "valid": True,
+                    "action": "<|start|>",
+                    "input_version": version,
+                    "raw_input": raw_input,
+                }
+            )
+        return events
+
+    def score(self, events, reference=("hello",), sample_id="test/sample.wav"):
+        return fleurs.score_trace_events(
+            {"sample_id": sample_id, "split": "test"},
+            events,
+            reference=reference,
+            normalizer=self.normalizer,
+            window_seconds=5.0,
+            historical_p50_ms=self.p50,
+        )
+
+    def test_anchor_ignores_punctuation_and_post_cutoff_words(self):
+        summary = fleurs.trace_lexical_summary(
+            self.events(
+                [
+                    (1.0, "D", "file_audio", 1),
+                    (1.2, "Don't", "file_audio", 2),
+                    (1.3, "Don't.", "file_audio", 2),
+                    (7.5, "Don't go", "eof_drain", 3),
+                ],
+                cutoff=7.0,
+            )
+        )
+        self.assertEqual(summary["anchor"]["monotonic"], 1.2)
+        self.assertEqual(summary["anchor"]["text"], "Don't")
+        self.assertEqual(summary["anchor_kind"], "completion")
+        self.assertEqual(summary["online_text"], "Don't.")
+        self.assertEqual(summary["final_text"], "Don't go")
+        self.assertEqual(
+            fleurs.lexical_transition(("alpha", "beta"), ("alpha", "gamma")), "rewrite"
+        )
+        self.assertEqual(
+            fleurs.lexical_transition(("alpha",), ("alpha", "beta")), "append"
+        )
+
+    def test_hit_latency_and_historical_chain_are_separate(self):
+        record = self.score(
+            self.events(
+                [
+                    (2.0, "Don't", "file_audio", 2),
+                    (2.05, "Don't.", "file_audio", 2),
+                    (7.5, "Don't go", "eof_drain", 3),
+                ],
+                cutoff=7.0,
+                starts=[(2.12, 2, "Don't.")],
+            ),
+            reference=("do", "not", "go"),
+        )
+        self.assertTrue(record["hit"])
+        self.assertTrue(record["anchor_valid"])
+        self.assertTrue(record["window_complete"])
+        self.assertEqual(record["score_category"], "hit")
+        self.assertAlmostEqual(record["control_latency_ms"], 120.0)
+        self.assertAlmostEqual(record["chain_estimated_ms"], self.p50 + 120.0, delta=1e-6)
+        self.assertAlmostEqual(record["first_raw_start_relative_ms"], 120.0)
+        self.assertEqual(record["online_errors"], 1)
+        self.assertEqual(record["final_errors"], 0)
+
+    def test_miss_categories_and_window_edges(self):
+        base = [(10.0, "hello", "file_audio", 1)]
+        early = self.score(self.events(base, 15.0, starts=[(9.5, 1, "hello")]))
+        self.assertEqual(early["score_category"], "early_start_only")
+        self.assertAlmostEqual(early["first_raw_start_relative_ms"], -500.0)
+        self.assertIsNone(early["control_latency_ms"])
+
+        stale = self.score(self.events(base, 15.0, starts=[(10.2, 0, "hello")]))
+        self.assertEqual(stale["score_category"], "stale_prefix_only")
+        self.assertEqual(stale["starts_stale_prefix"], 1)
+        self.assertIsNone(stale["control_latency_ms"])
+
+        outside = self.score(self.events(base, 20.0, starts=[(15.5, 1, "hello")]))
+        self.assertEqual(outside["score_category"], "outside_window_only")
+        self.assertIsNone(outside["control_latency_ms"])
+
+        post = self.score(self.events(base, 11.0, starts=[(11.5, 1, "hello")]))
+        self.assertEqual(post["score_category"], "post_cutoff_only")
+        self.assertFalse(post["window_complete"])
+
+        timeout = self.score(self.events(base, 15.0))
+        self.assertEqual(timeout["score_category"], "timeout_no_start")
+        self.assertIsNone(timeout["control_latency_ms"])
+
+        incomplete = self.score(self.events(base, 12.0))
+        self.assertEqual(incomplete["score_category"], "incomplete_window")
+        self.assertFalse(incomplete["window_complete"])
+        self.assertIsNone(incomplete["control_latency_ms"])
+
+    def test_same_timestamp_is_decided_by_event_sequence(self):
+        header = {
+            "seq": 1,
+            "event": "trace_header",
+            "sample_id": "test/sample.wav",
+            "reference_included": False,
+            "main_window_seconds": 5.0,
+        }
+        same_time = [
+            header,
+            {
+                "seq": 2,
+                "event": "asr_observation",
+                "monotonic": 10.0,
+                "receive_monotonic": 10.0,
+                "phase": "file_audio",
+                "text": "hello",
+                "prefix_version": 1,
+            },
+            {"seq": 3, "event": "online_cutoff", "monotonic": 15.0},
+            {
+                "seq": 4,
+                "event": "control_completed",
+                "monotonic": 10.0,
+                "receive_monotonic": 10.0,
+                "valid": True,
+                "action": "<|start|>",
+                "input_version": 1,
+                "raw_input": "hello",
+            },
+        ]
+        record = self.score(same_time)
+        self.assertTrue(record["hit"])
+        self.assertAlmostEqual(record["control_latency_ms"], 0.0)
+
+        out_of_order = [
+            header,
+            {
+                "seq": 2,
+                "event": "control_completed",
+                "monotonic": 10.0,
+                "receive_monotonic": 10.0,
+                "valid": True,
+                "action": "<|start|>",
+                "input_version": 1,
+                "raw_input": "hello",
+            },
+            {
+                "seq": 3,
+                "event": "asr_observation",
+                "monotonic": 10.0,
+                "receive_monotonic": 10.0,
+                "phase": "file_audio",
+                "text": "hello",
+                "prefix_version": 1,
+            },
+            {"seq": 4, "event": "online_cutoff", "monotonic": 15.0},
+        ]
+        record = self.score(out_of_order)
+        self.assertEqual(record["score_category"], "out_of_order_only")
+        self.assertEqual(record["starts_out_of_order"], 1)
+        self.assertIsNone(record["control_latency_ms"])
+
+    def test_hit_is_kept_when_the_window_is_incomplete(self):
+        record = self.score(
+            self.events(
+                [(10.0, "hello", "file_audio", 1)],
+                cutoff=11.5,
+                starts=[(10.4, 1, "hello")],
+            )
+        )
+        self.assertTrue(record["hit"])
+        self.assertFalse(record["window_complete"])
+        self.assertAlmostEqual(record["window_coverage_ms"], 1500.0)
+        self.assertAlmostEqual(record["control_latency_ms"], 400.0)
+
+    def test_empty_hypothesis_counts_as_deletions(self):
+        record = self.score(
+            self.events([(10.0, "", "file_audio", 1)], cutoff=15.0),
+            reference=("hello", "world"),
+        )
+        self.assertEqual(record["score_category"], "empty_transcript")
+        self.assertEqual(record["online_errors"], 2)
+        self.assertAlmostEqual(record["online_wer"], 1.0)
+        self.assertIsNone(record["control_latency_ms"])
+
+    def test_runner_keeps_denominator_wer_and_null_latency(self):
+        samples = [
+            ("test/hit.wav", "hello world"),
+            ("test/empty.wav", "hello world"),
+            ("test/rewrite.wav", "alpha beta"),
+            ("test/failed.wav", "hello world"),
+        ]
+        traces = [
+            self.events(
+                [(10.0, "hello", "file_audio", 1)],
+                cutoff=15.0,
+                starts=[(10.4, 1, "hello")],
+                sample_id="test/hit.wav",
+            ),
+            self.events(
+                [(10.0, "", "file_audio", 1)], cutoff=15.0, sample_id="test/empty.wav"
+            ),
+            self.events(
+                [
+                    (10.0, "alpha beta", "file_audio", 1),
+                    (10.5, "alpha gamma", "file_audio", 2),
+                ],
+                cutoff=15.0,
+                sample_id="test/rewrite.wav",
+            ),
+            None,
+        ]
+        with tempfile.TemporaryDirectory() as folder:
+            replay = self.write_run(Path(folder), samples, traces)
+            runner = fleurs.ScoreRunner(replay, workers=1)
+            summary = runner.run()
+            self.assertEqual(summary["counts"]["planned"], 4)
+            self.assertEqual(summary["counts"]["hits"], 1)
+            self.assertEqual(summary["counts"]["anchor_valid"], 1)
+            self.assertEqual(summary["counts"]["empty_transcript_samples"], 1)
+            self.assertEqual(summary["counts"]["rewrite_samples"], 1)
+            self.assertEqual(summary["counts"]["failed"], 1)
+            self.assertEqual(
+                summary["category_counts"],
+                {
+                    "hit": 1,
+                    "empty_transcript": 1,
+                    "asr_rewrite": 1,
+                    "sample_failed": 1,
+                },
+            )
+            latency = summary["main_metrics"]["latency_ms"]
+            self.assertEqual(latency["count"], 1)
+            self.assertAlmostEqual(latency["mean_ms"], 400.0)
+            self.assertAlmostEqual(
+                summary["chain_estimate"]["mean_ms"], self.p50 + 400.0, delta=1e-6
+            )
+            self.assertEqual(summary["wer"]["online"]["scorable_samples"], 3)
+            self.assertEqual(summary["wer"]["online"]["reference_words"], 6)
+            self.assertEqual(summary["wer"]["online"]["errors"], 4)
+            self.assertAlmostEqual(summary["wer"]["online"]["corpus_wer"], 4 / 6)
+            with (replay / "score" / "samples.csv").open(encoding="utf-8") as stream:
+                rows = list(csv.DictReader(stream))
+            self.assertEqual(len(rows), 4)
+            by_id = {row["sample_id"]: row for row in rows}
+            self.assertEqual(by_id["test/failed.wav"]["control_latency_ms"], "")
+            self.assertEqual(by_id["test/hit.wav"]["control_latency_ms"], "400.0")
+            self.assertEqual(by_id["test/rewrite.wav"]["score_category"], "asr_rewrite")
+
+    def write_run(self, root, samples, traces):
+        data = root / "dataset" / "fleurs_en_us"
+        data.mkdir(parents=True)
+        manifest_samples = []
+        for sample_id, reference in samples:
+            normalized = " ".join(self.normalizer(reference).split())
+            manifest_samples.append(
+                {
+                    "sample_id": sample_id,
+                    "split": "test",
+                    "relative_path": f"audio/test/{Path(sample_id).name}",
+                    "reference": reference,
+                    "normalized_reference": normalized,
+                    "normalized_reference_words": len(normalized.split()),
+                }
+            )
+        manifest_path = data / "manifest.json"
+        fleurs.write_json(
+            manifest_path, {"schema": fleurs.MANIFEST_SCHEMA, "samples": manifest_samples}
+        )
+        replay = root / "runs" / "r1" / "replay"
+        replay.mkdir(parents=True)
+        config = replay / "config.json"
+        config.write_bytes(CONFIG.read_bytes())
+        items = []
+        for sample, events in zip(samples, traces):
+            sample_id = sample[0]
+            if events is None:
+                items.append(
+                    {
+                        "sample_id": sample_id,
+                        "split": "test",
+                        "status": "failed",
+                        "failure_reason": "simulated replay failure",
+                        "trace_path": None,
+                    }
+                )
+                continue
+            relative = f"traces/test/{Path(sample_id).stem}.jsonl"
+            path = replay / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(
+                "".join(json.dumps(event) + "\n" for event in events), encoding="utf-8"
+            )
+            items.append(
+                {
+                    "sample_id": sample_id,
+                    "split": "test",
+                    "status": "completed",
+                    "failure_reason": None,
+                    "trace_path": relative,
+                    "trace_sha256": fleurs.sha256_file(path),
+                }
+            )
+        snapshot = {
+            "schema": fleurs.INPUT_SNAPSHOT_SCHEMA,
+            "config": {"sha256": fleurs.sha256_file(config)},
+            "manifest": {
+                "path": str(manifest_path),
+                "sha256": fleurs.sha256_file(manifest_path),
+            },
+            "split": "test",
+            "limit": None,
+            "main_window_seconds": 5.0,
+            "reference_included": False,
+            "planned_samples": len(samples),
+            "samples": [
+                {"sample_id": sample_id, "split": "test"} for sample_id, _ in samples
+            ],
+        }
+        fleurs.write_json(replay / "input_snapshot.json", snapshot)
+        fleurs.write_json(
+            replay / "status.json",
+            {
+                "schema": fleurs.REPLAY_STATUS_SCHEMA,
+                "items": items,
+            },
+        )
+        return replay
 
 
 if __name__ == "__main__":

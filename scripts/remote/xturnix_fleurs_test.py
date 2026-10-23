@@ -1,9 +1,11 @@
-"""Freeze the FLEURS subset, replay audio and collect XTurnix traces.
+"""Freeze the FLEURS subset, replay audio and score the saved traces.
 
 ``prepare-data`` and ``verify-data`` belong to XTX-001. ``replay`` belongs to
 XTX-003: it streams the frozen audio in real time through Nemotron and XTurnix
-and records causal events. It deliberately computes no latency or WER metric;
-XTX-004 owns offline scoring.
+and records causal events. ``score`` belongs to XTX-004: it reads a saved replay
+run and the frozen manifest offline, computes the last-word control latency,
+window coverage, corpus WER and the historical chain estimate, and loads no
+model.
 """
 
 from __future__ import annotations
@@ -56,6 +58,8 @@ INPUT_SNAPSHOT_SCHEMA = "xtx-003-input-snapshot-v1"
 REPLAY_STATUS_SCHEMA = "xtx-003-replay-status-v1"
 REPLAY_REPORT_SCHEMA = "xtx-003-replay-report-v1"
 TRACE_SCHEMA = "xtx-003-replay-trace-v1"
+SCORE_SUMMARY_SCHEMA = "xtx-004-score-summary-v1"
+ONLINE_PHASES = ("file_audio", "tail_silence")
 SILENCE_PACKET = b"\x00\x00"
 TOKEN_PATTERN = re.compile(r"[^\W_]+(?:['’][^\W_]+)*", re.UNICODE)
 TRACE_LIMIT_BYTES = 2 * 1024**3
@@ -2154,6 +2158,857 @@ def run_replay(
         controller.close()
 
 
+class ScoreError(RuntimeError):
+    """Fail scoring preflight or trace loading with an explicit reason."""
+
+
+def trace_tokens(text: str) -> tuple[str, ...]:
+    """Return the same word-like tokens used by the replay trace."""
+    return tuple(TOKEN_PATTERN.findall(text))
+
+
+def lexical_transition(previous: tuple[str, ...], current: tuple[str, ...]) -> str:
+    """Classify one cumulative ASR update as none, append, completion or rewrite.
+
+    ``completion`` means the last delivered token was extended in place, such as
+    ``D -> Don't``. A pure revision or deletion of already delivered tokens is a
+    ``rewrite`` and is never used as the last-word anchor.
+    """
+    if current == previous:
+        return "none"
+    common = 0
+    for old, new in zip(previous, current):
+        if old != new:
+            break
+        common += 1
+    if common == len(previous):
+        return "append"
+    if (
+        len(previous) == common + 1
+        and len(current) >= common + 1
+        and current[common].startswith(previous[common])
+    ):
+        return "completion"
+    return "rewrite"
+
+
+def event_time(event: dict[str, Any]) -> float:
+    """Return the client monotonic time of a scored trace event."""
+    value = event.get("receive_monotonic", event.get("monotonic"))
+    if not isinstance(value, (int, float)):
+        raise ScoreError(f"event has no numeric monotonic time: {event.get('event')!r}")
+    return float(value)
+
+
+def load_trace_events(path: Path) -> list[dict[str, Any]]:
+    """Read one JSONL trace and fail on a malformed line."""
+    events: list[dict[str, Any]] = []
+    for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError as error:
+            raise ScoreError(f"{path}:{number} is not valid JSON: {error}") from error
+        if not isinstance(event, dict):
+            raise ScoreError(f"{path}:{number} is not a JSON object")
+        events.append(event)
+    if not events:
+        raise ScoreError(f"trace is empty: {path}")
+    return events
+
+
+def trace_lexical_summary(events: list[dict[str, Any]]) -> dict[str, Any]:
+    """Return the last online lexical update and the text seen per phase."""
+    previous: tuple[str, ...] = ()
+    anchor: dict[str, Any] | None = None
+    anchor_kind: str | None = None
+    rewrites = 0
+    online_text: str | None = None
+    final_observation: str | None = None
+    final_snapshot: str | None = None
+    for event in events:
+        name = event.get("event")
+        if name == "asr_final_snapshot" and "text" in event:
+            final_snapshot = str(event["text"])
+        if name != "asr_observation":
+            continue
+        text = str(event.get("text", ""))
+        tokens = trace_tokens(text)
+        kind = lexical_transition(previous, tokens)
+        previous = tokens
+        final_observation = text
+        if event.get("phase") not in ONLINE_PHASES:
+            continue
+        online_text = text
+        if kind == "none":
+            continue
+        if kind == "rewrite":
+            rewrites += 1
+        anchor = event
+        anchor_kind = kind
+    return {
+        "anchor": anchor,
+        "anchor_kind": anchor_kind,
+        "rewrite_observations": rewrites,
+        "online_text": online_text,
+        "final_text": final_observation if final_observation is not None else final_snapshot,
+    }
+
+
+def edit_distance(reference: tuple[str, ...], hypothesis: tuple[str, ...]) -> int:
+    """Return Levenshtein errors (substitutions + deletions + insertions)."""
+    if not reference:
+        return len(hypothesis)
+    previous = list(range(len(hypothesis) + 1))
+    for row, ref_token in enumerate(reference, start=1):
+        current = [row]
+        for column, hyp_token in enumerate(hypothesis, start=1):
+            current.append(
+                min(
+                    previous[column] + 1,
+                    current[column - 1] + 1,
+                    previous[column - 1] + (ref_token != hyp_token),
+                )
+            )
+        previous = current
+    return previous[-1]
+
+
+def percentile(values: list[float], fraction: float) -> float | None:
+    """Linear-interpolated percentile; an empty sample stays missing."""
+    if not values:
+        return None
+    if not 0 <= fraction <= 1:
+        raise ValueError("fraction must be within [0, 1]")
+    ordered = sorted(values)
+    position = (len(ordered) - 1) * fraction
+    lower = math.floor(position)
+    upper = math.ceil(position)
+    if lower == upper:
+        return ordered[lower]
+    return ordered[lower] + (ordered[upper] - ordered[lower]) * (position - lower)
+
+
+def latency_summary(values: list[float]) -> dict[str, Any]:
+    """Summarize hit-only latencies without filling missing samples with zero."""
+    values = [float(value) for value in values]
+    if not values:
+        return {
+            "count": 0,
+            "mean_ms": None,
+            "min_ms": None,
+            "p50_ms": None,
+            "p95_ms": None,
+            "max_ms": None,
+        }
+    return {
+        "count": len(values),
+        "mean_ms": round(sum(values) / len(values), 6),
+        "min_ms": round(min(values), 6),
+        "p50_ms": round(percentile(values, 0.5), 6),
+        "p95_ms": round(percentile(values, 0.95), 6),
+        "max_ms": round(max(values), 6),
+    }
+
+
+SCORE_CSV_FIELDS = (
+    "sample_id",
+    "split",
+    "replay_status",
+    "score_category",
+    "anchor_valid",
+    "hit",
+    "window_complete",
+    "anchor_phase",
+    "anchor_seq",
+    "anchor_prefix_version",
+    "anchor_monotonic",
+    "anchor_text",
+    "online_text",
+    "final_text",
+    "online_cutoff_monotonic",
+    "window_coverage_ms",
+    "t_asr_last_monotonic",
+    "t_start_after_last_monotonic",
+    "control_latency_ms",
+    "first_raw_start_relative_ms",
+    "starts_total",
+    "starts_before_anchor",
+    "starts_stale_prefix",
+    "starts_outside_window",
+    "starts_post_cutoff",
+    "starts_out_of_order",
+    "rewrite_observations",
+    "control_failures",
+    "control_invalid",
+    "reference_words",
+    "online_hypothesis",
+    "online_errors",
+    "online_wer",
+    "final_hypothesis",
+    "final_errors",
+    "final_wer",
+    "chain_estimated_ms",
+    "failure_reason",
+)
+
+
+def empty_score_record(sample: dict[str, Any], replay_status: str, category: str) -> dict[str, Any]:
+    """Build one CSV-complete record whose measurements stay missing."""
+    record = {field: None for field in SCORE_CSV_FIELDS}
+    record.update(
+        {
+            "sample_id": sample["sample_id"],
+            "split": sample.get("split"),
+            "replay_status": replay_status,
+            "score_category": category,
+            "anchor_valid": False,
+            "hit": False,
+            "window_complete": False,
+        }
+    )
+    return record
+
+
+def _wer_fields(
+    reference: tuple[str, ...], text: str, normalizer: Callable[[str], str]
+) -> dict[str, Any]:
+    hypothesis = tuple(normalizer(text).split())
+    errors = edit_distance(reference, hypothesis)
+    return {
+        "hypothesis": " ".join(hypothesis),
+        "errors": errors,
+        "wer": round(errors / len(reference), 9) if reference else None,
+    }
+
+
+def score_trace_events(
+    sample: dict[str, Any],
+    events: list[dict[str, Any]],
+    *,
+    reference: tuple[str, ...],
+    normalizer: Callable[[str], str],
+    window_seconds: float,
+    historical_p50_ms: float,
+    final_text_fallback: str | None = None,
+) -> dict[str, Any]:
+    """Score one saved trace without calling either model.
+
+    The anchor is the last online lexical increment visible to the measurement
+    client. Punctuation-only, EOF-drain and post-cutoff updates never move it.
+    A miss keeps ``control_latency_ms`` null; it is never filled with a timeout
+    value.
+    """
+    sample_id = str(sample["sample_id"])
+    if not events or events[0].get("event") != "trace_header":
+        raise ScoreError(f"{sample_id}: trace has no header")
+    header = events[0]
+    if header.get("sample_id") != sample_id:
+        raise ScoreError(f"{sample_id}: trace header names {header.get('sample_id')!r}")
+    if header.get("reference_included") is not False:
+        raise ScoreError(f"{sample_id}: trace does not prove reference exclusion")
+    if abs(float(header.get("main_window_seconds", window_seconds)) - window_seconds) > 1e-9:
+        raise ScoreError(f"{sample_id}: trace main window does not match the frozen contract")
+
+    record = empty_score_record(sample, "completed", "unscored")
+    summary = trace_lexical_summary(events)
+    online_text = summary["online_text"] or ""
+    final_text = (
+        summary["final_text"]
+        if summary["final_text"] is not None
+        else (final_text_fallback or "")
+    )
+    record["online_text"] = online_text
+    record["final_text"] = final_text
+    record["rewrite_observations"] = int(summary["rewrite_observations"])
+
+    if reference:
+        online = _wer_fields(reference, online_text, normalizer)
+        final = _wer_fields(reference, final_text, normalizer)
+        record.update(
+            {
+                "reference_words": len(reference),
+                "online_hypothesis": online["hypothesis"],
+                "online_errors": online["errors"],
+                "online_wer": online["wer"],
+                "final_hypothesis": final["hypothesis"],
+                "final_errors": final["errors"],
+                "final_wer": final["wer"],
+            }
+        )
+
+    starts = sorted(
+        (
+            event
+            for event in events
+            if event.get("event") == "control_completed"
+            and event.get("valid") is True
+            and event.get("action") == "<|start|>"
+        ),
+        key=lambda event: (event_time(event), int(event.get("seq", -1))),
+    )
+    record["starts_total"] = len(starts)
+    record["control_failures"] = sum(
+        event.get("event") == "control_failed" for event in events
+    )
+    record["control_invalid"] = sum(
+        event.get("event") == "control_completed" and event.get("valid") is not True
+        for event in events
+    )
+
+    anchor = summary["anchor"]
+    if not online_text.strip() and (
+        anchor is None or summary["anchor_kind"] == "rewrite"
+    ):
+        record["score_category"] = "empty_transcript"
+        return record
+    if anchor is None:
+        record["score_category"] = "no_online_lexical_anchor"
+        return record
+    if summary["anchor_kind"] == "rewrite":
+        record["score_category"] = "asr_rewrite"
+        return record
+
+    anchor_text = str(anchor.get("text", ""))
+    anchor_tokens = trace_tokens(anchor_text)
+    if not anchor_tokens:
+        record["score_category"] = "no_online_lexical_anchor"
+        return record
+    anchor_time = event_time(anchor)
+    anchor_seq = int(anchor.get("seq", -1))
+    anchor_version = int(anchor.get("prefix_version", -1))
+    record.update(
+        {
+            "anchor_valid": True,
+            "anchor_phase": anchor.get("phase"),
+            "anchor_seq": anchor_seq,
+            "anchor_prefix_version": anchor_version,
+            "anchor_monotonic": anchor_time,
+            "anchor_text": anchor_text,
+            "t_asr_last_monotonic": anchor_time,
+        }
+    )
+    if starts:
+        record["first_raw_start_relative_ms"] = round(
+            (event_time(starts[0]) - anchor_time) * 1000, 6
+        )
+
+    cutoff = next(
+        (
+            event_time(event)
+            for event in reversed(events)
+            if event.get("event") == "online_cutoff"
+        ),
+        None,
+    )
+    if cutoff is None:
+        record["score_category"] = "missing_online_cutoff"
+        return record
+
+    window_end = anchor_time + window_seconds
+    coverage = max(0.0, cutoff - anchor_time)
+    record["online_cutoff_monotonic"] = cutoff
+    record["window_coverage_ms"] = round(coverage * 1000, 6)
+    record["window_complete"] = coverage + 1e-9 >= window_seconds
+
+    stale: list[dict[str, Any]] = []
+    outside: list[dict[str, Any]] = []
+    post_cutoff: list[dict[str, Any]] = []
+    out_of_order: list[dict[str, Any]] = []
+    hits: list[dict[str, Any]] = []
+    for start in starts:
+        received = event_time(start)
+        if received < anchor_time:
+            continue
+        tokens = trace_tokens(str(start.get("raw_input", "")))
+        version = int(start.get("input_version", -1))
+        contains = len(tokens) >= len(anchor_tokens) and tokens[: len(anchor_tokens)] == anchor_tokens
+        if received > cutoff:
+            post_cutoff.append(start)
+            if version < anchor_version or not contains:
+                stale.append(start)
+            continue
+        if int(start.get("seq", -1)) <= anchor_seq:
+            out_of_order.append(start)
+            continue
+        if received > window_end:
+            outside.append(start)
+            if version < anchor_version or not contains:
+                stale.append(start)
+            continue
+        if version < anchor_version or not contains:
+            stale.append(start)
+            continue
+        hits.append(start)
+
+    record["starts_before_anchor"] = sum(
+        event_time(start) < anchor_time for start in starts
+    )
+    record["starts_stale_prefix"] = len(stale)
+    record["starts_outside_window"] = len(outside)
+    record["starts_post_cutoff"] = len(post_cutoff)
+    record["starts_out_of_order"] = len(out_of_order)
+
+    if hits:
+        hit = hits[0]
+        hit_time = event_time(hit)
+        latency = max(0.0, (hit_time - anchor_time) * 1000)
+        record.update(
+            {
+                "hit": True,
+                "score_category": "hit",
+                "t_start_after_last_monotonic": hit_time,
+                "control_latency_ms": round(latency, 6),
+                "chain_estimated_ms": round(historical_p50_ms + latency, 6),
+            }
+        )
+        return record
+
+    if post_cutoff:
+        category = "post_cutoff_only"
+    elif outside:
+        category = "outside_window_only"
+    elif stale:
+        category = "stale_prefix_only"
+    elif out_of_order:
+        category = "out_of_order_only"
+    elif record["starts_before_anchor"]:
+        category = "early_start_only"
+    elif not record["window_complete"]:
+        category = "incomplete_window"
+    else:
+        category = "timeout_no_start"
+    record["score_category"] = category
+    return record
+
+
+def _csv_value(value: Any) -> Any:
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if value is None:
+        return ""
+    if isinstance(value, (dict, list, tuple)):
+        return json.dumps(value, ensure_ascii=False)
+    return value
+
+
+class ScoreRunner:
+    """Score one saved replay run from the trace and the frozen manifest only."""
+
+    def __init__(
+        self,
+        replay_dir: Path,
+        *,
+        manifest_path: Path | None = None,
+        output: Path | None = None,
+        workers: int = 2,
+        overwrite: bool = False,
+    ) -> None:
+        if workers < 1 or workers > 2:
+            raise ScoreError("scoring allows 1 or 2 workers")
+        self.replay_dir = replay_dir.expanduser().resolve()
+        self.manifest_path = manifest_path
+        self.output = output
+        self.workers = workers
+        self.overwrite = overwrite
+        self.normalizer = load_english_normalizer()
+        self.reference: dict[str, tuple[str, ...]] = {}
+        self.snapshot: dict[str, Any] = {}
+        self.status: dict[str, Any] = {}
+        self.historical_p50_ms = float(historical_baseline()["p50_ms"])
+
+    def _read_json(self, path: Path, schema: str, label: str) -> dict[str, Any]:
+        if not path.is_file():
+            raise ScoreError(f"{label} not found: {path}")
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if payload.get("schema") != schema:
+            raise ScoreError(f"unexpected {label} schema: {payload.get('schema')!r}")
+        return payload
+
+    def preflight(self) -> dict[str, Any]:
+        """Check the frozen run, manifest and status before scoring any sample."""
+        config_path = self.replay_dir / "config.json"
+        snapshot_path = self.replay_dir / "input_snapshot.json"
+        status_path = self.replay_dir / "status.json"
+        if not config_path.is_file():
+            raise ScoreError(f"replay config not found: {config_path}")
+        self.snapshot = self._read_json(
+            snapshot_path, INPUT_SNAPSHOT_SCHEMA, "input snapshot"
+        )
+        self.status = self._read_json(status_path, REPLAY_STATUS_SCHEMA, "replay status")
+        if self.snapshot.get("reference_included") is not False:
+            raise ScoreError("input snapshot does not prove reference exclusion")
+        window = float(self.snapshot.get("main_window_seconds", 0))
+        if abs(window - 5.0) > 1e-9:
+            raise ScoreError(f"scoring requires the frozen 5 s main window, found {window}")
+        config_sha = str(self.snapshot.get("config", {}).get("sha256", ""))
+        if config_sha != sha256_file(config_path):
+            raise ScoreError("stored replay config does not match the input snapshot")
+        config = json.loads(config_path.read_text(encoding="utf-8"))
+        if config.get("schema") != REPLAY_CONFIG_SCHEMA:
+            raise ScoreError("stored replay config is not the frozen XTX-002 schema")
+        if abs(float(config["replay_contract"]["main_window_seconds"]) - 5.0) > 1e-9:
+            raise ScoreError("frozen config does not use the 5 s main window")
+        allowed_workers = int(config["resources"]["storage"]["scoring_workers"])
+        if self.workers > allowed_workers:
+            raise ScoreError(
+                f"{self.workers} scoring workers exceed the frozen limit {allowed_workers}"
+            )
+        if self.manifest_path is None:
+            candidate = Path(str(self.snapshot.get("manifest", {}).get("path", "")))
+            if candidate.is_file():
+                self.manifest_path = candidate
+            else:
+                base = (
+                    self.replay_dir.parents[2]
+                    if len(self.replay_dir.parents) >= 3
+                    else self.replay_dir
+                )
+                self.manifest_path = base / "dataset" / "fleurs_en_us" / "manifest.json"
+        self.manifest_path = self.manifest_path.expanduser().resolve()
+        if not self.manifest_path.is_file():
+            raise ScoreError(f"manifest not found: {self.manifest_path}")
+        expected_manifest_sha = str(self.snapshot.get("manifest", {}).get("sha256", ""))
+        if sha256_file(self.manifest_path) != expected_manifest_sha:
+            raise ScoreError("manifest digest does not match the replay snapshot")
+
+        manifest = self._read_json(self.manifest_path, MANIFEST_SCHEMA, "manifest")
+        manifest_samples = {
+            str(sample["sample_id"]): sample for sample in manifest.get("samples", [])
+        }
+        planned = [str(sample["sample_id"]) for sample in self.snapshot.get("samples", [])]
+        if not planned:
+            raise ScoreError("input snapshot has no planned samples")
+        status_items = self.status.get("items")
+        if not isinstance(status_items, list):
+            raise ScoreError("replay status has no item list")
+        status_ids = [str(item["sample_id"]) for item in status_items]
+        if sorted(status_ids) != sorted(planned):
+            raise ScoreError("replay status does not cover exactly the planned samples")
+        for sample in self.snapshot.get("samples", []):
+            if sample.get("reference_included") is True:
+                raise ScoreError("input snapshot marks a sample as reference-bearing")
+        for sample_id in planned:
+            sample = manifest_samples.get(sample_id)
+            if sample is None:
+                raise ScoreError(f"manifest has no reference for {sample_id}")
+            normalized = tuple(self.normalizer(str(sample["reference"])).split())
+            if normalized != tuple(str(sample.get("normalized_reference", "")).split()):
+                raise ScoreError(
+                    f"{sample_id}: reference normalization differs from the frozen manifest"
+                )
+            if not normalized:
+                raise ScoreError(f"{sample_id}: reference is empty after normalization")
+            self.reference[sample_id] = normalized
+
+        baseline_path = self.manifest_path.parent / "historical_asr_baseline.json"
+        baseline_source: dict[str, Any] = {"path": str(baseline_path), "present": False}
+        if baseline_path.is_file():
+            baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+            if baseline.get("schema") != BASELINE_SCHEMA:
+                raise ScoreError("historical baseline schema is not the frozen one")
+            if abs(float(baseline.get("p50_ms", 0)) - self.historical_p50_ms) > 1e-6:
+                raise ScoreError("historical baseline P50 differs from the frozen constant")
+            if baseline.get("source_commit") != BASELINE_COMMIT:
+                raise ScoreError("historical baseline source commit differs from the frozen one")
+            baseline_source["present"] = True
+
+        return {
+            "config_sha256": config_sha,
+            "input_snapshot_sha256": sha256_file(snapshot_path),
+            "status_sha256": sha256_file(status_path),
+            "manifest_path": str(self.manifest_path),
+            "manifest_sha256": expected_manifest_sha,
+            "baseline": baseline_source,
+            "planned": len(planned),
+            "reference_excluded_from_online": True,
+        }
+
+    def _score_one(
+        self,
+        sample: dict[str, Any],
+        status_item: dict[str, Any],
+        window_seconds: float,
+    ) -> dict[str, Any]:
+        sample_id = str(sample["sample_id"])
+        replay_status = str(status_item.get("status", "unknown"))
+        if replay_status in {"failed", "skipped"}:
+            record = empty_score_record(sample, replay_status, f"sample_{replay_status}")
+            record["failure_reason"] = status_item.get("failure_reason")
+            return record
+        trace_relative = status_item.get("trace_path")
+        if not trace_relative:
+            record = empty_score_record(sample, replay_status, "missing_trace")
+            record["failure_reason"] = "status item has no trace_path"
+            return record
+        trace_path = (self.replay_dir / str(trace_relative)).resolve()
+        try:
+            trace_path.relative_to(self.replay_dir)
+        except ValueError as error:
+            raise ScoreError(f"{sample_id}: trace path escapes the replay directory") from error
+        if not trace_path.is_file():
+            record = empty_score_record(sample, replay_status, "missing_trace")
+            record["failure_reason"] = f"trace not found: {trace_path}"
+            return record
+        expected_sha = status_item.get("trace_sha256")
+        if expected_sha and sha256_file(trace_path) != expected_sha:
+            record = empty_score_record(sample, replay_status, "invalid_trace")
+            record["failure_reason"] = "trace digest does not match status.json"
+            return record
+        try:
+            events = load_trace_events(trace_path)
+            record = score_trace_events(
+                sample,
+                events,
+                reference=self.reference[sample_id],
+                normalizer=self.normalizer,
+                window_seconds=window_seconds,
+                historical_p50_ms=self.historical_p50_ms,
+                final_text_fallback=status_item.get("final_text"),
+            )
+        except ScoreError as error:
+            record = empty_score_record(sample, replay_status, "invalid_trace")
+            record["failure_reason"] = str(error)
+            return record
+        record["replay_status"] = replay_status
+        return record
+
+    def run(self) -> dict[str, Any]:
+        preflight = self.preflight()
+        window_seconds = float(self.snapshot["main_window_seconds"])
+        status_by_id = {
+            str(item["sample_id"]): item for item in self.status["items"]
+        }
+        samples = [dict(sample) for sample in self.snapshot["samples"]]
+        from concurrent.futures import ThreadPoolExecutor
+
+        with ThreadPoolExecutor(max_workers=self.workers) as pool:
+            records = list(
+                pool.map(
+                    lambda sample: self._score_one(
+                        sample, status_by_id[str(sample["sample_id"])], window_seconds
+                    ),
+                    samples,
+                )
+            )
+        summary = self._summarize(records, preflight, window_seconds)
+        self._write(records, summary)
+        return summary
+
+    def _summarize(
+        self,
+        records: list[dict[str, Any]],
+        preflight: dict[str, Any],
+        window_seconds: float,
+    ) -> dict[str, Any]:
+        hits = [record for record in records if record["hit"]]
+        anchor_valid = [record for record in records if record["anchor_valid"]]
+        complete = [record for record in records if record["window_complete"]]
+        latencies = [
+            float(record["control_latency_ms"])
+            for record in hits
+            if record["control_latency_ms"] is not None
+        ]
+        chain = [
+            float(record["chain_estimated_ms"])
+            for record in hits
+            if record["chain_estimated_ms"] is not None
+        ]
+        categories: dict[str, int] = {}
+        for record in records:
+            category = str(record["score_category"])
+            categories[category] = categories.get(category, 0) + 1
+
+        def count(predicate: Callable[[dict[str, Any]], bool]) -> int:
+            return sum(1 for record in records if predicate(record))
+
+        planned = len(records)
+        early_relative = [
+            float(record["first_raw_start_relative_ms"])
+            for record in records
+            if (record["starts_before_anchor"] or 0) > 0
+            and record["first_raw_start_relative_ms"] is not None
+        ]
+        scorable_online = [
+            record
+            for record in records
+            if record["online_errors"] is not None and record["reference_words"]
+        ]
+        scorable_final = [
+            record
+            for record in records
+            if record["final_errors"] is not None and record["reference_words"]
+        ]
+
+        def corpus(rows: list[dict[str, Any]], errors_key: str) -> dict[str, Any]:
+            reference_words = sum(int(row["reference_words"]) for row in rows)
+            errors = sum(int(row[errors_key]) for row in rows)
+            return {
+                "scorable_samples": len(rows),
+                "reference_words": reference_words,
+                "errors": errors,
+                "corpus_wer": round(errors / reference_words, 9) if reference_words else None,
+            }
+
+        counts = {
+            "planned": planned,
+            "completed": count(lambda row: row["replay_status"] == "completed"),
+            "failed": count(lambda row: row["replay_status"] == "failed"),
+            "skipped": count(lambda row: row["replay_status"] == "skipped"),
+            "hits": len(hits),
+            "misses": planned - len(hits),
+            "anchor_valid": len(anchor_valid),
+            "anchor_invalid": planned - len(anchor_valid),
+            "complete_window": len(complete),
+            "incomplete_window": planned - len(complete),
+            "early_start_samples": count(lambda row: (row["starts_before_anchor"] or 0) > 0),
+            "stale_prefix_samples": count(lambda row: (row["starts_stale_prefix"] or 0) > 0),
+            "outside_window_samples": count(
+                lambda row: (row["starts_outside_window"] or 0) > 0
+            ),
+            "post_cutoff_samples": count(lambda row: (row["starts_post_cutoff"] or 0) > 0),
+            "out_of_order_samples": count(
+                lambda row: (row["starts_out_of_order"] or 0) > 0
+            ),
+            "rewrite_samples": count(lambda row: (row["rewrite_observations"] or 0) > 0),
+            "empty_transcript_samples": count(
+                lambda row: row["score_category"] == "empty_transcript"
+            ),
+            "timeout_samples": count(
+                lambda row: row["score_category"] == "timeout_no_start"
+            ),
+            "missing_trace": count(
+                lambda row: row["score_category"] == "missing_trace"
+            ),
+            "invalid_trace": count(
+                lambda row: row["score_category"] == "invalid_trace"
+            ),
+        }
+        return {
+            "schema": SCORE_SUMMARY_SCHEMA,
+            "generated_utc": utc_now(),
+            "run": {
+                "replay_dir": str(self.replay_dir),
+                **preflight,
+            },
+            "contract": {
+                "main_window_seconds": window_seconds,
+                "online_phases": list(ONLINE_PHASES),
+                "anchor": (
+                    "last online lexical increment or in-word completion received by "
+                    "the measurement client; punctuation-only, post-cutoff and EOF "
+                    "changes never move it"
+                ),
+                "hit": (
+                    "first valid <|start|> returned after the anchor, within the main "
+                    "window and before the online cutoff, whose input version contains "
+                    "the anchor prefix"
+                ),
+                "missing_policy": "misses keep null latency; no 0 or 5000 ms fill",
+            },
+            "counts": counts,
+            "main_metrics": {
+                "denominator": planned,
+                "hits": len(hits),
+                "hit_rate": round(len(hits) / planned, 9) if planned else None,
+                "anchor_coverage": (
+                    round(len(anchor_valid) / planned, 9) if planned else None
+                ),
+                "complete_window_coverage": (
+                    round(len(complete) / planned, 9) if planned else None
+                ),
+                "hit_rate_over_valid_anchor": (
+                    round(len(hits) / len(anchor_valid), 9) if anchor_valid else None
+                ),
+                "latency_ms": latency_summary(latencies),
+                "early_start": {
+                    "samples": counts["early_start_samples"],
+                    "first_relative_ms": {
+                        "min": min(early_relative) if early_relative else None,
+                        "max": max(early_relative) if early_relative else None,
+                    },
+                },
+            },
+            "wer": {
+                "normalizer": f"{NORMALIZER_PACKAGE}=={NORMALIZER_VERSION} EnglishTextNormalizer",
+                "online": corpus(scorable_online, "online_errors"),
+                "final": corpus(scorable_final, "final_errors"),
+            },
+            "chain_estimate": {
+                "historical_p50_ms": self.historical_p50_ms,
+                "source_commit": BASELINE_COMMIT,
+                "sources": {"selection_report": BASELINE_REPORT, "repeated_results": BASELINE_RESULTS},
+                "baseline_file_present": preflight["baseline"]["present"],
+                "formula": "L_chain_estimated = 413.582852 ms + L_control",
+                "count": len(chain),
+                "mean_ms": (
+                    round(sum(chain) / len(chain), 6) if chain else None
+                ),
+                "p50_ms": (
+                    round(percentile(chain, 0.5), 6) if chain else None
+                ),
+                "p95_ms": (
+                    round(percentile(chain, 0.95), 6) if chain else None
+                ),
+                "max_ms": round(max(chain), 6) if chain else None,
+                "note": (
+                    "Estimated audio-to-start latency using the historical per-word "
+                    "ASR P50. It is not a measured last-word-to-start value, not an "
+                    "end-to-end reply latency, and the historical P95 is not added to "
+                    "the control P95."
+                ),
+            },
+            "category_counts": categories,
+        }
+
+    def _write(self, records: list[dict[str, Any]], summary: dict[str, Any]) -> None:
+        output = (self.output or (self.replay_dir / "score")).expanduser().resolve()
+        if output.exists() and any(output.iterdir()) and not self.overwrite:
+            raise ScoreError(f"score output already exists: {output}")
+        output.mkdir(parents=True, exist_ok=True)
+        csv_path = output / "samples.csv"
+        with csv_path.open("w", encoding="utf-8", newline="") as stream:
+            writer = csv.DictWriter(stream, fieldnames=SCORE_CSV_FIELDS, extrasaction="ignore")
+            writer.writeheader()
+            for record in records:
+                writer.writerow(
+                    {field: _csv_value(record.get(field)) for field in SCORE_CSV_FIELDS}
+                )
+        summary["outputs"] = {
+            "samples_csv": csv_path.name,
+            "samples_csv_sha256": sha256_file(csv_path),
+            "summary_json": "summary.json",
+        }
+        write_json(output / "summary.json", summary)
+
+
+def run_score(
+    root: Path,
+    *,
+    run_id: str | None,
+    replay_input: Path | None,
+    manifest: Path | None,
+    output: Path | None,
+    workers: int,
+    overwrite: bool,
+) -> dict[str, Any]:
+    """Resolve a saved run under the workspace and score it offline."""
+    root = root.expanduser().resolve()
+    if replay_input is None:
+        if not run_id:
+            raise ScoreError("either --run-id or --input is required")
+        replay_input = root / "runs" / run_id / "replay"
+    runner = ScoreRunner(
+        replay_input,
+        manifest_path=manifest,
+        output=output,
+        workers=workers,
+        overwrite=overwrite,
+    )
+    return runner.run()
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -2197,6 +3052,19 @@ def main(argv: list[str] | None = None) -> None:
     replay.add_argument("--asr-url", help="override the frozen ASR service URL")
     replay.add_argument("--min-free-gib", type=int, default=DEFAULT_MIN_FREE_GIB)
 
+    score = sub.add_parser("score", help="score saved replay traces offline")
+    score.add_argument("--root", type=Path, required=True, help="remote workspace root")
+    score.add_argument("--run-id", help="run identifier under <root>/runs/")
+    score.add_argument("--input", type=Path, help="explicit replay output directory")
+    score.add_argument("--manifest", type=Path, help="frozen FLEURS manifest")
+    score.add_argument("--output", type=Path, help="new score output directory")
+    score.add_argument("--workers", type=int, default=2, help="scoring workers (1 or 2)")
+    score.add_argument(
+        "--overwrite",
+        action="store_true",
+        help="replace samples.csv and summary.json in an existing score directory",
+    )
+
     args = parser.parse_args(argv)
     try:
         if args.command == "prepare-data":
@@ -2224,9 +3092,21 @@ def main(argv: list[str] | None = None) -> None:
             )
             print(json.dumps(report, ensure_ascii=False, indent=2))
             return
+        if args.command == "score":
+            summary = run_score(
+                args.root,
+                run_id=args.run_id,
+                replay_input=args.input,
+                manifest=args.manifest,
+                output=args.output,
+                workers=args.workers,
+                overwrite=args.overwrite,
+            )
+            print(json.dumps(summary, ensure_ascii=False, indent=2))
+            return
         print(json.dumps(verify_data(args.root), ensure_ascii=False, indent=2))
-    except ReplayError as error:
-        print(f"replay error: {error}", file=sys.stderr)
+    except (ReplayError, ScoreError) as error:
+        print(f"xturnix fleurs error: {error}", file=sys.stderr)
         raise SystemExit(1) from error
 
 

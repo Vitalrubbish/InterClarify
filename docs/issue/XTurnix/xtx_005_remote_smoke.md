@@ -1,6 +1,6 @@
 # XTX-005：编排远端预检、服务生命周期与冒烟
 
-状态：待实施。依赖：[XTX-001](README.md)、[XTX-002](../../../reports/xturnix_fleurs/20261023-xtx-002-protocol/README.md)、[XTX-003](xtx_003_streaming_replay.md)、[XTX-004](xtx_004_independent_metrics.md)。依据：[质量测试计划第 6 节](../../dev/XTurnix/quality_test_on_fleurs.md)。
+状态：待实施。依赖：[XTX-001](README.md)、[XTX-002](../../../reports/xturnix_fleurs/20261023-xtx-002-protocol/README.md)、[XTX-003](xtx_003_streaming_replay.md)、[XTX-004](../../../reports/xturnix_fleurs/20261023-xtx-004-scoring/README.md)。依据：[质量测试计划第 6 节](../../dev/XTurnix/quality_test_on_fleurs.md)。
 
 ## 目标
 
