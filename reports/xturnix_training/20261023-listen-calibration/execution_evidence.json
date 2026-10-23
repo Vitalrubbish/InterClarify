@@ -1,0 +1,14 @@
+{
+  "run_id": "xtx-010-listen-20261023-r1",
+  "scheduler_job_id": "job-179277094008290558430-xuan-zhang",
+  "execution_source_commit": "987ec51f6b558d434d150de84ed3c2194a983d6c",
+  "executed_script_sha256": "5e2ee4bb3ff7356df1757f225f4d2188998421da630dd608d5b7af2000c1384d",
+  "summary_source_commit_caveat": "summary git cwd points to the unchanged main checkout; runner source_commit.txt and script digest identify the executed worktree",
+  "raw_result_hashes": {
+    "dev_scores.jsonl": "f30c6e6ea776b89b3856ccbc52e9bd6ed80e24e1869a9303d2c4634ed11e227b",
+    "threshold.json": "1359eec41d3793a7978fd01d49a0b00b3038265987809eed3de634ef789e7307",
+    "test_scores.jsonl": "cb80b8de7fe79d899c3f96c9b7fdb7373113ab17ab8140a05196acd611a1654a",
+    "dev_curve.json": "48fcc22460040a409961c2591409ca5c0197c85b963b7bfa97913aa0658e6024",
+    "summary.json": "2322924f9e2538851d007959ac1165be75d63a7c2e89642044df3f029a74a646"
+  }
+}

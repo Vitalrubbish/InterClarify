@@ -231,7 +231,9 @@ def main() -> None:
     report = {"schema": "xtx010-listen-calibration-result-v1", "scope": "offline_reference_text_listen_only",
               "model": model_evidence, "dtype": "float32", "transformers": transformers.__version__,
               "torch": torch.__version__, "gpu": torch.cuda.get_device_name(0),
-              "source_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
+              "source_commit": subprocess.check_output(
+                  ["git", "-C", str(Path(__file__).resolve().parents[2]), "rev-parse", "HEAD"],
+                  text=True).strip(),
               "input_summary_sha256": file_sha(args.inputs / "prepare_summary.json"),
               "threshold_sha256": file_sha(args.output / "threshold.json"),
               "threshold": threshold, "test_default": baseline, "test_calibrated": calibrated,

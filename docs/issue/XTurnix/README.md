@@ -1,10 +1,10 @@
 # XTurnix 工作单
 
-最新指令：XTX-010 已获准先做 Listen 下 start/keep 校准，Speak 下 keep/stop 校准后置。仅官方文本、固定 Listen 与未训练 PT 的离线对照，规则见[冻结协议](../../dev/XTurnix/listen_calibration.md)；本阶段不再以 XTX-008 或四类训练集冻结作为前置。
+最新进展：XTX-010 的 Listen 下 start/keep 校准已完成远端验证，Speak 下 keep/stop 校准后置。官方文本、固定 Listen 与未训练 PT 的[结果](../../../reports/xturnix_training/20261023-listen-calibration/README.md)为误抢话下降、接话召回下降，留出误抢话 5.39% 超出预设 5%；不采用新阈值上线、不启动训练。本阶段未以 XTX-008 或四类训练集冻结作为前置。
 
-更新：2026-10-23。XTX-001 已完成远端数据冻结与复核，XTX-002 已完成远端环境/协议冻结与 dev 验证，XTX-003 已完成回放器实现与模拟契约验证并归档，XTX-004 已完成离线评分实现与合成 trace 验证并归档；XTX-005 已完成 A10 远端作业入口与 5 条冒烟并归档，冒烟 0/5 仅作诊断。XTX-006 正式 100 条作业已按用户要求取消；随后完成 pause token 诊断，句末 `<|pause|>` 不触发 start。正式成绩尚未产生。总范围见[工程实施计划](../../engineering_implementation.md)，全局入口见[工作单管理](../README.md)。
+更新：2026-10-24。XTX-001 已完成远端数据冻结与复核，XTX-002 已完成远端环境/协议冻结与 dev 验证，XTX-003 已完成回放器实现与模拟契约验证并归档，XTX-004 已完成离线评分实现与合成 trace 验证并归档；XTX-005 已完成 A10 远端作业入口与 5 条冒烟并归档，冒烟 0/5 仅作诊断。XTX-006 正式 100 条作业已按用户要求取消；随后完成 pause token 诊断，句末 `<|pause|>` 不触发 start。正式成绩尚未产生。总范围见[工程实施计划](../../engineering_implementation.md)，全局入口见[工作单管理](../README.md)。
 
-XTX-007—013 当前进度 1/7。[XTX-007 分析](../../dev/XTurnix/training_feasibility_assessment.md)已完成，用户明确同意先启动 40—60 个英文场景审核，工作单已归档。XTX-009 已完成[48 会话首轮来源审核](../../dev/XTurnix/source_audit.md)，目前没有可直接冻结的四类训练监督。本次只放行不依赖 VAD 实现的来源与可判定性审核，正式冻结仍依赖 XTX-008；双人试标、输入/环境、校准和训练尚未启动。
+XTX-007—013 当前进度 1/7。[XTX-007 分析](../../dev/XTurnix/training_feasibility_assessment.md)已完成并归档，XTX-009 已完成[48 会话首轮来源审核](../../dev/XTurnix/source_audit.md)，XTX-010 已完成获准的 Listen 文本校准阶段。正式四类数据冻结仍依赖 XTX-008；双人试标、VAD 输入/环境、Speak 校准及训练尚未启动，不能提前标记这些工作单整体完成。
 
 <a id="fleurs-evaluation"></a>
 
@@ -30,7 +30,7 @@ XTX-007—013 当前进度 1/7。[XTX-007 分析](../../dev/XTurnix/training_fea
 | XTX-007 | [训练可行性分析与路线讨论](../archive/XTurnix/xtx_007_training_feasibility.md) | 已有结果与官方实现 | 已完成并归档；结论为先补审核证据 |
 | XTX-008 | [VAD 辅助输入协议与隔离环境](xtx_008_vad_input_contract.md) | 后续输入/环境范围需明确同意 | 条件性后续，尚未授权实施 |
 | XTX-009 | [四类训练、开发与测试数据审核冻结](xtx_009_training_data_freeze.md) | 首轮来源审核已获同意；正式冻结仍依赖 008 | 首轮 48 会话审核完成；正式试标与冻结未完成 |
-| XTX-010 | [未训练基线、开发集校准与评分入口](xtx_010_control_baseline_calibration.md) | 008、009 及对应范围确认 | 条件性后续，尚未授权实施 |
+| XTX-010 | [未训练基线、开发集校准与评分入口](xtx_010_control_baseline_calibration.md) | Listen 文本校准已单独验证；扩展/四类阶段保留后续依赖 | Listen 阶段完成，本项整体未完成；Speak 校准后置 |
 | XTX-011 | [LoRA 训练入口与单卡资源探针](xtx_011_lora_resource_probe.md) | 008—010 及试训范围确认 | 条件性后续，尚未授权实施 |
 | XTX-012 | [受限 LoRA 试训与候选冻结](xtx_012_lora_pilot_training.md) | 011，复用 009、010 | 条件性后续，尚未授权实施 |
 | XTX-013 | [独立验证与继续或停止结论](xtx_013_independent_training_evaluation.md) | 010、012 | 条件性后续，尚未授权实施 |

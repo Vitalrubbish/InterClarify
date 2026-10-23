@@ -1,0 +1,58 @@
+{
+  "threshold": 0.6057546734809875,
+  "default_threshold": 0.5,
+  "false_cutoff_budget": 0.05,
+  "selected_from": "dev_only",
+  "selection": "max_end_recall_then_min_cutoff_then_max_threshold",
+  "dev_input_sha256": "ef42fb05e90995d7e67439fcafa7e3a1b54b2d4f8f42754e4388353ac22981ea",
+  "dev_default": {
+    "planned_turns": 225,
+    "planned_events": 728,
+    "successful_events": 726,
+    "failed_events": 0,
+    "abstained_empty_text_events": 2,
+    "risk_turns": 131,
+    "uncertain_hold_turns": 0,
+    "false_cutoffs": 32,
+    "false_cutoff_rate": 0.14222222222222222,
+    "risk_conditional_false_cutoff_rate": 0.24427480916030533,
+    "endpoint_hits": 109,
+    "endpoint_recall": 0.48444444444444446,
+    "safe_endpoint_hits": 95,
+    "safe_endpoint_recall": 0.4222222222222222,
+    "snapshot_confusion": {
+      "start_as_start": 109,
+      "start_as_keep": 116,
+      "keep_as_start": 39,
+      "keep_as_keep": 462
+    }
+  },
+  "dev_calibrated": {
+    "planned_turns": 225,
+    "planned_events": 728,
+    "successful_events": 726,
+    "failed_events": 0,
+    "abstained_empty_text_events": 2,
+    "risk_turns": 131,
+    "uncertain_hold_turns": 0,
+    "false_cutoffs": 10,
+    "false_cutoff_rate": 0.044444444444444446,
+    "risk_conditional_false_cutoff_rate": 0.07633587786259542,
+    "endpoint_hits": 77,
+    "endpoint_recall": 0.3422222222222222,
+    "safe_endpoint_hits": 74,
+    "safe_endpoint_recall": 0.3288888888888889,
+    "snapshot_confusion": {
+      "start_as_start": 77,
+      "start_as_keep": 148,
+      "keep_as_start": 10,
+      "keep_as_keep": 491
+    }
+  },
+  "dev_ranking": {
+    "snapshot_roc_auc": 0.8223641605677534,
+    "positive_snapshots": 225,
+    "negative_snapshots": 501,
+    "unit": "correlated_pause_snapshots"
+  }
+}
