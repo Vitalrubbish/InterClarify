@@ -1,60 +1,76 @@
-% Overall project architecture; implementation stages are tracked separately.
-% Requires TikZ and the arrows.meta library.
-\begin{tikzpicture}[x=1cm,y=1cm,font=\sffamily\small,
-  >={Latex[length=2mm]},
-  module/.style={rounded corners=3pt,draw=black!55,line width=.65pt,
-    text width=3cm,minimum height=1.45cm,inner sep=6pt,align=center},
-  frontend/.style={rounded corners=3pt,draw=teal!65!black,line width=.65pt,
-    text width=7cm,minimum height=1cm,inner sep=6pt,align=center},
-  shared/.style={rounded corners=3pt,draw=black!50,line width=.65pt,
-    text width=13.2cm,minimum height=.95cm,inner sep=6pt,align=center},
-  output/.style={rounded corners=3pt,draw=black!55,line width=.65pt,
-    text width=6.5cm,minimum height=1cm,inner sep=6pt,align=center},
-  flow/.style={draw=black!65,-Latex,line width=.8pt},
-  tool/.style={draw=violet!75!black,-Latex,dashed,line width=.85pt},
-  label/.style={font=\sffamily\scriptsize,align=center}
+% Shared architecture figure; all runtime actions use one arbiter.
+\begin{tikzpicture}[x=1cm,y=1cm,font=\sffamily\large,
+  >={Latex[length=3mm,width=2mm]},
+  box/.style={rounded corners=5pt,draw=black!55,line width=1pt,
+    text width=4.8cm,minimum height=2.4cm,inner sep=10pt,align=center},
+  wide/.style={box,text width=12cm,minimum height=1.4cm},
+  flow/.style={draw=black!70,-Latex,line width=1.2pt},
+  control/.style={draw=orange!85!black,-Latex,line width=1.3pt},
+  thinking/.style={draw=violet!80!black,-Latex,dashed,line width=1.3pt},
+  feedback/.style={draw=teal!75!black,-Latex,line width=1.2pt},
+  label/.style={font=\sffamily\normalsize,align=center,fill=white,inner sep=3pt}
 ]
-  \node[frontend,fill=teal!12] (x2) at (7,-1.6)
-    {\textbf{X2-Turn front end}\\Streaming ASR + user state tokens};
-  \node[label] at (7,-2.6) {Incoming user audio};
-  \draw[flow] (7,-2.4) -- (x2.south);
+  \node[font=\sffamily\bfseries\LARGE] at (10,16.6)
+    {InterClarify: Thinking and Speaking in Parallel};
+  \node[font=\sffamily\normalsize,text=black!65] at (10,15.8)
+    {Independent turn policy \quad / \quad Asynchronous thinking \quad / \quad One playback owner};
 
-  \node[shared,fill=teal!8] (context) at (7,.5)
-    {\textbf{Streaming input + shared dialogue context}\\
-     Only currently available observations};
+  \node[box,fill=teal!9,text width=6cm,minimum height=1.2cm] (asr) at (10,13.6)
+    {\textbf{Nemotron Streaming ASR}\\Online transcript + prefix version};
+  \node[font=\sffamily\normalsize] (audio) at (10,15.1) {Incoming user audio};
+  \draw[flow] (audio.south) -- (asr.north);
 
-  \node[module,fill=cyan!10] (l0) at (2,3)
-    {\textbf{Layer 0}\\System backchannel\\Timing prediction};
-  \node[module,fill=blue!9] (l1) at (7,3)
-    {\textbf{Layer 1}\\Expression model\\Text + tool calls};
-  \node[module,fill=violet!9] (l2) at (12,3)
-    {\textbf{Layer 2}\\Async thinking\\Structured results};
+  \node[wide,fill=teal!6,text width=22cm,minimum height=1.5cm] (context) at (10,10.9)
+    {\textbf{Currently Available Dialogue Context + Runtime State}\\
+     Transcript updates \enspace / \enspace generated and played history \enspace / \enspace actual Listen--Speak state};
+  \draw[flow] (asr.south) -- node[label,right] {Observed input only} (context.north);
 
-  \node[output,fill=orange!12] (arbiter) at (4.5,5.6)
-    {\textbf{Unified arbiter}\\Select output using X2 user state};
-  \node[output,fill=gray!10] (playback) at (4.5,7.4)
-    {\textbf{Streaming TTS + playback}\\Single playback owner};
+  \node[box,fill=orange!11] (turn) at (0,7.4)
+    {\textbf{XTurnix}\\\textbf{Turn Policy}\\[3pt]
+     Listen: keep / start\\Speak: keep / stop};
+  \node[box,fill=cyan!9] (l0) at (6.4,7.4)
+    {\textbf{Layer 0}\\\textbf{Backchannel Timing}\\[3pt]
+     Suggest a brief listener\\response, or wait};
+  \node[box,fill=blue!8] (l1) at (12.8,7.4)
+    {\textbf{Layer 1}\\\textbf{Expression}\\[3pt]
+     Generate spoken content\\Request thinking};
+  \node[box,fill=violet!9] (l2) at (20.2,7.4)
+    {\textbf{Layer 2}\\\textbf{Async Thinking}\\[3pt]
+     Analyze gaps and tasks\\Publish incremental results};
 
-  \draw[flow] (x2.north) -- (context.south);
-  \draw[flow] (l0.south |- context.north) -- (l0.south);
-  \draw[flow] (l1.south |- context.north) -- (l1.south);
-  \draw[flow] (l2.south |- context.north) --
-    node[label,right] {while active} (l2.south);
+  \foreach \name in {turn,l0,l1,l2} {
+    \draw[flow] (\name.north |- context.south) -- (\name.north);
+  }
+  \node[label] at (10,9.5) {Observe while listening or speaking};
 
-  \draw[flow] (context.west) -- (-.5,.5) -- (-.5,4.85) -|
-    node[label,below,pos=.35] {X2 user state} ([xshift=-3cm]arbiter.south);
-  \draw[tool] ([yshift=3mm]l1.east) --
-    node[label,above] {request token} ([yshift=3mm]l2.west);
-  \draw[tool] ([yshift=-3mm]l2.west) --
-    node[label,below] {result} ([yshift=-3mm]l1.east);
+  \draw[thinking] ([yshift=5mm]l1.east) --
+    node[label,above] {Request} ([yshift=5mm]l2.west);
+  \draw[thinking] ([yshift=-5mm]l2.west) --
+    node[label,below] {Results$^{*}$} ([yshift=-5mm]l1.east);
 
-  \draw[flow] (l0.north) --
-    node[label,right] {Layer 0 result} (l0.north |- arbiter.south);
-  \draw[flow] (l1.north) --
-    node[label,right] {response text} (l1.north |- arbiter.south);
-  \draw[flow] (arbiter.north) -- (playback.south);
+  \node[wide,fill=orange!9,text width=16cm,minimum height=1.6cm] (arbiter) at (7.1,3.5)
+    {\textbf{Unified Arbiter}\\
+     Coordinate control, backchannel suggestions and content\\
+     Check runtime state; commit, wait or stop};
+  \draw[control] (turn.south) -- node[label,right] {Turn action} (turn.south |- arbiter.north);
+  \draw[flow] (l0.south) -- node[label,right] {Timing suggestion} (l0.south |- arbiter.north);
+  \draw[flow] (l1.south) -- node[label,right] {Content to speak} (l1.south |- arbiter.north);
 
-  \draw[flow] (playback.east) -- (14.5,7.4) -- (14.5,.5) -- (context.east);
-  \node[label,rotate=90,text=black!65] at (14.72,4.6) {actual playback state};
+  \node[wide,fill=gray!8,text width=16cm,minimum height=1.5cm] (playback) at (7.1,.4)
+    {\textbf{Streaming TTS + Playback}\\Single owner of audible output};
+  \draw[flow] (arbiter.south) -- node[label,right] {One execution path} (playback.north);
+  \node[font=\sffamily\normalsize] (heard) at (7.1,-1.5) {Audio heard by the user};
+  \draw[flow] (playback.south) -- (heard.north);
 
+  \draw[feedback] (playback.east) -- (24.5,.4) -- (24.5,10.9) -- (context.east);
+  \node[label,rotate=90,text=teal!65!black] at (24.5,5.3)
+    {Actual playback state + played history};
+  \node[align=left,anchor=north west,text width=7cm,font=\sffamily\normalsize,
+    text=violet!75!black] at (16.6,4.6)
+    {$^{*}$Results enter Layer 1 context\\at the next normal input boundary.\\[8pt]
+     Thinking does not directly\\generate playable text.};
+  \node[align=center,font=\sffamily\normalsize,text=black!70] at (10,-2.6)
+    {Thinking-conditioned turn control: planned adaptation; not an assumed pretrained capability.};
+  \node[align=center,font=\sffamily\normalsize,text=black!70] at (10,-3.25)
+    {No Layer 3 \enspace / \enspace Heard audio cannot be undone \enspace / \enspace Layer 2 never edits the playback queue};
 \end{tikzpicture}
