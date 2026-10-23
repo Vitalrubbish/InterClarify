@@ -1,6 +1,6 @@
-# XTX-010：实现 LoRA 训练入口并完成单卡资源探针
+# XTX-011：实现 LoRA 训练入口并完成单卡资源探针
 
-状态：待实施。依赖：[XTX-007](xtx_007_vad_input_contract.md)、[XTX-008](xtx_008_training_data_freeze.md)、[XTX-009](xtx_009_control_baseline_calibration.md)。依据：[训练可行性方案第 6、8 节](../../dev/XTurnix/training_feasibility.md)，共同资源与范围见[工作单入口](README.md#训练阶段共同边界)。
+状态：条件性后续，等待 XTX-007 分析结论与用户讨论。前置：[XTX-007](xtx_007_training_feasibility.md)明确同意进入后续范围；依赖：[XTX-008](xtx_008_vad_input_contract.md)、[XTX-009](xtx_009_training_data_freeze.md)、[XTX-010](xtx_010_control_baseline_calibration.md)。依据：[训练可行性方案第 6、8 节](../../dev/XTurnix/training_feasibility.md)，共同资源与范围见[工作单入口](README.md#训练阶段共同边界)。
 
 ## 目标
 
@@ -8,7 +8,7 @@
 
 ## 工作内容
 
-- 基于冻结 PT 与 XTX-007 扩展输入实现 LoRA SFT，冻结底座，只在当前动作 token 位置计算下一 token 词表交叉熵；历史、外部观测、模板、padding 均屏蔽损失，不训练回答正文。
+- 基于冻结 PT 与 XTX-008 扩展输入实现 LoRA SFT，冻结底座，只在当前动作 token 位置计算下一 token 词表交叉熵；历史、外部观测、模板、padding 均屏蔽损失，不训练回答正文。
 - 核验训练和推理前缀、目标 token 位置、causal shift、合法动作 ID 及实际可训练参数；用可人工检查的少量样本确认梯度进入 LoRA，避免通用 SFT 默认监督全部历史助手消息。
 - 起点沿用方案中的一个配置：r=16、alpha=32、dropout=0.05，注意力 q/k/v/o 投影，学习率 5e-5、micro-batch=1、梯度累积 16；核验后使用 BF16、梯度检查点并关闭训练 KV cache。不自动搜索超参数。
 - 在远端单 GPU 调度作业内逐步测量 512、1,024、2,048 token 的峰值 allocated/reserved、GPU 总占用、RSS、步耗时和保存成本；用训练集极少量明确样本检查损失及目标分数变化。
@@ -32,4 +32,4 @@
 
 ## 边界
 
-本工作单的微量优化仅为机制与资源探针，不产生正式候选成绩；探针也计入阶段累计 GPU 时间及资产预算。不合并覆盖官方权重，不部署或替换现役控制器。
+本工作单的微量优化已经涉及参数更新，不能作为 XTX-007 的纯分析活动提前执行；只在分析讨论同意进入本项后运行，不产生正式候选成绩。探针也计入阶段累计 GPU 时间及资产预算。不合并覆盖官方权重，不部署或替换现役控制器。

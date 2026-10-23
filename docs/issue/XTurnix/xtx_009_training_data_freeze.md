@@ -1,6 +1,6 @@
-# XTX-008：审核并冻结四类动作的训练、开发与测试数据
+# XTX-009：审核并冻结四类动作的训练、开发与测试数据
 
-状态：待实施。依赖：[XTX-007](xtx_007_vad_input_contract.md)。依据：[训练可行性方案第 4 节](../../dev/XTurnix/training_feasibility.md#4-数据与监督是否可获得)，共同资源与范围见[工作单入口](README.md#训练阶段共同边界)。
+状态：条件性后续，等待 XTX-007 分析结论与用户讨论。前置：[XTX-007](xtx_007_training_feasibility.md)明确同意进入后续范围；依赖：[XTX-008](xtx_008_vad_input_contract.md)。依据：[训练可行性方案第 4 节](../../dev/XTurnix/training_feasibility.md#4-数据与监督是否可获得)，共同资源与范围见[工作单入口](README.md#训练阶段共同边界)。
 
 ## 目标
 
