@@ -25,14 +25,14 @@
 
   \node[wide,fill=teal!6,text width=26cm,minimum height=1.8cm] (context) at (10.5,11.2)
     {\textbf{Currently Available Dialogue Context + Runtime State}\\[3pt]
-     Transcript + generated history \enspace / \enspace Layer 2 results \enspace / \enspace XTurnix decisions\\
+     Transcript + generated history \enspace / \enspace Layer 2 CoT \enspace / \enspace XTurnix decisions\\
      Backchannel timing suggestions \enspace / \enspace Layer 1 output \enspace / \enspace Listen--Speak state\\
      Interruption events / generated, submitted, canceled and played records};
   \draw[flow] (asr.south) -- node[label,right] {Transcript updates} (context.north);
 
   \node[box,fill=orange!11,minimum height=3.4cm] (turn) at (0,7.2)
     {\textbf{XTurnix}\\\textbf{Turn Policy}\\[3pt]
-     Listen: keep / start\\Speak: keep / stop};
+     Listen: keep / start\\Speak: keep / stop\\All turn decisions};
   \node[box,fill=cyan!9,minimum height=3.4cm] (l0) at (7,7.2)
     {\textbf{Layer 0}\\\textbf{Backchannel Timing}\\[3pt]
      System backchannel\\Timing prediction};
@@ -41,7 +41,7 @@
      Generate spoken text\\Request thinking\\Resume with new input};
   \node[box,fill=violet!9,minimum height=3.4cm] (l2) at (21,7.2)
     {\textbf{Layer 2}\\\textbf{Async Thinking}\\[3pt]
-     Analyze gaps and tasks\\Publish incremental results\\Update one active task};
+     Publish CoT only\\No turn-action advice\\Update one active task};
 
   \foreach \name in {turn,l0,l1,l2} {
     \draw[flow] ([xshift=-1.4cm]\name.north |- context.south) --
@@ -54,13 +54,13 @@
   \draw[write] ([xshift=1.4cm]l1.north) --
     node[label,right] {Output} ([xshift=1.4cm]l1.north |- context.south);
   \draw[thinking] ([xshift=1.4cm]l2.north) --
-    node[label,right] {Results} ([xshift=1.4cm]l2.north |- context.south);
+    node[label,right] {CoT} ([xshift=1.4cm]l2.north |- context.south);
   \draw[thinking] (l1.east) -- node[label,above] {Request} (l2.west);
 
   \node[align=center,font=\sffamily\normalsize,text=orange!70!black] at (0,4.8)
     {Independent control cycle\\Faster than Layer 1 micro-turns};
   \node[align=center,font=\sffamily\normalsize,text=violet!75!black] at (19,4.8)
-    {Results shared with XTurnix + Layer 1\\Consumed at their next input boundary};
+    {CoT shared with XTurnix + Layer 1\\Consumed at their next input boundary};
 
   \node[wide,fill=blue!5] (fifo) at (10.5,2.4)
     {\textbf{Text FIFO}\\Submitted speech text / system backchannel, in order\\
@@ -96,7 +96,7 @@
   \draw[control] (ack.east) -- (restart.west);
 
   \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-8)
-    {Layer 2 publication does not trigger an extra XTurnix call; the next control cycle reads the update.};
+    {CoT publication does not trigger an extra XTurnix call; the next control cycle reads the update.};
   \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-8.7)
-    {Thinking-conditioned XTurnix requires adaptation \enspace / \enspace Layer 2 results are analysis, not playable text};
+    {CoT-conditioned XTurnix requires training \enspace / \enspace Layer 2 CoT is internal, never playable text};
 \end{tikzpicture}

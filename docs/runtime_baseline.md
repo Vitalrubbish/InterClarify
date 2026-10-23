@@ -25,7 +25,7 @@
 ## 行为边界
 
 - 保持单一仲裁器与单一 TTS 播放所有权；已播放内容不可撤销。
-- 现役双工控制仍由 DuplexCascade 路径执行。目标分工为 Nemotron 输出转写、XTurnix 提供控制决策、统一仲裁器执行；Layer 1 负责表达与思考请求，Layer 2 异步返回结构化结果，Layer 0 后续只负责系统附和时机。首轮计划见[FLEURS 两组件测试](dev/XTurnix/quality_test_on_fleurs.md)。
+- 现役双工控制仍由 DuplexCascade 路径执行。目标分工为 Nemotron 输出转写，训练后的 XTurnix 结合对话、已发布 CoT 与运行状态负责全部话轮决策，统一仲裁器执行；Layer 1 负责表达与思考请求，Layer 2 仅向共享上下文发布 CoT，不提供话轮建议，Layer 0 后续只负责系统附和时机。首轮计划见[FLEURS 两组件测试](dev/XTurnix/quality_test_on_fleurs.md)。
 - 控制信号与思考 token 不直接进入 TTS。
 - 系统 backchannel 当前未实现，后续由 Layer 0 专项训练并接入，未从总计划移除；Layer 2 尚未接入运行链路。
 

@@ -8,6 +8,8 @@
 
 本版展示各模块对共享 Context 的读取和写回、独立高频 XTurnix 周期，以及 Layer 0/1 直接提交至 Text FIFO 的输出路径。橙色优先控制线绕过 FIFO，进入兼有唯一仲裁执行点与 TTS/播放器的输出运行时；Context 不向 FIFO 提交文本。底部时序条展示旧 `output_id` 关闭、停播与取消、确认 Listen，以及有效 start 后使用新标识输出。运行时向 Context 回传真实状态和打断事件。
 
+Layer 2 仅将 CoT 发布至 Context，不提供话轮建议；XTurnix 负责全部话轮决策，Layer 1 利用同一 CoT 组织表达。图中 CoT 写回线与控制动作线分开，CoT 条件化控制标注为仍需训练。
+
 产物为可任意放大的[矢量 PDF](../../figures/interclarify_method_preview.pdf)，以及便于直接查看的[高清 PNG](../../figures/interclarify_method_preview.png)。两者来自同一次构建。
 
 ## 构建方式

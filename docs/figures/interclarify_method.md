@@ -8,13 +8,15 @@
 
 图中保留 Layer 0/1 直接提交 Text FIFO 的结构，不新增独立 Arbiter 模块；唯一仲裁执行点位于输出运行时，统一管理队列、TTS 和播放器。图与文档描述目标合同，不代表打断链路已经实现或通过验证。本次不创建工作单或运行远端作业。
 
+按用户确认的职责调整，Layer 2 标注为仅发布 CoT，XTurnix 标注为负责全部话轮决策。移除将 Layer 2 发布理解为介入建议的歧义，避免任务分析与话轮策略重复承担动作监督。
+
 ## 结构与绘图元素
 
 文件为 TikZ 绘图源码，没有运行时类或方法。`box` 定义模块，`wide` 定义共享 Context 和输出路径，`eventbox` 定义底部打断时序。`flow` 表示读取或顺序消费；`write` 表示结果与文本写入；`control` 表示橙色话轮决策及优先控制；`thinking` 表示紫色虚线思考请求与结果；`feedback` 表示运行状态回传。`foreach` 为四个并列模块绘制 Context 读取箭头。
 
-Nemotron 将在线转写写入 Context。XTurnix、Layer 0、Layer 1、Layer 2 分别读取当前可用信息，再把话轮动作、附和时机建议、表达输出、增量分析结果写回 Context。Layer 2 结果因此同时对 XTurnix 和 Layer 1 可见，不再画成只直接返回 Layer 1。Layer 1 到 Layer 2 的直接虚线仅代表思考请求。
+Nemotron 将在线转写写入 Context。XTurnix、Layer 0、Layer 1、Layer 2 分别读取当前可用信息，再把话轮动作、附和时机建议、表达输出、CoT 写回 Context。Layer 2 只发布 CoT 正文，不附带继续倾听、建议澄清或 start/keep/stop 标签；任务标识、版本、观察截止点和任务生命周期作为运行时元数据另记。CoT 同时对 XTurnix 和 Layer 1 可见，分别用于独立控制和表达。Layer 1 到 Layer 2 的直接虚线仅代表思考请求。
 
-XTurnix 采用独立且比 Layer 1 micro-turn 更快的控制周期，具体周期尚未冻结。Layer 2 发布只更新 Context，不额外触发 XTurnix；各模块在下一次实际输入边界读取新信息。XTurnix 决策写入 Context，由输出运行时及时消费；stop 不等待 Layer 1 推理完成，也不作为文本排入 FIFO。利用 thinking 条件的能力仍需适配，不能视为原版权重已经具备。
+XTurnix 采用独立且比 Layer 1 micro-turn 更快的控制周期，具体周期尚未冻结。CoT 发布只更新 Context，不额外触发 XTurnix；各模块在下一次实际输入边界读取新信息。XTurnix 结合最新对话、已发布 CoT 和真实运行状态，独立判断全部话轮动作；决策写入 Context，由输出运行时及时消费。stop 不等待 Layer 1 推理完成，也不作为文本排入 FIFO。CoT 条件化控制仍需训练，不能视为原版权重已经具备。
 
 Text FIFO 直接接收 Layer 0 路径的系统 backchannel 和 Layer 1 的表达文本；Context 不作为队列的文本来源。Layer 0 保留附和时机预测职责，具体附和措辞与编码本图不展开；两条提交路径仍共享唯一 TTS/播放器。每次连续输出分配 `output_id`，文本和音频块携带该标识与 `chunk_id`，FIFO 和播放器只接受当前有效输出。各模块对 Context 的读取和写回关系保留，Layer 1 的生成历史可见，但同一文本不重复注入模型输入。
 
