@@ -2,12 +2,13 @@
 
 InterClarify 研究独立 thinking 流在语音 Agent 倾听与表达期间持续工作带来的优势，工作包括 Agent 框架、边听边想与边说边想两组 benchmark，以及大规模对话数据与训练。研究背景、目标、参考文章和三篇子文档见 [docs/research_design.md](docs/research_design.md)，工程安排见 [docs/engineering_implementation.md](docs/engineering_implementation.md)。
 
-当前运行底座保留 DuplexCascade、Nemotron EN160、Kokoro 与 X-Talk `ca9b23c`。2026-10-23 已撤回本轮 X2-Turn 部署、回放及评分实现和测试，研究文档树继续保留；下一步话轮控制选型另行确定。Layer 1 表达、Layer 2 异步思考、统一仲裁及单一 TTS 播放路径的目标分工见研究文档。运行底座来自独立维护的 [X-Talk fork](https://github.com/Vitalrubbish/xtalk)。
+当前运行底座保留 DuplexCascade、Nemotron EN160、Kokoro 与 X-Talk `ca9b23c`。下一步采用 Nemotron ASR＋XTurnix 控制，先规划 FLEURS 两组件质量测试，尚未部署新控制链路。Layer 1 表达、Layer 2 异步思考、统一仲裁及单一 TTS 播放路径的目标分工见研究文档。运行底座来自独立维护的 [X-Talk fork](https://github.com/Vitalrubbish/xtalk)。
 
 | 内容 | 位置 |
 | --- | --- |
 | 研究方案与评测范围 | [docs/research_design.md](docs/research_design.md) |
-| 工程基线与 X2-Turn 回退记录 | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
+| 工程实施计划：Nemotron＋XTurnix | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
+| FLEURS 两组件质量与延迟测试计划 | [docs/dev/XTurnix/quality_test_on_fleurs.md](docs/dev/XTurnix/quality_test_on_fleurs.md) |
 | 本地 conda 环境 | [docs/local_environment.md](docs/local_environment.md)（`interclarify-dev`） |
 | 工作单管理 | [docs/issue](docs/issue/README.md)（当前没有活动工作单） |
 | 已采用的运行时配置 | [docs/runtime_baseline.md](docs/runtime_baseline.md) |
