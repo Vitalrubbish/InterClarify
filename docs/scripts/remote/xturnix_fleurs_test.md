@@ -150,7 +150,7 @@ PYTHONNOUSERSITE=1 ~/interclarify-xturnix-fleurs/envs/xturnix/bin/python \
   --asr-url http://127.0.0.1:18805
 ```
 
-`--split` 可选 `test`、`dev`、`all`，`--limit` 只用于冒烟；正式 100 条由 XTX-006 按计划清单执行。输出目录已存在且非空时脚本直接失败，避免覆盖旧证据。完整的单作业启动、限额和退出清理属于 XTX-005 的 `run_xturnix_fleurs_job.sh`。
+`--split` 可选 `test`、`dev`、`all`，`--limit` 只用于冒烟；正式 100 条由 XTX-006 按计划清单执行。输出目录已存在且非空时脚本直接失败，避免覆盖旧证据。完整的单作业预检、服务生命周期、限额、评分和退出清理见 [`run_xturnix_fleurs_job.sh`](run_xturnix_fleurs_job.md)；XTX-005 起不再手工拼接这些步骤。
 
 回放结束、推理服务退出后，用数据环境离线评分；该步骤不需要 GPU，也不访问模型服务：
 
