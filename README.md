@@ -1,20 +1,17 @@
 # InterClarify
 
-InterClarify 研究全双工语音代理在用户话轮内是否应主动澄清、何时介入，以及澄清内容是否合理。正式研究方案见 [docs/research_design.md](docs/research_design.md)，工程安排见 [docs/engineering_implementation.md](docs/engineering_implementation.md)。
+InterClarify 研究独立 thinking 流在语音 Agent 倾听与表达期间持续工作带来的优势，工作包括 Agent 框架、边听边想与边说边想两组 benchmark，以及大规模对话数据与训练。研究背景、目标、参考文章和三篇子文档见 [docs/research_design.md](docs/research_design.md)，工程安排见 [docs/engineering_implementation.md](docs/engineering_implementation.md)。
 
-系统以 DuplexCascade 为运行底座，计划由 X2-Turn 提供转写与用户话轮状态，Layer 1 负责表达与思考调用，Layer 2 异步思考，经统一仲裁器与单一 TTS 播放路径发声。当前先接入与测试 X2-Turn；Layer 0 的系统 backchannel 时机预测及训练保留在后续总计划。运行底座来自独立维护的 [X-Talk fork](https://github.com/Vitalrubbish/xtalk)。
+当前运行底座保留 DuplexCascade、Nemotron EN160、Kokoro 与 X-Talk `ca9b23c`。2026-10-23 已撤回本轮 X2-Turn 部署、回放及评分实现和测试，研究文档树继续保留；下一步话轮控制选型另行确定。Layer 1 表达、Layer 2 异步思考、统一仲裁及单一 TTS 播放路径的目标分工见研究文档。运行底座来自独立维护的 [X-Talk fork](https://github.com/Vitalrubbish/xtalk)。
 
 | 内容 | 位置 |
 | --- | --- |
 | 研究方案与评测范围 | [docs/research_design.md](docs/research_design.md) |
-| 工程第一步：X2-Turn 接入与 FDB 测试计划 | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
-| X2-Turn 测试数据 | [历史核查](docs/dev/X2-Turn/fleurs_subset_verification.md) · [已恢复子集](reports/x2_turn_complete/20261022-fleurs-subset/README.md) |
-| X2-Turn 测试计划：转写质量与末端 complete | [简化计划](docs/dev/X2-Turn/complete_test_on_fleurs.md) |
+| 工程基线与 X2-Turn 回退记录 | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
 | 本地 conda 环境 | [docs/local_environment.md](docs/local_environment.md)（`interclarify-dev`） |
-| 工作单管理 | [docs/issue](docs/issue/README.md)（X2Q-009 数据恢复已完成，X2Q-010—014 待实施） |
+| 工作单管理 | [docs/issue](docs/issue/README.md)（当前没有活动工作单） |
 | 已采用的运行时配置 | [docs/runtime_baseline.md](docs/runtime_baseline.md) |
 | FDB 评测结果 | [reports/fdb](reports/README.md) |
-| X2-Turn FLEURS 评测记录 | [reports/x2_turn_complete](reports/x2_turn_complete/README.md) |
 | X-Talk 源码版本 | [configs/xtalk_runtime_source.json](configs/xtalk_runtime_source.json) |
 | 英文运行配置 | [docs/configs/xtalk_duplex_english_runtime.md](docs/configs/xtalk_duplex_english_runtime.md) |
 

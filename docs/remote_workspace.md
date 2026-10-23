@@ -17,7 +17,6 @@
 | `InterClarify/benchmark/fdb_v1_0` | FDB v1.0 评测数据 |
 | `interclarify-fdb-two-axes-20261021-r4` | FDB 两轴最终结果 |
 | `Full-Duplex-Bench` | 官方 FDB 评分仓库 |
-| `interclarify-x2-turn-complete` | X2-Turn 固定输入、模型、离线源码包、锁与回放结果根目录 |
 
 ## 固定 conda 环境
 
@@ -27,22 +26,14 @@
 | FDB 官方评分 | `~/miniconda3/envs/full-duplex-bench` |
 | ASR 组件 | `~/interclarify-english-integration-20261018-v1/envs/asr` |
 | TTS 组件 | `~/interclarify-english-integration-20261018-v1/envs/tts` |
-| FLEURS 数据准备与回放评分 | `~/miniconda3/envs/interclarify-x2-turn-data`（Python 3.11，固定 `whisper-normalizer==0.1.12`、`websockets==17.3`） |
-| X2-Turn vLLM 服务 | `~/miniconda3/envs/interclarify-x2-turn-vllm`（Python 3.11，`vllm==0.19.1`、`transformers==5.5.1`） |
 
 `paratalker-dev` 与 `sidecar` 属于其他项目，不纳入 InterClarify 清理。
 
 ## 维护记录
 
+2026-10-23 仅回退 InterClarify/X-Talk 仓库中的本轮 X2-Turn 实现和测试，保留现役运行基线。本次没有登录服务器删除模型、conda 环境、固定数据或原始报告；此前新增的 `interclarify-x2-turn-complete` 和两个 X2-Turn conda 环境不再作为现役依赖，其当前远端状态仍需另行核查。不能把本次代码回退解释为已释放远端磁盘。
+
 2026-10-22 已完成旧训练/选型资产、旧 X2 环境与缓存清理，记录释放约 301G。现役模型、ASR/TTS conda、评分环境、运行快照及 FDB 数据/最终结果保留，旧 X2 模型与环境不能假定仍存在。完整清理明细可从 Git 历史追溯；远端日志为 `~/cleanup_remote_assets.dry-run.log`、`~/cleanup_remote_assets.execute.log` 和 `~/cleanup_second.log`。这些是当时维护记录，新的作业仍须重新预检磁盘和环境。
-
-同日重新登录核查：旧 `interclarify-asr-selection/dataset`、`runs` 和默认 HF 缓存路径不存在；上述 execute/second 两份日志当时也未找到，不能再作为当前可读证据。历史 FLEURS `en_us/test` 100 条的固定 revision、选样规则及可恢复范围见 [核查记录](dev/X2-Turn/fleurs_subset_verification.md)。本次没有恢复或下载数据。
-
-2026-10-22 已按 [X2Q-010](issue/archive/x2q/x2q_010_x2_turn_deployment.md) 部署冻结版本 X2-Turn：`models/X2-Turn-4B-0812`（固定 revision）、`models/X2-Turn-4B-0812-vllm`（导出）、`source/x2_turn_sources.tar.gz`（离线源码包）与 `env/x2_turn_*.json` 锁；服务诊断证据在 `runs/deploy-20261022-r4`。安装与下载按用户指示在调试机执行，GPU 推理只走 `vc`。详见[部署报告](../reports/x2_turn_complete/20261022-deploy/README.md)。
-
-2026-10-22 已按 [X2Q-009](issue/archive/x2q/x2q_009_fleurs_data.md) 恢复并冻结 FLEURS 英文子集：`interclarify-x2-turn-complete/dataset/fleurs_en_us` 保存 100 test + 1 dev、manifest、数据锁、下载事件和复核日志；独立 conda 与包版本记录在 `interclarify-x2-turn-complete/env`。证据摘要见 [报告](../reports/x2_turn_complete/20261022-fleurs-subset/README.md)。本轮只恢复输入，未部署或运行 X2-Turn。
-
-2026-10-22 已完成 [X2Q-014](issue/archive/x2q/x2q_014_fleurs_evaluation.md) 正式测试：`runs/formal-20261022-r1` 保存 100 条原始 trace、`asr_scores.json`、`complete_scores.json` 与 `job/`，`source/InterClarify-20261022-x2q014` 为固定回放源码，`source/x2q014` 为作业脚本。结果为 WER 22.53%、在线末端文本延迟均值 -1,027.86 ms、输入末端 complete 输出率 1.0%；测试后 `vc list` 为空、无遗留服务。详见[报告](../reports/x2_turn_fleurs_evaluation.md)。
 
 ## 运行约定
 
