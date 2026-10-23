@@ -7,6 +7,7 @@
 | XTurnix 输入冻结 | [XTX-001 数据冻结](xturnix_fleurs/20261023-xtx-001-data-freeze/README.md)：固定 100 test＋1 dev、逐文件哈希与历史 ASR 基线 |
 | XTurnix 组件协议 | [XTX-002 协议冻结](xturnix_fleurs/20261023-xtx-002-protocol/README.md)：隔离环境、模型修订、Listen 双动作、去标点与 dev 预热；未运行正式回放 |
 | XTurnix 远端冒烟 | [XTX-005 A10 冒烟](xturnix_fleurs/20261023-xtx-005-smoke-a10/README.md)：单作业完成预检、dev 1 条、test 5 条、停服评分与清理；5/5 完成、0/5 末端 start，仅作诊断 |
+| XTurnix pause 诊断 | [句末 pause 探针](xturnix_fleurs/20261023-pause-token-probe/README.md)：5 条 ASR＋100 条参考文本；句末或中段 `<|pause|>` 均为 0 次 start，无 pause 仅 1/100，pause 反而压低 start 概率 |
 | 完整两轴 | [r4 最终结果](fdb/20261021-full-two-axes-r4/README.md)：319 例回放、官方转写与时序评分完成；Smooth TOR 59/119、平均延迟 1.023 秒，Interruption TOR 160/200、平均延迟 1.183 秒；GPT 相关性待补 |
 | 固定子集 | [ASR_R4 子集回归](fdb/20261021-asr-subset-r1/README.md)：历史 25 例固定输入，两轴各 5 例官方对齐与时序评分 |
 
