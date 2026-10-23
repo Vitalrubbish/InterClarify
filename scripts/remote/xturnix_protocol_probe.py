@@ -209,7 +209,7 @@ def run_asr(config: dict[str, Any], dev_audio: Path, output_dir: Path) -> dict[s
         "health": health.get("status") == "ok",
         "model": str(Path(health.get("model", "")).resolve()) == expected_model,
         "chunk": health.get("chunk_ms") == asr["chunk_ms"],
-        "dtype": health.get("dtype") == asr["dtype"],
+        "dtype": str(health.get("dtype", "")).removeprefix("torch.") == asr["dtype"],
         "warmup": health.get("warmup_sessions") == 2,
     }
     if not all(checks.values()):
