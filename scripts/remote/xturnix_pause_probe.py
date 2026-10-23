@@ -139,8 +139,11 @@ def main(argv: list[str] | None = None) -> None:
 
     root = args.root.expanduser().resolve()
     output = args.output.expanduser().resolve()
-    if output.exists() and any(output.iterdir()):
-        raise SystemExit(f"probe output already exists: {output}")
+    if output.exists():
+        runner_files = {"probe.log", "gpu.csv", "exit_code.txt"}
+        extra = {path.name for path in output.iterdir()} - runner_files
+        if extra:
+            raise SystemExit(f"probe output already exists: {output} ({sorted(extra)})")
     output.mkdir(parents=True, exist_ok=True)
 
     config = read_json(args.config)
