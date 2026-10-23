@@ -15,7 +15,7 @@
 
 - `full_fdb_two_axes.py`：完整两轴输入冻结、暂存、回放调度与官方评分。
 - `xturnix_fleurs_test.py`：XTurnix 评测的 FLEURS 输入、历史 ASR 基线与后续回放/评分入口。
-- `setup_xturnix_env.sh`、`xturnix_protocol_probe.py`、`run_xturnix_protocol_probe.sh`：XTurnix 隔离环境、模型冻结与 dev 协议探针。
+- `setup_xturnix_env.sh`：XTurnix 隔离环境与模型冻结。
 - `fdb_subset_report.py`：固定子集评分与尾窗隔离。
 - `duplex_a4_replay.py`：真实音频会话回放与时间线证据。
 - `layer1_fdb.py`：25 例子集暂存与回放驱动。

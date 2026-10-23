@@ -91,7 +91,6 @@ Layer 0 继续只预测“发出系统附和／继续等待”，不接管 XTurn
 | 拟实现 | 对应说明 | 作用 |
 | --- | --- | --- |
 | `scripts/remote/setup_xturnix_env.sh`、`configs/xturnix_fleurs_test.json` | `docs/scripts/remote/setup_xturnix_env.md`、`docs/configs/xturnix_fleurs_test.md` | 隔离环境准备与模型/协议/资源配置冻结 |
-| `scripts/remote/xturnix_protocol_probe.py`、`scripts/remote/run_xturnix_protocol_probe.sh` | `docs/scripts/remote/xturnix_protocol_probe.md`、`docs/scripts/remote/run_xturnix_protocol_probe.md` | XTX-002 dev 两组件协议证据与单作业入口 |
 | `scripts/remote/xturnix_fleurs_test.py` | `docs/scripts/remote/xturnix_fleurs_test.md` | 固定输入、真实时钟回放、ASR/控制事件及独立评分 |
 | `scripts/remote/run_xturnix_fleurs_job.sh` | `docs/scripts/remote/run_xturnix_fleurs_job.md` | 远端预检、串行预热、限额与退出清理 |
 | `tests/test_xturnix_fleurs_test.py` | `docs/tests/test_xturnix_fleurs_test.md` | 少量可手算事件，验证时窗、版本、提前 start 与失败分母 |
