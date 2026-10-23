@@ -9,7 +9,7 @@
 | `setup_xturnix_env.sh` 或 `prepare` | 克隆测量过的 ASR seed 环境、固定 Transformers、下载模型、校验并写锁 |
 | `setup_xturnix_env.sh verify` | 不联网、不改包；按已有锁重新校验环境与模型，写复核记录 |
 
-环境默认位于 `~/interclarify-xturnix-fleurs/envs/xturnix`，从 `~/interclarify-english-integration-20261018-v1/envs/asr` 克隆。克隆使用 conda 的硬链接能力，避免复制大型包；随后在该隔离环境内安装 `transformers==4.57.1`，与模型卡要求的 `>=4.57.1,<6` 和模型自身训练版本一致。
+环境默认位于 `~/interclarify-xturnix-fleurs/envs/xturnix`，从 `~/interclarify-english-integration-20261018-v1/envs/asr` 克隆。克隆使用 conda 的硬链接能力，避免复制大型包；随后在该隔离环境内安装 `transformers==4.57.1`，与模型卡要求的 `>=4.57.1,<6` 和模型自身训练版本一致。该隔离环境只服务 XTurnix 控制与回放；Nemotron 流式服务继续使用现役 ASR 环境（`transformers 5.x`，提供 `AutoModelForRNNT`），两者不能互换。
 
 模型默认位于 `~/interclarify-xturnix-fleurs/models/xturnix-pt`，revision 固定为 `d4b0403e5a6744b46fa7602b6d77bbac2768d5b5`。脚本使用 `https://hf-mirror.com`；`model.safetensors` 由 `aria2c` 双连接断点续传，其余文件由 `huggingface_hub` 下载，总并发不超过 2。可用 `HF_ENDPOINT` 覆盖，但不能改变 revision。
 

@@ -18,6 +18,8 @@ ENTRY="$REPO_ROOT/scripts/remote/xturnix_fleurs_test.py"
 CONFIG="$REPO_ROOT/configs/xturnix_fleurs_test.json"
 ENV_DIR="${XTURNIX_ENV_DIR:-$ROOT/envs/xturnix}"
 ENV_PY="$ENV_DIR/bin/python"
+ASR_ENV_DIR="${XTURNIX_ASR_ENV_DIR:-$HOME/interclarify-english-integration-20261018-v1/envs/asr}"
+ASR_PY="${XTURNIX_ASR_PYTHON:-$ASR_ENV_DIR/bin/python}"
 DATA_PY="${XTURNIX_DATA_PYTHON:-$HOME/miniconda3/envs/interclarify-x2-turn-data/bin/python}"
 ASR_MODEL="${XTURNIX_ASR_MODEL:-$HOME/interclarify-asr-selection/models/nemotron_en}"
 XTURNIX_MODEL="${XTURNIX_MODEL:-$ROOT/models/xturnix-pt}"
@@ -114,7 +116,10 @@ log "start_free_gib=$START_FREE"
 
 # Preflight: frozen source/config, environment, inputs and model inventory.
 [ -x "$ENV_PY" ] || die "missing XTurnix environment: $ENV_PY"
+[ -x "$ASR_PY" ] || die "missing ASR environment: $ASR_PY"
 [ -x "$DATA_PY" ] || die "missing data/scoring environment: $DATA_PY"
+"$ASR_PY" -c 'from transformers import AutoModelForRNNT, AutoProcessor; import fastapi, uvicorn, soundfile' \
+  || die "ASR environment cannot import the native RNNT service dependencies: $ASR_ENV_DIR"
 [ -f "$ENTRY" ] || die "missing replay entry: $ENTRY"
 [ -f "$CONFIG" ] || die "missing frozen config: $CONFIG"
 ACTUAL_CONFIG_SHA="$(sha256sum "$CONFIG" | awk '{print $1}')"
@@ -137,13 +142,14 @@ printf '%s\n' "$COMMIT" > "$JOB_DIR/source_commit.txt"
 printf '%s\n' "$ACTUAL_CONFIG_SHA" > "$JOB_DIR/config_sha256.txt"
 "$ENV_PY" - "$REPO_ROOT" "$MODE" "$RUN_ID" "$COMMIT" "$DIRTY" "$START_FREE" \
   "$MIN_FREE_GIB" "$TRACE_LIMIT_GIB" "$EXPECTED_PLANNED" "$ASR_PORT" \
-  "$JOB_DIR/limits.json" <<'PY'
+  "$ENV_DIR" "$ASR_ENV_DIR" "$JOB_DIR/limits.json" <<'PY'
 import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-repo, mode, run_id, commit, dirty, free, min_free, trace_limit, planned, port, output = sys.argv[1:]
+(repo, mode, run_id, commit, dirty, free, min_free, trace_limit, planned, port,
+ xturnix_env, asr_env, output) = sys.argv[1:]
 payload = {
     "schema": "xtx-005-job-limits-v1",
     "frozen_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -166,6 +172,7 @@ payload = {
     },
     "expected_planned_test_samples": int(planned),
     "repo_root": repo,
+    "environments": {"asr": asr_env, "xturnix": xturnix_env},
 }
 Path(output).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 PY
@@ -213,7 +220,7 @@ export OMP_NUM_THREADS=8
 export MKL_NUM_THREADS=8
 
 log "starting frozen Nemotron service on port $ASR_PORT"
-setsid "$ENV_PY" -u "$REPO_ROOT/scripts/remote/nemotron_asr_service.py" \
+setsid "$ASR_PY" -u "$REPO_ROOT/scripts/remote/nemotron_asr_service.py" \
   --model "$ASR_MODEL" --warmup-audio "$WARMUP_AUDIO" --warmup-timeout 60 \
   --port "$ASR_PORT" > "$JOB_DIR/asr_service.log" 2>&1 &
 SERVER_PID=$!

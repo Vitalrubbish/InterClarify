@@ -16,7 +16,7 @@ dev 样本只用于协议检查，不计入正式分母。正式运行不会因�
 1. **参数与输出**：校验 `smoke|formal`、新 `run_id` 与输出目录；目录非空直接失败，避免覆盖旧证据。
 2. **冻结预检**：核对配置 SHA256 必须是 XTX-002 冻结值；运行 `verify-data` 重新校验 101 条输入；运行 `setup_xturnix_env.sh verify` 重新校验隔离环境、XTurnix 逐文件摘要和只读 Nemotron 资产。模型加载可能生成 `__pycache__`/`.pyc`，预检忽略这些运行时缓存，作业同时设置 `PYTHONDONTWRITEBYTECODE=1`，避免把字节码写入冻结目录。
 3. **资源与端口**：要求工作盘至少 30 GiB 空闲；记录可见 CPU、内存、GPU 型号与显存；ASR 端口已占用时失败。
-4. **服务生命周期**：`setsid` 启动冻结的 Nemotron 服务，等待 `/health` 返回两个真实预热会话；启动 GPU 逐秒采样；服务加载失败或 240 秒未 ready 即失败。
+4. **服务生命周期**：用现役 ASR 环境（含 `AutoModelForRNNT` 与 FastAPI）`setsid` 启动冻结的 Nemotron 服务，等待 `/health` 返回两个真实预热会话；启动 GPU 逐秒采样；服务加载失败或 240 秒未 ready 即失败。XTurnix 控制与回放仍使用隔离的 `envs/xturnix`（`transformers==4.57.1`），两个环境不能互换：隔离环境不提供 ASR 所需的 `AutoModelForRNNT`。
 5. **回放**：用隔离环境运行 `xturnix_fleurs_test.py replay`，80ms 真实时钟送音、5 秒静音尾窗、5 秒主窗口；每条新会话，影子 Listen。
 6. **停服与评分**：先 `SIGTERM` 整个服务进程组并等待 30 秒，再运行 `score`；评分不加载模型、不访问服务。服务需要 `SIGKILL` 视为退出不有序，作业最终失败。
 7. **汇总与清理**：核对计划分母、状态计数、评分分母和 trace 总量（≤2 GiB），记录服务峰值 RSS、GPU 显存峰值、磁盘前后变化和遗留进程；EXIT trap 始终写退出码并再次清理服务与采样进程。
@@ -28,7 +28,8 @@ dev 样本只用于协议检查，不计入正式分母。正式运行不会因�
 | `XTURNIX_MODE` | `smoke` |
 | `XTURNIX_RUN_ID` | 必填；`<root>/runs/<run_id>` |
 | `XTURNIX_ROOT` | `~/interclarify-xturnix-fleurs` |
-| `XTURNIX_ENV_DIR` | `$ROOT/envs/xturnix` |
+| `XTURNIX_ENV_DIR` | `$ROOT/envs/xturnix`（XTurnix 控制与回放） |
+| `XTURNIX_ASR_ENV_DIR` | `~/interclarify-english-integration-20261018-v1/envs/asr`（Nemotron 服务） |
 | `XTURNIX_DATA_PYTHON` | `~/miniconda3/envs/interclarify-x2-turn-data/bin/python` |
 | `XTURNIX_ASR_MODEL` | `~/interclarify-asr-selection/models/nemotron_en` |
 | `XTURNIX_MODEL` | `$ROOT/models/xturnix-pt` |
@@ -44,7 +45,7 @@ dev 样本只用于协议检查，不计入正式分母。正式运行不会因�
 <root>/runs/<run_id>/
 ├── job/
 │   ├── job.log                     # 阶段日志
-│   ├── limits.json                 # 模式、上限、源码提交与开始容量
+│   ├── limits.json                 # 模式、上限、源码提交、环境与开始容量
 │   ├── verify_data.json            # 输入复核
 │   ├── model_verification.json     # 环境/模型逐文件复核
 │   ├── health.json                 # 真实 readiness
