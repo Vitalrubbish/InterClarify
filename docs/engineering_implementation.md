@@ -2,7 +2,7 @@
 
 更新：2026-10-23。当前方案为 **Nemotron EN160 流式 ASR＋XTurnix 话轮控制**。本次将前端与控制分离：Nemotron 提供转写，XTurnix 根据转写历史和系统 Listen/Speak 状态预测动作。调整原因是此前前端方案已回退，现按用户决定验证 XTurnix 与现役 ASR 的组合。本文更新计划，不表示新链路已经部署或通过验收。
 
-研究背景和范围见[研究主文档](research_design.md)，模块合同见[架构设计](research_design/architecture.md)。当前没有活动工作单；本次不新建 issue、不启动模型推理或远端作业。
+研究背景和范围见[研究主文档](research_design.md)，模块合同见[架构设计](research_design/architecture.md)。本轮已按用户指令拆分为 [XTX-001—006](issue/XTurnix/README.md)，均待实施；本次只创建工作单，不启动实现、模型推理或远端作业。
 
 ## 1. 当前步骤与边界
 
@@ -86,10 +86,11 @@ Layer 0 继续只预测“发出系统附和／继续等待”，不接管 XTurn
 
 ## 7. 拟交付文件与说明
 
-本次只提交计划，不创建代码空壳。实施时按同路径提供中文说明，X-Talk 同步维护其对应文档。
+拟交付内容按[XTurnix 工作单](issue/XTurnix/README.md)分别实施，本次只创建工作单，不创建代码空壳。实施时按同路径提供中文说明，X-Talk 同步维护其对应文档。
 
 | 拟实现 | 对应说明 | 作用 |
 | --- | --- | --- |
+| `scripts/remote/setup_xturnix_env.sh`、`configs/xturnix_fleurs_test.json` | `docs/scripts/remote/setup_xturnix_env.md`、`docs/configs/xturnix_fleurs_test.md` | 隔离环境准备与模型/协议/资源配置冻结 |
 | `scripts/remote/xturnix_fleurs_test.py` | `docs/scripts/remote/xturnix_fleurs_test.md` | 固定输入、真实时钟回放、ASR/控制事件及独立评分 |
 | `scripts/remote/run_xturnix_fleurs_job.sh` | `docs/scripts/remote/run_xturnix_fleurs_job.md` | 远端预检、串行预热、限额与退出清理 |
 | `tests/test_xturnix_fleurs_test.py` | `docs/tests/test_xturnix_fleurs_test.md` | 少量可手算事件，验证时窗、版本、提前 start 与失败分母 |
@@ -110,4 +111,4 @@ Layer 0 继续只预测“发出系统附和／继续等待”，不接管 XTurn
 
 首轮预检峰值，不自动增加卡数或工作数。新增资产≤10 GiB、报告/trace≤2 GiB、启动可用盘≥30 GiB；模型只读复用，不复制大权重。触限则停止并保留失败，日志与检查点有上限。
 
-实施顺序为“冻结 FLEURS 输入与历史 ASR 基线 → 锁定 Nemotron/XTurnix/停顿策略 → dev 预热及少量冒烟 → 100 条正式回放 → 独立评分和报告”。权重 revision、停顿检测与阈值、接口轮询周期和请求缓冲上限须在正式回放前固定。真实模型测试在远端执行；本次只写文档，不创建工作单、不运行测试作业。
+实施顺序为“冻结 FLEURS 输入与历史 ASR 基线 → 锁定 Nemotron/XTurnix/停顿策略 → 实现回放与独立评分 → dev 预热及少量冒烟 → 100 条正式回放 → 独立评分和报告”。权重 revision、停顿检测与阈值、接口轮询周期和请求缓冲上限须在正式回放前固定。真实模型测试在远端执行；当前工作单均未实施，本次不运行测试作业。

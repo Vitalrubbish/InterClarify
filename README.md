@@ -10,7 +10,7 @@ InterClarify 研究独立 thinking 流在语音 Agent 倾听与表达期间持�
 | 工程实施计划：Nemotron＋XTurnix | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
 | FLEURS 两组件质量与延迟测试计划 | [docs/dev/XTurnix/quality_test_on_fleurs.md](docs/dev/XTurnix/quality_test_on_fleurs.md) |
 | 本地 conda 环境 | [docs/local_environment.md](docs/local_environment.md)（`interclarify-dev`） |
-| 工作单管理 | [docs/issue](docs/issue/README.md)（当前没有活动工作单） |
+| 工作单管理 | [XTurnix 工作单](docs/issue/XTurnix/README.md)（XTX-001—006 均待实施） |
 | 已采用的运行时配置 | [docs/runtime_baseline.md](docs/runtime_baseline.md) |
 | FDB 评测结果 | [reports/fdb](reports/README.md) |
 | X-Talk 源码版本 | [configs/xtalk_runtime_source.json](configs/xtalk_runtime_source.json) |
