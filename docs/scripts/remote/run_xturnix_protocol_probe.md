@@ -38,7 +38,6 @@
 ├── gpu_samples.csv
 ├── service.log
 ├── service_process_status.txt
-├── probe.json
 ├── probe/
 │   ├── probe.json
 │   ├── asr_evidence.json

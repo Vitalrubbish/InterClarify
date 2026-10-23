@@ -30,14 +30,14 @@
 
 `safe` 加载官方 `turn_pipeline.py` 后，通过本地 `transformers.pipeline` 加载模型，记录加载耗时。配置要求 `max_seq_length` 与模型内 `xturnix_config` 一致，Listen 只允许 `start/keep`。
 
-`run_xturnix` 以最终 ASR 文本的三段前缀和完整文本调用模型，记录请求 ID、原始/归一化输入、状态、动作、两动作分数和收发单调时间。归一化检查直接调用官方 `prepare_messages` 与 `strip_trailing_punctuation`：
+`run_xturnix` 以最终 ASR 文本的三段前缀和完整文本调用模型，记录请求 ID、控制输入序号、原始/归一化输入及其摘要、状态、动作、两动作分数和收发单调时间。另用模型卡给出的完整问句做一次 `contract_example` 诊断，验证 start/keep 动作路径本身可用；该诊断不属于 FLEURS 样本，也不参与正式指标。归一化检查直接调用官方 `prepare_messages` 与 `strip_trailing_punctuation`：
 
 - 末尾标点与空白被去除，内部逗号、大小写和词序保留；
 - 原始文本与规范化文本得到相同动作和分数；
 - 超长单条用户消息触发 `cannot fit max_length`，不静默截断；
 - Speaking 状态只返回 `stop/keep`。
 
-所有调用串行执行，不并发请求。任何检查失败时写出完整证据后返回非零，不以部分成功掩盖失败。
+所有调用串行执行，不并发请求。任何检查失败时写出完整证据后返回非零，不以部分成功掩盖失败。XTurnix 以官方 `turn_pipeline.py` 在独立 conda 进程中加载，不新建 HTTP 文本生成服务；`pipe` 进程退出即释放模型，ASR 服务由作业入口单独启停。
 
 ## 运行
 

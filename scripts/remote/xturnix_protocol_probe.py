@@ -338,7 +338,7 @@ def run_xturnix(config: dict[str, Any], model_dir: Path, final_text: str,
     calls: list[dict[str, Any]] = []
     normalization: list[dict[str, Any]] = []
 
-    def call(text: str, state: str) -> dict[str, Any]:
+    def call(text: str, state: str, kind: str = "prefix") -> dict[str, Any]:
         request_id = uuid.uuid4().hex
         sent = time.monotonic()
         try:
@@ -355,8 +355,11 @@ def run_xturnix(config: dict[str, Any], model_dir: Path, final_text: str,
         )
         record = {
             "request_id": request_id,
+            "input_version": len(calls) + 1,
+            "kind": kind,
             "state": state,
             "raw_input": text,
+            "input_sha256": sha256_bytes(text.encode()),
             "normalized_input": turn_pipeline.strip_trailing_punctuation(text),
             "action": result["action"],
             "scores": scores,
@@ -408,6 +411,8 @@ def run_xturnix(config: dict[str, Any], model_dir: Path, final_text: str,
 
     speaking = call(final_text, "speaking")
 
+    contract = call("那我们明天几点出发？", "listening", kind="contract_example")
+
     context_error = None
     try:
         pipe([{"role": "user", "content": " ".join(["word"] * 3000)}], state="listening")
@@ -426,6 +431,7 @@ def run_xturnix(config: dict[str, Any], model_dir: Path, final_text: str,
             and "cannot fit max_length" in context_error,
             "speaking_contract": speaking["valid"]
             and speaking["action"] in ("<|stop|>", "<|keep|>"),
+            "contract_example": contract["valid"],
         }
     )
 
