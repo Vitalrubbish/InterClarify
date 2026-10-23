@@ -74,6 +74,13 @@ test 与 dev 文件名集合无交集，分别保存在独立目录。100 条正
 
 `prepare_report.json` 自报的 manifest／lock／baseline 摘要与上表一致；`verification.json` 记录复核时的 manifest 与 baseline 摘要。
 
+## 失败路径检查
+
+在远端临时副本上做了两项负向检查，均未触碰冻结目录，检查后删除副本：
+
+- 改动一个 test WAV 的字节后，`verify-data` 退出码 1，报 `Audio digest mismatch: audio/test/2074231104398719826.wav`。
+- 指向不存在的根目录时，退出码 1，报 `Manifest not found`。
+
 ## 资源
 
 复用数据，无模型下载与 GPU。启动前空闲盘约 902 GiB，结束后约 902 GiB；数据目录 63,241,343 字节（报告时点），远低于 10 GiB 资产上限。数据准备耗时 3.75 秒，未接近 1 小时上限。
