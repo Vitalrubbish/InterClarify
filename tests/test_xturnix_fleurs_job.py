@@ -49,21 +49,28 @@ class XTurnixFleursJobEntryTest(unittest.TestCase):
                 self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_unknown_mode_is_rejected_before_any_filesystem_access(self) -> None:
-        result = run_job({"XTURNIX_JOB_MODE": "diagnostic"})
+        result = run_job({"XTURNIX_MODE": "diagnostic"})
         self.assertEqual(result.returncode, 2)
         self.assertIn("usage", result.stderr)
 
     def test_missing_run_id_is_rejected(self) -> None:
-        result = run_job({"XTURNIX_JOB_MODE": "smoke"})
+        result = run_job({"XTURNIX_MODE": "smoke"})
         self.assertEqual(result.returncode, 2)
-        self.assertIn("XTURNIX_JOB_RUN_ID", result.stderr)
+        self.assertIn("XTURNIX_RUN_ID", result.stderr)
 
     def test_path_like_run_id_is_rejected(self) -> None:
         result = run_job(
-            {"XTURNIX_JOB_MODE": "formal", "XTURNIX_JOB_RUN_ID": "../escape"}
+            {"XTURNIX_MODE": "formal", "XTURNIX_RUN_ID": "../escape"}
         )
         self.assertEqual(result.returncode, 2)
         self.assertIn("invalid run id", result.stderr)
+
+    def test_legacy_names_still_work_outside_the_scheduler_wrapper(self) -> None:
+        result = run_job(
+            {"XTURNIX_JOB_MODE": "diagnostic", "XTURNIX_JOB_RUN_ID": "legacy"}
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("usage", result.stderr)
 
 
 if __name__ == "__main__":

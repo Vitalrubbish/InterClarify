@@ -7,8 +7,11 @@
 #           samples, then score the test replay offline after the service is stopped.
 set -euo pipefail
 
-MODE="${XTURNIX_JOB_MODE:-smoke}"
-RUN_ID="${XTURNIX_JOB_RUN_ID:-}"
+# The cluster wrapper rewrites the literal token "JOB" in a submitted command, so
+# variables passed through `vc submit --cmd` must not contain it.  The old names
+# remain accepted for direct/manual execution outside the scheduler.
+MODE="${XTURNIX_MODE:-${XTURNIX_JOB_MODE:-smoke}}"
+RUN_ID="${XTURNIX_RUN_ID:-${XTURNIX_JOB_RUN_ID:-}}"
 ROOT="${XTURNIX_ROOT:-$HOME/interclarify-xturnix-fleurs}"
 REPO_ROOT="${PARATHINK_ROOT:-${INTERCLARIFY_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}}"
 ENTRY="$REPO_ROOT/scripts/remote/xturnix_fleurs_test.py"
@@ -27,9 +30,9 @@ EXPECTED_CONFIG_SHA256="ae121007859ab3d7c6d07d38688082bffb0a6803cda3490b0c8b34f6
 
 case "$MODE" in
   smoke|formal) ;;
-  *) echo "usage: XTURNIX_JOB_MODE={smoke|formal} $0" >&2; exit 2 ;;
+  *) echo "usage: XTURNIX_MODE={smoke|formal} $0" >&2; exit 2 ;;
 esac
-[ -n "$RUN_ID" ] || { echo "XTURNIX_JOB_RUN_ID is required" >&2; exit 2; }
+[ -n "$RUN_ID" ] || { echo "XTURNIX_RUN_ID is required" >&2; exit 2; }
 case "$RUN_ID" in
   *[!A-Za-z0-9._-]*|.*) echo "invalid run id: $RUN_ID" >&2; exit 2 ;;
 esac

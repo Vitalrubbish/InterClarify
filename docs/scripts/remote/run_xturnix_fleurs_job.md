@@ -25,8 +25,8 @@ dev 样本只用于协议检查，不计入正式分母。正式运行不会因�
 
 | 变量 | 默认值 |
 | --- | --- |
-| `XTURNIX_JOB_MODE` | `smoke` |
-| `XTURNIX_JOB_RUN_ID` | 必填；`<root>/runs/<run_id>` |
+| `XTURNIX_MODE` | `smoke` |
+| `XTURNIX_RUN_ID` | 必填；`<root>/runs/<run_id>` |
 | `XTURNIX_ROOT` | `~/interclarify-xturnix-fleurs` |
 | `XTURNIX_ENV_DIR` | `$ROOT/envs/xturnix` |
 | `XTURNIX_DATA_PYTHON` | `~/miniconda3/envs/interclarify-x2-turn-data/bin/python` |
@@ -34,7 +34,9 @@ dev 样本只用于协议检查，不计入正式分母。正式运行不会因�
 | `XTURNIX_MODEL` | `$ROOT/models/xturnix-pt` |
 | `XTURNIX_ASR_PORT` | `18805` |
 
-提交脚本另用 `XTURNIX_JOB_TAG` 作为 `run_id`，用 `XTURNIX_JOB_IMAGE` 指定镜像，`XTURNIX_JOB_TIMEOUT_SECONDS` 默认 14400。
+提交脚本用 `XTURNIX_TAG` 作为 `run_id`，用 `XTURNIX_PARTITION` 选择分区（默认 `pdgpu-4090`），用 `XTURNIX_IMAGE` 指定镜像，`XTURNIX_TIMEOUT_SECONDS` 默认 14400。
+
+集群的 `vc` 包装脚本会把提交命令中字面量 `JOB` 替换成 `$JOB`；因此经 `--cmd` 传入的变量名刻意避开该 token，使用 `XTURNIX_MODE` / `XTURNIX_RUN_ID`。旧名 `XTURNIX_JOB_MODE` / `XTURNIX_JOB_RUN_ID` 只保留给不经过调度包装的直接执行。
 
 ## 输出
 
@@ -64,10 +66,10 @@ dev 样本只用于协议检查，不计入正式分母。正式运行不会因�
 
 ```bash
 cd <frozen source worktree>
-XTURNIX_JOB_TAG=xtx-005-smoke-20261023 XTURNIX_JOB_MODE=smoke \
-  bash scripts/remote/submit_xturnix_fleurs_job.sh
-XTURNIX_JOB_TAG=xtx-006-formal-20261023 XTURNIX_JOB_MODE=formal \
-  bash scripts/remote/submit_xturnix_fleurs_job.sh
+XTURNIX_TAG=xtx-005-smoke-20261023 XTURNIX_MODE=smoke \
+  XTURNIX_PARTITION=pdgpu-a10 bash scripts/remote/submit_xturnix_fleurs_job.sh
+XTURNIX_TAG=xtx-006-formal-20261023 XTURNIX_MODE=formal \
+  XTURNIX_PARTITION=pdgpu-a10 bash scripts/remote/submit_xturnix_fleurs_job.sh
 ```
 
 提交后核对 `vc list`，等待作业结束再提交下一个；同一时间只允许一个推理作业。
