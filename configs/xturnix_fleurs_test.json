@@ -1,0 +1,139 @@
+{
+  "schema": "xtx-002-xturnix-fleurs-config-v1",
+  "frozen_at": "2026-10-23",
+  "scope": "Nemotron EN160 streaming ASR plus XTurnix-PT Listen shadow control on the frozen FLEURS input; no Layer 1, TTS or playback",
+  "asr": {
+    "repo": "nvidia/nemotron-speech-streaming-en-0.6b",
+    "revision": "ebe59e5a817142986528bbbee5dba8db7b38ed50",
+    "local_path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-asr-selection/models/nemotron_en",
+    "model_sha256": {
+      "model.safetensors": "bddd8a7300826efd19cf7e01f1c7db8402bed6786fc4c7739632894f69c71473"
+    },
+    "chunk_ms": 160,
+    "lookahead_tokens": 1,
+    "dtype": "float32",
+    "transport": {
+      "encoding": "pcm16le",
+      "sample_rate_hz": 16000,
+      "channels": 1,
+      "packet_ms": 80
+    },
+    "service": {
+      "base_url": "http://127.0.0.1:18805",
+      "poll_interval_ms": 50,
+      "request_timeout_seconds": 30,
+      "eof_drain_seconds": 2,
+      "max_pending_audio_seconds": 30,
+      "max_active_sessions": 1
+    }
+  },
+  "xturnix": {
+    "repo": "xcczach/xturnix-pt",
+    "revision": "d4b0403e5a6744b46fa7602b6d77bbac2768d5b5",
+    "local_path": "/hpc_stor03/sjtu_home/xuan.zhang/interclarify-xturnix-fleurs/models/xturnix-pt",
+    "dtype": "float32",
+    "state": "listening",
+    "allowed_actions": [
+      "<|start|>",
+      "<|keep|>"
+    ],
+    "selection": "argmax_pair_softmax",
+    "max_seq_length": 2048,
+    "normalization": {
+      "rule": "strip_trailing_unicode_punctuation_and_adjacent_whitespace",
+      "implementation": "turn_pipeline.strip_trailing_punctuation",
+      "preserve_raw_input": true,
+      "preserve_internal_punctuation_case_and_original_asr": true
+    },
+    "scheduler": {
+      "max_in_flight": 1,
+      "max_queued": 1,
+      "queue_policy": "latest_prefix_only",
+      "drop_policy": "drop_older_unstarted",
+      "request_timeout_seconds": 10
+    }
+  },
+  "triggers": {
+    "on_asr_prefix_change": true,
+    "on_pause_event": false,
+    "on_eof": false,
+    "on_tail_silence": false,
+    "poll_interval_ms": 50
+  },
+  "pause": {
+    "enabled": false,
+    "token": "<|pause|>",
+    "policy": "disabled_no_pause_token_in_this_round",
+    "reason": "The frozen Nemotron service exposes no causal upstream segmentation event. A standalone VAD is not part of XTX-002, and EOF, file duration, reference text and offline last-token anchors are forbidden pause sources, so no pause token is injected.",
+    "forbidden_sources": [
+      "eof",
+      "file_duration",
+      "reference_text",
+      "offline_last_token",
+      "post_hoc_alignment"
+    ],
+    "future_enable_requires": "freeze and validate a causal VAD or real upstream segmentation event before any formal run"
+  },
+  "replay_contract": {
+    "shadow_listen": true,
+    "stop_asr_on_start": false,
+    "tail_silence_seconds": 5,
+    "main_window_seconds": 5,
+    "max_in_flight_control_requests": 1,
+    "preserve_early_starts": true,
+    "preserve_stale_prefix_responses": true
+  },
+  "resources": {
+    "preparation": {
+      "max_cpu": 4,
+      "max_ram_gib": 8,
+      "download_concurrency": 2,
+      "max_hours": 1
+    },
+    "inference": {
+      "max_gpu": 1,
+      "max_gpu_memory_gib": 24,
+      "max_cpu": 8,
+      "max_ram_gib": 32,
+      "batch_size": 1,
+      "max_jobs": 1,
+      "max_active_recordings": 1,
+      "max_hours": 4
+    },
+    "storage": {
+      "max_new_asset_gib": 10,
+      "max_trace_gib": 2,
+      "min_free_gib": 30,
+      "scoring_workers": 2
+    }
+  },
+  "evidence": {
+    "asr": [
+      "session_id",
+      "prefix_version",
+      "raw_text",
+      "delta",
+      "client_receive_monotonic",
+      "pause_event",
+      "eof_stage"
+    ],
+    "xturnix": [
+      "request_id",
+      "input_version",
+      "raw_input",
+      "normalized_input",
+      "state",
+      "action",
+      "scores",
+      "send_monotonic",
+      "receive_monotonic"
+    ],
+    "resources": [
+      "load_seconds",
+      "peak_rss_kib",
+      "gpu_name",
+      "gpu_peak_allocated_bytes",
+      "gpu_peak_reserved_bytes"
+    ]
+  }
+}

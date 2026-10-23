@@ -1,13 +1,13 @@
 # XTurnix 工作单
 
-更新：2026-10-23。XTX-001 已完成远端数据冻结与复核，XTX-002—006 待实施。本轮只完成输入与历史基线，不表示组件部署、回放或模型测试已开始。总范围见[工程实施计划](../../engineering_implementation.md)，全局入口见[工作单管理](../README.md)。
+更新：2026-10-23。XTX-001 已完成远端数据冻结与复核，XTX-002 进行中，XTX-003—006 待实施。本轮只完成输入、历史基线与 XTX-002 的协议实现，不表示组件部署验收、正式回放或模型测试已完成。总范围见[工程实施计划](../../engineering_implementation.md)，全局入口见[工作单管理](../README.md)。
 
 ## 工作单与依赖
 
 | 编号 | 工作单 | 依赖 | 状态 |
 | --- | --- | --- | --- |
 | XTX-001 | 固定 FLEURS 输入与历史 ASR 基线（[证据](../../../reports/xturnix_fleurs/20261023-xtx-001-data-freeze/README.md)） | 无 | 已完成并归档 |
-| XTX-002 | [Nemotron/XTurnix 服务及控制协议冻结](xtx_002_component_deployment.md) | XTX-001 | 待实施 |
+| XTX-002 | [Nemotron/XTurnix 服务及控制协议冻结](xtx_002_component_deployment.md) | XTX-001 | 进行中 |
 | XTX-003 | [真实时钟回放与事件采集](xtx_003_streaming_replay.md) | XTX-001、002 | 待实施 |
 | XTX-004 | [独立评分与链路估计](xtx_004_independent_metrics.md) | XTX-001、003 | 待实施 |
 | XTX-005 | [远端作业入口与 5 条冒烟](xtx_005_remote_smoke.md) | XTX-001—004 | 待实施 |

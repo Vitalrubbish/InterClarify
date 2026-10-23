@@ -2,7 +2,7 @@
 
 更新：2026-10-23。当前方案为 **Nemotron EN160 流式 ASR＋XTurnix 话轮控制**。本次将前端与控制分离：Nemotron 提供转写，XTurnix 根据转写历史和系统 Listen/Speak 状态预测动作。调整原因是此前前端方案已回退，现按用户决定验证 XTurnix 与现役 ASR 的组合。本文更新计划，不表示新链路已经部署或通过验收。
 
-研究背景和范围见[研究主文档](research_design.md)，模块合同见[架构设计](research_design/architecture.md)。本轮已按用户指令拆分为 [XTX-001—006](issue/XTurnix/README.md)；XTX-001 已完成 FLEURS 输入与历史 ASR 基线冻结，XTX-002—006 待实施，尚未部署模型或提交推理作业。
+研究背景和范围见[研究主文档](research_design.md)，模块合同见[架构设计](research_design/architecture.md)。本轮已按用户指令拆分为 [XTX-001—006](issue/XTurnix/README.md)；XTX-001 已完成 FLEURS 输入与历史 ASR 基线冻结，XTX-002 正在实施协议与环境准备，XTX-003—006 待实施，尚未提交正式回放或质量测试作业。
 
 ## 1. 当前步骤与边界
 
@@ -91,6 +91,7 @@ Layer 0 继续只预测“发出系统附和／继续等待”，不接管 XTurn
 | 拟实现 | 对应说明 | 作用 |
 | --- | --- | --- |
 | `scripts/remote/setup_xturnix_env.sh`、`configs/xturnix_fleurs_test.json` | `docs/scripts/remote/setup_xturnix_env.md`、`docs/configs/xturnix_fleurs_test.md` | 隔离环境准备与模型/协议/资源配置冻结 |
+| `scripts/remote/xturnix_protocol_probe.py`、`scripts/remote/run_xturnix_protocol_probe.sh` | `docs/scripts/remote/xturnix_protocol_probe.md`、`docs/scripts/remote/run_xturnix_protocol_probe.md` | XTX-002 dev 两组件协议证据与单作业入口 |
 | `scripts/remote/xturnix_fleurs_test.py` | `docs/scripts/remote/xturnix_fleurs_test.md` | 固定输入、真实时钟回放、ASR/控制事件及独立评分 |
 | `scripts/remote/run_xturnix_fleurs_job.sh` | `docs/scripts/remote/run_xturnix_fleurs_job.md` | 远端预检、串行预热、限额与退出清理 |
 | `tests/test_xturnix_fleurs_test.py` | `docs/tests/test_xturnix_fleurs_test.md` | 少量可手算事件，验证时窗、版本、提前 start 与失败分母 |

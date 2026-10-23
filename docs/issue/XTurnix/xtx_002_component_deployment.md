@@ -1,6 +1,6 @@
 # XTX-002：冻结 Nemotron 与 XTurnix 服务及控制协议
 
-状态：待实施。依赖：[XTX-001](README.md)。依据：[质量测试计划第 2、3、6 节](../../dev/XTurnix/quality_test_on_fleurs.md)。
+状态：进行中。依赖：[XTX-001](README.md)。依据：[质量测试计划第 2、3、6 节](../../dev/XTurnix/quality_test_on_fleurs.md)。
 
 ## 目标
 
@@ -17,7 +17,7 @@
 
 ## 交付
 
-拟建 `scripts/remote/setup_xturnix_env.sh` 与同路径中文说明 `docs/scripts/remote/setup_xturnix_env.md`；冻结配置放 `configs/xturnix_fleurs_test.json`，说明放 `docs/configs/xturnix_fleurs_test.md`。复用原生 Nemotron 服务与官方 XTurnix 接口，不新建文本生成或播放支路。远端保存模型/环境锁、配置和 dev 协议证据。
+拟建 `scripts/remote/setup_xturnix_env.sh` 与同路径中文说明 `docs/scripts/remote/setup_xturnix_env.md`；冻结配置放 `configs/xturnix_fleurs_test.json`，说明放 `docs/configs/xturnix_fleurs_test.md`。dev 协议证据由 `scripts/remote/xturnix_protocol_probe.py` 与 `scripts/remote/run_xturnix_protocol_probe.sh` 在单个调度作业内采集，说明见 `docs/scripts/remote/xturnix_protocol_probe.md`、`docs/scripts/remote/run_xturnix_protocol_probe.md`。复用原生 Nemotron 服务与官方 XTurnix 接口，不新建文本生成或播放支路。远端保存模型/环境锁、配置和 dev 协议证据。
 
 ## 验收
 
