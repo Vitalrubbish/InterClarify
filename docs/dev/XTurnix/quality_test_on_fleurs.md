@@ -6,7 +6,7 @@
 
 使用现役 Nemotron EN 0.6B、160ms 配置和 XTurnix-PT，单条真实时钟回放、batch=1。ASR 转写原样保留，XTurnix 按官方规则去除最后用户消息的末尾标点。不运行表达模型、thinking 模块、TTS 或播放器，不注入参考转写，也不训练或调参。
 
-本轮主要报告末端 start 覆盖和增量延迟，辅助保留转写 WER、提前 start 与运行失败。FLEURS 是朗读集，不包含完整自然对话的让轮、附和和打断监督，末端 start 输出率不能称为话轮准确率或 FDB TOR。
+本轮主要报告末端 start 覆盖和增量延迟，辅助保留转写 WER、提前 start 与运行失败。FLEURS 是朗读集，不包含完整自然对话的让轮、附和和打断监督，末端 start 输出率不能称为话轮准确率或 FDB TOR。2026-10-23 的 pause 诊断进一步确认：同一 XTurnix pipeline 能在中英文问句上输出 start，但句末补 `<|pause|>` 会把这些 start 压成 keep；FLEURS 朗读陈述句接近零 start 属于任务/模型不匹配，不是调用格式错误，详见[pause 探针报告](../../../reports/xturnix_fleurs/20261023-pause-token-probe/README.md)。
 
 ## 2. 固定数据与组件
 
