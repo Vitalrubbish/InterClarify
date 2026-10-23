@@ -1,5 +1,7 @@
 # XTurnix 训练可行性分析报告
 
+当前路线说明（2026-10-24）：用户决定先利用 ASR 时间信息、不训练，XTX-008、009、011—013 已搁置归档，未完成内容不视为通过。当前由 [XTX-014](../../issue/XTurnix/xtx_014_asr_time_control.md)承接[无训练路线](asr_time_control.md)，先按后续指令核查并尝试[原生 pause](pause_usage.md)。下文保留原分析与候选训练方案作历史参考，不是当前执行清单。
+
 更新：2026-10-24。对应 [XTX-007](../../issue/archive/XTurnix/xtx_007_training_feasibility.md)。状态：分析与讨论已完成，用户同意先进行 40—60 个英文场景审核，XTX-007 已归档。后由 XTX-009 完成[48 会话首轮来源审核](source_audit.md)，正式试标、VAD 输入/环境和训练未启动。以下初始分析与成本估算保留，后续证据另列，避免把条件候选写成可训练金标。
 
 后续明确指令：先验证 Listen/start–keep 校准，Speak 校准后置。XTX-010 已完成[独立文本校准验证](../../../reports/xturnix_training/20261023-listen-calibration/README.md)，留出误抢话下降但召回同步下降，5% 预算未满足；Speak 校准后置。不再以四类在线训练金标不足阻塞该实验，也不因实验未达标自动训练。

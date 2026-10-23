@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
-# Run the frozen Listen-only calibration in one bounded scheduler job.
+# Run a frozen Listen calibration or pause diagnostic in one bounded GPU job.
 set -euo pipefail
 
 ROOT="${XTURNIX_ROOT:-$HOME/interclarify-xturnix-fleurs}"
 RUN_ID="${XTURNIX_CAL_RUN_ID:?set a unique run id}"
 INPUTS="${XTURNIX_CAL_INPUTS:?set frozen input directory}"
+ENTRYPOINT="${XTURNIX_CAL_ENTRYPOINT:-evaluate_xturnix_control.py}"
+TIMEOUT_SECONDS="${XTURNIX_CAL_TIMEOUT_SECONDS:-1800}"
+case "$ENTRYPOINT" in
+  evaluate_xturnix_control.py|xturnix_pause_usage_probe.py) ;;
+  *) echo "unsupported diagnostic entrypoint" >&2; exit 2 ;;
+esac
+[[ "$TIMEOUT_SECONDS" =~ ^[0-9]+$ ]] && [ "$TIMEOUT_SECONDS" -ge 1 ] && [ "$TIMEOUT_SECONDS" -le 1800 ] || { echo "invalid job timeout" >&2; exit 2; }
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 ENV_DIR="$ROOT/envs/xturnix"
 MODEL="$ROOT/models/xturnix-pt"
@@ -39,8 +46,8 @@ trap cleanup EXIT
 git -C "$REPO_ROOT" rev-parse HEAD > "$OUT/source_commit.txt"
 nvidia-smi --query-gpu=name,uuid,driver_version,memory.total --format=csv > "$OUT/hardware.csv"
 printf 'run_id=%s inputs=%s source=%s\n' "$RUN_ID" "$INPUTS" "$REPO_ROOT"
-timeout --signal=TERM --kill-after=30s 1800 "$ENV_DIR/bin/python" -u \
-  "$REPO_ROOT/scripts/remote/evaluate_xturnix_control.py" \
+timeout --signal=TERM --kill-after=30s "$TIMEOUT_SECONDS" "$ENV_DIR/bin/python" -u \
+  "$REPO_ROOT/scripts/remote/$ENTRYPOINT" \
   --inputs "$INPUTS" --output "$OUT/results" --model "$MODEL" \
   --model-lock "$ROOT/models/xturnix-pt.lock.json" &
 worker_pid=$!
