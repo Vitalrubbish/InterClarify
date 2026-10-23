@@ -4,7 +4,7 @@
 
 研究背景和范围见[研究主文档](research_design.md)，模块合同见[架构设计](research_design/architecture.md)。本轮已按用户指令拆分为 [XTX-001—006](issue/XTurnix/README.md)；XTX-001 已完成 FLEURS 输入与历史 ASR 基线冻结；XTX-002 已完成隔离环境、模型与协议冻结及 dev 验证；XTX-003 已完成真实时钟回放器与模拟契约验证；XTX-004 已完成离线评分与合成 trace 验证；XTX-005 已完成 A10 远端作业入口与 5 条冒烟并归档；XTX-006 正式 100 条作业已按用户要求取消，随后完成 pause token 诊断，未产生正式成绩。
 
-依用户要求先分析并讨论可行性，现调整为 [XTX-007—013](issue/XTurnix/README.md#vad-assisted-training)。当前只推进 XTX-007 的实际分析报告与讨论；此前推荐的 VAD 辅助 XTurnix 微调是候选方向，不是已经通过的可行性结论。[可行性方法文档](dev/XTurnix/training_feasibility.md)不替代实际分析，XTX-008—013 等待结论与讨论，不自动启动实现或训练。
+依用户要求先分析并讨论可行性，现调整为 [XTX-007—013](issue/XTurnix/README.md#vad-assisted-training)。XTX-007 已启动并交付[实际分析报告](dev/XTurnix/training_feasibility_assessment.md)，待用户讨论。因英文四类监督、独立测试来源与校准收益尚未落实，报告建议先补少量监督证据，再比较上下文和校准；此前推荐的 VAD 辅助微调继续作为条件性候选，尚无后续实施放行。[可行性方法文档](dev/XTurnix/training_feasibility.md)不替代实际分析，XTX-008—013 等待讨论确认，不自动启动实现或训练。
 
 ## 1. 当前步骤与边界
 
