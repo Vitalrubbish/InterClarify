@@ -4,7 +4,8 @@
 
 | 验证链 | 最新证据与用途 |
 | --- | --- |
-| XTurnix 输入冻结 | [XTX-001 数据冻结](xturnix_fleurs/20261023-xtx-001-data-freeze/README.md)：固定 100 test＋1 dev、逐文件哈希与历史 ASR 基线；尚未运行模型 |
+| XTurnix 输入冻结 | [XTX-001 数据冻结](xturnix_fleurs/20261023-xtx-001-data-freeze/README.md)：固定 100 test＋1 dev、逐文件哈希与历史 ASR 基线 |
+| XTurnix 组件协议 | [XTX-002 协议冻结](xturnix_fleurs/20261023-xtx-002-protocol/README.md)：隔离环境、模型修订、Listen 双动作、去标点与 dev 预热；未运行正式回放 |
 | 完整两轴 | [r4 最终结果](fdb/20261021-full-two-axes-r4/README.md)：319 例回放、官方转写与时序评分完成；Smooth TOR 59/119、平均延迟 1.023 秒，Interruption TOR 160/200、平均延迟 1.183 秒；GPT 相关性待补 |
 | 固定子集 | [ASR_R4 子集回归](fdb/20261021-asr-subset-r1/README.md)：历史 25 例固定输入，两轴各 5 例官方对齐与时序评分 |
 
@@ -14,6 +15,7 @@
 
 - `full_fdb_two_axes.py`：完整两轴输入冻结、暂存、回放调度与官方评分。
 - `xturnix_fleurs_test.py`：XTurnix 评测的 FLEURS 输入、历史 ASR 基线与后续回放/评分入口。
+- `setup_xturnix_env.sh`、`xturnix_protocol_probe.py`、`run_xturnix_protocol_probe.sh`：XTurnix 隔离环境、模型冻结与 dev 协议探针。
 - `fdb_subset_report.py`：固定子集评分与尾窗隔离。
 - `duplex_a4_replay.py`：真实音频会话回放与时间线证据。
 - `layer1_fdb.py`：25 例子集暂存与回放驱动。
