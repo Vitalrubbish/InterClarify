@@ -1,6 +1,6 @@
 # XTX-004：实现末端 start 延迟、覆盖与链路估计评分
 
-状态：待实施。依赖：[XTX-001](xtx_001_fleurs_data.md)、[XTX-003](xtx_003_streaming_replay.md)。依据：[质量测试计划第 4、5 节](../../dev/XTurnix/quality_test_on_fleurs.md)。
+状态：待实施。依赖：[XTX-001](README.md)、[XTX-003](xtx_003_streaming_replay.md)。依据：[质量测试计划第 4、5 节](../../dev/XTurnix/quality_test_on_fleurs.md)。
 
 ## 目标
 

@@ -1,6 +1,6 @@
 # XTX-002：冻结 Nemotron 与 XTurnix 服务及控制协议
 
-状态：待实施。依赖：[XTX-001](xtx_001_fleurs_data.md)。依据：[质量测试计划第 2、3、6 节](../../dev/XTurnix/quality_test_on_fleurs.md)。
+状态：待实施。依赖：[XTX-001](README.md)。依据：[质量测试计划第 2、3、6 节](../../dev/XTurnix/quality_test_on_fleurs.md)。
 
 ## 目标
 
