@@ -21,6 +21,7 @@
 - `asr_smoke_test`：XTX-005 冒烟 5 条 test 的 EOF 最终 ASR 文本。
 - `asr_smoke_dev`：冒烟的 1 条 dev 最终 ASR 文本。
 - `reference_test`：冻结 manifest 中 100 条 test 参考文本，仅作较大样本的文本敏感性检查；这不是 ASR 文本，不能替代正式分母。
+- `sanity`：模型卡中文问句、两个英文问句、英文陈述和中文陈述，用于确认 pipeline/state/prompt 本身仍能产生 start。若中文问句仍为 start，而英文朗读句为 keep，说明用法可用、问题在文本/语言分布，而不是调用格式。
 
 探针不读取参考答案来决定在线时机；参考文本只作为诊断输入。
 

@@ -35,7 +35,34 @@ CONFIGS = (
     "pause_mid_and_end_stripped",
 )
 STRIPPED_CONFIGS = {"pause_at_end_stripped", "pause_mid_and_end_stripped"}
-TEXT_SETS = ("asr_smoke_test", "asr_smoke_dev", "reference_test")
+TEXT_SETS = ("asr_smoke_test", "asr_smoke_dev", "reference_test", "sanity")
+SANITY_CASES = (
+    {
+        "case_set": "sanity",
+        "case_id": "zh_question_model_card",
+        "text": "那空气净化器应该一直开着，还是睡觉前开两小时就够了",
+    },
+    {
+        "case_set": "sanity",
+        "case_id": "en_question_what_time",
+        "text": "What time should we leave tomorrow?",
+    },
+    {
+        "case_set": "sanity",
+        "case_id": "en_question_help_move",
+        "text": "Could you help me move this table?",
+    },
+    {
+        "case_set": "sanity",
+        "case_id": "en_statement_weather",
+        "text": "The weather is nice today.",
+    },
+    {
+        "case_set": "sanity",
+        "case_id": "zh_statement_weather",
+        "text": "今天天气不错。",
+    },
+)
 
 
 def strip_trailing_punctuation(text: str) -> str:
@@ -173,6 +200,7 @@ def main(argv: list[str] | None = None) -> None:
     cases = read_asr_texts(run_dir / "replay", "asr_smoke_test")
     cases += read_asr_texts(run_dir / "replay-dev", "asr_smoke_dev")
     cases += read_reference_texts(root)
+    cases += [dict(case) for case in SANITY_CASES]
     if not cases:
         raise SystemExit("no text cases loaded")
 
