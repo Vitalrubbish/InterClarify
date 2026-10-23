@@ -1,9 +1,10 @@
-# FDB 评测结果
+# 评测结果
 
-更新：2026-10-21。FDB 作为辅助工程与能力评测保留；主动澄清专项 benchmark 另行构建，不能以 FDB 指标替代。
+更新：2026-10-23。FDB 作为辅助工程与能力评测保留；主动澄清专项 benchmark 另行构建，不能以 FDB 指标替代。
 
 | 验证链 | 最新证据与用途 |
 | --- | --- |
+| XTurnix 输入冻结 | [XTX-001 数据冻结](xturnix_fleurs/20261023-xtx-001-data-freeze/README.md)：固定 100 test＋1 dev、逐文件哈希与历史 ASR 基线；尚未运行模型 |
 | 完整两轴 | [r4 最终结果](fdb/20261021-full-two-axes-r4/README.md)：319 例回放、官方转写与时序评分完成；Smooth TOR 59/119、平均延迟 1.023 秒，Interruption TOR 160/200、平均延迟 1.183 秒；GPT 相关性待补 |
 | 固定子集 | [ASR_R4 子集回归](fdb/20261021-asr-subset-r1/README.md)：历史 25 例固定输入，两轴各 5 例官方对齐与时序评分 |
 
@@ -12,6 +13,7 @@
 评测脚本位于 `scripts/remote/`：
 
 - `full_fdb_two_axes.py`：完整两轴输入冻结、暂存、回放调度与官方评分。
+- `xturnix_fleurs_test.py`：XTurnix 评测的 FLEURS 输入、历史 ASR 基线与后续回放/评分入口。
 - `fdb_subset_report.py`：固定子集评分与尾窗隔离。
 - `duplex_a4_replay.py`：真实音频会话回放与时间线证据。
 - `layer1_fdb.py`：25 例子集暂存与回放驱动。
