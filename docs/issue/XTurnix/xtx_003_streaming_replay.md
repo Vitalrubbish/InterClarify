@@ -1,6 +1,6 @@
 # XTX-003：实现真实时钟回放与两组件事件采集
 
-状态：待实施。依赖：[XTX-001](README.md)、[XTX-002](../archive/XTurnix/xtx_002_component_deployment.md)。依据：[质量测试计划第 3、4、6 节](../../dev/XTurnix/quality_test_on_fleurs.md)。
+状态：待实施。依赖：[XTX-001](README.md)、[XTX-002](../../../reports/xturnix_fleurs/20261023-xtx-002-protocol/README.md)。依据：[质量测试计划第 3、4、6 节](../../dev/XTurnix/quality_test_on_fleurs.md)。
 
 ## 目标
 

@@ -7,7 +7,7 @@
 | 编号 | 工作单 | 依赖 | 状态 |
 | --- | --- | --- | --- |
 | XTX-001 | 固定 FLEURS 输入与历史 ASR 基线（[证据](../../../reports/xturnix_fleurs/20261023-xtx-001-data-freeze/README.md)） | 无 | 已完成并归档 |
-| XTX-002 | [Nemotron/XTurnix 服务及控制协议冻结](../archive/XTurnix/xtx_002_component_deployment.md)（[证据](../../../reports/xturnix_fleurs/20261023-xtx-002-protocol/README.md)） | XTX-001 | 已完成并归档 |
+| XTX-002 | Nemotron/XTurnix 服务及控制协议冻结（[证据](../../../reports/xturnix_fleurs/20261023-xtx-002-protocol/README.md)） | XTX-001 | 已完成并归档 |
 | XTX-003 | [真实时钟回放与事件采集](xtx_003_streaming_replay.md) | XTX-001、002 | 待实施 |
 | XTX-004 | [独立评分与链路估计](xtx_004_independent_metrics.md) | XTX-001、003 | 待实施 |
 | XTX-005 | [远端作业入口与 5 条冒烟](xtx_005_remote_smoke.md) | XTX-001—004 | 待实施 |
