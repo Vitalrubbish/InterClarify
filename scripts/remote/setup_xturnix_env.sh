@@ -35,6 +35,7 @@ DOWNLOAD_WORKERS=2
 
 export PYTHONNOUSERSITE=1
 export HF_HUB_ENABLE_HF_TRANSFER=0
+export HF_HUB_DOWNLOAD_TIMEOUT=60
 export TOKENIZERS_PARALLELISM=false
 export OMP_NUM_THREADS=4
 export MKL_NUM_THREADS=4
@@ -86,6 +87,16 @@ print(f"python={sys.version.split()[0]} torch={torch.__version__} transformers={
 PY
 
   log "downloading and validating $XTURNIX_REPO@$XTURNIX_REVISION"
+  if [ ! -f "$MODEL_DIR/model.safetensors" ] || [ -f "$MODEL_DIR/model.safetensors.aria2" ]; then
+    command -v aria2c >/dev/null || die "aria2c is required for the large model download"
+    log "pre-downloading model.safetensors with aria2c (2 connections)"
+    timeout 1800 aria2c -x2 -s2 -c --max-tries=0 --retry-wait=2 \
+      --timeout=60 --connect-timeout=20 --file-allocation=none \
+      --summary-interval=30 --console-log-level=warn \
+      --dir "$MODEL_DIR" --out model.safetensors \
+      "$ENDPOINT/$XTURNIX_REPO/resolve/$XTURNIX_REVISION/model.safetensors" \
+      || die "aria2c model download failed; rerun to resume"
+  fi
   "$ENV_DIR/bin/python" - "$MODEL_DIR" "$XTURNIX_REPO" "$XTURNIX_REVISION" "$ENDPOINT" "$DOWNLOAD_WORKERS" <<'PY'
 import hashlib
 import json
@@ -105,7 +116,7 @@ if info.sha != revision:
 remote = {item.rfilename: item for item in info.siblings}
 model_dir.mkdir(parents=True, exist_ok=True)
 snapshot_download(repo_id=repo, revision=revision, local_dir=str(model_dir),
-                  endpoint=endpoint, max_workers=workers)
+                  endpoint=endpoint, max_workers=workers, etag_timeout=60)
 
 def sha256(path):
     digest = hashlib.sha256()
