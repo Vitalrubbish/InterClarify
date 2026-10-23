@@ -20,8 +20,8 @@
 3. 克隆 seed 环境；已存在时复用，不重新创建。
 4. 安装并断言 `transformers==4.57.1`，随后检查 `torch`、`Pipeline` 可导入。
 5. 先用 `aria2c` 预下载并续传 `model.safetensors`，再用 `snapshot_download` 补齐小文件；全文件清单必须与上游一致。
-6. 大文件比较 LFS SHA256，小文件比较 git blob SHA1；任何缺失、额外文件或摘要不一致立即失败。
-7. 只读复核 Nemotron 的 revision、文件集合和 `model.safetensors` 摘要，不修改其目录。
+6. 大文件比较 LFS SHA256，小文件比较 git blob SHA1；任何缺失、额外文件或摘要不一致立即失败。`.cache`、`__pycache__` 与 `.pyc` 是运行时生成的缓存，不计入冻结清单。
+7. 只读复核 Nemotron 的 revision、文件集合和 `model.safetensors` 摘要，不修改其目录；同样忽略运行时字节码缓存。
 8. 写入模型锁、pip freeze、conda explicit 清单、模型复核记录和准备报告；配置副本同时保存。
 
 `verify` 模式只执行第 6—8 步的校验部分，用于作业前复核。已有锁与重新计算的文件清单不一致时失败，不会静默重写锁；需要重新冻结时必须显式删除旧锁并由人工确认。

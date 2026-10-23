@@ -14,7 +14,7 @@ dev 样本只用于协议检查，不计入正式分母。正式运行不会因�
 ## 执行阶段
 
 1. **参数与输出**：校验 `smoke|formal`、新 `run_id` 与输出目录；目录非空直接失败，避免覆盖旧证据。
-2. **冻结预检**：核对配置 SHA256 必须是 XTX-002 冻结值；运行 `verify-data` 重新校验 101 条输入；运行 `setup_xturnix_env.sh verify` 重新校验隔离环境、XTurnix 逐文件摘要和只读 Nemotron 资产。
+2. **冻结预检**：核对配置 SHA256 必须是 XTX-002 冻结值；运行 `verify-data` 重新校验 101 条输入；运行 `setup_xturnix_env.sh verify` 重新校验隔离环境、XTurnix 逐文件摘要和只读 Nemotron 资产。模型加载可能生成 `__pycache__`/`.pyc`，预检忽略这些运行时缓存，作业同时设置 `PYTHONDONTWRITEBYTECODE=1`，避免把字节码写入冻结目录。
 3. **资源与端口**：要求工作盘至少 30 GiB 空闲；记录可见 CPU、内存、GPU 型号与显存；ASR 端口已占用时失败。
 4. **服务生命周期**：`setsid` 启动冻结的 Nemotron 服务，等待 `/health` 返回两个真实预热会话；启动 GPU 逐秒采样；服务加载失败或 240 秒未 ready 即失败。
 5. **回放**：用隔离环境运行 `xturnix_fleurs_test.py replay`，80ms 真实时钟送音、5 秒静音尾窗、5 秒主窗口；每条新会话，影子 Listen。

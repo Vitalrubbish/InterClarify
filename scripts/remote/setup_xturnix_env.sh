@@ -136,7 +136,12 @@ def git_blob_sha1(path):
 
 files = {}
 for path in sorted(model_dir.rglob("*")):
-    if not path.is_file() or ".cache" in path.parts:
+    if (
+        not path.is_file()
+        or ".cache" in path.parts
+        or "__pycache__" in path.parts
+        or path.suffix == ".pyc"
+    ):
         continue
     relative = path.relative_to(model_dir).as_posix()
     if relative not in remote:
@@ -226,7 +231,12 @@ if xturnix_lock["revision"] != revision:
     raise SystemExit("XTurnix lock revision mismatch")
 local = {}
 for path in sorted(model_dir.rglob("*")):
-    if not path.is_file() or ".cache" in path.parts:
+    if (
+        not path.is_file()
+        or ".cache" in path.parts
+        or "__pycache__" in path.parts
+        or path.suffix == ".pyc"
+    ):
         continue
     local[path.relative_to(model_dir).as_posix()] = sha256(path)
 expected = {name: entry["sha256"] for name, entry in xturnix_lock["files"].items()}
@@ -238,7 +248,12 @@ if asr_expected["revision"] != "ebe59e5a817142986528bbbee5dba8db7b38ed50":
     raise SystemExit("unexpected Nemotron revision in the source lock")
 asr_local = {}
 for path in sorted(asr_dir.rglob("*")):
-    if not path.is_file() or ".cache" in path.parts:
+    if (
+        not path.is_file()
+        or ".cache" in path.parts
+        or "__pycache__" in path.parts
+        or path.suffix == ".pyc"
+    ):
         continue
     asr_local[path.relative_to(asr_dir).as_posix()] = sha256(path)
 if asr_local != asr_expected["files"]:
