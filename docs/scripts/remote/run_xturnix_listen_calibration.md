@@ -6,6 +6,8 @@
 
 同一受限入口也支持 XTX-014 原生 pause 诊断：设置 `XTURNIX_CAL_ENTRYPOINT=xturnix_pause_usage_probe.py`、`XTURNIX_CAL_TIMEOUT_SECONDS=900`。入口只允许原校准与该诊断两个脚本，超时只允许 1—1,800 秒；默认仍是原校准 1,800 秒，不改变旧 run 或评分配置。
 
+原校准继续只支持 CUDA；仅 pause 机制诊断另允许显式 `XTURNIX_CAL_DEVICE=cpu`，用于 GPU 队列持续 Pending 后的远端 4 CPU/16 GiB 作业。此时线程限制为 4，不调用 nvidia-smi，监控文件中的显存 0 只表示未使用 GPU，summary 的 CUDA 峰值为 null。不得把 CPU 诊断说成 GPU 验证或在登录节点运行。
+
 启动时检查 conda 标记、输入摘要、空闲磁盘≥30 GiB，限制输入≤10 MiB，运行超时 1,800 秒。作业申请 1 GPU、8 CPU、32 GiB RAM；环境线程≤8，模型 batch=1。采样 GPU 显存并保留进程 RSS；超过 22 GiB 显存或 100 MiB 结果大小则终止计算，退出码与清理结果保留。失败不覆盖重跑，不自动增配。
 
 ## 提交示例

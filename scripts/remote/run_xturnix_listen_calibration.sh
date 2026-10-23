@@ -7,9 +7,14 @@ RUN_ID="${XTURNIX_CAL_RUN_ID:?set a unique run id}"
 INPUTS="${XTURNIX_CAL_INPUTS:?set frozen input directory}"
 ENTRYPOINT="${XTURNIX_CAL_ENTRYPOINT:-evaluate_xturnix_control.py}"
 TIMEOUT_SECONDS="${XTURNIX_CAL_TIMEOUT_SECONDS:-1800}"
+MODEL_DEVICE="${XTURNIX_CAL_DEVICE:-cuda}"
 case "$ENTRYPOINT" in
   evaluate_xturnix_control.py|xturnix_pause_usage_probe.py) ;;
   *) echo "unsupported diagnostic entrypoint" >&2; exit 2 ;;
+esac
+case "$MODEL_DEVICE:$ENTRYPOINT" in
+  cuda:*|cpu:xturnix_pause_usage_probe.py) ;;
+  *) echo "unsupported device for this entrypoint" >&2; exit 2 ;;
 esac
 [[ "$TIMEOUT_SECONDS" =~ ^[0-9]+$ ]] && [ "$TIMEOUT_SECONDS" -ge 1 ] && [ "$TIMEOUT_SECONDS" -le 1800 ] || { echo "invalid job timeout" >&2; exit 2; }
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -28,6 +33,7 @@ mkdir "$OUT"
 exec > >(tee "$OUT/run.log") 2>&1
 export PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 export TOKENIZERS_PARALLELISM=false OMP_NUM_THREADS=8 MKL_NUM_THREADS=8
+if [ "$MODEL_DEVICE" = cpu ]; then export OMP_NUM_THREADS=4 MKL_NUM_THREADS=4; fi
 worker_pid=""
 monitor_pid=""
 cleanup() {
@@ -44,7 +50,11 @@ cleanup() {
 }
 trap cleanup EXIT
 git -C "$REPO_ROOT" rev-parse HEAD > "$OUT/source_commit.txt"
-nvidia-smi --query-gpu=name,uuid,driver_version,memory.total --format=csv > "$OUT/hardware.csv"
+if [ "$MODEL_DEVICE" = cuda ]; then
+  nvidia-smi --query-gpu=name,uuid,driver_version,memory.total --format=csv > "$OUT/hardware.csv"
+else
+  printf 'device,allocated_cpu,allocated_ram_gib\ncpu,4,16\n' > "$OUT/hardware.csv"
+fi
 printf 'run_id=%s inputs=%s source=%s\n' "$RUN_ID" "$INPUTS" "$REPO_ROOT"
 timeout --signal=TERM --kill-after=30s "$TIMEOUT_SECONDS" "$ENV_DIR/bin/python" -u \
   "$REPO_ROOT/scripts/remote/$ENTRYPOINT" \
@@ -53,7 +63,11 @@ timeout --signal=TERM --kill-after=30s "$TIMEOUT_SECONDS" "$ENV_DIR/bin/python" 
 worker_pid=$!
 (
   while kill -0 "$worker_pid" 2>/dev/null; do
-    sample="$(nvidia-smi --query-gpu=timestamp,memory.used --format=csv,noheader,nounits)"
+    if [ "$MODEL_DEVICE" = cuda ]; then
+      sample="$(nvidia-smi --query-gpu=timestamp,memory.used --format=csv,noheader,nounits)"
+    else
+      sample="$(date -u '+%Y/%m/%d %H:%M:%S'), 0"
+    fi
     printf '%s\n' "$sample" >> "$OUT/gpu_samples.csv"
     used="$(printf '%s\n' "$sample" | awk -F, '{gsub(/ /,"",$2); if ($2>m) m=$2} END {print m+0}')"
     size="$(du -sk "$OUT" | awk '{print $1}')"

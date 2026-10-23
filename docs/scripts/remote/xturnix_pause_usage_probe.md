@@ -13,3 +13,5 @@ XTX-014 的原生 pause 机制诊断，按[核查方案](../../dev/XTurnix/pause
 输入、模型和代码均留摘要；原始记录保存在独立远端 run。新入口只用于诊断，旧 pause 探针、Listen 基线、现役框架与模型均不覆盖。
 
 通过已有受限 runner 设置 `XTURNIX_CAL_ENTRYPOINT=xturnix_pause_usage_probe.py`、`XTURNIX_CAL_TIMEOUT_SECONDS=900`，其余输入/模型/独立 run_id 参数沿用原合同。只允许远端 conda 调度 GPU 执行，单卡、单作业，不启动 vLLM 或新的播放服务。
+
+GPU 队列持续 Pending 时可设置 `XTURNIX_CAL_DEVICE=cpu`，使用远端 4 CPU/16 GiB 作业及最多 1,800 秒。`main` 固定裁取原顺序前 8 个自然话轮加 3 个 sanity，FP32 不变；CUDA 调用与显存字段关闭，设备明确记为 CPU、CUDA 占用为 null。CPU 结果只支持机制行为，不能作为 GPU 延迟比较。模型仍不在本地或登录节点运行。

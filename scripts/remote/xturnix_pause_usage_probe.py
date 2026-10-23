@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 import gzip
 import hashlib
 import json
+import os
 from pathlib import Path
 import resource
 import subprocess
@@ -103,6 +104,7 @@ def run_probe(cases: list[dict], pipe: object, output: Path) -> dict:
     import torch
 
     cache, results = {}, []
+    use_cuda = pipe.device.type == "cuda"
     model_calls = errors = 0
     with (output / "events.jsonl").open("x") as stream:
         for case in cases:
@@ -128,7 +130,8 @@ def run_probe(cases: list[dict], pipe: object, output: Path) -> dict:
                         started = time.perf_counter()
                         try:
                             result = pipe(messages, state="listening")
-                            torch.cuda.synchronize()
+                            if use_cuda:
+                                torch.cuda.synchronize()
                             score = float(result["scores"]["<|start|>"])
                         except Exception as exc:
                             if isinstance(exc, torch.cuda.OutOfMemoryError):
@@ -154,7 +157,7 @@ def run_probe(cases: list[dict], pipe: object, output: Path) -> dict:
                               "cached": cached, "elapsed_ms": elapsed, "error": error}
                     stream.write(json.dumps(record, ensure_ascii=False) + "\n")
                     stream.flush()
-                    if torch.cuda.max_memory_reserved() > 22 * 1024 ** 3:
+                    if use_cuda and torch.cuda.max_memory_reserved() > 22 * 1024 ** 3:
                         raise RuntimeError("GPU reservation exceeds 22 GiB")
                 results.append({"case_id": case["case_id"], "source": case["source"], "mode": mode,
                                 "first_start_target": first_start, "pause_candidates": pause_candidates,
@@ -186,16 +189,23 @@ def main() -> None:
         raise ValueError("development input digest mismatch")
     verified = verify_model(args.model, args.model_lock)
     cases = select_cases(dev_file)
+    device = os.environ.get("XTURNIX_CAL_DEVICE", "cuda")
+    if device not in {"cuda", "cpu"}:
+        raise ValueError("unsupported model device")
+    if device == "cpu":
+        cases = [c for c in cases if c["source"] == "reference_dev_diagnostic"][:8] + [
+            c for c in cases if c["source"] == "scripted_sanity"]
     write_json(args.output / "case_manifest.json", [
         {"case_id": c["case_id"], "source": c["source"], "events": len(c["events"])} for c in cases])
     import torch
     import transformers
     from transformers import pipeline
 
-    if not torch.cuda.is_available():
+    if device == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("real model probe must run on a scheduler GPU")
+    torch.set_num_threads(4 if device == "cpu" else 8)
     pipe = pipeline(model=str(args.model), trust_remote_code=True,
-                    dtype="float32", device=0, local_files_only=True)
+                    dtype="float32", device=0 if device == "cuda" else -1, local_files_only=True)
     if pipe._configured_max_length() != 2048:
         raise ValueError("unexpected context contract")
     pause_ids = pipe.tokenizer.encode(PAUSE, add_special_tokens=False)
@@ -208,9 +218,11 @@ def main() -> None:
                    "source_commit": subprocess.check_output([
                        "git", "-C", str(Path(__file__).resolve().parents[2]), "rev-parse", "HEAD"], text=True).strip(),
                    "transformers": transformers.__version__, "torch": torch.__version__,
-                   "gpu": torch.cuda.get_device_name(0), "elapsed_seconds": time.perf_counter() - started,
-                   "gpu_peak_allocated_bytes": torch.cuda.max_memory_allocated(),
-                   "gpu_peak_reserved_bytes": torch.cuda.max_memory_reserved(),
+                   "device": device, "torch_threads": torch.get_num_threads(),
+                   "gpu": torch.cuda.get_device_name(0) if device == "cuda" else None,
+                   "elapsed_seconds": time.perf_counter() - started,
+                   "gpu_peak_allocated_bytes": torch.cuda.max_memory_allocated() if device == "cuda" else None,
+                   "gpu_peak_reserved_bytes": torch.cuda.max_memory_reserved() if device == "cuda" else None,
                    "peak_rss_kib": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss,
                    "dev_input_sha256": file_sha(dev_file),
                    "scope": "reference_pause_contract_not_live_asr_or_full_xtalk"})
