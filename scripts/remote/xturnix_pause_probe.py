@@ -19,16 +19,31 @@ import csv
 import hashlib
 import json
 import random
-import re
 import sys
 import time
+import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 PAUSE = "<|pause|>"
-CONFIGS = ("no_pause", "pause_at_end", "pause_mid_and_end")
+CONFIGS = (
+    "no_pause",
+    "pause_at_end",
+    "pause_mid_and_end",
+    "pause_at_end_stripped",
+    "pause_mid_and_end_stripped",
+)
+STRIPPED_CONFIGS = {"pause_at_end_stripped", "pause_mid_and_end_stripped"}
 TEXT_SETS = ("asr_smoke_test", "asr_smoke_dev", "reference_test")
+
+
+def strip_trailing_punctuation(text: str) -> str:
+    """Mirror the frozen turn_pipeline trailing-punctuation rule."""
+    normalized = text.rstrip()
+    while normalized and unicodedata.category(normalized[-1]).startswith("P"):
+        normalized = normalized[:-1].rstrip()
+    return normalized
 
 
 def choose_pause_offset(text: str, rng: random.Random) -> int | None:
@@ -55,6 +70,13 @@ def with_pause(text: str, config: str, offset: int | None = None) -> str:
         if offset is None:
             return text + PAUSE
         return text[:offset] + PAUSE + text[offset:] + PAUSE
+    if config in STRIPPED_CONFIGS:
+        base = strip_trailing_punctuation(text)
+        if config == "pause_at_end_stripped":
+            return base + PAUSE
+        if offset is None:
+            return base + PAUSE
+        return base[:offset] + PAUSE + base[offset:] + PAUSE
     raise ValueError(f"unsupported config: {config}")
 
 
@@ -163,9 +185,14 @@ def main(argv: list[str] | None = None) -> None:
     rows: list[dict[str, Any]] = []
     started = time.monotonic()
     for case in cases:
-        rng = random.Random(f"{args.seed}:{case['case_id']}")
-        offset = choose_pause_offset(case["text"], rng)
         for config_name in CONFIGS:
+            rng = random.Random(f"{args.seed}:{case['case_id']}:{config_name}")
+            base = (
+                strip_trailing_punctuation(case["text"])
+                if config_name in STRIPPED_CONFIGS
+                else case["text"]
+            )
+            offset = choose_pause_offset(base, rng)
             content = with_pause(case["text"], config_name, offset)
             sent = time.monotonic()
             result = pipe(

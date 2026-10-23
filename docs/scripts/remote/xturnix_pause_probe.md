@@ -9,8 +9,12 @@
 | `no_pause` | 原始 ASR 文本 |
 | `pause_at_end` | 文本末尾直接追加一个 `<|pause|>` |
 | `pause_mid_and_end` | 在文本中段随机词间插入一个 `<|pause|>`，再在末尾追加一个 |
+| `pause_at_end_stripped` | 先按官方规则去掉末尾标点，再在末尾追加一个 `<|pause|>` |
+| `pause_mid_and_end_stripped` | 去末尾标点后，在文本中段随机词间插入一个 `<|pause|>`，再在末尾追加一个 |
 
-中段位置按 `case_id` 与固定 seed 选择，位于文本长度 20%—80% 的空格边界；`samples.csv` 记录实际偏移和完整内容，可逐条复核。token 直接拼接、不额外加空格，与 X-Talk 中 pause 段渲染后的连续 user 内容一致。
+后两种是对照组：官方 `turn_pipeline` 会去掉最后一轮用户文本的末尾标点，而末尾一旦跟着 `<|pause|>`，标点就不再位于末尾。对照可区分“pause token 本身”与“末尾标点未被去掉”的影响。
+
+中段位置按 `case_id`、配置名与固定 seed 选择，位于文本长度 20%—80% 的空格边界；`samples.csv` 记录实际偏移和完整内容，可逐条复核。token 直接拼接、不额外加空格，与 X-Talk 中 pause 段渲染后的连续 user 内容一致。
 
 ## 文本集
 

@@ -32,6 +32,16 @@ class PauseProbeTests(unittest.TestCase):
         self.assertTrue(content.endswith(probe.PAUSE))
         self.assertEqual(content.replace(probe.PAUSE, ""), text)
 
+    def test_stripped_end_pause_removes_terminal_period(self) -> None:
+        content = probe.with_pause("hello world.", "pause_at_end_stripped")
+        self.assertEqual(content, "hello world<|pause|>")
+
+    def test_stripped_mid_pause_preserves_stripped_text(self) -> None:
+        text = "one two three four five six."
+        content = probe.with_pause(text, "pause_mid_and_end_stripped", offset=7)
+        self.assertEqual(content.count(probe.PAUSE), 2)
+        self.assertEqual(content.replace(probe.PAUSE, ""), "one two three four five six")
+
     def test_offset_is_a_middle_word_boundary(self) -> None:
         text = "one two three four five six seven eight nine ten"
         offset = probe.choose_pause_offset(text, random.Random("fixed"))
