@@ -14,7 +14,7 @@
 | `interclarify-english-integration-20261018-v6` | 组件入口；`envs` 软链到 v1 |
 | `interclarify-runtime-20261021-adopted` | 当前运行时源码快照 |
 | `interclarify-runtime-current` | 指向当前运行时快照的稳定入口 |
-| `interclarify-xturnix-fleurs` | XTurnix FLEURS 冻结输入与后续评测输出；XTX-001 数据在 `dataset/fleurs_en_us` |
+| `interclarify-xturnix-fleurs` | XTurnix FLEURS 冻结输入与后续评测输出；XTX-001 数据在 `dataset/fleurs_en_us`，XTX-002 环境/模型在 `envs/xturnix`、`models/xturnix-pt` |
 | `InterClarify/benchmark/fdb_v1_0` | FDB v1.0 评测数据 |
 | `interclarify-fdb-two-axes-20261021-r4` | FDB 两轴最终结果 |
 | `Full-Duplex-Bench` | 官方 FDB 评分仓库 |
@@ -31,6 +31,8 @@
 `paratalker-dev` 与 `sidecar` 属于其他项目，不纳入 InterClarify 清理。
 
 ## 维护记录
+
+2026-10-23 完成 XTX-002：在 `interclarify-xturnix-fleurs` 下创建隔离 conda 环境 `envs/xturnix`（Python 3.12.15、torch 2.11.0+cu128、transformers 4.57.1），下载并锁定 `models/xturnix-pt`（`xcczach/xturnix-pt@d4b0403`），只读复核 Nemotron `ebe59e5`。dev 协议证据在 `runs/xtx-002-probe-20261023-r3`；未覆盖现役 ASR/TTS/评分环境。证据见 [XTX-002 报告](../reports/xturnix_fleurs/20261023-xtx-002-protocol/README.md)。
 
 2026-10-23 完成 XTX-001：在 `interclarify-xturnix-fleurs` 新建冻结数据目录，只读复用 `interclarify-x2-turn-complete` 的 TSV 与 101 个 WAV 后重新选择并哈希；未删除旧数据，旧目录仍不恢复为现役依赖。证据见 [XTX-001 报告](../reports/xturnix_fleurs/20261023-xtx-001-data-freeze/README.md)。
 
