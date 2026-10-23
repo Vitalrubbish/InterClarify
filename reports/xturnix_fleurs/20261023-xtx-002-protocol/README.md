@@ -86,7 +86,7 @@ In many cases, enrolling on a gap year course abroad can actually improve your c
 
 - 首次作业因 ASR `/health` 返回 `torch.float32`、而探针只接受 `float32` 而失败；改为接受 `torch.` 前缀后重跑。
 - 另一次通过配置检查但未包含控制输入序号和 start 诊断，随后补入 `input_version` / `input_sha256` 与 `contract_example` 并完成最终 r3。
-- r1、r2 的失败/中间证据保留在 `runs/`，未覆盖为成功结果。
+- r1、r2 的失败已记录；清理时删除其运行目录与提交日志，只保留最终 r3 证据。
 
 ## 证据摘要
 
