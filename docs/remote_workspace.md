@@ -14,6 +14,7 @@
 | `interclarify-english-integration-20261018-v6` | 组件入口；`envs` 软链到 v1 |
 | `interclarify-runtime-20261021-adopted` | 当前运行时源码快照 |
 | `interclarify-runtime-current` | 指向当前运行时快照的稳定入口 |
+| `interclarify-xturnix-fleurs` | XTurnix FLEURS 冻结输入与后续评测输出；XTX-001 数据在 `dataset/fleurs_en_us` |
 | `InterClarify/benchmark/fdb_v1_0` | FDB v1.0 评测数据 |
 | `interclarify-fdb-two-axes-20261021-r4` | FDB 两轴最终结果 |
 | `Full-Duplex-Bench` | 官方 FDB 评分仓库 |
@@ -30,6 +31,8 @@
 `paratalker-dev` 与 `sidecar` 属于其他项目，不纳入 InterClarify 清理。
 
 ## 维护记录
+
+2026-10-23 完成 XTX-001：在 `interclarify-xturnix-fleurs` 新建冻结数据目录，只读复用 `interclarify-x2-turn-complete` 的 TSV 与 101 个 WAV 后重新选择并哈希；未删除旧数据，旧目录仍不恢复为现役依赖。证据见 [XTX-001 报告](../reports/xturnix_fleurs/20261023-xtx-001-data-freeze/README.md)。
 
 2026-10-23 仅回退 InterClarify/X-Talk 仓库中的本轮 X2-Turn 实现和测试，保留现役运行基线。本次没有登录服务器删除模型、conda 环境、固定数据或原始报告；此前新增的 `interclarify-x2-turn-complete` 和两个 X2-Turn conda 环境不再作为现役依赖，其当前远端状态仍需另行核查。不能把本次代码回退解释为已释放远端磁盘。
 
