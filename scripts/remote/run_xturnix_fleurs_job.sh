@@ -283,6 +283,7 @@ log "building job summary (end_free_gib=$END_FREE)"
 "$ENV_PY" - "$RUN_DIR" "$JOB_DIR" "$MODE" "$RUN_ID" "$COMMIT" "$START_FREE" \
   "$END_FREE" "$EXPECTED_PLANNED" "$TRACE_LIMIT_GIB" "$SERVICE_STOPPED_ORDERLY" <<'PY'
 import json
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -343,8 +344,10 @@ if samples.is_file():
     values = []
     for line in samples.read_text().splitlines()[1:]:
         columns = [item.strip() for item in line.split(",")]
-        if len(columns) >= 3 and columns[2].isdigit():
-            values.append(int(columns[2]))
+        if len(columns) >= 3:
+            match = re.match(r"(\d+)", columns[2])
+            if match:
+                values.append(int(match.group(1)))
     gpu_peak_mib = max(values) if values else None
 
 leftover = subprocess.run(
