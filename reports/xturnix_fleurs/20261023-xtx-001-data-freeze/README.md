@@ -67,12 +67,12 @@ test 与 dev 文件名集合无交集，分别保存在独立目录。100 条正
 | `dataset.lock.json` | `3fb2eb15c14ad662eb88080c6508a5c4b3e655d9ec8a6fe5c4f9c11c908c256f` |
 | `historical_asr_baseline.json` | `1de45c5542ab4a1bbd1d458d35a3321f10ede0b82c415bc93550198393e9dc2a` |
 | `prepare_report.json` | `6474843d3c14f1bf04a5aa10a9a81219e1526b829d193917292688999def290a` |
-| `verification.json` | `a2676eff3477c7f5a9d15c2c37877129067819cd7e7cf8cfd5fc49711f838189` |
+| `verification.json` | `5e461d158bc529f176ac6fa854ad9a2f465d4dc0e8134653349a8b33c7fde855` |
 | `prepare_events.jsonl` | `c180a359ccd51a23485c99e22e757ea26be23822f4f45374aad26790e029c759` |
 | `xtx-001-prepare.log` | `8770917c49f4850839ba272eaa07f8d6c2d94c856ed0d5a23415e10286d67fdd` |
 | `xtx-001-verify.log` | `6ec568cc4b558b051d2c838b1818cd7510c2e89d40c0335f9712acac8d95f1c3` |
 
-`prepare_report.json` 自报的 manifest／lock／baseline 摘要与上表一致；`verification.json` 记录复核时的 manifest 与 baseline 摘要。
+`prepare_report.json` 自报的 manifest／lock／baseline 摘要与上表一致；`verification.json` 记录复核时的 manifest 与 baseline 摘要，包含复核时间戳，再次运行 `verify-data` 会更新该文件及其摘要。
 
 ## 失败路径检查
 
