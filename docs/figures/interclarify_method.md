@@ -16,7 +16,7 @@ Nemotron 将在线转写写入 Context。XTurnix、Layer 0、Layer 1、Layer 2 �
 
 XTurnix 采用独立且比 Layer 1 micro-turn 更快的控制周期，具体周期尚未冻结。Layer 2 发布只更新 Context，不额外触发 XTurnix；各模块在下一次实际输入边界读取新信息。XTurnix 决策经 Context 驱动 Layer 1 表达，利用 thinking 条件的能力仍需适配，不能视为原版权重已经具备。
 
-Layer 0 保留时机预测职责，图以建议形式写入 Context，不将其画成独立音频来源。Layer 1 生成普通正文与系统 backchannel，输出写回 Context。已提交的发声文本进入 Text FIFO，TTS/播放器按顺序消费；播放器不从任意 Context 字段中自行挑选分析内容。Layer 1 的生成历史可见，但同一文本不重复注入模型输入。
+按用户最新修正，Text FIFO 直接接收 Layer 0 的系统 backchannel 和 Layer 1 的表达文本；Context 不作为队列的文本来源。Layer 0 保留附和时机预测职责，具体附和措辞与编码本图不展开；两条提交路径仍共享唯一 TTS/播放器。各模块对 Context 的读取和写回关系保留，Layer 1 的生成历史可见，但同一文本不重复注入模型输入。
 
 图中只回传 Listen/Speak 等运行状态，不把精确播放位置或已听文本对齐作为 Layer 1 的常规输入。生成历史保留，单一 TTS/播放所有权保留；没有 Layer 3，Layer 2 不生成待播放正文。图不规定 stop 的队列清理时点、在途生成处理或控制执行顺序，这些打断细节依用户要求暂不展开。
 
