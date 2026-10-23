@@ -1,6 +1,6 @@
 # Nemotron ASR 与 XTurnix：FLEURS 质量测试计划
 
-更新：2026-10-23。状态：XTX-001 已完成 FLEURS 输入与历史 ASR 基线冻结，XTX-002 已完成隔离环境、模型与协议冻结及 dev 验证，XTX-003—006 待实施。本次验证“真实音频 → Nemotron 在线转写 → XTurnix 控制动作”，主测最后一个 ASR 词汇 token 到 `<|start|>` 的增量延迟，再结合历史 ASR 测量估计音频到 start 的链路延迟。总安排见[工程实施计划](../../engineering_implementation.md)。
+更新：2026-10-23。状态：XTX-001 已完成 FLEURS 输入与历史 ASR 基线冻结，XTX-002 已完成隔离环境、模型与协议冻结及 dev 验证，XTX-003 已完成真实时钟回放器与模拟契约验证并归档；尚未在远端运行正式回放，XTX-004—006 待实施。本次验证“真实音频 → Nemotron 在线转写 → XTurnix 控制动作”，主测最后一个 ASR 词汇 token 到 `<|start|>` 的增量延迟，再结合历史 ASR 测量估计音频到 start 的链路延迟。总安排见[工程实施计划](../../engineering_implementation.md)。
 
 ## 1. 测试范围
 
