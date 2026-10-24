@@ -1,0 +1,812 @@
+{
+  "reviewer": "coding_agent",
+  "scope_zh": "先检查12条训练来源的完整请求及陈述，再查看4条训练轨迹的关键窗口；抽检不等同逐例人工审核。Wait前缀已按可见停止语义修正，未读取独立测试模型结果。",
+  "status": "accepted_with_documented_limits",
+  "sampled_windows": [
+    {
+      "snapshot_id": "mixed_10119:0:0",
+      "category": "pause",
+      "visible": {
+        "history": [],
+        "user_text": "How",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "How",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "当前新增输入仍在到达，尚未出现完整表达后的让轮空观察。"
+    },
+    {
+      "snapshot_id": "mixed_10119:0:1",
+      "category": "pause",
+      "visible": {
+        "history": [],
+        "user_text": "How do",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": " do",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "当前新增输入仍在到达，尚未出现完整表达后的让轮空观察。"
+    },
+    {
+      "snapshot_id": "mixed_10119:1:0",
+      "category": "pause",
+      "visible": {
+        "history": [],
+        "user_text": "How do",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "<|no-voice|>",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 1,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "只看到问句开头，缺少谓语或必要补语；当前语义不完整，不依据未来文字。"
+    },
+    {
+      "snapshot_id": "mixed_10119:3:0",
+      "category": "smooth",
+      "visible": {
+        "history": [],
+        "user_text": "How do you determine your target market in a business plan",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "<|no-voice|>",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 1,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "start",
+      "reason_zh": "完整请求或陈述已可见，随后出现首个让轮空观察；正文按来源完整保留。"
+    },
+    {
+      "snapshot_id": "mixed_10119:5:0",
+      "category": "backchannel",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "How do you determine your target market in a business plan?"
+          }
+        ],
+        "user_text": "Hmm",
+        "assistant_visible": "As an AI language model, I do not have personal experience in running a business",
+        "state": "Speak",
+        "observation": "Hmm",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": false,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "助手表达中的短促附和，没有要求停止或接管。"
+    },
+    {
+      "snapshot_id": "mixed_10119:11:0",
+      "category": "smooth",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "How do you determine your target market in a business plan?"
+          },
+          {
+            "role": "user",
+            "text": "Hmm.",
+            "kind": "backchannel"
+          },
+          {
+            "role": "assistant",
+            "text": "As an AI language model, I do not have personal experience in running a business or creating a business plan. However, I can provide general steps on how to determine your target market:\n\n1. Identify the product or service - Determine the features, benefits, and solutions your product or service offers.\n\n2. Analyze your competition - Take a look at your competitors and see who they are marketing to, their demographics, and their sales strategies.\n\n3. Conduct research - Conduct surveys, interviews, and focus group discussions to gather information about your target market. The data collected should include age, gender, occupation, lifestyle habits, and location.\n\n4. Use segmentation - Narrow down your audience into more defined segments, such as age, income, or location, to better target your advertising strategies.\n\n5. Determine your target market - Based on your research, create a clear description of your ideal customer or client. This includes age, gender, income, and psychographic traits.\n\n6. Refine your strategy - Determine how you will reach your target market and what channels you will use to market your product or service.\n\n7. Continuously evaluate and adapt - Continuously monitor your target market and adapt your strategy accordingly."
+          }
+        ],
+        "user_text": "I think I have a better idea of how to identify my target market now",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "<|no-voice|>",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 1,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "start",
+      "reason_zh": "完整请求或陈述已可见，随后出现首个让轮空观察；正文按来源完整保留。"
+    },
+    {
+      "snapshot_id": "mixed_10119:13:0",
+      "category": "interruption",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "How do you determine your target market in a business plan?"
+          },
+          {
+            "role": "user",
+            "text": "Hmm.",
+            "kind": "backchannel"
+          },
+          {
+            "role": "assistant",
+            "text": "As an AI language model, I do not have personal experience in running a business or creating a business plan. However, I can provide general steps on how to determine your target market:\n\n1. Identify the product or service - Determine the features, benefits, and solutions your product or service offers.\n\n2. Analyze your competition - Take a look at your competitors and see who they are marketing to, their demographics, and their sales strategies.\n\n3. Conduct research - Conduct surveys, interviews, and focus group discussions to gather information about your target market. The data collected should include age, gender, occupation, lifestyle habits, and location.\n\n4. Use segmentation - Narrow down your audience into more defined segments, such as age, income, or location, to better target your advertising strategies.\n\n5. Determine your target market - Based on your research, create a clear description of your ideal customer or client. This includes age, gender, income, and psychographic traits.\n\n6. Refine your strategy - Determine how you will reach your target market and what channels you will use to market your product or service.\n\n7. Continuously evaluate and adapt - Continuously monitor your target market and adapt your strategy accordingly."
+          },
+          {
+            "role": "user",
+            "text": "I think I have a better idea of how to identify my target market now."
+          }
+        ],
+        "user_text": "Please pause",
+        "assistant_visible": "I'm glad I could help you. Remember that having a well-defined target market",
+        "state": "Speak",
+        "observation": "Please pause",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": false,
+        "cot": ""
+      },
+      "target_action": "stop",
+      "reason_zh": "当前前缀已明确要求停止或暂停；stop仅用于用户打断。"
+    },
+    {
+      "snapshot_id": "mixed_10243:0:0",
+      "category": "pause",
+      "visible": {
+        "history": [],
+        "user_text": "How",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "How",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "当前新增输入仍在到达，尚未出现完整表达后的让轮空观察。"
+    },
+    {
+      "snapshot_id": "mixed_10243:0:1",
+      "category": "pause",
+      "visible": {
+        "history": [],
+        "user_text": "How do",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": " do",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "当前新增输入仍在到达，尚未出现完整表达后的让轮空观察。"
+    },
+    {
+      "snapshot_id": "mixed_10243:1:0",
+      "category": "pause",
+      "visible": {
+        "history": [],
+        "user_text": "How do",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "<|no-voice|>",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 1,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "只看到问句开头，缺少谓语或必要补语；当前语义不完整，不依据未来文字。"
+    },
+    {
+      "snapshot_id": "mixed_10243:3:0",
+      "category": "smooth",
+      "visible": {
+        "history": [],
+        "user_text": "How do you respond to those who argue that political correctness is limiting free speech",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "<|no-voice|>",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 1,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "start",
+      "reason_zh": "完整请求或陈述已可见，随后出现首个让轮空观察；正文按来源完整保留。"
+    },
+    {
+      "snapshot_id": "mixed_10243:5:0",
+      "category": "backchannel",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "How do you respond to those who argue that political correctness is limiting free speech?"
+          }
+        ],
+        "user_text": "Okay",
+        "assistant_visible": "As a language model AI, I do not have personal beliefs but generally, people",
+        "state": "Speak",
+        "observation": "Okay",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": false,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "助手表达中的短促附和，没有要求停止或接管。"
+    },
+    {
+      "snapshot_id": "mixed_10243:11:0",
+      "category": "smooth",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "How do you respond to those who argue that political correctness is limiting free speech?"
+          },
+          {
+            "role": "user",
+            "text": "Okay.",
+            "kind": "backchannel"
+          },
+          {
+            "role": "assistant",
+            "text": "As a language model AI, I do not have personal beliefs but generally, people who suggest that political correctness is limiting free speech may feel that certain topics or viewpoints are being censored or silenced due to concerns about offending others. However, it is important to remember that language can be used to harm or marginalize certain groups, and that promoting inclusive language and avoiding discriminatory language does not necessarily equate to limiting free speech. It is possible to express one's opinions and beliefs without resorting to hurtful or harmful language that marginalizes certain members of society. Ultimately, it is up to individuals to weigh the costs and benefits of their speech and make responsible choices about how to communicate their opinions without causing harm to others."
+          }
+        ],
+        "user_text": "I think political correctness is just a way for people to become too sensitive and easily offended. It's ridiculous that we need to change the way we speak just to avoid hurting someone's feelings. Free speech should come first",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "<|no-voice|>",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 1,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "start",
+      "reason_zh": "完整请求或陈述已可见，随后出现首个让轮空观察；正文按来源完整保留。"
+    },
+    {
+      "snapshot_id": "mixed_10243:13:0",
+      "category": "interruption",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "How do you respond to those who argue that political correctness is limiting free speech?"
+          },
+          {
+            "role": "user",
+            "text": "Okay.",
+            "kind": "backchannel"
+          },
+          {
+            "role": "assistant",
+            "text": "As a language model AI, I do not have personal beliefs but generally, people who suggest that political correctness is limiting free speech may feel that certain topics or viewpoints are being censored or silenced due to concerns about offending others. However, it is important to remember that language can be used to harm or marginalize certain groups, and that promoting inclusive language and avoiding discriminatory language does not necessarily equate to limiting free speech. It is possible to express one's opinions and beliefs without resorting to hurtful or harmful language that marginalizes certain members of society. Ultimately, it is up to individuals to weigh the costs and benefits of their speech and make responsible choices about how to communicate their opinions without causing harm to others."
+          },
+          {
+            "role": "user",
+            "text": "I think political correctness is just a way for people to become too sensitive and easily offended. It's ridiculous that we need to change the way we speak just to avoid hurting someone's feelings. Free speech should come first."
+          }
+        ],
+        "user_text": "Wait",
+        "assistant_visible": "As an AI language model, I don't have personal beliefs but responding neutrally",
+        "state": "Speak",
+        "observation": "Wait",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": false,
+        "cot": ""
+      },
+      "target_action": "stop",
+      "reason_zh": "当前前缀已明确要求停止或暂停；stop仅用于用户打断。"
+    },
+    {
+      "snapshot_id": "mixed_10243:13:1",
+      "category": "interruption",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "How do you respond to those who argue that political correctness is limiting free speech?"
+          },
+          {
+            "role": "user",
+            "text": "Okay.",
+            "kind": "backchannel"
+          },
+          {
+            "role": "assistant",
+            "text": "As a language model AI, I do not have personal beliefs but generally, people who suggest that political correctness is limiting free speech may feel that certain topics or viewpoints are being censored or silenced due to concerns about offending others. However, it is important to remember that language can be used to harm or marginalize certain groups, and that promoting inclusive language and avoiding discriminatory language does not necessarily equate to limiting free speech. It is possible to express one's opinions and beliefs without resorting to hurtful or harmful language that marginalizes certain members of society. Ultimately, it is up to individuals to weigh the costs and benefits of their speech and make responsible choices about how to communicate their opinions without causing harm to others."
+          },
+          {
+            "role": "user",
+            "text": "I think political correctness is just a way for people to become too sensitive and easily offended. It's ridiculous that we need to change the way we speak just to avoid hurting someone's feelings. Free speech should come first."
+          },
+          {
+            "role": "assistant",
+            "text": "As an AI language model, I don't have personal beliefs but responding neutrally",
+            "interrupted": true,
+            "generated_only": true
+          }
+        ],
+        "user_text": "Wait,",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": ",",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "已因用户打断让出话轮，当前新增文字继续归入该用户轮。"
+    },
+    {
+      "snapshot_id": "mixed_10243:13:2",
+      "category": "interruption",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "How do you respond to those who argue that political correctness is limiting free speech?"
+          },
+          {
+            "role": "user",
+            "text": "Okay.",
+            "kind": "backchannel"
+          },
+          {
+            "role": "assistant",
+            "text": "As a language model AI, I do not have personal beliefs but generally, people who suggest that political correctness is limiting free speech may feel that certain topics or viewpoints are being censored or silenced due to concerns about offending others. However, it is important to remember that language can be used to harm or marginalize certain groups, and that promoting inclusive language and avoiding discriminatory language does not necessarily equate to limiting free speech. It is possible to express one's opinions and beliefs without resorting to hurtful or harmful language that marginalizes certain members of society. Ultimately, it is up to individuals to weigh the costs and benefits of their speech and make responsible choices about how to communicate their opinions without causing harm to others."
+          },
+          {
+            "role": "user",
+            "text": "I think political correctness is just a way for people to become too sensitive and easily offended. It's ridiculous that we need to change the way we speak just to avoid hurting someone's feelings. Free speech should come first."
+          },
+          {
+            "role": "assistant",
+            "text": "As an AI language model, I don't have personal beliefs but responding neutrally",
+            "interrupted": true,
+            "generated_only": true
+          }
+        ],
+        "user_text": "Wait, stop",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": " stop",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "已因用户打断让出话轮，当前新增文字继续归入该用户轮。"
+    },
+    {
+      "snapshot_id": "mixed_10341:0:0",
+      "category": "pause",
+      "visible": {
+        "history": [],
+        "user_text": "Are there",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "Are there",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "当前新增输入仍在到达，尚未出现完整表达后的让轮空观察。"
+    },
+    {
+      "snapshot_id": "mixed_10341:1:0",
+      "category": "pause",
+      "visible": {
+        "history": [],
+        "user_text": "Are there",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "<|no-voice|>",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 1,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "只看到问句开头，缺少谓语或必要补语；当前语义不完整，不依据未来文字。"
+    },
+    {
+      "snapshot_id": "mixed_10341:1:1",
+      "category": "pause",
+      "visible": {
+        "history": [],
+        "user_text": "Are there",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "<|no-voice|>",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 2,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "只看到问句开头，缺少谓语或必要补语；当前语义不完整，不依据未来文字。"
+    },
+    {
+      "snapshot_id": "mixed_10341:3:0",
+      "category": "smooth",
+      "visible": {
+        "history": [],
+        "user_text": "Are there any breakfast foods that you simply cannot stand",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "<|no-voice|>",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 1,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "start",
+      "reason_zh": "完整请求或陈述已可见，随后出现首个让轮空观察；正文按来源完整保留。"
+    },
+    {
+      "snapshot_id": "mixed_10341:5:0",
+      "category": "backchannel",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "Are there any breakfast foods that you simply cannot stand?"
+          }
+        ],
+        "user_text": "Right",
+        "assistant_visible": "As an AI language model, I don't have the ability to stand or dislike",
+        "state": "Speak",
+        "observation": "Right",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": false,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "助手表达中的短促附和，没有要求停止或接管。"
+    },
+    {
+      "snapshot_id": "mixed_10341:11:0",
+      "category": "smooth",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "Are there any breakfast foods that you simply cannot stand?"
+          },
+          {
+            "role": "user",
+            "text": "Right.",
+            "kind": "backchannel"
+          },
+          {
+            "role": "assistant",
+            "text": "As an AI language model, I don't have the ability to stand or dislike food, but I can tell you that some people may not like certain breakfast foods, such as oatmeal, grapefruit, or tofu scrambles, for example. However, taste preferences vary from person to person."
+          }
+        ],
+        "user_text": "Yeah, I guess you're right. Personally, I can't stand the taste of black coffee. I need to have cream and sugar in it",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "<|no-voice|>",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 1,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "start",
+      "reason_zh": "完整请求或陈述已可见，随后出现首个让轮空观察；正文按来源完整保留。"
+    },
+    {
+      "snapshot_id": "mixed_10341:13:0",
+      "category": "interruption",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "Are there any breakfast foods that you simply cannot stand?"
+          },
+          {
+            "role": "user",
+            "text": "Right.",
+            "kind": "backchannel"
+          },
+          {
+            "role": "assistant",
+            "text": "As an AI language model, I don't have the ability to stand or dislike food, but I can tell you that some people may not like certain breakfast foods, such as oatmeal, grapefruit, or tofu scrambles, for example. However, taste preferences vary from person to person."
+          },
+          {
+            "role": "user",
+            "text": "Yeah, I guess you're right. Personally, I can't stand the taste of black coffee. I need to have cream and sugar in it."
+          }
+        ],
+        "user_text": "Stop for",
+        "assistant_visible": "As an AI language model, I don't drink or taste food, but if",
+        "state": "Speak",
+        "observation": "Stop for",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": false,
+        "cot": ""
+      },
+      "target_action": "stop",
+      "reason_zh": "当前前缀已明确要求停止或暂停；stop仅用于用户打断。"
+    },
+    {
+      "snapshot_id": "mixed_10341:13:1",
+      "category": "interruption",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "Are there any breakfast foods that you simply cannot stand?"
+          },
+          {
+            "role": "user",
+            "text": "Right.",
+            "kind": "backchannel"
+          },
+          {
+            "role": "assistant",
+            "text": "As an AI language model, I don't have the ability to stand or dislike food, but I can tell you that some people may not like certain breakfast foods, such as oatmeal, grapefruit, or tofu scrambles, for example. However, taste preferences vary from person to person."
+          },
+          {
+            "role": "user",
+            "text": "Yeah, I guess you're right. Personally, I can't stand the taste of black coffee. I need to have cream and sugar in it."
+          },
+          {
+            "role": "assistant",
+            "text": "As an AI language model, I don't drink or taste food, but if",
+            "interrupted": true,
+            "generated_only": true
+          }
+        ],
+        "user_text": "Stop for a",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": " a",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "已因用户打断让出话轮，当前新增文字继续归入该用户轮。"
+    },
+    {
+      "snapshot_id": "mixed_10341:13:2",
+      "category": "interruption",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "Are there any breakfast foods that you simply cannot stand?"
+          },
+          {
+            "role": "user",
+            "text": "Right.",
+            "kind": "backchannel"
+          },
+          {
+            "role": "assistant",
+            "text": "As an AI language model, I don't have the ability to stand or dislike food, but I can tell you that some people may not like certain breakfast foods, such as oatmeal, grapefruit, or tofu scrambles, for example. However, taste preferences vary from person to person."
+          },
+          {
+            "role": "user",
+            "text": "Yeah, I guess you're right. Personally, I can't stand the taste of black coffee. I need to have cream and sugar in it."
+          },
+          {
+            "role": "assistant",
+            "text": "As an AI language model, I don't drink or taste food, but if",
+            "interrupted": true,
+            "generated_only": true
+          }
+        ],
+        "user_text": "Stop for a moment",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": " moment",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "已因用户打断让出话轮，当前新增文字继续归入该用户轮。"
+    },
+    {
+      "snapshot_id": "mixed_10376:0:0",
+      "category": "pause",
+      "visible": {
+        "history": [],
+        "user_text": "How",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "How",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "当前新增输入仍在到达，尚未出现完整表达后的让轮空观察。"
+    },
+    {
+      "snapshot_id": "mixed_10376:0:1",
+      "category": "pause",
+      "visible": {
+        "history": [],
+        "user_text": "How does",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": " does",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "当前新增输入仍在到达，尚未出现完整表达后的让轮空观察。"
+    },
+    {
+      "snapshot_id": "mixed_10376:1:0",
+      "category": "pause",
+      "visible": {
+        "history": [],
+        "user_text": "How does",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "<|no-voice|>",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 1,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "只看到问句开头，缺少谓语或必要补语；当前语义不完整，不依据未来文字。"
+    },
+    {
+      "snapshot_id": "mixed_10376:1:1",
+      "category": "pause",
+      "visible": {
+        "history": [],
+        "user_text": "How does",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "<|no-voice|>",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 2,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "只看到问句开头，缺少谓语或必要补语；当前语义不完整，不依据未来文字。"
+    },
+    {
+      "snapshot_id": "mixed_10376:3:0",
+      "category": "smooth",
+      "visible": {
+        "history": [],
+        "user_text": "How does one know if they are dehydrated or over-hydrated",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "<|no-voice|>",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 1,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "start",
+      "reason_zh": "完整请求或陈述已可见，随后出现首个让轮空观察；正文按来源完整保留。"
+    },
+    {
+      "snapshot_id": "mixed_10376:5:0",
+      "category": "backchannel",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "How does one know if they are dehydrated or over-hydrated?"
+          }
+        ],
+        "user_text": "Right",
+        "assistant_visible": "Dehydration\n- Dry mouth and throat\n- Thirst\n- Dark yellow",
+        "state": "Speak",
+        "observation": "Right",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": false,
+        "cot": ""
+      },
+      "target_action": "keep",
+      "reason_zh": "助手表达中的短促附和，没有要求停止或接管。"
+    },
+    {
+      "snapshot_id": "mixed_10376:11:0",
+      "category": "smooth",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "How does one know if they are dehydrated or over-hydrated?"
+          },
+          {
+            "role": "user",
+            "text": "Right.",
+            "kind": "backchannel"
+          },
+          {
+            "role": "assistant",
+            "text": "Dehydration\n- Dry mouth and throat\n- Thirst\n- Dark yellow or amber-colored urine\n- Fatigue or weakness\n- Dizziness\n- Dry or cool skin\n- Headache\n- Muscle cramps or spasms\n- Reduced urine output\n\nOverhydration\n- Nausea\n- Headache\n- Vomiting\n- Muscle cramps\n- Swelling in hands, feet or legs\n- Confusion\n- Seizures\n- Coma\n\nIt's important to note that severe dehydration and overhydration can both be dangerous and require medical attention."
+          }
+        ],
+        "user_text": "Wow, I never realized overhydration could be dangerous too. I'll have to make sure I'm not drinking too much water now",
+        "assistant_visible": "",
+        "state": "Listen",
+        "observation": "<|no-voice|>",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 1,
+        "assistant_generation_complete": null,
+        "cot": ""
+      },
+      "target_action": "start",
+      "reason_zh": "完整请求或陈述已可见，随后出现首个让轮空观察；正文按来源完整保留。"
+    },
+    {
+      "snapshot_id": "mixed_10376:13:0",
+      "category": "interruption",
+      "visible": {
+        "history": [
+          {
+            "role": "user",
+            "text": "How does one know if they are dehydrated or over-hydrated?"
+          },
+          {
+            "role": "user",
+            "text": "Right.",
+            "kind": "backchannel"
+          },
+          {
+            "role": "assistant",
+            "text": "Dehydration\n- Dry mouth and throat\n- Thirst\n- Dark yellow or amber-colored urine\n- Fatigue or weakness\n- Dizziness\n- Dry or cool skin\n- Headache\n- Muscle cramps or spasms\n- Reduced urine output\n\nOverhydration\n- Nausea\n- Headache\n- Vomiting\n- Muscle cramps\n- Swelling in hands, feet or legs\n- Confusion\n- Seizures\n- Coma\n\nIt's important to note that severe dehydration and overhydration can both be dangerous and require medical attention."
+          },
+          {
+            "role": "user",
+            "text": "Wow, I never realized overhydration could be dangerous too. I'll have to make sure I'm not drinking too much water now!"
+          }
+        ],
+        "user_text": "Please pause",
+        "assistant_visible": "It's always best to maintain a balance and listen to your body's signals.",
+        "state": "Speak",
+        "observation": "Please pause",
+        "window_ms": 480,
+        "consecutive_no_voice_windows": 0,
+        "assistant_generation_complete": false,
+        "cot": ""
+      },
+      "target_action": "stop",
+      "reason_zh": "当前前缀已明确要求停止或暂停；stop仅用于用户打断。"
+    }
+  ]
+}

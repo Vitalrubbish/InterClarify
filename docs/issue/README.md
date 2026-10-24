@@ -1,6 +1,6 @@
 # 工作单管理
 
-2026-10-25 最新工作单：按用户明确要求，依据[训练方案](../dev/TextTurn/training_plan.md)建立 [TextTurn TT-001—004](TextTurn/README.md)，依次交付四类数据、候选模型、Nemotron／Shared Context 接入和独立验收。共 4 项、0 项完成；用户进一步指令启动 TT-001 并检查数据，现已交付[480ms检查批次六条综合轨迹／343快照](../../reports/textturn/20261024-tt-001-preview/README.md)，已按用户反馈采用短促附和、User随机1—2 token／窗、Assistant每480ms窗8 token模拟生成及分开的播放尾窗／下一轮等待，并将状态转换串入连续多轮片段，数据项实施中，正式来源与切分冻结尚未完成。TT-002—004 待实施；环境、少量测试和必要核查并入实现，不另拆确认任务。未启动训练或 GPU 作业；下方 SoulX/XTurnix 记录保留，不恢复其旧计划。
+2026-10-25 最新工作单：按用户明确要求推进 [TextTurn TT-001—004](TextTurn/README.md)。用户进一步授权完成TT-001并启动训练及后续评估；[TT-001正式文本数据](../../reports/textturn/20261025-tt-001-freeze/README.md)已冻结归档，当前1/4完成。实际train/dev/test为160/200/300来源，训练10,000快照、pilot 2,000快照，完整来源LFS及切分核查通过；时序与播放仍为合成，规则标注及历史正文覆盖限制如实保留。TT-002训练入口与远端准备中，TT-003/004按开发集候选放行。环境和必要测试并入原工作单，不新建issue，不恢复旧SoulX/XTurnix计划。
 
 2026-10-24 当前路线：用户已确认 **SoulX-Duplug＋Nemotron**，并要求简化为公开英文 Easy Turn 集上的质量与延迟测试；[方案](../dev/SoulX-Duplug/quality_test.md)已同步。本次只更新路线文档，未新建 issue、实现适配或启动远端作业。以下 XTurnix 内容保留为历史记录，不代表当前继续推进旧训练或恢复已取消测试。
 

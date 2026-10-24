@@ -1,6 +1,6 @@
 # TT-004：完成四类质量与延迟验收
 
-状态：待实施。依赖：[TT-001](tt_001_dataset.md)、[TT-002](tt_002_training.md)、[TT-003](tt_003_streaming_context.md)。依据：[训练方案第 4 节](../../dev/TextTurn/training_plan.md#4-通过门槛)。
+状态：待实施。依赖：[TT-001](../archive/TextTurn/tt_001_dataset.md)、[TT-002](tt_002_training.md)、[TT-003](tt_003_streaming_context.md)。依据：[训练方案第 4 节](../../dev/TextTurn/training_plan.md#4-通过门槛)。
 
 ## 目标
 
