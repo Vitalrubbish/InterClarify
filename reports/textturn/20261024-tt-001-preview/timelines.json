@@ -1,0 +1,1195 @@
+[
+  {
+    "scenario_id": "smooth_question",
+    "source_id": "0",
+    "events": [
+      {
+        "step": 0,
+        "visible_ms": 160,
+        "kind": "user",
+        "user_delta_raw": "How can",
+        "observation": "How can",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "user",
+        "user_delta_raw": " cross training",
+        "observation": " cross training",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "user",
+        "user_delta_raw": " benefit groups",
+        "observation": " benefit groups",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "user",
+        "user_delta_raw": " like runners",
+        "observation": " like runners",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "user",
+        "user_delta_raw": ", sw",
+        "observation": ", sw",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 5,
+        "visible_ms": 960,
+        "kind": "user",
+        "user_delta_raw": "immers,",
+        "observation": "immers,",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 6,
+        "visible_ms": 1120,
+        "kind": "user",
+        "user_delta_raw": " or weight",
+        "observation": " or weight",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 7,
+        "visible_ms": 1280,
+        "kind": "user",
+        "user_delta_raw": "lifters?",
+        "observation": "lifters",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 8,
+        "visible_ms": 1440,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 9,
+        "visible_ms": 1600,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 10,
+        "visible_ms": 1760,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 11,
+        "visible_ms": 1920,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      }
+    ]
+  },
+  {
+    "scenario_id": "smooth_statement_ocean",
+    "source_id": "2",
+    "events": [
+      {
+        "step": 0,
+        "visible_ms": 160,
+        "kind": "user",
+        "user_delta_raw": "Wow,",
+        "observation": "Wow,",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "user",
+        "user_delta_raw": " that's",
+        "observation": " that's",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "user",
+        "user_delta_raw": " a lot",
+        "observation": " a lot",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "user",
+        "user_delta_raw": " of water",
+        "observation": " of water",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "user",
+        "user_delta_raw": "! No",
+        "observation": "! No",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 5,
+        "visible_ms": 960,
+        "kind": "user",
+        "user_delta_raw": " wonder we",
+        "observation": " wonder we",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 6,
+        "visible_ms": 1120,
+        "kind": "user",
+        "user_delta_raw": " call it",
+        "observation": " call it",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 7,
+        "visible_ms": 1280,
+        "kind": "user",
+        "user_delta_raw": " the blue",
+        "observation": " the blue",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 8,
+        "visible_ms": 1440,
+        "kind": "user",
+        "user_delta_raw": " planet.",
+        "observation": " planet",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 9,
+        "visible_ms": 1600,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 10,
+        "visible_ms": 1760,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 11,
+        "visible_ms": 1920,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 12,
+        "visible_ms": 2080,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      }
+    ]
+  },
+  {
+    "scenario_id": "smooth_statement_translation",
+    "source_id": "3",
+    "events": [
+      {
+        "step": 0,
+        "visible_ms": 160,
+        "kind": "user",
+        "user_delta_raw": "It's",
+        "observation": "It's",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "user",
+        "user_delta_raw": " amazing how",
+        "observation": " amazing how",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "user",
+        "user_delta_raw": " language translation",
+        "observation": " language translation",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "user",
+        "user_delta_raw": " technology has",
+        "observation": " technology has",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "user",
+        "user_delta_raw": " made the",
+        "observation": " made the",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 5,
+        "visible_ms": 960,
+        "kind": "user",
+        "user_delta_raw": " world feel",
+        "observation": " world feel",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 6,
+        "visible_ms": 1120,
+        "kind": "user",
+        "user_delta_raw": " smaller.",
+        "observation": " smaller",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 7,
+        "visible_ms": 1280,
+        "kind": "user",
+        "user_delta_raw": " I can",
+        "observation": " I can",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 8,
+        "visible_ms": 1440,
+        "kind": "user",
+        "user_delta_raw": " talk to",
+        "observation": " talk to",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 9,
+        "visible_ms": 1600,
+        "kind": "user",
+        "user_delta_raw": " someone from",
+        "observation": " someone from",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 10,
+        "visible_ms": 1760,
+        "kind": "user",
+        "user_delta_raw": " across the",
+        "observation": " across the",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 11,
+        "visible_ms": 1920,
+        "kind": "user",
+        "user_delta_raw": " globe without",
+        "observation": " globe without",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 12,
+        "visible_ms": 2080,
+        "kind": "user",
+        "user_delta_raw": " ever leaving",
+        "observation": " ever leaving",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 13,
+        "visible_ms": 2240,
+        "kind": "user",
+        "user_delta_raw": " my home!",
+        "observation": " my home",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 14,
+        "visible_ms": 2400,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 15,
+        "visible_ms": 2560,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 16,
+        "visible_ms": 2720,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 17,
+        "visible_ms": 2880,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      }
+    ]
+  },
+  {
+    "scenario_id": "smooth_question_meditation",
+    "source_id": "9",
+    "events": [
+      {
+        "step": 0,
+        "visible_ms": 160,
+        "kind": "user",
+        "user_delta_raw": "Can mindful",
+        "observation": "Can mindful",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "user",
+        "user_delta_raw": " walking be",
+        "observation": " walking be",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "user",
+        "user_delta_raw": " used as",
+        "observation": " used as",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "user",
+        "user_delta_raw": " a form",
+        "observation": " a form",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "user",
+        "user_delta_raw": " of meditation",
+        "observation": " of meditation",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 5,
+        "visible_ms": 960,
+        "kind": "user",
+        "user_delta_raw": " or spiritual",
+        "observation": " or spiritual",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 6,
+        "visible_ms": 1120,
+        "kind": "user",
+        "user_delta_raw": " practice?",
+        "observation": " practice",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 7,
+        "visible_ms": 1280,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 8,
+        "visible_ms": 1440,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 9,
+        "visible_ms": 1600,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 10,
+        "visible_ms": 1760,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      }
+    ]
+  },
+  {
+    "scenario_id": "pause_cross_training",
+    "source_id": "0",
+    "events": [
+      {
+        "step": 0,
+        "visible_ms": 160,
+        "kind": "user",
+        "user_delta_raw": "How can",
+        "observation": "How can",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "user",
+        "user_delta_raw": " cross training",
+        "observation": " cross training",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "user",
+        "user_delta_raw": " benefit groups",
+        "observation": " benefit groups",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "user",
+        "user_delta_raw": " like",
+        "observation": " like",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 5,
+        "visible_ms": 960,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 6,
+        "visible_ms": 1120,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 7,
+        "visible_ms": 1280,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 600,
+        "rebuilt_duration_ms": 640
+      },
+      {
+        "step": 8,
+        "visible_ms": 1440,
+        "kind": "user",
+        "user_delta_raw": " runners,",
+        "observation": " runners,",
+        "state": "Listen",
+        "phase_index": 2
+      },
+      {
+        "step": 9,
+        "visible_ms": 1600,
+        "kind": "user",
+        "user_delta_raw": " swimmers",
+        "observation": " swimmers",
+        "state": "Listen",
+        "phase_index": 2
+      },
+      {
+        "step": 10,
+        "visible_ms": 1760,
+        "kind": "user",
+        "user_delta_raw": ", or",
+        "observation": ", or",
+        "state": "Listen",
+        "phase_index": 2
+      },
+      {
+        "step": 11,
+        "visible_ms": 1920,
+        "kind": "user",
+        "user_delta_raw": " weightlift",
+        "observation": " weightlift",
+        "state": "Listen",
+        "phase_index": 2
+      },
+      {
+        "step": 12,
+        "visible_ms": 2080,
+        "kind": "user",
+        "user_delta_raw": "ers?",
+        "observation": "ers",
+        "state": "Listen",
+        "phase_index": 2
+      }
+    ]
+  },
+  {
+    "scenario_id": "pause_mindful_walking",
+    "source_id": "9",
+    "events": [
+      {
+        "step": 0,
+        "visible_ms": 160,
+        "kind": "user",
+        "user_delta_raw": "Can mindful",
+        "observation": "Can mindful",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "user",
+        "user_delta_raw": " walking be",
+        "observation": " walking be",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "user",
+        "user_delta_raw": " used as",
+        "observation": " used as",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "user",
+        "user_delta_raw": " a form",
+        "observation": " a form",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "user",
+        "user_delta_raw": " of",
+        "observation": " of",
+        "state": "Listen",
+        "phase_index": 0
+      },
+      {
+        "step": 5,
+        "visible_ms": 960,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 1200,
+        "rebuilt_duration_ms": 1280
+      },
+      {
+        "step": 6,
+        "visible_ms": 1120,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 1200,
+        "rebuilt_duration_ms": 1280
+      },
+      {
+        "step": 7,
+        "visible_ms": 1280,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 1200,
+        "rebuilt_duration_ms": 1280
+      },
+      {
+        "step": 8,
+        "visible_ms": 1440,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 1200,
+        "rebuilt_duration_ms": 1280
+      },
+      {
+        "step": 9,
+        "visible_ms": 1600,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 1200,
+        "rebuilt_duration_ms": 1280
+      },
+      {
+        "step": 10,
+        "visible_ms": 1760,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 1200,
+        "rebuilt_duration_ms": 1280
+      },
+      {
+        "step": 11,
+        "visible_ms": 1920,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 1200,
+        "rebuilt_duration_ms": 1280
+      },
+      {
+        "step": 12,
+        "visible_ms": 2080,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Listen",
+        "phase_index": 1,
+        "original_duration_ms": 1200,
+        "rebuilt_duration_ms": 1280
+      },
+      {
+        "step": 13,
+        "visible_ms": 2240,
+        "kind": "user",
+        "user_delta_raw": " meditation or",
+        "observation": " meditation or",
+        "state": "Listen",
+        "phase_index": 2
+      },
+      {
+        "step": 14,
+        "visible_ms": 2400,
+        "kind": "user",
+        "user_delta_raw": " spiritual practice?",
+        "observation": " spiritual practice",
+        "state": "Listen",
+        "phase_index": 2
+      }
+    ]
+  },
+  {
+    "scenario_id": "backchannel_translation",
+    "source_id": "3",
+    "events": [
+      {
+        "step": 0,
+        "visible_ms": 160,
+        "kind": "user",
+        "user_delta_raw": "I",
+        "observation": "I",
+        "state": "Speak",
+        "phase_index": 0
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "user",
+        "user_delta_raw": " follow the",
+        "observation": " follow the",
+        "state": "Speak",
+        "phase_index": 1
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "user",
+        "user_delta_raw": " translation example",
+        "observation": " translation example",
+        "state": "Speak",
+        "phase_index": 1
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "user",
+        "user_delta_raw": "; please",
+        "observation": "; please",
+        "state": "Speak",
+        "phase_index": 1
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "user",
+        "user_delta_raw": " continue",
+        "observation": " continue",
+        "state": "Speak",
+        "phase_index": 1
+      }
+    ]
+  },
+  {
+    "scenario_id": "backchannel_meditation",
+    "source_id": "9",
+    "events": [
+      {
+        "step": 0,
+        "visible_ms": 160,
+        "kind": "user",
+        "user_delta_raw": "Yes,",
+        "observation": "Yes,",
+        "state": "Speak",
+        "phase_index": 0
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "user",
+        "user_delta_raw": " I'm",
+        "observation": " I'm",
+        "state": "Speak",
+        "phase_index": 1
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "user",
+        "user_delta_raw": " following,",
+        "observation": " following,",
+        "state": "Speak",
+        "phase_index": 1
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "user",
+        "user_delta_raw": " go on",
+        "observation": " go on",
+        "state": "Speak",
+        "phase_index": 1
+      }
+    ]
+  },
+  {
+    "scenario_id": "backchannel_shared_prefix",
+    "source_id": "19",
+    "events": [
+      {
+        "step": 0,
+        "visible_ms": 160,
+        "kind": "user",
+        "user_delta_raw": "That makes",
+        "observation": "That makes",
+        "state": "Speak",
+        "phase_index": 0
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "user",
+        "user_delta_raw": " sense",
+        "observation": " sense",
+        "state": "Speak",
+        "phase_index": 0
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "user",
+        "user_delta_raw": ", please",
+        "observation": ", please",
+        "state": "Speak",
+        "phase_index": 1
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "user",
+        "user_delta_raw": " keep going",
+        "observation": " keep going",
+        "state": "Speak",
+        "phase_index": 1
+      }
+    ]
+  },
+  {
+    "scenario_id": "interruption_shared_prefix",
+    "source_id": "19",
+    "events": [
+      {
+        "step": 0,
+        "visible_ms": 160,
+        "kind": "user",
+        "user_delta_raw": "That makes",
+        "observation": "That makes",
+        "state": "Speak",
+        "phase_index": 0
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "user",
+        "user_delta_raw": " sense",
+        "observation": " sense",
+        "state": "Speak",
+        "phase_index": 0
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "user",
+        "user_delta_raw": ", but",
+        "observation": ", but",
+        "state": "Speak",
+        "phase_index": 1
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "user",
+        "user_delta_raw": " please stop",
+        "observation": " please stop",
+        "state": "Speak",
+        "phase_index": 1
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "user",
+        "user_delta_raw": " now",
+        "observation": " now",
+        "state": "Speak",
+        "phase_index": 1
+      }
+    ]
+  },
+  {
+    "scenario_id": "interruption_change_request",
+    "source_id": "0",
+    "events": [
+      {
+        "step": 0,
+        "visible_ms": 160,
+        "kind": "user",
+        "user_delta_raw": "Please",
+        "observation": "Please",
+        "state": "Speak",
+        "phase_index": 0
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "user",
+        "user_delta_raw": " stop;",
+        "observation": " stop;",
+        "state": "Speak",
+        "phase_index": 1
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "user",
+        "user_delta_raw": " I want",
+        "observation": " I want",
+        "state": "Speak",
+        "phase_index": 1
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "user",
+        "user_delta_raw": " to focus",
+        "observation": " to focus",
+        "state": "Speak",
+        "phase_index": 1
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "user",
+        "user_delta_raw": " on swimming",
+        "observation": " on swimming",
+        "state": "Speak",
+        "phase_index": 1
+      },
+      {
+        "step": 5,
+        "visible_ms": 960,
+        "kind": "user",
+        "user_delta_raw": " instead",
+        "observation": " instead",
+        "state": "Speak",
+        "phase_index": 1
+      }
+    ]
+  },
+  {
+    "scenario_id": "interruption_original_refusal",
+    "source_id": "6",
+    "events": [
+      {
+        "step": 0,
+        "visible_ms": 160,
+        "kind": "user",
+        "user_delta_raw": "I appreciate",
+        "observation": "I appreciate",
+        "state": "Speak",
+        "phase_index": 0
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "user",
+        "user_delta_raw": " your concern",
+        "observation": " your concern",
+        "state": "Speak",
+        "phase_index": 0
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "user",
+        "user_delta_raw": ", but",
+        "observation": ", but",
+        "state": "Speak",
+        "phase_index": 0
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "user",
+        "user_delta_raw": " I don",
+        "observation": " I don",
+        "state": "Speak",
+        "phase_index": 0
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "user",
+        "user_delta_raw": "'t need",
+        "observation": "'t need",
+        "state": "Speak",
+        "phase_index": 0
+      },
+      {
+        "step": 5,
+        "visible_ms": 960,
+        "kind": "user",
+        "user_delta_raw": " any more",
+        "observation": " any more",
+        "state": "Speak",
+        "phase_index": 0
+      },
+      {
+        "step": 6,
+        "visible_ms": 1120,
+        "kind": "user",
+        "user_delta_raw": " information.",
+        "observation": " information",
+        "state": "Speak",
+        "phase_index": 0
+      }
+    ]
+  },
+  {
+    "scenario_id": "natural_completion_2",
+    "source_id": "2",
+    "events": [
+      {
+        "step": 0,
+        "visible_ms": 160,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": 0,
+        "original_duration_ms": 160,
+        "rebuilt_duration_ms": 160
+      },
+      {
+        "step": 1,
+        "visible_ms": 160,
+        "kind": "playback_complete",
+        "state_after": "Listen",
+        "target_action": null
+      }
+    ]
+  },
+  {
+    "scenario_id": "natural_completion_9",
+    "source_id": "9",
+    "events": [
+      {
+        "step": 0,
+        "visible_ms": 160,
+        "kind": "silence",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": 0,
+        "original_duration_ms": 160,
+        "rebuilt_duration_ms": 160
+      },
+      {
+        "step": 1,
+        "visible_ms": 160,
+        "kind": "playback_complete",
+        "state_after": "Listen",
+        "target_action": null
+      }
+    ]
+  }
+]

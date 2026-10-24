@@ -1,0 +1,19 @@
+{
+  "action_only_mask_checked": 27,
+  "max_input_tokens": 669,
+  "dedup": {
+    "scope": "selected_review_sources_only",
+    "word_ngram": 5,
+    "jaccard_threshold": 0.85,
+    "dialogues_checked": 6,
+    "groups": 6,
+    "matched_pairs": []
+  },
+  "category_snapshot_counts": {
+    "smooth": 8,
+    "pause": 6,
+    "backchannel": 6,
+    "interruption": 5,
+    "natural_completion": 2
+  }
+}

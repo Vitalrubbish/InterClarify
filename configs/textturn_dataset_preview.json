@@ -1,0 +1,340 @@
+{
+  "schema_version": 1,
+  "purpose": "TT-001 source-linked review preview",
+  "max_length": 2048,
+  "annotation_policy_zh": "原始 UltraChat 文本及可见上下文逐例核对；插入的附和／停止请求明确标为合成。动作仅标在可见语义依据充分的锚点，其余为未知；未做人类独立复核。",
+  "gaps_zh": [
+    "远端已检查的旧训练目录和归档位置未找到旧对话及600ms事件产物；本轮仅恢复同一固定revision的源前缀，未恢复旧切分或原停顿位置。",
+    "HTTP Range仅验证固定revision和区间，未下载整分片校验LFS SHA256。",
+    "当前只构建review集合；旧测试是否用于调参及全部历史来源组尚未核验，不声明新来源独立。",
+    "六个来源组仅做样例内原文精确去重和近重复检查；未覆盖原全量候选及模板组。",
+    "正式训练、开发、独立测试数量均为0，尚不满足1000/200/300对话及每类100个独立测试场景组目标。",
+    "新增600/1200ms停顿为显式合成，非恢复的旧事件；160ms为模拟发布时序，无Nemotron真实trace或可回放语音。",
+    "样例由编码代理按可见内容核查并给出理由，用户检查待完成；尚不放行TT-002。"
+  ],
+  "scenarios": [
+    {
+      "scenario_id": "smooth_question",
+      "source_id": "0",
+      "category": "smooth",
+      "history_before_turn": 0,
+      "state": "Listen",
+      "phases": [
+        {
+          "channel": "user",
+          "source_turn": 0
+        },
+        {
+          "channel": "silence",
+          "duration_ms": 600,
+          "action": "start",
+          "reason_zh": "完整的交叉训练提问已可见，随后四个空文本步骤，允许正常接话。"
+        }
+      ],
+      "utterance_form": "question"
+    },
+    {
+      "scenario_id": "smooth_statement_ocean",
+      "source_id": "2",
+      "category": "smooth",
+      "history_before_turn": 2,
+      "state": "Listen",
+      "phases": [
+        {
+          "channel": "user",
+          "source_turn": 2
+        },
+        {
+          "channel": "silence",
+          "duration_ms": 600,
+          "action": "start",
+          "reason_zh": "用户完整表达对海洋覆盖率的感想并留出空窗，陈述句也允许回应。"
+        }
+      ],
+      "utterance_form": "declarative"
+    },
+    {
+      "scenario_id": "smooth_statement_translation",
+      "source_id": "3",
+      "category": "smooth",
+      "history_before_turn": 2,
+      "state": "Listen",
+      "phases": [
+        {
+          "channel": "user",
+          "source_turn": 2
+        },
+        {
+          "channel": "silence",
+          "duration_ms": 600,
+          "action": "start",
+          "reason_zh": "完整陈述翻译技术带来的交流体验，没有留下未完成的从句。"
+        }
+      ],
+      "utterance_form": "declarative"
+    },
+    {
+      "scenario_id": "smooth_question_meditation",
+      "source_id": "9",
+      "category": "smooth",
+      "history_before_turn": 0,
+      "state": "Listen",
+      "phases": [
+        {
+          "channel": "user",
+          "source_turn": 0
+        },
+        {
+          "channel": "silence",
+          "duration_ms": 600,
+          "action": "start",
+          "reason_zh": "完整问题已经结束，空文本窗后允许回应。"
+        }
+      ],
+      "utterance_form": "question"
+    },
+    {
+      "scenario_id": "pause_cross_training",
+      "source_id": "0",
+      "category": "pause",
+      "history_before_turn": 0,
+      "state": "Listen",
+      "phases": [
+        {
+          "channel": "user",
+          "source_turn": 0,
+          "end": 42,
+          "action": "keep",
+          "reason_zh": "当前可见句法仍缺少宾语，不能据截断或标点启动回应。"
+        },
+        {
+          "channel": "silence",
+          "duration_ms": 600,
+          "action": "keep",
+          "reason_zh": "空文本没有补全当前未完成表达，保持倾听。"
+        },
+        {
+          "channel": "user",
+          "source_turn": 0,
+          "start": 42
+        }
+      ]
+    },
+    {
+      "scenario_id": "pause_mindful_walking",
+      "source_id": "9",
+      "category": "pause",
+      "history_before_turn": 0,
+      "state": "Listen",
+      "phases": [
+        {
+          "channel": "user",
+          "source_turn": 0,
+          "end": 40,
+          "action": "keep",
+          "reason_zh": "当前可见句法仍缺少宾语，不能据截断或标点启动回应。"
+        },
+        {
+          "channel": "silence",
+          "duration_ms": 1200,
+          "action": "keep",
+          "reason_zh": "空文本没有补全当前未完成表达，保持倾听。"
+        },
+        {
+          "channel": "user",
+          "source_turn": 0,
+          "start": 40
+        }
+      ]
+    },
+    {
+      "scenario_id": "backchannel_translation",
+      "source_id": "3",
+      "category": "backchannel",
+      "history_before_turn": 1,
+      "state": "Speak",
+      "phases": [
+        {
+          "channel": "user",
+          "text": "I",
+          "origin": "synthetic_annotation"
+        },
+        {
+          "channel": "user",
+          "text": " follow the translation example; please continue",
+          "origin": "synthetic_annotation",
+          "action": "keep",
+          "reason_zh": "用户明确允许继续讲解，属于附和。"
+        }
+      ],
+      "assistant_visible": {
+        "source_turn": 1,
+        "end": 190
+      }
+    },
+    {
+      "scenario_id": "backchannel_meditation",
+      "source_id": "9",
+      "category": "backchannel",
+      "history_before_turn": 1,
+      "state": "Speak",
+      "phases": [
+        {
+          "channel": "user",
+          "text": "Yes,",
+          "origin": "synthetic_annotation"
+        },
+        {
+          "channel": "user",
+          "text": " I'm following, go on",
+          "origin": "synthetic_annotation",
+          "action": "keep",
+          "reason_zh": "用户确认理解并请系统继续，不应停止播放。"
+        }
+      ],
+      "assistant_visible": {
+        "source_turn": 1,
+        "end": 190
+      }
+    },
+    {
+      "scenario_id": "backchannel_shared_prefix",
+      "source_id": "19",
+      "category": "backchannel",
+      "history_before_turn": 1,
+      "state": "Speak",
+      "phases": [
+        {
+          "channel": "user",
+          "text": "That makes sense",
+          "origin": "synthetic_annotation"
+        },
+        {
+          "channel": "user",
+          "text": ", please keep going",
+          "origin": "synthetic_annotation",
+          "action": "keep",
+          "reason_zh": "相同前缀后出现明确的继续请求，应继续表达。"
+        }
+      ],
+      "assistant_visible": {
+        "source_turn": 1,
+        "end": 190
+      }
+    },
+    {
+      "scenario_id": "interruption_shared_prefix",
+      "source_id": "19",
+      "category": "interruption",
+      "history_before_turn": 1,
+      "state": "Speak",
+      "phases": [
+        {
+          "channel": "user",
+          "text": "That makes sense",
+          "origin": "synthetic_annotation"
+        },
+        {
+          "channel": "user",
+          "text": ", but please stop now",
+          "origin": "synthetic_annotation",
+          "action": "stop",
+          "reason_zh": "相同前缀后出现明确的停止请求，应让出话轮。"
+        }
+      ],
+      "assistant_visible": {
+        "source_turn": 1,
+        "end": 190
+      }
+    },
+    {
+      "scenario_id": "interruption_change_request",
+      "source_id": "0",
+      "category": "interruption",
+      "history_before_turn": 1,
+      "state": "Speak",
+      "phases": [
+        {
+          "channel": "user",
+          "text": "Please",
+          "origin": "synthetic_annotation"
+        },
+        {
+          "channel": "user",
+          "text": " stop; I want to focus on swimming instead",
+          "origin": "synthetic_annotation",
+          "action": "stop",
+          "reason_zh": "用户明确要求停止并更改关注对象，构成打断。"
+        }
+      ],
+      "assistant_visible": {
+        "source_turn": 1,
+        "end": 190
+      }
+    },
+    {
+      "scenario_id": "interruption_original_refusal",
+      "source_id": "6",
+      "category": "interruption",
+      "history_before_turn": 5,
+      "state": "Speak",
+      "phases": [
+        {
+          "channel": "user",
+          "source_turn": 6,
+          "end": 65,
+          "action": "stop",
+          "reason_zh": "原对话中的拒绝前缀已明确表示不再需要信息；模拟在上一轮解释尚在播放时到达。"
+        }
+      ],
+      "assistant_visible": {
+        "source_turn": 5,
+        "end": 190
+      }
+    },
+    {
+      "scenario_id": "natural_completion_2",
+      "source_id": "2",
+      "category": "natural_completion",
+      "history_before_turn": 1,
+      "state": "Speak",
+      "phases": [
+        {
+          "channel": "silence",
+          "duration_ms": 160,
+          "action": "keep",
+          "reason_zh": "没有用户打断，最后仍在播放的步骤保持 keep；其后的播放结束事件直接转 Listen。"
+        },
+        {
+          "channel": "playback_complete"
+        }
+      ],
+      "assistant_visible": {
+        "source_turn": 1,
+        "end": 54
+      }
+    },
+    {
+      "scenario_id": "natural_completion_9",
+      "source_id": "9",
+      "category": "natural_completion",
+      "history_before_turn": 1,
+      "state": "Speak",
+      "phases": [
+        {
+          "channel": "silence",
+          "duration_ms": 160,
+          "action": "keep",
+          "reason_zh": "没有用户打断，最后仍在播放的步骤保持 keep；其后的播放结束事件直接转 Listen。"
+        },
+        {
+          "channel": "playback_complete"
+        }
+      ],
+      "assistant_visible": {
+        "source_turn": 1,
+        "end": 79
+      }
+    }
+  ]
+}

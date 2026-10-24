@@ -1,0 +1,108 @@
+{
+  "status": "preview_for_review",
+  "training_allowed": false,
+  "independent_test_ready": false,
+  "source_revision": "f220fe796ce3ed62fbe1681b45ce6cbc9c6cabe0",
+  "source_verification": "pinned_HTTP_byte_range; full_shard_LFS_hash_not_verified",
+  "model_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+  "new_token_ids": {
+    "<|tt_keep|>": 151669,
+    "<|tt_start|>": 151670,
+    "<|tt_stop|>": 151671,
+    "<|no-voice|>": 151672
+  },
+  "source_dialogues": 6,
+  "scenarios": 14,
+  "snapshots": 27,
+  "readable_candidates": 16,
+  "action_counts": {
+    "unknown": 11,
+    "start": 4,
+    "keep": 9,
+    "stop": 3
+  },
+  "start_declarative": 2,
+  "start_total": 4,
+  "start_declarative_fraction": 0.5,
+  "category_scenario_groups": {
+    "backchannel": 3,
+    "interruption": 3,
+    "natural_completion": 2,
+    "pause": 2,
+    "smooth": 4
+  },
+  "overlength": 0,
+  "formal_split_actual": {
+    "train": 0,
+    "dev": 0,
+    "test": 0
+  },
+  "formal_split_targets": {
+    "train_dialogues_max": 1000,
+    "train_snapshots_max": 10000,
+    "pilot_snapshots_max": 2000,
+    "dev_dialogues": 200,
+    "test_dialogues": 300,
+    "test_groups_per_category_min": 100
+  },
+  "gaps_zh": [
+    "远端已检查的旧训练目录和归档位置未找到旧对话及600ms事件产物；本轮仅恢复同一固定revision的源前缀，未恢复旧切分或原停顿位置。",
+    "HTTP Range仅验证固定revision和区间，未下载整分片校验LFS SHA256。",
+    "当前只构建review集合；旧测试是否用于调参及全部历史来源组尚未核验，不声明新来源独立。",
+    "六个来源组仅做样例内原文精确去重和近重复检查；未覆盖原全量候选及模板组。",
+    "正式训练、开发、独立测试数量均为0，尚不满足1000/200/300对话及每类100个独立测试场景组目标。",
+    "新增600/1200ms停顿为显式合成，非恢复的旧事件；160ms为模拟发布时序，无Nemotron真实trace或可回放语音。",
+    "样例由编码代理按可见内容核查并给出理由，用户检查待完成；尚不放行TT-002。"
+  ],
+  "config_sha256": "c5a7b3eb9bf8ad861c84587e470729a89185737fd5e10e2b8db1ee8ab8a671ed",
+  "builder_sha256": "afa945bd9c453aede6e28443529c607951b63c9c9b9252e0801d3409dfb0a015",
+  "audit": {
+    "action_only_mask_checked": 27,
+    "max_input_tokens": 669,
+    "dedup": {
+      "scope": "selected_review_sources_only",
+      "word_ngram": 5,
+      "jaccard_threshold": 0.85,
+      "dialogues_checked": 6,
+      "groups": 6,
+      "matched_pairs": []
+    },
+    "category_snapshot_counts": {
+      "smooth": 8,
+      "pause": 6,
+      "backchannel": 6,
+      "interruption": 5,
+      "natural_completion": 2
+    }
+  },
+  "downloads": {
+    "dataset_api.json": {
+      "url": "https://huggingface.co/api/datasets/openbmb/UltraChat/revision/f220fe796ce3ed62fbe1681b45ce6cbc9c6cabe0",
+      "sha256": "e56969495c4ccfa70207fa32b9c124653a7f47eb0b4534c198b216ece3bef6a6",
+      "bytes": 1718,
+      "http_status": 200,
+      "content_range": null
+    },
+    "tokenizer.json": {
+      "url": "https://huggingface.co/Qwen/Qwen3-0.6B/resolve/c1899de289a04d12100db370d81485cdf75e47ca/tokenizer.json",
+      "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4",
+      "bytes": 11422654,
+      "http_status": 200,
+      "content_range": null
+    },
+    "tokenizer_config.json": {
+      "url": "https://huggingface.co/Qwen/Qwen3-0.6B/resolve/c1899de289a04d12100db370d81485cdf75e47ca/tokenizer_config.json",
+      "sha256": "d5d09f07b48c3086c508b30d1c9114bd1189145b74e982a265350c923acd8101",
+      "bytes": 9732,
+      "http_status": 200,
+      "content_range": null
+    },
+    "source.bin": {
+      "url": "https://huggingface.co/datasets/stingning/ultrachat/resolve/f220fe796ce3ed62fbe1681b45ce6cbc9c6cabe0/train_0.jsonl",
+      "sha256": "f42fb10c00b781576040552f976fb2f0bd291de3d9154d9de4126533bca84a60",
+      "bytes": 1048576,
+      "http_status": 206,
+      "content_range": "bytes 0-1048575/963569677"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "qwen_character_roundtrip_phases": 19,
+  "chunks_exceeding_two_reencoded_tokens": 3,
+  "punctuation_only_chunks": 0,
+  "tokenizer_reload": true,
+  "shared_ambiguous_prefix_identical_input": true,
+  "chat_template_matches": 27,
+  "unit_tests_passed": 5
+}
