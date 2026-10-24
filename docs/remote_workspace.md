@@ -34,6 +34,8 @@
 
 ## 维护记录
 
+2026-10-24 按用户要求将当前实现恢复至阈值实验前的 `13ba980`，清除 XTurnix 实验目录下 18 个过期源码 worktree 与 7 份撤回实验启动脚本。其后产生的 5 个原始 run、离线输入及对应日志已移至 `~/interclarify-retired-threshold-experiments-20261024/`，清单为 `cleanup_manifest.json`；这些只保留历史证据，不是现役入口。模型、conda、现役运行快照和原 FLEURS/FDB 资产保留，详见[回滚记录](dev/XTurnix/rollback_cleanup.md)。
+
 2026-10-23 完成 XTX-002：在 `interclarify-xturnix-fleurs` 下创建隔离 conda 环境 `envs/xturnix`（Python 3.12.15、torch 2.11.0+cu128、transformers 4.57.1），下载并锁定 `models/xturnix-pt`（`xcczach/xturnix-pt@d4b0403`），只读复核 Nemotron `ebe59e5`。dev 协议证据在 `runs/xtx-002-probe-20261023-r3`；未覆盖现役 ASR/TTS/评分环境。证据见 [XTX-002 报告](../reports/xturnix_fleurs/20261023-xtx-002-protocol/README.md)。
 
 2026-10-23 完成 XTX-001：在 `interclarify-xturnix-fleurs` 新建冻结数据目录，只读复用 `interclarify-x2-turn-complete` 的 TSV 与 101 个 WAV 后重新选择并哈希；未删除旧数据，旧目录仍不恢复为现役依赖。证据见 [XTX-001 报告](../reports/xturnix_fleurs/20261023-xtx-001-data-freeze/README.md)。

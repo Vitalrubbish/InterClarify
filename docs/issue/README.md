@@ -1,23 +1,20 @@
 # 工作单管理
 
-更新：2026-10-24。已按用户要求完成 ASR 时间辅助的短延迟对照，本轮未训练；依据结果，下一步选择 Listen 定向训练准备，完整监督与资源探针尚未实施，不自动恢复原四类训练范围。
+2026-10-24 回滚说明：用户明确选择撤销全部阈值实验，恢复 `13ba980` 的工作单与实现记录；其后校准、ASR 时间控制、短延迟和训练入口草案已清理。以下为基点保留状态，不代表重新授权旧训练或取消的测试。当前仅执行[回滚清理](../dev/XTurnix/rollback_cleanup.md)，没有新建工作单。
 
-## 当前路线
+更新：2026-10-23。
 
-[XTX-014：ASR 时间观测与无训练 Listen 控制](XTurnix/xtx_014_asr_time_control.md)已完成原生 pause 与[短延迟真实对照](../../reports/xturnix_control/20261024-short-latency-comparison/README.md)：45/45、退出 0，500ms 与提前动作≤5% 下，预设三类策略的评估安全命中均为 0/14。根据用户要求作出的[入口决策](../dev/XTurnix/listen_training_entry.md)为停止当前规则重复扫参，先冻结独立 Listen 配对监督，再验证小规模训练。现有 45 轮及 FDB/FLEURS 不进入训练，本轮尚未更新参数；XTX-014 整体在线适配与独立验收仍未完成，未创建新工作单。
+按用户明确指令，依据[Nemotron＋XTurnix 的 FLEURS 质量测试计划](../dev/XTurnix/quality_test_on_fleurs.md)，在 [XTurnix 工作单目录](XTurnix/README.md)推进 XTX-001—006。XTX-001 已完成输入与历史基线冻结并归档；XTX-002 已完成隔离环境、模型与协议冻结及 dev 验证并归档；XTX-003 已完成真实时钟回放器与模拟契约验证并归档；XTX-004 已完成离线评分入口与合成 trace 验证并归档；XTX-005 已完成 A10 远端作业入口与 5 条冒烟并归档；XTX-006 正式 100 条作业已按用户要求取消，随后完成 pause token 诊断，未产生正式成绩。
 
-[XTX-010](XTurnix/xtx_010_control_baseline_calibration.md)的 Listen 纯文本阶段已完成并保留为基线，Speak 校准后置。[真实结果](../../reports/xturnix_training/20261023-listen-calibration/README.md)为留出误抢话 10.78%→5.39%、末端召回 44.31%→28.74%，未达到预设工作点，新阈值未部署。XTX-014 不依赖 Speak 校准或完整四类训练数据。
+XTX-007 已完成[实际分析](../dev/XTurnix/training_feasibility_assessment.md)，用户同意先启动 40—60 个英文场景的来源与可判定性审核，[分析工作单](archive/XTurnix/xtx_007_training_feasibility.md)已归档。[XTX-009](XTurnix/xtx_009_training_data_freeze.md) 已交付[48 会话首轮审核](../dev/XTurnix/source_audit.md)：30 个条件候选、18 个歧义，当前可直接冻结的训练记录为 0。本次只放行来源审核，正式冻结仍依赖 XTX-008，约 200 场景双人试标、输入/环境、校准及训练均未启动；不切换现役控制路径。
 
-## 归档与历史
+| 工作单组 | 范围 | 进度 |
+| --- | --- | --- |
+| [XTurnix：FLEURS 两组件测试](XTurnix/README.md#fleurs-evaluation) | 固定输入与历史基线、组件协议、在线回放、独立评分、远端冒烟、100 条正式测试与报告 | 5/6 完成；XTX-006 正式作业已取消 |
+| [XTurnix：可行性分析及条件性试训](XTurnix/README.md#vad-assisted-training) | 分析与讨论完成；已开展首轮来源审核，正式输入/数据及训练待条件 | 1/7；XTX-007 已归档，XTX-009 首轮审核完成、本项未完成 |
 
-训练相关 XTX-008、009、011—013 已按用户指令移入 `docs/issue/archive/XTurnix/`，状态为搁置归档，未完成验收保留，不标记训练已通过。XTX-009 的 48 会话辅助审核和 XTX-010 的基线证据继续保留，XTX-007 分析与讨论此前已完成归档。详细清单见[XTurnix 归档入口](XTurnix/README.md#vad-assisted-training)。
+XTX-001 证据见[数据冻结报告](../../reports/xturnix_fleurs/20261023-xtx-001-data-freeze/README.md)，XTX-002 证据见[协议冻结报告](../../reports/xturnix_fleurs/20261023-xtx-002-protocol/README.md)，XTX-003 证据见[回放器报告](../../reports/xturnix_fleurs/20261023-xtx-003-replay/README.md)，XTX-004 证据见[离线评分报告](../../reports/xturnix_fleurs/20261023-xtx-004-scoring/README.md)，XTX-005 证据见[A10 冒烟报告](../../reports/xturnix_fleurs/20261023-xtx-005-smoke-a10/README.md)。依赖顺序及每项验收以组内入口和工作单为准。完成一项立即归档至 `docs/issue/archive/XTurnix/`，同步更新链接与状态；未实施不标记完成。真实模型测试仍需远端 conda、单作业及既定内存/磁盘上限。
 
-| 工作单组 | 当前状态 |
-| --- | --- |
-| [ASR 时间无训练控制](XTurnix/README.md#当前工作) | XTX-014 原生 pause 子诊断完成，ASR 时间适配待完成；XTX-010 保留 Listen 基线，Speak 后置 |
-| [原分析及训练路线](XTurnix/README.md#vad-assisted-training) | XTX-007 已完成；008、009、011—013 搁置归档，不计完成率 |
-| [FLEURS 两组件测试](XTurnix/README.md#fleurs-evaluation) | XTX-001—005 已完成；006 正式作业已取消，pause 诊断已完成，正式成绩未产生 |
+此前 X2-Turn 实现和测试及其 X2Q 工作单已撤下，不因本轮工作单创建而恢复。历史记录可从 Git 与回退备份追溯。
 
-原 FLEURS/FDB 输入、报告与取消状态保留，不参与新策略选参，不恢复已撤下的 X2-Turn 实现。已查看的 Listen 留出集仅作回归/探索性诊断，不能继续当作新路线独立测试。
-
-研究范围与模块职责见[研究主文档](../research_design.md)，工程顺序见[工程实施计划](../engineering_implementation.md)。保持单一控制策略、唯一仲裁执行点与单一 TTS 播放所有权；当前不接 CoT、Layer 0/1/2 或真实播放，不替换现役控制器。实现和必要测试需有同路径中文说明；真实模型仅在远端 conda 受限作业验证，完成验收后归档，搁置项与完成项明确区分。后续新工作单仍依据用户明确指令建立。
+研究范围与模块职责见[研究主文档](../research_design.md)，实施顺序与待定参数见[工程实施计划](../engineering_implementation.md)。XTX-007 完成的是分析与讨论，XTX-009 当前完成的是首轮来源审核，均不代表四类监督或训练通过。普通控制训练与影子验证继续作为条件性计划，不包含 CoT 条件化主动介入训练、Layer 0/1/2 训练、完整播放链集成或现役替换，也不恢复此前取消的测试。

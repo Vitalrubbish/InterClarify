@@ -1,10 +1,6 @@
 # XTX-008：冻结 VAD 辅助输入协议与隔离训练环境
 
-状态：搁置归档；未完成，非验收通过。2026-10-24 按用户“先利用 ASR 时间信息、不训练模型”的指令退出当前执行队列。
-
-## 归档说明
-
-本项尚未实施，原计划与未完成验收继续保留。 原 VAD 辅助训练路线暂不推进，不因归档写成已实现或已通过；后续如重启需重新明确范围。当前路线见 [XTX-014](../../XTurnix/xtx_014_asr_time_control.md)及[ASR 时间无训练方案](../../../dev/XTurnix/asr_time_control.md)。以下内容为归档前计划，不作为当前实施前置。
+状态：条件性后续，尚未授权实施；XTX-007 已完成，用户本次仅同意 XTX-009 首轮来源审核。前置：[XTX-007](../archive/XTurnix/xtx_007_training_feasibility.md)明确同意进入本项后，复用并重新核验 [XTX-002 冻结资产](../../../reports/xturnix_fleurs/20261023-xtx-002-protocol/README.md)。依据：[训练可行性方案](../../dev/XTurnix/training_feasibility.md)，共同资源与范围见[工作单入口](README.md#训练阶段共同边界)。
 
 ## 目标
 
