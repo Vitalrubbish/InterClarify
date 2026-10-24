@@ -147,6 +147,10 @@ class AsrObserver(threading.Thread):
                            and not snapshot["ended"])
                 self.log.emit("snapshot", text_version=self.version, nonempty=bool(text),
                               changed_at=self.changed_at, healthy=healthy,
+                              asr_ended=bool(snapshot["ended"]),
+                              receive_age_ms=1000 * (at - self.receive_at) if self.receive_at is not None else None,
+                              consume_age_ms=1000 * (at - self.consume_at) if self.consume_at is not None else None,
+                              backlog_ms=1000 * (received - consumed) / 16000,
                               text_sha256=hashlib.sha256(text.encode()).hexdigest(),
                               received_samples=received, consumed_samples=consumed)
                 if changed and text:
