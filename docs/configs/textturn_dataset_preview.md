@@ -1,17 +1,13 @@
 # TextTurn 检查批次配置
 
-对应文件：`configs/textturn_dataset_preview.json`。仅供 TT-001 启动后的语义与数据结构检查，不是正式训练配置。
+对应文件：`configs/textturn_dataset_preview.json`，仅供TT-001检查，不是正式训练放行配置。
 
-配置固定 2048 token 上限，引用六个 UltraChat 来源对话，分别构造正常接话、用户打断、用户附和、内部停顿和自然播放完成负例。完整陈述与完整提问各保留两条正常 start；同一来源的所有派生均在 review 集合。
+按用户2026-10-25指令，window_ms=480、user_tokens_per_step=[1,2]、assistant_tokens_per_step=8、seed=20261025。User按固定种子随机分片；Assistant的8 token描述模拟生成，不代表语速或实测LLM吞吐。底层ASR仍为160ms，后续在线接入按三个完成步骤聚合控制窗，转写每次及时写Context。
 
-`scenarios` 中的 history_before_turn 指定已完成历史范围；assistant_stream 指定待逐步发布的助手来源文本，assistant_lead_in_steps 指定用户附和／打断前已推进的步骤数。全局 assistant_tokens_per_step=2，每个 160ms 步骤同时推进用户观察和至多一个助手分片，只把当前已发布的累计助手前缀放入模型输入 assistant_visible。此前一次性放入固定助手片段的配置已替换。
+history_before_turn指定已完成历史；assistant_stream引用当前助手来源，assistant_lead_in_steps=2用于附和／打断前的生成片段；sampling_group使配对场景共用随机分片。原文区间右开，新增表达显式标synthetic_annotation。
 
-附和和打断场景先推进 20 步助手文本，随后用户到达时继续同步推进；这些前导步骤只保留在时间线，不增加训练锚点。自然完成负例先推进至最后一片之前，在最后一片发布时标 keep，再单独触发 playback_complete。phases 描述用户字符增量、明确持续时间的空窗与播放完成事件。原文区间是右开区间；新增表达必须标 synthetic_annotation；动作和中文依据仅用于监督及检查，不进模型输入。
+phases支持user、silence、generation、playback_tail、playback_complete、post_playback_wait。话中silence在已审核不完整表达处随机1—3窗，较长停顿例使用2—3窗；完整用户表达后的首个允许让轮空窗标start。自然结束先完成generation，再随机1—3窗保持Speak，收到播放完成事件后转Listen，再随机1—5窗等待下一轮开口。计划尾窗长度不作为控制输入。
 
-按用户检查反馈，三个附和样例改为短促的 `Hmm.`、`Right.` 和 `I see.`，不追加继续指令。助手正在持续解释时，短回应没有表达停止或接管请求，标 Speak/keep；不将这些词做成脱离上下文的固定动作词表。
+三个短附和仍为Hmm.、Right.、I see.，按当前上下文保持keep。打断阶段用人工核对的trigger_text定位首个停止依据可见的窗，之前显式标prefix_action=keep；不等完整后续请求。额外保留生成已结束、音频仍在播放时用户打断的对照。
 
-附和与打断对照保留同一来源、同一助手片段、相同的 `I see.` 前缀，当前前缀均标 keep；打断分支后续出现 `But please stop now.` 时才标 stop。不能因未来会打断，就倒推当前前缀应停止或必须等完后续。另一条打断直接使用原对话中的拒绝表达，模拟其在助手播放中到达。
-
-剩余七个未标注快照已逐条审核补为 keep：四个正常接话场景的文字到达锚点、两个内部停顿场景续说后的文字到达锚点，以及助手表达中只有 `Please` 的前缀。前六个当前仍有新增文字，仅句意完整不能单独证明让轮；最后一个尚无停止或接管依据。已有静音锚点的 start 和后续明确打断的 stop 保持原标注。这是本批逐例判断，不是将所有非空观察固定标 keep，也不要求在线等待 600ms。
-
-本配置无类或方法。`gaps_zh` 列出旧产物、切分、完整 LFS 验证、全量去重、正式规模与真实 ASR 轨迹的缺口，构建时直接写入 manifest，不能根据样例可读就标正式训练通过。
+本配置没有类或方法；构建器在窗口、随机预算和生命周期处拒绝无效参数。所有来源及派生保持review集合，正式切分和独立性缺口见gaps_zh。

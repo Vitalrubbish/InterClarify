@@ -1,43 +1,37 @@
 # TextTurn 数据构建入口
 
-对应实现：`scripts/training/build_textturn_dataset.py`。本次交付 TT-001 的来源可追溯检查批次，正式规模及旧切分尚未恢复，工作单继续实施中，不放行训练。
+对应实现：`scripts/training/build_textturn_dataset.py`。TT-001 当前交付480ms合成检查批次，正式来源及切分尚未冻结，不启动训练。
 
-## 功能与输入
+## 来源与编码
 
-`--fetch-preview` 只下载固定 revision 的 UltraChat `train_0.jsonl` 前 1MiB、来源 API 和 Qwen3-0.6B tokenizer，不加载模型。要求 HTTP 206 且 Content-Range 精确一致，单资源读取有上限。API 验证别名跳转后的 revision，下载清单记录 URL、范围、大小和 SHA256；没有整分片 LFS 校验，不能声称完整来源验真。
+`fetch_preview` 只下载固定revision的UltraChat分片前1MiB、来源API和Qwen3-0.6B tokenizer，不加载模型。校验HTTP范围、revision及缓存SHA256；没有整分片LFS校验，不冒称恢复旧训练产物。`read_sources`只读取完整行，保留来源ID、行摘要和字节位置。新增文本必须声明synthetic_annotation。
 
-`--config` 读取逐例语义计划。原文引用使用 source_turn 和字符区间，新增用户表达必须显式标 synthetic_annotation。仅取完整 JSONL 行，保留原始行哈希与字节位置。当前配置所有来源均属 review 集合，不分配 train/dev/test；原来 train_0 是上游分片名，不是本项目训练切分。
+`ControlTokenizer` 注册独立keep/start/stop/no-voice token，不沿用旧数值ID。`chunks`按token offset取原始字符区间；User传入1—2的随机预算及显式种子，Assistant传入8的固定生成预算。Unicode重叠区间与User孤立末尾句读合并，可能偶尔超过预算，保留全部字符。Assistant保留句读；末片可小于预算。
 
-## 类与核心方法
+## 逐窗状态与监督
 
-`ControlTokenizer` 从固定 Qwen3 tokenizer 注册 keep/start/stop 和 no-voice 四个独立 token，验证它们都位于原词表末尾之后；不引用旧 DuplexCascade 数值 ID。`chunks` 根据原文 token offset 切分，默认每两 token，合并 Unicode 重叠区间，保留全部字符。User 的孤立末尾句读并入前一片段，避免去句读后凭空产生 no-voice 观察；Assistant 按 assistant_tokens_per_step 切分，保留独立句读末片。Unicode 或 User 句读合并可偶尔超过两 token，不能拆坏字符。
+`compile_scenario`使用配置的window_ms=480，与底层ASR名义160ms区分。每窗先发布User和Assistant新增文字，再生成控制快照。emit_step累加已生成的助手前缀，记录当前生成是否完成、连续空观察窗数及当前Listen/Speak；不把未来正文、计划等待长度或标注理由放入输入。
 
-`compile_scenario` 顺序消费计划，只把当前可见历史、用户累计文本、助手已生成／模拟播放可见文本、Listen/Speak、本步观察和空 CoT 写入 prompt。计划类型、未来文本、标签及标注理由都放在输入外。每个非空片段计 160ms；空窗按 ceil(duration/160) 重建，600ms 为四步／640ms，1200ms 为八步／1280ms。当前新增停顿为合成设置，没有冒称恢复旧停顿位置。
+seeded_rng用种子、场景采样组及阶段编号派生随机数，顺序变化不改变结果。配对的I see场景使用相同sampling_group，使共用前缀的分片、时间和可见输入一致。话中停顿在已审核位置随机1—3窗，较长停顿例分层取2—3窗；原始毫秒时长按ceil(duration/480)量化并记录误差。
 
-Speak 场景从空助手前缀开始，emit_step 在每个 160ms 步骤发布一个助手片段并累加 assistant_visible；User 到达或无新增文字时都按同一时钟推进。assistant_lead_in_steps 只推进时间线，快照仍取既定锚点。事件记录本步助手增量、累计前缀及 token 数，可逐窗检查。配置使用 assistant_stream 提供来源，不再接受旧的固定 assistant_visible 片段。
+Speak保持到playback_complete。generation阶段持续发布8-token片段，最后一片后assistant_generation_complete=true，不自动切Listen。playback_tail要求生成已结束，随机等待1—3窗，助手无新文本但仍Speak。playback_complete是无动作的状态事件，把已完成助手正文写入历史并转Listen；post_playback_wait随机等待1—5窗，模拟下一轮开口前等待，不等同真实认知时间。
 
-仅在逐例语义锚点输出快照，action=null 表示未提供动作监督，全部 labels=-100；默认说明只记录未标注，不把它解释为语义歧义。可以依据当前上下文判断的记录，应在配置中显式填写动作及理由，不在构建器中自动填 keep。当前检查批次已逐条补齐七个 keep，不再有空标签。已标注快照在输入末尾附一个动作 token，只该位置参与损失；其余输入及回答正文都被屏蔽。按 causal LM 的常规左移损失使用。超过 2048 token 的记录保留并排除，不截断历史。当前完整输入按固定 ChatML 模板关闭 thinking，保存 tokenizer 和 tokenizer_config，不输出解释。
+每个观察窗都保留一个动作快照，合法动作仅Listen/keep、Listen/start、Speak/keep、Speak/stop。当前审核阶段显式给出keep；stop阶段前缀须显式指定prefix_action，并在已审核trigger_text首次可见时标stop且结束轨迹，避免等完整后续请求。start阶段只允许一个明确的让轮空窗。没有动作标注的输入仍全部屏蔽损失，不自动填keep。
 
-`playback_complete` 是运行状态事件，要求当前助手来源已全部发布，再将 Speak 改为 Listen，不产生 stop 目标。最后一片发布不自动转 Listen，保持生成与播放生命周期分开；start/stop 后必须结束本场景，防止继续沿用过期状态。助手文本与播放状态均为合成，未发布的回答不进入输入，不能据此宣称真实 TTS 已按相同节奏播放。
+snapshot仅把最后的动作token作为预测目标，用户和助手正文均不计算损失。超过2048 token的记录保留并排除，不能截断关键历史。连续空窗数只反映已观察的窗口，播放完成后按新一轮等待重置。
 
-`group_sources` 对本批所选来源做 NFKC／大小写归一化后的五词 shingle 比较，Jaccard≥0.85 的对话归为同组。当前只检查六个来源，不声称覆盖全库或全部模板派生。
+## 输出与边界
 
-`build` 校验缓存摘要，输出原文、完整事件时间线、含输入与 loss mask 的检查快照、候选 JSONL、中文阅读版和数量清单；逐例核对动作损失位置，并记录最大输入长度、类别数量和去重结果。配置与实现摘要写入 manifest；已存在的非空目录拒绝覆盖。最多 2000 检查快照，正式候选规模上限仍以工作单为准。本入口当前不提供正式数据切分或训练放行功能。
+`group_sources`在所选来源内做归一化五词shingle及Jaccard≥0.85去重，不声称覆盖全库。`build`检查来源摘要、资源规模和动作损失位置，记录类别、token数、各类空窗和生命周期统计。最多2000个检查快照，非空输出目录拒绝覆盖。
 
-检查 JSON 按快照紧凑存储，避免 token 数组产生大量无意义换行；人工阅读使用单独的 samples.md。
+输出包括逐窗timelines.json、带输入和labels的review_samples.json、JSONL候选、来源、manifest及audit。samples.md先给每窗新增文本、当前状态和动作token的紧凑表，完整历史与标注理由放在可展开区。动作均为监督目标，不是模型实测输出。
 
-## 复现与结果
-
-本地使用已有 conda 环境 `interclarify-dev`，这是项目约定允许复用的环境。只做 CPU 数据准备与契约测试，线程设为 1；无 GPU、远端调度或模型测试。本次远端仅只读核查来源目录、活动作业与磁盘。
+本轮仅在已有conda interclarify-dev中做单线程CPU数据构造与少量测试；Nemotron三步聚合及真实LLM/TTS时间戳仍待TT-003/004，未修改现役服务。
 
 ```bash
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false \
 conda run --no-capture-output -n interclarify-dev python scripts/training/build_textturn_dataset.py \
-  --fetch-preview --cache artifacts/textturn/pinned-preview
-
-OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 TOKENIZERS_PARALLELISM=false \
-conda run --no-capture-output -n interclarify-dev python scripts/training/build_textturn_dataset.py \
-  --cache artifacts/textturn/pinned-preview --output artifacts/textturn/review-preview
+  --cache artifacts/textturn/tt-001-pinned-preview --output artifacts/textturn/new-review
 ```
 
-检查材料与缺口见[本次报告](../../../reports/textturn/20261024-tt-001-preview/README.md)。用户审核这些样例不能替代全量来源核查、独立测试隔离和实际 Nemotron 回放。
+结果和缺口见[报告](../../../reports/textturn/20261024-tt-001-preview/README.md)。

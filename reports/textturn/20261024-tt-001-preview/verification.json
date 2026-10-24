@@ -1,26 +1,40 @@
 {
-  "qwen_character_roundtrip_phases": 16,
-  "chunks_exceeding_two_reencoded_tokens": 6,
-  "tokenizer_reload": true,
-  "shared_short_ack_prefix_identical_input": true,
-  "shared_short_ack_prefix_keep_before_later_stop": true,
-  "short_backchannel_texts": [
-    "Hmm",
-    "Right",
-    "I see"
+  "window_ms": 480,
+  "assistant_tokens_per_step": 8,
+  "user_tokens_per_step": [
+    1,
+    2
   ],
-  "chat_template_matches": 24,
+  "seed": 20261025,
+  "clock_windows_checked": 118,
+  "action_only_masks_checked": 118,
   "unannotated_snapshots": 0,
-  "preserved_action_labels": 24,
-  "preserved_user_contexts": 24,
-  "assistant_tokens_per_step": 2,
-  "assistant_streaming_scenarios": 8,
-  "assistant_prefix_checks": 155,
-  "clock_steps_checked": 237,
-  "assistant_token_counts_per_step": {
-    "2": 154,
-    "1": 1
+  "assistant_prefix_checks": 34,
+  "user_character_roundtrip_phases": 18,
+  "user_raw_token_counts": {
+    "1": 26,
+    "2": 53,
+    "3": 2
   },
-  "natural_completion_after_full_publication": true,
-  "unit_tests_passed": 6
+  "user_chunks_above_budget_from_boundary_merges": 3,
+  "lifecycle_windows": {
+    "natural_completion_2": {
+      "generation": 2,
+      "playback_tail": 3,
+      "post_playback_wait": 4
+    },
+    "natural_completion_9": {
+      "generation": 2,
+      "playback_tail": 1,
+      "post_playback_wait": 4
+    }
+  },
+  "interruption_after_generation_before_playback_complete": true,
+  "shared_ack_prefix_identical_inputs": true,
+  "wait_lengths_hidden_from_input": true,
+  "tokenizer_reload": true,
+  "chat_template_matches": 118,
+  "deterministic_rebuild": true,
+  "unit_tests_passed": 7,
+  "stop_at_first_visible_trigger": true
 }

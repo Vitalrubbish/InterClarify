@@ -2,14 +2,14 @@
   "schema_version": 1,
   "purpose": "TT-001 source-linked review preview",
   "max_length": 2048,
-  "annotation_policy_zh": "按用户反馈，附和使用Hmm.、I see.、Right.等短促回应，不追加继续指令。原始UltraChat文本及可见上下文逐例核对；新增短回应／停止请求标为合成。只依当前可见依据标注，未来打断不倒推当前动作；歧义保留未知，未做人类独立复核。 七个原未标注快照已按当前可见状态逐条审核为keep，不从未来续说或动作倒推，不自动填充其他缺失标签。 Assistant按每160ms两token逐步发布，控制输入仅包含截至本步已发布的累计前缀。",
+  "annotation_policy_zh": "按用户确认使用480ms控制窗、User每个非空窗随机1—2 token、Assistant每窗8 token模拟生成。每个观察窗保留当前可见历史、连续空窗数和助手生成完成状态；只监督合法动作。话中停顿在审核过的不完整表达处随机1—3窗；生成后的播放尾巴与播放完成后的下一轮等待分开随机采样，未来等待长度不进入输入。",
   "gaps_zh": [
     "远端已检查的旧训练目录和归档位置未找到旧对话及600ms事件产物；本轮仅恢复同一固定revision的源前缀，未恢复旧切分或原停顿位置。",
     "HTTP Range仅验证固定revision和区间，未下载整分片校验LFS SHA256。",
     "当前只构建review集合；旧测试是否用于调参及全部历史来源组尚未核验，不声明新来源独立。",
     "六个来源组仅做样例内原文精确去重和近重复检查；未覆盖原全量候选及模板组。",
     "正式训练、开发、独立测试数量均为0，尚不满足1000/200/300对话及每类100个独立测试场景组目标。",
-    "新增600/1200ms停顿为显式合成，非恢复的旧事件；160ms为模拟发布时序，无Nemotron真实trace或可回放语音。",
+    "480ms时序、随机话中停顿、播放尾窗和下一轮等待均为合成；没有真实Nemotron/LLM/TTS时间戳或可回放语音，8 token不是实测生成吞吐。",
     "样例由编码代理按可见内容核查并给出理由，用户检查待完成；尚不放行TT-002。"
   ],
   "scenarios": [
@@ -28,9 +28,12 @@
         },
         {
           "channel": "silence",
-          "duration_ms": 600,
           "action": "start",
-          "reason_zh": "完整的交叉训练提问已可见，随后四个空文本步骤，允许正常接话。"
+          "reason_zh": "完整用户表达后，首个480ms空观察窗允许正常接话。",
+          "windows": [
+            1,
+            1
+          ]
         }
       ],
       "utterance_form": "question"
@@ -50,9 +53,12 @@
         },
         {
           "channel": "silence",
-          "duration_ms": 600,
           "action": "start",
-          "reason_zh": "用户完整表达对海洋覆盖率的感想并留出空窗，陈述句也允许回应。"
+          "reason_zh": "完整用户表达后，首个480ms空观察窗允许正常接话。",
+          "windows": [
+            1,
+            1
+          ]
         }
       ],
       "utterance_form": "declarative"
@@ -72,9 +78,12 @@
         },
         {
           "channel": "silence",
-          "duration_ms": 600,
           "action": "start",
-          "reason_zh": "完整陈述翻译技术带来的交流体验，没有留下未完成的从句。"
+          "reason_zh": "完整用户表达后，首个480ms空观察窗允许正常接话。",
+          "windows": [
+            1,
+            1
+          ]
         }
       ],
       "utterance_form": "declarative"
@@ -94,9 +103,12 @@
         },
         {
           "channel": "silence",
-          "duration_ms": 600,
           "action": "start",
-          "reason_zh": "完整问题已经结束，空文本窗后允许回应。"
+          "reason_zh": "完整用户表达后，首个480ms空观察窗允许正常接话。",
+          "windows": [
+            1,
+            1
+          ]
         }
       ],
       "utterance_form": "question"
@@ -117,9 +129,12 @@
         },
         {
           "channel": "silence",
-          "duration_ms": 600,
           "action": "keep",
-          "reason_zh": "空文本没有补全当前未完成表达，保持倾听。"
+          "reason_zh": "空文本没有补全当前未完成表达，保持倾听。",
+          "windows": [
+            1,
+            3
+          ]
         },
         {
           "channel": "user",
@@ -146,9 +161,12 @@
         },
         {
           "channel": "silence",
-          "duration_ms": 1200,
           "action": "keep",
-          "reason_zh": "空文本没有补全当前未完成表达，保持倾听。"
+          "reason_zh": "空文本没有补全当前未完成表达，保持倾听。",
+          "windows": [
+            2,
+            3
+          ]
         },
         {
           "channel": "user",
@@ -177,7 +195,7 @@
       "assistant_stream": {
         "source_turn": 1
       },
-      "assistant_lead_in_steps": 20
+      "assistant_lead_in_steps": 2
     },
     {
       "scenario_id": "backchannel_meditation",
@@ -197,7 +215,7 @@
       "assistant_stream": {
         "source_turn": 1
       },
-      "assistant_lead_in_steps": 20
+      "assistant_lead_in_steps": 2
     },
     {
       "scenario_id": "backchannel_shared_prefix",
@@ -217,7 +235,8 @@
       "assistant_stream": {
         "source_turn": 1
       },
-      "assistant_lead_in_steps": 20
+      "assistant_lead_in_steps": 2,
+      "sampling_group": "shared_ack"
     },
     {
       "scenario_id": "interruption_shared_prefix",
@@ -238,13 +257,17 @@
           "text": " But please stop now.",
           "origin": "synthetic_annotation",
           "action": "stop",
-          "reason_zh": "新增文本已明确请求停止；此时才让出话轮，不把未来打断泄漏到前一快照。"
+          "reason_zh": "新增文本已明确请求停止；此时才让出话轮，不把未来打断泄漏到前一快照。",
+          "prefix_action": "keep",
+          "prefix_reason_zh": "当前前缀尚未表达完整的停止或接管依据，维持表达。",
+          "trigger_text": "stop"
         }
       ],
       "assistant_stream": {
         "source_turn": 1
       },
-      "assistant_lead_in_steps": 20
+      "assistant_lead_in_steps": 2,
+      "sampling_group": "shared_ack"
     },
     {
       "scenario_id": "interruption_change_request",
@@ -262,16 +285,19 @@
         },
         {
           "channel": "user",
-          "text": " stop; I want to focus on swimming instead",
+          "text": " stop.",
           "origin": "synthetic_annotation",
           "action": "stop",
-          "reason_zh": "用户明确要求停止并更改关注对象，构成打断。"
+          "reason_zh": "用户明确要求停止并更改关注对象，构成打断。",
+          "prefix_action": "keep",
+          "prefix_reason_zh": "当前前缀尚未表达完整的停止或接管依据，维持表达。",
+          "trigger_text": "stop"
         }
       ],
       "assistant_stream": {
         "source_turn": 1
       },
-      "assistant_lead_in_steps": 20
+      "assistant_lead_in_steps": 2
     },
     {
       "scenario_id": "interruption_original_refusal",
@@ -285,13 +311,16 @@
           "source_turn": 6,
           "end": 65,
           "action": "stop",
-          "reason_zh": "原对话中的拒绝前缀已明确表示不再需要信息；模拟在上一轮解释尚在播放时到达。"
+          "reason_zh": "原对话中的拒绝前缀已明确表示不再需要信息；模拟在上一轮解释尚在播放时到达。",
+          "prefix_action": "keep",
+          "prefix_reason_zh": "当前前缀尚未表达完整的停止或接管依据，维持表达。",
+          "trigger_text": "don't need"
         }
       ],
       "assistant_stream": {
         "source_turn": 5
       },
-      "assistant_lead_in_steps": 20
+      "assistant_lead_in_steps": 2
     },
     {
       "scenario_id": "natural_completion_2",
@@ -301,20 +330,37 @@
       "state": "Speak",
       "phases": [
         {
-          "channel": "silence",
-          "duration_ms": 160,
+          "channel": "generation",
           "action": "keep",
-          "reason_zh": "没有用户打断，最后仍在播放的步骤保持 keep；其后的播放结束事件直接转 Listen。"
+          "reason_zh": "当前没有用户打断，助手继续生成和播放；生成完成不自动结束Speak。"
+        },
+        {
+          "channel": "playback_tail",
+          "windows": [
+            1,
+            3
+          ],
+          "action": "keep",
+          "reason_zh": "LLM已生成完，音频尚有剩余播放尾巴；没有用户打断，保持Speak。"
         },
         {
           "channel": "playback_complete"
+        },
+        {
+          "channel": "post_playback_wait",
+          "windows": [
+            1,
+            5
+          ],
+          "action": "keep",
+          "reason_zh": "播放已完成且当前回答已交付；用户下一轮尚未开口，保持Listen，不重复start。"
         }
       ],
       "assistant_stream": {
         "source_turn": 1,
         "end": 54
       },
-      "assistant_lead_in_steps": 7
+      "assistant_lead_in_steps": 0
     },
     {
       "scenario_id": "natural_completion_9",
@@ -324,21 +370,80 @@
       "state": "Speak",
       "phases": [
         {
-          "channel": "silence",
-          "duration_ms": 160,
+          "channel": "generation",
           "action": "keep",
-          "reason_zh": "没有用户打断，最后仍在播放的步骤保持 keep；其后的播放结束事件直接转 Listen。"
+          "reason_zh": "当前没有用户打断，助手继续生成和播放；生成完成不自动结束Speak。"
+        },
+        {
+          "channel": "playback_tail",
+          "windows": [
+            1,
+            3
+          ],
+          "action": "keep",
+          "reason_zh": "LLM已生成完，音频尚有剩余播放尾巴；没有用户打断，保持Speak。"
         },
         {
           "channel": "playback_complete"
+        },
+        {
+          "channel": "post_playback_wait",
+          "windows": [
+            1,
+            5
+          ],
+          "action": "keep",
+          "reason_zh": "播放已完成且当前回答已交付；用户下一轮尚未开口，保持Listen，不重复start。"
         }
       ],
       "assistant_stream": {
         "source_turn": 1,
         "end": 79
       },
-      "assistant_lead_in_steps": 7
+      "assistant_lead_in_steps": 0
+    },
+    {
+      "scenario_id": "interruption_playback_tail",
+      "source_id": "2",
+      "category": "interruption",
+      "history_before_turn": 1,
+      "state": "Speak",
+      "phases": [
+        {
+          "channel": "generation",
+          "action": "keep",
+          "reason_zh": "助手正常生成并播放，当前没有用户打断。"
+        },
+        {
+          "channel": "user",
+          "text": "Please",
+          "origin": "synthetic_annotation",
+          "action": "keep",
+          "reason_zh": "LLM已生成完但播放尚未结束；仅Please不足以支持停止。"
+        },
+        {
+          "channel": "user",
+          "text": " stop.",
+          "origin": "synthetic_annotation",
+          "action": "stop",
+          "trigger_text": "stop",
+          "prefix_action": "keep",
+          "prefix_reason_zh": "尚未看到完整停止请求，保持播放。",
+          "reason_zh": "生成已结束但音频仍在播放，用户明确要求停止，此时仍标Speak/stop。"
+        }
+      ],
+      "assistant_stream": {
+        "source_turn": 1,
+        "end": 54
+      },
+      "assistant_lead_in_steps": 0
     }
   ],
-  "assistant_tokens_per_step": 2
+  "assistant_tokens_per_step": 8,
+  "window_ms": 480,
+  "seed": 20261025,
+  "user_tokens_per_step": [
+    1,
+    2
+  ]
 }

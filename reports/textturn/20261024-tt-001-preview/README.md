@@ -1,74 +1,58 @@
-# TT-001 首批数据检查材料
+# TT-001：480ms控制窗检查批次
 
-2026-10-24，按用户“启动 TT-001，并提供数据示例检查”的指令交付。状态：**TT-001 实施中；本批为 review 样例，正式数据尚未冻结**。未加载模型、训练或执行 GPU 作业。
+更新：2026-10-25。按用户最新指令，控制窗改为480ms，User非空窗随机1—2 token，Assistant每窗8 token模拟LLM生成。生成完成、剩余音频播放、下一轮用户开口前等待分别建模。此前160ms／24锚点批次已被替换，历史证据保留在Git。
 
-用户检查后修订：附和样例改为 `Hmm.`、`Right.`、`I see.`，移除追加的继续指令；同一 `I see.` 前缀当前保持 keep，打断分支在后续停止请求可见后才标 stop。场景数保持 14，快照由 27 改为 24；被替换的初版保留在 Git 历史，不沿用其数量或验证结论。
+**TT-001仍实施中，本批全部为review，不放行训练或独立测试。** 未加载模型、运行GPU或替换现役服务。原始来源和旧切分缺口仍未解决。
 
-此前按用户要求，剩余七个空标签已逐条审核补为 keep：六个 Listen 快照本步仍有新增文字，句意完整尚不足以证明已让轮；一个 Speak 快照仅有 `Please`，当前没有停止或接管依据。该次只补标签，未改变当时的输入和时间线。本批 24 条已全部有标签，不新增在线固定静音等待。
+直接查看[逐窗阅读表](samples.md)；表中列出双方本窗新增、Listen/Speak、生成是否完成、连续空窗数和动作token。完整输入与loss mask见[review_samples.json](review_samples.json)，原文、时间线和统计分别见[source_records.json](source_records.json)、[timelines.json](timelines.json)、[manifest.json](manifest.json)。动作是监督目标，不是模型实测输出。
 
-本次按用户核对旧实现的反馈，恢复 Assistant 逐窗发布。旧实现的 `assistant_tokens=10` 对应 600ms，本批设置 `assistant_tokens_per_step=2`，每个 160ms 步骤与 User 观察同步推进并累加，替换固定可见片段。八个 Speak 场景均已重建，Assistant 前缀和发布时间随之更新；24 条动作标签、User 上下文及原始来源保持不变。
+## 当前参数和数量
 
-直接查看[逐例中文阅读版](samples.md)，或下载[含实际输入、动作 token 和损失 mask 的 JSON](review_samples.json)。原文、完整时间线及清单分别见 [source_records.json](source_records.json)、[timelines.json](timelines.json)和 [manifest.json](manifest.json)。所有样例属于 review 集合。
-
-## 本批数量
-
-| 项目 | 实际数量 |
+| 项目 | 当前值 |
 | --- | --- |
-| 原始 UltraChat 对话／本批去重组 | 6／6 |
-| 合成场景 | 14 |
-| 决策快照 | 24 |
-| 有标签／未标注 | 24／0 |
-| keep／start／stop | 17／4／3 |
-| 正常 start 中完整陈述 | 2／4，50% |
-| 超长排除 | 0；最大输入 689 token |
-| Assistant 非空发布步骤 | 155；154 步各 2 token、1 个末块为 1 token |
-| 正式 train／dev／独立 test | 0／0／0 |
+| ASR名义解码步骤／控制窗 | 160ms／480ms；在线聚合待TT-003 |
+| User非空输入 | 按种子随机1—2 token／窗 |
+| Assistant模拟生成 | 8 token／窗；末片可更短，不按语速解释 |
+| 来源对话／去重组／场景 | 6／6／15 |
+| 窗口及有标签快照 | 118；未标注0 |
+| keep／start／stop | 110／4／4 |
+| 完整陈述start | 2／4，50% |
+| 无新增用户文字的窗 | 38／118；不等同声学静音 |
+| Assistant非空生成窗 | 34；32窗各8 token，2个末块各7 token |
+| 最大输入／超长排除 | 718 token／0 |
+| 正式train／dev／独立test | 0／0／0 |
 
-四类场景的不同来源组分别为正常接话 4、用户打断 3、用户附和 3、内部停顿 2；另有自然完成负例 2 组。这些组有重叠，不能相加当作独立对话总数。正式目标仍为训练最多 1000 对话／10000 快照、机制试训最多 2000 快照、开发 200、独立测试 300 对话，测试四类各至少 100 个不同场景组，当前均未满足。
+四类不同来源组：正常接话4、打断4、附和3、内部停顿2，另有自然完成2组；这些有重叠，不能相加冒充独立对话数。正式目标仍为最多1000训练对话／10000快照、200开发及300独立测试对话，测试四类各至少100个场景组，当前不满足。
 
-## 先看这几条
+## 生成完成后还有什么
 
-下表为完整样例的节选；历史及助手当前可见片段请以对应 JSON／阅读版为准。
+以natural_completion_2为例，用户原问题为海洋覆盖率。Assistant以8-token块生成原回答的完整一句；下表只展开关键窗口，逐窗细节见samples.md。
 
-| 场景与状态 | 当时可见用户文本 | 本步观察 | 目标动作 | 依据 |
-| --- | --- | --- | --- | --- |
-| 陈述接话，Listen | Wow, that's a lot of water! No wonder we call it the blue planet | no-voice | start | 完整感想后留出空窗，陈述也可正常回应 |
-| 内部停顿，Listen | How can cross training benefit groups like | no-voice | keep | “like” 后的对象尚未出现，空窗不能补全句意 |
-| 附和，Speak | Hmm | Hmm | keep | 助手正在展开解释，用户短促回应，没有表达停止或接管请求 |
-| 附和，Speak | Right | Right | keep | 助手正在解释正念行走，用户短促确认 |
-| 附和／共用前缀，Speak | I see | I see | keep | 当前只是短促的理解回应，不用未来是否打断决定当前动作 |
-| 打断，Speak | I see. But please stop now | now | stop | 新增文本已经明确要求停止 |
-| 自然说完前，Speak | （本轮没有用户新增文本） | no-voice | keep | 仍在播放时保持 keep；播放结束事件直接转 Listen，不标 stop |
+| 时刻 | 观察阶段 | 状态 | User新增 | Assistant新增 | 目标 |
+| --- | --- | --- | --- | --- | --- |
+| 480ms | LLM仍在生成，音频播放中 | Speak | no-voice | 首8 token | keep |
+| 960ms | LLM生成结束 | Speak | no-voice | 剩余7 token | keep |
+| 1440—2400ms，共3窗 | 无新文本，尚有播放尾巴 | Speak | no-voice | 无 | 每窗keep |
+| 2400ms，状态事件 | playback_complete | Speak→Listen | — | — | 不输出stop |
+| 2880—4320ms，共4窗 | 等待用户下一轮开口 | Listen | no-voice | 无 | 每窗keep |
 
-表中本步非空观察的实际字符片段以 JSON 为准，可能包含前导空格或部分单词；没有等待完整词。前缀对照的两个 prompt 完全一致，已做相等检查。本批所有样例只在最后一个动作 token 上计算损失；构建器仍允许显式未标注记录全部屏蔽损失，不把未标注自动解释为语义歧义。
+播放尾窗只模拟生成结束时剩余未播完的部分，不额外加一遍整段语音长度。下一轮等待是开口前的剩余等待，不推断真实认知过程。另有interruption_playback_tail：LLM已经生成完，但播放仍在继续，用户要求stop时仍标Speak/stop。
 
-## Assistant 如何逐窗可见
+## 构造与可见性
 
-时间线从空助手前缀开始，每步发布下一片，再把累计前缀交给控制快照。下表取翻译解释场景的开头；引号中的空格是原文的一部分。
+- 固定种子20261025，User随机分片预算1—2 token；实际81个非空用户窗中26窗为1 token、53窗为2 token，两个带原始句读的末片为3 token。字符边界和句读合并保留原文，不为严格凑预算丢字符。
+- 话中停顿只在已审核的不完整表达处插入随机空窗，一例取1—3窗，较长例分层取2—3窗。完整问题后的首个允许让轮空窗标start，所有可见观察窗都有监督，未只取阶段末尾。
+- 自然完成场景的剩余播放尾巴随机1—3窗，播放完成后的下一轮等待随机1—5窗。当前两例分别抽到3／1个播放尾窗和各4个下一轮等待窗；计划长度不进入输入。
+- 控制输入新增window_ms、连续no-voice窗数和assistant_generation_complete。它们只描述已经观察到的时间及当前生成状态，不暴露未来等待时长。相同文字下的连续空窗因此可区分；播放完成后按下一轮等待重置计数。
+- Assistant输入只累加已生成的正文；生成结束后保持完整已生成正文，Speak仍由播放状态维持。正常播放完成没有stop标签。打断依据首次可见即标stop，不等后续完整请求。
+- Nemotron底层160ms步骤保留；TT-003再实现三步聚合成480ms控制窗，ASR更新仍及时写Context。聚合等待必须单列并纳入及时性评分，不后移评分锚点。
 
-| 可见时刻 | User 观察 | Assistant 本步增量 | Assistant 累计可见 |
-| --- | --- | --- | --- |
-| 160ms | no-voice | `Language translation` | `Language translation` |
-| 320ms | no-voice | ` technology has` | `Language translation technology has` |
-| 480ms | no-voice | ` a significant` | `Language translation technology has a significant` |
+## 验证与来源限制
 
-附和／打断场景先有 20 个助手前导步骤；用户文字到达后，助手仍在同一步推进。前导步骤只记时间线，不增加训练锚点。自然完成负例先发布至最后一片之前，最后一片发布时仍标 keep，再由 playback_complete 转 Listen。完整事件见 timelines.json 中的 assistant_delta 与 assistant_visible；未来片段不会提前进入当前快照。
+七项CPU契约测试通过，实际Qwen tokenizer核查118个窗口／动作mask、34个助手前缀、18个用户阶段字符往返、tokenizer重载和全部prompt模板。全量重建结果可复现；配对I see前缀输入一致，生成结束后的尾窗打断仍为Speak/stop。详见[audit.json](audit.json)、[verification.json](verification.json)及[sha256.json](sha256.json)。本地复用conda interclarify-dev，线程1；没有集群模型测试。
 
-## 来源、时序与核查
+来源仍是UltraChat固定revision f220fe796ce3ed62fbe1681b45ce6cbc9c6cabe0的train_0.jsonl前1MiB，仅使用完整行并记录原始行哈希及字节位置。旧别名stingning/ultrachat跳转openbmb/UltraChat后revision一致；未下载整分片校验LFS。tokenizer固定Qwen3-0.6B@c1899de289a04d12100db370d81485cdf75e47ca，动作token与no-voice由本次注册，不沿用旧ID。
 
-- 来源固定为原计划的 `stingning/ultrachat@f220fe796ce3ed62fbe1681b45ce6cbc9c6cabe0`；请求转向 `openbmb/UltraChat` 后，[官方 API](https://huggingface.co/api/datasets/openbmb/UltraChat/revision/f220fe796ce3ed62fbe1681b45ce6cbc9c6cabe0)仍返回同一 revision。只下载 `train_0.jsonl` 的前 1MiB，HTTP 206、范围 `0–1048575/963569677`；仅取完整行，保留来源 ID、原始行 SHA256 与字节位置。没有整分片 LFS 校验，未声称恢复旧资产。
-- 使用 [Qwen3-0.6B 固定 tokenizer](https://huggingface.co/Qwen/Qwen3-0.6B/tree/c1899de289a04d12100db370d81485cdf75e47ca)，新增 keep/start/stop/no-voice ID 分别为 151669／151670／151671／151672；它们由本次注册产生，没有沿用旧控制 ID。tokenizer 重载后编码一致。
-- 原文引用按字符区间保留；新增附和、停止请求在配置中显式标为合成。16 个用户文本阶段的实际 tokenizer 分片往返无字符损失。非空片段每步约 1—2 token，本批有六个片段在并入末尾孤立句读后超过两 token，保留全部字符且没有凭空增加静音步骤。
-- 所有 160ms 发布时刻及 Speak 播放状态均为模拟；Assistant 每步发布 2 token，末片可更短，User 继续采用每步约 1—2 token。新增 600ms／1200ms 空窗按向上取整变为四步 640ms／八步 1280ms，未把旧 600ms 窗直接改名。文本发布节奏不等同于真实 TTS 播放节奏；当前没有真实 Nemotron trace 或可回放语音。
-- 已核对六个来源与逐例锚点的可见语义，完整表达方可标 start；助手表达中的短促附和没有接管依据时标 keep，明确停止请求可见后标 stop。`Hmm`、`I see` 等不构成脱离上下文的固定词表；没有将截断位置、末尾标点或未来用户文本作为标签依据。用户已反馈附和应短促，其余内容仍未完成独立的人类语义审核。
-- 本批做五词 shingle、Jaccard≥0.85 的来源去重，六个来源无匹配；仅覆盖所选来源，不声称全库或模板审查完成。
+没有真实Nemotron、LLM或TTS时间戳，8 token和随机等待只是可复现的合成起点，不能宣称已经匹配真实输出或播放分布。旧来源分组、切分、测试使用历史、正式规模和独立测试语音仍有缺口，因此training_allowed=false、independent_test_ready=false，TT-001不归档。
 
-## 验证与复现
-
-本地复用 conda `interclarify-dev`，CPU 线程上限 1。重跑六项契约测试通过，包含助手前缀逐步增长、步长参数有效、未来助手文本隔离及未发布完时禁止播放完成。实际 Qwen tokenizer 完成 16 个 User 阶段字符往返、八个助手来源的分片往返、四个新增 token 重载、24 条 prompt 与官方关闭 thinking 模板一致，以及 24 条动作损失屏蔽检查。逐窗核对 155 个助手前缀，24 条动作及 User 上下文均保持原标注。额外核对三个附和输入确为短回应，以及相同 `I see.` 输入均标 keep、后续停止请求才标 stop。结果见 [audit.json](audit.json)和 [verification.json](verification.json)。这些是数据契约检查，不是模型质量或集群测试。
-
-实现入口为 [build_textturn_dataset.py](../../../scripts/training/build_textturn_dataset.py)，配置为 [textturn_dataset_preview.json](../../../configs/textturn_dataset_preview.json)，使用方式见[对应中文说明](../../../docs/scripts/training/build_textturn_dataset.md)。完整 tokenizer 与 JSONL 候选留在本地 `artifacts/textturn/tt-001-review-final/`，报告不提交重复的 11MiB tokenizer。
-
-本轮远端只读检查：主机 `d6-hpc-debuggpu-001`，`vc list` 无活动作业，用户文件系统当时可用 894GiB；未创建远端作业。已检查的旧训练目录、主仓库、p0 模型目录和撤回实验归档的限定深度内，未找到旧 `dialogues.json`、UltraChat 原始分片或事件产物；这不代表已证明整台服务器没有备份。
-
-后续仍需恢复或可核验重建旧来源／分组及切分，核对旧测试使用历史，补足正式候选和独立测试来源，完成必要语义抽查及正式冻结。因此 **training_allowed=false、independent_test_ready=false**，TT-001 不归档，TT-002 不启动。当前样例足以检查数据结构与标签方向，不能据此声称四类能力已通过。
+实现为[构建器](../../../scripts/training/build_textturn_dataset.py)，参数见[配置](../../../configs/textturn_dataset_preview.json)，复现见[中文说明](../../../docs/scripts/training/build_textturn_dataset.md)。完整tokenizer与JSONL留在本地artifacts/textturn/tt-001-review-final，不重复提交大tokenizer。报告目录日期保留首次交付日期，内容按本页更新日期为准。

@@ -2,7 +2,7 @@
 
 更新：2026-10-23。[研究背景与参考文章](../research_design.md) · [边听边想](listening.md) · [边说边想](speaking.md)。
 
-2026-10-24 最新选型覆盖说明：用户已指令启动 **Nemotron EN160＋Qwen3-0.6B 文本控制器**路线，具体输入、训练及门槛见 [TextTurn 方案](../dev/TextTurn/training_plan.md)。Nemotron 转写持续写入 Shared Context，控制器按名义 160ms 解码步骤完成事件处理新增文本或 `no-voice`，不另等 600ms 观察窗；无新增 ASR 文本直接作为带延迟的静音，不增加 VAD、词稳定等待或延迟补偿。首阶段训练 keep/start/stop，stop 仅用于用户打断；正常说完由生成／播放完成事件驱动运行时结束，后续再加入 CoT。此合同覆盖下文旧 XTurnix 的固定输入、触发及 VAD 约定；原模型名称、专属 token 和图示只作历史候选参考。此前 SoulX 方案保留，当前不推进。层级职责、共享 Context、唯一输出执行点和已听内容不可撤销的共同边界继续适用；尚未切换现役运行时。
+2026-10-24 最新选型覆盖说明：用户已指令启动 **Nemotron EN160＋Qwen3-0.6B 文本控制器**路线，具体输入、训练及门槛见 [TextTurn 方案](../dev/TextTurn/training_plan.md)。Nemotron 转写持续写入 Shared Context，按用户2026-10-25修订，控制器聚合三个名义160ms解码完成步骤形成480ms观察窗，处理窗内累计新增文字或no-voice，聚合等待单独计入延迟；无新增 ASR 文本直接作为带延迟的静音，不增加 VAD、词稳定等待或延迟补偿。首阶段训练 keep/start/stop，stop 仅用于用户打断；正常说完由生成／播放完成事件驱动运行时结束，后续再加入 CoT。此合同覆盖下文旧 XTurnix 的固定输入、触发及 VAD 约定；原模型名称、专属 token 和图示只作历史候选参考。此前 SoulX 方案保留，当前不推进。层级职责、共享 Context、唯一输出执行点和已听内容不可撤销的共同边界继续适用；尚未切换现役运行时。
 
 本文统一两项能力的模块职责、异步时序、结果合同、实验与训练约定。系统以 DuplexCascade 为运行底座，前端方案按用户决定调整为 Nemotron 流式 ASR 与 XTurnix 话轮控制，分别提供转写和状态条件下的控制动作。原因是此前前端方案已撤回，现验证与既有 ASR 匹配的控制器。新控制模式尚未完成接入；当前工程阶段见[实施计划](../engineering_implementation.md)。
 

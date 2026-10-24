@@ -11,22 +11,29 @@
     "<|tt_stop|>": 151671,
     "<|no-voice|>": 151672
   },
-  "assistant_tokens_per_step": 2,
+  "assistant_tokens_per_step": 8,
+  "window_ms": 480,
+  "asr_decode_step_ms": 160,
+  "user_tokens_per_step": [
+    1,
+    2
+  ],
+  "seed": 20261025,
   "source_dialogues": 6,
-  "scenarios": 14,
-  "snapshots": 24,
-  "readable_candidates": 24,
+  "scenarios": 15,
+  "snapshots": 118,
+  "readable_candidates": 118,
   "action_counts": {
-    "keep": 17,
+    "keep": 110,
     "start": 4,
-    "stop": 3
+    "stop": 4
   },
   "start_declarative": 2,
   "start_total": 4,
   "start_declarative_fraction": 0.5,
   "category_scenario_groups": {
     "backchannel": 3,
-    "interruption": 3,
+    "interruption": 4,
     "natural_completion": 2,
     "pause": 2,
     "smooth": 4
@@ -51,14 +58,14 @@
     "当前只构建review集合；旧测试是否用于调参及全部历史来源组尚未核验，不声明新来源独立。",
     "六个来源组仅做样例内原文精确去重和近重复检查；未覆盖原全量候选及模板组。",
     "正式训练、开发、独立测试数量均为0，尚不满足1000/200/300对话及每类100个独立测试场景组目标。",
-    "新增600/1200ms停顿为显式合成，非恢复的旧事件；160ms为模拟发布时序，无Nemotron真实trace或可回放语音。",
+    "480ms时序、随机话中停顿、播放尾窗和下一轮等待均为合成；没有真实Nemotron/LLM/TTS时间戳或可回放语音，8 token不是实测生成吞吐。",
     "样例由编码代理按可见内容核查并给出理由，用户检查待完成；尚不放行TT-002。"
   ],
-  "config_sha256": "eadc0c90bb67be87042b7b26e7d77ccf3333554094ce1e696075d434d7137f7e",
-  "builder_sha256": "989d6fc4df0225c49307fe855247d35d776610c47e056c39fdf633ec77a73928",
+  "config_sha256": "c5e0c8a9927e5c809df4f97fa9f069596b11411fe52d165ed90114afb62c36aa",
+  "builder_sha256": "c374c3321705231125f88c78ded84970cafe4d48672a3ac2955f46da92cf5ebe",
   "audit": {
-    "action_only_mask_checked": 24,
-    "max_input_tokens": 689,
+    "action_only_mask_checked": 118,
+    "max_input_tokens": 718,
     "dedup": {
       "scope": "selected_review_sources_only",
       "word_ngram": 5,
@@ -68,17 +75,26 @@
       "matched_pairs": []
     },
     "category_snapshot_counts": {
-      "smooth": 8,
-      "pause": 6,
-      "backchannel": 3,
-      "interruption": 5,
-      "natural_completion": 2
+      "smooth": 50,
+      "pause": 20,
+      "backchannel": 10,
+      "interruption": 22,
+      "natural_completion": 16
     },
     "assistant_token_counts_per_step": {
-      "2": 154,
-      "1": 1
+      "8": 32,
+      "7": 2
     },
-    "assistant_streaming_steps": 155
+    "assistant_streaming_steps": 34,
+    "window_counts_by_kind": {
+      "user": 81,
+      "silence": 7,
+      "assistant_lead_in": 12,
+      "generation": 6,
+      "playback_tail": 4,
+      "post_playback_wait": 8
+    },
+    "no_voice_windows": 38
   },
   "downloads": {
     "dataset_api.json": {
