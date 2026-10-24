@@ -51,6 +51,8 @@ Layer 0/1 的发声路径直接连接 Text FIFO，Context 不向队列提交文�
 
 Context 保存截至当前实际可用的用户转写及前缀版本、Layer 1 生成历史和输出、Layer 2 已发布结果、XTurnix 决策、Layer 0 时机建议，以及 Listen/Speak 状态和打断事件。生成、提交、取消与实际播放分别记录，不能把已生成内容直接视为用户已听内容；同一份生成文本不重复注入模型输入。
 
+2026-10-24 补充当前路线的转写接口：Nemotron 每次在线文本更新先按稳定的用户 `turn_id` 写入 Shared Context，再供控制器和 Layer 1/2 在各自输入边界读取；不等待完成判断，不把音频块或 micro-turn 当成新用户消息。Context 暴露最新话轮快照和有序版本读取接口，保留来源、ASR 前缀版本、实际观察截止点及可见时间；关闭记录与语义完成、EOF 排空分别处理。字段及读取合同见[Shared Context 接口](../dev/SoulX-Duplug/shared_context_interface.md)，目前尚未实现。
+
 按用户对触发机制的确认，XTurnix 改为事件驱动：ASR 更新写入 Context 后触发决策；后续实现 Layer 2 后，CoT 写入 Context 也触发决策。调整原因是输入未更新时，按固定时间重复调用不能提供新的文本依据。Layer 1 和 Layer 2 也只在各自明确的输入边界消费新增观察，已经构造的输入不因结果到达而自动重算。
 
 输出运行时及时消费有效控制事件。stop 绕过 Text FIFO，不等待排队文本、TTS 完成或 Layer 1 当前推理结束；提交检查、取消与播放检查属于同一个执行域，不能由不同模块各自执行一次。

@@ -2,6 +2,8 @@
 
 2026-10-24 当前选型：按用户明确决定，后续采用 **SoulX-Duplug＋Nemotron EN160**，Nemotron 为唯一 ASR 来源。当前只更新[路线说明](dev/SoulX-Duplug/README.md)及[质量测试方案](dev/SoulX-Duplug/quality_test.md)，首轮仅回放公开英文 Easy Turn 全集，评价完整性判断与延迟；自建场景及附和／打断测试撤回。适配尚未实现，不启动模型或训练，不切换现役路径。以下 XTurnix 计划与回滚记录保留为历史，不自动恢复旧工作单或已取消测试；后续实施单元按用户明确指令建立。
 
+同日按用户补充要求，将[每个用户 turn 的 Shared Context 转写接口](dev/SoulX-Duplug/shared_context_interface.md)纳入后续适配交付：Nemotron 更新先写 Context，提供下游 LLM 的快照及更新读取，独立于控制器完成判断。公开集回放同步用只读消费者替身核验接口，不增加语料或加载下游 LLM；当前仅定义合同，未实现写入路径。
+
 2026-10-24 回滚说明：按用户确认恢复阈值实验前的 `13ba980`，以下为基点计划。校准及 ASR 时间实验实现和报告已从当前目录清理，历史证据见 Git 的 `fa24868`；本次不重新启动旧计划，详情见[回滚记录](dev/XTurnix/rollback_cleanup.md)。
 
 更新：2026-10-23。当前方案为 **Nemotron EN160 流式 ASR＋XTurnix 话轮控制**。本次将前端与控制分离：Nemotron 提供转写，XTurnix 根据转写历史和系统 Listen/Speak 状态预测动作。调整原因是此前前端方案已回退，现按用户决定验证 XTurnix 与现役 ASR 的组合。本文更新计划，不表示新链路已经部署或通过验收。

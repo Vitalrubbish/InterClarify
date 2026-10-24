@@ -4,9 +4,11 @@
 
 Nemotron EN160 是唯一 ASR 来源，持续产生原始转写、增量和版本；SoulX-Duplug 读取同一用户音频及 Nemotron 的在线文本，保留原生五类用户状态。后续 Layer 1/2 读取同一份 Nemotron 转写，不另外运行 SenseVoice。选择这一组合的原因是保留现有英文识别能力，并避免两套转写在内容和修订上的分歧。
 
+按用户补充要求，必须向下游 LLM 暴露每个用户 turn 的转写：同一 `turn_id` 下的在线文本更新先写入 Shared Context，提供最新快照与按游标读取更新的接口，不等控制器判 complete。字段、版本及关闭规则见[Shared Context 接口合同](shared_context_interface.md)。
+
 ## 当前测试
 
-仅使用官方公开的英文 `Easy-Turn-Testset-en.zip`，计划全量回放 Complete 318 条、Incomplete 299 条，共 617 条。报告完成／未完成判断、原生判断与兜底接话差异，以及组合的实测延迟。具体协议见[质量测试计划](quality_test.md)。
+仅使用官方公开的英文 `Easy-Turn-Testset-en.zip`，计划全量回放 Complete 318 条、Incomplete 299 条，共 617 条。报告完成／未完成判断、原生判断与兜底接话差异，以及组合的实测延迟；同次回放验证 Shared Context 的转写写入、读取与可见耗时，不加载下游 LLM。具体协议见[质量测试计划](quality_test.md)。
 
 此前自建 100 个交互场景、额外开发集和公开集 200 条抽样方案撤回。本轮不测试 Speak、用户附和、用户打断或真实播放，不以这个二分类数据集证明完整话轮控制能力。
 
