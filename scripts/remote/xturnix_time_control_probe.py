@@ -36,6 +36,7 @@ class EventLog:
         self.stream = path.open("x")
         self.lock = threading.RLock()
         self.sequence = 0
+        self.emit("clock_origin", started_monotonic=self.started)
 
     def emit(self, kind: str, **values) -> None:
         with self.lock:
@@ -84,6 +85,17 @@ class LatestScorer(threading.Thread):
                     raise ValueError("invalid action score")
                 self.log.emit("score", text_version=version, p_start=score, input_sha256=input_sha,
                               elapsed_ms=1000 * (time.monotonic() - started))
+                if getattr(getattr(self.pipe, "device", None), "type", None) == "cuda":
+                    import torch
+
+                    cleanup_started = time.monotonic()
+                    allocated = torch.cuda.memory_allocated()
+                    reserved = torch.cuda.memory_reserved()
+                    torch.cuda.empty_cache()
+                    self.log.emit("cache_cleanup", text_version=version,
+                                  allocated_before_bytes=allocated, reserved_before_bytes=reserved,
+                                  reserved_after_bytes=torch.cuda.memory_reserved(),
+                                  elapsed_ms=1000 * (time.monotonic() - cleanup_started))
             except Exception as exc:
                 self.error = repr(exc)
                 self.log.emit("inference_error", text_version=version, error=self.error)
@@ -202,8 +214,11 @@ def replay(case: dict, manifest_dir: Path, pipe, normalize, base: str,
         except Exception as exc:
             cleanup_error = repr(exc)
         try:
-            request(base + "/v1/recognize", "POST",
-                    {"session_id": identity, "audio": "", "end_stream": True})
+            drained = request(base + "/v1/recognize", "POST",
+                              {"session_id": identity, "audio": "", "end_stream": True})
+            drained_text = normalize(drained["text"])
+            log.emit("eof_drain", nonempty=bool(drained_text), ended=drained["ended"],
+                     text_sha256=hashlib.sha256(drained_text.encode()).hexdigest())
             request(base + f"/v1/session/{identity}", "DELETE")
         except Exception as exc:
             cleanup_error = repr(exc)

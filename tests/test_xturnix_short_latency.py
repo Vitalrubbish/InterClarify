@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 import tempfile
 import threading
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 from urllib.error import URLError
@@ -45,7 +46,7 @@ class ShortLatencyContractTest(unittest.TestCase):
 
     def test_single_inflight_keeps_only_latest_pending_prefix(self):
         first_started, release, third_finished = (threading.Event() for _ in range(3))
-        versions = []
+        versions, cache_clears = [], []
 
         def fake_pipe(messages, state):
             value = messages[-1]["content"]
@@ -58,23 +59,30 @@ class ShortLatencyContractTest(unittest.TestCase):
                 third_finished.set()
             return {"scores": {"<|start|>": .7}}
 
+        fake_pipe.device = SimpleNamespace(type="cuda")
+        fake_torch = SimpleNamespace(cuda=SimpleNamespace(
+            memory_allocated=lambda: 10, memory_reserved=lambda: 20,
+            empty_cache=lambda: cache_clears.append(True)))
+
         with tempfile.TemporaryDirectory() as temporary:
             log = EventLog(Path(temporary) / "events.jsonl")
             worker = LatestScorer(fake_pipe, [], log)
-            worker.start()
-            try:
-                worker.submit(1, "one")
-                self.assertTrue(first_started.wait(2))
-                worker.submit(2, "two")
-                worker.submit(3, "three")
-                release.set()
-                self.assertTrue(third_finished.wait(2))
-            finally:
-                release.set()
-                worker.close()
-                log.stream.close()
+            with patch.dict(sys.modules, {"torch": fake_torch}):
+                worker.start()
+                try:
+                    worker.submit(1, "one")
+                    self.assertTrue(first_started.wait(2))
+                    worker.submit(2, "two")
+                    worker.submit(3, "three")
+                    release.set()
+                    self.assertTrue(third_finished.wait(2))
+                finally:
+                    release.set()
+                    worker.close()
+                    log.stream.close()
             self.assertEqual(versions, ["one", "three"])
             self.assertEqual(worker.replaced, 1)
+            self.assertEqual(len(cache_clears), 2)
             self.assertIsNone(worker.error)
 
     def test_old_score_cannot_start_new_prefix(self):

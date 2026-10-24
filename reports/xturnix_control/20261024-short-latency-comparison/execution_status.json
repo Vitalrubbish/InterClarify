@@ -1,6 +1,6 @@
 {
   "schema": "xtx014-short-latency-preflight-v1",
-  "status": "queued_4090",
+  "status": "incomplete_4090_resource_stop",
   "primary_budget_ms": 500,
   "budgets_ms": [
     300,
@@ -90,8 +90,12 @@
         "ram_gib": 32,
         "timeout_seconds": 7200
       },
-      "exit_code": null,
-      "phase": "pending"
+      "exit_code": 143,
+      "phase": "gpu_memory_resource_stop",
+      "completed_turns": 12,
+      "planned_turns": 45,
+      "peak_observed_gpu_mib": 23098,
+      "output_kib_at_stop": 23863
     }
   ],
   "current_run_id": "xtx014-time-20261024-4090-r2",
