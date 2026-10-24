@@ -1,0 +1,32 @@
+{
+  "config": {
+    "model_id": "Qwen/Qwen3-0.6B",
+    "model_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+    "seed": 20261025,
+    "rank": 16,
+    "alpha": 32,
+    "learning_rate": 0.0001,
+    "warmup_fraction": 0.05,
+    "epochs": 2,
+    "gradient_accumulation": 16,
+    "max_length": 2048,
+    "pilot_snapshots": 2000,
+    "full_snapshots": 10000,
+    "false_action_regression_tolerance": 0.02,
+    "gpu_stop_gib": 22,
+    "max_wall_seconds": 13800,
+    "max_asset_gib": 10,
+    "max_report_gib": 2
+  },
+  "dataset_manifest_sha256": "6eb145f00c12deaaee986a505e7f2dcca5b75490d0563476bb85fd26fabe681b",
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "transformers": "4.57.1",
+    "peft": "0.19.1",
+    "tokenizers": "0.22.2"
+  },
+  "gpu": "NVIDIA GeForce RTX 4090",
+  "started_unix": 1792863126.363463,
+  "model_config_sha256": "660db3b73d788119c04535e48cf9be5f55bc3100841a718637ae695b442f27dd",
+  "model_weights_sha256": "f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b"
+}

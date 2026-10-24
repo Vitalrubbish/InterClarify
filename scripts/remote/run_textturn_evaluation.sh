@@ -41,7 +41,7 @@ trap cleanup EXIT
 trap 'exit 130' INT
 trap 'exit 143' TERM
 run_step() {
-  setsid "$@" &
+  setsid "$@" <&0 &
   STEP_PID=$!
   wait "$STEP_PID"
   STEP_PID=''
@@ -89,7 +89,7 @@ setsid "$ENV_DIR/bin/python" -u "$REPO_ROOT/scripts/remote/textturn_controller_s
   --model "$MODEL" --data "$DATA" --training "$TRAIN_DIR" --config "$CONFIG" --port 18816 \
   > "$RUN_DIR/controller.log" 2>&1 &
 CONTROLLER_PID=$!
-"$ENV_DIR/bin/python" - <<'PY'
+run_step "$ENV_DIR/bin/python" - <<'PY'
 import time, requests
 deadline=time.monotonic()+300
 pending={18815,18816}

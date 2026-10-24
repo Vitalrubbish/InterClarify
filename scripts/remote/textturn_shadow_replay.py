@@ -143,7 +143,7 @@ def replay_case(case, args, tokenizer):
     try:
         with output.open('w') as trace:
             def record(kind, value):
-                trace.write(json.dumps({'kind': kind, **value}, ensure_ascii=False) + '\n')
+                trace.write(json.dumps({**value, 'source_kind': value.get('kind'), 'kind': kind}, ensure_ascii=False) + '\n')
 
             while time.monotonic() - started < len(audio) / rate + 50:
                 result = session.get(args.asr_url + f'/v1/session/{generation}/events',
@@ -286,8 +286,14 @@ def summarize(cases, results):
     metrics['merged_windows'] = sum(r.get('merged_windows', 0) for r in rows)
     metrics['planned_windows'] = sum(r.get('planned_windows', 0) for r in rows)
     metrics['source_groups'] = len({c['source_id'] for c in cases})
+    metrics['observable_groups'] = {
+        'smooth': len({r['source_id'] for r in rows if r['category'] in ('smooth_question_pause', 'smooth_declarative') and r.get('anchor_at') is not None}),
+        'declarative': len({r['source_id'] for r in rows if r['category'] == 'smooth_declarative' and r.get('anchor_at') is not None}),
+        'interruption': len({r['source_id'] for r in rows if r['category'] == 'interruption' and r.get('anchor_at') is not None}),
+        'pause': len({r['source_id'] for r in rows if (r.get('pause') or {}).get('observable', False)}),
+        'backchannel': len({r['source_id'] for r in rows if r['category'] == 'backchannel' and r.get('asr_reference_complete', False)})}
     metrics['input_type'] = 'real_time_kokoro_synthetic_speech_to_native_nemotron'
-    enough = metrics['source_groups'] >= 100
+    enough = metrics['source_groups'] >= 100 and all(n >= 100 for n in metrics['observable_groups'].values())
     quality = all(metrics[name]['rate'] is not None and metrics[name]['rate'] >= .8
                   for name in ('smooth', 'declarative', 'interruption')) and all(
         metrics[name]['rate'] is not None and metrics[name]['rate'] <= .15

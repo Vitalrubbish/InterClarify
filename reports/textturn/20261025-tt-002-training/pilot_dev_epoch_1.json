@@ -1,0 +1,60 @@
+{
+  "smooth": {
+    "numerator": 342,
+    "denominator": 400,
+    "rate": 0.855,
+    "wilson_95": [
+      0.8171167606818923,
+      0.8861295103407572
+    ]
+  },
+  "declarative": {
+    "numerator": 149,
+    "denominator": 200,
+    "rate": 0.745,
+    "wilson_95": [
+      0.6803707417954529,
+      0.8003950482796865
+    ]
+  },
+  "interruption": {
+    "numerator": 200,
+    "denominator": 200,
+    "rate": 1.0,
+    "wilson_95": [
+      0.9811546736227335,
+      1.0
+    ]
+  },
+  "pause_false_start": {
+    "numerator": 0,
+    "denominator": 200,
+    "rate": 0.0,
+    "wilson_95": [
+      1.734723475976807e-18,
+      0.018845326377266575
+    ]
+  },
+  "backchannel_false_stop": {
+    "numerator": 0,
+    "denominator": 200,
+    "rate": 0.0,
+    "wilson_95": [
+      1.734723475976807e-18,
+      0.018845326377266575
+    ]
+  },
+  "runtime": {
+    "numerator": 13378,
+    "denominator": 13378,
+    "rate": 1.0,
+    "wilson_95": [
+      0.9997129349624626,
+      0.9999999999999999
+    ]
+  },
+  "control_ms_p95": 37.24554181098938,
+  "opportunity_score": 0.9199999999999999,
+  "evaluation_mode": "offline_given_state_text_diagnostic",
+  "online_pass": null
+}

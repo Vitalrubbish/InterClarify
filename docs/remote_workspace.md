@@ -34,6 +34,8 @@
 
 ## 维护记录
 
+2026-10-25 新建 `~/parathink-textturn`，TT-001正式数据位于 `dataset/tt-001-frozen-r3`，固定Qwen3-0.6B位于 `models/qwen3-0.6b`。训练源码 `source/74b0846`，训练run为 `runs/tt-002-20261025-r1`，4090单卡作业 `job-179286310634760697957-xuan-zhang`。只读复用已由conda创建的XTurnix隔离环境；ASR/TTS仍使用现有各自conda，不在现役环境安装依赖。评估源码位于 `source/evaluation-v1`，续接器状态在 `submit_logs/tt-004-20261025-r1.pipeline.json`；成功放行后才提交评估，不把等待状态写为完成。原主仓库未被reset或覆盖。
+
 2026-10-24 按用户要求将当前实现恢复至阈值实验前的 `13ba980`，清除 XTurnix 实验目录下 18 个过期源码 worktree 与 7 份撤回实验启动脚本。其后产生的 5 个原始 run、离线输入及对应日志已移至 `~/interclarify-retired-threshold-experiments-20261024/`，清单为 `cleanup_manifest.json`；这些只保留历史证据，不是现役入口。模型、conda、现役运行快照和原 FLEURS/FDB 资产保留，详见[回滚记录](dev/XTurnix/rollback_cleanup.md)。
 
 2026-10-23 完成 XTX-002：在 `interclarify-xturnix-fleurs` 下创建隔离 conda 环境 `envs/xturnix`（Python 3.12.15、torch 2.11.0+cu128、transformers 4.57.1），下载并锁定 `models/xturnix-pt`（`xcczach/xturnix-pt@d4b0403`），只读复核 Nemotron `ebe59e5`。dev 协议证据在 `runs/xtx-002-probe-20261023-r3`；未覆盖现役 ASR/TTS/评分环境。证据见 [XTX-002 报告](../reports/xturnix_fleurs/20261023-xtx-002-protocol/README.md)。
