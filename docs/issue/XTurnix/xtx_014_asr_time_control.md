@@ -1,6 +1,6 @@
 # XTX-014：利用 ASR 时间信息验证无训练 Listen 控制
 
-状态：进行中；2026-10-24 用户先要求补充无训练路线，随后明确要求核查并尝试原生 pause。当前先执行[pause 使用机制诊断](../../dev/XTurnix/pause_usage.md)，ASR 时间观测、联合策略和完整因果验证尚未完成。依据：[ASR 时间无训练路线](../../dev/XTurnix/asr_time_control.md)。复用 XTX-002 组件与 [XTX-010 基线](xtx_010_control_baseline_calibration.md)，不依赖训练工作单或独立 VAD；Speak 校准继续后置。
+状态：进行中；原生 pause 和本次真实 ASR 短延迟对照子项已完成，完整在线适配与独立验收尚未完成。依据：[ASR 时间无训练路线](../../dev/XTurnix/asr_time_control.md)及[短延迟协议](../../dev/XTurnix/short_latency_comparison.md)。本项没有更新模型参数；Speak 校准继续后置。
 
 ## 原生 pause 子诊断进展
 
@@ -10,7 +10,9 @@
 
 2026-10-24 用户进一步授权先做[短延迟对照](../../dev/XTurnix/short_latency_comparison.md)，明确 500ms 控制决策主预算，300/800ms 为敏感性预算；不含 LLM/TTS。真实 ASR 回放与已有参考分数诊断严格分开，当前不因讨论训练而恢复训练工作单。
 
-短延迟子项：离线音频准备、上传和逐条校验已完成，15 项契约及关联回归检查通过。4090 作业 `job-179281557459393666619-xuan-zhang` 实际完成 12/45 轮后触发显存保护、退出 143；先补充显存分配记录并清理推理后的未使用缓存，保持同一配置重新完整回放，详见[执行状态](../../../reports/xturnix_control/20261024-short-latency-comparison/README.md)。本项不计完成或归档。
+短延迟子项已完成：4090 r2 因显存保护中断后补充资源记录并清理未使用缓存；r3 `job-179281756337954664654-xuan-zhang` 完成 45/45、退出 0，实际事件复算通过。500ms、提前≤5% 时三类预设策略的评估安全命中均为 0/14；默认 0.5 则提前 7/14、安全命中 1/14，详见[完整结果](../../../reports/xturnix_control/20261024-short-latency-comparison/README.md)。
+
+按用户要求作出的下一阶段决策是结束当前规则的重复阈值扫描，进入[Listen 训练入口准备](../../dev/XTurnix/listen_training_entry.md)。本项保留为未训练基线，尚未冻结新训练集或更新权重，不自动恢复原四类训练工作单。整体在线适配和独立验收未完成，本项不计完成或归档。
 
 在冻结 Nemotron EN160 与 XTurnix-PT 权重的条件下，利用有效文字无增量时长及 ASR 进度，检验能否在误抢话受控且等待有界时提高末端接话召回。先利用现有 ASR 信息，不将独立 VAD 或模型训练作为前置。
 

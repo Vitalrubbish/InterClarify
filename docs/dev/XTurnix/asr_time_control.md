@@ -1,6 +1,6 @@
 # ASR 时间信息辅助的无训练话轮控制路线
 
-更新：2026-10-24。用户明确决定先利用 ASR 提供的时间信息、不训练模型，并归档训练相关工作单。本路线由 [XTX-014](../../issue/XTurnix/xtx_014_asr_time_control.md) 承接；随后用户要求检查并尝试原生 pause，[pause 机制诊断](pause_usage.md)已完成真实 CPU 前向，未见末端覆盖提升；完整 ASR 时间适配尚未完成。先验证 Listen 下 keep/start，Speak 校准继续后置。
+更新：2026-10-24。本路线由 [XTX-014](../../issue/XTurnix/xtx_014_asr_time_control.md)承接，已完成原生 pause 及真实 ASR 短延迟对照子项，本轮没有训练。500ms、提前≤5% 下，预设策略未找到可用工作点；按用户要求作出的下一步判断为[Listen 定向训练准备](listen_training_entry.md)，不再重复扫描当前阈值规则。完整在线适配和独立验收仍未完成，Speak 继续后置，原四类训练工作单不自动恢复。
 
 ## 1. 为什么调整
 
@@ -48,7 +48,7 @@ ASR 增量触发新的语义打分；无增量时，跨越已定义时间区间�
 
 ## 5. 实施与资源边界
 
-2026-10-24 用户授权先做[短延迟对照](short_latency_comparison.md)，主预算 500ms、敏感性 300/800ms，不含 LLM/TTS。按用户本地说明恢复连接后，首个作业因计算节点无外网在数据读取阶段退出；现已准备并校验 45 份离线音频，按用户要求提交单卡 4090 作业，初始状态 Pending，详见[执行记录](../../../reports/xturnix_control/20261024-short-latency-comparison/README.md)。此进展不代表完整在线适配已验收。
+2026-10-24 用户授权的[短延迟对照](short_latency_comparison.md)已在单卡 4090 完成 45/45 回放，主预算 500ms、敏感性 300/800ms，不含 LLM/TTS；结果和失败重跑均见[执行记录](../../../reports/xturnix_control/20261024-short-latency-comparison/README.md)。该探索性对照不代表完整在线适配已验收，也不证明新训练必然有收益。
 
 ASR 时间完整适配尚未实现；用户随后明确授权的原生 pause 机制诊断先在远端短作业执行，不创建训练环境、准备训练集或编写训练入口。后续按 [XTX-014](../../issue/XTurnix/xtx_014_asr_time_control.md) 分步验收，复用现有 conda 与模型，不升级现役 ASR/TTS 环境。
 

@@ -1,6 +1,6 @@
 {
   "schema": "xtx014-short-latency-preflight-v1",
-  "status": "incomplete_4090_resource_stop",
+  "status": "completed_comparison_training_preparation_recommended",
   "primary_budget_ms": 500,
   "budgets_ms": [
     300,
@@ -46,9 +46,9 @@
   "config_sha256": "c7f0d1d69762cb00e9528ac3b90e5441e371552820d2486f40ec6921739c23e8",
   "metadata_manifest_sha256": "0c4da87d9336913603ba20f96bedfa616574a2328827178b194a7ac466f1bcd1",
   "audio_downloaded": true,
-  "new_model_calls": 0,
-  "cluster_jobs_submitted": 2,
-  "actual_comparison_results": null,
+  "new_model_calls": null,
+  "cluster_jobs_submitted": 3,
+  "actual_comparison_results": "comparison_summary.json",
   "limitations": [
     "Previously viewed development cohort; not an independent test.",
     "Metadata preparation and synthetic contract tests do not establish real ASR latency.",
@@ -96,9 +96,27 @@
       "planned_turns": 45,
       "peak_observed_gpu_mib": 23098,
       "output_kib_at_stop": 23863
+    },
+    {
+      "run_id": "xtx014-time-20261024-4090-r3",
+      "scheduler_job_id": "job-179281756337954664654-xuan-zhang",
+      "partition": "pdgpu-4090",
+      "source_commit": "6007234",
+      "phase": "completed",
+      "exit_code": 0,
+      "change": "release_unused_pt_allocator_cache_after_score_and_record_memory",
+      "planned_turns": 45,
+      "node": "d6-hpc-gpu-068",
+      "completed_turns": 45,
+      "peak_observed_gpu_mib": 6768.0
     }
   ],
-  "current_run_id": "xtx014-time-20261024-4090-r2",
-  "current_job_id": "job-179281557459393666619-xuan-zhang",
-  "remote_input_hashes_verified": true
+  "current_run_id": "xtx014-time-20261024-4090-r3",
+  "current_job_id": "job-179281756337954664654-xuan-zhang",
+  "remote_input_hashes_verified": true,
+  "r2_observed_score_returns": 301,
+  "r2_model_compute_median_ms": 45.03365606069565,
+  "completed_current_run_model_forward_calls": 1085,
+  "decision": "stop_current_threshold_sweep_prioritize_listen_only_training_preparation",
+  "training_parameters_updated": false
 }

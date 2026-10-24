@@ -1,10 +1,10 @@
 # 工作单管理
 
-更新：2026-10-24。按用户最新指令，当前先利用 ASR 的时间信息辅助话轮控制，暂不训练模型，独立 VAD 不作为前置。
+更新：2026-10-24。已按用户要求完成 ASR 时间辅助的短延迟对照，本轮未训练；依据结果，下一步选择 Listen 定向训练准备，完整监督与资源探针尚未实施，不自动恢复原四类训练范围。
 
 ## 当前路线
 
-[XTX-014：ASR 时间观测与无训练 Listen 控制](XTurnix/xtx_014_asr_time_control.md)已完成原生 pause 子诊断，完整 ASR 时间适配尚未完成；具体方案见[路线文档](../dev/XTurnix/asr_time_control.md)。先使用文字无增量时长、ASR 接收/消费进度与冻结 XTurnix 分数，验证能否在误抢话受控、等待有界时提高末端接话召回。归档与路线已补充；按用户随后明确指令，先核查并尝试[原生 pause](../dev/XTurnix/pause_usage.md)，当前不训练。
+[XTX-014：ASR 时间观测与无训练 Listen 控制](XTurnix/xtx_014_asr_time_control.md)已完成原生 pause 与[短延迟真实对照](../../reports/xturnix_control/20261024-short-latency-comparison/README.md)：45/45、退出 0，500ms 与提前动作≤5% 下，预设三类策略的评估安全命中均为 0/14。根据用户要求作出的[入口决策](../dev/XTurnix/listen_training_entry.md)为停止当前规则重复扫参，先冻结独立 Listen 配对监督，再验证小规模训练。现有 45 轮及 FDB/FLEURS 不进入训练，本轮尚未更新参数；XTX-014 整体在线适配与独立验收仍未完成，未创建新工作单。
 
 [XTX-010](XTurnix/xtx_010_control_baseline_calibration.md)的 Listen 纯文本阶段已完成并保留为基线，Speak 校准后置。[真实结果](../../reports/xturnix_training/20261023-listen-calibration/README.md)为留出误抢话 10.78%→5.39%、末端召回 44.31%→28.74%，未达到预设工作点，新阈值未部署。XTX-014 不依赖 Speak 校准或完整四类训练数据。
 

@@ -1,0 +1,26 @@
+{
+  "planned_turns": 45,
+  "completed_turns": 45,
+  "technical_failures": 0,
+  "online_asr_empty_turns": [
+    "en__1011_87__user_turn_002"
+  ],
+  "model_score_returns": 1084,
+  "pt_warmup_calls": 1,
+  "model_forward_calls": 1085,
+  "replaced_pending": 0,
+  "stale_score_results": 10,
+  "inference_errors": 0,
+  "observer_errors": 0,
+  "model_compute_median_ms": 45.62417417764664,
+  "allocator_cleanup_median_ms": 3.666551783680916,
+  "gpu_peak_observed_mib": 6768.0,
+  "pt_allocated_after_forward_max_mib": 2290.50048828125,
+  "pt_reserved_before_cleanup_max_mib": 3392.0,
+  "pt_reserved_after_cleanup_max_mib": 2296.0,
+  "pt_peak_rss_kib": 4085544,
+  "asr_peak_rss_kib": 2865868,
+  "replay_elapsed_seconds": 765.2680756840855,
+  "output_kib_before_export": 12686,
+  "maximum_send_lateness_ms": 0.833733007311821
+}
