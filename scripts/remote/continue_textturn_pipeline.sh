@@ -31,6 +31,10 @@ while [ "$SECONDS" -lt "$DEADLINE" ]; do
   fi
   sleep 30
 done
+if [ ! -f "$ROOT/submit_logs/$TRAIN_ID.exit_code.txt" ]; then
+  state stopped_training_deadline 'Training did not publish a successful exit code before the deadline'
+  exit 1
+fi
 if [ ! -f "$ROOT/runs/$TRAIN_ID/candidate.json" ]; then
   state stopped_missing_candidate 'Training did not deliver a frozen candidate before the deadline'
   exit 1
