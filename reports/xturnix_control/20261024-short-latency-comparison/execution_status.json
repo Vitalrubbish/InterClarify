@@ -1,6 +1,6 @@
 {
   "schema": "xtx014-short-latency-preflight-v1",
-  "status": "ready_for_remote_run_authentication_unavailable",
+  "status": "offline_inputs_prepared_4090_submission_pending",
   "primary_budget_ms": 500,
   "budgets_ms": [
     300,
@@ -45,19 +45,39 @@
   },
   "config_sha256": "c7f0d1d69762cb00e9528ac3b90e5441e371552820d2486f40ec6921739c23e8",
   "metadata_manifest_sha256": "0c4da87d9336913603ba20f96bedfa616574a2328827178b194a7ac466f1bcd1",
-  "audio_downloaded": false,
+  "audio_downloaded": true,
   "new_model_calls": 0,
-  "cluster_jobs_submitted": 0,
+  "cluster_jobs_submitted": 1,
   "actual_comparison_results": null,
-  "authentication_check": {
+  "limitations": [
+    "Previously viewed development cohort; not an independent test.",
+    "Metadata preparation and synthetic contract tests do not establish real ASR latency.",
+    "No model-quality or training-necessity conclusion is available before the real run."
+  ],
+  "initial_linux_authentication_check": {
     "tcp_connection": "established",
     "server_host_key": "matched_existing_known_hosts",
     "public_key_authentication": "rejected",
     "ssh_agent": "unavailable"
   },
-  "limitations": [
-    "Previously viewed development cohort; not an independent test.",
-    "Metadata preparation and synthetic contract tests do not establish real ASR latency.",
-    "No model-quality or training-necessity conclusion is available before the real run."
+  "remote_authentication_restored": true,
+  "requested_partition": "pdgpu-4090",
+  "prepared_manifest_sha256": "b16d6b5e6bc8f3c767fb7f69f28cace670393d1a00a13376b8af5964d18f5810",
+  "input_archive_sha256": "22e375db5db263d092171d0366f0a03bb8cf9c4d0e8d8d42388f0e3a296ffb4a",
+  "input_archive_bytes": 11091605,
+  "contract_and_regression_tests_passed": 15,
+  "attempts": [
+    {
+      "run_id": "xtx014-time-20261024-r1",
+      "scheduler_job_id": "job-179281475036898974472-xuan-zhang",
+      "partition": "pdgpu-a10",
+      "node": "d6-hpc-gpu-038",
+      "source_commit": "8f3878d",
+      "exit_code": 1,
+      "phase": "input_download_before_asr_or_pt_replay",
+      "error": "compute_node_network_unreachable",
+      "model_lock_verified": true,
+      "actual_replay_model_calls": 0
+    }
   ]
 }

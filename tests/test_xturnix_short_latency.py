@@ -1,12 +1,15 @@
 """Check stale-score rejection, bounded timing and calibration isolation."""
 
 import importlib.util
+import io
 import json
 from pathlib import Path
 import sys
 import tempfile
 import threading
 import unittest
+from unittest.mock import patch
+from urllib.error import URLError
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
@@ -16,6 +19,7 @@ SPEC.loader.exec_module(MODULE)
 CONFIG = json.loads((ROOT / "configs/xturnix_short_latency.json").read_text())
 sys.path.insert(0, str(ROOT / "scripts/remote"))
 from xturnix_time_control_probe import EventLog, LatestScorer
+from prepare_xturnix_short_latency import read_bounded
 
 
 def snapshot(at, version=1, changed=0, healthy=True, nonempty=True):
@@ -28,6 +32,17 @@ def score(at, version=1, value=.7):
 
 
 class ShortLatencyContractTest(unittest.TestCase):
+    def test_download_retries_transient_errors_but_retains_size_limit(self):
+        target = "prepare_xturnix_short_latency.urllib.request.urlopen"
+        with patch(target, side_effect=[URLError("temporary"), io.BytesIO(b"ok")]) as opening:
+            with patch("prepare_xturnix_short_latency.time.sleep"):
+                self.assertEqual(read_bounded("https://example.invalid/audio", 2), b"ok")
+            self.assertEqual(opening.call_count, 2)
+        with patch(target, return_value=io.BytesIO(b"large")) as opening:
+            with self.assertRaises(ValueError):
+                read_bounded("https://example.invalid/audio", 2)
+            self.assertEqual(opening.call_count, 1)
+
     def test_single_inflight_keeps_only_latest_pending_prefix(self):
         first_started, release, third_finished = (threading.Event() for _ in range(3))
         versions = []

@@ -7,7 +7,10 @@ import csv
 import gzip
 import hashlib
 import json
+import os
 from pathlib import Path
+import time
+import urllib.error
 import urllib.request
 
 from compare_xturnix_latency import file_sha, partition
@@ -16,15 +19,22 @@ REVISION = "ca9d98a9686b920a2d8c9eb984224ba9be74e4dd"
 
 
 def read_bounded(url: str, limit: int) -> bytes:
-    with urllib.request.urlopen(url, timeout=60) as response:
-        value = response.read(limit + 1)
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(url, timeout=60) as response:
+                value = response.read(limit + 1)
+            break
+        except (urllib.error.URLError, TimeoutError, ConnectionError):
+            if attempt == 2:
+                raise
+            time.sleep(attempt + 1)
     if len(value) > limit:
         raise ValueError("download exceeds byte limit")
     return value
 
 
 def prepare(inputs: Path, labels: Path, config_path: Path, output: Path,
-            download_audio: bool = False) -> dict:
+            download_audio: bool = False, audio_cache: Path | None = None) -> dict:
     config = json.loads(config_path.read_text())
     prepared = json.loads((inputs / "prepare_summary.json").read_text())
     if file_sha(inputs / "source_metadata.json") != prepared["source_metadata_sha256"]:
@@ -61,7 +71,7 @@ def prepare(inputs: Path, labels: Path, config_path: Path, output: Path,
     output.mkdir(parents=True, exist_ok=False)
     (output / "audio").mkdir()
     (output / "source_audio").mkdir()
-    cases, downloaded = [], 0
+    cases, downloaded, fetched, reused = [], 0, 0, 0
     for turn_id in sorted(selected):
         source = metadata[turn_id]
         case = {"turn_id": turn_id,
@@ -78,12 +88,26 @@ def prepare(inputs: Path, labels: Path, config_path: Path, output: Path,
             from scipy.signal import resample_poly
             from math import gcd
 
-            data = read_bounded(case["audio_url"], 64 * 1024 ** 2)
+            cached = audio_cache / "source_audio" / f"{turn_id}.bin" if audio_cache else None
+            if cached and cached.exists():
+                if cached.stat().st_size > 64 * 1024 ** 2:
+                    raise ValueError("cached audio exceeds byte limit")
+                data = cached.read_bytes()
+                reused += 1
+            else:
+                data = read_bounded(case["audio_url"], 64 * 1024 ** 2)
+                fetched += len(data)
             downloaded += len(data)
             if downloaded > config["max_audio_bytes"]:
                 raise ValueError("audio asset budget exceeded")
             raw_path = output / "source_audio" / f"{turn_id}.bin"
-            raw_path.write_bytes(data)
+            if cached and cached.exists():
+                try:
+                    os.link(cached, raw_path)
+                except OSError:
+                    raw_path.write_bytes(data)
+            else:
+                raw_path.write_bytes(data)
             samples, rate = sf.read(raw_path, dtype="float32", always_2d=True)
             if not np.isfinite(samples).all() or abs(len(samples) / rate - source["duration"]) > .15:
                 raise ValueError("invalid source audio or duration mismatch")
@@ -102,9 +126,11 @@ def prepare(inputs: Path, labels: Path, config_path: Path, output: Path,
     manifest = {"schema": "xtx014-short-latency-inputs-v1", "source_revision": REVISION,
                 "config_sha256": file_sha(config_path), "labels_sha256": file_sha(labels),
                 "source_metadata_sha256": prepared["source_metadata_sha256"],
-                "audio_downloaded": download_audio, "request_ledger": ledger, "cases": cases}
+                "audio_downloaded": download_audio, "reused_source_audio_files": reused,
+                "network_audio_bytes": fetched, "request_ledger": ledger, "cases": cases}
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
-    print(json.dumps({"turns": len(cases), "downloaded_bytes": downloaded,
+    print(json.dumps({"turns": len(cases), "source_audio_bytes": downloaded,
+                      "network_audio_bytes": fetched, "reused_source_audio_files": reused,
                       "partition_counts": {p: sum(c["partition"] == p for c in cases)
                                            for p in ("calibration", "evaluation")}}, indent=2))
     return manifest
@@ -117,8 +143,9 @@ def main() -> None:
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--download-audio", action="store_true")
+    parser.add_argument("--audio-cache", type=Path)
     args = parser.parse_args()
-    prepare(args.inputs, args.labels, args.config, args.output, args.download_audio)
+    prepare(args.inputs, args.labels, args.config, args.output, args.download_audio, args.audio_cache)
 
 
 if __name__ == "__main__":
