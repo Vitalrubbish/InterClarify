@@ -2,6 +2,8 @@
 
 更新：2026-10-23。[研究背景与参考文章](../research_design.md) · [边听边想](listening.md) · [边说边想](speaking.md)。
 
+2026-10-24 选型覆盖说明：用户已确认后续组合为 **SoulX-Duplug＋Nemotron EN160**，Nemotron 为唯一转写来源，先进行[公开英文完成／未完成测试](../dev/SoulX-Duplug/quality_test.md)。下文中的 XTurnix 专属输入、动作编码和图示保留为此前候选设计，不作为新组合的原生接口；新路线第一阶段保留 SoulX 五类用户状态，后续 CoT 与系统动作合同尚待适配训练。层级职责、共享 Context、唯一输出执行点和已听内容不可撤销的共同边界继续适用；方案确认不表示当前运行时已经切换。
+
 本文统一两项能力的模块职责、异步时序、结果合同、实验与训练约定。系统以 DuplexCascade 为运行底座，前端方案按用户决定调整为 Nemotron 流式 ASR 与 XTurnix 话轮控制，分别提供转写和状态条件下的控制动作。原因是此前前端方案已撤回，现验证与既有 ASR 匹配的控制器。新控制模式尚未完成接入；当前工程阶段见[实施计划](../engineering_implementation.md)。
 
 [架构图 PDF](../../figures/parathink_method_preview.pdf)与[图示说明](../figures/parathink_method.md)展示当前确认的目标结构：共享 Context 连接 Nemotron、事件驱动的 XTurnix 和 Layer 0/1/2；Layer 0/1 将发声内容提交 Text FIFO，控制事件绕过 FIFO，由输出运行时统一执行；TTS/播放器回传真实状态与打断事件。下图与本文共同描述研究合同，不表示组件已接入或具备实测能力。
