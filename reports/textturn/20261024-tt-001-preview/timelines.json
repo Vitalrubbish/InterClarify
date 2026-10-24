@@ -837,46 +837,10 @@
         "step": 0,
         "visible_ms": 160,
         "kind": "user",
-        "user_delta_raw": "I",
-        "observation": "I",
+        "user_delta_raw": "Hmm.",
+        "observation": "Hmm",
         "state": "Speak",
         "phase_index": 0
-      },
-      {
-        "step": 1,
-        "visible_ms": 320,
-        "kind": "user",
-        "user_delta_raw": " follow the",
-        "observation": " follow the",
-        "state": "Speak",
-        "phase_index": 1
-      },
-      {
-        "step": 2,
-        "visible_ms": 480,
-        "kind": "user",
-        "user_delta_raw": " translation example",
-        "observation": " translation example",
-        "state": "Speak",
-        "phase_index": 1
-      },
-      {
-        "step": 3,
-        "visible_ms": 640,
-        "kind": "user",
-        "user_delta_raw": "; please",
-        "observation": "; please",
-        "state": "Speak",
-        "phase_index": 1
-      },
-      {
-        "step": 4,
-        "visible_ms": 800,
-        "kind": "user",
-        "user_delta_raw": " continue",
-        "observation": " continue",
-        "state": "Speak",
-        "phase_index": 1
       }
     ]
   },
@@ -888,37 +852,10 @@
         "step": 0,
         "visible_ms": 160,
         "kind": "user",
-        "user_delta_raw": "Yes,",
-        "observation": "Yes,",
+        "user_delta_raw": "Right.",
+        "observation": "Right",
         "state": "Speak",
         "phase_index": 0
-      },
-      {
-        "step": 1,
-        "visible_ms": 320,
-        "kind": "user",
-        "user_delta_raw": " I'm",
-        "observation": " I'm",
-        "state": "Speak",
-        "phase_index": 1
-      },
-      {
-        "step": 2,
-        "visible_ms": 480,
-        "kind": "user",
-        "user_delta_raw": " following,",
-        "observation": " following,",
-        "state": "Speak",
-        "phase_index": 1
-      },
-      {
-        "step": 3,
-        "visible_ms": 640,
-        "kind": "user",
-        "user_delta_raw": " go on",
-        "observation": " go on",
-        "state": "Speak",
-        "phase_index": 1
       }
     ]
   },
@@ -930,37 +867,10 @@
         "step": 0,
         "visible_ms": 160,
         "kind": "user",
-        "user_delta_raw": "That makes",
-        "observation": "That makes",
+        "user_delta_raw": "I see.",
+        "observation": "I see",
         "state": "Speak",
         "phase_index": 0
-      },
-      {
-        "step": 1,
-        "visible_ms": 320,
-        "kind": "user",
-        "user_delta_raw": " sense",
-        "observation": " sense",
-        "state": "Speak",
-        "phase_index": 0
-      },
-      {
-        "step": 2,
-        "visible_ms": 480,
-        "kind": "user",
-        "user_delta_raw": ", please",
-        "observation": ", please",
-        "state": "Speak",
-        "phase_index": 1
-      },
-      {
-        "step": 3,
-        "visible_ms": 640,
-        "kind": "user",
-        "user_delta_raw": " keep going",
-        "observation": " keep going",
-        "state": "Speak",
-        "phase_index": 1
       }
     ]
   },
@@ -972,8 +882,8 @@
         "step": 0,
         "visible_ms": 160,
         "kind": "user",
-        "user_delta_raw": "That makes",
-        "observation": "That makes",
+        "user_delta_raw": "I see.",
+        "observation": "I see",
         "state": "Speak",
         "phase_index": 0
       },
@@ -981,35 +891,17 @@
         "step": 1,
         "visible_ms": 320,
         "kind": "user",
-        "user_delta_raw": " sense",
-        "observation": " sense",
+        "user_delta_raw": " But please",
+        "observation": " But please",
         "state": "Speak",
-        "phase_index": 0
+        "phase_index": 1
       },
       {
         "step": 2,
         "visible_ms": 480,
         "kind": "user",
-        "user_delta_raw": ", but",
-        "observation": ", but",
-        "state": "Speak",
-        "phase_index": 1
-      },
-      {
-        "step": 3,
-        "visible_ms": 640,
-        "kind": "user",
-        "user_delta_raw": " please stop",
-        "observation": " please stop",
-        "state": "Speak",
-        "phase_index": 1
-      },
-      {
-        "step": 4,
-        "visible_ms": 800,
-        "kind": "user",
-        "user_delta_raw": " now",
-        "observation": " now",
+        "user_delta_raw": " stop now.",
+        "observation": " stop now",
         "state": "Speak",
         "phase_index": 1
       }

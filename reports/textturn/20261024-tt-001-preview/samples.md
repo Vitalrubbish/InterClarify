@@ -287,11 +287,11 @@
 
 来源：UltraChat 3；类别：backchannel；可见时间：160ms。
 
-状态：Speak；本步：`I`；动作：**unknown**。
+状态：Speak；本步：`Hmm`；动作：**keep**。
 
 当前累计用户文本：
 
-> I
+> Hmm
 
 已完成对话历史：
 
@@ -303,39 +303,17 @@
 >
 > 1. Breaking down language barriers: Translation technology enables individuals and businesse
 
-前缀含义未定，不计动作损失。
-
-## backchannel_translation:1
-
-来源：UltraChat 3；类别：backchannel；可见时间：800ms。
-
-状态：Speak；本步：` continue`；动作：**keep**。
-
-当前累计用户文本：
-
-> I follow the translation example; please continue
-
-已完成对话历史：
-
-[{"role": "user", "text": "How does language translation technology impact globalization?"}]
-
-当前助手已生成／模拟播放可见文本：
-
-> Language translation technology has a significant impact on globalization in the following ways:
->
-> 1. Breaking down language barriers: Translation technology enables individuals and businesse
-
-用户明确允许继续讲解，属于附和。
+助手正在展开翻译技术的解释；用户作短促的倾听回应，当前没有停止或接管请求，保持表达。
 
 ## backchannel_meditation:0
 
 来源：UltraChat 9；类别：backchannel；可见时间：160ms。
 
-状态：Speak；本步：`Yes,`；动作：**unknown**。
+状态：Speak；本步：`Right`；动作：**keep**。
 
 当前累计用户文本：
 
-> Yes,
+> Right
 
 已完成对话历史：
 
@@ -345,37 +323,17 @@
 
 > Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention to each step, focusing on the physical sensations in the body, an
 
-前缀含义未定，不计动作损失。
-
-## backchannel_meditation:1
-
-来源：UltraChat 9；类别：backchannel；可见时间：640ms。
-
-状态：Speak；本步：` go on`；动作：**keep**。
-
-当前累计用户文本：
-
-> Yes, I'm following, go on
-
-已完成对话历史：
-
-[{"role": "user", "text": "Can mindful walking be used as a form of meditation or spiritual practice?"}]
-
-当前助手已生成／模拟播放可见文本：
-
-> Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention to each step, focusing on the physical sensations in the body, an
-
-用户确认理解并请系统继续，不应停止播放。
+助手正在解释正念行走；用户短促确认，当前没有停止或接管请求，保持表达。
 
 ## backchannel_shared_prefix:0
 
-来源：UltraChat 19；类别：backchannel；可见时间：320ms。
+来源：UltraChat 19；类别：backchannel；可见时间：160ms。
 
-状态：Speak；本步：` sense`；动作：**unknown**。
+状态：Speak；本步：`I see`；动作：**keep**。
 
 当前累计用户文本：
 
-> That makes sense
+> I see
 
 已完成对话历史：
 
@@ -387,39 +345,17 @@
 >
 > 1. K
 
-前缀含义未定，不计动作损失。
-
-## backchannel_shared_prefix:1
-
-来源：UltraChat 19；类别：backchannel；可见时间：640ms。
-
-状态：Speak；本步：` keep going`；动作：**keep**。
-
-当前累计用户文本：
-
-> That makes sense, please keep going
-
-已完成对话历史：
-
-[{"role": "user", "text": "How can you adjust your business model to accommodate changes in the market?"}]
-
-当前助手已生成／模拟播放可见文本：
-
-> As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the market:
->
-> 1. K
-
-相同前缀后出现明确的继续请求，应继续表达。
+助手正在解释商业模式调整；用户短促表示理解，当前没有停止或接管请求，保持表达。
 
 ## interruption_shared_prefix:0
 
-来源：UltraChat 19；类别：interruption；可见时间：320ms。
+来源：UltraChat 19；类别：interruption；可见时间：160ms。
 
-状态：Speak；本步：` sense`；动作：**unknown**。
+状态：Speak；本步：`I see`；动作：**keep**。
 
 当前累计用户文本：
 
-> That makes sense
+> I see
 
 已完成对话历史：
 
@@ -431,17 +367,17 @@
 >
 > 1. K
 
-前缀含义未定，不计动作损失。
+与附和分支相同的短促理解回应；此时停止请求尚不可见，保持表达。
 
 ## interruption_shared_prefix:1
 
-来源：UltraChat 19；类别：interruption；可见时间：800ms。
+来源：UltraChat 19；类别：interruption；可见时间：480ms。
 
-状态：Speak；本步：` now`；动作：**stop**。
+状态：Speak；本步：` stop now`；动作：**stop**。
 
 当前累计用户文本：
 
-> That makes sense, but please stop now
+> I see. But please stop now
 
 已完成对话历史：
 
@@ -453,7 +389,7 @@
 >
 > 1. K
 
-相同前缀后出现明确的停止请求，应让出话轮。
+新增文本已明确请求停止；此时才让出话轮，不把未来打断泄漏到前一快照。
 
 ## interruption_change_request:0
 

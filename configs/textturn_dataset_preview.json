@@ -2,7 +2,7 @@
   "schema_version": 1,
   "purpose": "TT-001 source-linked review preview",
   "max_length": 2048,
-  "annotation_policy_zh": "原始 UltraChat 文本及可见上下文逐例核对；插入的附和／停止请求明确标为合成。动作仅标在可见语义依据充分的锚点，其余为未知；未做人类独立复核。",
+  "annotation_policy_zh": "按用户反馈，附和使用Hmm.、I see.、Right.等短促回应，不追加继续指令。原始UltraChat文本及可见上下文逐例核对；新增短回应／停止请求标为合成。只依当前可见依据标注，未来打断不倒推当前动作；歧义保留未知，未做人类独立复核。",
   "gaps_zh": [
     "远端已检查的旧训练目录和归档位置未找到旧对话及600ms事件产物；本轮仅恢复同一固定revision的源前缀，未恢复旧切分或原停顿位置。",
     "HTTP Range仅验证固定revision和区间，未下载整分片校验LFS SHA256。",
@@ -156,15 +156,10 @@
       "phases": [
         {
           "channel": "user",
-          "text": "I",
-          "origin": "synthetic_annotation"
-        },
-        {
-          "channel": "user",
-          "text": " follow the translation example; please continue",
+          "text": "Hmm.",
           "origin": "synthetic_annotation",
           "action": "keep",
-          "reason_zh": "用户明确允许继续讲解，属于附和。"
+          "reason_zh": "助手正在展开翻译技术的解释；用户作短促的倾听回应，当前没有停止或接管请求，保持表达。"
         }
       ],
       "assistant_visible": {
@@ -181,15 +176,10 @@
       "phases": [
         {
           "channel": "user",
-          "text": "Yes,",
-          "origin": "synthetic_annotation"
-        },
-        {
-          "channel": "user",
-          "text": " I'm following, go on",
+          "text": "Right.",
           "origin": "synthetic_annotation",
           "action": "keep",
-          "reason_zh": "用户确认理解并请系统继续，不应停止播放。"
+          "reason_zh": "助手正在解释正念行走；用户短促确认，当前没有停止或接管请求，保持表达。"
         }
       ],
       "assistant_visible": {
@@ -206,15 +196,10 @@
       "phases": [
         {
           "channel": "user",
-          "text": "That makes sense",
-          "origin": "synthetic_annotation"
-        },
-        {
-          "channel": "user",
-          "text": ", please keep going",
+          "text": "I see.",
           "origin": "synthetic_annotation",
           "action": "keep",
-          "reason_zh": "相同前缀后出现明确的继续请求，应继续表达。"
+          "reason_zh": "助手正在解释商业模式调整；用户短促表示理解，当前没有停止或接管请求，保持表达。"
         }
       ],
       "assistant_visible": {
@@ -231,15 +216,17 @@
       "phases": [
         {
           "channel": "user",
-          "text": "That makes sense",
-          "origin": "synthetic_annotation"
+          "text": "I see.",
+          "origin": "synthetic_annotation",
+          "action": "keep",
+          "reason_zh": "与附和分支相同的短促理解回应；此时停止请求尚不可见，保持表达。"
         },
         {
           "channel": "user",
-          "text": ", but please stop now",
+          "text": " But please stop now.",
           "origin": "synthetic_annotation",
           "action": "stop",
-          "reason_zh": "相同前缀后出现明确的停止请求，应让出话轮。"
+          "reason_zh": "新增文本已明确请求停止；此时才让出话轮，不把未来打断泄漏到前一快照。"
         }
       ],
       "assistant_visible": {

@@ -13,12 +13,12 @@
   },
   "source_dialogues": 6,
   "scenarios": 14,
-  "snapshots": 27,
-  "readable_candidates": 16,
+  "snapshots": 24,
+  "readable_candidates": 17,
   "action_counts": {
-    "unknown": 11,
+    "unknown": 7,
     "start": 4,
-    "keep": 9,
+    "keep": 10,
     "stop": 3
   },
   "start_declarative": 2,
@@ -54,10 +54,10 @@
     "新增600/1200ms停顿为显式合成，非恢复的旧事件；160ms为模拟发布时序，无Nemotron真实trace或可回放语音。",
     "样例由编码代理按可见内容核查并给出理由，用户检查待完成；尚不放行TT-002。"
   ],
-  "config_sha256": "c5a7b3eb9bf8ad861c84587e470729a89185737fd5e10e2b8db1ee8ab8a671ed",
+  "config_sha256": "4018736a45a5b8aafcb63718e5ad77996c3fd102a8e950ada890c35452e9342b",
   "builder_sha256": "afa945bd9c453aede6e28443529c607951b63c9c9b9252e0801d3409dfb0a015",
   "audit": {
-    "action_only_mask_checked": 27,
+    "action_only_mask_checked": 24,
     "max_input_tokens": 669,
     "dedup": {
       "scope": "selected_review_sources_only",
@@ -70,7 +70,7 @@
     "category_snapshot_counts": {
       "smooth": 8,
       "pause": 6,
-      "backchannel": 6,
+      "backchannel": 3,
       "interruption": 5,
       "natural_completion": 2
     }

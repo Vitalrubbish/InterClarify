@@ -1,9 +1,15 @@
 {
-  "qwen_character_roundtrip_phases": 19,
-  "chunks_exceeding_two_reencoded_tokens": 3,
+  "qwen_character_roundtrip_phases": 16,
+  "chunks_exceeding_two_reencoded_tokens": 6,
   "punctuation_only_chunks": 0,
   "tokenizer_reload": true,
-  "shared_ambiguous_prefix_identical_input": true,
-  "chat_template_matches": 27,
+  "shared_short_ack_prefix_identical_input": true,
+  "shared_short_ack_prefix_keep_before_later_stop": true,
+  "short_backchannel_texts": [
+    "Hmm",
+    "Right",
+    "I see"
+  ],
+  "chat_template_matches": 24,
   "unit_tests_passed": 5
 }
