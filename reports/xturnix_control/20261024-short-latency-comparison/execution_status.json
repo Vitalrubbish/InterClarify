@@ -1,0 +1,63 @@
+{
+  "schema": "xtx014-short-latency-preflight-v1",
+  "status": "ready_for_remote_run_authentication_unavailable",
+  "primary_budget_ms": 500,
+  "budgets_ms": [
+    300,
+    500,
+    800
+  ],
+  "planned_turns": 45,
+  "partitions": {
+    "calibration": {
+      "turns": 31,
+      "conversations": 23,
+      "categories": {
+        "slot_answer": 30,
+        "status_description": 1
+      }
+    },
+    "evaluation": {
+      "turns": 14,
+      "conversations": 9,
+      "categories": {
+        "slot_answer": 12,
+        "status_description": 2
+      }
+    }
+  },
+  "candidate_counts": {
+    "300": {
+      "text": 8,
+      "time": 4,
+      "joint": 120
+    },
+    "500": {
+      "text": 8,
+      "time": 6,
+      "joint": 120
+    },
+    "800": {
+      "text": 8,
+      "time": 8,
+      "joint": 120
+    }
+  },
+  "config_sha256": "c7f0d1d69762cb00e9528ac3b90e5441e371552820d2486f40ec6921739c23e8",
+  "metadata_manifest_sha256": "0c4da87d9336913603ba20f96bedfa616574a2328827178b194a7ac466f1bcd1",
+  "audio_downloaded": false,
+  "new_model_calls": 0,
+  "cluster_jobs_submitted": 0,
+  "actual_comparison_results": null,
+  "authentication_check": {
+    "tcp_connection": "established",
+    "server_host_key": "matched_existing_known_hosts",
+    "public_key_authentication": "rejected",
+    "ssh_agent": "unavailable"
+  },
+  "limitations": [
+    "Previously viewed development cohort; not an independent test.",
+    "Metadata preparation and synthetic contract tests do not establish real ASR latency.",
+    "No model-quality or training-necessity conclusion is available before the real run."
+  ]
+}
