@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+from collections import deque
 import hashlib
 import json
 import logging
@@ -101,12 +102,17 @@ class NativeNemotron:
                      'chunk_ms': 160, 'dtype': str(self.model.dtype),
                      'torch': torch.__version__, 'load_seconds': time.monotonic()-started}
 
-    def run(self, source, emit):
+    supports_decode_steps = True
+
+    def run(self, source, emit, emit_step=None):
         """Feed the released processor's overlapping, cache-aware feature iterator."""
         torch, processor, model = self.torch, self.processor, self.model
         extra = {}
+        pending_steps = []
+        step_seq = 0
 
         def features():
+            nonlocal step_seq
             first = True
             frame_index = 0
             while True:
@@ -123,6 +129,14 @@ class NativeNemotron:
                                   if k not in ('input_features', 'attention_mask', 'num_lookahead_tokens')})
                 frames = processor.num_mel_frames_first_audio_chunk if first else processor.num_mel_frames_per_audio_chunk
                 yield inputs.input_features[:, :frames].to('cuda', dtype=model.dtype)
+                # The decoder requests another chunk only after consuming this chunk's frames.
+                # Publish after the paired streamer delivery, which follows the generation update.
+                step_seq += 1
+                pending_steps.append({'step_seq': step_seq, 'decode_completed_at': time.monotonic(),
+                                      'nominal_audio_start_ms': (step_seq - 1) * 160,
+                                      'nominal_audio_end_ms': step_seq * 160,
+                                      'consumed_samples': source.consumed,
+                                      'received_samples': source.received, 'eof_received': source.eof})
                 frame_index += frames
                 first = False
 
@@ -136,6 +150,10 @@ class NativeNemotron:
                 self.ids.extend(value.detach().cpu().reshape(-1).tolist())
                 emit(processor.decode(self.ids, skip_special_tokens=True,
                                       clean_up_tokenization_spaces=False), list(self.ids))
+                while pending_steps:
+                    step = pending_steps.pop(0)
+                    if emit_step is not None:
+                        emit_step(step)
 
             def end(self):
                 pass
@@ -168,6 +186,10 @@ class NemotronSession:
         self.error = None
         self.done = threading.Event()
         self.started = time.monotonic()
+        self.steps = deque(maxlen=4096)
+        self.step_seq = 0
+        self.events = deque(maxlen=4096)
+        self.event_seq = 0
         self.worker = threading.Thread(target=self._run, args=(engine,), daemon=True)
         self.worker.start()
 
@@ -181,6 +203,13 @@ class NemotronSession:
                 delta = text[len(self.text):]
                 self.version += 1
                 self.text = text
+                self.event_seq += 1
+                self.events.append({'event_seq': self.event_seq, 'kind': 'transcript',
+                                    'text': text, 'delta': delta, 'prefix_version': self.version,
+                                    'published_at': time.monotonic(), 'generation': self.id,
+                                    'received_samples': self.source.received,
+                                    'consumed_samples': self.source.consumed,
+                                    'eof_received': self.source.eof})
                 LOG.info(json.dumps({'event': 'asr_output', 'session_id': self.id,
                     'generation': self.id, 'prefix_version': self.version, 'raw': text,
                     'visible': text, 'delta': delta, 'arrival_monotonic': time.monotonic(),
@@ -188,13 +217,51 @@ class NemotronSession:
 
     def _run(self, engine):
         try:
-            engine.run(self.source, self.emit)
+            if getattr(engine, 'supports_decode_steps', False):
+                engine.run(self.source, self.emit, self.complete_step)
+            else:
+                engine.run(self.source, self.emit)
         except Exception as exc:
             if not self.source.cancelled:
                 self.error = repr(exc)
                 LOG.exception('Native ASR failed session=%s', self.id)
         finally:
             self.done.set()
+
+    def complete_step(self, step):
+        """Publish each real decoder completion, including unchanged transcripts."""
+        with self.lock:
+            if step['step_seq'] != self.step_seq + 1:
+                raise RuntimeError('Decoder steps must be contiguous')
+            self.step_seq = step['step_seq']
+            self.event_seq += 1
+            event = {**step, 'session_id': self.id, 'generation': self.id,
+                     'text': self.text, 'prefix_version': self.version, 'kind': 'decode_step',
+                     'published_at': time.monotonic(), 'event_seq': self.event_seq}
+            self.steps.append(event)
+            self.events.append(event)
+
+    def read_events(self, after=0):
+        """Expose transcript updates immediately in the same ordered stream as steps."""
+        with self.lock:
+            if self.error:
+                raise RuntimeError(self.error)
+            if after < 0 or after > self.event_seq or (self.events and after < self.events[0]['event_seq'] - 1):
+                raise ValueError('ASR event cursor is invalid or expired')
+            return {'events': [event.copy() for event in self.events if event['event_seq'] > after],
+                    'last_event_seq': self.event_seq, 'ended': self.done.is_set(),
+                    'eof_received': self.source.eof}
+
+    def read_steps(self, after=0):
+        """Reject expired or future cursors rather than silently losing observations."""
+        with self.lock:
+            if self.error:
+                raise RuntimeError(self.error)
+            if after < 0 or after > self.step_seq or (self.steps and after < self.steps[0]['step_seq'] - 1):
+                raise ValueError('Decoder step cursor is invalid or expired')
+            return {'steps': [step.copy() for step in self.steps if step['step_seq'] > after],
+                    'last_step_seq': self.step_seq, 'ended': self.done.is_set(),
+                    'eof_received': self.source.eof}
 
     def snapshot(self):
         """Read output independently of new audio; fail closed on decoder errors."""
@@ -325,6 +392,24 @@ def create_app(service):
             return session.snapshot()
         except ValueError as exc:
             raise HTTPException(400, str(exc)) from exc
+        except RuntimeError as exc:
+            raise HTTPException(500, str(exc)) from exc
+
+    @app.get('/v1/session/{identity}/steps')
+    def read_steps(identity: str, after: int = 0):
+        try:
+            return service.get(identity).read_steps(after)
+        except ValueError as exc:
+            raise HTTPException(409, str(exc)) from exc
+        except RuntimeError as exc:
+            raise HTTPException(500, str(exc)) from exc
+
+    @app.get('/v1/session/{identity}/events')
+    def read_events(identity: str, after: int = 0):
+        try:
+            return service.get(identity).read_events(after)
+        except ValueError as exc:
+            raise HTTPException(409, str(exc)) from exc
         except RuntimeError as exc:
             raise HTTPException(500, str(exc)) from exc
 

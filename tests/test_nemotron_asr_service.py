@@ -76,6 +76,35 @@ class NemotronServiceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             source.append(b'\0\0'*1000)
 
+    def test_ordered_events_include_unchanged_decoder_steps(self):
+        class StepEngine:
+            supports_decode_steps = True
+            info = {'backend': 'nemotron_en'}
+
+            def run(self, source, emit, complete):
+                for index in range(2):
+                    source.read(index * 2560, 2560)
+                    emit('hello', [1])
+                    complete({'step_seq': index + 1, 'decode_completed_at': time.monotonic(),
+                              'nominal_audio_start_ms': index * 160,
+                              'nominal_audio_end_ms': (index + 1) * 160,
+                              'consumed_samples': source.consumed,
+                              'received_samples': source.received, 'eof_received': source.eof})
+
+        model = service.NemotronService(StepEngine(), timeout=1)
+        identity = model.create()
+        session = model.get(identity)
+        session.source.append(b'\0\0' * 5120, eof=True)
+        self.assertTrue(session.done.wait(1))
+        events = session.read_events()['events']
+        self.assertEqual([event['kind'] for event in events], ['transcript', 'decode_step', 'decode_step'])
+        self.assertEqual([event['prefix_version'] for event in events], [1, 1, 1])
+        self.assertEqual(session.read_steps(1)['steps'][0]['step_seq'], 2)
+        self.assertEqual(session.read_events(3)['events'], [])
+        with self.assertRaises(ValueError):
+            session.read_events(4)
+        model.close(identity)
+
     def test_rewrite_fails_closed(self):
         model = service.NemotronService(FakeEngine(), timeout=1)
         identity = model.create()
