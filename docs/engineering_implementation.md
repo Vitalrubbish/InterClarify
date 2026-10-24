@@ -1,6 +1,6 @@
 # 工程实施计划
 
-2026-10-24 最新主线：按用户指令新增 [TextTurn](dev/TextTurn/README.md)，采用 Nemotron EN160＋Qwen3-0.6B 文本控制器，复用旧 UltraChat 四类轨迹重建动作监督。无新增 ASR 文本直接作为带延迟静音，不另加 VAD 或补偿。基模、训练方法及通过门槛统一见[训练方案](dev/TextTurn/training_plan.md)。本次仅启动文档设计，未重建数据、训练或部署；以下 SoulX 及 XTurnix 内容为此前方案，不继续自动推进。用户已要求的 Shared Context 下游转写接口随新路线保留，实施工作单仍依明确指令建立。
+2026-10-24 最新主线：按用户指令新增 [TextTurn](dev/TextTurn/README.md)，采用 Nemotron EN160＋Qwen3-0.6B 文本控制器，复用旧 UltraChat 四类轨迹重建动作监督。无新增 ASR 文本直接作为带延迟静音，不另加 VAD 或补偿。基模、训练方法及通过门槛统一见[训练方案](dev/TextTurn/training_plan.md)。已按用户进一步指令建立 [TT-001—004](issue/TextTurn/README.md)：数据、模型、在线接入及四类验收；必要核查并入实现，不单设工程确认任务。当前均待实施，未重建数据、训练或部署；以下 SoulX 及 XTurnix 内容为此前方案，不继续自动推进。用户已要求的 Shared Context 下游转写接口随新路线保留。
 
 同日修订：stop 仅表示用户打断系统，不监督自然完成；控制器匹配 Nemotron 的名义 160ms 解码步骤完成事件，取消 600ms 观察等待，旧数据按新粒度重新分块。首轮质量及延迟门槛放宽，具体数值和计时锚点以 TextTurn 方案为准。解码步骤事件接口尚待适配，现役表达 micro-turn 和服务实现不在本次修改范围内。
 

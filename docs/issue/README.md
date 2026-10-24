@@ -1,6 +1,6 @@
 # 工作单管理
 
-2026-10-24 最新路线：用户要求启动 [TextTurn 文本控制器路线](../dev/TextTurn/README.md)并交付[基模、数据、训练与验收方案](../dev/TextTurn/training_plan.md)，当前文档已建立，实施未开始。本次未新建 issue，不推进旧 SoulX/XTurnix 测试或训练；后续工作单依用户明确指令创建。
+2026-10-24 最新工作单：按用户明确要求，依据[训练方案](../dev/TextTurn/training_plan.md)建立 [TextTurn TT-001—004](TextTurn/README.md)，依次交付四类数据、候选模型、Nemotron／Shared Context 接入和独立验收。共 4 项、0 项完成，均待实施；环境、少量测试和必要核查并入实现，不另拆确认任务。本次只交付工作单，不启动训练或远端作业；下方 SoulX/XTurnix 记录保留，不恢复其旧计划。
 
 2026-10-24 当前路线：用户已确认 **SoulX-Duplug＋Nemotron**，并要求简化为公开英文 Easy Turn 集上的质量与延迟测试；[方案](../dev/SoulX-Duplug/quality_test.md)已同步。本次只更新路线文档，未新建 issue、实现适配或启动远端作业。以下 XTurnix 内容保留为历史记录，不代表当前继续推进旧训练或恢复已取消测试。
 
