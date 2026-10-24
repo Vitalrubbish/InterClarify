@@ -11,6 +11,7 @@
     "<|tt_stop|>": 151671,
     "<|no-voice|>": 151672
   },
+  "assistant_tokens_per_step": 2,
   "source_dialogues": 6,
   "scenarios": 14,
   "snapshots": 24,
@@ -53,11 +54,11 @@
     "新增600/1200ms停顿为显式合成，非恢复的旧事件；160ms为模拟发布时序，无Nemotron真实trace或可回放语音。",
     "样例由编码代理按可见内容核查并给出理由，用户检查待完成；尚不放行TT-002。"
   ],
-  "config_sha256": "7bfb953446a0ace290de2c2177a149498fc2c58dcfb0927d343a10033921cae0",
-  "builder_sha256": "dcbf932380b856c26f21307a55cb42943231923e416d72161c054b5742c4a42f",
+  "config_sha256": "eadc0c90bb67be87042b7b26e7d77ccf3333554094ce1e696075d434d7137f7e",
+  "builder_sha256": "989d6fc4df0225c49307fe855247d35d776610c47e056c39fdf633ec77a73928",
   "audit": {
     "action_only_mask_checked": 24,
-    "max_input_tokens": 669,
+    "max_input_tokens": 689,
     "dedup": {
       "scope": "selected_review_sources_only",
       "word_ngram": 5,
@@ -72,7 +73,12 @@
       "backchannel": 3,
       "interruption": 5,
       "natural_completion": 2
-    }
+    },
+    "assistant_token_counts_per_step": {
+      "2": 154,
+      "1": 1
+    },
+    "assistant_streaming_steps": 155
   },
   "downloads": {
     "dataset_api.json": {

@@ -10,7 +10,10 @@
         "user_delta_raw": "How can",
         "observation": "How can",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 1,
@@ -19,7 +22,10 @@
         "user_delta_raw": " cross training",
         "observation": " cross training",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 2,
@@ -28,7 +34,10 @@
         "user_delta_raw": " benefit groups",
         "observation": " benefit groups",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 3,
@@ -37,7 +46,10 @@
         "user_delta_raw": " like runners",
         "observation": " like runners",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 4,
@@ -46,7 +58,10 @@
         "user_delta_raw": ", sw",
         "observation": ", sw",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 5,
@@ -55,7 +70,10 @@
         "user_delta_raw": "immers,",
         "observation": "immers,",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 6,
@@ -64,7 +82,10 @@
         "user_delta_raw": " or weight",
         "observation": " or weight",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 7,
@@ -73,7 +94,10 @@
         "user_delta_raw": "lifters?",
         "observation": "lifters",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 8,
@@ -83,6 +107,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -94,6 +121,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -105,6 +135,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -116,6 +149,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       }
@@ -132,7 +168,10 @@
         "user_delta_raw": "Wow,",
         "observation": "Wow,",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 1,
@@ -141,7 +180,10 @@
         "user_delta_raw": " that's",
         "observation": " that's",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 2,
@@ -150,7 +192,10 @@
         "user_delta_raw": " a lot",
         "observation": " a lot",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 3,
@@ -159,7 +204,10 @@
         "user_delta_raw": " of water",
         "observation": " of water",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 4,
@@ -168,7 +216,10 @@
         "user_delta_raw": "! No",
         "observation": "! No",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 5,
@@ -177,7 +228,10 @@
         "user_delta_raw": " wonder we",
         "observation": " wonder we",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 6,
@@ -186,7 +240,10 @@
         "user_delta_raw": " call it",
         "observation": " call it",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 7,
@@ -195,7 +252,10 @@
         "user_delta_raw": " the blue",
         "observation": " the blue",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 8,
@@ -204,7 +264,10 @@
         "user_delta_raw": " planet.",
         "observation": " planet",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 9,
@@ -214,6 +277,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -225,6 +291,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -236,6 +305,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -247,6 +319,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       }
@@ -263,7 +338,10 @@
         "user_delta_raw": "It's",
         "observation": "It's",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 1,
@@ -272,7 +350,10 @@
         "user_delta_raw": " amazing how",
         "observation": " amazing how",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 2,
@@ -281,7 +362,10 @@
         "user_delta_raw": " language translation",
         "observation": " language translation",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 3,
@@ -290,7 +374,10 @@
         "user_delta_raw": " technology has",
         "observation": " technology has",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 4,
@@ -299,7 +386,10 @@
         "user_delta_raw": " made the",
         "observation": " made the",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 5,
@@ -308,7 +398,10 @@
         "user_delta_raw": " world feel",
         "observation": " world feel",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 6,
@@ -317,7 +410,10 @@
         "user_delta_raw": " smaller.",
         "observation": " smaller",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 7,
@@ -326,7 +422,10 @@
         "user_delta_raw": " I can",
         "observation": " I can",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 8,
@@ -335,7 +434,10 @@
         "user_delta_raw": " talk to",
         "observation": " talk to",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 9,
@@ -344,7 +446,10 @@
         "user_delta_raw": " someone from",
         "observation": " someone from",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 10,
@@ -353,7 +458,10 @@
         "user_delta_raw": " across the",
         "observation": " across the",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 11,
@@ -362,7 +470,10 @@
         "user_delta_raw": " globe without",
         "observation": " globe without",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 12,
@@ -371,7 +482,10 @@
         "user_delta_raw": " ever leaving",
         "observation": " ever leaving",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 13,
@@ -380,7 +494,10 @@
         "user_delta_raw": " my home!",
         "observation": " my home",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 14,
@@ -390,6 +507,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -401,6 +521,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -412,6 +535,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -423,6 +549,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       }
@@ -439,7 +568,10 @@
         "user_delta_raw": "Can mindful",
         "observation": "Can mindful",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 1,
@@ -448,7 +580,10 @@
         "user_delta_raw": " walking be",
         "observation": " walking be",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 2,
@@ -457,7 +592,10 @@
         "user_delta_raw": " used as",
         "observation": " used as",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 3,
@@ -466,7 +604,10 @@
         "user_delta_raw": " a form",
         "observation": " a form",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 4,
@@ -475,7 +616,10 @@
         "user_delta_raw": " of meditation",
         "observation": " of meditation",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 5,
@@ -484,7 +628,10 @@
         "user_delta_raw": " or spiritual",
         "observation": " or spiritual",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 6,
@@ -493,7 +640,10 @@
         "user_delta_raw": " practice?",
         "observation": " practice",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 7,
@@ -503,6 +653,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -514,6 +667,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -525,6 +681,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -536,6 +695,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       }
@@ -552,7 +714,10 @@
         "user_delta_raw": "How can",
         "observation": "How can",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 1,
@@ -561,7 +726,10 @@
         "user_delta_raw": " cross training",
         "observation": " cross training",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 2,
@@ -570,7 +738,10 @@
         "user_delta_raw": " benefit groups",
         "observation": " benefit groups",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 3,
@@ -579,7 +750,10 @@
         "user_delta_raw": " like",
         "observation": " like",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 4,
@@ -589,6 +763,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -600,6 +777,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -611,6 +791,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -622,6 +805,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 600,
         "rebuilt_duration_ms": 640
       },
@@ -632,7 +818,10 @@
         "user_delta_raw": " runners,",
         "observation": " runners,",
         "state": "Listen",
-        "phase_index": 2
+        "phase_index": 2,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 9,
@@ -641,7 +830,10 @@
         "user_delta_raw": " swimmers",
         "observation": " swimmers",
         "state": "Listen",
-        "phase_index": 2
+        "phase_index": 2,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 10,
@@ -650,7 +842,10 @@
         "user_delta_raw": ", or",
         "observation": ", or",
         "state": "Listen",
-        "phase_index": 2
+        "phase_index": 2,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 11,
@@ -659,7 +854,10 @@
         "user_delta_raw": " weightlift",
         "observation": " weightlift",
         "state": "Listen",
-        "phase_index": 2
+        "phase_index": 2,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 12,
@@ -668,7 +866,10 @@
         "user_delta_raw": "ers?",
         "observation": "ers",
         "state": "Listen",
-        "phase_index": 2
+        "phase_index": 2,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       }
     ]
   },
@@ -683,7 +884,10 @@
         "user_delta_raw": "Can mindful",
         "observation": "Can mindful",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 1,
@@ -692,7 +896,10 @@
         "user_delta_raw": " walking be",
         "observation": " walking be",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 2,
@@ -701,7 +908,10 @@
         "user_delta_raw": " used as",
         "observation": " used as",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 3,
@@ -710,7 +920,10 @@
         "user_delta_raw": " a form",
         "observation": " a form",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 4,
@@ -719,7 +932,10 @@
         "user_delta_raw": " of",
         "observation": " of",
         "state": "Listen",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 5,
@@ -729,6 +945,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 1200,
         "rebuilt_duration_ms": 1280
       },
@@ -740,6 +959,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 1200,
         "rebuilt_duration_ms": 1280
       },
@@ -751,6 +973,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 1200,
         "rebuilt_duration_ms": 1280
       },
@@ -762,6 +987,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 1200,
         "rebuilt_duration_ms": 1280
       },
@@ -773,6 +1001,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 1200,
         "rebuilt_duration_ms": 1280
       },
@@ -784,6 +1015,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 1200,
         "rebuilt_duration_ms": 1280
       },
@@ -795,6 +1029,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 1200,
         "rebuilt_duration_ms": 1280
       },
@@ -806,6 +1043,9 @@
         "observation": "<|no-voice|>",
         "state": "Listen",
         "phase_index": 1,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0,
         "original_duration_ms": 1200,
         "rebuilt_duration_ms": 1280
       },
@@ -816,7 +1056,10 @@
         "user_delta_raw": " meditation or",
         "observation": " meditation or",
         "state": "Listen",
-        "phase_index": 2
+        "phase_index": 2,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       },
       {
         "step": 14,
@@ -825,7 +1068,10 @@
         "user_delta_raw": " spiritual practice?",
         "observation": " spiritual practice",
         "state": "Listen",
-        "phase_index": 2
+        "phase_index": 2,
+        "assistant_delta": "",
+        "assistant_visible": "",
+        "assistant_delta_tokens": 0
       }
     ]
   },
@@ -836,11 +1082,254 @@
       {
         "step": 0,
         "visible_ms": 160,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "Language translation",
+        "assistant_visible": "Language translation",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " technology has",
+        "assistant_visible": "Language translation technology has",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " a significant",
+        "assistant_visible": "Language translation technology has a significant",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " impact on",
+        "assistant_visible": "Language translation technology has a significant impact on",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " globalization in",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 5,
+        "visible_ms": 960,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " the following",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 6,
+        "visible_ms": 1120,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " ways:\n\n",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 7,
+        "visible_ms": 1280,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "1.",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n1.",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 8,
+        "visible_ms": 1440,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " Breaking down",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n1. Breaking down",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 9,
+        "visible_ms": 1600,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " language barriers",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n1. Breaking down language barriers",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 10,
+        "visible_ms": 1760,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": ": Translation",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n1. Breaking down language barriers: Translation",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 11,
+        "visible_ms": 1920,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " technology enables",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n1. Breaking down language barriers: Translation technology enables",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 12,
+        "visible_ms": 2080,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " individuals and",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n1. Breaking down language barriers: Translation technology enables individuals and",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 13,
+        "visible_ms": 2240,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " businesses to",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n1. Breaking down language barriers: Translation technology enables individuals and businesses to",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 14,
+        "visible_ms": 2400,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " communicate with",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n1. Breaking down language barriers: Translation technology enables individuals and businesses to communicate with",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 15,
+        "visible_ms": 2560,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " people from",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n1. Breaking down language barriers: Translation technology enables individuals and businesses to communicate with people from",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 16,
+        "visible_ms": 2720,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " different countries",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n1. Breaking down language barriers: Translation technology enables individuals and businesses to communicate with people from different countries",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 17,
+        "visible_ms": 2880,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " who speak",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n1. Breaking down language barriers: Translation technology enables individuals and businesses to communicate with people from different countries who speak",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 18,
+        "visible_ms": 3040,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " different languages",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n1. Breaking down language barriers: Translation technology enables individuals and businesses to communicate with people from different countries who speak different languages",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 19,
+        "visible_ms": 3200,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": ". This",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n1. Breaking down language barriers: Translation technology enables individuals and businesses to communicate with people from different countries who speak different languages. This",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 20,
+        "visible_ms": 3360,
         "kind": "user",
         "user_delta_raw": "Hmm.",
         "observation": "Hmm",
         "state": "Speak",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": " leads to",
+        "assistant_visible": "Language translation technology has a significant impact on globalization in the following ways:\n\n1. Breaking down language barriers: Translation technology enables individuals and businesses to communicate with people from different countries who speak different languages. This leads to",
+        "assistant_delta_tokens": 2
       }
     ]
   },
@@ -851,11 +1340,254 @@
       {
         "step": 0,
         "visible_ms": 160,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "Yes,",
+        "assistant_visible": "Yes,",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " mindful walking",
+        "assistant_visible": "Yes, mindful walking",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " can be",
+        "assistant_visible": "Yes, mindful walking can be",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " used as",
+        "assistant_visible": "Yes, mindful walking can be used as",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " a form",
+        "assistant_visible": "Yes, mindful walking can be used as a form",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 5,
+        "visible_ms": 960,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " of meditation",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 6,
+        "visible_ms": 1120,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " or spiritual",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 7,
+        "visible_ms": 1280,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " practice.",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice.",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 8,
+        "visible_ms": 1440,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " It involves",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 9,
+        "visible_ms": 1600,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " bringing awareness",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 10,
+        "visible_ms": 1760,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " and attention",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 11,
+        "visible_ms": 1920,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " to each",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention to each",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 12,
+        "visible_ms": 2080,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " step,",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention to each step,",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 13,
+        "visible_ms": 2240,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " focusing on",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention to each step, focusing on",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 14,
+        "visible_ms": 2400,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " the physical",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention to each step, focusing on the physical",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 15,
+        "visible_ms": 2560,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " sensations in",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention to each step, focusing on the physical sensations in",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 16,
+        "visible_ms": 2720,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " the body",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention to each step, focusing on the physical sensations in the body",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 17,
+        "visible_ms": 2880,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": ", and",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention to each step, focusing on the physical sensations in the body, and",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 18,
+        "visible_ms": 3040,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " being fully",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention to each step, focusing on the physical sensations in the body, and being fully",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 19,
+        "visible_ms": 3200,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " present in",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention to each step, focusing on the physical sensations in the body, and being fully present in",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 20,
+        "visible_ms": 3360,
         "kind": "user",
         "user_delta_raw": "Right.",
         "observation": "Right",
         "state": "Speak",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": " the moment",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention to each step, focusing on the physical sensations in the body, and being fully present in the moment",
+        "assistant_delta_tokens": 2
       }
     ]
   },
@@ -866,11 +1598,254 @@
       {
         "step": 0,
         "visible_ms": 160,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "As an",
+        "assistant_visible": "As an",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " AI language",
+        "assistant_visible": "As an AI language",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " model,",
+        "assistant_visible": "As an AI language model,",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " I don",
+        "assistant_visible": "As an AI language model, I don",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "'t have",
+        "assistant_visible": "As an AI language model, I don't have",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 5,
+        "visible_ms": 960,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " personal experience",
+        "assistant_visible": "As an AI language model, I don't have personal experience",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 6,
+        "visible_ms": 1120,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " running a",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 7,
+        "visible_ms": 1280,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " business,",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business,",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 8,
+        "visible_ms": 1440,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " but here",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 9,
+        "visible_ms": 1600,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " are some",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 10,
+        "visible_ms": 1760,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " suggestions on",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 11,
+        "visible_ms": 1920,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " how a",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 12,
+        "visible_ms": 2080,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " business can",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 13,
+        "visible_ms": 2240,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " adjust its",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 14,
+        "visible_ms": 2400,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " model to",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 15,
+        "visible_ms": 2560,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " accommodate changes",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 16,
+        "visible_ms": 2720,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " in the",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 17,
+        "visible_ms": 2880,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " market:\n\n",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the market:\n\n",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 18,
+        "visible_ms": 3040,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "1.",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the market:\n\n1.",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 19,
+        "visible_ms": 3200,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " Keep track",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the market:\n\n1. Keep track",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 20,
+        "visible_ms": 3360,
         "kind": "user",
         "user_delta_raw": "I see.",
         "observation": "I see",
         "state": "Speak",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": " of trends",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the market:\n\n1. Keep track of trends",
+        "assistant_delta_tokens": 2
       }
     ]
   },
@@ -881,29 +1856,278 @@
       {
         "step": 0,
         "visible_ms": 160,
-        "kind": "user",
-        "user_delta_raw": "I see.",
-        "observation": "I see",
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
         "state": "Speak",
-        "phase_index": 0
+        "phase_index": null,
+        "assistant_delta": "As an",
+        "assistant_visible": "As an",
+        "assistant_delta_tokens": 2
       },
       {
         "step": 1,
         "visible_ms": 320,
-        "kind": "user",
-        "user_delta_raw": " But please",
-        "observation": " But please",
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
         "state": "Speak",
-        "phase_index": 1
+        "phase_index": null,
+        "assistant_delta": " AI language",
+        "assistant_visible": "As an AI language",
+        "assistant_delta_tokens": 2
       },
       {
         "step": 2,
         "visible_ms": 480,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " model,",
+        "assistant_visible": "As an AI language model,",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " I don",
+        "assistant_visible": "As an AI language model, I don",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "'t have",
+        "assistant_visible": "As an AI language model, I don't have",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 5,
+        "visible_ms": 960,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " personal experience",
+        "assistant_visible": "As an AI language model, I don't have personal experience",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 6,
+        "visible_ms": 1120,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " running a",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 7,
+        "visible_ms": 1280,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " business,",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business,",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 8,
+        "visible_ms": 1440,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " but here",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 9,
+        "visible_ms": 1600,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " are some",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 10,
+        "visible_ms": 1760,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " suggestions on",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 11,
+        "visible_ms": 1920,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " how a",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 12,
+        "visible_ms": 2080,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " business can",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 13,
+        "visible_ms": 2240,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " adjust its",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 14,
+        "visible_ms": 2400,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " model to",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 15,
+        "visible_ms": 2560,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " accommodate changes",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 16,
+        "visible_ms": 2720,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " in the",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 17,
+        "visible_ms": 2880,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " market:\n\n",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the market:\n\n",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 18,
+        "visible_ms": 3040,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "1.",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the market:\n\n1.",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 19,
+        "visible_ms": 3200,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " Keep track",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the market:\n\n1. Keep track",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 20,
+        "visible_ms": 3360,
+        "kind": "user",
+        "user_delta_raw": "I see.",
+        "observation": "I see",
+        "state": "Speak",
+        "phase_index": 0,
+        "assistant_delta": " of trends",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the market:\n\n1. Keep track of trends",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 21,
+        "visible_ms": 3520,
+        "kind": "user",
+        "user_delta_raw": " But please",
+        "observation": " But please",
+        "state": "Speak",
+        "phase_index": 1,
+        "assistant_delta": ": By",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the market:\n\n1. Keep track of trends: By",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 22,
+        "visible_ms": 3680,
         "kind": "user",
         "user_delta_raw": " stop now.",
         "observation": " stop now",
         "state": "Speak",
-        "phase_index": 1
+        "phase_index": 1,
+        "assistant_delta": " monitoring the",
+        "assistant_visible": "As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the market:\n\n1. Keep track of trends: By monitoring the",
+        "assistant_delta_tokens": 2
       }
     ]
   },
@@ -914,56 +2138,314 @@
       {
         "step": 0,
         "visible_ms": 160,
-        "kind": "user",
-        "user_delta_raw": "Please",
-        "observation": "Please",
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
         "state": "Speak",
-        "phase_index": 0
+        "phase_index": null,
+        "assistant_delta": "Cross training",
+        "assistant_visible": "Cross training",
+        "assistant_delta_tokens": 2
       },
       {
         "step": 1,
         "visible_ms": 320,
-        "kind": "user",
-        "user_delta_raw": " stop;",
-        "observation": " stop;",
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
         "state": "Speak",
-        "phase_index": 1
+        "phase_index": null,
+        "assistant_delta": " can benefit",
+        "assistant_visible": "Cross training can benefit",
+        "assistant_delta_tokens": 2
       },
       {
         "step": 2,
         "visible_ms": 480,
-        "kind": "user",
-        "user_delta_raw": " I want",
-        "observation": " I want",
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
         "state": "Speak",
-        "phase_index": 1
+        "phase_index": null,
+        "assistant_delta": " groups like",
+        "assistant_visible": "Cross training can benefit groups like",
+        "assistant_delta_tokens": 2
       },
       {
         "step": 3,
         "visible_ms": 640,
-        "kind": "user",
-        "user_delta_raw": " to focus",
-        "observation": " to focus",
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
         "state": "Speak",
-        "phase_index": 1
+        "phase_index": null,
+        "assistant_delta": " runners,",
+        "assistant_visible": "Cross training can benefit groups like runners,",
+        "assistant_delta_tokens": 2
       },
       {
         "step": 4,
         "visible_ms": 800,
-        "kind": "user",
-        "user_delta_raw": " on swimming",
-        "observation": " on swimming",
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
         "state": "Speak",
-        "phase_index": 1
+        "phase_index": null,
+        "assistant_delta": " swimmers",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers",
+        "assistant_delta_tokens": 2
       },
       {
         "step": 5,
         "visible_ms": 960,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": ", or",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 6,
+        "visible_ms": 1120,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " weightlift",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlift",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 7,
+        "visible_ms": 1280,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "ers in",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 8,
+        "visible_ms": 1440,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " the following",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 9,
+        "visible_ms": 1600,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " ways:\n\n",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 10,
+        "visible_ms": 1760,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "1.",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1.",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 11,
+        "visible_ms": 1920,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " Reduces",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 12,
+        "visible_ms": 2080,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " the risk",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces the risk",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 13,
+        "visible_ms": 2240,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " of injury",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces the risk of injury",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 14,
+        "visible_ms": 2400,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": ": Cross",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces the risk of injury: Cross",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 15,
+        "visible_ms": 2560,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " training involves",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces the risk of injury: Cross training involves",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 16,
+        "visible_ms": 2720,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " different types",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces the risk of injury: Cross training involves different types",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 17,
+        "visible_ms": 2880,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " of exercises",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces the risk of injury: Cross training involves different types of exercises",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 18,
+        "visible_ms": 3040,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " that work",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces the risk of injury: Cross training involves different types of exercises that work",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 19,
+        "visible_ms": 3200,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " different muscle",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces the risk of injury: Cross training involves different types of exercises that work different muscle",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 20,
+        "visible_ms": 3360,
+        "kind": "user",
+        "user_delta_raw": "Please",
+        "observation": "Please",
+        "state": "Speak",
+        "phase_index": 0,
+        "assistant_delta": " groups.",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces the risk of injury: Cross training involves different types of exercises that work different muscle groups.",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 21,
+        "visible_ms": 3520,
+        "kind": "user",
+        "user_delta_raw": " stop;",
+        "observation": " stop;",
+        "state": "Speak",
+        "phase_index": 1,
+        "assistant_delta": " This reduces",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces the risk of injury: Cross training involves different types of exercises that work different muscle groups. This reduces",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 22,
+        "visible_ms": 3680,
+        "kind": "user",
+        "user_delta_raw": " I want",
+        "observation": " I want",
+        "state": "Speak",
+        "phase_index": 1,
+        "assistant_delta": " the risk",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces the risk of injury: Cross training involves different types of exercises that work different muscle groups. This reduces the risk",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 23,
+        "visible_ms": 3840,
+        "kind": "user",
+        "user_delta_raw": " to focus",
+        "observation": " to focus",
+        "state": "Speak",
+        "phase_index": 1,
+        "assistant_delta": " of over",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces the risk of injury: Cross training involves different types of exercises that work different muscle groups. This reduces the risk of over",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 24,
+        "visible_ms": 4000,
+        "kind": "user",
+        "user_delta_raw": " on swimming",
+        "observation": " on swimming",
+        "state": "Speak",
+        "phase_index": 1,
+        "assistant_delta": "use injuries",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces the risk of injury: Cross training involves different types of exercises that work different muscle groups. This reduces the risk of overuse injuries",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 25,
+        "visible_ms": 4160,
         "kind": "user",
         "user_delta_raw": " instead",
         "observation": " instead",
         "state": "Speak",
-        "phase_index": 1
+        "phase_index": 1,
+        "assistant_delta": " that may",
+        "assistant_visible": "Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:\n\n1. Reduces the risk of injury: Cross training involves different types of exercises that work different muscle groups. This reduces the risk of overuse injuries that may",
+        "assistant_delta_tokens": 2
       }
     ]
   },
@@ -974,65 +2456,326 @@
       {
         "step": 0,
         "visible_ms": 160,
-        "kind": "user",
-        "user_delta_raw": "I appreciate",
-        "observation": "I appreciate",
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
         "state": "Speak",
-        "phase_index": 0
+        "phase_index": null,
+        "assistant_delta": "As an",
+        "assistant_visible": "As an",
+        "assistant_delta_tokens": 2
       },
       {
         "step": 1,
         "visible_ms": 320,
-        "kind": "user",
-        "user_delta_raw": " your concern",
-        "observation": " your concern",
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
         "state": "Speak",
-        "phase_index": 0
+        "phase_index": null,
+        "assistant_delta": " AI language",
+        "assistant_visible": "As an AI language",
+        "assistant_delta_tokens": 2
       },
       {
         "step": 2,
         "visible_ms": 480,
-        "kind": "user",
-        "user_delta_raw": ", but",
-        "observation": ", but",
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
         "state": "Speak",
-        "phase_index": 0
+        "phase_index": null,
+        "assistant_delta": " model,",
+        "assistant_visible": "As an AI language model,",
+        "assistant_delta_tokens": 2
       },
       {
         "step": 3,
         "visible_ms": 640,
-        "kind": "user",
-        "user_delta_raw": " I don",
-        "observation": " I don",
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
         "state": "Speak",
-        "phase_index": 0
+        "phase_index": null,
+        "assistant_delta": " I completely",
+        "assistant_visible": "As an AI language model, I completely",
+        "assistant_delta_tokens": 2
       },
       {
         "step": 4,
         "visible_ms": 800,
-        "kind": "user",
-        "user_delta_raw": "'t need",
-        "observation": "'t need",
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
         "state": "Speak",
-        "phase_index": 0
+        "phase_index": null,
+        "assistant_delta": " understand your",
+        "assistant_visible": "As an AI language model, I completely understand your",
+        "assistant_delta_tokens": 2
       },
       {
         "step": 5,
         "visible_ms": 960,
-        "kind": "user",
-        "user_delta_raw": " any more",
-        "observation": " any more",
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
         "state": "Speak",
-        "phase_index": 0
+        "phase_index": null,
+        "assistant_delta": " perspective.",
+        "assistant_visible": "As an AI language model, I completely understand your perspective.",
+        "assistant_delta_tokens": 2
       },
       {
         "step": 6,
         "visible_ms": 1120,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " However,",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However,",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 7,
+        "visible_ms": 1280,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " relying on",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 8,
+        "visible_ms": 1440,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " gut instinct",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 9,
+        "visible_ms": 1600,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " or intuition",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 10,
+        "visible_ms": 1760,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " alone can",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 11,
+        "visible_ms": 1920,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " be problematic",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 12,
+        "visible_ms": 2080,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " since it",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 13,
+        "visible_ms": 2240,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " can lead",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 14,
+        "visible_ms": 2400,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " to cognitive",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 15,
+        "visible_ms": 2560,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " biases and",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive biases and",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 16,
+        "visible_ms": 2720,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " flawed decision",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive biases and flawed decision",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 17,
+        "visible_ms": 2880,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "-making.",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive biases and flawed decision-making.",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 18,
+        "visible_ms": 3040,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " It's",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive biases and flawed decision-making. It's",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 19,
+        "visible_ms": 3200,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " important to",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive biases and flawed decision-making. It's important to",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 20,
+        "visible_ms": 3360,
+        "kind": "user",
+        "user_delta_raw": "I appreciate",
+        "observation": "I appreciate",
+        "state": "Speak",
+        "phase_index": 0,
+        "assistant_delta": " strike a",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive biases and flawed decision-making. It's important to strike a",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 21,
+        "visible_ms": 3520,
+        "kind": "user",
+        "user_delta_raw": " your concern",
+        "observation": " your concern",
+        "state": "Speak",
+        "phase_index": 0,
+        "assistant_delta": " balance between",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive biases and flawed decision-making. It's important to strike a balance between",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 22,
+        "visible_ms": 3680,
+        "kind": "user",
+        "user_delta_raw": ", but",
+        "observation": ", but",
+        "state": "Speak",
+        "phase_index": 0,
+        "assistant_delta": " following your",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive biases and flawed decision-making. It's important to strike a balance between following your",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 23,
+        "visible_ms": 3840,
+        "kind": "user",
+        "user_delta_raw": " I don",
+        "observation": " I don",
+        "state": "Speak",
+        "phase_index": 0,
+        "assistant_delta": " intuition and",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive biases and flawed decision-making. It's important to strike a balance between following your intuition and",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 24,
+        "visible_ms": 4000,
+        "kind": "user",
+        "user_delta_raw": "'t need",
+        "observation": "'t need",
+        "state": "Speak",
+        "phase_index": 0,
+        "assistant_delta": " critical thinking",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive biases and flawed decision-making. It's important to strike a balance between following your intuition and critical thinking",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 25,
+        "visible_ms": 4160,
+        "kind": "user",
+        "user_delta_raw": " any more",
+        "observation": " any more",
+        "state": "Speak",
+        "phase_index": 0,
+        "assistant_delta": ". By",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive biases and flawed decision-making. It's important to strike a balance between following your intuition and critical thinking. By",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 26,
+        "visible_ms": 4320,
         "kind": "user",
         "user_delta_raw": " information.",
         "observation": " information",
         "state": "Speak",
-        "phase_index": 0
+        "phase_index": 0,
+        "assistant_delta": " taking the",
+        "assistant_visible": "As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive biases and flawed decision-making. It's important to strike a balance between following your intuition and critical thinking. By taking the",
+        "assistant_delta_tokens": 2
       }
     ]
   },
@@ -1043,17 +2786,104 @@
       {
         "step": 0,
         "visible_ms": 160,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "About ",
+        "assistant_visible": "About ",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "71",
+        "assistant_visible": "About 71",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "% of",
+        "assistant_visible": "About 71% of",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " the Earth",
+        "assistant_visible": "About 71% of the Earth",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "'s surface",
+        "assistant_visible": "About 71% of the Earth's surface",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 5,
+        "visible_ms": 960,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " is covered",
+        "assistant_visible": "About 71% of the Earth's surface is covered",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 6,
+        "visible_ms": 1120,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " by oceans",
+        "assistant_visible": "About 71% of the Earth's surface is covered by oceans",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 7,
+        "visible_ms": 1280,
         "kind": "silence",
         "user_delta_raw": "",
         "observation": "<|no-voice|>",
         "state": "Speak",
         "phase_index": 0,
+        "assistant_delta": ".",
+        "assistant_visible": "About 71% of the Earth's surface is covered by oceans.",
+        "assistant_delta_tokens": 1,
         "original_duration_ms": 160,
         "rebuilt_duration_ms": 160
       },
       {
-        "step": 1,
-        "visible_ms": 160,
+        "step": 8,
+        "visible_ms": 1280,
         "kind": "playback_complete",
         "state_after": "Listen",
         "target_action": null
@@ -1067,17 +2897,104 @@
       {
         "step": 0,
         "visible_ms": 160,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": "Yes,",
+        "assistant_visible": "Yes,",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 1,
+        "visible_ms": 320,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " mindful walking",
+        "assistant_visible": "Yes, mindful walking",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 2,
+        "visible_ms": 480,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " can be",
+        "assistant_visible": "Yes, mindful walking can be",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 3,
+        "visible_ms": 640,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " used as",
+        "assistant_visible": "Yes, mindful walking can be used as",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 4,
+        "visible_ms": 800,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " a form",
+        "assistant_visible": "Yes, mindful walking can be used as a form",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 5,
+        "visible_ms": 960,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " of meditation",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 6,
+        "visible_ms": 1120,
+        "kind": "assistant_lead_in",
+        "user_delta_raw": "",
+        "observation": "<|no-voice|>",
+        "state": "Speak",
+        "phase_index": null,
+        "assistant_delta": " or spiritual",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual",
+        "assistant_delta_tokens": 2
+      },
+      {
+        "step": 7,
+        "visible_ms": 1280,
         "kind": "silence",
         "user_delta_raw": "",
         "observation": "<|no-voice|>",
         "state": "Speak",
         "phase_index": 0,
+        "assistant_delta": " practice.",
+        "assistant_visible": "Yes, mindful walking can be used as a form of meditation or spiritual practice.",
+        "assistant_delta_tokens": 2,
         "original_duration_ms": 160,
         "rebuilt_duration_ms": 160
       },
       {
-        "step": 1,
-        "visible_ms": 160,
+        "step": 8,
+        "visible_ms": 1280,
         "kind": "playback_complete",
         "state_after": "Listen",
         "target_action": null

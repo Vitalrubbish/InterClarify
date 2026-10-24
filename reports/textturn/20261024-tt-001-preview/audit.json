@@ -1,6 +1,6 @@
 {
   "action_only_mask_checked": 24,
-  "max_input_tokens": 669,
+  "max_input_tokens": 689,
   "dedup": {
     "scope": "selected_review_sources_only",
     "word_ngram": 5,
@@ -15,5 +15,10 @@
     "backchannel": 3,
     "interruption": 5,
     "natural_completion": 2
-  }
+  },
+  "assistant_token_counts_per_step": {
+    "2": 154,
+    "1": 1
+  },
+  "assistant_streaming_steps": 155
 }

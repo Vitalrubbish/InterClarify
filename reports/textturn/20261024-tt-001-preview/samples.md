@@ -285,7 +285,7 @@
 
 ## backchannel_translation:0
 
-来源：UltraChat 3；类别：backchannel；可见时间：160ms。
+来源：UltraChat 3；类别：backchannel；可见时间：3360ms。
 
 状态：Speak；本步：`Hmm`；动作：**keep**。
 
@@ -301,13 +301,13 @@
 
 > Language translation technology has a significant impact on globalization in the following ways:
 >
-> 1. Breaking down language barriers: Translation technology enables individuals and businesse
+> 1. Breaking down language barriers: Translation technology enables individuals and businesses to communicate with people from different countries who speak different languages. This leads to
 
 助手正在展开翻译技术的解释；用户作短促的倾听回应，当前没有停止或接管请求，保持表达。
 
 ## backchannel_meditation:0
 
-来源：UltraChat 9；类别：backchannel；可见时间：160ms。
+来源：UltraChat 9；类别：backchannel；可见时间：3360ms。
 
 状态：Speak；本步：`Right`；动作：**keep**。
 
@@ -321,13 +321,13 @@
 
 当前助手已生成／模拟播放可见文本：
 
-> Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention to each step, focusing on the physical sensations in the body, an
+> Yes, mindful walking can be used as a form of meditation or spiritual practice. It involves bringing awareness and attention to each step, focusing on the physical sensations in the body, and being fully present in the moment
 
 助手正在解释正念行走；用户短促确认，当前没有停止或接管请求，保持表达。
 
 ## backchannel_shared_prefix:0
 
-来源：UltraChat 19；类别：backchannel；可见时间：160ms。
+来源：UltraChat 19；类别：backchannel；可见时间：3360ms。
 
 状态：Speak；本步：`I see`；动作：**keep**。
 
@@ -343,13 +343,13 @@
 
 > As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the market:
 >
-> 1. K
+> 1. Keep track of trends
 
 助手正在解释商业模式调整；用户短促表示理解，当前没有停止或接管请求，保持表达。
 
 ## interruption_shared_prefix:0
 
-来源：UltraChat 19；类别：interruption；可见时间：160ms。
+来源：UltraChat 19；类别：interruption；可见时间：3360ms。
 
 状态：Speak；本步：`I see`；动作：**keep**。
 
@@ -365,13 +365,13 @@
 
 > As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the market:
 >
-> 1. K
+> 1. Keep track of trends
 
 与附和分支相同的短促理解回应；此时停止请求尚不可见，保持表达。
 
 ## interruption_shared_prefix:1
 
-来源：UltraChat 19；类别：interruption；可见时间：480ms。
+来源：UltraChat 19；类别：interruption；可见时间：3680ms。
 
 状态：Speak；本步：` stop now`；动作：**stop**。
 
@@ -387,13 +387,13 @@
 
 > As an AI language model, I don't have personal experience running a business, but here are some suggestions on how a business can adjust its model to accommodate changes in the market:
 >
-> 1. K
+> 1. Keep track of trends: By monitoring the
 
 新增文本已明确请求停止；此时才让出话轮，不把未来打断泄漏到前一快照。
 
 ## interruption_change_request:0
 
-来源：UltraChat 0；类别：interruption；可见时间：160ms。
+来源：UltraChat 0；类别：interruption；可见时间：3360ms。
 
 状态：Speak；本步：`Please`；动作：**keep**。
 
@@ -409,13 +409,13 @@
 
 > Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:
 >
-> 1. Reduces the risk of injury: Cross training involves different types of exercises that wo
+> 1. Reduces the risk of injury: Cross training involves different types of exercises that work different muscle groups.
 
 助手仍在表达，当前只看到Please，尚未表达停止、纠正条件或改变请求，继续表达；不能依据未来文本提前停播。
 
 ## interruption_change_request:1
 
-来源：UltraChat 0；类别：interruption；可见时间：960ms。
+来源：UltraChat 0；类别：interruption；可见时间：4160ms。
 
 状态：Speak；本步：` instead`；动作：**stop**。
 
@@ -431,13 +431,13 @@
 
 > Cross training can benefit groups like runners, swimmers, or weightlifters in the following ways:
 >
-> 1. Reduces the risk of injury: Cross training involves different types of exercises that wo
+> 1. Reduces the risk of injury: Cross training involves different types of exercises that work different muscle groups. This reduces the risk of overuse injuries that may
 
 用户明确要求停止并更改关注对象，构成打断。
 
 ## interruption_original_refusal:0
 
-来源：UltraChat 6；类别：interruption；可见时间：1120ms。
+来源：UltraChat 6；类别：interruption；可见时间：4320ms。
 
 状态：Speak；本步：` information`；动作：**stop**。
 
@@ -451,13 +451,13 @@
 
 当前助手已生成／模拟播放可见文本：
 
-> As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive biases and flawed dec
+> As an AI language model, I completely understand your perspective. However, relying on gut instinct or intuition alone can be problematic since it can lead to cognitive biases and flawed decision-making. It's important to strike a balance between following your intuition and critical thinking. By taking the
 
 原对话中的拒绝前缀已明确表示不再需要信息；模拟在上一轮解释尚在播放时到达。
 
 ## natural_completion_2:0
 
-来源：UltraChat 2；类别：natural_completion；可见时间：160ms。
+来源：UltraChat 2；类别：natural_completion；可见时间：1280ms。
 
 状态：Speak；本步：`<|no-voice|>`；动作：**keep**。
 
@@ -477,7 +477,7 @@
 
 ## natural_completion_9:0
 
-来源：UltraChat 9；类别：natural_completion；可见时间：160ms。
+来源：UltraChat 9；类别：natural_completion；可见时间：1280ms。
 
 状态：Speak；本步：`<|no-voice|>`；动作：**keep**。
 

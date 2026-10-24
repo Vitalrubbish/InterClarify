@@ -4,7 +4,9 @@
 
 配置固定 2048 token 上限，引用六个 UltraChat 来源对话，分别构造正常接话、用户打断、用户附和、内部停顿和自然播放完成负例。完整陈述与完整提问各保留两条正常 start；同一来源的所有派生均在 review 集合。
 
-`scenarios` 中的 history_before_turn 指定已完成历史范围；assistant_visible 指定当前已生成／模拟播放可见的原文片段；phases 描述用户字符增量、明确持续时间的空窗与播放完成事件。原文区间是右开区间；新增表达必须标 synthetic_annotation；动作和中文依据仅用于监督及检查，不进模型输入。
+`scenarios` 中的 history_before_turn 指定已完成历史范围；assistant_stream 指定待逐步发布的助手来源文本，assistant_lead_in_steps 指定用户附和／打断前已推进的步骤数。全局 assistant_tokens_per_step=2，每个 160ms 步骤同时推进用户观察和至多一个助手分片，只把当前已发布的累计助手前缀放入模型输入 assistant_visible。此前一次性放入固定助手片段的配置已替换。
+
+附和和打断场景先推进 20 步助手文本，随后用户到达时继续同步推进；这些前导步骤只保留在时间线，不增加训练锚点。自然完成负例先推进至最后一片之前，在最后一片发布时标 keep，再单独触发 playback_complete。phases 描述用户字符增量、明确持续时间的空窗与播放完成事件。原文区间是右开区间；新增表达必须标 synthetic_annotation；动作和中文依据仅用于监督及检查，不进模型输入。
 
 按用户检查反馈，三个附和样例改为短促的 `Hmm.`、`Right.` 和 `I see.`，不追加继续指令。助手正在持续解释时，短回应没有表达停止或接管请求，标 Speak/keep；不将这些词做成脱离上下文的固定动作词表。
 

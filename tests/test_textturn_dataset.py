@@ -29,7 +29,7 @@ class TextTurnDatasetTests(unittest.TestCase):
         plan = {'scenario_id': 'contract', 'source_id': 'source', 'category': 'pause',
                 'state': state, 'history_before_turn': 0, 'phases': phases}
         if state == 'Speak':
-            plan['assistant_visible'] = {'source_turn': 1}
+            plan['assistant_stream'] = {'source_turn': 1}
         return plan
 
     def test_chunks_preserve_unicode_and_punctuation(self):
@@ -64,9 +64,34 @@ class TextTurnDatasetTests(unittest.TestCase):
     def test_natural_completion_has_no_stop_target(self):
         phases = [{'channel': 'silence', 'duration_ms': 160, 'action': 'keep', 'reason_zh': '继续播放。'},
                   {'channel': 'playback_complete'}]
-        events, rows = dataset.compile_scenario(self.plan(phases, 'Speak'), self.source, self.tokenizer, 20000)
+        plan = self.plan(phases, 'Speak')
+        plan['assistant_lead_in_steps'] = len(list(self.tokenizer.chunks(
+            self.source['texts'][1], merge_terminal=False))) - 1
+        events, rows = dataset.compile_scenario(plan, self.source, self.tokenizer, 20000)
         self.assertEqual(events[-1]['state_after'], 'Listen')
         self.assertEqual([r['target_action'] for r in rows], ['keep'])
+        self.assertEqual(rows[0]['visible']['assistant_visible'], self.source['texts'][1])
+        with self.assertRaises(ValueError):
+            dataset.compile_scenario(self.plan([{'channel': 'playback_complete'}], 'Speak'),
+                                     self.source, self.tokenizer, 20000)
+
+    def test_assistant_stream_is_incremental_and_step_size_is_effective(self):
+        self.source['texts'][1] = 'ABCDEFGHIJKLMNO'
+        phases = [{'channel': 'user', 'text': text, 'origin': 'synthetic_annotation',
+                   'action': 'keep', 'reason_zh': '用户简短确认，当前继续表达。'}
+                  for text in ['Hmm.', 'Yes']]
+        plan = self.plan(phases, 'Speak')
+        plan['assistant_lead_in_steps'] = 2
+        events, rows = dataset.compile_scenario(plan, self.source, self.tokenizer, 20000)
+        self.assertEqual(rows[0]['visible']['assistant_visible'], 'ABCDEFGH')
+        self.assertEqual(rows[1]['visible']['assistant_visible'], 'ABCDEFGHIJKL')
+        self.assertNotIn('IJKL', rows[0]['prompt'])
+        self.assertNotIn('MNO', rows[1]['prompt'])
+        self.assertTrue(all(e['assistant_delta_tokens'] == 2 for e in events))
+        self.assertEqual(events[0]['observation'], dataset.SILENCE)
+        _, slower = dataset.compile_scenario(plan, self.source, self.tokenizer, 20000,
+                                              assistant_tokens_per_step=1)
+        self.assertEqual(slower[0]['visible']['assistant_visible'], 'ABCD')
 
     def test_illegal_labels_and_unmarked_insertions_are_rejected(self):
         for state, action in [('Listen', 'stop'), ('Speak', 'start')]:

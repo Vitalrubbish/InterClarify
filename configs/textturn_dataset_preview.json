@@ -2,7 +2,7 @@
   "schema_version": 1,
   "purpose": "TT-001 source-linked review preview",
   "max_length": 2048,
-  "annotation_policy_zh": "按用户反馈，附和使用Hmm.、I see.、Right.等短促回应，不追加继续指令。原始UltraChat文本及可见上下文逐例核对；新增短回应／停止请求标为合成。只依当前可见依据标注，未来打断不倒推当前动作；歧义保留未知，未做人类独立复核。 七个原未标注快照已按当前可见状态逐条审核为keep，不从未来续说或动作倒推，不自动填充其他缺失标签。",
+  "annotation_policy_zh": "按用户反馈，附和使用Hmm.、I see.、Right.等短促回应，不追加继续指令。原始UltraChat文本及可见上下文逐例核对；新增短回应／停止请求标为合成。只依当前可见依据标注，未来打断不倒推当前动作；歧义保留未知，未做人类独立复核。 七个原未标注快照已按当前可见状态逐条审核为keep，不从未来续说或动作倒推，不自动填充其他缺失标签。 Assistant按每160ms两token逐步发布，控制输入仅包含截至本步已发布的累计前缀。",
   "gaps_zh": [
     "远端已检查的旧训练目录和归档位置未找到旧对话及600ms事件产物；本轮仅恢复同一固定revision的源前缀，未恢复旧切分或原停顿位置。",
     "HTTP Range仅验证固定revision和区间，未下载整分片校验LFS SHA256。",
@@ -174,10 +174,10 @@
           "reason_zh": "助手正在展开翻译技术的解释；用户作短促的倾听回应，当前没有停止或接管请求，保持表达。"
         }
       ],
-      "assistant_visible": {
-        "source_turn": 1,
-        "end": 190
-      }
+      "assistant_stream": {
+        "source_turn": 1
+      },
+      "assistant_lead_in_steps": 20
     },
     {
       "scenario_id": "backchannel_meditation",
@@ -194,10 +194,10 @@
           "reason_zh": "助手正在解释正念行走；用户短促确认，当前没有停止或接管请求，保持表达。"
         }
       ],
-      "assistant_visible": {
-        "source_turn": 1,
-        "end": 190
-      }
+      "assistant_stream": {
+        "source_turn": 1
+      },
+      "assistant_lead_in_steps": 20
     },
     {
       "scenario_id": "backchannel_shared_prefix",
@@ -214,10 +214,10 @@
           "reason_zh": "助手正在解释商业模式调整；用户短促表示理解，当前没有停止或接管请求，保持表达。"
         }
       ],
-      "assistant_visible": {
-        "source_turn": 1,
-        "end": 190
-      }
+      "assistant_stream": {
+        "source_turn": 1
+      },
+      "assistant_lead_in_steps": 20
     },
     {
       "scenario_id": "interruption_shared_prefix",
@@ -241,10 +241,10 @@
           "reason_zh": "新增文本已明确请求停止；此时才让出话轮，不把未来打断泄漏到前一快照。"
         }
       ],
-      "assistant_visible": {
-        "source_turn": 1,
-        "end": 190
-      }
+      "assistant_stream": {
+        "source_turn": 1
+      },
+      "assistant_lead_in_steps": 20
     },
     {
       "scenario_id": "interruption_change_request",
@@ -268,10 +268,10 @@
           "reason_zh": "用户明确要求停止并更改关注对象，构成打断。"
         }
       ],
-      "assistant_visible": {
-        "source_turn": 1,
-        "end": 190
-      }
+      "assistant_stream": {
+        "source_turn": 1
+      },
+      "assistant_lead_in_steps": 20
     },
     {
       "scenario_id": "interruption_original_refusal",
@@ -288,10 +288,10 @@
           "reason_zh": "原对话中的拒绝前缀已明确表示不再需要信息；模拟在上一轮解释尚在播放时到达。"
         }
       ],
-      "assistant_visible": {
-        "source_turn": 5,
-        "end": 190
-      }
+      "assistant_stream": {
+        "source_turn": 5
+      },
+      "assistant_lead_in_steps": 20
     },
     {
       "scenario_id": "natural_completion_2",
@@ -310,10 +310,11 @@
           "channel": "playback_complete"
         }
       ],
-      "assistant_visible": {
+      "assistant_stream": {
         "source_turn": 1,
         "end": 54
-      }
+      },
+      "assistant_lead_in_steps": 7
     },
     {
       "scenario_id": "natural_completion_9",
@@ -332,10 +333,12 @@
           "channel": "playback_complete"
         }
       ],
-      "assistant_visible": {
+      "assistant_stream": {
         "source_turn": 1,
         "end": 79
-      }
+      },
+      "assistant_lead_in_steps": 7
     }
-  ]
+  ],
+  "assistant_tokens_per_step": 2
 }

@@ -1,7 +1,6 @@
 {
   "qwen_character_roundtrip_phases": 16,
   "chunks_exceeding_two_reencoded_tokens": 6,
-  "punctuation_only_chunks": 0,
   "tokenizer_reload": true,
   "shared_short_ack_prefix_identical_input": true,
   "shared_short_ack_prefix_keep_before_later_stop": true,
@@ -11,17 +10,17 @@
     "I see"
   ],
   "chat_template_matches": 24,
-  "reviewed_keep_snapshot_ids": [
-    "smooth_question:0",
-    "smooth_statement_ocean:0",
-    "smooth_statement_translation:0",
-    "smooth_question_meditation:0",
-    "pause_cross_training:2",
-    "pause_mindful_walking:2",
-    "interruption_change_request:0"
-  ],
-  "preserved_visible_inputs": 24,
-  "preserved_existing_labeled_snapshots": 17,
   "unannotated_snapshots": 0,
-  "unit_tests_passed": 5
+  "preserved_action_labels": 24,
+  "preserved_user_contexts": 24,
+  "assistant_tokens_per_step": 2,
+  "assistant_streaming_scenarios": 8,
+  "assistant_prefix_checks": 155,
+  "clock_steps_checked": 237,
+  "assistant_token_counts_per_step": {
+    "2": 154,
+    "1": 1
+  },
+  "natural_completion_after_full_publication": true,
+  "unit_tests_passed": 6
 }

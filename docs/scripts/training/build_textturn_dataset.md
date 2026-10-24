@@ -10,13 +10,15 @@
 
 ## 类与核心方法
 
-`ControlTokenizer` 从固定 Qwen3 tokenizer 注册 keep/start/stop 和 no-voice 四个独立 token，验证它们都位于原词表末尾之后；不引用旧 DuplexCascade 数值 ID。`chunks` 根据原文 token offset 每两 token 切分，合并 Unicode 重叠区间，保留全部字符。孤立的末尾句读并入前一片段，避免去句读后凭空产生 no-voice 观察。Unicode 或句读合并可偶尔超过两 token，不能拆坏字符。
+`ControlTokenizer` 从固定 Qwen3 tokenizer 注册 keep/start/stop 和 no-voice 四个独立 token，验证它们都位于原词表末尾之后；不引用旧 DuplexCascade 数值 ID。`chunks` 根据原文 token offset 切分，默认每两 token，合并 Unicode 重叠区间，保留全部字符。User 的孤立末尾句读并入前一片段，避免去句读后凭空产生 no-voice 观察；Assistant 按 assistant_tokens_per_step 切分，保留独立句读末片。Unicode 或 User 句读合并可偶尔超过两 token，不能拆坏字符。
 
 `compile_scenario` 顺序消费计划，只把当前可见历史、用户累计文本、助手已生成／模拟播放可见文本、Listen/Speak、本步观察和空 CoT 写入 prompt。计划类型、未来文本、标签及标注理由都放在输入外。每个非空片段计 160ms；空窗按 ceil(duration/160) 重建，600ms 为四步／640ms，1200ms 为八步／1280ms。当前新增停顿为合成设置，没有冒称恢复旧停顿位置。
 
+Speak 场景从空助手前缀开始，emit_step 在每个 160ms 步骤发布一个助手片段并累加 assistant_visible；User 到达或无新增文字时都按同一时钟推进。assistant_lead_in_steps 只推进时间线，快照仍取既定锚点。事件记录本步助手增量、累计前缀及 token 数，可逐窗检查。配置使用 assistant_stream 提供来源，不再接受旧的固定 assistant_visible 片段。
+
 仅在逐例语义锚点输出快照，action=null 表示未提供动作监督，全部 labels=-100；默认说明只记录未标注，不把它解释为语义歧义。可以依据当前上下文判断的记录，应在配置中显式填写动作及理由，不在构建器中自动填 keep。当前检查批次已逐条补齐七个 keep，不再有空标签。已标注快照在输入末尾附一个动作 token，只该位置参与损失；其余输入及回答正文都被屏蔽。按 causal LM 的常规左移损失使用。超过 2048 token 的记录保留并排除，不截断历史。当前完整输入按固定 ChatML 模板关闭 thinking，保存 tokenizer 和 tokenizer_config，不输出解释。
 
-`playback_complete` 是运行状态事件，将 Speak 改为 Listen，不产生 stop 目标；start/stop 后必须结束本场景，防止继续沿用过期状态。助手可见正文明确是合成播放状态，未生成的回答不进入输入。
+`playback_complete` 是运行状态事件，要求当前助手来源已全部发布，再将 Speak 改为 Listen，不产生 stop 目标。最后一片发布不自动转 Listen，保持生成与播放生命周期分开；start/stop 后必须结束本场景，防止继续沿用过期状态。助手文本与播放状态均为合成，未发布的回答不进入输入，不能据此宣称真实 TTS 已按相同节奏播放。
 
 `group_sources` 对本批所选来源做 NFKC／大小写归一化后的五词 shingle 比较，Jaccard≥0.85 的对话归为同组。当前只检查六个来源，不声称覆盖全库或全部模板派生。
 

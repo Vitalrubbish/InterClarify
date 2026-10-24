@@ -91,13 +91,15 @@ class ControlTokenizer:
     def encode(self, text):
         return self.backend.encode(text, add_special_tokens=False).ids
 
-    def chunks(self, text):
+    def chunks(self, text, tokens_per_step=2, merge_terminal=True):
         """Preserve Unicode spans and attach terminal punctuation to the preceding fragment."""
+        if type(tokens_per_step) is not int or tokens_per_step < 1:
+            raise ValueError('Token step size must be a positive integer')
         offsets = self.backend.encode(text, add_special_tokens=False).offsets
         cursor = start = 0
         chunks = []
         while cursor < len(offsets):
-            end = min(cursor + 2, len(offsets))
+            end = min(cursor + tokens_per_step, len(offsets))
             stop = offsets[end - 1][1]
             while end < len(offsets) and offsets[end][0] < stop:
                 stop = max(stop, offsets[end][1])
@@ -106,7 +108,7 @@ class ControlTokenizer:
                 stop = len(text)
             chunks.append(text[start:stop])
             cursor, start = end, stop
-        if len(chunks) > 1 and not strip_terminal(chunks[-1]).strip():
+        if merge_terminal and len(chunks) > 1 and not strip_terminal(chunks[-1]).strip():
             chunks[-2:] = [chunks[-2] + chunks[-1]]
         yield from chunks
 
@@ -177,7 +179,7 @@ def prompt_for(visible):
             '<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n')
 
 
-def compile_scenario(plan, source, tokenizer, max_length):
+def compile_scenario(plan, source, tokenizer, max_length, assistant_tokens_per_step=2):
     """Compile forward only; labels and future phases never enter the model input."""
     texts = source['texts']
     history = [{'role': 'user' if i % 2 == 0 else 'assistant', 'text': text}
@@ -185,14 +187,50 @@ def compile_scenario(plan, source, tokenizer, max_length):
     state = plan['state']
     if state not in LEGAL:
         raise ValueError('Invalid initial playback state')
-    assistant = source_text(plan['assistant_visible'], texts) if 'assistant_visible' in plan else ''
+    if 'assistant_visible' in plan:
+        raise ValueError('Use an assistant stream instead of a fixed visible prefix')
+    stream_spec = plan.get('assistant_stream')
+    if (state == 'Speak') != (stream_spec is not None):
+        raise ValueError('Only Speak scenarios require an assistant stream')
+    assistant_chunks = list(tokenizer.chunks(
+        source_text(stream_spec, texts), assistant_tokens_per_step, merge_terminal=False
+    )) if stream_spec is not None else []
+    lead_in = plan.get('assistant_lead_in_steps', 0)
+    if type(lead_in) is not int or lead_in < 0 or (lead_in and lead_in >= len(assistant_chunks)):
+        raise ValueError('Assistant lead-in must leave at least one unpublished fragment')
+    if state == 'Speak' and not assistant_chunks:
+        raise ValueError('Assistant stream must not be empty')
+    assistant, assistant_cursor = '', 0
     user, elapsed = '', 0
     events, snapshots = [], []
+
+    def emit_step(kind, piece='', phase_index=None):
+        """Publish this step's two text streams before exposing the control snapshot."""
+        nonlocal assistant, assistant_cursor, user, elapsed
+        assistant_delta = ''
+        if state == 'Speak' and assistant_cursor < len(assistant_chunks):
+            assistant_delta = assistant_chunks[assistant_cursor]
+            assistant_cursor += 1
+            assistant += assistant_delta
+        user += piece
+        elapsed += 160
+        event = {'step': len(events), 'visible_ms': elapsed, 'kind': kind,
+                 'user_delta_raw': piece, 'observation': strip_terminal(piece) or SILENCE,
+                 'state': state, 'phase_index': phase_index,
+                 'assistant_delta': assistant_delta, 'assistant_visible': assistant,
+                 'assistant_delta_tokens': len(tokenizer.encode(assistant_delta))}
+        events.append(event)
+        return event
+
+    for _ in range(lead_in):
+        emit_step('assistant_lead_in')
     for phase_index, phase in enumerate(plan['phases']):
         channel = phase['channel']
         if channel == 'playback_complete':
             if state != 'Speak':
                 raise ValueError('Playback completion requires Speak')
+            if assistant_cursor != len(assistant_chunks):
+                raise ValueError('Playback cannot complete before all assistant text is published')
             state = 'Listen'
             history.extend([{'role': 'assistant', 'text': assistant}])
             assistant, user = '', ''
@@ -211,15 +249,10 @@ def compile_scenario(plan, source, tokenizer, max_length):
         else:
             raise ValueError('Unknown event channel')
         for piece_index, piece in enumerate(pieces):
-            user += piece
-            elapsed += 160
             last = piece_index == len(pieces) - 1
-            event = {'step': len(events), 'visible_ms': elapsed, 'kind': channel,
-                     'user_delta_raw': piece, 'observation': strip_terminal(piece) or SILENCE,
-                     'state': state, 'phase_index': phase_index}
+            event = emit_step(channel, piece, phase_index)
             if channel == 'silence':
                 event.update(original_duration_ms=duration, rebuilt_duration_ms=len(pieces) * 160)
-            events.append(event)
             if not last:
                 continue
             action = phase.get('action')
@@ -257,6 +290,9 @@ def compile_scenario(plan, source, tokenizer, max_length):
 
 def build(config_path, cache, output):
     config = json.loads(Path(config_path).read_text())
+    assistant_tokens_per_step = config['assistant_tokens_per_step']
+    if type(assistant_tokens_per_step) is not int or assistant_tokens_per_step < 1:
+        raise ValueError('Assistant token step size must be a positive integer')
     cache, output = Path(cache), Path(output)
     if output.exists() and any(output.iterdir()):
         raise ValueError('Use a fresh output directory')
@@ -280,7 +316,7 @@ def build(config_path, cache, output):
     snapshots, timelines = [], []
     for plan in plans:
         source = sources[plan['source_id']]
-        events, rows = compile_scenario(plan, source, tokenizer, config['max_length'])
+        events, rows = compile_scenario(plan, source, tokenizer, config['max_length'], assistant_tokens_per_step)
         snapshots.extend(rows)
         timelines.append({'scenario_id': plan['scenario_id'], 'source_id': plan['source_id'],
                           'events': events})
@@ -305,14 +341,19 @@ def build(config_path, cache, output):
             raise ValueError('Action-only loss mask is invalid')
         if len(row['labels']) != len(row['input_ids']):
             raise ValueError('Loss mask length differs from input length')
+    assistant_sizes = Counter(event['assistant_delta_tokens'] for trace in timelines for event in trace['events']
+                              if event.get('assistant_delta'))
     audit = {'action_only_mask_checked': len(snapshots), 'max_input_tokens': max(
         (len(r['input_ids']) for r in snapshots), default=0), 'dedup': dedup,
-        'category_snapshot_counts': dict(Counter(r['category'] for r in snapshots))}
+        'category_snapshot_counts': dict(Counter(r['category'] for r in snapshots)),
+        'assistant_token_counts_per_step': dict(assistant_sizes),
+        'assistant_streaming_steps': sum(assistant_sizes.values())}
     write_json(output / 'audit.json', audit)
     report = {'status': 'preview_for_review', 'training_allowed': False,
               'independent_test_ready': False, 'source_revision': SOURCE_REVISION,
               'source_verification': 'pinned_HTTP_byte_range; full_shard_LFS_hash_not_verified',
               'model_revision': MODEL_REVISION, 'new_token_ids': tokenizer.special,
+              'assistant_tokens_per_step': assistant_tokens_per_step,
               'source_dialogues': len({p['source_id'] for p in plans}), 'scenarios': len(plans),
               'snapshots': len(snapshots), 'readable_candidates': len(candidates),
               'action_counts': dict(counts), 'start_declarative': declarations,
