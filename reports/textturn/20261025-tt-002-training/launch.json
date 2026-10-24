@@ -45,5 +45,6 @@
       "context_versions": 3
     },
     "real_nemotron_smoke_completed": false
-  }
+  },
+  "evaluation_source_commit": "c05aff4"
 }

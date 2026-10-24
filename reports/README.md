@@ -1,6 +1,8 @@
 # 评测结果
 
-2026-10-25 更新 [TT-001 首批数据检查材料](textturn/20261024-tt-001-preview/README.md)：六个固定UltraChat来源，2026-10-25按480ms窗、User随机1—2 token和Assistant每窗8 token按连续话轮重建为六条综合轨迹／343逐窗快照，供用户检查四类控制与自然完成负例；本批仅为 review，正式数据未冻结，未产生模型评测成绩。
+2026-10-25 已完成 [TT-001正式文本数据冻结](textturn/20261025-tt-001-freeze/README.md)，并交付[训练及自动后续评估启动记录](textturn/20261025-tt-002-training/README.md)。当前训练运行中，独立评估等待成功候选，尚无最终成绩。
+
+此前 [TT-001 首批数据检查材料](textturn/20261024-tt-001-preview/README.md)：六个固定UltraChat来源，2026-10-25按480ms窗、User随机1—2 token和Assistant每窗8 token按连续话轮重建为六条综合轨迹／343逐窗快照，供用户检查四类控制与自然完成负例；本批仅为 review，正式数据未冻结，未产生模型评测成绩。
 
 2026-10-24 按用户要求恢复 `13ba980` 的报告集合；其后的阈值校准、pending/gate 和短延迟实验报告已移出当前文件树，提交 `fa24868` 保留完整历史。本轮是回滚清理，不产生新评测成绩，见[记录](../docs/dev/XTurnix/rollback_cleanup.md)。
 
