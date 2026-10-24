@@ -2,7 +2,7 @@
   "schema_version": 1,
   "purpose": "TT-001 source-linked review preview",
   "max_length": 2048,
-  "annotation_policy_zh": "按用户反馈，附和使用Hmm.、I see.、Right.等短促回应，不追加继续指令。原始UltraChat文本及可见上下文逐例核对；新增短回应／停止请求标为合成。只依当前可见依据标注，未来打断不倒推当前动作；歧义保留未知，未做人类独立复核。",
+  "annotation_policy_zh": "按用户反馈，附和使用Hmm.、I see.、Right.等短促回应，不追加继续指令。原始UltraChat文本及可见上下文逐例核对；新增短回应／停止请求标为合成。只依当前可见依据标注，未来打断不倒推当前动作；歧义保留未知，未做人类独立复核。 七个原未标注快照已按当前可见状态逐条审核为keep，不从未来续说或动作倒推，不自动填充其他缺失标签。",
   "gaps_zh": [
     "远端已检查的旧训练目录和归档位置未找到旧对话及600ms事件产物；本轮仅恢复同一固定revision的源前缀，未恢复旧切分或原停顿位置。",
     "HTTP Range仅验证固定revision和区间，未下载整分片校验LFS SHA256。",
@@ -22,7 +22,9 @@
       "phases": [
         {
           "channel": "user",
-          "source_turn": 0
+          "source_turn": 0,
+          "action": "keep",
+          "reason_zh": "交叉训练提问的文本已完整到达，但本步仍有新增文字，尚未观察到本次表达后的让轮空窗，先保持倾听。"
         },
         {
           "channel": "silence",
@@ -42,7 +44,9 @@
       "phases": [
         {
           "channel": "user",
-          "source_turn": 2
+          "source_turn": 2,
+          "action": "keep",
+          "reason_zh": "海洋覆盖率的感想已可见，但本步仍在接收新增文字；完整陈述本身不足以证明让轮，先保持倾听。"
         },
         {
           "channel": "silence",
@@ -62,7 +66,9 @@
       "phases": [
         {
           "channel": "user",
-          "source_turn": 2
+          "source_turn": 2,
+          "action": "keep",
+          "reason_zh": "关于翻译技术的陈述已可见，但当前仍是新增文字到达步骤，尚无本次表达后的让轮观察，先保持倾听。"
         },
         {
           "channel": "silence",
@@ -82,7 +88,9 @@
       "phases": [
         {
           "channel": "user",
-          "source_turn": 0
+          "source_turn": 0,
+          "action": "keep",
+          "reason_zh": "正念行走提问的文本已完整到达，但本步仍有新增文字，尚无本次表达后的让轮观察，先保持倾听。"
         },
         {
           "channel": "silence",
@@ -116,7 +124,9 @@
         {
           "channel": "user",
           "source_turn": 0,
-          "start": 42
+          "start": 42,
+          "action": "keep",
+          "reason_zh": "用户在内部停顿后继续补充了交叉训练对象；当前仍有新增文字，尚无续说结束后的让轮观察，保持倾听。"
         }
       ]
     },
@@ -143,7 +153,9 @@
         {
           "channel": "user",
           "source_turn": 0,
-          "start": 40
+          "start": 40,
+          "action": "keep",
+          "reason_zh": "用户在内部停顿后继续补充冥想或精神练习的内容；当前仍有新增文字，尚无续说结束后的让轮观察，保持倾听。"
         }
       ]
     },
@@ -244,7 +256,9 @@
         {
           "channel": "user",
           "text": "Please",
-          "origin": "synthetic_annotation"
+          "origin": "synthetic_annotation",
+          "action": "keep",
+          "reason_zh": "助手仍在表达，当前只看到Please，尚未表达停止、纠正条件或改变请求，继续表达；不能依据未来文本提前停播。"
         },
         {
           "channel": "user",

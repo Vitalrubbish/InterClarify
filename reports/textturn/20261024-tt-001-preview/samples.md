@@ -1,13 +1,13 @@
 # TT-001 数据检查样例
 
 这是固定 UltraChat 来源上的合成事件样例；split=review，不进入正式训练或测试。
-表中只列该时刻可见内容；后续续说仅见独立时间线。无动作表示未知标签。
+表中只列该时刻可见内容；后续续说仅见独立时间线。无动作表示未提供标注。
 
 ## smooth_question:0
 
 来源：UltraChat 0；类别：smooth；可见时间：1280ms。
 
-状态：Listen；本步：`lifters`；动作：**unknown**。
+状态：Listen；本步：`lifters`；动作：**keep**。
 
 当前累计用户文本：
 
@@ -21,7 +21,7 @@
 
 > （空）
 
-前缀含义未定，不计动作损失。
+交叉训练提问的文本已完整到达，但本步仍有新增文字，尚未观察到本次表达后的让轮空窗，先保持倾听。
 
 ## smooth_question:1
 
@@ -47,7 +47,7 @@
 
 来源：UltraChat 2；类别：smooth；可见时间：1440ms。
 
-状态：Listen；本步：` planet`；动作：**unknown**。
+状态：Listen；本步：` planet`；动作：**keep**。
 
 当前累计用户文本：
 
@@ -61,7 +61,7 @@
 
 > （空）
 
-前缀含义未定，不计动作损失。
+海洋覆盖率的感想已可见，但本步仍在接收新增文字；完整陈述本身不足以证明让轮，先保持倾听。
 
 ## smooth_statement_ocean:1
 
@@ -87,7 +87,7 @@
 
 来源：UltraChat 3；类别：smooth；可见时间：2240ms。
 
-状态：Listen；本步：` my home`；动作：**unknown**。
+状态：Listen；本步：` my home`；动作：**keep**。
 
 当前累计用户文本：
 
@@ -101,7 +101,7 @@
 
 > （空）
 
-前缀含义未定，不计动作损失。
+关于翻译技术的陈述已可见，但当前仍是新增文字到达步骤，尚无本次表达后的让轮观察，先保持倾听。
 
 ## smooth_statement_translation:1
 
@@ -127,7 +127,7 @@
 
 来源：UltraChat 9；类别：smooth；可见时间：1120ms。
 
-状态：Listen；本步：` practice`；动作：**unknown**。
+状态：Listen；本步：` practice`；动作：**keep**。
 
 当前累计用户文本：
 
@@ -141,7 +141,7 @@
 
 > （空）
 
-前缀含义未定，不计动作损失。
+正念行走提问的文本已完整到达，但本步仍有新增文字，尚无本次表达后的让轮观察，先保持倾听。
 
 ## smooth_question_meditation:1
 
@@ -207,7 +207,7 @@
 
 来源：UltraChat 0；类别：pause；可见时间：2080ms。
 
-状态：Listen；本步：`ers`；动作：**unknown**。
+状态：Listen；本步：`ers`；动作：**keep**。
 
 当前累计用户文本：
 
@@ -221,7 +221,7 @@
 
 > （空）
 
-前缀含义未定，不计动作损失。
+用户在内部停顿后继续补充了交叉训练对象；当前仍有新增文字，尚无续说结束后的让轮观察，保持倾听。
 
 ## pause_mindful_walking:0
 
@@ -267,7 +267,7 @@
 
 来源：UltraChat 9；类别：pause；可见时间：2400ms。
 
-状态：Listen；本步：` spiritual practice`；动作：**unknown**。
+状态：Listen；本步：` spiritual practice`；动作：**keep**。
 
 当前累计用户文本：
 
@@ -281,7 +281,7 @@
 
 > （空）
 
-前缀含义未定，不计动作损失。
+用户在内部停顿后继续补充冥想或精神练习的内容；当前仍有新增文字，尚无续说结束后的让轮观察，保持倾听。
 
 ## backchannel_translation:0
 
@@ -395,7 +395,7 @@
 
 来源：UltraChat 0；类别：interruption；可见时间：160ms。
 
-状态：Speak；本步：`Please`；动作：**unknown**。
+状态：Speak；本步：`Please`；动作：**keep**。
 
 当前累计用户文本：
 
@@ -411,7 +411,7 @@
 >
 > 1. Reduces the risk of injury: Cross training involves different types of exercises that wo
 
-前缀含义未定，不计动作损失。
+助手仍在表达，当前只看到Please，尚未表达停止、纠正条件或改变请求，继续表达；不能依据未来文本提前停播。
 
 ## interruption_change_request:1
 

@@ -11,5 +11,17 @@
     "I see"
   ],
   "chat_template_matches": 24,
+  "reviewed_keep_snapshot_ids": [
+    "smooth_question:0",
+    "smooth_statement_ocean:0",
+    "smooth_statement_translation:0",
+    "smooth_question_meditation:0",
+    "pause_cross_training:2",
+    "pause_mindful_walking:2",
+    "interruption_change_request:0"
+  ],
+  "preserved_visible_inputs": 24,
+  "preserved_existing_labeled_snapshots": 17,
+  "unannotated_snapshots": 0,
   "unit_tests_passed": 5
 }

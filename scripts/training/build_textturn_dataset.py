@@ -243,7 +243,7 @@ def compile_scenario(plan, source, tokenizer, max_length):
                         'source_id': plan['source_id'], 'source': source | {'texts': None},
                         'clock_type': 'synthetic_160ms', 'playback_simulated': True,
                         'visible_ms': elapsed, 'step': event['step'], 'visible': visible,
-                        'target_action': action, 'reason_zh': phase.get('reason_zh', '前缀含义未定，不计动作损失。'),
+                        'target_action': action, 'reason_zh': phase.get('reason_zh', '本快照未提供动作标注，不计动作损失。'),
                         'utterance_form': plan.get('utterance_form'),
                         'review_status': 'agent_checked_user_review_pending',
                         'prompt': prompt, 'input_ids': input_ids, 'labels': labels,
@@ -328,7 +328,7 @@ def build(config_path, cache, output):
               'builder_sha256': digest(Path(__file__).read_bytes()), 'audit': audit, 'downloads': evidence}
     write_json(output / 'manifest.json', report)
     lines = ['# TT-001 数据检查样例', '', '这是固定 UltraChat 来源上的合成事件样例；split=review，不进入正式训练或测试。',
-             '表中只列该时刻可见内容；后续续说仅见独立时间线。无动作表示未知标签。', '']
+             '表中只列该时刻可见内容；后续续说仅见独立时间线。无动作表示未提供标注。', '']
     for row in snapshots:
         v = row['visible']
         lines.extend([f"## {row['snapshot_id']}", '',

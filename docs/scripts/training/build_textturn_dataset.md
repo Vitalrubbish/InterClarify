@@ -14,7 +14,7 @@
 
 `compile_scenario` 顺序消费计划，只把当前可见历史、用户累计文本、助手已生成／模拟播放可见文本、Listen/Speak、本步观察和空 CoT 写入 prompt。计划类型、未来文本、标签及标注理由都放在输入外。每个非空片段计 160ms；空窗按 ceil(duration/160) 重建，600ms 为四步／640ms，1200ms 为八步／1280ms。当前新增停顿为合成设置，没有冒称恢复旧停顿位置。
 
-仅在逐例语义锚点输出快照，前缀不确定时 action=null，全部 labels=-100。已标注快照在输入末尾附一个动作 token，只该位置参与损失；其余输入及回答正文都被屏蔽。按 causal LM 的常规左移损失使用。超过 2048 token 的记录保留并排除，不截断历史。当前完整输入按固定 ChatML 模板关闭 thinking，保存 tokenizer 和 tokenizer_config，不输出解释。
+仅在逐例语义锚点输出快照，action=null 表示未提供动作监督，全部 labels=-100；默认说明只记录未标注，不把它解释为语义歧义。可以依据当前上下文判断的记录，应在配置中显式填写动作及理由，不在构建器中自动填 keep。当前检查批次已逐条补齐七个 keep，不再有空标签。已标注快照在输入末尾附一个动作 token，只该位置参与损失；其余输入及回答正文都被屏蔽。按 causal LM 的常规左移损失使用。超过 2048 token 的记录保留并排除，不截断历史。当前完整输入按固定 ChatML 模板关闭 thinking，保存 tokenizer 和 tokenizer_config，不输出解释。
 
 `playback_complete` 是运行状态事件，将 Speak 改为 Listen，不产生 stop 目标；start/stop 后必须结束本场景，防止继续沿用过期状态。助手可见正文明确是合成播放状态，未生成的回答不进入输入。
 

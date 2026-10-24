@@ -4,6 +4,8 @@
 
 用户检查后修订：附和样例改为 `Hmm.`、`Right.`、`I see.`，移除追加的继续指令；同一 `I see.` 前缀当前保持 keep，打断分支在后续停止请求可见后才标 stop。场景数保持 14，快照由 27 改为 24；被替换的初版保留在 Git 历史，不沿用其数量或验证结论。
 
+按用户进一步要求，剩余七个空标签已逐条审核补为 keep：六个 Listen 快照本步仍有新增文字，句意完整尚不足以证明已让轮；一个 Speak 快照仅有 `Please`，当前没有停止或接管依据。输入和时间线保持原样，没有用未来内容倒推当前动作，也没有自动把其他缺失标签填为 keep。本批 24 条已全部有标签，不新增在线固定静音等待。
+
 直接查看[逐例中文阅读版](samples.md)，或下载[含实际输入、动作 token 和损失 mask 的 JSON](review_samples.json)。原文、完整时间线及清单分别见 [source_records.json](source_records.json)、[timelines.json](timelines.json)和 [manifest.json](manifest.json)。所有样例属于 review 集合。
 
 ## 本批数量
@@ -13,8 +15,8 @@
 | 原始 UltraChat 对话／本批去重组 | 6／6 |
 | 合成场景 | 14 |
 | 决策快照 | 24 |
-| 有标签／未知 | 17／7 |
-| keep／start／stop | 10／4／3 |
+| 有标签／未标注 | 24／0 |
+| keep／start／stop | 17／4／3 |
 | 正常 start 中完整陈述 | 2／4，50% |
 | 超长排除 | 0；最大输入 669 token |
 | 正式 train／dev／独立 test | 0／0／0 |
@@ -35,7 +37,7 @@
 | 打断，Speak | I see. But please stop now | now | stop | 新增文本已经明确要求停止 |
 | 自然说完前，Speak | （本轮没有用户新增文本） | no-voice | keep | 仍在播放时保持 keep；播放结束事件直接转 Listen，不标 stop |
 
-表中本步非空观察的实际字符片段以 JSON 为准，可能包含前导空格或部分单词；没有等待完整词。前缀对照的两个 prompt 完全一致，已做相等检查。未知样例 labels 全为 -100；有标签样例只在最后一个动作 token 上计算损失。
+表中本步非空观察的实际字符片段以 JSON 为准，可能包含前导空格或部分单词；没有等待完整词。前缀对照的两个 prompt 完全一致，已做相等检查。本批所有样例只在最后一个动作 token 上计算损失；构建器仍允许显式未标注记录全部屏蔽损失，不把未标注自动解释为语义歧义。
 
 ## 来源、时序与核查
 
@@ -48,7 +50,7 @@
 
 ## 验证与复现
 
-本地复用 conda `interclarify-dev`，CPU 线程上限 1。修订后重跑五项契约测试通过；实际 Qwen tokenizer 完成 16 阶段字符往返、四个新增 token 的重载检查、24 条 prompt 与官方关闭 thinking 模板一致、24 条动作损失屏蔽检查。额外核对三个附和输入确为短回应，以及相同 `I see.` 输入均标 keep、后续停止请求才标 stop。结果见 [audit.json](audit.json)和 [verification.json](verification.json)。这些是数据契约检查，不是模型质量或集群测试。
+本地复用 conda `interclarify-dev`，CPU 线程上限 1。补标后重跑五项契约测试通过；实际 Qwen tokenizer 完成 16 阶段字符往返、四个新增 token 的重载检查、24 条 prompt 与官方关闭 thinking 模板一致、24 条动作损失屏蔽检查。补标的七个快照只新增 keep 目标和逐例理由；24 条可见输入／prompt、原始来源及事件时间线均与补标前一致，原有 17 条动作标签保持不变。额外核对三个附和输入确为短回应，以及相同 `I see.` 输入均标 keep、后续停止请求才标 stop。结果见 [audit.json](audit.json)和 [verification.json](verification.json)。这些是数据契约检查，不是模型质量或集群测试。
 
 实现入口为 [build_textturn_dataset.py](../../../scripts/training/build_textturn_dataset.py)，配置为 [textturn_dataset_preview.json](../../../configs/textturn_dataset_preview.json)，使用方式见[对应中文说明](../../../docs/scripts/training/build_textturn_dataset.md)。完整 tokenizer 与 JSONL 候选留在本地 `artifacts/textturn/tt-001-review-final/`，报告不提交重复的 11MiB tokenizer。
 
