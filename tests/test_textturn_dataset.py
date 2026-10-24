@@ -115,6 +115,43 @@ class TextTurnDatasetTests(unittest.TestCase):
         b = dataset.compile_scenario(plan, self.source, self.tokenizer, 20000)
         self.assertEqual(a, b)
 
+    def test_mixed_dialogue_preserves_context_across_start_and_stop(self):
+        self.source['texts'][1] = 'A' * 120 + 'UNGENERATED_TAIL'
+        phases = [
+            {'channel': 'user', 'source_turn': 0, 'action': 'keep', 'reason_zh': '继续倾听。'},
+            {'channel': 'silence', 'windows': [1, 1], 'action': 'start', 'reason_zh': '允许接话。',
+             'assistant_stream': {'source_turn': 1}},
+            {'channel': 'generation', 'windows': [1, 1], 'action': 'keep', 'reason_zh': '继续生成。'},
+            {'channel': 'user', 'text': 'Hmm.', 'origin': 'synthetic_annotation', 'action': 'keep',
+             'reason_zh': '短附和。', 'close_backchannel': True},
+            {'channel': 'user', 'text': 'Please stop. More words', 'origin': 'synthetic_annotation',
+             'action': 'stop', 'trigger_text': 'stop', 'prefix_action': 'keep',
+             'prefix_reason_zh': '尚无停止依据。', 'reason_zh': '明确打断。'},
+            {'channel': 'silence', 'windows': [1, 1], 'action': 'start', 'reason_zh': '新请求已让轮。',
+             'assistant_stream': {'text': 'OK.', 'origin': 'synthetic_annotation'}},
+            {'channel': 'generation', 'action': 'keep', 'reason_zh': '继续生成。'},
+            {'channel': 'playback_tail', 'windows': [1, 1], 'action': 'keep', 'reason_zh': '尚在播放。'},
+            {'channel': 'playback_complete'},
+            {'channel': 'post_playback_wait', 'windows': [1, 1], 'action': 'keep', 'reason_zh': '下一轮等待。'},
+        ]
+        events, rows = dataset.compile_scenario(self.plan(phases), self.source, self.tokenizer, 20000,
+                                               user_tokens_per_step=(2, 2))
+        self.assertEqual(sum(r['target_action'] == 'start' for r in rows), 2)
+        self.assertEqual(sum(r['target_action'] == 'stop' for r in rows), 1)
+        self.assertEqual([e['state_after'] for e in events if e['kind'] == 'control_applied'],
+                         ['Speak', 'Listen', 'Speak'])
+        starts = [r for r in rows if r['target_action'] == 'start']
+        self.assertEqual(starts[0]['visible']['assistant_visible'], '')
+        self.assertEqual(starts[1]['visible']['user_text'], 'Please stop. More words')
+        interrupted = next(h for h in starts[1]['visible']['history'] if h.get('interrupted'))
+        self.assertTrue(interrupted['generated_only'])
+        self.assertNotIn('UNGENERATED_TAIL', interrupted['text'])
+        self.assertNotIn('UNGENERATED_TAIL', rows[-1]['prompt'])
+        self.assertEqual(sum(h.get('kind') == 'backchannel' for h in rows[-1]['visible']['history']), 1)
+        self.assertEqual(rows[-1]['visible']['state'], 'Listen')
+        self.assertEqual(rows[-1]['visible']['history'][-1]['text'], 'OK.')
+        self.assertEqual(events[-1]['visible_ms'], sum('observation' in e for e in events) * 480)
+
     def test_illegal_labels_and_unmarked_insertions_are_rejected(self):
         for state, action in [('Listen', 'stop'), ('Speak', 'start')]:
             with self.assertRaises(ValueError):

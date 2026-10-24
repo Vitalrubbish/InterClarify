@@ -2,7 +2,7 @@
   "schema_version": 1,
   "purpose": "TT-001 source-linked review preview",
   "max_length": 2048,
-  "annotation_policy_zh": "按用户确认使用480ms控制窗、User每个非空窗随机1—2 token、Assistant每窗8 token模拟生成。每个观察窗保留当前可见历史、连续空窗数和助手生成完成状态；只监督合法动作。话中停顿在审核过的不完整表达处随机1—3窗；生成后的播放尾巴与播放完成后的下一轮等待分开随机采样，未来等待长度不进入输入。",
+  "annotation_policy_zh": "按用户要求，每个来源构建一条综合多轮轨迹，在同一连续时间线内包含Listen、start、Speak、短附和／打断、播放尾窗、再次Listen及第二次start。保持480ms、User随机1—2 token、Assistant每窗8 token。动作快照为执行前状态，仲裁模拟接受事件才切换状态；未来助手正文不可见，打断只保留带标记的已生成前缀。每个观察窗只监督合法动作；类别及语义计划不作为模型输入。",
   "gaps_zh": [
     "远端已检查的旧训练目录和归档位置未找到旧对话及600ms事件产物；本轮仅恢复同一固定revision的源前缀，未恢复旧切分或原停顿位置。",
     "HTTP Range仅验证固定revision和区间，未下载整分片校验LFS SHA256。",
@@ -14,429 +14,777 @@
   ],
   "scenarios": [
     {
-      "scenario_id": "smooth_question",
-      "source_id": "0",
-      "category": "smooth",
-      "history_before_turn": 0,
-      "state": "Listen",
-      "phases": [
-        {
-          "channel": "user",
-          "source_turn": 0,
-          "action": "keep",
-          "reason_zh": "交叉训练提问的文本已完整到达，但本步仍有新增文字，尚未观察到本次表达后的让轮空窗，先保持倾听。"
-        },
-        {
-          "channel": "silence",
-          "action": "start",
-          "reason_zh": "完整用户表达后，首个480ms空观察窗允许正常接话。",
-          "windows": [
-            1,
-            1
-          ]
-        }
-      ],
-      "utterance_form": "question"
-    },
-    {
-      "scenario_id": "smooth_statement_ocean",
+      "scenario_id": "mixed_dialogue_2",
       "source_id": "2",
-      "category": "smooth",
+      "category": "mixed",
       "history_before_turn": 2,
       "state": "Listen",
       "phases": [
         {
           "channel": "user",
-          "source_turn": 2,
+          "category": "smooth",
           "action": "keep",
-          "reason_zh": "海洋覆盖率的感想已可见，但本步仍在接收新增文字；完整陈述本身不足以证明让轮，先保持倾听。"
+          "reason_zh": "用户当前仍有新增文字，尚无本次表达结束后的让轮观察，保持倾听。",
+          "source_turn": 2
         },
         {
           "channel": "silence",
-          "action": "start",
-          "reason_zh": "完整用户表达后，首个480ms空观察窗允许正常接话。",
+          "category": "smooth",
           "windows": [
             1,
             1
-          ]
-        }
-      ],
-      "utterance_form": "declarative"
-    },
-    {
-      "scenario_id": "smooth_statement_translation",
-      "source_id": "3",
-      "category": "smooth",
-      "history_before_turn": 2,
-      "state": "Listen",
-      "phases": [
-        {
-          "channel": "user",
-          "source_turn": 2,
-          "action": "keep",
-          "reason_zh": "关于翻译技术的陈述已可见，但当前仍是新增文字到达步骤，尚无本次表达后的让轮观察，先保持倾听。"
+          ],
+          "action": "start",
+          "utterance_form": "declarative",
+          "assistant_stream": {
+            "source_turn": 3
+          },
+          "reason_zh": "用户当前表达已完整并出现让轮空窗，模拟仲裁接受start；随后下一窗才生成助手文本。"
         },
         {
-          "channel": "silence",
-          "action": "start",
-          "reason_zh": "完整用户表达后，首个480ms空观察窗允许正常接话。",
+          "channel": "generation",
+          "category": "natural_completion",
+          "action": "keep",
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。"
+        },
+        {
+          "channel": "playback_tail",
+          "category": "natural_completion",
           "windows": [
             1,
             1
-          ]
-        }
-      ],
-      "utterance_form": "declarative"
-    },
-    {
-      "scenario_id": "smooth_question_meditation",
-      "source_id": "9",
-      "category": "smooth",
-      "history_before_turn": 0,
-      "state": "Listen",
-      "phases": [
+          ],
+          "action": "keep",
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
+        },
         {
           "channel": "user",
-          "source_turn": 0,
+          "category": "interruption",
           "action": "keep",
-          "reason_zh": "正念行走提问的文本已完整到达，但本步仍有新增文字，尚无本次表达后的让轮观察，先保持倾听。"
+          "reason_zh": "助手虽已生成完但仍在播放，只看到Please尚不足以停止。",
+          "text": "Please",
+          "origin": "synthetic_annotation"
+        },
+        {
+          "channel": "user",
+          "category": "interruption",
+          "action": "stop",
+          "reason_zh": "用户停止或拒绝请求已可见，模拟仲裁接受stop并让出话轮；只保留截至当前窗已生成的助手前缀。",
+          "text": " stop.",
+          "origin": "synthetic_annotation",
+          "trigger_text": "stop",
+          "prefix_action": "keep",
+          "prefix_reason_zh": "当前前缀尚无充分停止依据，保持表达。"
+        },
+        {
+          "channel": "user",
+          "category": "smooth",
+          "action": "keep",
+          "reason_zh": "用户当前仍有新增文字，尚无本次表达结束后的让轮观察，保持倾听。",
+          "text": " I love visiting the ocean.",
+          "origin": "synthetic_annotation"
         },
         {
           "channel": "silence",
-          "action": "start",
-          "reason_zh": "完整用户表达后，首个480ms空观察窗允许正常接话。",
+          "category": "smooth",
           "windows": [
             1,
             1
-          ]
-        }
-      ],
-      "utterance_form": "question"
-    },
-    {
-      "scenario_id": "pause_cross_training",
-      "source_id": "0",
-      "category": "pause",
-      "history_before_turn": 0,
-      "state": "Listen",
-      "phases": [
-        {
-          "channel": "user",
-          "source_turn": 0,
-          "end": 42,
-          "action": "keep",
-          "reason_zh": "当前可见句法仍缺少宾语，不能据截断或标点启动回应。"
+          ],
+          "action": "start",
+          "utterance_form": "mixed",
+          "assistant_stream": {
+            "text": "The ocean can be a wonderful place to visit.",
+            "origin": "synthetic_annotation"
+          },
+          "reason_zh": "用户当前表达已完整并出现让轮空窗，模拟仲裁接受start；随后下一窗才生成助手文本。"
         },
         {
-          "channel": "silence",
+          "channel": "generation",
+          "category": "natural_completion",
           "action": "keep",
-          "reason_zh": "空文本没有补全当前未完成表达，保持倾听。",
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。"
+        },
+        {
+          "channel": "playback_tail",
+          "category": "natural_completion",
           "windows": [
             1,
             3
-          ]
+          ],
+          "action": "keep",
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
         },
         {
-          "channel": "user",
-          "source_turn": 0,
-          "start": 42,
+          "channel": "playback_complete"
+        },
+        {
+          "channel": "post_playback_wait",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            5
+          ],
           "action": "keep",
-          "reason_zh": "用户在内部停顿后继续补充了交叉训练对象；当前仍有新增文字，尚无续说结束后的让轮观察，保持倾听。"
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
         }
       ]
     },
     {
-      "scenario_id": "pause_mindful_walking",
-      "source_id": "9",
-      "category": "pause",
+      "scenario_id": "mixed_dialogue_3",
+      "source_id": "3",
+      "category": "mixed",
+      "history_before_turn": 2,
+      "state": "Listen",
+      "phases": [
+        {
+          "channel": "user",
+          "category": "smooth",
+          "action": "keep",
+          "reason_zh": "用户当前仍有新增文字，尚无本次表达结束后的让轮观察，保持倾听。",
+          "source_turn": 2
+        },
+        {
+          "channel": "silence",
+          "category": "smooth",
+          "windows": [
+            1,
+            1
+          ],
+          "action": "start",
+          "utterance_form": "declarative",
+          "assistant_stream": {
+            "source_turn": 3
+          },
+          "reason_zh": "用户当前表达已完整并出现让轮空窗，模拟仲裁接受start；随后下一窗才生成助手文本。"
+        },
+        {
+          "channel": "generation",
+          "category": "natural_completion",
+          "action": "keep",
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。",
+          "windows": [
+            2,
+            2
+          ]
+        },
+        {
+          "channel": "user",
+          "category": "backchannel",
+          "action": "keep",
+          "reason_zh": "用户作短促附和，没有要求停止或接管；助手继续表达，短回应结束后单独写入历史。",
+          "text": "I see.",
+          "origin": "synthetic_annotation",
+          "close_backchannel": true
+        },
+        {
+          "channel": "generation",
+          "category": "natural_completion",
+          "action": "keep",
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。"
+        },
+        {
+          "channel": "playback_tail",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            3
+          ],
+          "action": "keep",
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
+        },
+        {
+          "channel": "playback_complete"
+        },
+        {
+          "channel": "post_playback_wait",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            5
+          ],
+          "action": "keep",
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
+        },
+        {
+          "channel": "user",
+          "category": "smooth",
+          "action": "keep",
+          "reason_zh": "用户当前仍有新增文字，尚无本次表达结束后的让轮观察，保持倾听。",
+          "source_turn": 4
+        },
+        {
+          "channel": "silence",
+          "category": "smooth",
+          "windows": [
+            1,
+            1
+          ],
+          "action": "start",
+          "utterance_form": "declarative",
+          "assistant_stream": {
+            "source_turn": 5
+          },
+          "reason_zh": "用户当前表达已完整并出现让轮空窗，模拟仲裁接受start；随后下一窗才生成助手文本。"
+        },
+        {
+          "channel": "generation",
+          "category": "natural_completion",
+          "action": "keep",
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。"
+        },
+        {
+          "channel": "playback_tail",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            3
+          ],
+          "action": "keep",
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
+        },
+        {
+          "channel": "playback_complete"
+        },
+        {
+          "channel": "post_playback_wait",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            5
+          ],
+          "action": "keep",
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
+        }
+      ]
+    },
+    {
+      "scenario_id": "mixed_dialogue_0",
+      "source_id": "0",
+      "category": "mixed",
       "history_before_turn": 0,
       "state": "Listen",
       "phases": [
         {
           "channel": "user",
-          "source_turn": 0,
-          "end": 40,
+          "category": "pause",
           "action": "keep",
-          "reason_zh": "当前可见句法仍缺少宾语，不能据截断或标点启动回应。"
+          "reason_zh": "当前表达仍缺少必要宾语，继续倾听。",
+          "source_turn": 0,
+          "end": 42
         },
         {
           "channel": "silence",
+          "category": "pause",
+          "windows": [
+            1,
+            3
+          ],
           "action": "keep",
-          "reason_zh": "空文本没有补全当前未完成表达，保持倾听。",
+          "reason_zh": "当前未完成表达中的随机停顿，不应抢话；只依据已经可见的语义判断。"
+        },
+        {
+          "channel": "user",
+          "category": "smooth",
+          "action": "keep",
+          "reason_zh": "用户当前仍有新增文字，尚无本次表达结束后的让轮观察，保持倾听。",
+          "source_turn": 0,
+          "start": 42
+        },
+        {
+          "channel": "silence",
+          "category": "smooth",
+          "windows": [
+            1,
+            1
+          ],
+          "action": "start",
+          "utterance_form": "question",
+          "assistant_stream": {
+            "source_turn": 1
+          },
+          "reason_zh": "用户当前表达已完整并出现让轮空窗，模拟仲裁接受start；随后下一窗才生成助手文本。"
+        },
+        {
+          "channel": "generation",
+          "category": "natural_completion",
+          "action": "keep",
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。",
+          "windows": [
+            2,
+            2
+          ]
+        },
+        {
+          "channel": "user",
+          "category": "backchannel",
+          "action": "keep",
+          "reason_zh": "用户作短促附和，没有要求停止或接管；助手继续表达，短回应结束后单独写入历史。",
+          "text": "Hmm.",
+          "origin": "synthetic_annotation",
+          "close_backchannel": true
+        },
+        {
+          "channel": "user",
+          "category": "interruption",
+          "action": "keep",
+          "reason_zh": "助手仍在表达，当前仅有Please，维持Speak。",
+          "text": "Please",
+          "origin": "synthetic_annotation"
+        },
+        {
+          "channel": "user",
+          "category": "interruption",
+          "action": "stop",
+          "reason_zh": "用户停止或拒绝请求已可见，模拟仲裁接受stop并让出话轮；只保留截至当前窗已生成的助手前缀。",
+          "text": " stop.",
+          "origin": "synthetic_annotation",
+          "trigger_text": "stop",
+          "prefix_action": "keep",
+          "prefix_reason_zh": "当前前缀尚无充分停止依据，保持表达。"
+        },
+        {
+          "channel": "user",
+          "category": "smooth",
+          "action": "keep",
+          "reason_zh": "用户当前仍有新增文字，尚无本次表达结束后的让轮观察，保持倾听。",
+          "text": " I want running exercises instead.",
+          "origin": "synthetic_annotation"
+        },
+        {
+          "channel": "silence",
+          "category": "smooth",
+          "windows": [
+            1,
+            1
+          ],
+          "action": "start",
+          "utterance_form": "mixed",
+          "assistant_stream": {
+            "source_turn": 3
+          },
+          "reason_zh": "用户当前表达已完整并出现让轮空窗，模拟仲裁接受start；随后下一窗才生成助手文本。"
+        },
+        {
+          "channel": "generation",
+          "category": "natural_completion",
+          "action": "keep",
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。"
+        },
+        {
+          "channel": "playback_tail",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            3
+          ],
+          "action": "keep",
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
+        },
+        {
+          "channel": "playback_complete"
+        },
+        {
+          "channel": "post_playback_wait",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            5
+          ],
+          "action": "keep",
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
+        }
+      ]
+    },
+    {
+      "scenario_id": "mixed_dialogue_9",
+      "source_id": "9",
+      "category": "mixed",
+      "history_before_turn": 0,
+      "state": "Listen",
+      "phases": [
+        {
+          "channel": "user",
+          "category": "pause",
+          "action": "keep",
+          "reason_zh": "当前表达仍缺少必要宾语，继续倾听。",
+          "source_turn": 0,
+          "end": 40
+        },
+        {
+          "channel": "silence",
+          "category": "pause",
           "windows": [
             2,
             3
+          ],
+          "action": "keep",
+          "reason_zh": "当前未完成表达中的随机停顿，不应抢话；只依据已经可见的语义判断。"
+        },
+        {
+          "channel": "user",
+          "category": "smooth",
+          "action": "keep",
+          "reason_zh": "用户当前仍有新增文字，尚无本次表达结束后的让轮观察，保持倾听。",
+          "source_turn": 0,
+          "start": 40
+        },
+        {
+          "channel": "silence",
+          "category": "smooth",
+          "windows": [
+            1,
+            1
+          ],
+          "action": "start",
+          "utterance_form": "question",
+          "assistant_stream": {
+            "source_turn": 1
+          },
+          "reason_zh": "用户当前表达已完整并出现让轮空窗，模拟仲裁接受start；随后下一窗才生成助手文本。"
+        },
+        {
+          "channel": "generation",
+          "category": "natural_completion",
+          "action": "keep",
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。",
+          "windows": [
+            2,
+            2
           ]
         },
         {
           "channel": "user",
-          "source_turn": 0,
-          "start": 40,
+          "category": "backchannel",
           "action": "keep",
-          "reason_zh": "用户在内部停顿后继续补充冥想或精神练习的内容；当前仍有新增文字，尚无续说结束后的让轮观察，保持倾听。"
+          "reason_zh": "用户作短促附和，没有要求停止或接管；助手继续表达，短回应结束后单独写入历史。",
+          "text": "Right.",
+          "origin": "synthetic_annotation",
+          "close_backchannel": true
+        },
+        {
+          "channel": "generation",
+          "category": "natural_completion",
+          "action": "keep",
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。"
+        },
+        {
+          "channel": "playback_tail",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            3
+          ],
+          "action": "keep",
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
+        },
+        {
+          "channel": "playback_complete"
+        },
+        {
+          "channel": "post_playback_wait",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            5
+          ],
+          "action": "keep",
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
+        },
+        {
+          "channel": "user",
+          "category": "smooth",
+          "action": "keep",
+          "reason_zh": "用户当前仍有新增文字，尚无本次表达结束后的让轮观察，保持倾听。",
+          "text": "I'll try mindful walking tomorrow.",
+          "origin": "synthetic_annotation"
+        },
+        {
+          "channel": "silence",
+          "category": "smooth",
+          "windows": [
+            1,
+            1
+          ],
+          "action": "start",
+          "utterance_form": "declarative",
+          "assistant_stream": {
+            "text": "Take your time and notice the sensations of each step.",
+            "origin": "synthetic_annotation"
+          },
+          "reason_zh": "用户当前表达已完整并出现让轮空窗，模拟仲裁接受start；随后下一窗才生成助手文本。"
+        },
+        {
+          "channel": "generation",
+          "category": "natural_completion",
+          "action": "keep",
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。"
+        },
+        {
+          "channel": "playback_tail",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            3
+          ],
+          "action": "keep",
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
+        },
+        {
+          "channel": "playback_complete"
+        },
+        {
+          "channel": "post_playback_wait",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            5
+          ],
+          "action": "keep",
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
         }
       ]
     },
     {
-      "scenario_id": "backchannel_translation",
-      "source_id": "3",
-      "category": "backchannel",
-      "history_before_turn": 1,
-      "state": "Speak",
+      "scenario_id": "mixed_dialogue_19",
+      "source_id": "19",
+      "category": "mixed",
+      "history_before_turn": 0,
+      "state": "Listen",
       "phases": [
         {
           "channel": "user",
+          "category": "smooth",
+          "action": "keep",
+          "reason_zh": "用户当前仍有新增文字，尚无本次表达结束后的让轮观察，保持倾听。",
+          "source_turn": 0
+        },
+        {
+          "channel": "silence",
+          "category": "smooth",
+          "windows": [
+            1,
+            1
+          ],
+          "action": "start",
+          "utterance_form": "question",
+          "assistant_stream": {
+            "source_turn": 1
+          },
+          "reason_zh": "用户当前表达已完整并出现让轮空窗，模拟仲裁接受start；随后下一窗才生成助手文本。"
+        },
+        {
+          "channel": "generation",
+          "category": "natural_completion",
+          "action": "keep",
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。",
+          "windows": [
+            2,
+            2
+          ]
+        },
+        {
+          "channel": "user",
+          "category": "backchannel",
+          "action": "keep",
+          "reason_zh": "用户作短促附和，没有要求停止或接管；助手继续表达，短回应结束后单独写入历史。",
           "text": "Hmm.",
           "origin": "synthetic_annotation",
-          "action": "keep",
-          "reason_zh": "助手正在展开翻译技术的解释；用户作短促的倾听回应，当前没有停止或接管请求，保持表达。"
-        }
-      ],
-      "assistant_stream": {
-        "source_turn": 1
-      },
-      "assistant_lead_in_steps": 2
-    },
-    {
-      "scenario_id": "backchannel_meditation",
-      "source_id": "9",
-      "category": "backchannel",
-      "history_before_turn": 1,
-      "state": "Speak",
-      "phases": [
+          "close_backchannel": true
+        },
         {
-          "channel": "user",
-          "text": "Right.",
-          "origin": "synthetic_annotation",
+          "channel": "generation",
+          "category": "natural_completion",
           "action": "keep",
-          "reason_zh": "助手正在解释正念行走；用户短促确认，当前没有停止或接管请求，保持表达。"
-        }
-      ],
-      "assistant_stream": {
-        "source_turn": 1
-      },
-      "assistant_lead_in_steps": 2
-    },
-    {
-      "scenario_id": "backchannel_shared_prefix",
-      "source_id": "19",
-      "category": "backchannel",
-      "history_before_turn": 1,
-      "state": "Speak",
-      "phases": [
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。"
+        },
         {
-          "channel": "user",
-          "text": "I see.",
-          "origin": "synthetic_annotation",
+          "channel": "playback_tail",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            3
+          ],
           "action": "keep",
-          "reason_zh": "助手正在解释商业模式调整；用户短促表示理解，当前没有停止或接管请求，保持表达。"
-        }
-      ],
-      "assistant_stream": {
-        "source_turn": 1
-      },
-      "assistant_lead_in_steps": 2,
-      "sampling_group": "shared_ack"
-    },
-    {
-      "scenario_id": "interruption_shared_prefix",
-      "source_id": "19",
-      "category": "interruption",
-      "history_before_turn": 1,
-      "state": "Speak",
-      "phases": [
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
+        },
         {
-          "channel": "user",
-          "text": "I see.",
-          "origin": "synthetic_annotation",
+          "channel": "playback_complete"
+        },
+        {
+          "channel": "post_playback_wait",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            5
+          ],
           "action": "keep",
-          "reason_zh": "与附和分支相同的短促理解回应；此时停止请求尚不可见，保持表达。"
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
         },
         {
           "channel": "user",
-          "text": " But please stop now.",
-          "origin": "synthetic_annotation",
-          "action": "stop",
-          "reason_zh": "新增文本已明确请求停止；此时才让出话轮，不把未来打断泄漏到前一快照。",
-          "prefix_action": "keep",
-          "prefix_reason_zh": "当前前缀尚未表达完整的停止或接管依据，维持表达。",
-          "trigger_text": "stop"
-        }
-      ],
-      "assistant_stream": {
-        "source_turn": 1
-      },
-      "assistant_lead_in_steps": 2,
-      "sampling_group": "shared_ack"
-    },
-    {
-      "scenario_id": "interruption_change_request",
-      "source_id": "0",
-      "category": "interruption",
-      "history_before_turn": 1,
-      "state": "Speak",
-      "phases": [
-        {
-          "channel": "user",
-          "text": "Please",
-          "origin": "synthetic_annotation",
+          "category": "smooth",
           "action": "keep",
-          "reason_zh": "助手仍在表达，当前只看到Please，尚未表达停止、纠正条件或改变请求，继续表达；不能依据未来文本提前停播。"
+          "reason_zh": "用户当前仍有新增文字，尚无本次表达结束后的让轮观察，保持倾听。",
+          "text": "I need a concrete example of a business adapting.",
+          "origin": "synthetic_annotation"
         },
         {
-          "channel": "user",
-          "text": " stop.",
-          "origin": "synthetic_annotation",
-          "action": "stop",
-          "reason_zh": "用户明确要求停止并更改关注对象，构成打断。",
-          "prefix_action": "keep",
-          "prefix_reason_zh": "当前前缀尚未表达完整的停止或接管依据，维持表达。",
-          "trigger_text": "stop"
+          "channel": "silence",
+          "category": "smooth",
+          "windows": [
+            1,
+            1
+          ],
+          "action": "start",
+          "utterance_form": "declarative",
+          "assistant_stream": {
+            "source_turn": 3
+          },
+          "reason_zh": "用户当前表达已完整并出现让轮空窗，模拟仲裁接受start；随后下一窗才生成助手文本。"
+        },
+        {
+          "channel": "generation",
+          "category": "natural_completion",
+          "action": "keep",
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。"
+        },
+        {
+          "channel": "playback_tail",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            3
+          ],
+          "action": "keep",
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
+        },
+        {
+          "channel": "playback_complete"
+        },
+        {
+          "channel": "post_playback_wait",
+          "category": "natural_completion",
+          "windows": [
+            1,
+            5
+          ],
+          "action": "keep",
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
         }
-      ],
-      "assistant_stream": {
-        "source_turn": 1
-      },
-      "assistant_lead_in_steps": 2
+      ]
     },
     {
-      "scenario_id": "interruption_original_refusal",
+      "scenario_id": "mixed_dialogue_6",
       "source_id": "6",
-      "category": "interruption",
-      "history_before_turn": 5,
-      "state": "Speak",
+      "category": "mixed",
+      "history_before_turn": 0,
+      "state": "Listen",
       "phases": [
         {
           "channel": "user",
+          "category": "smooth",
+          "action": "keep",
+          "reason_zh": "用户当前仍有新增文字，尚无本次表达结束后的让轮观察，保持倾听。",
+          "source_turn": 0
+        },
+        {
+          "channel": "silence",
+          "category": "smooth",
+          "windows": [
+            1,
+            1
+          ],
+          "action": "start",
+          "utterance_form": "question",
+          "assistant_stream": {
+            "source_turn": 1
+          },
+          "reason_zh": "用户当前表达已完整并出现让轮空窗，模拟仲裁接受start；随后下一窗才生成助手文本。"
+        },
+        {
+          "channel": "generation",
+          "category": "natural_completion",
+          "action": "keep",
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。",
+          "windows": [
+            2,
+            2
+          ]
+        },
+        {
+          "channel": "user",
+          "category": "backchannel",
+          "action": "keep",
+          "reason_zh": "用户作短促附和，没有要求停止或接管；助手继续表达，短回应结束后单独写入历史。",
+          "text": "I see.",
+          "origin": "synthetic_annotation",
+          "close_backchannel": true
+        },
+        {
+          "channel": "user",
+          "category": "interruption",
+          "action": "stop",
+          "reason_zh": "用户停止或拒绝请求已可见，模拟仲裁接受stop并让出话轮；只保留截至当前窗已生成的助手前缀。",
           "source_turn": 6,
-          "end": 65,
-          "action": "stop",
-          "reason_zh": "原对话中的拒绝前缀已明确表示不再需要信息；模拟在上一轮解释尚在播放时到达。",
+          "trigger_text": "don't need",
           "prefix_action": "keep",
-          "prefix_reason_zh": "当前前缀尚未表达完整的停止或接管依据，维持表达。",
-          "trigger_text": "don't need"
-        }
-      ],
-      "assistant_stream": {
-        "source_turn": 5
-      },
-      "assistant_lead_in_steps": 2
-    },
-    {
-      "scenario_id": "natural_completion_2",
-      "source_id": "2",
-      "category": "natural_completion",
-      "history_before_turn": 1,
-      "state": "Speak",
-      "phases": [
+          "prefix_reason_zh": "当前前缀尚无充分停止依据，保持表达。",
+          "end": 65
+        },
+        {
+          "channel": "user",
+          "category": "smooth",
+          "action": "keep",
+          "reason_zh": "用户当前仍有新增文字，尚无本次表达结束后的让轮观察，保持倾听。",
+          "text": " I'll stick to my own decision.",
+          "origin": "synthetic_annotation"
+        },
+        {
+          "channel": "silence",
+          "category": "smooth",
+          "windows": [
+            1,
+            1
+          ],
+          "action": "start",
+          "utterance_form": "declarative",
+          "assistant_stream": {
+            "text": "Understood. I will leave the decision to you.",
+            "origin": "synthetic_annotation"
+          },
+          "reason_zh": "用户当前表达已完整并出现让轮空窗，模拟仲裁接受start；随后下一窗才生成助手文本。"
+        },
         {
           "channel": "generation",
+          "category": "natural_completion",
           "action": "keep",
-          "reason_zh": "当前没有用户打断，助手继续生成和播放；生成完成不自动结束Speak。"
+          "reason_zh": "助手当前正常生成和播放，用户没有明确打断，保持Speak。"
         },
         {
           "channel": "playback_tail",
+          "category": "natural_completion",
           "windows": [
             1,
             3
           ],
           "action": "keep",
-          "reason_zh": "LLM已生成完，音频尚有剩余播放尾巴；没有用户打断，保持Speak。"
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
         },
         {
           "channel": "playback_complete"
         },
         {
           "channel": "post_playback_wait",
+          "category": "natural_completion",
           "windows": [
             1,
             5
           ],
           "action": "keep",
-          "reason_zh": "播放已完成且当前回答已交付；用户下一轮尚未开口，保持Listen，不重复start。"
+          "reason_zh": "当前维持已有话轮状态，没有用户要求接管；生成完成与播放完成分开处理。"
         }
-      ],
-      "assistant_stream": {
-        "source_turn": 1,
-        "end": 54
-      },
-      "assistant_lead_in_steps": 0
-    },
-    {
-      "scenario_id": "natural_completion_9",
-      "source_id": "9",
-      "category": "natural_completion",
-      "history_before_turn": 1,
-      "state": "Speak",
-      "phases": [
-        {
-          "channel": "generation",
-          "action": "keep",
-          "reason_zh": "当前没有用户打断，助手继续生成和播放；生成完成不自动结束Speak。"
-        },
-        {
-          "channel": "playback_tail",
-          "windows": [
-            1,
-            3
-          ],
-          "action": "keep",
-          "reason_zh": "LLM已生成完，音频尚有剩余播放尾巴；没有用户打断，保持Speak。"
-        },
-        {
-          "channel": "playback_complete"
-        },
-        {
-          "channel": "post_playback_wait",
-          "windows": [
-            1,
-            5
-          ],
-          "action": "keep",
-          "reason_zh": "播放已完成且当前回答已交付；用户下一轮尚未开口，保持Listen，不重复start。"
-        }
-      ],
-      "assistant_stream": {
-        "source_turn": 1,
-        "end": 79
-      },
-      "assistant_lead_in_steps": 0
-    },
-    {
-      "scenario_id": "interruption_playback_tail",
-      "source_id": "2",
-      "category": "interruption",
-      "history_before_turn": 1,
-      "state": "Speak",
-      "phases": [
-        {
-          "channel": "generation",
-          "action": "keep",
-          "reason_zh": "助手正常生成并播放，当前没有用户打断。"
-        },
-        {
-          "channel": "user",
-          "text": "Please",
-          "origin": "synthetic_annotation",
-          "action": "keep",
-          "reason_zh": "LLM已生成完但播放尚未结束；仅Please不足以支持停止。"
-        },
-        {
-          "channel": "user",
-          "text": " stop.",
-          "origin": "synthetic_annotation",
-          "action": "stop",
-          "trigger_text": "stop",
-          "prefix_action": "keep",
-          "prefix_reason_zh": "尚未看到完整停止请求，保持播放。",
-          "reason_zh": "生成已结束但音频仍在播放，用户明确要求停止，此时仍标Speak/stop。"
-        }
-      ],
-      "assistant_stream": {
-        "source_turn": 1,
-        "end": 54
-      },
-      "assistant_lead_in_steps": 0
+      ]
     }
   ],
   "assistant_tokens_per_step": 8,

@@ -20,23 +20,23 @@
   ],
   "seed": 20261025,
   "source_dialogues": 6,
-  "scenarios": 15,
-  "snapshots": 118,
-  "readable_candidates": 118,
+  "scenarios": 6,
+  "snapshots": 343,
+  "readable_candidates": 343,
   "action_counts": {
-    "keep": 110,
-    "start": 4,
-    "stop": 4
+    "keep": 328,
+    "start": 12,
+    "stop": 3
   },
-  "start_declarative": 2,
-  "start_total": 4,
+  "start_declarative": 6,
+  "start_total": 12,
   "start_declarative_fraction": 0.5,
   "category_scenario_groups": {
-    "backchannel": 3,
-    "interruption": 4,
-    "natural_completion": 2,
+    "backchannel": 5,
+    "interruption": 3,
+    "natural_completion": 6,
     "pause": 2,
-    "smooth": 4
+    "smooth": 6
   },
   "overlength": 0,
   "formal_split_actual": {
@@ -61,11 +61,11 @@
     "480ms时序、随机话中停顿、播放尾窗和下一轮等待均为合成；没有真实Nemotron/LLM/TTS时间戳或可回放语音，8 token不是实测生成吞吐。",
     "样例由编码代理按可见内容核查并给出理由，用户检查待完成；尚不放行TT-002。"
   ],
-  "config_sha256": "c5e0c8a9927e5c809df4f97fa9f069596b11411fe52d165ed90114afb62c36aa",
-  "builder_sha256": "c374c3321705231125f88c78ded84970cafe4d48672a3ac2955f46da92cf5ebe",
+  "config_sha256": "7c335801b482ac9e2b11bc5a7364705d238d70ba2460d96fc803c8664821db05",
+  "builder_sha256": "7875c8c1cb00c3498c935f3c38fe85e2d78f85ef0799a8450c164959e63e4412",
   "audit": {
-    "action_only_mask_checked": 118,
-    "max_input_tokens": 718,
+    "action_only_mask_checked": 343,
+    "max_input_tokens": 667,
     "dedup": {
       "scope": "selected_review_sources_only",
       "word_ngram": 5,
@@ -75,26 +75,34 @@
       "matched_pairs": []
     },
     "category_snapshot_counts": {
-      "smooth": 50,
-      "pause": 20,
-      "backchannel": 10,
-      "interruption": 22,
-      "natural_completion": 16
+      "smooth": 122,
+      "natural_completion": 187,
+      "interruption": 13,
+      "backchannel": 5,
+      "pause": 16
     },
     "assistant_token_counts_per_step": {
-      "8": 32,
-      "7": 2
+      "8": 143,
+      "3": 4,
+      "2": 2,
+      "1": 2,
+      "6": 1,
+      "7": 1
     },
-    "assistant_streaming_steps": 34,
+    "assistant_streaming_steps": 153,
     "window_counts_by_kind": {
-      "user": 81,
-      "silence": 7,
-      "assistant_lead_in": 12,
-      "generation": 6,
-      "playback_tail": 4,
-      "post_playback_wait": 8
+      "user": 138,
+      "silence": 18,
+      "generation": 139,
+      "playback_tail": 20,
+      "post_playback_wait": 28
     },
-    "no_voice_windows": 38
+    "no_voice_windows": 207,
+    "mixed_state_trajectories": 6,
+    "control_transitions": {
+      "start": 12,
+      "stop": 3
+    }
   },
   "downloads": {
     "dataset_api.json": {

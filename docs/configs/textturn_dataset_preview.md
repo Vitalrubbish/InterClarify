@@ -4,10 +4,12 @@
 
 按用户2026-10-25指令，window_ms=480、user_tokens_per_step=[1,2]、assistant_tokens_per_step=8、seed=20261025。User按固定种子随机分片；Assistant的8 token描述模拟生成，不代表语速或实测LLM吞吐。底层ASR仍为160ms，后续在线接入按三个完成步骤聚合控制窗，转写每次及时写Context。
 
-history_before_turn指定已完成历史；assistant_stream引用当前助手来源，assistant_lead_in_steps=2用于附和／打断前的生成片段；sampling_group使配对场景共用随机分片。原文区间右开，新增表达显式标synthetic_annotation。
+本批每个来源保留一条mixed综合轨迹，从Listen开始并跨越至少两轮表达。history_before_turn指定初始历史；每个start阶段用assistant_stream指定下一轮生成来源，生成阶段可用windows限定先生成几窗再插入附和或打断。原文区间右开，新增用户或助手表达显式标synthetic_annotation，合成助手正文不冒称真实模型生成结果。
 
 phases支持user、silence、generation、playback_tail、playback_complete、post_playback_wait。话中silence在已审核不完整表达处随机1—3窗，较长停顿例使用2—3窗；完整用户表达后的首个允许让轮空窗标start。自然结束先完成generation，再随机1—3窗保持Speak，收到播放完成事件后转Listen，再随机1—5窗等待下一轮开口。计划尾窗长度不作为控制输入。
 
-三个短附和仍为Hmm.、Right.、I see.，按当前上下文保持keep。打断阶段用人工核对的trigger_text定位首个停止依据可见的窗，之前显式标prefix_action=keep；不等完整后续请求。额外保留生成已结束、音频仍在播放时用户打断的对照。
+短附和使用Hmm.、Right.、I see.等，close_backchannel=true表示本次短回应结束，留在历史但不混入下一轮用户请求。打断阶段用已核对的trigger_text定位首次停止依据，之前显式prefix_action=keep；stop后保留已到达文字，后续user阶段继续累加直到下一次start。保留生成已结束、音频仍在播放时打断的对照。
+
+category在每个阶段指定smooth/pause/backchannel/interruption/natural_completion，用于统计综合轨迹内的监督覆盖；utterance_form在start阶段标陈述或问题，二者都不作为模型输入。start/stop模拟接受后通过control_applied事件改变状态，playback_complete仍不输出stop。
 
 本配置没有类或方法；构建器在窗口、随机预算和生命周期处拒绝无效参数。所有来源及派生保持review集合，正式切分和独立性缺口见gaps_zh。

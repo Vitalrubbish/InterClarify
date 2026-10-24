@@ -2,7 +2,7 @@
 
 更新：2026-10-25。状态：用户已指令启动 TT-001，已构建来源可追溯的首批数据检查样例；正式数据冻结、训练与远端测试尚未完成。TextTurn 是本项目路线名称，不是已有模型或研究成果。
 
-用户已明确要求按训练方案提出工作单，现建立 [TT-001—004](../../issue/TextTurn/README.md)：数据 → 模型 → 在线接入 → 四类验收。TT-001 实施中，见[首批检查报告](../../../reports/textturn/20261024-tt-001-preview/README.md)；其余待实施。必要检查直接随工作交付，不单独设置确认项目。
+用户已明确要求按训练方案提出工作单，现建立 [TT-001—004](../../issue/TextTurn/README.md)：数据 → 模型 → 在线接入 → 四类验收。TT-001实施中，当前样例为每条同时包含Listen和Speak的连续综合话轮，见[首批检查报告](../../../reports/textturn/20261024-tt-001-preview/README.md)；其余待实施。必要检查直接随工作交付，不单独设置确认项目。
 
 采用 **Nemotron EN160＋Qwen3-0.6B 专项微调控制器**：Nemotron 是唯一 ASR 来源，转写按用户 turn 持续写入 Shared Context；控制器读取文本、历史和 Listen/Speak 状态，输出 keep/start/stop。第一阶段训练普通接话、用户打断、用户附和和停顿处理；第二阶段待 Layer 2 可用后加入 CoT。
 

@@ -1,58 +1,69 @@
-# TT-001：480ms控制窗检查批次
+# TT-001：连续综合话轮检查批次
 
-更新：2026-10-25。按用户最新指令，控制窗改为480ms，User非空窗随机1—2 token，Assistant每窗8 token模拟LLM生成。生成完成、剩余音频播放、下一轮用户开口前等待分别建模。此前160ms／24锚点批次已被替换，历史证据保留在Git。
+更新：2026-10-25。按用户反馈，当前检查批次以**连续综合话轮**为单位，替换此前按纯Listen／纯Speak阶段分开的15个场景。六个固定来源各构建一条轨迹，每条都跨越Listen和Speak，含两次start，保留同一时钟和当前已经可见的历史。
 
-**TT-001仍实施中，本批全部为review，不放行训练或独立测试。** 未加载模型、运行GPU或替换现役服务。原始来源和旧切分缺口仍未解决。
+保持480ms控制窗、User非空输入随机1—2 token、Assistant每窗8 token模拟生成。随机话中停顿、剩余播放尾窗和下一轮等待仍分开处理；没有训练模型、执行GPU作业或接入真实播放器。**本批全为review，TT-001仍实施中，正式来源及切分尚未冻结。**
 
-直接查看[逐窗阅读表](samples.md)；表中列出双方本窗新增、Listen/Speak、生成是否完成、连续空窗数和动作token。完整输入与loss mask见[review_samples.json](review_samples.json)，原文、时间线和统计分别见[source_records.json](source_records.json)、[timelines.json](timelines.json)、[manifest.json](manifest.json)。动作是监督目标，不是模型实测输出。
+直接查看[综合轨迹逐窗表](samples.md)，表中动作均为监督目标；[review_samples.json](review_samples.json)保留每窗完整输入及动作loss mask，[timelines.json](timelines.json)记录观察和状态执行事件，[source_records.json](source_records.json)保留来源，[manifest.json](manifest.json)给出目标及缺口。
 
-## 当前参数和数量
+## 六条片段包含什么
 
-| 项目 | 当前值 |
+| 轨迹 | 连续路径 | 观察窗 |
+| --- | --- | --- |
+| mixed_dialogue_2 | 陈述输入→start→生成完且仍播放→用户打断stop→继续用户表达→再次start→正常播完→等待 | 29 |
+| mixed_dialogue_3 | 陈述输入→start→I see附和→正常播完→下一轮陈述→再次start→正常播完→等待 | 83 |
+| mixed_dialogue_0 | 提问及话中停顿→start→Hmm附和→用户打断stop→续说新要求→再次start→正常播完→等待 | 57 |
+| mixed_dialogue_9 | 提问及话中停顿→start→Right附和→正常播完→下一轮陈述→再次start→正常播完→等待 | 42 |
+| mixed_dialogue_19 | 提问→start→Hmm附和→正常播完→下一轮请求→再次start→正常播完→等待 | 97 |
+| mixed_dialogue_6 | 提问→start→I see附和→用户拒绝后stop→继续用户表达→再次start→正常播完→等待 | 35 |
+
+例如mixed_dialogue_2的一段真实构建结果如下；不重复列更早的用户陈述分片。
+
+| 时刻 | 状态／事件 | User新增 | Assistant新增／状态 | 目标token |
+| --- | --- | --- | --- | --- |
+| 5280ms | Listen | no-voice，完整陈述已让轮 | 尚未生成回答 | tt_start |
+| 5280ms | 模拟仲裁接受start | — | Listen→Speak | 无新动作 |
+| 5760—8160ms | Speak | no-voice | 按8 token／窗推进，末窗生成完 | 每窗tt_keep |
+| 8640ms | Speak | no-voice | 已生成完，尚在播放 | tt_keep |
+| 9120ms | Speak | Please | 无新助手文本 | tt_keep |
+| 9600ms | Speak | stop | 仍在播放 | tt_stop |
+| 9600ms | 模拟仲裁接受stop | 已到达的打断文本保留 | Speak→Listen，只保留已生成前缀 | 无新动作 |
+| 10080—11040ms | Listen | I love visiting the ocean分片到达 | 不再生成原回答 | 每窗tt_keep |
+| 11520ms | Listen | no-voice，新表达已让轮 | 尚未生成下一回答 | tt_start |
+| 11520ms后 | Speak | no-voice | 生成下一回答→剩余播放尾窗→playback_complete→Listen等待 | 每观察窗tt_keep |
+
+这些状态变化模拟唯一仲裁器接受监督动作，先保留动作执行前的快照，再记录执行事件；不把模型预测直接当成已播放。正常playback_complete不产生stop。
+
+## 当前统计
+
+| 项目 | 实际值 |
 | --- | --- |
-| ASR名义解码步骤／控制窗 | 160ms／480ms；在线聚合待TT-003 |
-| User非空输入 | 按种子随机1—2 token／窗 |
-| Assistant模拟生成 | 8 token／窗；末片可更短，不按语速解释 |
-| 来源对话／去重组／场景 | 6／6／15 |
-| 窗口及有标签快照 | 118；未标注0 |
-| keep／start／stop | 110／4／4 |
-| 完整陈述start | 2／4，50% |
-| 无新增用户文字的窗 | 38／118；不等同声学静音 |
-| Assistant非空生成窗 | 34；32窗各8 token，2个末块各7 token |
-| 最大输入／超长排除 | 718 token／0 |
+| 来源／去重组／综合轨迹 | 6／6／6 |
+| 同时有Listen和Speak的轨迹 | 6／6 |
+| 逐窗快照／有标签／未标注 | 343／343／0 |
+| keep／start／stop | 328／12／3 |
+| 陈述式start | 6／12，50% |
+| Assistant非空生成窗 | 153；143窗为8 token，其余10个末块为1—7 token |
+| 无新增用户文字的观察窗 | 207／343，约60.3%；不等同声学静音 |
+| 最大输入／超长排除 | 667 token／0 |
 | 正式train／dev／独立test | 0／0／0 |
 
-四类不同来源组：正常接话4、打断4、附和3、内部停顿2，另有自然完成2组；这些有重叠，不能相加冒充独立对话数。正式目标仍为最多1000训练对话／10000快照、200开发及300独立测试对话，测试四类各至少100个场景组，当前不满足。
+类别按同一综合轨迹内的阶段记录：smooth共122窗，natural_completion 187窗，interruption 13窗，backchannel 5窗，pause 16窗。不同来源组分别为6、6、3、5、2，不能跨类别相加当作更多独立对话。343个窗口也不等于343个独立场景；正式训练分层采样及规模目标仍以工作单为准，不能用本批大量keep宣称质量达标。
 
-## 生成完成后还有什么
+## 上下文与来源边界
 
-以natural_completion_2为例，用户原问题为海洋覆盖率。Assistant以8-token块生成原回答的完整一句；下表只展开关键窗口，逐窗细节见samples.md。
+- start执行后才把当前用户文字提交为完整用户历史，下一窗开始发布助手增量；start快照不能看到下一回答。每条轨迹的第二次start读取前面真实已构造的上下文，不另建独立会话。
+- 短附和在Speak中标keep，结束后以backchannel标记写入历史，清空当前用户缓冲，避免与后续新请求粘连；助手保持Speak。
+- stop执行后停止本轮生成，已生成前缀保留generated_only/interrupted标记，不当作完整已播放回答。当前用户打断文字不清空，同阶段尚未到达的文字及后续续说继续在Listen累加。未生成的助手后缀不进入后续历史。
+- 正常生成结束不退出Speak；随机1—3窗播放尾巴后，playback_complete将已完成正文入历史，再转Listen并随机等待1—5窗。当前窗口计数和生成完成状态可见，未来等待长度及语义计划不可见。
+- 若续说改变了原请求，后续助手回答使用显式synthetic_annotation短文本，不能冒称是原UltraChat回答或模型实测输出。其余回答引用固定来源的相应turn，完整原始记录保留。
 
-| 时刻 | 观察阶段 | 状态 | User新增 | Assistant新增 | 目标 |
-| --- | --- | --- | --- | --- | --- |
-| 480ms | LLM仍在生成，音频播放中 | Speak | no-voice | 首8 token | keep |
-| 960ms | LLM生成结束 | Speak | no-voice | 剩余7 token | keep |
-| 1440—2400ms，共3窗 | 无新文本，尚有播放尾巴 | Speak | no-voice | 无 | 每窗keep |
-| 2400ms，状态事件 | playback_complete | Speak→Listen | — | — | 不输出stop |
-| 2880—4320ms，共4窗 | 等待用户下一轮开口 | Listen | no-voice | 无 | 每窗keep |
+## 验证及未完成项
 
-播放尾窗只模拟生成结束时剩余未播完的部分，不额外加一遍整段语音长度。下一轮等待是开口前的剩余等待，不推断真实认知过程。另有interruption_playback_tail：LLM已经生成完，但播放仍在继续，用户要求stop时仍标Speak/stop。
+八项单线程CPU契约测试通过；其中综合测试跨越两次start、一次stop及自然完成，核对用户剩余文字不丢失、附和只关闭一次、未来助手后缀不泄漏。实际Qwen tokenizer逐窗复核343个输入／动作mask／历史缓冲、153个助手前缀、五次附和关闭及三次打断上下文提交，全部模板和tokenizer重载一致；重复构建产物相同，六条轨迹均含两种状态及两次start。证据见[audit.json](audit.json)、[verification.json](verification.json)和[sha256.json](sha256.json)。
 
-## 构造与可见性
+来源、tokenizer revision及上游下载证据不变：固定UltraChat revision f220fe796ce3ed62fbe1681b45ce6cbc9c6cabe0的分片前1MiB，仅取完整行，未完成整分片LFS核验。Qwen3-0.6B tokenizer固定c1899de289a04d12100db370d81485cdf75e47ca。所有同源派生在review，未完成旧来源分组／切分和测试使用历史核验，正式1000训练／200开发／300测试对话目标及真实语音仍缺。
 
-- 固定种子20261025，User随机分片预算1—2 token；实际81个非空用户窗中26窗为1 token、53窗为2 token，两个带原始句读的末片为3 token。字符边界和句读合并保留原文，不为严格凑预算丢字符。
-- 话中停顿只在已审核的不完整表达处插入随机空窗，一例取1—3窗，较长例分层取2—3窗。完整问题后的首个允许让轮空窗标start，所有可见观察窗都有监督，未只取阶段末尾。
-- 自然完成场景的剩余播放尾巴随机1—3窗，播放完成后的下一轮等待随机1—5窗。当前两例分别抽到3／1个播放尾窗和各4个下一轮等待窗；计划长度不进入输入。
-- 控制输入新增window_ms、连续no-voice窗数和assistant_generation_complete。它们只描述已经观察到的时间及当前生成状态，不暴露未来等待时长。相同文字下的连续空窗因此可区分；播放完成后按下一轮等待重置计数。
-- Assistant输入只累加已生成的正文；生成结束后保持完整已生成正文，Speak仍由播放状态维持。正常播放完成没有stop标签。打断依据首次可见即标stop，不等后续完整请求。
-- Nemotron底层160ms步骤保留；TT-003再实现三步聚合成480ms控制窗，ASR更新仍及时写Context。聚合等待必须单列并纳入及时性评分，不后移评分锚点。
+480ms、8 token和随机等待只是合成调度，没有真实Nemotron／LLM／TTS时间戳，也不具备独立模型评测结果。training_allowed=false、independent_test_ready=false，TT-001不归档。
 
-## 验证与来源限制
-
-七项CPU契约测试通过，实际Qwen tokenizer核查118个窗口／动作mask、34个助手前缀、18个用户阶段字符往返、tokenizer重载和全部prompt模板。全量重建结果可复现；配对I see前缀输入一致，生成结束后的尾窗打断仍为Speak/stop。详见[audit.json](audit.json)、[verification.json](verification.json)及[sha256.json](sha256.json)。本地复用conda interclarify-dev，线程1；没有集群模型测试。
-
-来源仍是UltraChat固定revision f220fe796ce3ed62fbe1681b45ce6cbc9c6cabe0的train_0.jsonl前1MiB，仅使用完整行并记录原始行哈希及字节位置。旧别名stingning/ultrachat跳转openbmb/UltraChat后revision一致；未下载整分片校验LFS。tokenizer固定Qwen3-0.6B@c1899de289a04d12100db370d81485cdf75e47ca，动作token与no-voice由本次注册，不沿用旧ID。
-
-没有真实Nemotron、LLM或TTS时间戳，8 token和随机等待只是可复现的合成起点，不能宣称已经匹配真实输出或播放分布。旧来源分组、切分、测试使用历史、正式规模和独立测试语音仍有缺口，因此training_allowed=false、independent_test_ready=false，TT-001不归档。
-
-实现为[构建器](../../../scripts/training/build_textturn_dataset.py)，参数见[配置](../../../configs/textturn_dataset_preview.json)，复现见[中文说明](../../../docs/scripts/training/build_textturn_dataset.md)。完整tokenizer与JSONL留在本地artifacts/textturn/tt-001-review-final，不重复提交大tokenizer。报告目录日期保留首次交付日期，内容按本页更新日期为准。
+实现为[构建器](../../../scripts/training/build_textturn_dataset.py)，参数见[配置](../../../configs/textturn_dataset_preview.json)，使用方法见[中文说明](../../../docs/scripts/training/build_textturn_dataset.md)。本地复用conda interclarify-dev、CPU线程1；完整tokenizer及JSONL候选保留artifacts/textturn/tt-001-review-final。目录日期保留首次交付日期，本页更新日期表示当前版本。

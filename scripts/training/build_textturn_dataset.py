@@ -214,6 +214,8 @@ def compile_scenario(plan, source, tokenizer, max_length, assistant_tokens_per_s
     assistant, assistant_cursor, user, elapsed, empty_streak = '', 0, '', 0, 0
     events, snapshots = [], []
     sampling_group = plan.get('sampling_group', plan['scenario_id'])
+    active_category = plan['category']
+    active_form = plan.get('utterance_form')
 
     def emit_step(kind, piece='', phase_index=None):
         nonlocal assistant, assistant_cursor, user, elapsed, empty_streak
@@ -252,12 +254,12 @@ def compile_scenario(plan, source, tokenizer, max_length, assistant_tokens_per_s
             labels.append(token_id)
         snapshots.append({'snapshot_id': f"{plan['scenario_id']}:{phase_index}:{index}",
                           'scenario_id': plan['scenario_id'], 'scenario_group': source.get('duplicate_group', plan['source_id']),
-                          'category': plan['category'], 'split': 'review', 'source_id': plan['source_id'],
+                          'category': active_category, 'split': 'review', 'source_id': plan['source_id'],
                           'source': source | {'texts': None}, 'clock_type': f'synthetic_{window_ms}ms',
                           'playback_simulated': True, 'visible_ms': elapsed, 'step': event['step'],
                           'visible': visible, 'target_action': action,
                           'reason_zh': reason or '本快照未提供动作标注，不计动作损失。',
-                          'utterance_form': plan.get('utterance_form'),
+                          'utterance_form': active_form,
                           'review_status': 'agent_checked_user_review_pending', 'prompt': prompt,
                           'input_ids': input_ids, 'labels': labels,
                           'excluded_reason': 'overlength' if len(input_ids) > max_length else None})
@@ -266,6 +268,8 @@ def compile_scenario(plan, source, tokenizer, max_length, assistant_tokens_per_s
         snapshot(emit_step('assistant_lead_in'), -1, index, 'keep',
                  '助手正在生成并播放，当前没有用户打断，维持Speak。')
     for phase_index, phase in enumerate(plan['phases']):
+        active_category = phase.get('category', plan['category'])
+        active_form = phase.get('utterance_form', plan.get('utterance_form'))
         channel = phase['channel']
         if channel == 'playback_complete':
             if state != 'Speak' or assistant_cursor != len(assistant_chunks):
@@ -273,6 +277,7 @@ def compile_scenario(plan, source, tokenizer, max_length, assistant_tokens_per_s
             state = 'Listen'
             history.append({'role': 'assistant', 'text': assistant})
             assistant, user, empty_streak = '', '', 0
+            assistant_chunks, assistant_cursor = [], 0
             events.append({'step': len(events), 'visible_ms': elapsed, 'kind': channel,
                            'state_after': state, 'target_action': None})
             continue
@@ -284,7 +289,13 @@ def compile_scenario(plan, source, tokenizer, max_length, assistant_tokens_per_s
         elif channel == 'generation':
             if state != 'Speak' or assistant_cursor == len(assistant_chunks):
                 raise ValueError('Generation phase requires unpublished assistant text')
-            pieces = [''] * (len(assistant_chunks) - assistant_cursor)
+            count = len(assistant_chunks) - assistant_cursor
+            if 'windows' in phase:
+                low, high = phase['windows']
+                if type(low) is not int or type(high) is not int or not 1 <= low <= high <= count:
+                    raise ValueError('Generation windows must not exceed remaining text')
+                count = rng.randint(low, high)
+            pieces = [''] * count
         elif channel in ('silence', 'playback_tail', 'post_playback_wait'):
             if channel == 'playback_tail' and (state != 'Speak' or assistant_cursor != len(assistant_chunks)):
                 raise ValueError('Playback tail requires completed generation and active playback')
@@ -306,6 +317,7 @@ def compile_scenario(plan, source, tokenizer, max_length, assistant_tokens_per_s
         action = phase.get('action')
         if action == 'start' and len(pieces) != 1:
             raise ValueError('A start anchor must identify one allowed observation window')
+        phase_stopped = False
         for index, piece in enumerate(pieces):
             event = emit_step(channel, piece, phase_index)
             if channel == 'silence' and 'duration_ms' in phase:
@@ -313,15 +325,40 @@ def compile_scenario(plan, source, tokenizer, max_length, assistant_tokens_per_s
             trigger = phase.get('trigger_text')
             triggered = trigger is not None and trigger.casefold() in user.casefold()
             last = index == len(pieces) - 1
-            if trigger is not None and (action != 'stop' or (last and not triggered)):
+            if trigger is not None and not phase_stopped and (action != 'stop' or (last and not triggered)):
                 raise ValueError('A stop trigger must become visible before labeling stop')
             current_action = action if action in (None, 'keep') or last or triggered else phase.get('prefix_action')
             reason = phase.get('reason_zh') if current_action == action else phase.get('prefix_reason_zh')
+            if phase_stopped:
+                current_action, reason = 'keep', '已因用户打断让出话轮，当前新增文字继续归入该用户轮。'
             snapshot(event, phase_index, index, current_action, reason)
+            if current_action == 'start':
+                spec = phase.get('assistant_stream')
+                if spec is None:
+                    if phase_index == len(plan['phases']) - 1:
+                        return events, snapshots
+                    raise ValueError('A continuing start requires the next assistant stream')
+                chunks = list(tokenizer.chunks(source_text(spec, texts), assistant_tokens_per_step, merge_terminal=False))
+                if not chunks or not user.strip():
+                    raise ValueError('A continuing start requires a user turn and nonempty assistant text')
+                history.append({'role': 'user', 'text': user})
+                user, assistant, assistant_cursor, empty_streak = '', '', 0, 0
+                assistant_chunks, state = chunks, 'Speak'
+            elif current_action == 'stop':
+                if assistant:
+                    history.append({'role': 'assistant', 'text': assistant,
+                                    'interrupted': True, 'generated_only': True})
+                assistant, assistant_chunks, assistant_cursor, empty_streak = '', [], 0, 0
+                state, phase_stopped = 'Listen', True
             if current_action in ('start', 'stop'):
-                if phase_index != len(plan['phases']) - 1:
-                    raise ValueError('End a scenario at an executed turn-changing action')
-                return events, snapshots
+                events.append({'step': len(events), 'visible_ms': elapsed, 'kind': 'control_applied',
+                               'action': current_action, 'state_before': event['state'], 'state_after': state,
+                               'execution': 'simulated_arbiter_acceptance'})
+        if phase.get('close_backchannel'):
+            if state != 'Speak' or action != 'keep' or not user.strip():
+                raise ValueError('Only a kept Speak backchannel may close independently')
+            history.append({'role': 'user', 'text': user, 'kind': 'backchannel'})
+            user = ''
     return events, snapshots
 
 
@@ -387,8 +424,13 @@ def build(config_path, cache, output):
         'assistant_token_counts_per_step': dict(assistant_sizes),
         'assistant_streaming_steps': sum(assistant_sizes.values()),
         'window_counts_by_kind': dict(Counter(event['kind'] for trace in timelines for event in trace['events']
-                                              if event['kind'] != 'playback_complete')),
-        'no_voice_windows': sum(event.get('observation') == SILENCE for trace in timelines for event in trace['events'])}
+                                              if 'observation' in event)),
+        'no_voice_windows': sum(event.get('observation') == SILENCE for trace in timelines for event in trace['events']),
+        'mixed_state_trajectories': sum({row['visible']['state'] for row in snapshots
+                                         if row['scenario_id'] == trace['scenario_id']} == {'Listen', 'Speak'}
+                                        for trace in timelines),
+        'control_transitions': dict(Counter(event['action'] for trace in timelines for event in trace['events']
+                                            if event['kind'] == 'control_applied'))}
     write_json(output / 'audit.json', audit)
     report = {'status': 'preview_for_review', 'training_allowed': False,
               'independent_test_ready': False, 'source_revision': SOURCE_REVISION,
@@ -401,8 +443,8 @@ def build(config_path, cache, output):
               'snapshots': len(snapshots), 'readable_candidates': len(candidates),
               'action_counts': dict(counts), 'start_declarative': declarations,
               'start_total': len(starts), 'start_declarative_fraction': declarations / len(starts) if starts else None,
-              'category_scenario_groups': {c: len({sources[p['source_id']]['duplicate_group'] for p in plans if p['category'] == c})
-                                           for c in sorted({p['category'] for p in plans})},
+              'category_scenario_groups': {c: len({r['scenario_group'] for r in snapshots if r['category'] == c})
+                                           for c in sorted({r['category'] for r in snapshots})},
               'overlength': sum(r['excluded_reason'] == 'overlength' for r in snapshots),
               'formal_split_actual': {'train': 0, 'dev': 0, 'test': 0},
               'formal_split_targets': {'train_dialogues_max': 1000, 'train_snapshots_max': 10000,
@@ -424,6 +466,9 @@ def build(config_path, cache, output):
                       '| 时刻ms | 状态 | User新增／空观察 | Assistant新增 | 已生成完 | 连续空窗 | 动作token |',
                       '| --- | --- | --- | --- | --- | --- | --- |'])
         for event in trace['events']:
+            if event['kind'] == 'control_applied':
+                lines.append(f"| {event['visible_ms']} | {event['state_before']}→{event['state_after']} | 仲裁模拟接受{event['action']} | — | — | 0 | 已执行上窗动作 |")
+                continue
             if event['kind'] == 'playback_complete':
                 lines.append(f"| {event['visible_ms']} | Speak→Listen | playback_complete | — | — | 0 | 无动作 |")
                 continue

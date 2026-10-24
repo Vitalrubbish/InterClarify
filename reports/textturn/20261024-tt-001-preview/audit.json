@@ -1,6 +1,6 @@
 {
-  "action_only_mask_checked": 118,
-  "max_input_tokens": 718,
+  "action_only_mask_checked": 343,
+  "max_input_tokens": 667,
   "dedup": {
     "scope": "selected_review_sources_only",
     "word_ngram": 5,
@@ -10,24 +10,32 @@
     "matched_pairs": []
   },
   "category_snapshot_counts": {
-    "smooth": 50,
-    "pause": 20,
-    "backchannel": 10,
-    "interruption": 22,
-    "natural_completion": 16
+    "smooth": 122,
+    "natural_completion": 187,
+    "interruption": 13,
+    "backchannel": 5,
+    "pause": 16
   },
   "assistant_token_counts_per_step": {
-    "8": 32,
-    "7": 2
+    "8": 143,
+    "3": 4,
+    "2": 2,
+    "1": 2,
+    "6": 1,
+    "7": 1
   },
-  "assistant_streaming_steps": 34,
+  "assistant_streaming_steps": 153,
   "window_counts_by_kind": {
-    "user": 81,
-    "silence": 7,
-    "assistant_lead_in": 12,
-    "generation": 6,
-    "playback_tail": 4,
-    "post_playback_wait": 8
+    "user": 138,
+    "silence": 18,
+    "generation": 139,
+    "playback_tail": 20,
+    "post_playback_wait": 28
   },
-  "no_voice_windows": 38
+  "no_voice_windows": 207,
+  "mixed_state_trajectories": 6,
+  "control_transitions": {
+    "start": 12,
+    "stop": 3
+  }
 }
