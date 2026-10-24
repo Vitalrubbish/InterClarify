@@ -1,5 +1,7 @@
 # 边听边想：主动介入 benchmark 与训练数据
 
+2026-10-24 选型更新：当前控制器主线为 [TextTurn](../dev/TextTurn/training_plan.md)，第一阶段先训练普通控制，CoT 条件化主动介入留待第二阶段。下文 XTurnix 名称沿用此前候选表述，模块职责与共同规则以[架构最新覆盖说明](architecture.md)为准，不表示 TextTurn 已具备本任务能力。
+
 更新：2026-10-23。[研究背景与参考文章](../research_design.md) · [架构设计](architecture.md) · [边说边想](speaking.md)。
 
 本文检验倾听期间的 thinking 流能否带来更合理、及时的主动澄清，并设计相应的大规模训练数据。运行合同与训练对象采用架构文档：不设计 Layer 3，Layer 2 只向共享上下文发布 CoT，不提供话轮建议或候选问句；训练后的 XTurnix 负责是否及何时介入，Layer 1 负责实际表达，经统一仲裁和单一播放路径发声。

@@ -1,5 +1,7 @@
 # 每个用户话轮的转写与 Shared Context 接口
 
+2026-10-24 最新状态：SoulX 路线转为保留候选，当前 [TextTurn](../TextTurn/training_plan.md)继承本文的按 turn 版本化转写与下游读取原则；不继承 SoulX 音频同步前置。新路线的 `no-voice` 只作为静音控制观察，不写成用户转写正文。本文仍为接口设计，未实现。
+
 更新：2026-10-24。状态：按用户要求补充接口合同，尚未实现。适用于 [SoulX-Duplug＋Nemotron 路线](README.md)；Shared Context 指项目架构中的共享 Context，不另设第二份权威转写。
 
 ## 1. 写入时机与话轮标识

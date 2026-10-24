@@ -1,5 +1,7 @@
 # 边说边想：benchmark 与训练数据
 
+2026-10-24 选型更新：当前控制器主线为 [TextTurn](../dev/TextTurn/training_plan.md)，第一阶段先训练普通控制，CoT 条件化控制留待第二阶段。下文 XTurnix 名称沿用此前候选表述，表达与 thinking 的职责继续遵守[架构最新覆盖说明](architecture.md)，不表示新路线已接入表达链路。
+
 更新：2026-10-23。[研究背景与参考文章](../research_design.md) · [架构设计](architecture.md) · [边听边想](listening.md)。
 
 本文检验系统开口后的 thinking 流能否改善有效内容到达与回答质量，并设计相应的大规模训练数据。统一采用架构合同：不设计 Layer 3，Layer 2 仅向共享上下文发布 CoT，不提供话轮建议或候选表达文本；XTurnix 负责全部话轮控制，Layer 1 继续生成后续表达，必要时口头纠正已说出的错误。所有发声经过同一仲裁器与 TTS 播放路径，已听内容不能撤销。

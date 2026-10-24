@@ -1,5 +1,7 @@
 # 工作单管理
 
+2026-10-24 最新路线：用户要求启动 [TextTurn 文本控制器路线](../dev/TextTurn/README.md)并交付[基模、数据、训练与验收方案](../dev/TextTurn/training_plan.md)，当前文档已建立，实施未开始。本次未新建 issue，不推进旧 SoulX/XTurnix 测试或训练；后续工作单依用户明确指令创建。
+
 2026-10-24 当前路线：用户已确认 **SoulX-Duplug＋Nemotron**，并要求简化为公开英文 Easy Turn 集上的质量与延迟测试；[方案](../dev/SoulX-Duplug/quality_test.md)已同步。本次只更新路线文档，未新建 issue、实现适配或启动远端作业。以下 XTurnix 内容保留为历史记录，不代表当前继续推进旧训练或恢复已取消测试。
 
 2026-10-24 回滚说明：用户明确选择撤销全部阈值实验，恢复 `13ba980` 的工作单与实现记录；其后校准、ASR 时间控制、短延迟和训练入口草案已清理。以下为基点保留状态，不代表重新授权旧训练或取消的测试。当前仅执行[回滚清理](../dev/XTurnix/rollback_cleanup.md)，没有新建工作单。

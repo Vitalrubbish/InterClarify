@@ -2,7 +2,7 @@
 
 更新：2026-10-23。[研究背景与参考文章](../research_design.md) · [边听边想](listening.md) · [边说边想](speaking.md)。
 
-2026-10-24 选型覆盖说明：用户已确认后续组合为 **SoulX-Duplug＋Nemotron EN160**，Nemotron 为唯一转写来源，先进行[公开英文完成／未完成测试](../dev/SoulX-Duplug/quality_test.md)。下文中的 XTurnix 专属输入、动作编码和图示保留为此前候选设计，不作为新组合的原生接口；新路线第一阶段保留 SoulX 五类用户状态，后续 CoT 与系统动作合同尚待适配训练。层级职责、共享 Context、唯一输出执行点和已听内容不可撤销的共同边界继续适用；方案确认不表示当前运行时已经切换。
+2026-10-24 最新选型覆盖说明：用户已指令启动 **Nemotron EN160＋Qwen3-0.6B 文本控制器**路线，具体输入、训练及门槛见 [TextTurn 方案](../dev/TextTurn/training_plan.md)。Nemotron 转写持续写入 Shared Context，控制器按 600ms 观察窗处理新增文本或 `no-voice`；无新增 ASR 文本直接作为带延迟的静音，不增加 VAD、词稳定等待或延迟补偿。首阶段训练 keep/start/stop，后续再加入 CoT。此合同覆盖下文旧 XTurnix 的固定输入、触发及 VAD 约定；原模型名称、专属 token 和图示只作历史候选参考。此前 SoulX 方案保留，当前不推进。层级职责、共享 Context、唯一输出执行点和已听内容不可撤销的共同边界继续适用；尚未切换现役运行时。
 
 本文统一两项能力的模块职责、异步时序、结果合同、实验与训练约定。系统以 DuplexCascade 为运行底座，前端方案按用户决定调整为 Nemotron 流式 ASR 与 XTurnix 话轮控制，分别提供转写和状态条件下的控制动作。原因是此前前端方案已撤回，现验证与既有 ASR 匹配的控制器。新控制模式尚未完成接入；当前工程阶段见[实施计划](../engineering_implementation.md)。
 
@@ -51,7 +51,7 @@ Layer 0/1 的发声路径直接连接 Text FIFO，Context 不向队列提交文�
 
 Context 保存截至当前实际可用的用户转写及前缀版本、Layer 1 生成历史和输出、Layer 2 已发布结果、XTurnix 决策、Layer 0 时机建议，以及 Listen/Speak 状态和打断事件。生成、提交、取消与实际播放分别记录，不能把已生成内容直接视为用户已听内容；同一份生成文本不重复注入模型输入。
 
-2026-10-24 补充当前路线的转写接口：Nemotron 每次在线文本更新先按稳定的用户 `turn_id` 写入 Shared Context，再供控制器和 Layer 1/2 在各自输入边界读取；不等待完成判断，不把音频块或 micro-turn 当成新用户消息。Context 暴露最新话轮快照和有序版本读取接口，保留来源、ASR 前缀版本、实际观察截止点及可见时间；关闭记录与语义完成、EOF 排空分别处理。字段及读取合同见[Shared Context 接口](../dev/SoulX-Duplug/shared_context_interface.md)，目前尚未实现。
+2026-10-24 补充当前路线的转写接口：Nemotron 每次在线文本更新先按稳定的用户 `turn_id` 写入 Shared Context，再供控制器和 Layer 1/2 在各自输入边界读取；不等待完成判断，不把音频块或 micro-turn 当成新用户消息。Context 暴露最新话轮快照和有序版本读取接口，保留来源、ASR 前缀版本、实际观察截止点及可见时间；关闭记录与语义完成、EOF 排空分别处理。版本和读取原则参考[既有接口设计](../dev/SoulX-Duplug/shared_context_interface.md)，当前 TextTurn 衔接以[新方案](../dev/TextTurn/training_plan.md)为准；尚未实现。
 
 按用户对触发机制的确认，XTurnix 改为事件驱动：ASR 更新写入 Context 后触发决策；后续实现 Layer 2 后，CoT 写入 Context 也触发决策。调整原因是输入未更新时，按固定时间重复调用不能提供新的文本依据。Layer 1 和 Layer 2 也只在各自明确的输入边界消费新增观察，已经构造的输入不因结果到达而自动重算。
 
