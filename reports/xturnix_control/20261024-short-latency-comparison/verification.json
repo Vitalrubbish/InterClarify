@@ -9,5 +9,6 @@
   "selected_from": "31_calibration_turns_only",
   "evaluation_turns": 14,
   "evaluation_conversations": 9,
-  "training_parameters_updated": false
+  "training_parameters_updated": false,
+  "published_csv_line_endings": "LF; original byte evidence retained in hash-verified archive"
 }
