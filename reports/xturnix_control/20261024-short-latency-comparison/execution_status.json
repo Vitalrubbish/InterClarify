@@ -1,6 +1,6 @@
 {
   "schema": "xtx014-short-latency-preflight-v1",
-  "status": "offline_inputs_prepared_4090_submission_pending",
+  "status": "queued_4090",
   "primary_budget_ms": 500,
   "budgets_ms": [
     300,
@@ -47,7 +47,7 @@
   "metadata_manifest_sha256": "0c4da87d9336913603ba20f96bedfa616574a2328827178b194a7ac466f1bcd1",
   "audio_downloaded": true,
   "new_model_calls": 0,
-  "cluster_jobs_submitted": 1,
+  "cluster_jobs_submitted": 2,
   "actual_comparison_results": null,
   "limitations": [
     "Previously viewed development cohort; not an independent test.",
@@ -78,6 +78,23 @@
       "error": "compute_node_network_unreachable",
       "model_lock_verified": true,
       "actual_replay_model_calls": 0
+    },
+    {
+      "run_id": "xtx014-time-20261024-4090-r2",
+      "scheduler_job_id": "job-179281557459393666619-xuan-zhang",
+      "partition": "pdgpu-4090",
+      "source_commit": "0d0d347",
+      "requested_resources": {
+        "gpu": 1,
+        "cpu": 8,
+        "ram_gib": 32,
+        "timeout_seconds": 7200
+      },
+      "exit_code": null,
+      "phase": "pending"
     }
-  ]
+  ],
+  "current_run_id": "xtx014-time-20261024-4090-r2",
+  "current_job_id": "job-179281557459393666619-xuan-zhang",
+  "remote_input_hashes_verified": true
 }

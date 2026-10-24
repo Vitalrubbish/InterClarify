@@ -48,7 +48,7 @@ ASR 增量触发新的语义打分；无增量时，跨越已定义时间区间�
 
 ## 5. 实施与资源边界
 
-2026-10-24 用户授权先做[短延迟对照](short_latency_comparison.md)，主预算 500ms、敏感性 300/800ms，不含 LLM/TTS。已准备独立诊断入口、冻结元数据清单和关键契约检查；按用户本地说明恢复连接后，首个作业因计算节点无外网在数据读取阶段退出，正改为离线输入，详见[执行记录](../../../reports/xturnix_control/20261024-short-latency-comparison/README.md)。此进展不代表完整在线适配已验收。
+2026-10-24 用户授权先做[短延迟对照](short_latency_comparison.md)，主预算 500ms、敏感性 300/800ms，不含 LLM/TTS。按用户本地说明恢复连接后，首个作业因计算节点无外网在数据读取阶段退出；现已准备并校验 45 份离线音频，按用户要求提交单卡 4090 作业，初始状态 Pending，详见[执行记录](../../../reports/xturnix_control/20261024-short-latency-comparison/README.md)。此进展不代表完整在线适配已验收。
 
 ASR 时间完整适配尚未实现；用户随后明确授权的原生 pause 机制诊断先在远端短作业执行，不创建训练环境、准备训练集或编写训练入口。后续按 [XTX-014](../../issue/XTurnix/xtx_014_asr_time_control.md) 分步验收，复用现有 conda 与模型，不升级现役 ASR/TTS 环境。
 
