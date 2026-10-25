@@ -14,7 +14,7 @@ flock -n 9 || exit 2
 [ -f "$(dirname "$(dirname "$PY")")/conda-meta/history" ] || exit 2
 export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
 BUDGET="$ROOT/submit_logs/$RUN_ID.budget.json"
-timeout 90 "$PY" - "$BUDGET" "$MANIFEST" "$REPO_ROOT/configs/textturn_fdb.json" <<'PY'
+timeout 90 "$PY" - "$BUDGET" "$MANIFEST" "$REPO_ROOT/configs/textturn_fdb.json" "$ROOT/runs/tt-002-20261025-r1" <<'PY'
 from datetime import datetime
 import hashlib, json, re, subprocess, sys
 from pathlib import Path
@@ -29,7 +29,7 @@ for line in raw.splitlines():
     fields = [p.strip() for p in line.split('|')]
     if len(fields) < 9 or not fields[0].startswith('job-') or not fields[8].startswith('textturn-'):
         continue
-    assert fields[3] in ('Completed', 'Terminated', 'Canceled', 'Failed'), 'Unfinished TextTurn job'
+    assert fields[3] in ('Completed', 'Terminated', 'Canceled', 'Failed', 'Error'), 'Unfinished TextTurn job'
     info = vc('info', '--job', fields[0])
     start = re.search(r'StartTime:\s*(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d)', info)
     end = re.search(r'EndTime:\s*(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d)', info)
@@ -40,6 +40,13 @@ for line in raw.splitlines():
                  'gpu_seconds': duration*int(fields[6]), 'scheduler_info': info})
 assert {'job-179286310634760697957-xuan-zhang', 'job-179287011405618549973-xuan-zhang'} <= {j['job_id'] for j in jobs}
 protocol = json.loads(Path(sys.argv[3]).read_text())
+assert re.fullmatch('[0-9a-f]{64}', protocol['candidate_sha256']), 'Invalid SHA256 format'
+training = Path(sys.argv[4])
+candidate = json.loads((training/'candidate.json').read_text())
+with (training/'best/adapter_model.safetensors').open('rb') as stream:
+    sha = hashlib.sha256()
+    for block in iter(lambda: stream.read(1048576), b''): sha.update(block)
+assert sha.hexdigest() == candidate['adapter_sha256'] == protocol['candidate_sha256'], 'Frozen candidate mismatch before allocation'
 manifest = json.loads(Path(sys.argv[2]).read_text())
 assert manifest['complete'] and len(manifest['records']) == 100
 assert manifest['protocol_sha256'] == hashlib.sha256(Path(sys.argv[3]).read_bytes()).hexdigest()

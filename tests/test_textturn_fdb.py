@@ -110,6 +110,10 @@ class FdbContractTests(unittest.TestCase):
             bad['files']['input.wav']['sha256'] = 'changed'
             with self.assertRaises(ValueError):
                 load_audio(bad, manifest)
+            config['candidate_sha256'] += '0'
+            config_path.write_text(json.dumps(config))
+            with self.assertRaises(ValueError):
+                freeze(root, config_path, root/'invalid-hash')
 
     def test_absent_formal_run_preserves_all_one_hundred_unknowns(self):
         with tempfile.TemporaryDirectory() as temp:

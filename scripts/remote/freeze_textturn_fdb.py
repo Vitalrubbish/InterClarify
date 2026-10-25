@@ -6,6 +6,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import re
 
 SUBSETS = {'candor_turn_taking': ('turn_taking.json',),
            'candor_pause_handling': ('pause.json', 'transcription.json')}
@@ -40,6 +41,8 @@ def freeze(root, config, output):
     import numpy as np
     import soundfile as sf
     protocol = json.loads(config.read_text())
+    if not re.fullmatch('[0-9a-f]{64}', protocol['candidate_sha256']):
+        raise ValueError('Candidate SHA256 must contain exactly 64 lowercase hex digits')
     output.mkdir(parents=True, exist_ok=False)
     candidates, selected, smoke, seen = [], [], [], set()
     for subset, names in SUBSETS.items():

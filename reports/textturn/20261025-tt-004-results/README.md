@@ -13,7 +13,7 @@
 | pilot | 0.795891 | 0.020651 |
 | full | 0.047986 | 0.011776 |
 
-候选为远端`~/parathink-textturn/runs/tt-002-20261025-r1/best`，adapter SHA256为`32f5493835a1b21294a3b862e38da85f7d052bbc93dbf12a81c42436e144b5d17`。新增token参数确实更新，重载后的token行及动作分数完全一致，见候选（原始文件`training/candidate.json`已归档）、重载检查（原始文件`training/reload_verification.json`已归档）与学习检查（原始文件`training/learning_verification.json`已归档）。最终开发集正常接话367/400（91.75%）、陈述句172/200（86%）、打断200/200；停顿与附和错误均0/200。
+候选为远端`~/parathink-textturn/runs/tt-002-20261025-r1/best`，adapter SHA256为`32f5493835a1b21294a3b862e38da85f7d052bbc93dbf12a81c42436e14b5d17`。新增token参数确实更新，重载后的token行及动作分数完全一致，见候选（原始文件`training/candidate.json`已归档）、重载检查（原始文件`training/reload_verification.json`已归档）与学习检查（原始文件`training/learning_verification.json`已归档）。最终开发集正常接话367/400（91.75%）、陈述句172/200（86%）、打断200/200；停顿与附和错误均0/200。
 
 ## 独立文本与语音结果
 
