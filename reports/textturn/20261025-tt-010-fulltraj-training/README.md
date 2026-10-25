@@ -24,7 +24,7 @@
 
 远端预检无活动作业，现有conda及固定Qwen3-0.6B可用，可用盘约892GiB。模型约1.5GiB、数据485MiB、旧run约503MiB，原资产停止线有余量。数据传输包SHA256为`99ec86d23b445ddce2f3bb9a1ca625817f12da1b889349eb4ec8785741fd43de`；上传后须远端核对摘要，不能以本地成功代替远端准备完成。
 
-当前为提交准备阶段，尚无调度回执，不宣称已开始权重更新。实际job ID、源码提交、启动日志及稳定运行证据将在提交后补充。单作业1张24GiB GPU／8CPU／32GiB RAM，一个活动作业，显存22GiB、训练13800秒／外层4小时、资产10GiB／报告2GiB停止线；仅取消旧累计剩余额度，不自动取消任何质量门槛。pilot开发集改善且误抢话／误停未明显回归才进入full，保留失败，不以启动作业当作质量通过。
+已提交并确认Running：job-179293824747465991917-xuan-zhang，pdgpu-4090，服务器时间2026-10-25 22:24:08提交、22:24:10开始。源码冻结为`56102849e3e88209a9943fd1ffa605395534526e`，远端worktree为`~/parathink-textturn/source/tt010-fulltraj-r1`，run为`~/parathink-textturn/runs/tt-010-fulltraj-20261025-r1`。实际设备为RTX4090；远端conda中5项损失边界测试通过，数据包摘要与本地完全一致。训练入口已完成模型／数据加载并持续输出baseline-dev进度，最后核查7001/88947；当前是开发集基线阶段，尚不宣称发生优化器更新、pilot／full完成或质量通过。单作业1张24GiB GPU／8CPU／32GiB RAM，一个活动作业，显存22GiB、训练13800秒／外层4小时、资产10GiB／报告2GiB停止线；仅取消旧累计剩余额度，不自动取消任何质量门槛。pilot开发集改善且误抢话／误停未明显回归才进入full，保留失败，不以启动作业当作质量通过。
 
 ## 复现及摘要
 
@@ -39,3 +39,5 @@ manifest SHA256：`21357f70fb2d382c1ed79741d094aaee9378ec609c5215c7db1afc096b477
 | dev.jsonl.gz | `a1bfa7bb34e5d84b01b4acd74e46e2494198a768156b43f3452e88bcdb2e64c3` |
 
 完整逐文件摘要及权重分母见manifest，audit.json绑定该manifest和训练配置，训练前仍校验冻结文件。大体积产物不进Git。
+
+实际日志：`~/parathink-textturn/submit_logs/tt-010-fulltraj-20261025-r1.training.log`；调度回执和源码摘要同目录保存。运行环境为torch2.11.0+cu128／transformers4.57.1／peft0.19.1／tokenizers0.22.2。作业结果、质量放行和重载验证待完成后补充，TT-010保持打开。
