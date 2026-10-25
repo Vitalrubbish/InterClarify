@@ -1,0 +1,26 @@
+{
+  "source_commit": "37d9543",
+  "waiter_pid": 136137,
+  "supervisor_pid": 136136,
+  "observed_state": {
+    "status": "waiting_for_training",
+    "jobs": {},
+    "detail": {
+      "job": {
+        "status": "Running",
+        "description": "textturn-tt-010-fulltraj-20261025-r1"
+      },
+      "last_training_log": [
+        "{\"event\": \"evaluation_progress\", \"output\": \"/hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/runs/tt-010-fulltraj-20261025-r1/pilot-dev-epoch-2\", \"completed\": 14001, \"planned\": 88947}"
+      ]
+    },
+    "updated_at": "2026-10-26T00:25:56.229095+08:00"
+  },
+  "verified_unix": 1792945587.1879146,
+  "observed_poll_count": 3,
+  "prepared_sha256": "d541cdd683273ead23f7cb49fb4132232afb4576979d7e9f38ad2652a0f5c4f6",
+  "address_space_limit": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            8388608              unlimited            bytes     \nMax core file size        0                    unlimited            bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             65535                65535                processes \nMax open files            65535                65535                files     \nMax locked memory         unlimited            unlimited            bytes     \nMax address space         2147483648           2147483648           bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       1541148              1541148              signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+  "affinity": [
+    0
+  ]
+}
