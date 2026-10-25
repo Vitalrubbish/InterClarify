@@ -36,7 +36,7 @@ class TextTurnContextTests(unittest.TestCase):
             shared.publish_user_transcript(self.snapshot(3, 'hello more'))
 
     def test_three_decode_steps_and_short_eof_window(self):
-        assembler = context.ControlWindowAssembler()
+        assembler = context.ControlWindowAssembler(480)
         windows = []
         for index, text in enumerate(['a', 'a', 'ab', 'ab'], 1):
             value = assembler.push_step({'kind': 'decode_step', 'step_seq': index, 'text': text,
@@ -83,7 +83,7 @@ class TextTurnContextTests(unittest.TestCase):
         self.assertEqual(results[-1]['window']['step_count'], 6)
 
     def test_160ms_emits_one_complete_cycle_per_decode_step(self):
-        assembler = context.ControlWindowAssembler(160)
+        assembler = context.ControlWindowAssembler()
         for index in range(1, 4):
             window = assembler.push_step({'kind': 'decode_step', 'step_seq': index, 'text': 'a',
                 'prefix_version': 1, 'published_at': index*.16,

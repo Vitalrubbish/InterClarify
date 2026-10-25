@@ -18,3 +18,5 @@ trace的kind标记在线、EOF排空、Context或控制事件，原始ASR／生�
 新回放不再执行v1的整段参考锚点评分；cases只保存运行事实，完整trace由v2统一产生summary.json及opportunities.csv。--annotations可显式提供盲审文件，审核hash和Context版本必须匹配；没有文件时不会自动给接话能力判通过。历史v1输出保留不改写，重评分使用新目录。
 
 FDB按用户最新要求仅监控TextTurn，不再依赖本模块的ShadowState或模拟生命周期。TT-007曾添加的可选生成周期扩展已撤回；本文件继续只服务原TT-003／004合成语音历史协议。
+
+TT-010将通用观察窗默认改为160ms后，本历史合成语音回放显式构造`ControlWindowAssembler(480)`，保持TT-003／004冻结协议。新160ms数据不通过此旧入口偷偷变更旧评测；本次没有提交远端评测。

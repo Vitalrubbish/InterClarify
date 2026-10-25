@@ -83,7 +83,7 @@ def replay_case(case, args, tokenizer):
     output = args.output / 'traces' / f"{case['case_id']}.jsonl"
     shared = SharedContext()
     consumer = TranscriptConsumer(case['case_id'])
-    assembler = ControlWindowAssembler()
+    assembler = ControlWindowAssembler(480)
     state = ShadowState(case, tokenizer)
     session = requests.Session()
     response = session.post(args.asr_url + '/v1/session', timeout=10)

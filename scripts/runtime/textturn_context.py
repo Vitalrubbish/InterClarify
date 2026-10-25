@@ -97,7 +97,7 @@ class TranscriptConsumer:
 class ControlWindowAssembler:
     """Close a control window after the configured genuine decode completions."""
 
-    def __init__(self, control_ms=480):
+    def __init__(self, control_ms=160):
         if control_ms not in (160, 480):
             raise ValueError('Expected a 160ms or 480ms control period')
         self.steps_per_window = control_ms // 160

@@ -1,0 +1,15 @@
+{
+  "seed": 20261025,
+  "window_ms": 160,
+  "user_tokens_per_480ms": [1, 2],
+  "assistant_tokens_per_window_cycle": [3, 3, 2],
+  "pause_probability": 0.20,
+  "pause_windows": [1, 5],
+  "backchannel_probability": 0.01,
+  "backchannels": ["Yes.", "Okay.", "Right.", "Mm-hm.", "I see.", "Uh-huh."],
+  "playback_tail_ms": 960,
+  "stop_confirmation_ms": 80,
+  "max_length": 2048,
+  "train_snapshots_max": 10000,
+  "resources": {"threads": 1, "address_space_gib": 2, "timeout_seconds": 600, "disk_mib": 512}
+}
