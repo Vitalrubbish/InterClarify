@@ -15,7 +15,7 @@
 | TT-005 | [统计 ASR 更新后 Speak／start 与等待拍数](../archive/TextTurn/tt_005_fdb_turn_taking.md) | 50 条真实录音的两项比例与 start 平均等待拍数 | TT-002／003 | 已完成并归档；更新后Speak44/50、start21/50，等待763.00ms |
 | TT-006 | [统计 ASR 更新前连续至少3周期 Speak](../archive/TextTurn/tt_006_fdb_pause_handling.md) | 50 条真实录音的持续 Speak 比例与区间辅助证据 | TT-002／003 | 已完成并归档；更新前连续3周期Speak33/50 |
 | TT-007 | [160ms周期的同样本FDB对照](../archive/TextTurn/tt_007_fdb_160ms.md) | 相同50＋50录音的160ms主指标与时间换算、对照说明 | TT-002／003；复用TT-005／006冻结清单 | 已完成并归档；Speak46/50、start9/50，等待303.45ms；连续3周期Speak46/50 |
-| TT-008 | [UltraChat注入助手正文的两周期重测stop](tt_008_ultrachat_stop_retest.md) | 480ms每周期8 token、160ms每周期3 token的stop、误stop及960ms抢话结果 | TT-002／003及既有测试资产 | 待实施；已修订配置，不做空正文对照 |
+| TT-008 | [UltraChat注入助手正文的两周期重测stop](tt_008_ultrachat_stop_retest.md) | 480ms每周期8 token、160ms每周期3 token的stop、误stop及960ms抢话结果 | TT-002／003及既有测试资产 | 实施中；冻结30来源及双周期回放入口，待服务器提交 |
 | TT-009 | [条件性训练数据重构](tt_009_conditional_data_rebuild.md) | 生命周期、轮次及自然接管覆盖完整的新版本控制数据 | TT-008交付；用户判定效果不好并指令启动 | 条件待启动；不自动重构或训练 |
 
 TT-007按用户授权完成同样本160ms对照。三项工作交付完成与模型质量达标分别记录；3周期在480ms／160ms下对应1440ms／480ms，不能当作等时长结果比较。没有更换候选、重训、调阈值或扩大原累计预算。

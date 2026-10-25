@@ -1,0 +1,19 @@
+{
+  "seed": 20261025,
+  "source_limit": 30,
+  "candidate_sha256": "32f5493835a1b21294a3b862e38da85f7d052bbc93dbf12a81c42436e14b5d17",
+  "configurations": [{"control_ms": 480, "assistant_tokens": 8}, {"control_ms": 160, "assistant_tokens": 3}],
+  "speak_overlap_threshold_ms": 960,
+  "stop_deadline_ms": 960,
+  "anchor_deadline_ms": 1000,
+  "maximum_job_seconds": 7200,
+  "cumulative_gpu_seconds": 28800,
+  "cleanup_reserve_seconds": 60,
+  "minimum_free_bytes": 32212254720,
+  "maximum_asset_bytes": 10737418240,
+  "maximum_report_bytes": 2147483648,
+  "maximum_gpu_mib": 22528,
+  "input_modes": ["clean_text_events", "recorded_online_asr"],
+  "selection": "sha256(seed|tt008|source_id)",
+  "causal_ablation": false
+}

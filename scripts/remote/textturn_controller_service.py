@@ -41,9 +41,10 @@ class Controller:
             legal = ('keep', 'start') if visible['state'] == 'Listen' else ('keep', 'stop')
             indices = [self.ids[list(ACTIONS).index(action)] for action in legal]
             action = legal[int(logits[indices].argmax().item())]
+            legal_logits = {name: float(logits[index].item()) for name, index in zip(legal, indices)}
             torch.cuda.synchronize()
         return {'action': action, 'service_ms': (time.monotonic() - begin) * 1000,
-                'input_tokens': len(ids), 'candidate_sha256': self.sha256}
+                'input_tokens': len(ids), 'candidate_sha256': self.sha256, 'legal_logits': legal_logits}
 
 
 def create_app(controller):
