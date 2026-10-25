@@ -34,6 +34,8 @@
 
 ## 维护记录
 
+2026-10-25评分修复：独立源码`~/parathink-textturn/source/scoring-v2`冻结`ec0bf36`，用已有conda数据环境执行单线程标准库离线重评，2GiB地址空间、60秒超时，无GPU任务。输出`inspection/scoring-v2/formal-r2`及`text-r2`；模型和v1结果未修改。[v2报告](../reports/textturn/20261025-scoring-v2/README.md)记录未知覆盖与训练构造／配比审核，接话语义标注仍不足。
+
 2026-10-25后续核查：TextTurn训练`tt-002-20261025-r1`和评估`tt-004-20261025-r1`均退出码0，评估调度ID为`job-179287011405618549973-xuan-zhang`，当前无活动作业。full第2轮候选保留在训练run的`best`；正式300来源／1200语音场景结果见[核查报告](../reports/textturn/20261025-tt-004-results/README.md)。语音原始未通过，评分口径缺口待修正，不再把pipeline的evaluation_submitted视为未执行。原始日志、adapter及语音资产均未删除，本次只读取并取回结果，无新增GPU作业。
 
 2026-10-25 新建 `~/parathink-textturn`，TT-001正式数据位于 `dataset/tt-001-frozen-r3`，固定Qwen3-0.6B位于 `models/qwen3-0.6b`。训练源码 `source/74b0846`，训练run为 `runs/tt-002-20261025-r1`，4090单卡作业 `job-179286310634760697957-xuan-zhang`。只读复用已由conda创建的XTurnix隔离环境；ASR/TTS仍使用现有各自conda，不在现役环境安装依赖。评估源码位于 `source/evaluation-v1`，续接器状态在 `submit_logs/tt-004-20261025-r1.pipeline.json`；成功放行后才提交评估，不把等待状态写为完成。原主仓库未被reset或覆盖。
