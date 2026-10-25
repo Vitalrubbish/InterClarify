@@ -2,7 +2,7 @@
 
 状态：实施中。依赖：[TT-002](../archive/TextTurn/tt_002_training.md)、[TT-003](../archive/TextTurn/tt_003_streaming_context.md)。依据：[FDB 跨数据集计划](../../dev/TextTurn/fdb_cross_dataset_plan.md)。
 
-2026-10-25已按用户指令启动。共用入口、冻结清单及启动修复记录见[联合运行记录](../../../reports/textturn/20261025-fdb-cross-dataset/README.md)。正式结果尚未交付，保持本项未归档。
+2026-10-25已按用户指令启动。共用入口、冻结清单及启动修复记录见[联合运行记录](../../../reports/textturn/20261025-fdb-action-only/README.md)。正式结果尚未交付，保持本项未归档。
 
 2026-10-25按用户最新纠正：本测试只监控TextTurn，移除模拟回答及其生成／播放生命周期。原r1—r3保留为撤回记录，新480ms结果按相同样本重提，不能沿用旧协议成绩。
 

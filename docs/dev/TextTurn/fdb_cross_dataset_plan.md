@@ -1,6 +1,6 @@
 # TextTurn：FDB 两臂各50条跨数据集测试计划
 
-更新：2026-10-25。状态：用户已明确指令启动TT-005／006，已实现新入口并冻结100条录音，正在远端执行；见[联合运行记录](../../../reports/textturn/20261025-fdb-cross-dataset/README.md)。按用户最新要求，[TT-005](../../issue/TextTurn/tt_005_fdb_turn_taking.md)统计ASR停止更新后的控制器Speak及start样本比例，并统计其中输出start样本的平均等待拍数；[TT-006](../../issue/TextTurn/tt_006_fdb_pause_handling.md)统计ASR停止更新前连续至少3周期Speak的样本比例。为支持这些指标，原固定Listen方案改为Listen/Speak动作状态转移；Turn Taking使用测试流程自动拼接的5秒静音，不重复添加，Pause Handling不拼接静音。数据规模、候选与预算不变，必要工程工作仍并入结果交付。
+更新：2026-10-25。状态：用户已明确指令启动TT-005／006，已实现新入口并冻结100条录音，正在远端执行；见[联合运行记录](../../../reports/textturn/20261025-fdb-action-only/README.md)。按用户最新要求，[TT-005](../../issue/TextTurn/tt_005_fdb_turn_taking.md)统计ASR停止更新后的控制器Speak及start样本比例，并统计其中输出start样本的平均等待拍数；[TT-006](../../issue/TextTurn/tt_006_fdb_pause_handling.md)统计ASR停止更新前连续至少3周期Speak的样本比例。为支持这些指标，原固定Listen方案改为Listen/Speak动作状态转移；Turn Taking使用测试流程自动拼接的5秒静音，不重复添加，Pause Handling不拼接静音。数据规模、候选与预算不变，必要工程工作仍并入结果交付。
 
 ## 1. 目的与结论边界
 
