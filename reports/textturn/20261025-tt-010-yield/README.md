@@ -1,5 +1,34 @@
 # TT-010 数据与输出生命周期交付
 
+## v2：歧义keep与专用finish ID
+
+按用户本次明确指令，已交付`artifacts/textturn/tt-010-yield-v2`。原unknown动作改为keep，保持当前Listen／Speak，不新增unknown token；1353个原未监督快照全部追加keep ID并计算动作损失。手写可判定边界和每个stop的控制时刻保持不变，没有额外等待。仅审核元数据保留fallback_keep，模型输入不含该字段。
+
+| 集合 | 来源 | 正式快照 | keep | start | stop | 无动作监督 |
+| --- | --- | --- | --- | --- | --- | --- |
+| train | 24 | 2401 | 1897 | 336 | 168 | 0 |
+| dev | 12 | 1196 | 944 | 168 | 84 | 0 |
+
+`<finish>`已注册为单个special token，ID **151673**。keep/start/stop/no-voice仍为151669／151670／151671／151672。新增标记随真实或明确合成的播放完成事件进入runtime_events，携带output_id等原有字段；仅首次消费携带专用marker，最近终态通过结构化状态持续可见，不反复追加标记。finish不是预测动作，所有输入位置包括ID151673均为-100，仅最后的合法动作ID参与监督。
+
+独立核查验证3597个快照全部只有一个动作目标；Hugging Face AutoTokenizer离线重载后`encode('<finish>') == [151673]`，该ID在special ID列表中，原四个编码不变；72个实际消费finish的正式快照均正确编码并屏蔽该输入位置。全部252个stop的事件时刻与v1逐一相同，432条轨迹的输出闭环通过。新增token边界检查后，TextTurn共41项回归测试通过。
+
+来源清单及来源正文与v1逐字节相同，v1和TT-001全部冻结摘要核对未变；v2保留相同采样分层，避免把歧义改keep时丢掉原前缀覆盖。构造仍为CPU、单进程、线程1、2GiB地址空间、600秒timeout和512MiB磁盘上限；耗时5.992秒，冻结资产约45.8MiB。
+
+此次完成的是tokenizer注册和数据重建，没有修改旧模型embedding或训练候选。manifest明确training_allowed=false；后续获授权训练时需适配新词表、初始化并学习finish输入行，当前旧训练入口不能直接用于v2。旧模型和播放器未替换，真实语音或模型质量结论不变。
+
+| v2资产 | SHA256 |
+| --- | --- |
+| train.jsonl | `e2b2899e7a01c93caff436040e969006288ccb4ac88c726034d695a1045ca6ea` |
+| dev.jsonl | `50652b77676dadf17657960a4a16dbc959b86990404562191a99894f7171ed9d` |
+| timelines.jsonl | `9c6f41ccb0f5ab21a68c72d01a462743af0039ce9f837ddf42a68927ece24a1b` |
+| tokenizer.json | `8d06f24d6a4f72c68780e1a502ab29250ada639e905c2fa2f655e12235b97020` |
+| tokenizer_config.json | `89a171df7d17659cff14b444b2d099c9d1566350885e7bcb470252c91052fedd` |
+
+构造器摘要`66ceacee3ee170b326148eb435dbef3799667b28259f232f3a47546227d1ba8c`；其余摘要见manifest。独立复核结果和脚本保存在v2目录的audit.json／audit_recheck.py，不计入已冻结manifest。下文为v1历史记录，其中unknown屏蔽及非专用finish编码已被v2替代。
+
+## v1历史交付
+
 2026-10-25完成。按用户“启动TT-010”指令，仅在本地既有conda环境中进行CPU构造与核查，无模型训练或GPU作业。新版本位于`artifacts/textturn/tt-010-yield-v1-r2`，旧TT-001全部冻结文件摘要复核未变化。
 
 | 集合 | 来源对话组 | 对照轨迹 | 正式快照 | keep | start | stop | unknown |

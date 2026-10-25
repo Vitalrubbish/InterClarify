@@ -1,5 +1,7 @@
 # 工作单管理
 
+2026-10-25 TT-010修订：按用户要求交付v2，歧义前缀使用keep监督，`<finish>`注册专用输入ID151673，原四个ID不变；训练／开发2401／1196快照，原1353个未监督窗口全部转为keep，252个stop时机不变，41项TextTurn测试通过。来源及旧资产保留，无模型训练；仍归档于[TT-010](archive/TextTurn/tt_010_asr_update_yield_dataset.md)，详见[更新报告](../../reports/textturn/20261025-tt-010-yield/README.md)。以下保留v1等历史记录。
+
 2026-10-25：按用户指令启动并完成[TT-010](archive/TextTurn/tt_010_asr_update_yield_dataset.md)，版本化数据、finish结构化输入合同及闭环核查已交付归档；24／12训练开发来源、2401／1196正式快照，40项TextTurn回归通过。未训练、未提交GPU作业，合成数据不代表模型或真实音频效果。见[报告](../../reports/textturn/20261025-tt-010-yield/README.md)。TextTurn共10项：8项完成、1项终止归档、1项未完成（TT-004）。以下为历史记录。
 
 2026-10-25归档：[TT-008](archive/TextTurn/tt_008_ultrachat_stop_retest.md)的480ms／160ms各150/150场景成功，作业退出码0，18:24:38结束，按用户指令归档。结果见[报告](../../reports/textturn/20261025-ultrachat-prefix-retest/README.md)。TextTurn共10项：7项完成、1项终止归档、2项未完成（TT-004、TT-010）；旧停止词覆盖不能替代TT-010的非附和更新让轮验收。下方启动及策略讨论保留为历史。

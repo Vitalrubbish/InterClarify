@@ -22,6 +22,8 @@ class YieldDatasetTests(unittest.TestCase):
         backend.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False)
         backend.save(str(Path(self.directory.name) / 'tokenizer.json'))
         self.tokenizer = dataset.ControlTokenizer(self.directory.name)
+        self.legacy_ids = dict(self.tokenizer.special)
+        self.finish_id = dataset.register_finish(self.tokenizer)
         self.source = dict(source_id='source', duplicate_group='group',
                            texts=['How can I learn?', 'A' * 120, 'I need examples.', 'B' * 40])
 
@@ -45,16 +47,23 @@ class YieldDatasetTests(unittest.TestCase):
         self.assertEqual(stop_request['state_after'], 'Speak')
         trace.validate()
 
-    def test_backchannel_then_takeover_and_unknown_masks(self):
+    def test_uncertain_prefix_keeps_state_until_decidable_takeover(self):
         trace = self.trace()
         trace.user_segment('Right', 'backchannel', backchannel=True)
         self.assertEqual(trace.state, 'Speak')
         self.assertEqual(trace.rows[-1]['target_action'], 'keep')
         trace.user_segment(', but add details.', 'change', 5)
         self.assertEqual(trace.state, 'Listen')
-        unknown = [r for r in trace.rows if r['target_action'] is None]
-        self.assertTrue(unknown)
-        self.assertTrue(all(all(v == -100 for v in r['labels']) for r in unknown))
+        uncertain = [r for r in trace.rows if r['annotation']['fallback_keep']]
+        self.assertTrue(uncertain)
+        keep_id = self.tokenizer.special[dataset.ACTIONS['keep']]
+        self.assertTrue(all(r['target_action'] == 'keep' and
+                            [v for v in r['labels'] if v != -100] == [keep_id] for r in uncertain))
+        self.assertTrue(all(r['target_action'] is not None for r in trace.rows))
+        listening = dataset.YieldTrace('listen', self.tokenizer, self.source, 'train')
+        listening.user_segment('Could', 'prefix')
+        self.assertEqual(listening.state, 'Listen')
+        self.assertTrue(all(r['target_action'] == 'keep' for r in listening.rows))
         self.assertNotIn('details', trace.rows[1]['prompt'])
         self.assertNotIn('judgment', trace.rows[-1]['prompt'])
 
@@ -91,6 +100,27 @@ class YieldDatasetTests(unittest.TestCase):
         self.assertEqual(normal.rows[-1]['visible']['latest_terminal']['kind'], 'finish')
         self.assertEqual(sum(e['kind'] == 'finish' for e in normal.events), 1)
         normal.validate()
+
+    def test_finish_is_one_input_only_id_and_survives_reload(self):
+        from tokenizers import Tokenizer
+        self.assertEqual(self.tokenizer.encode(dataset.FINISH), [self.finish_id])
+        self.assertNotIn(self.finish_id, [self.tokenizer.special[t] for t in dataset.ACTIONS.values()])
+        for marker, token_id in self.legacy_ids.items():
+            self.assertEqual(self.tokenizer.encode(marker), [token_id])
+        path = Path(self.directory.name) / 'registered.json'
+        self.tokenizer.backend.save(str(path))
+        self.assertEqual(Tokenizer.from_file(str(path)).encode(dataset.FINISH).ids, [self.finish_id])
+        trace = self.trace()
+        trace.drain()
+        trace.step('consume')
+        row = trace.rows[-1]
+        positions = [i for i, value in enumerate(row['input_ids']) if value == self.finish_id]
+        self.assertEqual(len(positions), 1)
+        self.assertTrue(all(row['labels'][i] == -100 for i in positions))
+        self.assertNotEqual(row['input_ids'][-1], self.finish_id)
+        trace.step('persistent_terminal')
+        self.assertNotIn(self.finish_id, trace.rows[-1]['input_ids'])
+        self.assertEqual(trace.rows[-1]['visible']['latest_terminal']['kind'], 'finish')
 
     def test_pretext_races_multiple_outputs_and_truncation(self):
         for variant, expected in [('pretext', 'stop'), ('finish_first', 'finish'),

@@ -13,7 +13,22 @@ import time
 from build_textturn_dataset import ACTIONS, SILENCE, ControlTokenizer, prompt_for, seeded_rng, write_json
 
 WINDOW = 480
-VERSION = 'tt-010-yield-v1'
+VERSION = 'tt-010-yield-v2'
+FINISH = '<finish>'
+
+
+def register_finish(tokenizer):
+    """Append an input-only completion marker without changing existing IDs."""
+    from tokenizers import AddedToken
+    if tokenizer.backend.token_to_id(FINISH) is not None:
+        raise ValueError('Finish registration requires a legacy tokenizer')
+    next_id = tokenizer.backend.get_vocab_size()
+    tokenizer.backend.add_special_tokens([AddedToken(FINISH, special=True, normalized=False)])
+    token_id = tokenizer.backend.token_to_id(FINISH)
+    if token_id != next_id or tokenizer.encode(FINISH) != [token_id]:
+        raise ValueError('Finish must use one new token ID')
+    tokenizer.special = dict(tokenizer.special) | {FINISH: token_id}
+    return token_id
 
 
 def file_hash(path):
@@ -86,6 +101,8 @@ class YieldTrace:
                                  completion=kind, playback_simulated=True))
         self.terminal = dict(kind=kind, output_id=output_id)
         event = self.emit(kind, output_id=output_id, reason=kind, state_after='Listen')
+        if kind == 'finish':
+            event['marker'] = FINISH
         self.pending.append(event)
         self.active, self.state = None, 'Listen'
 
@@ -118,6 +135,9 @@ class YieldTrace:
             delta = self.update(**update)
         if action not in (None, 'keep', 'start', 'stop'):
             raise ValueError('Unknown model action')
+        fallback_keep = action is None
+        if fallback_keep:
+            action = 'keep'
         if action == 'stop' and (self.state != 'Speak' or not delta or judgment != 'non_backchannel'):
             raise ValueError('Stop needs a decidable effective non-backchannel update in Speak')
         if action == 'start' and (self.state != 'Listen' or not response):
@@ -127,6 +147,8 @@ class YieldTrace:
             event['consumed_ms'] = self.now
             consumed.append({k: event[k] for k in ('event_seq', 'kind', 'output_id',
                                                    'occurred_ms', 'published_ms', 'consumed_ms', 'reason')})
+            if event['kind'] == 'finish':
+                consumed[-1]['marker'] = event['marker']
         self.pending.clear()
         output = self.active
         visible = dict(history=deepcopy(self.history), user_text=self.user, user_turn_id=self.turn,
@@ -149,6 +171,7 @@ class YieldTrace:
                    split=self.split, category=category, opportunity_id=f'{self.identity}:{category}',
                    visible_ms=self.now, visible=visible, target_action=action,
                    annotation=dict(visible_prefix=self.user, judgment=judgment,
+                                   fallback_keep=fallback_keep,
                                    method='authored_synthetic_prefix_annotation'),
                    first_effective_update_ms=self.first_update, request_event_seq=request['event_seq'],
                    prompt=prompt, input_ids=ids, labels=labels, playback_simulated=True,
@@ -168,7 +191,8 @@ class YieldTrace:
     def user_segment(self, text, category, decide_at=None, backchannel=False, advance=True):
         """Materialize authored prefix judgments separately from model-visible inputs."""
         prefix = ''
-        for piece in self.tokenizer.chunks(text, (1, 2), rng=seeded_rng(20261025, self.identity, category)):
+        sampling_identity = self.identity.replace(VERSION, 'tt-010-yield-v1', 1)
+        for piece in self.tokenizer.chunks(text, (1, 2), rng=seeded_rng(20261025, sampling_identity, category)):
             prefix += piece
             judgment = None
             if backchannel and prefix.strip().rstrip('.!,') in ('Right', 'Mm-hm', 'Okay', 'I see', 'Yes'):
@@ -199,7 +223,7 @@ class YieldTrace:
                     raise ValueError('Unmarked open output')
                 output['status'] = 'truncated'
         for row in self.rows:
-            expected = [] if row['target_action'] is None else [self.tokenizer.special[ACTIONS[row['target_action']]]]
+            expected = [self.tokenizer.special[ACTIONS[row['target_action']]]]
             if [v for v in row['labels'] if v != -100] != expected:
                 raise ValueError('Action-only loss mask failed')
         return dict(scenario_id=self.identity, source_id=self.source['source_id'], split=self.split,
@@ -290,6 +314,7 @@ def build(legacy, output):
     for marker, token_id in tokenizer.special.items():
         if tokenizer.encode(marker) != [token_id]:
             raise ValueError('Frozen token encoding differs')
+    finish_id = register_finish(tokenizer)
     index = json.loads((legacy / 'split_index.json').read_text())
     sources = json.loads((legacy / 'source_records.json').read_text())
     selected = []
@@ -308,7 +333,7 @@ def build(legacy, output):
     write_json(output / 'split_index.json', selected)
     write_json(output / 'source_records.json', {i['source_id']: sources[i['source_id']] for i in selected})
     stats, opportunity_counts, terminal_stats, category_counts = Counter(), Counter(), Counter(), Counter()
-    annotations, samples = [], []
+    annotations, samples, fallback_counts = [], [], Counter()
     handles = {split: (output / f'{split}.jsonl').open('w') for split in ('train', 'dev')}
     try:
         with (output / 'timelines.jsonl').open('w') as timelines:
@@ -320,7 +345,7 @@ def build(legacy, output):
                     terminal_stats.update(o['status'] for o in timeline['outputs'])
                     retained = Counter()
                     for row in rows:
-                        bucket = (row['category'], row['target_action'])
+                        bucket = (row['category'], row['target_action'], row['annotation']['fallback_keep'])
                         selected_row = not row['excluded_reason'] and (row['target_action'] in ('start', 'stop') or retained[bucket] < 2)
                         annotations.append({k: row[k] for k in ('snapshot_id', 'annotation', 'target_action', 'excluded_reason')}
                                            | {'selected': selected_row})
@@ -329,6 +354,7 @@ def build(legacy, output):
                         retained[bucket] += 1
                         handles[item['split']].write(json.dumps(row, ensure_ascii=False, separators=(',', ':')) + '\n')
                         stats[(item['split'], row['target_action'] or 'unknown')] += 1
+                        fallback_counts[item['split']] += row['annotation']['fallback_keep']
                         category_counts[(item['split'], row['category'])] += 1
                         opportunity_counts[(item['split'], row['opportunity_id'])] += 1
                         if ordinal == 0 and variant in ('ordinary', 'transition', 'tail', 'finish', 'pretext'):
@@ -343,10 +369,22 @@ def build(legacy, output):
     write_json(output / 'prefix_annotations.json', annotations)
     write_json(output / 'samples.json', samples)
     tokenizer.backend.save(str(output / 'tokenizer.json'))
-    (output / 'tokenizer_config.json').write_bytes((legacy / 'tokenizer_config.json').read_bytes())
-    result = dict(schema_version=1, version=VERSION, status='frozen_synthetic_prefix_annotated',
+    tokenizer_config = json.loads((legacy / 'tokenizer_config.json').read_text())
+    added = json.loads(tokenizer.backend.to_str())['added_tokens']
+    tokenizer_config['added_tokens_decoder'] = {
+        str(token['id']): {k: v for k, v in token.items() if k != 'id'} for token in added}
+    tokenizer_config['additional_special_tokens'] = list(dict.fromkeys(
+        tokenizer_config.get('additional_special_tokens', []) + list(tokenizer.special)))
+    write_json(output / 'tokenizer_config.json', tokenizer_config)
+    result = dict(schema_version=2, version=VERSION, status='frozen_synthetic_prefix_annotated',
                   training_executed=False, model_quality_verified=False, playback_simulated=True,
-                  finish_encoding={'kind': 'finish', 'special_token_added': False, 'loss': 'masked_input'},
+                  training_allowed=False, model_revision=manifest['model_revision'],
+                  new_token_ids=tokenizer.special,
+                  action_token_ids={a: tokenizer.special[t] for a, t in ACTIONS.items()},
+                  ambiguity_policy='keep', fallback_keep_snapshots=dict(fallback_counts),
+                  finish_encoding={'kind': 'finish', 'marker': FINISH, 'token_id': finish_id,
+                                   'special_token_added': True, 'loss': 'masked_input',
+                                   'embedding_policy': 'initialize_and_train_on_future_authorized_training'},
                   window_ms=480, user_tokens_per_step=[1, 2], assistant_tokens_per_step=8,
                   playback_tail_ms=960, stop_confirmation_ms=80, max_length=2048,
                   source_dialogues=dict(Counter(i['split'] for i in selected)),
