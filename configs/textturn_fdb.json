@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "seed": 20261025,
+  "per_arm": 50,
+  "candidate_sha256": "32f5493835a1b21294a3b862e38da85f7d052bbc93dbf12a81c42436e144b5d17",
+  "packet_ms": 80,
+  "control_ms": 480,
+  "tail_seconds": {"candor_turn_taking": 5, "candor_pause_handling": 0},
+  "assistant_text": "I am following what you are saying. I will take a moment to consider the information before continuing with a clear response.",
+  "assistant_tokens_per_window": 8,
+  "playback_tail_windows": 2,
+  "history": [],
+  "maximum_job_seconds": 7200,
+  "cumulative_gpu_seconds": 28800
+}
