@@ -26,6 +26,14 @@ def write(path, value):
     temporary.replace(path)
 
 
+def progress_snapshot(path):
+    # Legacy writers replace progress in place; a transient partial write is not a job failure.
+    try:
+        return read(path)
+    except (FileNotFoundError, json.JSONDecodeError):
+        return None
+
+
 def scheduler():
     result = subprocess.run(['vc', 'list', '--show-all', '--days', '3'], capture_output=True,
                             text=True, check=True, timeout=30)
@@ -226,7 +234,7 @@ class Pipeline:
             run = self.root / 'runs' / self.protocol[phase + '_run']
             progress = run / ('formal/progress.json' if phase == 'fdb' else 'formal/progress.json')
             self.save(phase + '_running' if job['status'] == 'Running' else phase + '_scheduler_wait',
-                      {'scheduler': job, 'progress': read(progress) if progress.exists() else None})
+                      {'scheduler': job, 'progress': progress_snapshot(progress)})
             if job['status'] in TERMINAL:
                 info = subprocess.check_output(['vc','info','--job',job_id], text=True, timeout=30)
                 (self.output / (phase + '.scheduler_info.txt')).write_text(info)

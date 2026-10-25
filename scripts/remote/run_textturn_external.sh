@@ -71,6 +71,10 @@ PARENT_PID=$$
  while true; do
   GPU=$(nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits | head -1)
   ASSETS=$(du -sb "$ROOT/models" "$ROOT/dataset" "$ROOT/runs" | awk '{n+=$1} END {printf "%.0f\n",n}')
+  if [ "$PHASE" = fdb ]; then
+   SHARED_ASSETS=$(du -sb "$HOME/interclarify-asr-selection/models/nemotron_en" "$HOME/InterClarify/benchmark/fdb_v1_0" | awk '{n+=$1} END {printf "%.0f\n",n}')
+   ASSETS=$((ASSETS + SHARED_ASSETS))
+  fi
   REPORTS=$(du -sb "$ROOT/runs" | awk '{print $1}')
   FREE_KIB=$(df -Pk "$ROOT" | awk 'NR==2 {print $4}')
   printf '%s %s %s %s %s\n' "$(date -u +%FT%TZ)" "$GPU" "$ASSETS" "$REPORTS" "$FREE_KIB" >> "$RUN/resource_samples.txt"

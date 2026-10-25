@@ -290,6 +290,9 @@ class DuplexReplayState(ReplayState):
 
     def snapshot(self, delta, windows):
         visible = super().snapshot(delta, windows)
+        visible['history'] = [{**item, 'text': strip_terminal(item['text'])}
+                              if item.get('role') == 'user' else item
+                              for item in visible['history']]
         events = [dict(event) for event in self.pending_events]
         self.pending_events.clear()
         # All runtime times use the same replay-relative clock as the trace.
