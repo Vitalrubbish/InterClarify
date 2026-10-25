@@ -1,8 +1,10 @@
 # TT-004：完成四类质量与延迟验收
 
-状态：实施准备（入口已实现，实际评估待TT-002成功及开发集gate）。依赖：[TT-001](../archive/TextTurn/tt_001_dataset.md)、[TT-002](tt_002_training.md)、[TT-003](tt_003_streaming_context.md)。依据：[训练方案第 4 节](../../dev/TextTurn/training_plan.md#4-通过门槛)。
+状态：评估运行已结束；原始结果未通过，评分口径缺口待修正，未归档。依赖：[TT-001](../archive/TextTurn/tt_001_dataset.md)、[TT-002](../archive/TextTurn/tt_002_training.md)、[TT-003](../archive/TextTurn/tt_003_streaming_context.md)。依据：[训练方案第 4 节](../../dev/TextTurn/training_plan.md#4-通过门槛)。
 
-当前已启动远端串行续接器，训练成功退出、开发集gate及候选重载验证完成后，自动提交独立文本、Kokoro合成语音及Nemotron影子评估。当前没有独立测试成绩，不标记完成；启动与实际结果见[训练及评估启动记录](../../../reports/textturn/20261025-tt-002-training/README.md)。
+2026-10-25核查：训练及评估退出码均0，独立文本19994窗口和正式语音300来源／1200场景均完成。文本质量点估计达标，语音原始正常接话42.33%、陈述37.67%、打断99.67%，原始结论未通过。
+
+全量trace核查发现附和127次失败均对应ASR参考未完整对齐，300场景实际stop为0；停顿1次失败是区间不可观察，实际误start为0。原始错误率字段混合缺失与动作错误，完整参考匹配锚点也不能直接等同可见语义让轮依据，因此不作为干净控制器错误率。保留原始分母、区间与失败，不改模型或重训。本项待上述评分缺口闭环后再归档。详见[结果报告和逐例CSV](../../../reports/textturn/20261025-tt-004-results/README.md)。
 
 ## 目标
 

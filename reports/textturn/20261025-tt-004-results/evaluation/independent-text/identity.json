@@ -1,0 +1,8 @@
+{
+  "candidate_sha256": "907899c427749be6342aa76666aec9165918646e2d5ddef2bfbfd5df84fdf62b",
+  "adapter_sha256": "32f5493835a1b21294a3b862e38da85f7d052bbc93dbf12a81c42436e14b5d17",
+  "dataset_manifest_sha256": "6eb145f00c12deaaee986a505e7f2dcca5b75490d0563476bb85fd26fabe681b",
+  "test_sha256": "68057c062f159a3097e061c66a361a0f757dcd63e7bacca4a4d576edb2715006",
+  "selection_uses_test": false,
+  "scoring_rule": "complete_opportunity_with_false_action_and_1000ms_deadline_v1"
+}

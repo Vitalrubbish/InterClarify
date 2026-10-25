@@ -1,0 +1,16 @@
+{
+  "text_checks": {
+    "smooth": true,
+    "declarative": true,
+    "interruption": true,
+    "pause_false_start": true,
+    "backchannel_false_stop": true
+  },
+  "text_quality_pass": true,
+  "online_conclusion": "insufficient_evidence",
+  "elapsed_seconds": 646.4887905493379,
+  "missing_zh": [
+    "Nemotron真实语音输入及Context接口验收尚需独立运行。",
+    "给定状态文本诊断不包含自由运行、传输、排队或实际播放延迟。"
+  ]
+}
