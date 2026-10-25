@@ -1,0 +1,5 @@
+# 完整轨迹训练配置
+
+`configs/textturn_full_trajectory_training.json`沿用TT-002基模、LoRA、优化器与每阶段两轮设置，新增与数据manifest完全一致的loss_policy。训练入口拒绝策略不一致的数据，所有窗口有正权重，仅打乱轨迹顺序。每阶段用自己的固定平均权重，避免pilot与full大小不同导致隐式损失尺度变化。
+
+pilot最多2000窗、full最多10000窗，保留开发集放行门槛及误抢话／误停回归约束；不因累计预算取消而取消质量门槛。单作业13800秒训练上限、显存22GiB、资产10GiB和报告2GiB不变，CPU8／RAM32GiB／单GPU由调度配置约束。

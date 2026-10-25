@@ -11,3 +11,11 @@
 训练首批反传检查新增 token 梯度非零且有限；另保留 keep/start/stop 各一个训练探针的前后 loss。重载必须恢复完全相同的新增行和动作分数，不能只检查 adapter 文件存在。
 
 作业检查完整数据摘要、环境版本、显存22GiB停止线、资产10GiB及报告2GiB预算，并遵守单作业4h和本轮8 GPU小时。开发集不改善则保存停止原因，不自行扩大规模或搜索参数。
+
+## TT-010完整轨迹适配
+
+新版本从manifest.split_files加载gzip逐拍数据，按complete_trajectories检查0起连续窗口，pilot/full/dev均不删拍。load_controller按manifest中的既有ID注册四或五个控制输入token，新增finish输入行用finish语义词均值初始化，加入PEFT可训练输入行并随adapter保存／重载；预测候选始终只有状态合法的keep/start/stop。
+
+配置loss_policy必须与冻结数据一致。train_stage只打乱轨迹顺序，保留轨迹内部时间顺序；使用textturn_loss.weighted_action_loss及阶段固定平均权重，所有样本都反传，finish等输入位置没有预测目标。仍是逐快照独立前向，不将整段拼成超长文本或跨快照反传。旧数据无loss_policy时保持原无权重训练行为。
+
+本轮用户取消原累计GPU剩余预算限制，授权核查通过后直接启动；新专用提交入口保留单作业资源上限和pilot质量放行。数据允许训练不代表质量通过，仍以实际作业及开发集结果记录。

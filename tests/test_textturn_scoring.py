@@ -30,6 +30,19 @@ class TextTurnScoringTests(unittest.TestCase):
         self.assertEqual(result['pause_false_start']['actual_errors'], 0)
         self.assertEqual(result['runtime']['denominator'], 1)
 
+    def test_complete_trajectory_listen_prefix_counts_as_early_start_error(self):
+        early = self.row('early', 'keep', category='listen', visible=160, allowed=160)
+        anchor = self.row('anchor', 'start', visible=480, allowed=480)
+        for row in (early, anchor):
+            row.update(scenario_id='full', scenario_variant='normal', visible={'state':'Listen'})
+        early['opportunity_id'] = 'full:listen'
+        anchor['opportunity_id'] = 'full:smooth'
+        predictions = [{'snapshot_id':key,'action':'start','control_ms':10} for key in ('early','anchor')]
+        result, opportunities = scoring.score_predictions([early, anchor], predictions)
+        self.assertEqual(result['smooth']['numerator'], 0)
+        self.assertEqual(result['smooth']['denominator'], 1)
+        self.assertTrue(opportunities[0]['actual_error'])
+
     def test_window_wait_is_included_in_timely_start(self):
         rows = [self.row('anchor', 'start')]
         prediction = {'snapshot_id': 'anchor', 'action': 'start', 'control_ms': 521}

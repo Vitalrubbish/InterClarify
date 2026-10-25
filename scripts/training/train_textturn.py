@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import gc
+import gzip
 import hashlib
 import importlib.metadata
 import json
@@ -14,6 +15,7 @@ import time
 
 from build_textturn_dataset import ACTIONS, SILENCE
 from score_textturn import score_file
+from textturn_loss import complete_trajectory_groups, trajectory_order, weight_summary, weighted_action_loss
 
 
 def write_json(path, value):
@@ -29,8 +31,27 @@ def file_hash(path):
 
 
 def read_rows(path):
-    with Path(path).open() as stream:
+    path = Path(path)
+    opener = gzip.open if path.suffix == '.gz' else open
+    with opener(path, 'rt', encoding='utf-8') as stream:
         return [json.loads(line) for line in stream]
+
+
+def split_path(data_path, manifest, split):
+    return data_path / manifest.get('split_files', {}).get(split, f'{split}.jsonl')
+
+
+def register_dataset_tokens(tokenizer, manifest):
+    markers = sorted(manifest['new_token_ids'], key=manifest['new_token_ids'].get)
+    expected = list(ACTIONS.values()) + [SILENCE]
+    if markers not in (expected, expected + ['<finish>']):
+        raise ValueError('Unsupported controller token registry')
+    tokenizer.add_special_tokens({'additional_special_tokens': markers})
+    actual = {marker: tokenizer.convert_tokens_to_ids(marker) for marker in markers}
+    if actual != manifest['new_token_ids'] or any(
+            tokenizer.encode(marker, add_special_tokens=False) != [actual[marker]] for marker in markers):
+        raise ValueError('Training tokenizer differs from the frozen dataset')
+    return list(actual.values())
 
 
 def load_controller(model_path, data_path, config, adapter=None, is_trainable=False):
@@ -38,11 +59,8 @@ def load_controller(model_path, data_path, config, adapter=None, is_trainable=Fa
     from peft import LoraConfig, PeftModel, get_peft_model
     from transformers import AutoModelForCausalLM, AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_path, local_files_only=True)
-    tokenizer.add_special_tokens({'additional_special_tokens': list(ACTIONS.values()) + [SILENCE]})
     manifest = json.loads((data_path / 'manifest.json').read_text())
-    token_ids = [tokenizer.convert_tokens_to_ids(t) for t in list(ACTIONS.values()) + [SILENCE]]
-    if dict(zip(list(ACTIONS.values()) + [SILENCE], token_ids)) != manifest['new_token_ids']:
-        raise ValueError('Training tokenizer differs from TT-001 encoding')
+    token_ids = register_dataset_tokens(tokenizer, manifest)
     torch.manual_seed(config['seed'])
     base = AutoModelForCausalLM.from_pretrained(model_path, local_files_only=True,
                                                dtype=torch.bfloat16, attn_implementation='sdpa').to('cuda')
@@ -50,7 +68,7 @@ def load_controller(model_path, data_path, config, adapter=None, is_trainable=Fa
         base.resize_token_embeddings(len(tokenizer))
     with torch.no_grad():
         weights = base.get_input_embeddings().weight
-        for token_id, word in zip(token_ids, ('keep', 'start', 'stop', 'silence')):
+        for token_id, word in zip(token_ids, ('keep', 'start', 'stop', 'silence', 'finish')):
             semantic = tokenizer.encode(word, add_special_tokens=False)
             weights[token_id] = weights[semantic].float().mean(dim=0).to(weights.dtype)
         base.tie_weights()
@@ -131,10 +149,19 @@ def train_stage(model, tokenizer, rows, dev, token_ids, args, config, started, s
     model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={'use_reentrant': False})
     model.enable_input_require_grads()
     history = []
+    weighted = config.get('loss_policy') is not None
+    if weighted:
+        complete_trajectory_groups(rows)
+        weights = weight_summary(rows)
+        write_json(args.output / f'{stage}-loss_weights.json', weights)
+    mean_weight = weights['mean_weight'] if weighted else 1.
     for epoch in range(config['epochs']):
         model.train()
-        order = list(rows)
-        random.Random(config['seed'] + epoch).shuffle(order)
+        if weighted:
+            order = trajectory_order(rows, config['seed'] + epoch)
+        else:
+            order = list(rows)
+            random.Random(config['seed'] + epoch).shuffle(order)
         optimizer.zero_grad(set_to_none=True)
         loss_sum, last_report = 0., time.monotonic()
         for index, row in enumerate(order):
@@ -143,7 +170,8 @@ def train_stage(model, tokenizer, rows, dev, token_ids, args, config, started, s
                 raise ValueError('Only one final action token may be supervised')
             logits = action_logits(model, row['input_ids'][:-1])
             target = torch.tensor([row['input_ids'][-1]], device='cuda')
-            loss = torch.nn.functional.cross_entropy(logits[None, :], target)
+            loss = (weighted_action_loss(logits[None, :], target, [row['loss_weight']], mean_weight)
+                    if weighted else torch.nn.functional.cross_entropy(logits[None, :], target))
             loss_sum += float(loss.detach())
             group_start = index // config['gradient_accumulation'] * config['gradient_accumulation']
             divisor = min(config['gradient_accumulation'], len(order) - group_start)
@@ -189,6 +217,8 @@ def main(args):
     manifest = json.loads((args.data / 'manifest.json').read_text())
     if not manifest['training_allowed'] or manifest['model_revision'] != config['model_revision']:
         raise ValueError('Dataset does not permit this training configuration')
+    if manifest.get('complete_trajectories') and config.get('loss_policy') != manifest.get('loss_policy'):
+        raise ValueError('Training loss policy differs from the complete-trajectory dataset')
     for name, expected in manifest['files'].items():
         if file_hash(args.data / name) != expected:
             raise ValueError(f'Frozen dataset changed: {name}')
@@ -205,7 +235,9 @@ def main(args):
     if not any('trainable_tokens' in name for name in trainable):
         raise RuntimeError('New input/output token rows are not trainable')
     write_json(args.output / 'trainable_parameters.json', trainable)
-    pilot = read_rows(args.data / 'pilot.jsonl')
+    pilot = read_rows(split_path(args.data, manifest, 'pilot'))
+    if manifest.get('complete_trajectories'):
+        complete_trajectory_groups(pilot)
     probe = [next(r for r in pilot if r['target_action'] == action) for action in ACTIONS]
     model.eval()
     with torch.inference_mode():
@@ -214,7 +246,9 @@ def main(args):
             torch.tensor([row['input_ids'][-1]], device='cuda'))) for row in probe]
     if not all(math.isfinite(loss) for loss in probe_losses):
         raise RuntimeError('Initial action loss is not finite')
-    dev = read_rows(args.data / 'dev.jsonl')
+    dev = read_rows(split_path(args.data, manifest, 'dev'))
+    if manifest.get('complete_trajectories'):
+        complete_trajectory_groups(dev)
     baseline = evaluate(model, dev, token_ids, args.output / 'baseline-dev', started, config)
     if len(pilot) > config['pilot_snapshots']:
         raise ValueError('Pilot snapshot budget exceeded')
@@ -236,7 +270,9 @@ def main(args):
         torch.cuda.empty_cache()
         model, tokenizer, token_ids = load_controller(args.model, args.data, config,
                                                        args.output / 'best', is_trainable=True)
-        full = read_rows(args.data / 'train.jsonl')
+        full = read_rows(split_path(args.data, manifest, 'train'))
+        if manifest.get('complete_trajectories'):
+            complete_trajectory_groups(full)
         if len(full) > config['full_snapshots']:
             raise ValueError('Full snapshot budget exceeded')
         _, best_score = train_stage(model, tokenizer, full, dev, token_ids, args, config, started,

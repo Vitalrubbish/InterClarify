@@ -48,7 +48,16 @@ def outcome_metric(opportunities, negative=False):
 def score_predictions(rows, predictions):
     predictions = {p['snapshot_id']: p for p in predictions}
     groups = defaultdict(list)
+    first_starts = {}
     for row in rows:
+        if row.get('scenario_variant') and row['target_action'] == 'start':
+            identity = row['scenario_id']
+            first_starts[identity] = min(row['visible_ms'], first_starts.get(identity, math.inf))
+    for row in rows:
+        if (row.get('scenario_variant') and row['category'] in ('listen', 'inter_chunk_gap')
+                and row['visible']['state'] == 'Listen'
+                and row['visible_ms'] < first_starts.get(row['scenario_id'], -math.inf)):
+            row = row | {'category': 'smooth', 'opportunity_id': f"{row['scenario_id']}:smooth"}
         if row['category'] in ('smooth', 'pause', 'backchannel', 'interruption'):
             groups[row['opportunity_id']].append(row)
     opportunities = []

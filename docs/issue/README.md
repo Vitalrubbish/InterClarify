@@ -1,12 +1,16 @@
 # 工作单管理
 
-2026-10-25 TT-010回退后重建交付：按用户最新授权选160ms，train160来源／9071快照、dev200来源／11272快照，陈述start各50%；句中停顿0.20随机插入1—5窗，用户附和逐Speak窗0.01随机插入，去用户末尾句读，歧义keep及finish专用ID保留。41项回归、全快照及六条生命周期诊断通过，[TT-010](archive/TextTurn/tt_010_asr_update_yield_dataset.md)重新归档；未训练或提交GPU作业。见[报告](../../reports/textturn/20261025-tt-010-duplex160/README.md)。当前8项完成、1项终止归档、1项未完成（TT-004）。以下回退重开及旧状态为历史。
+2026-10-25 TT-010完整轨迹修订已核查、远端训练准备中：train21来源9977窗，pilot1894窗，dev200来源88947窗，全部选中轨迹逐拍监督，keep组权重封顶、start/stop各2；47项回归及完整性核查通过。用户已明确授权直接启动远端训练并取消旧累计GPU剩余预算限制，仍保留单作业资源和质量门槛；TT-010重新打开，当前7项完成、1项终止归档、2项未完成。见[训练报告](../../reports/textturn/20261025-tt-010-fulltraj-training/README.md)。以下为此前记录。
 
-2026-10-25 TT-010回退重开：用户明确要求撤销旧实现，旧完成记录不再有效；新控制窗选择160ms，参考DuplexCascade构造随机用户附和及更频繁句中停顿，补齐陈述比例及用户末尾标点处理。保持歧义keep和专用finish，不训练或提交GPU作业。当前TextTurn共10项：7项完成、1项终止归档、2项未完成（TT-004、TT-010）。见[工作单](archive/TextTurn/tt_010_asr_update_yield_dataset.md)。以下为历史记录。
+2026-10-25 TT-010新修订实施中：按用户要求完整轨迹逐拍监督，取消类别内keep删拍，使用正损失权重控制重复keep；维持10000训练快照上限，改按完整来源组选取。沿用TT-010，不新增issue；用户进一步授权核查通过后直接启动远端训练，取消旧累计GPU剩余预算限制，保留单作业资源上限。旧r2抽样交付保留为历史，不能作为新修订已完成证据。
+
+2026-10-25 TT-010回退后重建交付：按用户最新授权选160ms，train160来源／9071快照、dev200来源／11272快照，陈述start各50%；句中停顿0.20随机插入1—5窗，用户附和逐Speak窗0.01随机插入，去用户末尾句读，歧义keep及finish专用ID保留。41项回归、全快照及六条生命周期诊断通过，[TT-010](TextTurn/tt_010_asr_update_yield_dataset.md)重新归档；未训练或提交GPU作业。见[报告](../../reports/textturn/20261025-tt-010-duplex160/README.md)。当前8项完成、1项终止归档、1项未完成（TT-004）。以下回退重开及旧状态为历史。
+
+2026-10-25 TT-010回退重开：用户明确要求撤销旧实现，旧完成记录不再有效；新控制窗选择160ms，参考DuplexCascade构造随机用户附和及更频繁句中停顿，补齐陈述比例及用户末尾标点处理。保持歧义keep和专用finish，不训练或提交GPU作业。当前TextTurn共10项：7项完成、1项终止归档、2项未完成（TT-004、TT-010）。见[工作单](TextTurn/tt_010_asr_update_yield_dataset.md)。以下为历史记录。
 
 2026-10-25归档：[TT-008](archive/TextTurn/tt_008_ultrachat_stop_retest.md)的480ms／160ms各150/150场景成功，作业退出码0，18:24:38结束，按用户指令归档。结果见[报告](../../reports/textturn/20261025-ultrachat-prefix-retest/README.md)。TextTurn共10项：7项完成、1项终止归档、2项未完成（TT-004、TT-010）；旧停止词覆盖不能替代TT-010的非附和更新让轮验收。下方启动及策略讨论保留为历史。
 
-2026-10-25最新指令：[TT-009](archive/TextTurn/tt_009_conditional_data_rebuild.md)终止归档，未实施、不计完成；新增[TT-010](archive/TextTurn/tt_010_asr_update_yield_dataset.md)，训练数据改为Speak下非backchannel式ASR更新即让轮、短附和keep，不等待固定停止词，同时论证播放结束后的外部finish标记与start终态配对。TT-008已按冻结配置完成并归档，未因新合同更改既有标签或评分。TextTurn共10项：7项完成、1项终止归档、2项未完成。仅建立新工作单，未启动数据构造或训练。
+2026-10-25最新指令：[TT-009](archive/TextTurn/tt_009_conditional_data_rebuild.md)终止归档，未实施、不计完成；新增[TT-010](TextTurn/tt_010_asr_update_yield_dataset.md)，训练数据改为Speak下非backchannel式ASR更新即让轮、短附和keep，不等待固定停止词，同时论证播放结束后的外部finish标记与start终态配对。TT-008已按冻结配置完成并归档，未因新合同更改既有标签或评分。TextTurn共10项：7项完成、1项终止归档、2项未完成。仅建立新工作单，未启动数据构造或训练。
 
 2026-10-25启动TT-008：用户授权推进到服务器测试提交并稳定运行。固定30个既有UltraChat test来源，复用干净文本及已保存的在线ASR时间戳事件，480ms／8 token与160ms／3 token串行执行；沿用原剩余预算，不启动TT-009。远端作业已提交并确认480ms首阶段稳定，160ms同作业自动接续，最终结果待交付。实施及调度证据见[TT-008](archive/TextTurn/tt_008_ultrachat_stop_retest.md)。
 
