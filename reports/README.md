@@ -6,6 +6,7 @@ Git只保留审阅后的README汇总：结论、关键分母、限制、源码�
 
 | 报告 | 状态与用途 |
 | --- | --- |
+| [FDB提前start与stop诊断](textturn/20261025-fdb-start-stop-audit/README.md) | 141次提前start均为空窗，但存在未完成语义；stop均0，输入合同差异与960ms持续状态需分开解释，无新模型作业 |
 | [FDB 480ms与160ms对照](textturn/20261025-fdb-action-only/README.md) | 同样本两次各100条，均退出码0、未知0；仅监控TextTurn动作，TT-005／006／007已归档 |
 | [句末start行为计数](textturn/20261025-start-after-end/README.md) | 原600条中，原录音发完后出现start为365条；需按句末Listen/Speak分层解释，不能视作语义正确率 |
 | [评分v2与数据审核](textturn/20261025-scoring-v2/README.md) | 错误与未知分开；原接话语义评分仍未完成，数据构造及采样建议未实施 |
