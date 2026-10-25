@@ -1,8 +1,10 @@
 # 工作单管理
 
+2026-10-25：按用户指令启动并完成[TT-010](archive/TextTurn/tt_010_asr_update_yield_dataset.md)，版本化数据、finish结构化输入合同及闭环核查已交付归档；24／12训练开发来源、2401／1196正式快照，40项TextTurn回归通过。未训练、未提交GPU作业，合成数据不代表模型或真实音频效果。见[报告](../../reports/textturn/20261025-tt-010-yield/README.md)。TextTurn共10项：8项完成、1项终止归档、1项未完成（TT-004）。以下为历史记录。
+
 2026-10-25归档：[TT-008](archive/TextTurn/tt_008_ultrachat_stop_retest.md)的480ms／160ms各150/150场景成功，作业退出码0，18:24:38结束，按用户指令归档。结果见[报告](../../reports/textturn/20261025-ultrachat-prefix-retest/README.md)。TextTurn共10项：7项完成、1项终止归档、2项未完成（TT-004、TT-010）；旧停止词覆盖不能替代TT-010的非附和更新让轮验收。下方启动及策略讨论保留为历史。
 
-2026-10-25最新指令：[TT-009](archive/TextTurn/tt_009_conditional_data_rebuild.md)终止归档，未实施、不计完成；新增[TT-010](TextTurn/tt_010_asr_update_yield_dataset.md)，训练数据改为Speak下非backchannel式ASR更新即让轮、短附和keep，不等待固定停止词，同时论证播放结束后的外部finish标记与start终态配对。TT-008已按冻结配置完成并归档，未因新合同更改既有标签或评分。TextTurn共10项：7项完成、1项终止归档、2项未完成。仅建立新工作单，未启动数据构造或训练。
+2026-10-25最新指令：[TT-009](archive/TextTurn/tt_009_conditional_data_rebuild.md)终止归档，未实施、不计完成；新增[TT-010](archive/TextTurn/tt_010_asr_update_yield_dataset.md)，训练数据改为Speak下非backchannel式ASR更新即让轮、短附和keep，不等待固定停止词，同时论证播放结束后的外部finish标记与start终态配对。TT-008已按冻结配置完成并归档，未因新合同更改既有标签或评分。TextTurn共10项：7项完成、1项终止归档、2项未完成。仅建立新工作单，未启动数据构造或训练。
 
 2026-10-25启动TT-008：用户授权推进到服务器测试提交并稳定运行。固定30个既有UltraChat test来源，复用干净文本及已保存的在线ASR时间戳事件，480ms／8 token与160ms／3 token串行执行；沿用原剩余预算，不启动TT-009。远端作业已提交并确认480ms首阶段稳定，160ms同作业自动接续，最终结果待交付。实施及调度证据见[TT-008](archive/TextTurn/tt_008_ultrachat_stop_retest.md)。
 

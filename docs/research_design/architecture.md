@@ -4,7 +4,7 @@
 
 2026-10-24 最新选型覆盖说明：用户已指令启动 **Nemotron EN160＋Qwen3-0.6B 文本控制器**路线，具体输入、训练及门槛见 [TextTurn 方案](../dev/TextTurn/training_plan.md)。Nemotron 转写持续写入 Shared Context，按用户2026-10-25修订，控制器聚合三个名义160ms解码完成步骤形成480ms观察窗，处理窗内累计新增文字或no-voice，聚合等待单独计入延迟；无新增 ASR 文本直接作为带延迟的静音，不增加 VAD、词稳定等待或延迟补偿。首阶段训练 keep/start/stop，stop 仅用于用户打断；正常说完由生成／播放完成事件驱动运行时结束，后续再加入 CoT。此合同覆盖下文旧 XTurnix 的固定输入、触发及 VAD 约定；原模型名称、专属 token 和图示只作历史候选参考。此前 SoulX 方案保留，当前不推进。层级职责、共享 Context、唯一输出执行点和已听内容不可撤销的共同边界继续适用；尚未切换现役运行时。
 
-2026-10-25后续训练合同修订见[TT-010](../issue/TextTurn/tt_010_asr_update_yield_dataset.md)：非backchannel式ASR新增文本触发Speak/stop，短附和维持keep；不依赖固定停止词。finish建议作为唯一输出运行时在真实音频播放完成后发布的外部输入事件，不由控制器预测，不增加第二个状态所有者。生成结束、TTS返回或暂时队列为空不代表finish；已接受start按output_id与一次stop终态或自然finish配对，异常及未闭合片段单列。实际token编码尚待实施冻结，当前TT-008不改动。
+2026-10-25后续训练合同修订见[TT-010](../issue/archive/TextTurn/tt_010_asr_update_yield_dataset.md)：非backchannel式ASR新增文本触发Speak/stop，短附和维持keep；不依赖固定停止词。finish由唯一输出运行时在真实音频播放完成后发布，不由控制器预测，不增加第二个状态所有者。生成结束、TTS返回或暂时队列为空不代表finish；已接受start按output_id与一次stop终态或自然finish配对，异常及未闭合片段单列。实施已冻结为普通JSON外部输入事件，不注册token；合成数据及合同已交付，未训练或接入实际播放器，TT-008旧结果不改动。详见[版本合同](../dev/TextTurn/asr_update_yield_dataset.md)。
 
 本文统一两项能力的模块职责、异步时序、结果合同、实验与训练约定。系统以 DuplexCascade 为运行底座，前端方案按用户决定调整为 Nemotron 流式 ASR 与 XTurnix 话轮控制，分别提供转写和状态条件下的控制动作。原因是此前前端方案已撤回，现验证与既有 ASR 匹配的控制器。新控制模式尚未完成接入；当前工程阶段见[实施计划](../engineering_implementation.md)。
 
