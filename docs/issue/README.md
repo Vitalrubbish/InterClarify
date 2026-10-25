@@ -1,8 +1,10 @@
 # 工作单管理
 
+2026-10-25最新指令：[TT-009](archive/TextTurn/tt_009_conditional_data_rebuild.md)终止归档，未实施、不计完成；新增[TT-010](TextTurn/tt_010_asr_update_yield_dataset.md)，训练数据改为Speak下非backchannel式ASR更新即让轮、短附和keep，不等待固定停止词，同时论证播放结束后的外部finish标记与start终态配对。当前测试TT-008保持冻结配置继续运行，不因新合同更改现有标签或评分。TextTurn共10项：6项完成、1项终止归档、3项未完成。仅建立新工作单，未启动数据构造或训练。
+
 2026-10-25启动TT-008：用户授权推进到服务器测试提交并稳定运行。固定30个既有UltraChat test来源，复用干净文本及已保存的在线ASR时间戳事件，480ms／8 token与160ms／3 token串行执行；沿用原剩余预算，不启动TT-009。远端作业已提交并确认480ms首阶段稳定，160ms同作业自动接续，最终结果待交付。实施及调度证据见[TT-008](TextTurn/tt_008_ultrachat_stop_retest.md)。
 
-2026-10-25最新修订：[TT-008](TextTurn/tt_008_ultrachat_stop_retest.md)取消空／不可见assistant_visible配置，不做有／无正文对照；UltraChat固定候选的480ms、160ms测试均执行，分别每个控制周期注入8 token、3 token助手正文，使用同一来源清单，串行运行、分别报告。[TT-009](TextTurn/tt_009_conditional_data_rebuild.md)仍仅在TT-008交付且用户明确判定效果不好并指令启动后重构训练数据。本次只更新工作单，未执行重测、重构或训练，TextTurn共6/9完成。正常结束仍是生命周期转Listen，stop专用于用户打断。两种配置共用既有剩余预算，不新分配GPU额度，不将结果写成已证明正文注入因果作用。
+历史修订（TT-009条件已被上方新指令替代）：[TT-008](TextTurn/tt_008_ultrachat_stop_retest.md)取消空／不可见assistant_visible配置，不做有／无正文对照；UltraChat固定候选的480ms、160ms测试均执行，分别每个控制周期注入8 token、3 token助手正文，使用同一来源清单，串行运行、分别报告。[TT-009](archive/TextTurn/tt_009_conditional_data_rebuild.md)仍仅在TT-008交付且用户明确判定效果不好并指令启动后重构训练数据。本次只更新工作单，未执行重测、重构或训练，TextTurn共6/9完成。正常结束仍是生命周期转Listen，stop专用于用户打断。两种配置共用既有剩余预算，不新分配GPU额度，不将结果写成已证明正文注入因果作用。
 
 2026-10-25用户最新确认：在TT-004内按“连续Speak与在线ASR更新区间重叠实际时长>960ms”直接统计抢话，不要求补齐语义标注。只重评已有trace，不新建issue、重训或提交GPU作业；原按固定3周期的已归档结果保留为历史口径。同时核对训练角色标识及评测输入字段，区分角色标记与助手已生成正文前缀。
 
