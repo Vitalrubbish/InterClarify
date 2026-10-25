@@ -6,6 +6,7 @@ Git只保留审阅后的README汇总：结论、关键分母、限制、源码�
 
 | 报告 | 状态与用途 |
 | --- | --- |
+| [FDB 480ms与160ms对照](textturn/20261025-fdb-action-only/README.md) | 同样本两次各100条，均退出码0、未知0；仅监控TextTurn动作，TT-005／006／007已归档 |
 | [句末start行为计数](textturn/20261025-start-after-end/README.md) | 原600条中，原录音发完后出现start为365条；需按句末Listen/Speak分层解释，不能视作语义正确率 |
 | [评分v2与数据审核](textturn/20261025-scoring-v2/README.md) | 错误与未知分开；原接话语义评分仍未完成，数据构造及采样建议未实施 |
 | [训练与验收核查](textturn/20261025-tt-004-results/README.md) | 训练完成，合成文本达标；语音原始评分缺陷已披露 |
@@ -13,7 +14,7 @@ Git只保留审阅后的README汇总：结论、关键分母、限制、源码�
 | [数据冻结](textturn/20261025-tt-001-freeze/README.md) | train/dev/test为160/200/300来源，训练10000窗 |
 | [早期检查样例](textturn/20261024-tt-001-preview/README.md) | 历史review批次，非正式训练或验收成绩 |
 
-[FDB各50条外部测试](../docs/dev/TextTurn/fdb_cross_dataset_plan.md)当前仅计划与工作单；没有因本次报告整理启动新任务。
+[FDB各50条外部测试](../docs/dev/TextTurn/fdb_cross_dataset_plan.md)及160ms同样本对照均已交付；两次3周期门槛的名义时长不同，等待均值须保留各自有效样本分母，不代替完整四类验收。
 
 ## 历史结果
 

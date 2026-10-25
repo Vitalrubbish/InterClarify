@@ -20,7 +20,7 @@
 
 2026-10-25用户要求直接查正常接话轨迹中“用户说完后出现start”的比例。本次仅做已有run的行为计数：以ASR服务实际接收完原录音采样点的音频包时刻为可复核结束边界，另列完整参考转写可见后的计数，后者仅为诊断、不作为语义金标。分别统计结束后任意start、首次start在结束后、结束前已start但之后无新start及完全无start；不混同旧及时成功率，不重跑模型，不启动FDB任务。 实查结果：600条均可定位原录音结束包，结束后出现start为365/600（60.83%），首次start在结束后334/600（55.67%），全程无start19/600；详见[行为计数](../../../reports/textturn/20261025-start-after-end/README.md)。
 
-2026-10-25用户提出从FDB Smooth Turn Taking和Pause Handling各取50条录音，进一步要求先列计划。已交付[FDB跨数据集测试计划](../../dev/TextTurn/fdb_cross_dataset_plan.md)；按用户随后明确要求，外部两臂诊断从本项拆为[TT-005接话覆盖与延迟](tt_005_fdb_turn_taking.md)和[TT-006停顿介入与归因](tt_006_fdb_pause_handling.md)。首选candor_turn_taking与candor_pause_handling，固定当前候选，真实ASR＋控制器、Listen影子动作，按FDB时间标注评估并分开解释当前语义策略。目前仅计划及工作单，尚未抽样冻结、实现入口或提交作业；不恢复旧完整FDB任务，不把小规模两臂诊断当本项完整四类验收，也不由两项完成自动归档本项。
+2026-10-25用户提出从FDB Smooth Turn Taking和Pause Handling各取50条录音，进一步要求先列计划。已交付[FDB跨数据集测试计划](../../dev/TextTurn/fdb_cross_dataset_plan.md)；按用户随后明确要求，外部两臂诊断从本项拆为[TT-005接话覆盖与延迟](../archive/TextTurn/tt_005_fdb_turn_taking.md)和[TT-006停顿介入与归因](../archive/TextTurn/tt_006_fdb_pause_handling.md)。首选candor_turn_taking与candor_pause_handling，固定当前候选，真实ASR＋控制器、Listen影子动作，按FDB时间标注评估并分开解释当前语义策略。当前480ms与160ms各100条已运行、核查及交付归档，仅监控动作和状态、不模拟回答；不恢复旧完整FDB任务，不把小规模两臂诊断当本项完整四类验收，也不由两项完成自动归档本项。
 
 2026-10-25用户明确要求先修正评分器，再检查训练数据构造及配比。本次在TT-004内修复，不新建issue、不修改候选或自动重训：保留v1原始结果；动作错误、ASR可观察性、缺失及运行异常分列，计划分母不变。v2为每类报告成功／失败／未知、可判定分母、覆盖率和计划分母上的上下界；未知不算成功，也不冒称动作错误。正常接话不得用完整参考精确匹配自动产生语义金标，支持按当前可见输入摘要绑定的独立审核锚点与禁止区间；历史trace缺少这类标注时明确证据不足，不通过放宽阈值补成通过。先从已保存trace离线重评，不加载GPU。数据检查仅审计已有train/pilot及其构造，提出基于训练来源的调整依据和候选配比，不把独立测试正文或trace转为训练材料。
 

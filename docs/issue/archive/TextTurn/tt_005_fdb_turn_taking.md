@@ -1,8 +1,8 @@
 # TT-005：统计 FDB 50 条录音在ASR停止更新后的Speak／start比例与start等待拍数
 
-状态：实施中。依赖：[TT-002](../archive/TextTurn/tt_002_training.md)、[TT-003](../archive/TextTurn/tt_003_streaming_context.md)。依据：[FDB 跨数据集计划](../../dev/TextTurn/fdb_cross_dataset_plan.md)。
+状态：已完成并归档（2026-10-25结果核查）。依赖：[TT-002](tt_002_training.md)、[TT-003](tt_003_streaming_context.md)。依据：[FDB 跨数据集计划](../../../dev/TextTurn/fdb_cross_dataset_plan.md)。
 
-2026-10-25已按用户指令启动。共用入口、冻结清单及启动修复记录见[联合运行记录](../../../reports/textturn/20261025-fdb-action-only/README.md)。正式结果尚未交付，保持本项未归档。
+2026-10-25交付核查：480ms正式100条均运行成功、无未知。接话50条中，最后ASR更新后Speak为44/50、start为21/50；仅这21条的首次start平均等待1.5896拍、763.00ms。逐例CSV、汇总JSON及trace已核对，见[联合结果](../../../../reports/textturn/20261025-fdb-action-only/README.md)。本项工作完成不代表完整四类验收通过。
 
 2026-10-25按用户最新纠正：本测试只监控TextTurn，移除模拟回答及其生成／播放生命周期。原r1—r3保留为撤回记录，新480ms结果按相同样本重提，不能沿用旧协议成绩。
 
@@ -28,4 +28,4 @@
 - 另报控制耗时P95、聚合等待、状态转移及EOF情况；这些是控制器状态和动作统计，不称为实际开口延迟或官方TOR。
 - 接话好坏均可完成本项；缺失和运行失败必须如实交付，不能换样本补成成功。结果用于跨集诊断，不等同完整四类验收。
 
-与 [TT-006](tt_006_fdb_pause_handling.md) 共用回放与评分入口、一次远端串行作业及一份联合报告；两项没有先后完成依赖，资源合计受[共同约定](README.md#fdb-跨数据集测试共同约定)约束，不因拆单增加预算。达到交付条件即归档，不以模型达到质量门槛作为归档条件。
+与 [TT-006](tt_006_fdb_pause_handling.md) 共用回放与评分入口、一次远端串行作业及一份联合报告；两项没有先后完成依赖，资源合计受[共同约定](../../TextTurn/README.md#fdb-跨数据集测试共同约定)约束，不因拆单增加预算。达到交付条件即归档，不以模型达到质量门槛作为归档条件。

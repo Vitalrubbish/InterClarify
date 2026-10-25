@@ -20,6 +20,6 @@ stop只用于用户打断，正常说完由播放完成事件处理。按用户2
 
 本轮已完成[训练数据构造与配比审核](data_review.md)，需先修语义对照及覆盖再改采样；现有冻结集和模型未改动。
 
-按用户要求新增[FDB两臂各50条跨数据集测试计划](fdb_cross_dataset_plan.md)，并按最新指令拆为[TT-005接话覆盖与延迟](../../issue/TextTurn/tt_005_fdb_turn_taking.md)及[TT-006停顿介入率与归因](../../issue/TextTurn/tt_006_fdb_pause_handling.md)。两项直接交付能力结果，必要工程工作并入测试，共用一次远端串行作业和原有预算；已实现共用入口并冻结50＋50，已按用户指令启动远端执行；运行记录见[联合报告](../../../reports/textturn/20261025-fdb-action-only/README.md)。使用现有候选补充接话／停顿外部诊断，历史使用、标注规则和语义策略差异分别披露，不替代完整四类验收。
+按用户要求新增[FDB两臂各50条跨数据集测试计划](fdb_cross_dataset_plan.md)，并按最新指令拆为[TT-005接话覆盖与延迟](../../issue/archive/TextTurn/tt_005_fdb_turn_taking.md)及[TT-006停顿介入率与归因](../../issue/archive/TextTurn/tt_006_fdb_pause_handling.md)。两项直接交付能力结果，必要工程工作并入测试，共用一次远端串行作业和原有预算；已实现共用入口并冻结50＋50，已完成480ms与160ms远端执行及核查；运行记录见[联合报告](../../../reports/textturn/20261025-fdb-action-only/README.md)。使用现有候选补充接话／停顿外部诊断，历史使用、标注规则和语义策略差异分别披露，不替代完整四类验收。
 
-用户进一步明确FDB只监控TextTurn。当前480ms与新增TT-007的160ms均采用仅由start／stop／keep驱动的状态，不模拟助手正文或生成／播放；旧运行撤回，修正后的480ms运行中，160ms由续接器按原预算串行提交。
+用户进一步明确FDB只监控TextTurn。当前480ms与新增TT-007的160ms均采用仅由start／stop／keep驱动的状态，不模拟助手正文或生成／播放；旧运行撤回，修正后的480ms与160ms均已100/100、退出码0、未知0，TT-005／006／007已归档，原累计预算未超限。
