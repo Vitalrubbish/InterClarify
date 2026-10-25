@@ -1,6 +1,8 @@
 # TT-005：统计 FDB 50 条录音在ASR停止更新后的Speak／start比例与start等待拍数
 
-状态：待实施。依赖：[TT-002](../archive/TextTurn/tt_002_training.md)、[TT-003](../archive/TextTurn/tt_003_streaming_context.md)。依据：[FDB 跨数据集计划](../../dev/TextTurn/fdb_cross_dataset_plan.md)。
+状态：实施中。依赖：[TT-002](../archive/TextTurn/tt_002_training.md)、[TT-003](../archive/TextTurn/tt_003_streaming_context.md)。依据：[FDB 跨数据集计划](../../dev/TextTurn/fdb_cross_dataset_plan.md)。
+
+2026-10-25已按用户指令启动。共用入口、冻结清单及启动修复记录见[联合运行记录](../../../reports/textturn/20261025-fdb-cross-dataset/README.md)。正式结果尚未交付，保持本项未归档。
 
 ## 目标
 

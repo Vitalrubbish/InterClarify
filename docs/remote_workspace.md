@@ -34,6 +34,8 @@
 
 ## 维护记录
 
+2026-10-25按用户指令启动TT-005／006：共用源码冻结于`~/parathink-textturn/source/fdb-v3`（`9d5376d`），50＋50录音清单为`dataset/tt-005-006-fdb-r2/manifest.json`。当前run为`tt-005-006-20261025-r3`、调度ID为`job-179290834177188572331-xuan-zhang`，单卡串行、最多2小时。r1摘要抄写错误及r2磁盘监控格式问题已修复并保留原日志、trace和实际占卡；r3提交前累计占卡17169秒，剩11631秒。详见[联合运行记录](../reports/textturn/20261025-fdb-cross-dataset/README.md)。当前为执行阶段，未交付正式成绩、未归档工作单。
+
 2026-10-25评分修复：独立源码`~/parathink-textturn/source/scoring-v2`冻结`ec0bf36`，用已有conda数据环境执行单线程标准库离线重评，2GiB地址空间、60秒超时，无GPU任务。输出`inspection/scoring-v2/formal-r2`及`text-r2`；模型和v1结果未修改。[v2报告](../reports/textturn/20261025-scoring-v2/README.md)记录未知覆盖与训练构造／配比审核，接话语义标注仍不足。
 
 2026-10-25后续核查：TextTurn训练`tt-002-20261025-r1`和评估`tt-004-20261025-r1`均退出码0，评估调度ID为`job-179287011405618549973-xuan-zhang`，当前无活动作业。full第2轮候选保留在训练run的`best`；正式300来源／1200语音场景结果见[核查报告](../reports/textturn/20261025-tt-004-results/README.md)。语音原始未通过，评分口径缺口待修正，不再把pipeline的evaluation_submitted视为未执行。原始日志、adapter及语音资产均未删除，本次只读取并取回结果，无新增GPU作业。
