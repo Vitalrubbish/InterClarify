@@ -1,5 +1,7 @@
 # 远端工作目录约定
 
+2026-10-26 TT-011已部署：独立源码`source/tt011-external-r1`（`37d9543`），准备目录`dataset/tt-011-external-r1`，等待器Python PID136137／独立supervisor136136，单CPU／2GiB／外层12小时。已连续3次轮询更新，状态`waiting_for_training`，新GPU测试未提交；00:25:56原训练pilot第2轮dev14001/88947且仍唯一活动作业。训练退出码、调度结束、候选gate／学习／重载核查均通过后，自动先160ms UltraChat再160ms action_only FDB。日志`submit_logs/tt011-waiter.log`，状态同准备目录`state.json`；见[运行记录](../reports/textturn/20261026-tt-011-external-evaluation/README.md)。
+
 2026-10-25 TT-010完整轨迹训练：用户已授权取消旧累计GPU剩余预算限制，作业`job-179293824747465991917-xuan-zhang`于22:24:10开始并确认Running，source为`~/parathink-textturn/source/tt010-fulltraj-r1`（源码`56102849e3e88209a9943fd1ffa605395534526e`），dataset为`dataset/tt-010-fulltraj-r1`，run为`tt-010-fulltraj-20261025-r1`。RTX4090单卡／8CPU／32GiB，单作业4小时及显存22GiB停止线保留。数据及远端CPU损失核查通过，当前基线评估7001/88947，未宣称模型质量或权重更新。见[训练记录](../reports/textturn/20261025-tt-010-fulltraj-training/README.md)。以下旧3991秒剩余额度仅作历史记录，不约束本次已授权作业。
 
 2026-10-25启动TT-008：源码`3fa4481`位于`~/parathink-textturn/source/tt008-r1`，冻结清单`dataset/tt-008-ultrachat-r1/manifest.json`；run为`tt-008-20261025-r1`，作业`job-179292031704516676972-xuan-zhang`。两周期各150/150成功、退出码0，2026-10-25 18:24:38结束并按用户指令归档；原预算提交前剩7549 GPU秒，单作业上限7200秒。详见[运行记录](../reports/textturn/20261025-ultrachat-prefix-retest/README.md)，两周期结果已交付；实际占卡3558秒，累计24809秒，原8GPU小时剩3991秒。
