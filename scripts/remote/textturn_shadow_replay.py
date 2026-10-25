@@ -25,12 +25,16 @@ from score_textturn_trace import run as rescore_traces
 class ShadowState:
     """Simulate one output lifecycle; no real playback or external action ownership."""
 
-    def __init__(self, case, tokenizer):
+    def __init__(self, case, tokenizer, control_ms=480, generation_ms=480):
+        if control_ms not in (160, 480) or generation_ms not in (160, 480):
+            raise ValueError('Expected supported control and generation periods')
+        self.steps_per_window = control_ms // 160
+        self.generation_seconds = generation_ms / 1000
         self.lock = threading.RLock()
         self.state = 'Speak' if case['category'] in ('backchannel', 'interruption') else 'Listen'
         self.chunks = list(tokenizer.chunks(case['assistant_text'], 8, merge_terminal=False))
         self.history = case['history'].copy()
-        self.generation_started = time.monotonic() - .48 if self.state == 'Speak' else None
+        self.generation_started = time.monotonic() - self.generation_seconds if self.state == 'Speak' else None
         self.tail_seconds = .48 * (1 + int(case['source_id']) % 3)
         self.empty_streak = 0
         self.user_offset = 0
@@ -40,16 +44,16 @@ class ShadowState:
         with self.lock:
             now = time.monotonic()
             count = 0 if self.generation_started is None else min(
-                len(self.chunks), max(0, int((now - self.generation_started) / .48)))
+                len(self.chunks), max(0, int((now - self.generation_started) / self.generation_seconds)))
             assistant = ''.join(self.chunks[:count]) if self.state == 'Speak' else ''
             complete = count == len(self.chunks) if self.state == 'Speak' else None
-            if self.state == 'Speak' and complete and now >= self.generation_started + len(self.chunks) * .48 + self.tail_seconds:
+            if self.state == 'Speak' and complete and now >= self.generation_started + len(self.chunks) * self.generation_seconds + self.tail_seconds:
                 self.history.append({'role': 'assistant', 'text': assistant})
                 self.state = 'Listen'
                 self.lifecycle.append({'kind': 'playback_complete', 'at': now})
                 assistant, complete = '', None
             observation = strip_terminal(window['user_delta']) or '<|no-voice|>'
-            self.empty_streak = self.empty_streak + max(1, math_ceil(window['step_count'] / 3)) if observation == '<|no-voice|>' else 0
+            self.empty_streak = self.empty_streak + max(1, math_ceil(window['step_count'] / self.steps_per_window)) if observation == '<|no-voice|>' else 0
             return {'history': self.history.copy(), 'user_text': strip_terminal(window['text'][self.user_offset:]),
                     'assistant_visible': assistant, 'state': self.state, 'observation': observation,
                     'window_ms': window['nominal_end_ms'] - window['nominal_start_ms'],

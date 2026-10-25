@@ -34,9 +34,10 @@ def replay(case, manifest, args, tokenizer):
     protocol = manifest['protocol']
     audio, rate = load_audio(case, manifest)
     state = ShadowState({'category': 'turn_taking', 'assistant_text': protocol['assistant_text'],
-                         'history': protocol['history'], 'source_id': '1'}, tokenizer)
-    state.tail_seconds = protocol['playback_tail_windows'] * .48
-    shared, assembler = SharedContext(), ControlWindowAssembler()
+                         'history': protocol['history'], 'source_id': '1'}, tokenizer,
+                        control_ms=protocol['control_ms'], generation_ms=protocol.get('assistant_generation_ms', 480))
+    state.tail_seconds = protocol.get('playback_tail_ms', protocol['playback_tail_windows'] * 480) / 1000
+    shared, assembler = SharedContext(), ControlWindowAssembler(protocol['control_ms'])
     consumer = TranscriptConsumer(case['case_id'])
     transport = requests.Session()
     generation = None
@@ -51,6 +52,7 @@ def replay(case, manifest, args, tokenizer):
             trace.flush()
 
         record('case_start', {'case_id': case['case_id'], 'started_at': started,
+            'control_ms': protocol['control_ms'], 'assistant_generation_ms': protocol.get('assistant_generation_ms', 480),
             'original_seconds': case['duration_seconds'], 'sent_seconds': case['sent_seconds'],
             'tail_seconds': case['tail_seconds']})
         failure = None

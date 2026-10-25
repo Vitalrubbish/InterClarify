@@ -98,10 +98,33 @@ def freeze(root, config, output):
     return complete
 
 
+def derive_manifest(baseline, config, output):
+    """Change the control protocol while retaining every frozen input and smoke record."""
+    result = json.loads(baseline.read_text())
+    protocol = json.loads(config.read_text())
+    allowed = {'control_ms', 'assistant_generation_ms', 'playback_tail_ms', 'experiment'}
+    original = result['protocol']
+    if (not result['complete'] or len(result['records']) != 100 or
+            original['control_ms'] != 480 or protocol['control_ms'] != 160 or
+            any(protocol.get(k) != original.get(k) for k in set(protocol) | set(original) if k not in allowed)):
+        raise ValueError('Expected a 160ms protocol with identical frozen inputs and candidate')
+    result.update(protocol=protocol, protocol_sha256=digest(config), baseline_manifest_sha256=digest(baseline),
+                  baseline_control_ms=original['control_ms'], baseline_manifest_path=str(baseline.resolve()))
+    output.mkdir(parents=True, exist_ok=False)
+    write_json(output / 'manifest.json', result)
+    print(json.dumps({'complete': True, 'selected': 100, 'baseline_manifest_sha256': digest(baseline),
+                      'manifest_sha256': digest(output / 'manifest.json')}))
+    return True
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--root', type=Path, required=True)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument('--root', type=Path)
+    source.add_argument('--baseline-manifest', type=Path)
     parser.add_argument('--config', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
-    raise SystemExit(0 if freeze(args.root, args.config, args.output) else 1)
+    complete = (derive_manifest(args.baseline_manifest, args.config, args.output) if args.baseline_manifest
+                else freeze(args.root, args.config, args.output))
+    raise SystemExit(0 if complete else 1)

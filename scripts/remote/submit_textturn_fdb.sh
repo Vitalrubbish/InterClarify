@@ -5,6 +5,7 @@ ROOT="${TEXTTURN_ROOT:-$HOME/parathink-textturn}"
 RUN_ID="${TEXTTURN_RUN_ID:?TEXTTURN_RUN_ID is required}"
 MANIFEST="${TEXTTURN_FDB_MANIFEST:?TEXTTURN_FDB_MANIFEST is required}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+CONFIG="${TEXTTURN_FDB_CONFIG:-$REPO_ROOT/configs/textturn_fdb.json}"
 PY="$HOME/miniconda3/envs/interclarify-x2-turn-data/bin/python"
 case "$RUN_ID" in ''|*[!A-Za-z0-9._-]*|.*) exit 2 ;; esac
 mkdir -p "$ROOT/submit_logs"
@@ -14,7 +15,7 @@ flock -n 9 || exit 2
 [ -f "$(dirname "$(dirname "$PY")")/conda-meta/history" ] || exit 2
 export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
 BUDGET="$ROOT/submit_logs/$RUN_ID.budget.json"
-timeout 90 "$PY" - "$BUDGET" "$MANIFEST" "$REPO_ROOT/configs/textturn_fdb.json" "$ROOT/runs/tt-002-20261025-r1" <<'PY'
+timeout 90 "$PY" - "$BUDGET" "$MANIFEST" "$CONFIG" "$ROOT/runs/tt-002-20261025-r1" <<'PY'
 from datetime import datetime
 import hashlib, json, re, subprocess, sys
 from pathlib import Path
@@ -59,8 +60,8 @@ Path(sys.argv[1]).write_text(json.dumps({'jobs': jobs, 'scheduler_history': raw,
 print(limit)
 PY
 LIMIT=$("$PY" -c 'import json,sys; print(json.load(open(sys.argv[1]))["job_limit_seconds"])' "$BUDGET")
-printf -v command 'TEXTTURN_ROOT=%q TEXTTURN_RUN_ID=%q TEXTTURN_FDB_MANIFEST=%q TEXTTURN_FDB_BUDGET=%q timeout --signal=TERM --kill-after=30 %q bash %q' \
-  "$ROOT" "$RUN_ID" "$MANIFEST" "$BUDGET" "$LIMIT" "$REPO_ROOT/scripts/remote/run_textturn_fdb.sh"
+printf -v command 'TEXTTURN_ROOT=%q TEXTTURN_RUN_ID=%q TEXTTURN_FDB_MANIFEST=%q TEXTTURN_FDB_BUDGET=%q TEXTTURN_FDB_CONFIG=%q timeout --signal=TERM --kill-after=30 %q bash %q' \
+  "$ROOT" "$RUN_ID" "$MANIFEST" "$BUDGET" "$CONFIG" "$LIMIT" "$REPO_ROOT/scripts/remote/run_textturn_fdb.sh"
 vc submit --image docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4 \
   --partition "${TEXTTURN_PARTITION:-pdgpu-4090}" --job "textturn-$RUN_ID" \
   --num-task 1 --cpu-per-task 8 --mem-per-task 32G --gpu-per-task 1 \

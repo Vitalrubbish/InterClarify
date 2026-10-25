@@ -7,3 +7,5 @@
 运行：`conda run -n interclarify-dev python -m unittest discover -s tests -p test_textturn_fdb.py`。这些测试验证评分和输入合同，不替代远端真实ASR冒烟或模型质量评测。
 
 输入冻结用例同时验证格式非法的候选摘要在写入清单前即被拒绝。
+
+TT-007增加两项必要验证：160ms首次start拍数／毫秒换算及严格边界前3周期；控制周期缩短时模拟生成和播放的实际速度保持不变。已有缺失输出用例补充派生清单保持全部100条及160ms时间标识。当前共8项，不运行模型；与共享Context的4项合计12项。

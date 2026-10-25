@@ -5,6 +5,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 import soundfile as sf
@@ -13,16 +14,18 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts/training'))
 sys.path.insert(0, str(ROOT / 'scripts/remote'))
 from score_textturn_fdb import proportion, run, score_case
-from freeze_textturn_fdb import freeze
+from freeze_textturn_fdb import derive_manifest, freeze
 from textturn_fdb_replay import load_audio
+from textturn_shadow_replay import ShadowState
 
 
-def trace(states, boundary=10., times=None):
+def trace(states, boundary=10., times=None, control_ms=480):
     times = times or list(range(1, len(states)+1))
+    steps = control_ms // 160
     events = [{'kind': 'context_publish', 'text': 'hello', 'published_at': boundary}]
     for index, (state, at) in enumerate(zip(states, times)):
-        window = {'first_step_seq': index*3+1, 'last_step_seq': index*3+3,
-                  'step_count': 3, 'partial_window': False, 'aggregation_wait_ms': 320}
+        window = {'first_step_seq': index*steps+1, 'last_step_seq': index*steps+steps,
+                  'step_count': steps, 'partial_window': False, 'aggregation_wait_ms': 320}
         events += [{'kind': 'control_window', **window}, {'kind': 'control_result',
             'window': window, 'action': 'keep', 'state_after': state,
             'action_returned_at': at, 'state_recorded_at': at, 'control_ms': 50,
@@ -82,6 +85,38 @@ class FdbContractTests(unittest.TestCase):
         self.assertEqual(metric['decidable_denominator'], 2)
         self.assertEqual(metric['conservative_bounds'], [.02, .98])
 
+    def test_160ms_wait_conversion_and_three_observed_cycles(self):
+        events = trace(['Speak']*3, boundary=1.5, control_ms=160)
+        events[4]['action'] = 'start'
+        row = score_case(CASE, events, 160)
+        self.assertTrue(row['post_asr_start'])
+        self.assertAlmostEqual(row['start_wait_ms'], 500)
+        self.assertAlmostEqual(row['start_wait_beats'], 3.125)
+        events[0]['published_at'] = 4.
+        self.assertTrue(score_case(CASE, events, 160)['pre_asr_three_speak'])
+        events[0]['published_at'] = 3.
+        self.assertFalse(score_case(CASE, events, 160)['pre_asr_three_speak'])
+
+    def test_control_period_does_not_accelerate_simulated_generation_or_playback(self):
+        class Tokenizer:
+            def chunks(self, *args, **kwargs):
+                return ['a', 'b', 'c']
+        case = {'category': 'turn_taking', 'assistant_text': '', 'history': [], 'source_id': '1'}
+        for control_ms in (160, 480):
+            with self.subTest(control_ms=control_ms), patch('textturn_shadow_replay.time.monotonic', return_value=0.) as clock:
+                state = ShadowState(case, Tokenizer(), control_ms=control_ms)
+                state.apply('start', {}, '')
+                window = {'step_count': control_ms//160, 'user_delta': '', 'text': '',
+                          'nominal_start_ms': 0, 'nominal_end_ms': control_ms}
+                clock.return_value = .16
+                self.assertEqual(state.snapshot(window)['assistant_visible'], '')
+                clock.return_value = .48
+                self.assertEqual(state.snapshot(window)['assistant_visible'], 'a')
+                clock.return_value = 2.3
+                self.assertEqual(state.snapshot(window)['state'], 'Speak')
+                clock.return_value = 2.4
+                self.assertEqual(state.snapshot(window)['state'], 'Listen')
+
     def test_ranked_freeze_audio_tail_and_no_sample_replacement(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
@@ -121,11 +156,21 @@ class FdbContractTests(unittest.TestCase):
             records = [{**CASE, 'case_id': f'{arm}-{i}', 'subset': arm} for arm in
                 ('candor_turn_taking', 'candor_pause_handling') for i in range(50)]
             path = root/'manifest.json'
-            path.write_text(json.dumps({'complete': True, 'records': records}))
+            protocol = json.loads((ROOT/'configs/textturn_fdb.json').read_text())
+            path.write_text(json.dumps({'complete': True, 'records': records, 'protocol': protocol,
+                                       'candidates': [], 'smoke': []}))
             summary = run(path, root/'absent', root/'score')
             self.assertEqual(summary['turn_taking']['post_asr_start']['unknown'], 50)
             self.assertEqual(summary['pause_handling']['pre_asr_three_speak']['unknown'], 50)
             self.assertIsNone(summary['turn_taking']['start_wait_beats_mean'])
+            config = ROOT/'configs/textturn_fdb_160ms.json'
+            self.assertTrue(derive_manifest(path, config, root/'derived'))
+            derived = json.loads((root/'derived/manifest.json').read_text())
+            self.assertEqual(derived['records'], records)
+            self.assertEqual(derived['baseline_control_ms'], 480)
+            summary = run(root/'derived/manifest.json', root/'absent', root/'score160')
+            self.assertEqual(summary['control_ms'], 160)
+            self.assertEqual(summary['three_cycles_nominal_ms'], 480)
 
 
 if __name__ == '__main__':

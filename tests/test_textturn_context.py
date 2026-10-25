@@ -82,6 +82,17 @@ class TextTurnContextTests(unittest.TestCase):
         self.assertEqual(worker.merged, 1)
         self.assertEqual(results[-1]['window']['step_count'], 6)
 
+    def test_160ms_emits_one_complete_cycle_per_decode_step(self):
+        assembler = context.ControlWindowAssembler(160)
+        for index in range(1, 4):
+            window = assembler.push_step({'kind': 'decode_step', 'step_seq': index, 'text': 'a',
+                'prefix_version': 1, 'published_at': index*.16,
+                'nominal_audio_start_ms': (index-1)*160, 'nominal_audio_end_ms': index*160})
+            self.assertEqual(window['step_count'], 1)
+            self.assertFalse(window['partial_window'])
+            self.assertEqual(window['observation'], 'a' if index == 1 else '<|no-voice|>')
+        self.assertIsNone(assembler.flush())
+
 
 if __name__ == '__main__':
     unittest.main()

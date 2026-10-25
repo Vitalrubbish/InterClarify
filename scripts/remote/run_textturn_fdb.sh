@@ -6,6 +6,7 @@ RUN_ID="${TEXTTURN_RUN_ID:?TEXTTURN_RUN_ID is required}"
 MANIFEST="${TEXTTURN_FDB_MANIFEST:?TEXTTURN_FDB_MANIFEST is required}"
 BUDGET="${TEXTTURN_FDB_BUDGET:?TEXTTURN_FDB_BUDGET is required}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+CONFIG="${TEXTTURN_FDB_CONFIG:-$REPO_ROOT/configs/textturn_fdb.json}"
 ENV_DIR="$HOME/interclarify-xturnix-fleurs/envs/xturnix"
 ASR_ENV="$HOME/interclarify-english-integration-20261018-v1/envs/asr"
 TRAIN_DIR="$ROOT/runs/tt-002-20261025-r1"
@@ -54,18 +55,21 @@ export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 git -C "$REPO_ROOT" rev-parse HEAD > "$RUN_DIR/source_commit.txt"
 cp "$MANIFEST" "$RUN_DIR/manifest.json"
 cp "$BUDGET" "$RUN_DIR/budget.json"
+cp "$CONFIG" "$RUN_DIR/protocol.json"
 "$ENV_DIR/bin/python" -m pip freeze > "$RUN_DIR/controller_packages.txt"
 "$ASR_ENV/bin/python" -m pip freeze > "$RUN_DIR/asr_packages.txt"
-"$ENV_DIR/bin/python" - "$REPO_ROOT" "$TRAIN_DIR" "$ROOT/models/qwen3-0.6b" "$RUN_DIR" <<'PY'
+"$ENV_DIR/bin/python" - "$REPO_ROOT" "$TRAIN_DIR" "$ROOT/models/qwen3-0.6b" "$RUN_DIR" "$CONFIG" <<'PY'
 import hashlib, json, sys
 from pathlib import Path
-repo, train, model, out = map(Path, sys.argv[1:])
+repo, train, model, out, config = map(Path, sys.argv[1:])
 def digest(path):
     h = hashlib.sha256()
     with path.open('rb') as f:
         for block in iter(lambda: f.read(1048576), b''): h.update(block)
     return h.hexdigest()
-protocol = json.loads((repo/'configs/textturn_fdb.json').read_text())
+protocol = json.loads(config.read_text())
+manifest = json.loads((out/'manifest.json').read_text())
+assert manifest['protocol_sha256'] == digest(config) and manifest['protocol'] == protocol
 assert digest(train/'best/adapter_model.safetensors') == protocol['candidate_sha256']
 files = [*model.glob('*.json'), *model.glob('*.safetensors'), *model.glob('*.txt'),
          *repo.glob('scripts/remote/*textturn*.py'), *repo.glob('scripts/training/*textturn*.py'),

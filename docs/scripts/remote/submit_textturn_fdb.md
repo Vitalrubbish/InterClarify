@@ -9,3 +9,5 @@
 使用现有conda CPU环境执行预检；`vc submit`申请1张4090、8CPU、32GiB，外层timeout及30秒强制清理。设置`TEXTTURN_RUN_ID`与`TEXTTURN_FDB_MANIFEST`后在冻结源码worktree执行；不在远端脏主仓库覆盖源码。
 
 提交前额外核对摘要格式、TT-002原始candidate.json与adapter实际SHA256三者一致，避免申请GPU后才发现文档摘要抄写错误。运行节点仍再次核查。首个r1因文档多余字符在推理前退出，记录保留，后续重提需单独编号且累计该次占卡时长。
+
+TT-007通过`TEXTTURN_FDB_CONFIG`显式选择160ms配置并传入运行节点，默认仍用480ms配置。提交前核对所选配置与派生清单摘要一致；排队等待由[串行续接器](continue_textturn_fdb.md)完成，实际提交前再次核算累计额度。已有480ms活动作业不会被抢占或并行运行。

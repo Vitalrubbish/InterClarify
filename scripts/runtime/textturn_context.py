@@ -95,9 +95,12 @@ class TranscriptConsumer:
 
 
 class ControlWindowAssembler:
-    """Close a control window after three genuine, contiguous decode completions."""
+    """Close a control window after the configured genuine decode completions."""
 
-    def __init__(self):
+    def __init__(self, control_ms=480):
+        if control_ms not in (160, 480):
+            raise ValueError('Expected a 160ms or 480ms control period')
+        self.steps_per_window = control_ms // 160
         self.pending = []
         self.last_step = 0
         self.window_start_text = ''
@@ -113,7 +116,7 @@ class ControlWindowAssembler:
             self.first_new_text_at = event.get('text_visible_at', event['published_at'])
         self.last_text, self.last_step = event['text'], event['step_seq']
         self.pending.append(deepcopy(event))
-        return self.flush() if len(self.pending) == 3 else None
+        return self.flush() if len(self.pending) == self.steps_per_window else None
 
     def flush(self):
         if not self.pending:
@@ -129,7 +132,7 @@ class ControlWindowAssembler:
                   'observation': delta if delta else '<|no-voice|>',
                   'asr_prefix_version': last['prefix_version'], 'input_ready_at': ready,
                   'first_input_visible_at': start, 'aggregation_wait_ms': max(0., ready - start) * 1000,
-                  'partial_window': len(self.pending) < 3, 'merged_windows': 0}
+                  'partial_window': len(self.pending) < self.steps_per_window, 'merged_windows': 0}
         self.pending = []
         self.window_start_text = last['text']
         self.first_new_text_at = None
