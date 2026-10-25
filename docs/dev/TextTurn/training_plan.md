@@ -2,7 +2,7 @@
 
 更新：2026-10-25。状态：TT-001正式文本数据已冻结归档，TT-002训练及TT-003接口已交付归档，TT-004评分v2已修复并重评，接话语义标注覆盖不足，整体证据不足。目标是得到一个独立的文本话轮控制器，处理普通接话、用户打断、用户附和及停顿；后续再学习 Layer 2 的 CoT。工作仍按 [TT-001—004](../../issue/TextTurn/README.md)推进。
 
-2026-10-25新一轮改造合同见[TT-010](../../issue/archive/TextTurn/tt_010_asr_update_yield_dataset.md)：Speak下首个可判定为非backchannel的有效ASR更新监督stop，不等待停止词或完整句；短附和及歧义前缀均keep，禁止用未来全文反推当前标签。TT-010已按用户启动指令交付24／12来源的版本化合成数据及输出闭环核查，按用户最新修订，v2将原unknown动作改为keep，finish注册专用输入token `<finish>`，ID151673；见[版本合同](asr_update_yield_dataset.md)。下方为TT-001旧冻结数据及训练记录，新版本尚未训练或替换候选；TT-008仍按旧合同完成并归档。
+2026-10-25新一轮改造合同见[TT-010](../../issue/TextTurn/tt_010_asr_update_yield_dataset.md)：Speak下首个可判定为非backchannel的有效ASR更新监督stop，不等待停止词或完整句；短附和keep、歧义前缀保留未知，禁止用未来全文反推当前标签。同步论证音频播放完成后由运行时注入finish输入标记及start输出生命周期闭环。下方数据构造和token集合描述已冻结旧版本，不代表新数据已实施；TT-008已按其旧合同完成并归档。
 
 本次按用户修订，将控制观察窗改为 **480ms**；User 非空片段每窗随机 1—2 token，Assistant 按文本生成设置为每窗 8 token。生成完成、音频播放完成及用户下一轮开口前等待分开模拟。此前 160ms 控制窗约定被本次替代，底层 Nemotron EN160 解码配置保留。
 
