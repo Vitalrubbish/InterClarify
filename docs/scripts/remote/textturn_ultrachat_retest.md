@@ -9,3 +9,5 @@
 `replay_case`以主线程处理事件、正文和动作；最多一个推理线程、一个待处理观察，合并只累积观察窗口，正文不依赖调用次数推进。完整请求、两个合法动作原始logit、真实返回及应用时间、用户更新和生命周期逐条写入trace。每场景单独落盘，运行异常不删除。`run`核对冻结资产与候选，按来源交错执行，实时更新progress及runtime；最后生成逐例CSV、详细JSON和汇总JSON。
 
 `score_case`分开统计stop输出、实际生效、独立用户机会、960ms及时覆盖、已有明确停止词1000ms覆盖、自然提前结束及观察不足。用户继续说不自动作为语义打断金标；附和与无当前用户输入的误stop单列次数及Speak观察分母。连续Speak与同一用户轮首末实际更新区间求交，严格大于960ms计抢话，不补尾静音。保留未处于Speak的更新数、尾窗及正常结束覆盖；未观测到的自然结束不能当作stop通过。清晰文本与ASR分别汇总，不能混成真实ASR成绩；本实验没有空正文对照，不作正文因果结论。
+
+TT-011增加`DuplexReplayState`，只在新配置`full_lifecycle`启用：沿用独立生成时钟，模拟播放落后一个周期，提供output_id、played_text、runtime_events、latest_terminal和用户版本。`terminal`在全部模拟播放完成后提交输入finish，stop闭合后迟到／重复完成仅记stale_callback；每次snapshot只消费一次终态。旧TT-008配置保持历史行为。正式回放出现运行失败将显式非零退出，阻止续接误判。新语义评分由`textturn_external_score`另存，原停止词诊断不代替它。

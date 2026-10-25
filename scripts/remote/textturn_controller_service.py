@@ -11,6 +11,7 @@ import time
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'training'))
 from build_textturn_dataset import ACTIONS, LEGAL, prompt_for
 from train_textturn import action_logits, file_hash, load_controller
+from textturn_candidate import validate_candidate
 
 
 class Controller:
@@ -18,10 +19,15 @@ class Controller:
         import torch
         config = json.loads(config_path.read_text())
         candidate = json.loads((training / 'candidate.json').read_text())
+        manifest = json.loads((data / 'manifest.json').read_text())
+        self.identity = None
+        if '<finish>' in manifest['new_token_ids']:
+            self.identity = validate_candidate(training, data, config_path, model)
         adapter = training / 'best'
         if not candidate['continue_online'] or file_hash(adapter / 'adapter_model.safetensors') != candidate['adapter_sha256']:
             raise ValueError('Candidate was not frozen and permitted by development gate')
         self.model, self.tokenizer, self.ids = load_controller(model, data, config, adapter)
+        self.token_ids = manifest['new_token_ids']
         self.model.eval()
         self.maximum = config['max_length']
         self.lock = threading.Lock()
@@ -53,7 +59,8 @@ def create_app(controller):
 
     @app.get('/health')
     def health():
-        return {'status': 'ok', 'candidate_sha256': controller.sha256}
+        return {'status': 'ok', 'candidate_sha256': controller.sha256,
+                'token_ids': controller.token_ids, 'identity': controller.identity}
 
     @app.post('/decide')
     def decide(visible: dict):

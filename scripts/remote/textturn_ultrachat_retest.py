@@ -225,6 +225,89 @@ class ReplayState:
         return True
 
 
+class DuplexReplayState(ReplayState):
+    """Expose versioned generated/played output and exactly one terminal per output."""
+
+    def __init__(self, case, tokenizer, config, emit):
+        self.pending_events, self.latest_terminal = [], None
+        self.played, self.output_id, self.runtime_sequence = '', None, 0
+        self.snapshot_at = 0.
+        super().__init__(case, tokenizer, config, emit)
+
+    def begin(self, at):
+        super().begin(at)
+        self.output_id = f"{self.case.get('case_id', 'case')}:output-{self.generation}"
+        self.played = ''
+
+    def terminal(self, kind, at, output_id):
+        if self.state != 'Speak' or self.output_id != output_id:
+            self.emit('stale_callback', at=at, output_id=output_id, callback=kind)
+            return False
+        if kind == 'finish' and (self.complete_at is None or self.played != self.visible or
+                                 at + 1e-9 < self.close_at):
+            raise ValueError('Finish requires completed simulated playback')
+        self.history.append({'role': 'assistant', 'text': self.visible, 'played_text': self.played,
+                             'interrupted': kind == 'stop', 'output_id': output_id,
+                             'completion': kind, 'playback_simulated': True})
+        self.latest_terminal = {'kind': kind, 'output_id': output_id}
+        self.runtime_sequence += 1
+        event = {'event_seq': self.runtime_sequence, 'kind': kind, 'output_id': output_id,
+                 'occurred_ms': at * 1000, 'published_ms': at * 1000, 'reason': kind}
+        if kind == 'finish':
+            event['marker'] = '<finish>'
+        self.pending_events.append(event)
+        self.emit(kind, at=at, **{k: v for k, v in event.items() if k != 'kind'})
+        self.state, self.output_id = 'Listen', None
+        return True
+
+    def advance(self, at):
+        if self.state != 'Speak':
+            return
+        # Generation has its own clock; simulated playback trails it by one period.
+        while self.count < len(self.chunks) and self.release_at <= at + 1e-9:
+            due = self.release_at
+            self.visible += self.chunks[self.count]
+            piece = self.chunks[self.count]
+            self.count += 1
+            self.release_at += self.period
+            self.emit('assistant_publish', at=at, scheduled_at=due, generation=self.generation,
+                      output_id=self.output_id, delta=piece, visible=self.visible,
+                      delta_tokens=len(self.tokenizer.encode(piece)),
+                      cumulative_tokens=len(self.tokenizer.encode(self.visible)),
+                      sha256=hashlib.sha256(self.visible.encode()).hexdigest())
+            if self.count == len(self.chunks):
+                self.complete_at = due
+                self.emit('generation_complete', at=at, scheduled_at=due,
+                          output_id=self.output_id, generation=self.generation)
+        begin = self.close_at - len(self.chunks) * self.period - self.case['tail_ms'] / 1000
+        played_count = max(0, min(len(self.chunks), math.floor((at - begin + 1e-9) / self.period) - 1))
+        self.played = ''.join(self.chunks[:played_count])
+        if at + 1e-9 >= self.close_at:
+            output_id = self.output_id
+            self.terminal('finish', at, output_id)
+            self.emit('playback_complete', at=at, scheduled_at=self.close_at,
+                      output_id=output_id, generation=self.generation)
+
+    def snapshot(self, delta, windows):
+        visible = super().snapshot(delta, windows)
+        events = [dict(event) for event in self.pending_events]
+        self.pending_events.clear()
+        # All runtime times use the same replay-relative clock as the trace.
+        for event in events:
+            event['consumed_ms'] = max(event['published_ms'], self.snapshot_at * 1000)
+        visible.update(user_turn_id=self.turn, user_version=self.version, played_text=self.played if
+                       self.state == 'Speak' else '', output_id=self.output_id,
+                       runtime_events=events, latest_terminal=deepcopy(self.latest_terminal))
+        return visible
+
+    def apply(self, action, snapshot, generation, at, turn=None, committed_end=None):
+        if action == 'stop' and self.state == snapshot['state'] == 'Speak' and self.generation == generation:
+            self.terminal('stop', at, self.output_id)
+            self.emit('stop_applied', at=at, generation=self.generation)
+            return True
+        return super().apply(action, snapshot, generation, at, turn, committed_end)
+
+
 def replay_case(case, config, tokenizer, decide, trace_path):
     if 'freeze_error' in case:
         raise ValueError(case['freeze_error'])
@@ -235,7 +318,8 @@ def replay_case(case, config, tokenizer, decide, trace_path):
             trace.flush()
         emit('case_begin', at=0., started_monotonic=started, case_id=case['case_id'], config=config,
              mode=case['mode'], initial_state=case['initial_state'])
-        state = ReplayState(case, tokenizer, config, emit)
+        state_type = DuplexReplayState if config.get('full_lifecycle') else ReplayState
+        state = state_type(case, tokenizer, config, emit)
         events = [(e['at'], 0, e) for e in case['updates']]
         stride = config['control_ms'] // 160
         events += [(at, 1, {'step': index + 1}) for index, at in enumerate(case['steps'])
@@ -275,6 +359,7 @@ def replay_case(case, config, tokenizer, decide, trace_path):
                         merged += 1
                 index += 1
             if future is None and pending is not None:
+                state.snapshot_at = now
                 request = {**pending, 'requested_at': time.monotonic() - started,
                            'generation': state.generation, 'turn': state.turn, 'version': state.version,
                            'committed_end': len(state.text),
@@ -468,7 +553,10 @@ def run(args):
                         'last_case': case['case_id'], 'updated_at': time.time()}
             write_json(args.output / 'progress.json', progress)
             print(json.dumps(progress), flush=True)
-    return summarize(manifest, args.output)
+    summary = summarize(manifest, args.output)
+    if successful != completed:
+        raise RuntimeError(f'{completed - successful} replay cases failed')
+    return summary
 
 
 if __name__ == '__main__':

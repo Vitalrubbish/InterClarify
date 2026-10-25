@@ -1,0 +1,1163 @@
+{
+  "schema_version": 1,
+  "baseline_manifest_sha256": "a05d1dbe3329b30f15a6c5317dd74c0334748f450eaccf44c6a13e3b5604fb18",
+  "reviewer": "Codex; execution-time prefix review before candidate inference, 2026-10-26",
+  "policy": "Exact case/turn/update and prefix digest; no future text or model outputs. Unreviewed prefixes remain unknown.",
+  "limitations": [
+    "打断正例为旧停止请求模板，不能证明一般非附和更新覆盖。",
+    "未审核接话语义与停顿边界，相关语义指标保留unknown。",
+    "每个已审核前缀仅延续到同一turn的后续追加版本；此前版本unknown。"
+  ],
+  "entries": [
+    {
+      "case_id": "93896-clean",
+      "turn": "phase13",
+      "update_index": 41,
+      "at": 37.92,
+      "prefix": "Please pause.",
+      "prefix_sha256": "da539414f156d3a8410e81b28e52faa0d4ee9d24a25f3545bdf69d7226202e97",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "93896-interruption",
+      "turn": "user0",
+      "update_index": 5,
+      "at": 0.9596674479544163,
+      "prefix": "Please pause",
+      "prefix_sha256": "1fb029fc1ca0fce3fe0a08af8334036d2035596e3b7f6ec94adc66fc66c85f73",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "93896-clean",
+      "turn": "phase5",
+      "update_index": 15,
+      "at": 9.6,
+      "prefix": "Hmm.",
+      "prefix_sha256": "7f2302c86d005fed4397eef4134c2c03eb6324268449f5cf97595e6307942c31",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "93896-backchannel",
+      "turn": "user0",
+      "update_index": 0,
+      "at": 1.9167441166937351,
+      "prefix": "M",
+      "prefix_sha256": "08f271887ce94707da822d5263bae19d5519cb3614e0daedc4c7ce5dab7473f1",
+      "judgment": "unknown",
+      "reason": "残字M不能依据后续参考恢复为附和。"
+    },
+    {
+      "case_id": "27813-clean",
+      "turn": "phase13",
+      "update_index": 41,
+      "at": 28.8,
+      "prefix": "Wait,",
+      "prefix_sha256": "6092546dbb6d2b104e200caa29a2d314ce1fea47009584a8838f60e8f10ee373",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "27813-interruption",
+      "turn": "user0",
+      "update_index": 2,
+      "at": 0.9590022135525942,
+      "prefix": "Wait",
+      "prefix_sha256": "26b83994dca8b4b483edc45464ba07a5bde05cb7e6c5c61bb2e66da9d1e15fc7",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "27813-clean",
+      "turn": "phase5",
+      "update_index": 12,
+      "at": 7.68,
+      "prefix": "I see.",
+      "prefix_sha256": "420c703b11610f7b7a8e910dc406505b7bda360bb628955d4625a5a8d7c3005c",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "27813-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.7980491723865271,
+      "prefix": "I see",
+      "prefix_sha256": "dcf10e361b8ded37f287e5d691729af4e7477886dca96d8c858033c6d4b746ba",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "10005-clean",
+      "turn": "phase13",
+      "update_index": 38,
+      "at": 36.48,
+      "prefix": "Please pause.",
+      "prefix_sha256": "da539414f156d3a8410e81b28e52faa0d4ee9d24a25f3545bdf69d7226202e97",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "10005-interruption",
+      "turn": "user0",
+      "update_index": 5,
+      "at": 0.9596771616488695,
+      "prefix": "Please pause",
+      "prefix_sha256": "1fb029fc1ca0fce3fe0a08af8334036d2035596e3b7f6ec94adc66fc66c85f73",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "10005-clean",
+      "turn": "phase5",
+      "update_index": 9,
+      "at": 6.24,
+      "prefix": "Hmm.",
+      "prefix_sha256": "7f2302c86d005fed4397eef4134c2c03eb6324268449f5cf97595e6307942c31",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "10005-backchannel",
+      "turn": "user0",
+      "update_index": 0,
+      "at": 1.9176051393151283,
+      "prefix": "M",
+      "prefix_sha256": "08f271887ce94707da822d5263bae19d5519cb3614e0daedc4c7ce5dab7473f1",
+      "judgment": "unknown",
+      "reason": "残字M不能依据后续参考恢复为附和。"
+    },
+    {
+      "case_id": "27765-clean",
+      "turn": "phase13",
+      "update_index": 23,
+      "at": 28.8,
+      "prefix": "Please stop.",
+      "prefix_sha256": "9d91db676c51231fbe8abf92a14dc774cd4fba8b2157ff09dfbb2b909b25e82e",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "27765-interruption",
+      "turn": "user0",
+      "update_index": 4,
+      "at": 0.9574516005814075,
+      "prefix": "Please stop",
+      "prefix_sha256": "77bece824317c87637316fa6c51a47b17668f5c7a63ea152d16d70b0d9709837",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "27765-clean",
+      "turn": "phase5",
+      "update_index": 8,
+      "at": 6.72,
+      "prefix": "Right.",
+      "prefix_sha256": "cd5592e5e3140daa2f3fe0541c004877a65933bc07d69dbec8e3a441e7877c90",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "27765-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 1.7581875957548618,
+      "prefix": "Right",
+      "prefix_sha256": "883361d5d682a1574410961ce51450b6e036a779c9f098dec71e28aec832bfa6",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "11652-clean",
+      "turn": "phase13",
+      "update_index": 29,
+      "at": 27.36,
+      "prefix": "Stop",
+      "prefix_sha256": "cae7d57bc067a514b8e34c9589631a95c7dc051638ddd2a190773269279a99df",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "11652-interruption",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.6468417085707188,
+      "prefix": "Stop",
+      "prefix_sha256": "cae7d57bc067a514b8e34c9589631a95c7dc051638ddd2a190773269279a99df",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "11652-clean",
+      "turn": "phase5",
+      "update_index": 12,
+      "at": 8.64,
+      "prefix": "Okay.",
+      "prefix_sha256": "03b25bed61dad2fc92bb7ca539a0f5abb89e97a767e3ca68789d47009f9fa5c3",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "11652-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.6399933006614447,
+      "prefix": "Okay",
+      "prefix_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "40154-clean",
+      "turn": "phase13",
+      "update_index": 27,
+      "at": 28.32,
+      "prefix": "Please stop.",
+      "prefix_sha256": "9d91db676c51231fbe8abf92a14dc774cd4fba8b2157ff09dfbb2b909b25e82e",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "40154-interruption",
+      "turn": "user0",
+      "update_index": 4,
+      "at": 0.9583955314010382,
+      "prefix": "Please stop",
+      "prefix_sha256": "77bece824317c87637316fa6c51a47b17668f5c7a63ea152d16d70b0d9709837",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "40154-clean",
+      "turn": "phase5",
+      "update_index": 7,
+      "at": 5.76,
+      "prefix": "Hmm.",
+      "prefix_sha256": "7f2302c86d005fed4397eef4134c2c03eb6324268449f5cf97595e6307942c31",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "40154-backchannel",
+      "turn": "user0",
+      "update_index": 0,
+      "at": 1.919440196827054,
+      "prefix": "M",
+      "prefix_sha256": "08f271887ce94707da822d5263bae19d5519cb3614e0daedc4c7ce5dab7473f1",
+      "judgment": "unknown",
+      "reason": "残字M不能依据后续参考恢复为附和。"
+    },
+    {
+      "case_id": "10213-clean",
+      "turn": "phase13",
+      "update_index": 20,
+      "at": 19.68,
+      "prefix": "Please pause.",
+      "prefix_sha256": "da539414f156d3a8410e81b28e52faa0d4ee9d24a25f3545bdf69d7226202e97",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "10213-interruption",
+      "turn": "user0",
+      "update_index": 5,
+      "at": 0.9613089486956596,
+      "prefix": "Please pause",
+      "prefix_sha256": "1fb029fc1ca0fce3fe0a08af8334036d2035596e3b7f6ec94adc66fc66c85f73",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "10213-clean",
+      "turn": "phase5",
+      "update_index": 6,
+      "at": 4.8,
+      "prefix": "Right.",
+      "prefix_sha256": "cd5592e5e3140daa2f3fe0541c004877a65933bc07d69dbec8e3a441e7877c90",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "10213-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 1.7598660755902529,
+      "prefix": "Right",
+      "prefix_sha256": "883361d5d682a1574410961ce51450b6e036a779c9f098dec71e28aec832bfa6",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "26058-clean",
+      "turn": "phase13",
+      "update_index": 31,
+      "at": 31.2,
+      "prefix": "Please pause.",
+      "prefix_sha256": "da539414f156d3a8410e81b28e52faa0d4ee9d24a25f3545bdf69d7226202e97",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "26058-interruption",
+      "turn": "user0",
+      "update_index": 5,
+      "at": 0.9588131327182055,
+      "prefix": "Please pause",
+      "prefix_sha256": "1fb029fc1ca0fce3fe0a08af8334036d2035596e3b7f6ec94adc66fc66c85f73",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "26058-clean",
+      "turn": "phase5",
+      "update_index": 17,
+      "at": 11.04,
+      "prefix": "Okay.",
+      "prefix_sha256": "03b25bed61dad2fc92bb7ca539a0f5abb89e97a767e3ca68789d47009f9fa5c3",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "26058-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.6379478387534618,
+      "prefix": "Okay",
+      "prefix_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "67280-clean",
+      "turn": "phase13",
+      "update_index": 40,
+      "at": 36.48,
+      "prefix": "Please stop.",
+      "prefix_sha256": "9d91db676c51231fbe8abf92a14dc774cd4fba8b2157ff09dfbb2b909b25e82e",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "67280-interruption",
+      "turn": "user0",
+      "update_index": 4,
+      "at": 0.9578261990100145,
+      "prefix": "Please stop",
+      "prefix_sha256": "77bece824317c87637316fa6c51a47b17668f5c7a63ea152d16d70b0d9709837",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "67280-clean",
+      "turn": "phase5",
+      "update_index": 18,
+      "at": 10.56,
+      "prefix": "Okay.",
+      "prefix_sha256": "03b25bed61dad2fc92bb7ca539a0f5abb89e97a767e3ca68789d47009f9fa5c3",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "67280-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.6377343237400055,
+      "prefix": "Okay",
+      "prefix_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "85056-clean",
+      "turn": "phase13",
+      "update_index": 29,
+      "at": 26.88,
+      "prefix": "Wait",
+      "prefix_sha256": "26b83994dca8b4b483edc45464ba07a5bde05cb7e6c5c61bb2e66da9d1e15fc7",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "85056-interruption",
+      "turn": "user0",
+      "update_index": 2,
+      "at": 0.9596724957227707,
+      "prefix": "Wait",
+      "prefix_sha256": "26b83994dca8b4b483edc45464ba07a5bde05cb7e6c5c61bb2e66da9d1e15fc7",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "85056-clean",
+      "turn": "phase5",
+      "update_index": 11,
+      "at": 7.2,
+      "prefix": "Hmm.",
+      "prefix_sha256": "7f2302c86d005fed4397eef4134c2c03eb6324268449f5cf97595e6307942c31",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "85056-backchannel",
+      "turn": "user0",
+      "update_index": 0,
+      "at": 1.9180416520684958,
+      "prefix": "M",
+      "prefix_sha256": "08f271887ce94707da822d5263bae19d5519cb3614e0daedc4c7ce5dab7473f1",
+      "judgment": "unknown",
+      "reason": "残字M不能依据后续参考恢复为附和。"
+    },
+    {
+      "case_id": "52068-clean",
+      "turn": "phase13",
+      "update_index": 28,
+      "at": 31.68,
+      "prefix": "Please stop.",
+      "prefix_sha256": "9d91db676c51231fbe8abf92a14dc774cd4fba8b2157ff09dfbb2b909b25e82e",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "52068-interruption",
+      "turn": "user0",
+      "update_index": 4,
+      "at": 0.9579179789870977,
+      "prefix": "Please stop",
+      "prefix_sha256": "77bece824317c87637316fa6c51a47b17668f5c7a63ea152d16d70b0d9709837",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "52068-clean",
+      "turn": "phase5",
+      "update_index": 13,
+      "at": 8.64,
+      "prefix": "Hmm.",
+      "prefix_sha256": "7f2302c86d005fed4397eef4134c2c03eb6324268449f5cf97595e6307942c31",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "70230-clean",
+      "turn": "phase13",
+      "update_index": 28,
+      "at": 24.48,
+      "prefix": "Wait,",
+      "prefix_sha256": "6092546dbb6d2b104e200caa29a2d314ce1fea47009584a8838f60e8f10ee373",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "70230-interruption",
+      "turn": "user0",
+      "update_index": 2,
+      "at": 0.9590137209743261,
+      "prefix": "Wait",
+      "prefix_sha256": "26b83994dca8b4b483edc45464ba07a5bde05cb7e6c5c61bb2e66da9d1e15fc7",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "70230-clean",
+      "turn": "phase5",
+      "update_index": 10,
+      "at": 7.68,
+      "prefix": "Right.",
+      "prefix_sha256": "cd5592e5e3140daa2f3fe0541c004877a65933bc07d69dbec8e3a441e7877c90",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "70230-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 1.7588451001793146,
+      "prefix": "Right",
+      "prefix_sha256": "883361d5d682a1574410961ce51450b6e036a779c9f098dec71e28aec832bfa6",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "81350-clean",
+      "turn": "phase13",
+      "update_index": 25,
+      "at": 29.76,
+      "prefix": "Wait,",
+      "prefix_sha256": "6092546dbb6d2b104e200caa29a2d314ce1fea47009584a8838f60e8f10ee373",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "81350-interruption",
+      "turn": "user0",
+      "update_index": 2,
+      "at": 0.9603309463709593,
+      "prefix": "Wait",
+      "prefix_sha256": "26b83994dca8b4b483edc45464ba07a5bde05cb7e6c5c61bb2e66da9d1e15fc7",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "81350-clean",
+      "turn": "phase5",
+      "update_index": 8,
+      "at": 5.76,
+      "prefix": "Okay.",
+      "prefix_sha256": "03b25bed61dad2fc92bb7ca539a0f5abb89e97a767e3ca68789d47009f9fa5c3",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "81350-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.6379785425961018,
+      "prefix": "Okay",
+      "prefix_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "91623-clean",
+      "turn": "phase13",
+      "update_index": 38,
+      "at": 33.12,
+      "prefix": "Stop for",
+      "prefix_sha256": "c4a0386a02c870aa9bcf60f17c30b6181f16592bfb8fd37c06921f04f4ff6e61",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "91623-interruption",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.636448010802269,
+      "prefix": "Stop",
+      "prefix_sha256": "cae7d57bc067a514b8e34c9589631a95c7dc051638ddd2a190773269279a99df",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "91623-clean",
+      "turn": "phase5",
+      "update_index": 14,
+      "at": 9.6,
+      "prefix": "Right.",
+      "prefix_sha256": "cd5592e5e3140daa2f3fe0541c004877a65933bc07d69dbec8e3a441e7877c90",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "91623-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 1.7589818444103003,
+      "prefix": "Right",
+      "prefix_sha256": "883361d5d682a1574410961ce51450b6e036a779c9f098dec71e28aec832bfa6",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "46106-clean",
+      "turn": "phase13",
+      "update_index": 25,
+      "at": 22.56,
+      "prefix": "Wait",
+      "prefix_sha256": "26b83994dca8b4b483edc45464ba07a5bde05cb7e6c5c61bb2e66da9d1e15fc7",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "46106-interruption",
+      "turn": "user0",
+      "update_index": 2,
+      "at": 0.9595447964966297,
+      "prefix": "Wait",
+      "prefix_sha256": "26b83994dca8b4b483edc45464ba07a5bde05cb7e6c5c61bb2e66da9d1e15fc7",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "46106-clean",
+      "turn": "phase5",
+      "update_index": 6,
+      "at": 5.28,
+      "prefix": "Right.",
+      "prefix_sha256": "cd5592e5e3140daa2f3fe0541c004877a65933bc07d69dbec8e3a441e7877c90",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "46106-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 1.7581067271530628,
+      "prefix": "Right",
+      "prefix_sha256": "883361d5d682a1574410961ce51450b6e036a779c9f098dec71e28aec832bfa6",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "57148-clean",
+      "turn": "phase13",
+      "update_index": 53,
+      "at": 40.32,
+      "prefix": "Please stop.",
+      "prefix_sha256": "9d91db676c51231fbe8abf92a14dc774cd4fba8b2157ff09dfbb2b909b25e82e",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "57148-interruption",
+      "turn": "user0",
+      "update_index": 4,
+      "at": 0.9581958185881376,
+      "prefix": "Please stop",
+      "prefix_sha256": "77bece824317c87637316fa6c51a47b17668f5c7a63ea152d16d70b0d9709837",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "57148-clean",
+      "turn": "phase5",
+      "update_index": 17,
+      "at": 10.56,
+      "prefix": "Mm-hm.",
+      "prefix_sha256": "8f032ea13b58e16d1d26d27ee7b8f7465a743c31c69daa0914951f36ac1a4b88",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "41513-clean",
+      "turn": "phase13",
+      "update_index": 26,
+      "at": 25.92,
+      "prefix": "Please pause.",
+      "prefix_sha256": "da539414f156d3a8410e81b28e52faa0d4ee9d24a25f3545bdf69d7226202e97",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "41513-interruption",
+      "turn": "user0",
+      "update_index": 5,
+      "at": 0.9612088780850172,
+      "prefix": "Please pause",
+      "prefix_sha256": "1fb029fc1ca0fce3fe0a08af8334036d2035596e3b7f6ec94adc66fc66c85f73",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "41513-clean",
+      "turn": "phase5",
+      "update_index": 9,
+      "at": 6.72,
+      "prefix": "I see.",
+      "prefix_sha256": "420c703b11610f7b7a8e910dc406505b7bda360bb628955d4625a5a8d7c3005c",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "41513-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.7974336240440607,
+      "prefix": "I see",
+      "prefix_sha256": "dcf10e361b8ded37f287e5d691729af4e7477886dca96d8c858033c6d4b746ba",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "58591-clean",
+      "turn": "phase13",
+      "update_index": 26,
+      "at": 30.72,
+      "prefix": "Wait,",
+      "prefix_sha256": "6092546dbb6d2b104e200caa29a2d314ce1fea47009584a8838f60e8f10ee373",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "58591-interruption",
+      "turn": "user0",
+      "update_index": 2,
+      "at": 0.9603437148034573,
+      "prefix": "Wait",
+      "prefix_sha256": "26b83994dca8b4b483edc45464ba07a5bde05cb7e6c5c61bb2e66da9d1e15fc7",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "58591-clean",
+      "turn": "phase5",
+      "update_index": 9,
+      "at": 6.72,
+      "prefix": "I see.",
+      "prefix_sha256": "420c703b11610f7b7a8e910dc406505b7bda360bb628955d4625a5a8d7c3005c",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "58591-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.7981981746852398,
+      "prefix": "I see",
+      "prefix_sha256": "dcf10e361b8ded37f287e5d691729af4e7477886dca96d8c858033c6d4b746ba",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "87329-clean",
+      "turn": "phase13",
+      "update_index": 38,
+      "at": 24.96,
+      "prefix": "Please stop.",
+      "prefix_sha256": "9d91db676c51231fbe8abf92a14dc774cd4fba8b2157ff09dfbb2b909b25e82e",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "87329-interruption",
+      "turn": "user0",
+      "update_index": 4,
+      "at": 0.9598639234900475,
+      "prefix": "Please stop",
+      "prefix_sha256": "77bece824317c87637316fa6c51a47b17668f5c7a63ea152d16d70b0d9709837",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "87329-clean",
+      "turn": "phase5",
+      "update_index": 13,
+      "at": 8.64,
+      "prefix": "I see.",
+      "prefix_sha256": "420c703b11610f7b7a8e910dc406505b7bda360bb628955d4625a5a8d7c3005c",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "87329-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.7991499714553356,
+      "prefix": "I see",
+      "prefix_sha256": "dcf10e361b8ded37f287e5d691729af4e7477886dca96d8c858033c6d4b746ba",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "85176-clean",
+      "turn": "phase13",
+      "update_index": 31,
+      "at": 32.64,
+      "prefix": "Please pause.",
+      "prefix_sha256": "da539414f156d3a8410e81b28e52faa0d4ee9d24a25f3545bdf69d7226202e97",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "85176-interruption",
+      "turn": "user0",
+      "update_index": 5,
+      "at": 0.9583044815808535,
+      "prefix": "Please pause",
+      "prefix_sha256": "1fb029fc1ca0fce3fe0a08af8334036d2035596e3b7f6ec94adc66fc66c85f73",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "85176-clean",
+      "turn": "phase5",
+      "update_index": 9,
+      "at": 6.24,
+      "prefix": "Hmm.",
+      "prefix_sha256": "7f2302c86d005fed4397eef4134c2c03eb6324268449f5cf97595e6307942c31",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "85176-backchannel",
+      "turn": "user0",
+      "update_index": 0,
+      "at": 1.9168341644108295,
+      "prefix": "M",
+      "prefix_sha256": "08f271887ce94707da822d5263bae19d5519cb3614e0daedc4c7ce5dab7473f1",
+      "judgment": "unknown",
+      "reason": "残字M不能依据后续参考恢复为附和。"
+    },
+    {
+      "case_id": "30112-clean",
+      "turn": "phase13",
+      "update_index": 35,
+      "at": 28.8,
+      "prefix": "Stop",
+      "prefix_sha256": "cae7d57bc067a514b8e34c9589631a95c7dc051638ddd2a190773269279a99df",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "30112-interruption",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.6408622562885284,
+      "prefix": "Stop",
+      "prefix_sha256": "cae7d57bc067a514b8e34c9589631a95c7dc051638ddd2a190773269279a99df",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "30112-clean",
+      "turn": "phase5",
+      "update_index": 10,
+      "at": 6.72,
+      "prefix": "Hmm.",
+      "prefix_sha256": "7f2302c86d005fed4397eef4134c2c03eb6324268449f5cf97595e6307942c31",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "30112-backchannel",
+      "turn": "user0",
+      "update_index": 0,
+      "at": 1.9169198293238878,
+      "prefix": "M",
+      "prefix_sha256": "08f271887ce94707da822d5263bae19d5519cb3614e0daedc4c7ce5dab7473f1",
+      "judgment": "unknown",
+      "reason": "残字M不能依据后续参考恢复为附和。"
+    },
+    {
+      "case_id": "82230-clean",
+      "turn": "phase13",
+      "update_index": 30,
+      "at": 30.24,
+      "prefix": "Stop for",
+      "prefix_sha256": "c4a0386a02c870aa9bcf60f17c30b6181f16592bfb8fd37c06921f04f4ff6e61",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "82230-interruption",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.6399801764637232,
+      "prefix": "Stop",
+      "prefix_sha256": "cae7d57bc067a514b8e34c9589631a95c7dc051638ddd2a190773269279a99df",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "82230-clean",
+      "turn": "phase5",
+      "update_index": 11,
+      "at": 7.68,
+      "prefix": "Mm-hm.",
+      "prefix_sha256": "8f032ea13b58e16d1d26d27ee7b8f7465a743c31c69daa0914951f36ac1a4b88",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "89632-clean",
+      "turn": "phase13",
+      "update_index": 36,
+      "at": 32.16,
+      "prefix": "Wait,",
+      "prefix_sha256": "6092546dbb6d2b104e200caa29a2d314ce1fea47009584a8838f60e8f10ee373",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "89632-interruption",
+      "turn": "user0",
+      "update_index": 2,
+      "at": 0.9589841309934855,
+      "prefix": "Wait",
+      "prefix_sha256": "26b83994dca8b4b483edc45464ba07a5bde05cb7e6c5c61bb2e66da9d1e15fc7",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "89632-clean",
+      "turn": "phase5",
+      "update_index": 11,
+      "at": 7.68,
+      "prefix": "Mm-hm.",
+      "prefix_sha256": "8f032ea13b58e16d1d26d27ee7b8f7465a743c31c69daa0914951f36ac1a4b88",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "72651-clean",
+      "turn": "phase13",
+      "update_index": 28,
+      "at": 24.96,
+      "prefix": "Stop for",
+      "prefix_sha256": "c4a0386a02c870aa9bcf60f17c30b6181f16592bfb8fd37c06921f04f4ff6e61",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "72651-interruption",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.6392267365008593,
+      "prefix": "Stop",
+      "prefix_sha256": "cae7d57bc067a514b8e34c9589631a95c7dc051638ddd2a190773269279a99df",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "72651-clean",
+      "turn": "phase5",
+      "update_index": 10,
+      "at": 7.68,
+      "prefix": "Hmm.",
+      "prefix_sha256": "7f2302c86d005fed4397eef4134c2c03eb6324268449f5cf97595e6307942c31",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "72651-backchannel",
+      "turn": "user0",
+      "update_index": 0,
+      "at": 1.9160502720624208,
+      "prefix": "M",
+      "prefix_sha256": "08f271887ce94707da822d5263bae19d5519cb3614e0daedc4c7ce5dab7473f1",
+      "judgment": "unknown",
+      "reason": "残字M不能依据后续参考恢复为附和。"
+    },
+    {
+      "case_id": "52044-clean",
+      "turn": "phase13",
+      "update_index": 28,
+      "at": 23.52,
+      "prefix": "Please stop.",
+      "prefix_sha256": "9d91db676c51231fbe8abf92a14dc774cd4fba8b2157ff09dfbb2b909b25e82e",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "52044-interruption",
+      "turn": "user0",
+      "update_index": 4,
+      "at": 0.9580557085573673,
+      "prefix": "Please stop",
+      "prefix_sha256": "77bece824317c87637316fa6c51a47b17668f5c7a63ea152d16d70b0d9709837",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "52044-clean",
+      "turn": "phase5",
+      "update_index": 5,
+      "at": 5.28,
+      "prefix": "I see.",
+      "prefix_sha256": "420c703b11610f7b7a8e910dc406505b7bda360bb628955d4625a5a8d7c3005c",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "52044-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.8003164120018482,
+      "prefix": "I see",
+      "prefix_sha256": "dcf10e361b8ded37f287e5d691729af4e7477886dca96d8c858033c6d4b746ba",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "46054-clean",
+      "turn": "phase13",
+      "update_index": 46,
+      "at": 39.84,
+      "prefix": "Please stop.",
+      "prefix_sha256": "9d91db676c51231fbe8abf92a14dc774cd4fba8b2157ff09dfbb2b909b25e82e",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "46054-interruption",
+      "turn": "user0",
+      "update_index": 4,
+      "at": 0.9573352392762899,
+      "prefix": "Please stop",
+      "prefix_sha256": "77bece824317c87637316fa6c51a47b17668f5c7a63ea152d16d70b0d9709837",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "46054-clean",
+      "turn": "phase5",
+      "update_index": 15,
+      "at": 9.12,
+      "prefix": "Okay.",
+      "prefix_sha256": "03b25bed61dad2fc92bb7ca539a0f5abb89e97a767e3ca68789d47009f9fa5c3",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "46054-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.6401504464447498,
+      "prefix": "Okay",
+      "prefix_sha256": "16584052fd337f09553dfe2ed98e35a2de86043f25e61a3acb5d1e63a949e844",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "14183-clean",
+      "turn": "phase13",
+      "update_index": 39,
+      "at": 35.52,
+      "prefix": "Stop",
+      "prefix_sha256": "cae7d57bc067a514b8e34c9589631a95c7dc051638ddd2a190773269279a99df",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "14183-interruption",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 0.6410189531743526,
+      "prefix": "Stop",
+      "prefix_sha256": "cae7d57bc067a514b8e34c9589631a95c7dc051638ddd2a190773269279a99df",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "14183-clean",
+      "turn": "phase5",
+      "update_index": 15,
+      "at": 9.12,
+      "prefix": "Right.",
+      "prefix_sha256": "cd5592e5e3140daa2f3fe0541c004877a65933bc07d69dbec8e3a441e7877c90",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "14183-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 1.7576818112283945,
+      "prefix": "Right",
+      "prefix_sha256": "883361d5d682a1574410961ce51450b6e036a779c9f098dec71e28aec832bfa6",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "20638-clean",
+      "turn": "phase13",
+      "update_index": 37,
+      "at": 33.12,
+      "prefix": "Please pause.",
+      "prefix_sha256": "da539414f156d3a8410e81b28e52faa0d4ee9d24a25f3545bdf69d7226202e97",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "20638-interruption",
+      "turn": "user0",
+      "update_index": 5,
+      "at": 0.9576738998293877,
+      "prefix": "Please pause",
+      "prefix_sha256": "1fb029fc1ca0fce3fe0a08af8334036d2035596e3b7f6ec94adc66fc66c85f73",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "20638-clean",
+      "turn": "phase5",
+      "update_index": 11,
+      "at": 8.16,
+      "prefix": "Right.",
+      "prefix_sha256": "cd5592e5e3140daa2f3fe0541c004877a65933bc07d69dbec8e3a441e7877c90",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "20638-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 1.759364489465952,
+      "prefix": "Right",
+      "prefix_sha256": "883361d5d682a1574410961ce51450b6e036a779c9f098dec71e28aec832bfa6",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "66763-clean",
+      "turn": "phase13",
+      "update_index": 58,
+      "at": 41.76,
+      "prefix": "Wait",
+      "prefix_sha256": "26b83994dca8b4b483edc45464ba07a5bde05cb7e6c5c61bb2e66da9d1e15fc7",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "66763-interruption",
+      "turn": "user0",
+      "update_index": 2,
+      "at": 0.9597338251769543,
+      "prefix": "Wait",
+      "prefix_sha256": "26b83994dca8b4b483edc45464ba07a5bde05cb7e6c5c61bb2e66da9d1e15fc7",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "66763-clean",
+      "turn": "phase5",
+      "update_index": 27,
+      "at": 15.36,
+      "prefix": "Mm-hm.",
+      "prefix_sha256": "8f032ea13b58e16d1d26d27ee7b8f7465a743c31c69daa0914951f36ac1a4b88",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "40932-clean",
+      "turn": "phase13",
+      "update_index": 39,
+      "at": 35.04,
+      "prefix": "Please stop.",
+      "prefix_sha256": "9d91db676c51231fbe8abf92a14dc774cd4fba8b2157ff09dfbb2b909b25e82e",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "40932-interruption",
+      "turn": "user0",
+      "update_index": 4,
+      "at": 0.9577959533780813,
+      "prefix": "Please stop",
+      "prefix_sha256": "77bece824317c87637316fa6c51a47b17668f5c7a63ea152d16d70b0d9709837",
+      "judgment": "non_backchannel",
+      "reason": "该可见前缀已构成暂停当前输出的直接请求；此前残字或Please不能单独判定。"
+    },
+    {
+      "case_id": "40932-clean",
+      "turn": "phase5",
+      "update_index": 12,
+      "at": 8.64,
+      "prefix": "Right.",
+      "prefix_sha256": "cd5592e5e3140daa2f3fe0541c004877a65933bc07d69dbec8e3a441e7877c90",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    },
+    {
+      "case_id": "40932-backchannel",
+      "turn": "user0",
+      "update_index": 1,
+      "at": 1.7566000316292048,
+      "prefix": "Right",
+      "prefix_sha256": "883361d5d682a1574410961ce51450b6e036a779c9f098dec71e28aec832bfa6",
+      "judgment": "backchannel",
+      "reason": "仅依据当前可见完整简短确认语判为附和；残字I、R、O和Mm-h不提前继承标签。"
+    }
+  ]
+}

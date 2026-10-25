@@ -1,0 +1,23 @@
+{
+  "training_run": "tt-010-fulltraj-20261025-r1",
+  "training_job": "job-179293824747465991917-xuan-zhang",
+  "training_source_commit": "56102849e3e88209a9943fd1ffa605395534526e",
+  "dataset": "tt-010-fulltraj-r1",
+  "dataset_manifest_sha256": "21357f70fb2d382c1ed79741d094aaee9378ec609c5215c7db1afc096b477989",
+  "training_config": "configs/textturn_full_trajectory_training.json",
+  "ultrachat_baseline": "dataset/tt-008-ultrachat-r1/manifest.json",
+  "fdb_baseline": "dataset/tt-007-fdb-160ms-r1/manifest.json",
+  "ultrachat_run": "tt-011-ultrachat-20261026-r1",
+  "fdb_run": "tt-011-fdb-20261026-r1",
+  "configurations": [{"control_ms": 160, "assistant_tokens": 3, "full_lifecycle": true}],
+  "maximum_job_seconds": 7200,
+  "cleanup_reserve_seconds": 60,
+  "maximum_gpu_mib": 22528,
+  "minimum_free_bytes": 32212254720,
+  "maximum_asset_bytes": 10737418240,
+  "maximum_report_bytes": 2147483648,
+  "training_wait_deadline": "2026-10-26T03:00:00+08:00",
+  "maximum_parallel_jobs": 1,
+  "stop_deadline_ms": 1000,
+  "overlap_threshold_ms": 960
+}
