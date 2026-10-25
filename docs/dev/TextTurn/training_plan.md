@@ -101,6 +101,8 @@ Assistant 模拟每480ms发布8个token，末块可更短；该参数描述 LLM 
 
 公开英文 Easy Turn 的 617 条可另报完成／未完成诊断，但它不能替代四类场景验收，不据其结果调参。训练 loss 下降、合成集高分或更频繁 start，都不足以通过。
 
+2026-10-25用户另行要求先制定[FDB Smooth Turn Taking与Pause Handling各50条测试计划](fdb_cross_dataset_plan.md)。使用固定候选、已有录音和FDB时间标注做外部动作诊断，音频参考延迟与本节ASR依据可见延迟分列，不能称官方音频输出TOR或完整四类通过。当前仅交付计划，未启动新作业。
+
 ## 5. Shared Context、第二阶段与执行边界
 
 Nemotron 每次文本更新先按稳定的 `turn_id` 写入 Shared Context；下游取得最新快照或按游标读取更新，无需等 start。同一轮多个快照不能重复追加为正文。`no-voice` 是控制观察事件，不向用户转写文本填入虚构词语。转写版本、消费者实际读取版本、关闭及 EOF 分别记录；沿用旧[接口设计](../SoulX-Duplug/shared_context_interface.md)中的版本与读取原则，但不依赖 SoulX 音频同步或完整实现任意 ASR 回写。
