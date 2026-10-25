@@ -3,11 +3,9 @@ from __future__ import annotations
 
 import argparse
 import base64
-from collections import defaultdict
 import hashlib
 import json
 from pathlib import Path
-import re
 import sys
 import threading
 import time
@@ -20,11 +18,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'runtime'))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'training'))
 from textturn_context import ControlWindowAssembler, LatestControlWorker, SharedContext, TranscriptConsumer
 from build_textturn_dataset import ControlTokenizer, strip_terminal
-from score_textturn import metric
+from score_textturn_trace import run as rescore_traces
 
-
-def normalize(text):
-    return ' '.join(re.findall(r'\w+', text.casefold()))
 
 
 class ShadowState:
@@ -223,85 +218,17 @@ def replay_case(case, args, tokenizer):
         raise RuntimeError('Audio sender did not terminate')
     latest = shared.get_user_turn(case['case_id'], turn_id)
     context_ok = consumer.turns[turn_id]['text'] == latest['text'] and len(consumer.versions_read) == version + 2
-    completed_reference_at = next((event['published_at'] for event in transcripts
-                                  if normalize(event['text']).startswith(normalize(case['reference_text']))), None)
-    trigger_at = next((event['published_at'] for event in transcripts
-                       if re.search(r'\b(?:stop|pause|wait)\b', event['text'], re.I)), None)
-    category = case['category']
-    correct_action = 'stop' if category == 'interruption' else 'start'
-    anchor = trigger_at if category == 'interruption' else completed_reference_at
-    applicable = [r for r in actions if r.get('action') == correct_action]
-    false_early = any(anchor is None or r['started_at'] < anchor for r in applicable)
-    timely = anchor is not None and any(anchor <= r['returned_at'] <= anchor + 1. for r in applicable)
-    quality_success = not false_early and timely and not any(r.get('error') for r in actions)
-    pause_results = None
-    if category == 'smooth_question_pause':
-        prefix = normalize(case['pause_prefix_text'])
-        pause_begin = next((event['published_at'] for event in transcripts
-                            if normalize(event['text']) == prefix), None)
-        resume = next((event['published_at'] for event in transcripts
-                       if pause_begin is not None and event['published_at'] > pause_begin and
-                       normalize(event['text']).startswith(prefix + ' ')), started + len(audio) / rate)
-        observed = [r for r in actions if pause_begin is not None and pause_begin <= r['started_at'] < resume]
-        pause_results = {'observable': bool(observed), 'false_start': any(r['action'] == 'start' for r in observed),
-                         'success': bool(observed) and all(r['action'] == 'keep' for r in observed)}
-    if category == 'backchannel':
-        quality_success = completed_reference_at is not None and bool(actions) and all(
-            r.get('action') != 'stop' and not r.get('error') for r in actions)
-    return {'case_id': case['case_id'], 'source_id': case['source_id'], 'category': category,
-            'success': quality_success, 'false_early_action': false_early if category != 'backchannel' else None,
-            'anchor_at': anchor, 'pause': pause_results, 'context_ok': context_ok,
-            'context_versions': len(consumer.versions_read), 'online_steps': len(steps),
-            'online_transcripts': len(transcripts), 'eof_drain_events': len(offline),
-            'asr_reference_complete': completed_reference_at is not None,
-            'merged_windows': worker.merged, 'planned_windows': math_ceil(len(steps) / 3),
-            'control_calls': len(actions), 'control_ms': [r['control_ms'] for r in actions],
-            'aggregation_wait_ms': [r['window']['aggregation_wait_ms'] for r in actions],
-            'elapsed_seconds': time.monotonic() - started,
+    return {'case_id': case['case_id'], 'source_id': case['source_id'], 'category': case['category'],
+            'context_ok': context_ok, 'context_versions': len(consumer.versions_read),
+            'online_steps': len(steps), 'online_transcripts': len(transcripts),
+            'eof_drain_events': len(offline), 'merged_windows': worker.merged,
+            'control_calls': len(actions), 'elapsed_seconds': time.monotonic() - started,
             'runtime_success': bool(steps) and bool(actions) and not any(r.get('error') for r in actions)}
 
 
 def math_ceil(value):
     import math
     return math.ceil(value)
-
-
-def summarize(cases, results):
-    lookup = {r['case_id']: r for r in results}
-    rows = [lookup.get(c['case_id'], {'case_id': c['case_id'], 'category': c['category'],
-                                    'source_id': c['source_id'], 'success': False, 'runtime_success': False}) for c in cases]
-    metrics = {}
-    for name, categories, negative in [
-        ('smooth', ('smooth_question_pause', 'smooth_declarative'), False),
-        ('declarative', ('smooth_declarative',), False), ('interruption', ('interruption',), False),
-        ('backchannel_false_stop', ('backchannel',), True)]:
-        selected = [r for r in rows if r['category'] in categories]
-        metrics[name] = metric(sum(not r['success'] if negative else r['success'] for r in selected), len(selected))
-    pauses = [r for r in rows if r['category'] == 'smooth_question_pause']
-    metrics['pause_false_start'] = metric(sum(not (r.get('pause') or {}).get('success', False) for r in pauses), len(pauses))
-    metrics['runtime'] = metric(sum(r['runtime_success'] for r in rows), len(rows))
-    metrics['context'] = metric(sum(r.get('context_ok', False) for r in rows), len(rows))
-    durations = sorted(ms for r in rows for ms in r.get('control_ms', []))
-    metrics['control_ms_p95'] = durations[math_ceil(len(durations) * .95) - 1] if durations else None
-    metrics['merged_windows'] = sum(r.get('merged_windows', 0) for r in rows)
-    metrics['planned_windows'] = sum(r.get('planned_windows', 0) for r in rows)
-    metrics['source_groups'] = len({c['source_id'] for c in cases})
-    metrics['observable_groups'] = {
-        'smooth': len({r['source_id'] for r in rows if r['category'] in ('smooth_question_pause', 'smooth_declarative') and r.get('anchor_at') is not None}),
-        'declarative': len({r['source_id'] for r in rows if r['category'] == 'smooth_declarative' and r.get('anchor_at') is not None}),
-        'interruption': len({r['source_id'] for r in rows if r['category'] == 'interruption' and r.get('anchor_at') is not None}),
-        'pause': len({r['source_id'] for r in rows if (r.get('pause') or {}).get('observable', False)}),
-        'backchannel': len({r['source_id'] for r in rows if r['category'] == 'backchannel' and r.get('asr_reference_complete', False)})}
-    metrics['input_type'] = 'real_time_kokoro_synthetic_speech_to_native_nemotron'
-    enough = metrics['source_groups'] >= 100 and all(n >= 100 for n in metrics['observable_groups'].values())
-    quality = all(metrics[name]['rate'] is not None and metrics[name]['rate'] >= .8
-                  for name in ('smooth', 'declarative', 'interruption')) and all(
-        metrics[name]['rate'] is not None and metrics[name]['rate'] <= .15
-        for name in ('pause_false_start', 'backchannel_false_stop'))
-    operational = metrics['runtime']['rate'] is not None and metrics['runtime']['rate'] >= .95 and metrics['context']['rate'] == 1.
-    latency = metrics['control_ms_p95'] is not None and metrics['control_ms_p95'] <= 500
-    metrics['conclusion'] = 'insufficient_evidence' if not enough else 'pass_initial_screen' if quality and operational and latency else 'not_passed'
-    return metrics
 
 
 def main(args):
@@ -324,14 +251,22 @@ def main(args):
                 result = replay_case(case, args, tokenizer)
             except Exception as exc:
                 result = {'case_id': case['case_id'], 'source_id': case['source_id'], 'category': case['category'],
-                          'success': False, 'runtime_success': False, 'error': repr(exc)}
+                          'runtime_success': False, 'error': repr(exc)}
             results.append(result)
             stream.write(json.dumps(result, ensure_ascii=False) + '\n')
             stream.flush()
-            (args.output / 'summary.json').write_text(json.dumps(summarize(cases, results), indent=2) + '\n')
+            (args.output / 'progress.json').write_text(json.dumps(
+                {'planned': len(cases), 'completed': index + 1,
+                 'runtime_successful': sum(r['runtime_success'] for r in results)}, indent=2) + '\n')
             print(json.dumps({'event': 'shadow_replay', 'completed': index + 1, 'planned': len(cases),
                               'runtime_success': result['runtime_success']}), flush=True)
-    return summarize(cases, results)
+    planned_manifest = args.output / 'planned_manifest.json'
+    planned_manifest.write_text(json.dumps({**manifest, 'records': cases}, ensure_ascii=False) + '\n')
+    result = rescore_traces(argparse.Namespace(
+        manifest=planned_manifest, traces=args.output / 'traces',
+        annotations=getattr(args, 'annotations', None), output=args.output / 'score-v2'))
+    (args.output / 'summary.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+    return result
 
 
 if __name__ == '__main__':
@@ -342,4 +277,5 @@ if __name__ == '__main__':
     parser.add_argument('--asr-url', default='http://127.0.0.1:18815')
     parser.add_argument('--controller-url', default='http://127.0.0.1:18816')
     parser.add_argument('--limit', type=int, default=0)
+    parser.add_argument('--annotations', type=Path)
     print(json.dumps(main(parser.parse_args()), indent=2))

@@ -25,6 +25,26 @@ def metric(numerator, denominator):
             'wilson_95': wilson(numerator, denominator)}
 
 
+def outcome_metric(opportunities, negative=False):
+    """Keep missing evidence separate from observed action errors and success."""
+    total = len(opportunities)
+    passed = sum(r['outcome'] == 'pass' for r in opportunities)
+    failed = sum(r['outcome'] == 'fail' for r in opportunities)
+    unknown = total - passed - failed
+    known = passed + failed
+    errors = sum(bool(r.get('actual_error')) for r in opportunities)
+    numerator = errors if negative else passed
+    denominator = known if negative else total
+    result = metric(numerator, denominator)
+    result.update(planned=total, passed=passed, failed=failed, unknown=unknown,
+                  actual_errors=errors, adjudicated=known,
+                  adjudicated_coverage=known / total if total else None,
+                  conditional_success=metric(passed, known),
+                  planned_success_bounds=[passed / total, (passed + unknown) / total] if total else [None, None],
+                  planned_error_bounds=[errors / total, (errors + unknown) / total] if total else [None, None])
+    return result
+
+
 def score_predictions(rows, predictions):
     predictions = {p['snapshot_id']: p for p in predictions}
     groups = defaultdict(list)
@@ -46,9 +66,11 @@ def score_predictions(rows, predictions):
             if prediction.get('action') == action and elapsed is not None:
                 timely |= anchor['visible_ms'] - anchor['allowed_visible_ms'] + elapsed <= 1000
         success = not missing and not false_action and (timely if action else True)
+        outcome = 'fail' if false_action else 'unknown' if missing else 'pass' if success else 'fail'
         opportunities.append({'opportunity_id': identity, 'source_id': windows[0]['source_id'],
                               'category': category, 'declarative': any(r.get('utterance_form') == 'declarative' for r in anchors),
-                              'success': success, 'false_action': false_action, 'missing': missing,
+                              'success': success, 'outcome': outcome, 'actual_error': false_action,
+                              'false_action': false_action, 'missing': missing,
                               'timely': timely if action else None, 'windows': len(windows)})
     result = {}
     for name, category in [('smooth', 'smooth'), ('declarative', 'smooth'), ('interruption', 'interruption'),
@@ -56,15 +78,14 @@ def score_predictions(rows, predictions):
         selected = [r for r in opportunities if r['category'] == category and
                     (name != 'declarative' or r['declarative'])]
         negative = name in ('pause_false_start', 'backchannel_false_stop')
-        numerator = sum((not r['success']) if negative else r['success'] for r in selected)
-        result[name] = metric(numerator, len(selected))
+        result[name] = outcome_metric(selected, negative=negative)
     durations = sorted(p['control_ms'] for p in predictions.values() if p.get('control_ms') is not None)
     successes = sum(predictions.get(r['snapshot_id'], {}).get('action') is not None for r in rows)
     result['runtime'] = metric(successes, len(rows))
     result['control_ms_p95'] = durations[max(0, math.ceil(len(durations) * .95) - 1)] if durations else None
     result['opportunity_score'] = sum(
         result[name]['rate'] if name not in ('pause_false_start', 'backchannel_false_stop')
-        else 1 - result[name]['rate']
+        else 1 - result[name]['planned_error_bounds'][1]
         for name in ('smooth', 'declarative', 'interruption', 'pause_false_start', 'backchannel_false_stop')
         if result[name]['rate'] is not None) / 5
     result['evaluation_mode'] = 'offline_given_state_text_diagnostic'
@@ -79,7 +100,8 @@ def score_file(rows, predictions, output):
     (output / 'summary.json').write_text(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
     with (output / 'opportunities.csv').open('w') as stream:
         writer = csv.DictWriter(stream, fieldnames=['opportunity_id', 'source_id', 'category', 'declarative',
-                                                    'success', 'false_action', 'missing', 'timely', 'windows'])
+                                                    'success', 'outcome', 'actual_error', 'false_action',
+                                                    'missing', 'timely', 'windows'], lineterminator='\n')
         writer.writeheader()
         writer.writerows(opportunities)
     return result

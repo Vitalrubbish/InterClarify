@@ -25,7 +25,9 @@ class TextTurnScoringTests(unittest.TestCase):
     def test_missing_wait_is_not_successful_pause(self):
         rows = [self.row('pause', 'keep', 'pause')]
         result, _ = scoring.score_predictions(rows, [])
-        self.assertEqual(result['pause_false_start']['rate'], 1.)
+        self.assertIsNone(result['pause_false_start']['rate'])
+        self.assertEqual(result['pause_false_start']['unknown'], 1)
+        self.assertEqual(result['pause_false_start']['actual_errors'], 0)
         self.assertEqual(result['runtime']['denominator'], 1)
 
     def test_window_wait_is_included_in_timely_start(self):
