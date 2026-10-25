@@ -68,6 +68,7 @@ def digest(path):
         for block in iter(lambda: f.read(1048576), b''): h.update(block)
     return h.hexdigest()
 protocol = json.loads(config.read_text())
+assert protocol.get('controller_state_mode') == 'action_only'
 manifest = json.loads((out/'manifest.json').read_text())
 assert manifest['protocol_sha256'] == digest(config) and manifest['protocol'] == protocol
 assert digest(train/'best/adapter_model.safetensors') == protocol['candidate_sha256']
@@ -123,9 +124,9 @@ assert not pending, f'Services not ready: {pending}'
 Path(sys.argv[1], 'health.json').write_text(json.dumps(health, indent=2)+'\n')
 PY
 run_step "$ENV_DIR/bin/python" -u "$REPO_ROOT/scripts/remote/textturn_fdb_replay.py" \
-  --manifest "$MANIFEST" --tokenizer "$ROOT/models/qwen3-0.6b" --output "$RUN_DIR/smoke" --smoke
+  --manifest "$MANIFEST" --output "$RUN_DIR/smoke" --smoke
 run_step "$ENV_DIR/bin/python" -u "$REPO_ROOT/scripts/remote/textturn_fdb_replay.py" \
-  --manifest "$MANIFEST" --tokenizer "$ROOT/models/qwen3-0.6b" --output "$RUN_DIR/formal"
+  --manifest "$MANIFEST" --output "$RUN_DIR/formal"
 stop_services
 run_step "$ENV_DIR/bin/python" "$REPO_ROOT/scripts/training/score_textturn_fdb.py" \
   --manifest "$MANIFEST" --replay "$RUN_DIR/formal" --output "$RUN_DIR/scoring"

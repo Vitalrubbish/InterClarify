@@ -15,3 +15,5 @@
 输出位置为`~/parathink-textturn/runs/<run_id>`；正式trace在`formal/traces`，在线进度在`formal/progress.json`，服务停止后结果在`scoring`。退出码0只代表作业执行结束，不表示模型质量通过或TT-004完成。
 
 TT-007支持`TEXTTURN_FDB_CONFIG`，默认480ms路径不变；复制所选配置到run的`protocol.json`，核对与清单内容及摘要完全一致后再加载模型。回放和评分从同一清单读取周期，不能出现160ms回放却按480ms拍数计分。源码、配置及产物独立冻结，不改正在运行的480ms worktree。
+
+按用户最新纠正，运行节点再次要求action_only协议，回放不再传入用于模拟回答的tokenizer。旧r3因用户纠正测试目的而撤回，trace和占卡记录保留；新480ms与160ms均仅由控制动作改变状态。

@@ -1,10 +1,11 @@
-"""Replay frozen natural recordings through Nemotron and a simulated output lifecycle."""
+"""Monitor TextTurn actions on frozen natural recordings without assistant responses."""
 from __future__ import annotations
 
 import argparse
 import base64
 import json
 from pathlib import Path
+import sys
 import threading
 import time
 
@@ -13,8 +14,46 @@ import requests
 import soundfile as sf
 
 from freeze_textturn_fdb import digest, write_json
-from textturn_shadow_replay import (ControlTokenizer, ControlWindowAssembler, LatestControlWorker,
-                                    ShadowState, SharedContext, TranscriptConsumer)
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'runtime'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'training'))
+from textturn_context import ControlWindowAssembler, LatestControlWorker, SharedContext, TranscriptConsumer
+from build_textturn_dataset import LEGAL, strip_terminal
+
+
+class ActionState:
+    """Track only controller-driven state; no generated text or timed completion."""
+
+    def __init__(self, control_ms, history):
+        self.lock = threading.RLock()
+        self.state = 'Listen'
+        self.history = list(history)
+        self.steps_per_window = control_ms // 160
+        self.empty_streak = 0
+        self.transitions = []
+
+    def snapshot(self, window):
+        with self.lock:
+            observation = strip_terminal(window['user_delta']) or '<|no-voice|>'
+            cycles = max(1, (window['step_count'] + self.steps_per_window - 1) // self.steps_per_window)
+            self.empty_streak = self.empty_streak + cycles if observation == '<|no-voice|>' else 0
+            return {'history': self.history.copy(), 'user_text': strip_terminal(window['text']),
+                    'assistant_visible': '', 'state': self.state, 'observation': observation,
+                    'window_ms': window['nominal_end_ms'] - window['nominal_start_ms'],
+                    'consecutive_no_voice_windows': self.empty_streak,
+                    'assistant_generation_complete': None, 'cot': ''}
+
+    def apply(self, action):
+        with self.lock:
+            if action not in LEGAL[self.state]:
+                raise ValueError('Illegal controller transition')
+            before = self.state
+            if action == 'start':
+                self.state = 'Speak'
+            elif action == 'stop':
+                self.state = 'Listen'
+            if action != 'keep':
+                self.transitions.append({'action': action, 'before': before, 'after': self.state,
+                                         'at': time.monotonic()})
 
 
 def load_audio(case, manifest):
@@ -30,13 +69,10 @@ def load_audio(case, manifest):
     return audio, rate
 
 
-def replay(case, manifest, args, tokenizer):
+def replay(case, manifest, args):
     protocol = manifest['protocol']
     audio, rate = load_audio(case, manifest)
-    state = ShadowState({'category': 'turn_taking', 'assistant_text': protocol['assistant_text'],
-                         'history': protocol['history'], 'source_id': '1'}, tokenizer,
-                        control_ms=protocol['control_ms'], generation_ms=protocol.get('assistant_generation_ms', 480))
-    state.tail_seconds = protocol.get('playback_tail_ms', protocol['playback_tail_windows'] * 480) / 1000
+    state = ActionState(protocol['control_ms'], protocol['history'])
     shared, assembler = SharedContext(), ControlWindowAssembler(protocol['control_ms'])
     consumer = TranscriptConsumer(case['case_id'])
     transport = requests.Session()
@@ -52,7 +88,7 @@ def replay(case, manifest, args, tokenizer):
             trace.flush()
 
         record('case_start', {'case_id': case['case_id'], 'started_at': started,
-            'control_ms': protocol['control_ms'], 'assistant_generation_ms': protocol.get('assistant_generation_ms', 480),
+            'control_ms': protocol['control_ms'], 'controller_state_mode': protocol['controller_state_mode'],
             'original_seconds': case['duration_seconds'], 'sent_seconds': case['sent_seconds'],
             'tail_seconds': case['tail_seconds']})
         failure = None
@@ -78,7 +114,7 @@ def replay(case, manifest, args, tokenizer):
                 action = service['action']
                 if action not in ({'keep', 'start'} if visible['state'] == 'Listen' else {'keep', 'stop'}):
                     raise ValueError('Illegal action')
-                state.apply(action, visible, window['text'])
+                state.apply(action)
                 with state.lock:
                     details[window['last_step_seq']] = {'visible': visible, 'service': service,
                         'action_returned_at': returned_at, 'state_after': state.state,
@@ -196,8 +232,8 @@ def replay(case, manifest, args, tokenizer):
             finally:
                 transport.close()
                 record('input_timing', timings)
-                for value in state.lifecycle:
-                    record('simulated_lifecycle', value)
+                for value in state.transitions:
+                    record('controller_transition', value)
                 record('case_end', {'runtime_success': failure is None, 'error': failure,
                     'steps': steps, 'control_calls': controls, 'merged_windows': worker.merged if worker else 0,
                     'eof_drain_events': drained, 'ended_at': time.monotonic()})
@@ -208,14 +244,15 @@ def main(args):
     manifest = json.loads(args.manifest.read_text())
     if not manifest['complete']:
         raise ValueError('Sampling incomplete; do not infer')
+    if manifest['protocol'].get('controller_state_mode') != 'action_only':
+        raise ValueError('Expected action-only monitoring; legacy response simulation is retired')
     args.output.mkdir(parents=True, exist_ok=False)
     (args.output / 'traces').mkdir()
-    tokenizer = ControlTokenizer(args.tokenizer)
     records = manifest['smoke'] if args.smoke else manifest['records']
     with (args.output / 'cases.jsonl').open('x') as stream:
         for index, case in enumerate(records):
             try:
-                result = replay(case, manifest, args, tokenizer)
+                result = replay(case, manifest, args)
             except Exception as exc:
                 result = {'case_id': case['case_id'], 'runtime_success': False, 'error': repr(exc)}
                 stream.write(json.dumps(result) + '\n')
@@ -233,7 +270,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--manifest', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--tokenizer', type=Path, required=True)
     parser.add_argument('--asr-url', default='http://127.0.0.1:18815')
     parser.add_argument('--controller-url', default='http://127.0.0.1:18816')
     parser.add_argument('--smoke', action='store_true')

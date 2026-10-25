@@ -9,13 +9,9 @@
     "candor_turn_taking": 5,
     "candor_pause_handling": 0
   },
-  "assistant_text": "I am following what you are saying. I will take a moment to consider the information before continuing with a clear response.",
-  "assistant_tokens_per_window": 8,
-  "playback_tail_windows": 2,
   "history": [],
   "maximum_job_seconds": 7200,
   "cumulative_gpu_seconds": 28800,
-  "assistant_generation_ms": 480,
-  "playback_tail_ms": 960,
-  "experiment": "tt-007-fdb-160ms"
+  "experiment": "tt-007-fdb-160ms",
+  "controller_state_mode": "action_only"
 }

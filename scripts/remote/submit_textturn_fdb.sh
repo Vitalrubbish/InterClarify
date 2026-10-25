@@ -41,6 +41,7 @@ for line in raw.splitlines():
                  'gpu_seconds': duration*int(fields[6]), 'scheduler_info': info})
 assert {'job-179286310634760697957-xuan-zhang', 'job-179287011405618549973-xuan-zhang'} <= {j['job_id'] for j in jobs}
 protocol = json.loads(Path(sys.argv[3]).read_text())
+assert protocol.get('controller_state_mode') == 'action_only', 'Retired response simulation is not permitted'
 assert re.fullmatch('[0-9a-f]{64}', protocol['candidate_sha256']), 'Invalid SHA256 format'
 training = Path(sys.argv[4])
 candidate = json.loads((training/'candidate.json').read_text())

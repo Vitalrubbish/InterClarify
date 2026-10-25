@@ -15,8 +15,7 @@ sys.path.insert(0, str(ROOT / 'scripts/training'))
 sys.path.insert(0, str(ROOT / 'scripts/remote'))
 from score_textturn_fdb import proportion, run, score_case
 from freeze_textturn_fdb import derive_manifest, freeze
-from textturn_fdb_replay import load_audio
-from textturn_shadow_replay import ShadowState
+from textturn_fdb_replay import ActionState, load_audio
 
 
 def trace(states, boundary=10., times=None, control_ms=480):
@@ -30,6 +29,7 @@ def trace(states, boundary=10., times=None, control_ms=480):
             'window': window, 'action': 'keep', 'state_after': state,
             'action_returned_at': at, 'state_recorded_at': at, 'control_ms': 50,
             'visible': {'state': state}}]
+    events.append({'kind': 'case_start', 'control_ms': control_ms, 'controller_state_mode': 'action_only'})
     events.append({'kind': 'case_end', 'runtime_success': True, 'control_calls': len(states),
                    'steps': 3*len(states), 'merged_windows': 0, 'eof_drain_events': 4})
     return events
@@ -97,25 +97,29 @@ class FdbContractTests(unittest.TestCase):
         events[0]['published_at'] = 3.
         self.assertFalse(score_case(CASE, events, 160)['pre_asr_three_speak'])
 
-    def test_control_period_does_not_accelerate_simulated_generation_or_playback(self):
-        class Tokenizer:
-            def chunks(self, *args, **kwargs):
-                return ['a', 'b', 'c']
-        case = {'category': 'turn_taking', 'assistant_text': '', 'history': [], 'source_id': '1'}
+    def test_state_changes_only_by_actions_without_answers_or_timed_reset(self):
         for control_ms in (160, 480):
-            with self.subTest(control_ms=control_ms), patch('textturn_shadow_replay.time.monotonic', return_value=0.) as clock:
-                state = ShadowState(case, Tokenizer(), control_ms=control_ms)
-                state.apply('start', {}, '')
-                window = {'step_count': control_ms//160, 'user_delta': '', 'text': '',
+            with self.subTest(control_ms=control_ms), patch('textturn_fdb_replay.time.monotonic', return_value=0.) as clock:
+                state = ActionState(control_ms, [])
+                window = {'step_count': control_ms//160, 'user_delta': 'hello', 'text': 'hello',
                           'nominal_start_ms': 0, 'nominal_end_ms': control_ms}
-                clock.return_value = .16
-                self.assertEqual(state.snapshot(window)['assistant_visible'], '')
-                clock.return_value = .48
-                self.assertEqual(state.snapshot(window)['assistant_visible'], 'a')
-                clock.return_value = 2.3
-                self.assertEqual(state.snapshot(window)['state'], 'Speak')
-                clock.return_value = 2.4
                 self.assertEqual(state.snapshot(window)['state'], 'Listen')
+                state.apply('start')
+                clock.return_value = 10000.
+                visible = state.snapshot(window)
+                self.assertEqual(visible['state'], 'Speak')
+                self.assertEqual(visible['assistant_visible'], '')
+                self.assertIsNone(visible['assistant_generation_complete'])
+                self.assertEqual(visible['history'], [])
+                self.assertEqual(visible['user_text'], 'hello')
+                state.apply('keep')
+                self.assertEqual(state.state, 'Speak')
+                window.update(user_delta='', step_count=3*(control_ms//160))
+                self.assertEqual(state.snapshot(window)['consecutive_no_voice_windows'], 3)
+                state.apply('stop')
+                self.assertEqual(state.snapshot(window)['state'], 'Listen')
+                with self.assertRaises(ValueError):
+                    state.apply('stop')
 
     def test_ranked_freeze_audio_tail_and_no_sample_replacement(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -171,6 +175,15 @@ class FdbContractTests(unittest.TestCase):
             summary = run(root/'derived/manifest.json', root/'absent', root/'score160')
             self.assertEqual(summary['control_ms'], 160)
             self.assertEqual(summary['three_cycles_nominal_ms'], 480)
+            legacy = json.loads(path.read_text())
+            legacy['protocol'].pop('controller_state_mode')
+            legacy['protocol']['assistant_text'] = 'retired'
+            legacy_path = root/'legacy.json'
+            legacy_path.write_text(json.dumps(legacy))
+            self.assertTrue(derive_manifest(legacy_path, ROOT/'configs/textturn_fdb.json', root/'corrected480'))
+            self.assertEqual(json.loads((root/'corrected480/manifest.json').read_text())['records'], records)
+            with self.assertRaises(ValueError):
+                run(legacy_path, root/'absent', root/'retired-score')
 
 
 if __name__ == '__main__':

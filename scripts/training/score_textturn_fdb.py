@@ -1,4 +1,4 @@
-"""Score ASR-boundary simulated-state metrics without loading a model or reference text."""
+"""Score ASR-boundary controller actions without loading a response model or reference text."""
 from __future__ import annotations
 
 import argparse
@@ -47,6 +47,10 @@ def score_case(case, events, control_ms=480):
            'start_timing_unknown': False, 'pre_asr_three_speak': None,
            'longest_pre_asr_speak': None, 'speak_sequences': [], 'unknown_reason': None}
     ends = [e for e in events if e['kind'] == 'case_end']
+    starts = [e for e in events if e['kind'] == 'case_start']
+    if len(starts) != 1 or starts[0].get('controller_state_mode') != 'action_only':
+        row['unknown_reason'] = 'missing_action_only_protocol_or_retired_trace'
+        return row
     if any(e.get('control_ms', 480) != control_ms for e in events if e['kind'] == 'case_start'):
         row['unknown_reason'] = 'control_period_mismatch'
         return row
@@ -138,6 +142,8 @@ def interval_evidence(case, events):
 
 def run(manifest_path, replay_root, output):
     manifest = json.loads(manifest_path.read_text())
+    if manifest.get('protocol', {}).get('controller_state_mode') != 'action_only':
+        raise ValueError('Legacy simulated-response runs must not be scored as action-only monitoring')
     control_ms = manifest.get('protocol', {}).get('control_ms', 480)
     if not manifest['complete'] or len(manifest['records']) != 100:
         raise ValueError('Expected frozen 50+50 planned denominator')
@@ -168,7 +174,8 @@ def run(manifest_path, replay_root, output):
         'start_timing_unknown_samples': sum(r['start_timing_unknown'] for r in smooth)},
         'pause_handling': {'pre_asr_three_speak': proportion([r['pre_asr_three_speak'] for r in pause])},
         'control_p95_ms': percentile(all_control), 'aggregation_p95_ms': percentile(all_aggregation),
-        'pause_intervals': len(intervals), 'interpretation': 'simulated state and action; not actual audio latency or official TOR'}
+        'pause_intervals': len(intervals), 'controller_state_mode': 'action_only',
+        'interpretation': 'controller actions and state only; not actual audio latency or official TOR'}
     for name, value in [('summary.json', summary), ('intervals.json', intervals)]:
         (output / name).write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
     with (output / 'cases.csv').open('w', newline='') as stream:
@@ -180,7 +187,7 @@ def run(manifest_path, replay_root, output):
                              for k, v in row.items()})
     (output / 'README.md').write_text(f'# FDB {control_ms}ms周期联合结果\n\n'
         f'一拍为{control_ms}ms，连续3周期名义覆盖{3*control_ms}ms；跨周期对照须同时查看实际毫秒。\n\n'
-        '本结果描述ASR更新边界附近的模拟Speak状态与start动作；不代表真实扬声器开口或官方TOR。'
+        '本结果仅监控ASR更新边界附近的TextTurn动作与状态，不模拟回答、生成或播放；不代表真实扬声器开口或官方TOR。'
         '每臂计划分母固定50；未运行、失败和关键trace缺失保留未知。\n\n'
         '主比例、Wilson95%区间与等待拍数有效分母见summary.json；逐录音见cases.csv，'
         '停顿区间ASR前缀和覆盖证据见intervals.json。区间证据不自动构成语义错误判断。\n\n'

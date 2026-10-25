@@ -102,12 +102,15 @@ def derive_manifest(baseline, config, output):
     """Change the control protocol while retaining every frozen input and smoke record."""
     result = json.loads(baseline.read_text())
     protocol = json.loads(config.read_text())
-    allowed = {'control_ms', 'assistant_generation_ms', 'playback_tail_ms', 'experiment'}
+    legacy = {'assistant_text', 'assistant_tokens_per_window', 'playback_tail_windows',
+              'assistant_generation_ms', 'playback_tail_ms'}
+    allowed = legacy | {'control_ms', 'controller_state_mode', 'experiment'}
     original = result['protocol']
     if (not result['complete'] or len(result['records']) != 100 or
-            original['control_ms'] != 480 or protocol['control_ms'] != 160 or
+            original['control_ms'] != 480 or protocol['control_ms'] not in (160, 480) or
+            protocol.get('controller_state_mode') != 'action_only' or legacy & protocol.keys() or
             any(protocol.get(k) != original.get(k) for k in set(protocol) | set(original) if k not in allowed)):
-        raise ValueError('Expected a 160ms protocol with identical frozen inputs and candidate')
+        raise ValueError('Expected action-only monitoring with identical frozen inputs and candidate')
     result.update(protocol=protocol, protocol_sha256=digest(config), baseline_manifest_sha256=digest(baseline),
                   baseline_control_ms=original['control_ms'], baseline_manifest_path=str(baseline.resolve()))
     output.mkdir(parents=True, exist_ok=False)

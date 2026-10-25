@@ -1,15 +1,15 @@
-# FDB 真实ASR影子回放
+# FDB真实ASR与TextTurn动作监控
 
-对应 `scripts/remote/textturn_fdb_replay.py`。只运行冻结候选的影子动作与模拟Listen/Speak生命周期，不调用回答模型或TTS，不改变现役控制路径。
+对应 `scripts/remote/textturn_fdb_replay.py`，由TT-005／006和TT-007共用。只监控TextTurn，不生成回答、助手正文或TTS，不模拟生成和播放，不改变现役控制路径。
 
-模块复用既有`ShadowState`、`SharedContext`、`TranscriptConsumer`、`ControlWindowAssembler`和`LatestControlWorker`，无新增状态所有者。`load_audio`检查每文件摘要并按清单拼接一次尾静音；`replay`逐录音建立独立ASR会话，80ms包按真实时钟发送，三个在线真实解码步骤组成完整控制窗；`main`串行处理冻结清单，逐例持久化进度。控制请求至多一个在途、一个待处理快照，合并区间完整保留。
+`ActionState`是动作监控的状态记录器，每条从Listen开始，`apply`只允许start切Speak、stop回Listen、keep维持，拒绝非法动作。状态没有计时自动复位。`snapshot`保留完整在线ASR前缀和实际控制窗的no-voice连续数；助手正文固定为空、生成完成标志为null、历史保持冻结空列表，不因start分割或伪造新对话。记录状态转移事实不代表真实开口或播放。
 
-每次在线文本实际变化立即发布Shared Context，重复文本不发布新内容；控制步骤核对Context文本和版本，下游只读消费者核验一致性。当前Nemotron适配拒绝已发布前缀修订，遇到此类错误保留失败，不能悄悄改写或当成静音。
+`load_audio`逐文件核对冻结摘要，按清单在Turn Taking拼接一次5秒静音，Pause不拼接。`replay`独立建立ASR会话，以80ms包按真实时钟发送，使用SharedContext及时发布转写；重复文本不形成新更新，控制步骤核对Context文本和版本，下游只读消费者核验一致性。
 
-模拟助手内容和尾窗来自冻结协议。返回动作仅允许当前状态合法动作；记录HTTP完整返回时刻、动作应用后状态时刻、输入状态、可见前缀、服务耗时和生命周期。ASR最后更新边界只在离线评分确定，不提供给控制器。
+控制聚合器从清单读取160ms或480ms周期，分别每1或3个真实解码完成步骤形成完整周期。LatestControlWorker至多一个在途、一个待处理快照，合并范围保留。记录HTTP完整返回、输入状态、动作应用后状态、ASR前缀、耗时及controller_transition；不加载用于模拟助手的tokenizer，不调用旧ShadowState。
 
-输入数组是尾静音唯一拼接点。Turn Taking5秒静音正常经过ASR；Pause只发送原音频。记录原录音结束、最后原音频包、实际输入结束及EOF。EOF事件和解码排空另记；不足三步的残窗只记录、不提交控制，不额外补no-voice。输入结束后保留在途真实返回，不截断计时。
+记录原录音结束、实际输入结束和EOF。EOF排空单列，不足完整周期的尾窗只记录、不提交，不追加no-voice或凑齐观察。输入结束后的在途调用保留实际返回，不截断时刻。
 
-每条trace即时刷新，失败保存原因；无法清理会话或线程时停止后续录音，避免泄漏并发会话。未运行样本在离线评分中为未知，不补位。模型执行须在远端单GPU调度作业内进行。
+`main`只接受action_only协议，在独立新目录串行处理正式100条或两条清单外冒烟，逐例刷新trace与进度。case_start包含周期和状态模式；失败保留，清理失败则停止后续录音，避免泄漏会话。旧模拟回答的trace不得混入新结果。
 
-TT-007读取清单`control_ms`配置聚合器和no-voice计数，支持160ms单步完整周期；默认480ms路径不变。`assistant_generation_ms`与`playback_tail_ms`独立固定模拟生命周期，160ms对照保持8 token/480ms和960ms尾窗。case_start保留控制及生成周期，便于离线核对，EOF完整／残窗判断以对应周期为准。
+移除模拟回答源于用户2026-10-25明确纠正；原r1—r3保留为撤回记录。480ms与160ms用相同输入和状态规则重新执行，真实模型只在远端调度节点现有conda中运行。

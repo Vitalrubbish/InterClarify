@@ -12,4 +12,4 @@ Smooth冻结`input.wav`和`turn_taking.json`；Pause冻结`input.wav`、`pause.j
 
 远端在已有conda CPU环境以单线程、2GiB地址空间和明确超时运行。输出目录必须不存在；不足50条时保留冻结结果、返回失败，不换来源。实际入口为`--root .../fdb_v1_0 --config configs/textturn_fdb.json --output <fresh-directory>`。
 
-TT-007通过互斥入口`--baseline-manifest`调用`derive_manifest`，只将原480ms协议替换为160ms协议并记录基线清单摘要、路径和周期。正式样本、全部候选和冒烟条目原样保留；拒绝候选、输入、静音或预算等非周期协议变更。运行时仍逐文件核对原始资产摘要，不重复抽样或复制音频。
+`--baseline-manifest`调用`derive_manifest`，从已有480ms冻结清单派生action_only协议，允许纠正为仅监控动作的480ms，或派生160ms；保存父清单摘要、路径和周期。正式样本、全部候选和冒烟条目原样保留，只允许周期、实验标识、状态模式变化及删除旧助手模拟字段；拒绝候选、静音、输入或预算变更。新协议不得含模拟回答参数。运行时仍逐文件核对资产，不重采样或复制音频。
