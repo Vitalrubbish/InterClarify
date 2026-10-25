@@ -96,6 +96,12 @@ def score_trace(case, events, review=None):
     results = [e for e in events if e['kind'] == 'control_result']
     valid = [r for r in results if valid_result(r)]
     malformed = len(results) - len(valid)
+    planned_windows = [e for e in events if e['kind'] == 'control_window']
+    missing_windows = sum(not any(
+        r.get('window', {}).get('first_step_seq', r.get('window', {}).get('last_step_seq', -1))
+        <= w['last_step_seq'] <= r.get('window', {}).get('last_step_seq', -1)
+        for r in results) for w in planned_windows)
+    merged = any(r.get('window', {}).get('merged_windows', 0) for r in results)
     decisions, reviewed_anchor = validated_review(review, contexts, results)
     reference = normalize(case['reference_text'])
     reference_matched = any(normalize(c['text']).startswith(reference) for c in contexts) if reference else False
@@ -113,10 +119,11 @@ def score_trace(case, events, review=None):
         e['event_seq'] in reads and reads[e['event_seq']]['text'] == e['text'] for e in closed)
     base = {'case_id': case['case_id'], 'source_id': case['source_id'], 'metric': metric_name,
             'outcome': 'unknown', 'actual_error': False, 'reason': 'missing_semantic_review',
-            'runtime_ok': bool(steps) and bool(results) and not malformed,
+            'runtime_ok': bool(steps) and bool(results) and not malformed and not missing_windows,
             'context_ok': context_ok, 'reference_matched': reference_matched,
             'actual_stop_count': actual_stops, 'actual_start_count': actual_starts,
-            'control_error_count': malformed, 'anchor_at': None, 'response_ms': None}
+            'control_error_count': malformed, 'missing_control_windows': missing_windows,
+            'anchor_at': None, 'response_ms': None}
 
     def finish(row, eligible, anchor=None, expected='keep', evidence_complete=True):
         row['anchor_at'] = anchor
@@ -129,7 +136,7 @@ def score_trace(case, events, review=None):
             row['reason'] = 'incomplete_input_or_control_coverage'
         elif not eligible:
             row['reason'] = 'no_eligible_control_input'
-        elif malformed:
+        elif malformed or missing_windows or merged:
             row['reason'] = 'control_error_or_missing_visible_input'
         elif expected == 'keep':
             row.update(outcome='pass', reason='observed_legal_keep')
@@ -244,6 +251,8 @@ def run(args):
     if args.output.exists() and any(args.output.iterdir()):
         raise ValueError('Use a fresh scoring output; original results must be preserved')
     manifest = json.loads(args.manifest.read_text())
+    if manifest.get('complete') is not True:
+        raise ValueError('Scoring requires a complete immutable input manifest')
     cases = manifest['records']
     if len({c['case_id'] for c in cases}) != len(cases):
         raise ValueError('Duplicate planned case identity')
