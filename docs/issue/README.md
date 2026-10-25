@@ -1,6 +1,6 @@
 # 工作单管理
 
-2026-10-25新增授权工作单：[TT-008](TextTurn/tt_008_ultrachat_stop_retest.md)以UltraChat固定候选、同快照有／无助手正文成对重测stop，区分正文与轮次／状态修复的影响；[TT-009](TextTurn/tt_009_conditional_data_rebuild.md)仅在TT-008交付且用户明确判定效果不好并指令启动后重构训练数据。本次只创建工作单，未执行重测、重构或训练，TextTurn共6/9完成。正常结束仍是生命周期转Listen，stop专用于用户打断，不因假设start／stop必须配对而自动更改合同。两项共用既有预算，不新分配GPU额度。
+2026-10-25最新修订：[TT-008](TextTurn/tt_008_ultrachat_stop_retest.md)取消空／不可见assistant_visible配置，不做有／无正文对照；UltraChat固定候选的480ms、160ms测试均执行，分别每个控制周期注入8 token、3 token助手正文，使用同一来源清单，串行运行、分别报告。[TT-009](TextTurn/tt_009_conditional_data_rebuild.md)仍仅在TT-008交付且用户明确判定效果不好并指令启动后重构训练数据。本次只更新工作单，未执行重测、重构或训练，TextTurn共6/9完成。正常结束仍是生命周期转Listen，stop专用于用户打断。两种配置共用既有剩余预算，不新分配GPU额度，不将结果写成已证明正文注入因果作用。
 
 2026-10-25用户最新确认：在TT-004内按“连续Speak与在线ASR更新区间重叠实际时长>960ms”直接统计抢话，不要求补齐语义标注。只重评已有trace，不新建issue、重训或提交GPU作业；原按固定3周期的已归档结果保留为历史口径。同时核对训练角色标识及评测输入字段，区分角色标记与助手已生成正文前缀。
 
