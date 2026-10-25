@@ -74,3 +74,7 @@ runs/<run_id>/replay/score/
 - 本报告没有真实回放或真实评分证据。真实回放、远端作业入口和 5 条冒烟属于 XTX-005；100 条正式回放与独立评分属于 XTX-006。
 - 评分不新增声学末词对齐，不把本项覆盖率称为话轮准确率、FDB TOR 或可听回复延迟。
 - 不接入 Layer 1/TTS/播放器，不训练、不调阈值，也不改变唯一播放所有权。
+
+## 原始产物保存
+
+本页为Git保留的结果汇总；逐例JSON／CSV、trace、样本正文及资源采样不再入库。本地归档位于`artifacts/report_archive/reports/xturnix_fleurs/20261023-xtx-004-scoring/`，具体文件与SHA256见本地`artifacts/report_archive/archive_index.json`；已有远端run路径保持原样。复现时读取归档，不从报告链接下载原始产物。Git历史未重写。

@@ -19,7 +19,7 @@ TOR将无词，或词跨度不足1秒且词数不超过3的样本计为未接话
 
 ## 回收与验收
 
-北京时间17:18:39回收并核对[最终summary](completed/summary.json)、[回放summary](completed/replay_summary.json)、[Smooth逐例时序](completed/smooth_turn_taking.json)、[Interruption逐例时序](completed/user_interruption.json)及[来源摘要和退出码](completed/collection.json)。回放summary的official_scoring=pending是评分前生成的阶段快照，最终状态以最终summary为准。请求范围通过，full_scoring_complete=false专指GPT评分待补；不表示模型能力达到验收目标。
+北京时间17:18:39回收并核对最终summary（原始文件`completed/summary.json`已归档）、回放summary（原始文件`completed/replay_summary.json`已归档）、Smooth逐例时序（原始文件`completed/smooth_turn_taking.json`已归档）、Interruption逐例时序（原始文件`completed/user_interruption.json`已归档）及来源摘要和退出码（原始文件`completed/collection.json`已归档）。回放summary的official_scoring=pending是评分前生成的阶段快照，最终状态以最终summary为准。请求范围通过，full_scoring_complete=false专指GPT评分待补；不表示模型能力达到验收目标。
 
 按用户决定暂缓GPT相关性评分，不更换judge；保留官方转写与两轴TOR/Latency。源码19f0371、X-Talk d6dc3bff0a512d13f4352bce6105aec80b7f9960，官方FDB 3e799c45a045256f47d5f1c9cda90157e2d2ec9e。
 
@@ -28,3 +28,7 @@ r3评分ASR预检通过，随后并行启动时Nemotron预热超原30秒而失�
 远端根`/hpc_stor03/sjtu_home/xuan.zhang/interclarify-fdb-two-axes-20261021-r4/`，输出`data/r4/`，日志`job.log`。预算2×4090/16CPU/64GiB、8小时、单并发，30GiB输出/50GiB空闲/8GiB单文件，评分后GPT明确待补。原始WAV、trace与完整数据清单留远端。
 
 任务：`job-179256336071350402616-xuan-zhang`，run_id=full-fdb-two-axes-065-r4。已确认模型condition=T2_R3_delayed_start、generation_policy=duplex_greedy_v1，日志有KV命中。用户要求启动评分时，既有作业已自动转入评分阶段，沿用同一作业完成，没有重复提交或重跑回放。回收后vc list无活动作业；原始WAV与大日志保留远端。GPT相关性评分待后续配置与授权。
+
+## 原始产物保存
+
+本页为Git保留的结果汇总；逐例JSON／CSV、trace、样本正文及资源采样不再入库。本地归档位于`artifacts/report_archive/reports/fdb/20261021-full-two-axes-r4/`，具体文件与SHA256见本地`artifacts/report_archive/archive_index.json`；已有远端run路径保持原样。复现时读取归档，不从报告链接下载原始产物。Git历史未重写。

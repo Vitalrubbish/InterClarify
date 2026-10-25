@@ -26,6 +26,10 @@
 
 ## 证据与复现
 
-逐例见[cases.csv](start-after-end-r1/cases.csv)，汇总及输入摘要见[summary.json](start-after-end-r1/summary.json)。分析入口及方法见[计数说明](../../../docs/scripts/analysis/check_textturn_start_after_end.md)。远端源码`a573f42`，输出`~/parathink-textturn/inspection/start-after-end-r1`；现有conda单线程执行，2GiB地址空间、60秒超时，无GPU消耗。录音结束包定位、首次／任意start及双边出现的边界检查已通过。
+逐例见cases.csv（原始文件`start-after-end-r1/cases.csv`已归档），汇总及输入摘要见summary.json（原始文件`start-after-end-r1/summary.json`已归档）。分析入口及方法见[计数说明](../../../docs/scripts/analysis/check_textturn_start_after_end.md)。远端源码`a573f42`，输出`~/parathink-textturn/inspection/start-after-end-r1`；现有conda单线程执行，2GiB地址空间、60秒超时，无GPU消耗。录音结束包定位、首次／任意start及双边出现的边界检查已通过。
 
 取回证据包SHA256：`6a2463cdf4aac2fa18cb1beb6804a8b3ed72c745badca275990504b23f9fa816`。原始ASR日志和trace只读，未覆盖历史结果。本报告回答“发生过多少start”，不把行为计数替换成完整语义验收。
+
+## 原始产物保存
+
+本页为Git保留的结果汇总；逐例JSON／CSV、trace、样本正文及资源采样不再入库。本地归档位于`artifacts/report_archive/reports/textturn/20261025-start-after-end/`，具体文件与SHA256见本地`artifacts/report_archive/archive_index.json`；已有远端run路径保持原样。复现时读取归档，不从报告链接下载原始产物。Git历史未重写。

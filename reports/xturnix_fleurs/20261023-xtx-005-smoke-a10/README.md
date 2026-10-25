@@ -83,3 +83,7 @@
 本报告只证明作业入口、服务生命周期、协议回放、评分和清理在 A10 上可执行。它不证明 FLEURS 的 start 命中率或模型质量，也不把 0/5 当作正式成绩。A10 的算力与 XTX-002 的 RTX 4090 不同，控制延迟不能跨硬件直接比较。正式 100 条仍按冻结配置独立回放，不做阈值或抽样调整。
 
 入口说明见 [run_xturnix_fleurs_job](../../../docs/scripts/remote/run_xturnix_fleurs_job.md)。
+
+## 原始产物保存
+
+本页为Git保留的结果汇总；逐例JSON／CSV、trace、样本正文及资源采样不再入库。本地归档位于`artifacts/report_archive/reports/xturnix_fleurs/20261023-xtx-005-smoke-a10/`，具体文件与SHA256见本地`artifacts/report_archive/archive_index.json`；已有远端run路径保持原样。复现时读取归档，不从报告链接下载原始产物。Git历史未重写。

@@ -13,11 +13,11 @@
 | pilot | 0.795891 | 0.020651 |
 | full | 0.047986 | 0.011776 |
 
-候选为远端`~/parathink-textturn/runs/tt-002-20261025-r1/best`，adapter SHA256为`32f5493835a1b21294a3b862e38da85f7d052bbc93dbf12a81c42436e144b5d17`。新增token参数确实更新，重载后的token行及动作分数完全一致，见[候选](training/candidate.json)、[重载检查](training/reload_verification.json)与[学习检查](training/learning_verification.json)。最终开发集正常接话367/400（91.75%）、陈述句172/200（86%）、打断200/200；停顿与附和错误均0/200。
+候选为远端`~/parathink-textturn/runs/tt-002-20261025-r1/best`，adapter SHA256为`32f5493835a1b21294a3b862e38da85f7d052bbc93dbf12a81c42436e144b5d17`。新增token参数确实更新，重载后的token行及动作分数完全一致，见候选（原始文件`training/candidate.json`已归档）、重载检查（原始文件`training/reload_verification.json`已归档）与学习检查（原始文件`training/learning_verification.json`已归档）。最终开发集正常接话367/400（91.75%）、陈述句172/200（86%）、打断200/200；停顿与附和错误均0/200。
 
 ## 独立文本与语音结果
 
-自动续接实际提交评估作业`job-179287011405618549973-xuan-zhang`，run为`tt-004-20261025-r1`，源码提交见[source_commit.txt](evaluation/source_commit.txt)。退出码0，完成19994个独立文本窗口、3来源真实冒烟和300来源／1200条正式语音场景。当前vc无活动作业。
+自动续接实际提交评估作业`job-179287011405618549973-xuan-zhang`，run为`tt-004-20261025-r1`，源码提交见source_commit.txt（原始文件`evaluation/source_commit.txt`已归档）。退出码0，完成19994个独立文本窗口、3来源真实冒烟和300来源／1200条正式语音场景。当前vc无活动作业。
 
 | 指标 | 独立文本 | Nemotron语音原始评分 | 门槛 |
 | --- | --- | --- | --- |
@@ -30,13 +30,13 @@
 | 运行成功 | 19994/19994 | 1196/1200，99.67% | ≥95% |
 | Context写入／读取一致 | 不适用 | 1200/1200 | 全部一致 |
 
-分母与Wilson 95%区间见[独立文本摘要](evaluation/independent-text/text/summary.json)及[原始语音摘要](evaluation/shadow-formal/summary.json)。[逐例核查CSV](cases_audited.csv)保留全部1200例；[文本机会CSV](evaluation/independent-text/text/opportunities.csv)保留1500个机会。失败未被剔除。
+分母与Wilson 95%区间见独立文本摘要（原始文件`evaluation/independent-text/text/summary.json`已归档）及原始语音摘要（原始文件`evaluation/shadow-formal/summary.json`已归档）。逐例核查CSV（原始文件`cases_audited.csv`已归档）保留全部1200例；文本机会CSV（原始文件`evaluation/independent-text/text/opportunities.csv`已归档）保留1500个机会。失败未被剔除。
 
 ## 评分口径与失败核查
 
 原始字段`backchannel_false_stop`实际统计“未成功完成附和机会”，混合了ASR参考未对齐、缺少控制及控制异常，**不能解释为模型实际误stop比例**。逐一读取300条附和trace后，实际stop为0例；完整参考可对齐173例，其余127例未完整对齐，正好构成原始127次失败。不能把这些未观察充分的场景改算成功。173个可对齐机会中没有误stop，只支持有限输入覆盖下的保持结论。
 
-停顿原始1次失败是没有可观察控制区间，299个可观察机会中实际误start为0。原始字段同样混合“未知”和“错误”，不能直接称0.33%实际误抢话。[inspection.json](inspection.json)保存上述全量trace核查统计及运行错误。
+停顿原始1次失败是没有可观察控制区间，299个可观察机会中实际误start为0。原始字段同样混合“未知”和“错误”，不能直接称0.33%实际误抢话。inspection.json（原始文件`inspection.json`已归档）保存上述全量trace核查统计及运行错误。
 
 正常接话失败包含按完整参考文本锚点判定的提前start：问句125/300、陈述145/300。锚点使用归一化后完整参考的精确前缀匹配，ASR替换、拆词或省略会导致缺锚；ASR参考完整可对齐问句274例、陈述275例。提前于整个参考结束不自动等于在可见语义仍不完整时抢话，原始结果不能直接作为纯控制器错误率。抽查`19244-smooth_declarative`：模型在完整首句及no-voice时start，后续用户还有第二句；按当前全轮参考锚点判失败。这提示需先修正机会与锚点定义，再评估模型归因，不能据此直接扩大训练。
 
@@ -44,10 +44,14 @@
 
 ## 资源与结论边界
 
-训练显存峰值保留约1.94GiB，评估监控峰值4910MiB；评估新增资产监控峰值约2.22GiB、run报告约0.34GiB。评估从北京时间03:28至06:13，训练及评估合计约4.67单卡小时，未触及本轮8小时预算。详细采样见[resource_samples.txt](evaluation/resource_samples.txt)。没有启动新作业。
+训练显存峰值保留约1.94GiB，评估监控峰值4910MiB；评估新增资产监控峰值约2.22GiB、run报告约0.34GiB。评估从北京时间03:28至06:13，训练及评估合计约4.67单卡小时，未触及本轮8小时预算。详细采样见resource_samples.txt（原始文件`evaluation/resource_samples.txt`已归档）。没有启动新作业。
 
 语音来自固定Kokoro离线合成，助手生成和播放均为模拟；模板范围及来源隔离限制沿用TT-001报告。本文只归纳已保存结果，不修改评分规则或测试数据。训练TT-002与接口TT-003可归档；TT-004已实际运行，但评分口径、完成锚点及缺失／错误分离尚未闭环，维持未完成，不能把作业退出码0当成验收通过。
 
 取回证据包SHA256：`cb93caaeae2a79103adf9b97b78230cbd615dee1b88f829fc90931a0c09e6ff9`，本地与远端一致。原始权重和全量日志仍保留远端，仓库只收录摘要、逐例结果及失败示例trace。
 
 CSV入库时仅将CRLF换行为LF，字段和数值不变；原始字节可从远端证据包核验。
+
+## 原始产物保存
+
+本页为Git保留的结果汇总；逐例JSON／CSV、trace、样本正文及资源采样不再入库。本地归档位于`artifacts/report_archive/reports/textturn/20261025-tt-004-results/`，具体文件与SHA256见本地`artifacts/report_archive/archive_index.json`；已有远端run路径保持原样。复现时读取归档，不从报告链接下载原始产物。Git历史未重写。

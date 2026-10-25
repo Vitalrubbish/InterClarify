@@ -25,7 +25,8 @@ def normalized(text):
 def collect_case(case, path):
     row = {'case_id': case['case_id'], 'category': case['category'], 'source_id': case['source_id'],
            'audio_seconds': case['audio_seconds'], 'generation': None,
-           'starts': [], 'reference_visible_at': None, 'lifecycle': [], 'control_errors': 0}
+           'starts': [], 'reference_visible_at': None, 'lifecycle': [], 'control_errors': 0,
+           'controls': [], 'reference_normalized': normalized(case['reference_text'])}
     if not path.exists():
         return row
     reference = normalized(case['reference_text'])
@@ -43,6 +44,13 @@ def collect_case(case, path):
                     row['reference_visible_at'] = stamp
             if kind == 'control_result':
                 row['control_errors'] += bool(event.get('error'))
+                visible = event.get('visible', {})
+                row['controls'].append({'action': event.get('action'), 'error': event.get('error'),
+                                        'state': visible.get('state'), 'observation': visible.get('observation'),
+                                        'user_text': visible.get('user_text', ''),
+                                        'empty_streak': visible.get('consecutive_no_voice_windows'),
+                                        'ready_at': event.get('window', {}).get('input_ready_at'),
+                                        'returned_at': event.get('returned_at')})
                 if (event.get('action') == 'start' and not event.get('error')
                         and event.get('visible', {}).get('state') == 'Listen'):
                     row['starts'].append(event['returned_at'])
@@ -53,6 +61,31 @@ def collect_case(case, path):
     row['generation'] = next(iter(generations), None)
     row['starts'].sort()
     return row
+
+
+def end_diagnostics(case, audio_at):
+    """Describe available end inputs without inventing a counterfactual Listen decision."""
+    controls = case['controls']
+    after = [c for c in controls if audio_at is not None and c['ready_at'] is not None
+             and c['ready_at'] >= audio_at and not c['error'] and c['state'] == 'Listen']
+    empty = [c for c in after if c['observation'] == '<|no-voice|>' and c['user_text'].strip()]
+    full = [c for c in empty if normalized(c['user_text']).startswith(case['reference_normalized'])]
+    first_start = next((c for c in controls if c['action'] == 'start' and not c['error']), None)
+    if case['starts']:
+        reason = 'start_observed'
+    elif not after:
+        reason = 'no_post_end_listen_control'
+    elif not empty:
+        reason = 'no_nonempty_user_silent_window'
+    elif full:
+        reason = 'full_reference_silent_keep'
+    else:
+        reason = 'different_or_partial_transcript_silent_keep'
+    return {'post_end_listen_controls': len(after), 'post_end_nonempty_silent_controls': len(empty),
+            'post_end_full_reference_silent_controls': len(full), 'no_start_reason': reason,
+            'first_start_on_no_voice': first_start['observation'] == '<|no-voice|>' if first_start else None,
+            'last_post_end_user_text': after[-1]['user_text'] if after else None,
+            'max_post_end_empty_streak': max((c['empty_streak'] or 0 for c in after), default=0)}
 
 
 def locate_audio_ends(rows, log_lines):
@@ -132,12 +165,24 @@ def run(args):
                    simulated_speaking_at_audio_end=state == 'Speak' if audio_at is not None else None)
         for prefix, anchor in [('audio', audio_at), ('reference', case['reference_visible_at'])]:
             row.update({prefix + '_' + key: value for key, value in classify(case, anchor).items()})
+        row.update(end_diagnostics(case, audio_at))
         rows.append(row)
+    idle = [r for r in rows if r['simulated_speaking_at_audio_end'] is False]
+    absent = [r for r in rows if not r['audio_after_end_start']]
+    late = [r for r in rows if r['audio_after_end_start'] and not r['audio_after_end_within_1000ms']]
     result = {'schema_version': 1, 'scope': 'saved_smooth_trace_occurrences_not_quality_scoring',
               'all': summarize(rows),
               'by_category': {category: summarize([r for r in rows if r['category'] == category])
                               for category in ('smooth_question_pause', 'smooth_declarative')},
               'speaking_at_audio_end': sum(r['simulated_speaking_at_audio_end'] is True for r in rows),
+              'end_diagnostics': {
+                  'idle_at_end': len(idle), 'idle_at_end_with_later_start': sum(r['audio_after_end_start'] for r in idle),
+                  'no_later_start': len(absent),
+                  'no_later_start_already_speaking': sum(r['simulated_speaking_at_audio_end'] is True for r in absent),
+                  'later_start_over_1000ms': len(late),
+                  'late_start_already_speaking': sum(r['simulated_speaking_at_audio_end'] is True for r in late),
+                  'first_start_on_no_voice': sum(r['first_start_on_no_voice'] is True for r in rows),
+                  'never_start_reasons': dict(Counter(r['no_start_reason'] for r in rows if r['audio_never_start']))},
               'identity': {'manifest_sha256': file_hash(args.manifest), 'asr_log_sha256': file_hash(args.asr_log),
                            'script_sha256': file_hash(__file__),
                            'trace_sha256': {c['case_id']: file_hash(args.traces / (c['case_id'] + '.jsonl'))

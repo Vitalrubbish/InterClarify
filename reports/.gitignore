@@ -1,0 +1,5 @@
+# Keep reviewed narrative summaries in Git; retain raw evidence under artifacts or on the cluster.
+*
+!*/
+!README.md
+!.gitignore

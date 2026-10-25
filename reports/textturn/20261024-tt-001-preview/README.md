@@ -4,7 +4,7 @@
 
 保持480ms控制窗、User非空输入随机1—2 token、Assistant每窗8 token模拟生成。随机话中停顿、剩余播放尾窗和下一轮等待仍分开处理；没有训练模型、执行GPU作业或接入真实播放器。**本批全为review，TT-001仍实施中，正式来源及切分尚未冻结。**
 
-直接查看[综合轨迹逐窗表](samples.md)，表中动作均为监督目标；[review_samples.json](review_samples.json)保留每窗完整输入及动作loss mask，[timelines.json](timelines.json)记录观察和状态执行事件，[source_records.json](source_records.json)保留来源，[manifest.json](manifest.json)给出目标及缺口。
+直接查看综合轨迹逐窗表（原始文件`samples.md`已归档），表中动作均为监督目标；review_samples.json（原始文件`review_samples.json`已归档）保留每窗完整输入及动作loss mask，timelines.json（原始文件`timelines.json`已归档）记录观察和状态执行事件，source_records.json（原始文件`source_records.json`已归档）保留来源，manifest.json（原始文件`manifest.json`已归档）给出目标及缺口。
 
 ## 六条片段包含什么
 
@@ -60,10 +60,14 @@
 
 ## 验证及未完成项
 
-八项单线程CPU契约测试通过；其中综合测试跨越两次start、一次stop及自然完成，核对用户剩余文字不丢失、附和只关闭一次、未来助手后缀不泄漏。实际Qwen tokenizer逐窗复核343个输入／动作mask／历史缓冲、153个助手前缀、五次附和关闭及三次打断上下文提交，全部模板和tokenizer重载一致；重复构建产物相同，六条轨迹均含两种状态及两次start。证据见[audit.json](audit.json)、[verification.json](verification.json)和[sha256.json](sha256.json)。
+八项单线程CPU契约测试通过；其中综合测试跨越两次start、一次stop及自然完成，核对用户剩余文字不丢失、附和只关闭一次、未来助手后缀不泄漏。实际Qwen tokenizer逐窗复核343个输入／动作mask／历史缓冲、153个助手前缀、五次附和关闭及三次打断上下文提交，全部模板和tokenizer重载一致；重复构建产物相同，六条轨迹均含两种状态及两次start。证据见audit.json（原始文件`audit.json`已归档）、verification.json（原始文件`verification.json`已归档）和sha256.json（原始文件`sha256.json`已归档）。
 
 来源、tokenizer revision及上游下载证据不变：固定UltraChat revision f220fe796ce3ed62fbe1681b45ce6cbc9c6cabe0的分片前1MiB，仅取完整行，未完成整分片LFS核验。Qwen3-0.6B tokenizer固定c1899de289a04d12100db370d81485cdf75e47ca。所有同源派生在review，未完成旧来源分组／切分和测试使用历史核验，正式1000训练／200开发／300测试对话目标及真实语音仍缺。
 
 480ms、8 token和随机等待只是合成调度，没有真实Nemotron／LLM／TTS时间戳，也不具备独立模型评测结果。training_allowed=false、independent_test_ready=false，TT-001不归档。
 
 实现为[构建器](../../../scripts/training/build_textturn_dataset.py)，参数见[配置](../../../configs/textturn_dataset_preview.json)，使用方法见[中文说明](../../../docs/scripts/training/build_textturn_dataset.md)。本地复用conda interclarify-dev、CPU线程1；完整tokenizer及JSONL候选保留artifacts/textturn/tt-001-review-final。目录日期保留首次交付日期，本页更新日期表示当前版本。
+
+## 原始产物保存
+
+本页为Git保留的结果汇总；逐例JSON／CSV、trace、样本正文及资源采样不再入库。本地归档位于`artifacts/report_archive/reports/textturn/20261024-tt-001-preview/`，具体文件与SHA256见本地`artifacts/report_archive/archive_index.json`；已有远端run路径保持原样。复现时读取归档，不从报告链接下载原始产物。Git历史未重写。

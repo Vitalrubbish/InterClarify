@@ -1,6 +1,6 @@
 # TextTurn 构造与配比审核
 
-2026-10-25。按用户明确指令，在TT-004评分修复后检查既有数据。本轮仅审计和建议，不修改TT-001冻结集、不启动训练、不新增issue。原始计数见[训练数据审计](../../../reports/textturn/20261025-scoring-v2/training_data_audit.json)。审核代码只读取train/pilot及其来源计划，没有把测试正文或trace用于训练材料。
+2026-10-25。按用户明确指令，在TT-004评分修复后检查既有数据。本轮仅审计和建议，不修改TT-001冻结集、不启动训练、不新增issue。原始计数见[训练数据审计](../../../reports/textturn/20261025-scoring-v2/README.md)。审核代码只读取train/pilot及其来源计划，没有把测试正文或trace用于训练材料。
 
 ## 当前实际暴露
 

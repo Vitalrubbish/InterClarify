@@ -65,3 +65,7 @@ runs/<run_id>/replay/
 - 回放器不计算 `t_asr_last`、`t_start_after_last`、窗口命中、WER 或链路估计；这些由 XTX-004 从 trace 离线完成。
 - 暂停注入仍关闭：没有因果 VAD 或上游分段事件，不使用 EOF、文件时长、参考文本或事后对齐补点。
 - 不训练、不调阈值、不接入 Layer 1/TTS/播放器，也不改变唯一播放所有权。
+
+## 原始产物保存
+
+本页为Git保留的结果汇总；逐例JSON／CSV、trace、样本正文及资源采样不再入库。本地归档位于`artifacts/report_archive/reports/xturnix_fleurs/20261023-xtx-003-replay/`，具体文件与SHA256见本地`artifacts/report_archive/archive_index.json`；已有远端run路径保持原样。复现时读取归档，不从报告链接下载原始产物。Git历史未重写。

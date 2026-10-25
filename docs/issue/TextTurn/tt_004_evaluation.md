@@ -14,6 +14,8 @@
 
 ## 工作
 
+2026-10-25用户要求维护reports并分析句末start偏低。本次将原始JSON、CSV、trace、逐窗样本与采样日志移入本地忽略的归档，仓库只保留审阅后的README汇总和产物定位，不重写Git历史、不删除远端证据。对原600条按句末状态分层，并进一步核查19条全程无start的控制窗口、转写及EOF覆盖；只做读取和归因，不重训、不自动启动FDB任务。
+
 2026-10-25用户要求直接查正常接话轨迹中“用户说完后出现start”的比例。本次仅做已有run的行为计数：以ASR服务实际接收完原录音采样点的音频包时刻为可复核结束边界，另列完整参考转写可见后的计数，后者仅为诊断、不作为语义金标。分别统计结束后任意start、首次start在结束后、结束前已start但之后无新start及完全无start；不混同旧及时成功率，不重跑模型，不启动FDB任务。 实查结果：600条均可定位原录音结束包，结束后出现start为365/600（60.83%），首次start在结束后334/600（55.67%），全程无start19/600；详见[行为计数](../../../reports/textturn/20261025-start-after-end/README.md)。
 
 2026-10-25用户提出从FDB Smooth Turn Taking和Pause Handling各取50条录音，进一步要求先列计划。已交付[FDB跨数据集测试计划](../../dev/TextTurn/fdb_cross_dataset_plan.md)；按用户随后明确要求，外部两臂诊断从本项拆为[TT-005接话覆盖与延迟](tt_005_fdb_turn_taking.md)和[TT-006停顿介入与归因](tt_006_fdb_pause_handling.md)。首选candor_turn_taking与candor_pause_handling，固定当前候选，真实ASR＋控制器、Listen影子动作，按FDB时间标注评估并分开解释当前语义策略。目前仅计划及工作单，尚未抽样冻结、实现入口或提交作业；不恢复旧完整FDB任务，不把小规模两臂诊断当本项完整四类验收，也不由两项完成自动归档本项。

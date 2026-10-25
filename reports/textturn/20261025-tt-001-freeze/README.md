@@ -13,8 +13,12 @@
 
 切分前检查来源前四轮的完整归一化文本精确重复及5词Jaccard≥0.85近重复，843个合格组中按固定种子选择660个。保留Git历史报告中的来源ID及哈希文件名并排除，来源范围进一步限于10000—94999；review来源不进入任何正式集合。同源不跨集合，FDB/FLEURS/Easy Turn均未作为训练来源。历史正文未全部恢复，无法证明全历史语义近重复排除，独立性结论限于已恢复来源标识和本批文本去重。
 
-标注为保守语义规则加代理抽检，非逐例人工审核。正常请求与陈述完整保留；停顿仅放在明确不完整的问句开头。停止指令按首次明确可见的pause/stop/Wait触发，Please前缀保持keep。抽检12条训练来源的完整请求与陈述、4条轨迹的关键窗口，记录见 [spot_check.json](spot_check.json)。样例回归及机会评分共11项测试通过；实际模型训练尚待远端运行。
+标注为保守语义规则加代理抽检，非逐例人工审核。正常请求与陈述完整保留；停顿仅放在明确不完整的问句开头。停止指令按首次明确可见的pause/stop/Wait触发，Please前缀保持keep。抽检12条训练来源的完整请求与陈述、4条轨迹的关键窗口，记录见 spot_check.json（原始文件`spot_check.json`已归档）。样例回归及机会评分共11项测试通过；实际模型训练尚待远端运行。
 
-冻结资产位于本地 `artifacts/textturn/tt-001-frozen-r3`，远端目标为 `~/parathink-textturn/dataset/tt-001-frozen-r3`。[manifest.json](manifest.json) 保存输入及输出摘要，[split_index.json](split_index.json) 保存全部来源和切分。构建入口及说明见 [数据冻结说明](../../../docs/scripts/training/freeze_textturn_dataset.md)。
+冻结资产位于本地 `artifacts/textturn/tt-001-frozen-r3`，远端目标为 `~/parathink-textturn/dataset/tt-001-frozen-r3`。manifest.json（原始文件`manifest.json`已归档） 保存输入及输出摘要，split_index.json（原始文件`split_index.json`已归档） 保存全部来源和切分。构建入口及说明见 [数据冻结说明](../../../docs/scripts/training/freeze_textturn_dataset.md)。
 
 本交付允许TT-002受限机制试训。短附和和停止指令使用小型模板集合，时序及播放均为合成，尚无可回放语音或Nemotron在线成绩；文本模型测试不能作为TT-004在线通过证据。
+
+## 原始产物保存
+
+本页为Git保留的结果汇总；逐例JSON／CSV、trace、样本正文及资源采样不再入库。本地归档位于`artifacts/report_archive/reports/textturn/20261025-tt-001-freeze/`，具体文件与SHA256见本地`artifacts/report_archive/archive_index.json`；已有远端run路径保持原样。复现时读取归档，不从报告链接下载原始产物。Git历史未重写。

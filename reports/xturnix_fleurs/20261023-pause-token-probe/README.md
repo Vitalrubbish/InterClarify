@@ -100,3 +100,7 @@
 - 探针只加载 XTurnix，不加载 Nemotron、不访问 ASR 服务、不写正式 run 目录。
 - 若目标是“朗读句末检测/端点检测”，应换用端点检测或专门的话轮结束模型；XTurnix-PT 不是该任务模型。若目标是验证 XTurnix 的话轮判断，输入应是自然对话中的让轮点，并只把真实因果 pause 作为闸门。
 - 入口与参数见 [xturnix_pause_probe](../../../docs/scripts/remote/xturnix_pause_probe.md)。
+
+## 原始产物保存
+
+本页为Git保留的结果汇总；逐例JSON／CSV、trace、样本正文及资源采样不再入库。本地归档位于`artifacts/report_archive/reports/xturnix_fleurs/20261023-pause-token-probe/`，具体文件与SHA256见本地`artifacts/report_archive/archive_index.json`；已有远端run路径保持原样。复现时读取归档，不从报告链接下载原始产物。Git历史未重写。

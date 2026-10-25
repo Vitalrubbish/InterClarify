@@ -22,14 +22,18 @@
 
 重评源码冻结为`ec0bf36`，远端输出在 `~/parathink-textturn/inspection/scoring-v2/formal-r2` 和 `text-r2`。使用标准库、单线程、2GiB地址空间及60秒超时，不占GPU。汇总包含输入manifest、全部trace和评分器摘要，原始trace和v1报告未覆盖。
 
-取回结果：[正式语音v2汇总](formal-r2/summary.json)、[1500条逐机会CSV](formal-r2/opportunities.csv)、[原文本标签重评](text-r2/summary.json)。语音CSV中600个正常接话、300个停顿、300个附和、300个打断共1500个机会，陈述是正常接话的子集，不能再次相加。证据包SHA256为`a825bf7ff06115520bbec34d058f87085986e8ff08c2c5603f3677448249efbf`，本地与远端一致。
+取回结果：正式语音v2汇总（原始文件`formal-r2/summary.json`已归档）、1500条逐机会CSV（原始文件`formal-r2/opportunities.csv`已归档）、原文本标签重评（原始文件`text-r2/summary.json`已归档）。语音CSV中600个正常接话、300个停顿、300个附和、300个打断共1500个机会，陈述是正常接话的子集，不能再次相加。证据包SHA256为`a825bf7ff06115520bbec34d058f87085986e8ff08c2c5603f3677448249efbf`，本地与远端一致。
 
 ## 数据检查结论
 
 **构造与配比都需要调整，优先修构造。** full中keep占95.2%，正常生命周期窗口占42.77%，附和仅2.46%；pilot到full新增8000窗全部为keep，没有新增start/stop机会。无模型规则在现有训练标签上达到99.46%，pilot为99.7%，说明标签存在明显时序捷径。
 
-160条轨迹顺序一致，只有5种附和／4种打断，显式停顿集中于不完整问句开头，播放尾窗打断对照为0。多句陈述中的当前边界也缺因果审核。详细计数见[training_data_audit.json](training_data_audit.json)，调整建议见[数据审核](../../../docs/dev/TextTurn/data_review.md)。
+160条轨迹顺序一致，只有5种附和／4种打断，显式停顿集中于不完整问句开头，播放尾窗打断对照为0。多句陈述中的当前边界也缺因果审核。详细计数见training_data_audit.json（原始文件`training_data_audit.json`已归档），调整建议见[数据审核](../../../docs/dev/TextTurn/data_review.md)。
 
 建议先补语义边界、句中停顿、上下文对照及尾窗打断，再按来源／机会采样。候选窗口预算为普通接话／停顿／附和／打断／生命周期30/20/20/20/10，仍待开发集验证；不是已调整的冻结数据，不靠复制现有短模板填满，也不按三种动作强行均衡。
 
 验证：21项TextTurn契约回归通过；本地替身HTTP从回放到v2汇总的集成检查通过；远端正式1200例及文本19994窗离线重评完成，原始文本结果一致。TT-004评分实现已修复，但接话语义审核覆盖仍缺失，本项继续保留，不标第一阶段通过。
+
+## 原始产物保存
+
+本页为Git保留的结果汇总；逐例JSON／CSV、trace、样本正文及资源采样不再入库。本地归档位于`artifacts/report_archive/reports/textturn/20261025-scoring-v2/`，具体文件与SHA256见本地`artifacts/report_archive/archive_index.json`；已有远端run路径保持原样。复现时读取归档，不从报告链接下载原始产物。Git历史未重写。

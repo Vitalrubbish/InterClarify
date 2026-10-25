@@ -110,3 +110,7 @@ In many cases, enrolling on a gap year course abroad can actually improve your c
 本报告只证明 XTX-002 的组件加载、协议字段和 dev 路径可复核。它不证明 FLEURS 末端 start 命中率、控制延迟、WER、链路估计或真实话轮质量；这些分别由 XTX-003—006 执行。探针不训练、不调阈值、不修改现役环境、不接入 Layer 1/TTS/播放器，也不把影子 start 实际执行。
 
 脚本说明见 [setup_xturnix_env](../../../docs/scripts/remote/setup_xturnix_env.md)；配置说明见 [xturnix_fleurs_test](../../../docs/configs/xturnix_fleurs_test.md)。
+
+## 原始产物保存
+
+本页为Git保留的结果汇总；逐例JSON／CSV、trace、样本正文及资源采样不再入库。本地归档位于`artifacts/report_archive/reports/xturnix_fleurs/20261023-xtx-002-protocol/`，具体文件与SHA256见本地`artifacts/report_archive/archive_index.json`；已有远端run路径保持原样。复现时读取归档，不从报告链接下载原始产物。Git历史未重写。

@@ -86,3 +86,7 @@ test 与 dev 文件名集合无交集，分别保存在独立目录。100 条正
 复用数据，无模型下载与 GPU。启动前空闲盘约 902 GiB，结束后约 902 GiB；`prepare_report` 在写入报告前记录 63,241,343 字节，最终数据目录为 63,269,113 字节（含报告与复核记录），远低于 10 GiB 资产上限。数据准备耗时 3.75 秒，未接近 1 小时上限。
 
 脚本说明见 [docs/scripts/remote/xturnix_fleurs_test.md](../../../docs/scripts/remote/xturnix_fleurs_test.md)，工作单入口见 [XTX 工作单](../../../docs/issue/XTurnix/README.md)。
+
+## 原始产物保存
+
+本页为Git保留的结果汇总；逐例JSON／CSV、trace、样本正文及资源采样不再入库。本地归档位于`artifacts/report_archive/reports/xturnix_fleurs/20261023-xtx-001-data-freeze/`，具体文件与SHA256见本地`artifacts/report_archive/archive_index.json`；已有远端run路径保持原样。复现时读取归档，不从报告链接下载原始产物。Git历史未重写。

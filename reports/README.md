@@ -1,40 +1,36 @@
-# 评测结果
+# 实验报告
 
-2026-10-25新增[正常接话结束后start行为计数](textturn/20261025-start-after-end/README.md)：原600条轨迹中365条在原录音发完后出现start（60.83%），不等同语义正确率。
+Git只保留审阅后的README汇总：结论、关键分母、限制、源码／模型版本和原始产物位置。逐例JSON／CSV、trace、样本正文、资源采样与完整manifest保存在远端run及本地artifacts，不再推送到GitHub，也不使用git add -f绕过此规则。
 
-2026-10-25按用户要求交付[评分器v2修复、原trace离线重评与训练数据审核](textturn/20261025-scoring-v2/README.md)。整体证据不足，接话语义标注仍缺，未重新训练。
+## 当前TextTurn结果
 
-此前已核查[TextTurn训练与验收结果](textturn/20261025-tt-004-results/README.md)：训练完成，独立文本达标，语音原始未通过；实际误停与ASR未识别已分开披露，评分缺口待修正。
-
-此前已完成 [TT-001正式文本数据冻结](textturn/20261025-tt-001-freeze/README.md)，并交付[训练及自动后续评估启动记录](textturn/20261025-tt-002-training/README.md)。当前训练运行中，独立评估等待成功候选，尚无最终成绩。
-
-此前 [TT-001 首批数据检查材料](textturn/20261024-tt-001-preview/README.md)：六个固定UltraChat来源，2026-10-25按480ms窗、User随机1—2 token和Assistant每窗8 token按连续话轮重建为六条综合轨迹／343逐窗快照，供用户检查四类控制与自然完成负例；本批仅为 review，正式数据未冻结，未产生模型评测成绩。
-
-2026-10-24 按用户要求恢复 `13ba980` 的报告集合；其后的阈值校准、pending/gate 和短延迟实验报告已移出当前文件树，提交 `fa24868` 保留完整历史。本轮是回滚清理，不产生新评测成绩，见[记录](../docs/dev/XTurnix/rollback_cleanup.md)。
-
-更新：2026-10-23。FDB 作为辅助工程与能力评测保留；主动澄清专项 benchmark 另行构建，不能以 FDB 指标替代。
-
-| 验证链 | 最新证据与用途 |
+| 报告 | 状态与用途 |
 | --- | --- |
-| XTurnix 输入冻结 | [XTX-001 数据冻结](xturnix_fleurs/20261023-xtx-001-data-freeze/README.md)：固定 100 test＋1 dev、逐文件哈希与历史 ASR 基线 |
-| XTurnix 组件协议 | [XTX-002 协议冻结](xturnix_fleurs/20261023-xtx-002-protocol/README.md)：隔离环境、模型修订、Listen 双动作、去标点与 dev 预热；未运行正式回放 |
-| XTurnix 远端冒烟 | [XTX-005 A10 冒烟](xturnix_fleurs/20261023-xtx-005-smoke-a10/README.md)：单作业完成预检、dev 1 条、test 5 条、停服评分与清理；5/5 完成、0/5 末端 start，仅作诊断 |
-| XTurnix pause 诊断 | [句末 pause 探针](xturnix_fleurs/20261023-pause-token-probe/README.md)：5 条 ASR＋100 条参考＋sanity；句末/中段 pause 均 0 次 start，无 pause 仅 1/100；sanity 中英文问句无 pause 可 start、加 pause 全灭，说明调用格式有效，问题是把话轮模型当端点检测用 |
-| XTurnix 首轮来源审核 | [48 会话审核](xturnix_training/20261023-source-audit/README.md)：DailyTalk/SwDA 各 24 个会话，30 个条件候选、18 个歧义；当前可直接冻结记录为 0，非双人人工试标 |
-| 完整两轴 | [r4 最终结果](fdb/20261021-full-two-axes-r4/README.md)：319 例回放、官方转写与时序评分完成；Smooth TOR 59/119、平均延迟 1.023 秒，Interruption TOR 160/200、平均延迟 1.183 秒；GPT 相关性待补 |
-| 固定子集 | [ASR_R4 子集回归](fdb/20261021-asr-subset-r1/README.md)：历史 25 例固定输入，两轴各 5 例官方对齐与时序评分 |
+| [句末start行为计数](textturn/20261025-start-after-end/README.md) | 原600条中，原录音发完后出现start为365条；需按句末Listen/Speak分层解释，不能视作语义正确率 |
+| [评分v2与数据审核](textturn/20261025-scoring-v2/README.md) | 错误与未知分开；原接话语义评分仍未完成，数据构造及采样建议未实施 |
+| [训练与验收核查](textturn/20261025-tt-004-results/README.md) | 训练完成，合成文本达标；语音原始评分缺陷已披露 |
+| [训练交付](textturn/20261025-tt-002-training/README.md) | full第2轮候选已保存并重载验证，不代表全部能力通过 |
+| [数据冻结](textturn/20261025-tt-001-freeze/README.md) | train/dev/test为160/200/300来源，训练10000窗 |
+| [早期检查样例](textturn/20261024-tt-001-preview/README.md) | 历史review批次，非正式训练或验收成绩 |
 
-回放使用 X-Talk `d6dc3bf`、Nemotron EN160、Kokoro `af_heart`、600ms micro-turn、300/1200ms TTS 分段、会话 KV 复用与 `duplex_greedy_v1`。原始 WAV、trace 与完整日志留在远端。
+[FDB各50条外部测试](../docs/dev/TextTurn/fdb_cross_dataset_plan.md)当前仅计划与工作单；没有因本次报告整理启动新任务。
 
-评测脚本位于 `scripts/remote/`：
+## 历史结果
 
-- `full_fdb_two_axes.py`：完整两轴输入冻结、暂存、回放调度与官方评分。
-- `xturnix_fleurs_test.py`：XTurnix 评测的 FLEURS 输入、历史 ASR 基线与后续回放/评分入口。
-- `setup_xturnix_env.sh`：XTurnix 隔离环境与模型冻结。
-- `fdb_subset_report.py`：固定子集评分与尾窗隔离。
-- `duplex_a4_replay.py`：真实音频会话回放与时间线证据。
-- `layer1_fdb.py`：25 例子集暂存与回放驱动。
-- `run_fdb_llm_judge.py`：官方 judge 工作副本与指标解析。
-- `setup_fdb_scoring_env.sh`：评分环境准备。
+| 报告 | 用途与限制 |
+| --- | --- |
+| [FDB完整两轴r4](fdb/20261021-full-two-axes-r4/README.md) | 旧候选319例，非当前TextTurn结果，GPT相关性待补 |
+| [FDB固定子集](fdb/20261021-asr-subset-r1/README.md) | 历史25例记录，不与当前条件直接合并 |
+| [XTurnix输入冻结](xturnix_fleurs/20261023-xtx-001-data-freeze/README.md) | 旧路线来源与基线 |
+| [XTurnix协议](xturnix_fleurs/20261023-xtx-002-protocol/README.md) | 旧模型、环境及协议 |
+| [XTurnix回放器](xturnix_fleurs/20261023-xtx-003-replay/README.md) | 旧回放实现记录 |
+| [XTurnix评分器](xturnix_fleurs/20261023-xtx-004-scoring/README.md) | 旧离线评分记录 |
+| [XTurnix冒烟](xturnix_fleurs/20261023-xtx-005-smoke-a10/README.md) | 旧路线5例诊断，非正式100例成绩 |
+| [XTurnix pause诊断](xturnix_fleurs/20261023-pause-token-probe/README.md) | 旧输入格式诊断，不恢复已取消实验 |
+| [来源审核](xturnix_training/20261023-source-audit/README.md) | 旧48会话来源审核，非训练通过 |
 
-执行通过不表示模型能力验收通过；GPT 评分未执行的结论保持 pending。
+## 原始产物归档
+
+2026-10-25按用户要求将59个原始产物移出Git当前树，原始字节约6.08MiB；本地文件保留在`artifacts/report_archive/reports/`，相对目录不变。`artifacts/report_archive/archive_index.json`记录逐文件原路径、归档路径、大小及SHA256，索引本身也不入库。远端原始模型、录音、日志和run未删除，具体路径见各报告。Git历史未重写。
+
+`reports/.gitignore`默认拒绝原始产物，只放行目录、README.md及忽略规则。后续报告把必要数字写进汇总，产物仍在远端或artifacts复现，不把整批输入、预测或逐例证据当文档推送。

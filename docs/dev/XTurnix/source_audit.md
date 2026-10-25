@@ -45,7 +45,7 @@ SwDA 文件有角色 A/B、话语顺序和话语行为标签，没有本项目�
 
 ## 3. 逐例审核发现
 
-完整 48 条中文审核意见见 [reviews.csv](../../../reports/xturnix_training/20261023-source-audit/reviews.csv)，每条均与 [manifest](../../../reports/xturnix_training/20261023-source-audit/manifest.json) 中的源文件摘要、观察记录序号和当前前缀摘要对应。原始文字只留在本地忽略目录，Git 不复制整批对话。
+完整 48 条中文审核意见见 [reviews.csv](../../../reports/xturnix_training/20261023-source-audit/README.md)，每条均与 [manifest](../../../reports/xturnix_training/20261023-source-audit/README.md) 中的源文件摘要、观察记录序号和当前前缀摘要对应。原始文字只留在本地忽略目录，Git 不复制整批对话。
 
 | 例子 | 从当前前缀看到什么 | 为什么不能直接贴控制标签 |
 | --- | --- | --- |
