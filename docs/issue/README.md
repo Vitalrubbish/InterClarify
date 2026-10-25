@@ -2,7 +2,7 @@
 
 2026-10-25 最新工作单：按用户要求修复 [TextTurn TT-004](TextTurn/tt_004_evaluation.md)评分器，再审计训练数据。当前TT-001—003共3项已归档；v2评分已在远端conda对原1200例trace及19994个文本窗口离线重评，不占GPU、不改候选。v2分离错误与未知，移除完整参考自动语义锚点；打断299/1、停顿298/2、附和173/127为正确/未知，接话600未知，整体证据不足，TT-004待语义标注覆盖后归档。数据审核发现时序捷径、固定模板和重复keep占比过高，给出构造及候选配比建议；冻结数据和训练未改动，不新建issue。详见[v2修复及数据审核](../../reports/textturn/20261025-scoring-v2/README.md)。
 
-2026-10-25最新补充：用户提出FDB Smooth Turn Taking／Pause Handling各50条外部录音测试，并进一步要求先列计划。已交付[两臂跨数据集计划](../dev/TextTurn/fdb_cross_dataset_plan.md)，纳入既有TT-004，不新建issue；当前只写文档，没有冻结抽样、实现入口或提交作业。固定现有候选、真实ASR、Listen影子动作，FDB标注时序与当前语义策略分开报告，旧完整FDB作业不恢复。
+2026-10-25最新补充：按用户明确要求，依据[两臂跨数据集计划](../dev/TextTurn/fdb_cross_dataset_plan.md)建立[TT-005：接话覆盖与延迟](TextTurn/tt_005_fdb_turn_taking.md)及[TT-006：停顿介入率与归因](TextTurn/tt_006_fdb_pause_handling.md)，分别交付50条真实录音结果，替代此前仅纳入TT-004的安排。必要抽样、适配和边界测试并入两项，不单设工程确认工作单；共用一次远端串行测试与原有预算。当前只有计划及工作单，没有冻结抽样、实现入口或提交作业。固定现有候选、真实ASR、Listen影子动作，FDB标注时序与当前语义策略分开报告；TT-004仍未完成，旧完整FDB作业不恢复。
 
 2026-10-24 当前路线：用户已确认 **SoulX-Duplug＋Nemotron**，并要求简化为公开英文 Easy Turn 集上的质量与延迟测试；[方案](../dev/SoulX-Duplug/quality_test.md)已同步。本次只更新路线文档，未新建 issue、实现适配或启动远端作业。以下 XTurnix 内容保留为历史记录，不代表当前继续推进旧训练或恢复已取消测试。
 
