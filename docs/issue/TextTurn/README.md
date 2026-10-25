@@ -1,8 +1,8 @@
 # TextTurn 第一阶段工作单
 
-更新：2026-10-25。TT-008已授权实施，远端作业已提交并确认480ms首阶段稳定，160ms同作业串行接续，见[运行记录](../../../reports/textturn/20261025-ultrachat-prefix-retest/README.md)；本项仍未交付最终结果。
+更新：2026-10-25。TT-008两周期测试已完成并按用户指令归档，各150/150成功、退出码0，见[结果记录](../../../reports/textturn/20261025-ultrachat-prefix-retest/README.md)。当前共10项：7项完成、1项终止归档、2项未完成（TT-004、TT-010）。
 
-2026-10-25最新策略：按用户指令将TT-009终止归档（未实施，不计完成），新增[TT-010](tt_010_asr_update_yield_dataset.md)。新数据要求Speak期间出现非backchannel式有效ASR更新即让轮，不等待固定停止词；短附和仍keep。TT-010同时论证播放完成后由运行时注入finish及start闭环。当前共10项：6项完成、1项终止归档、3项未完成；本次不构造数据或训练，TT-008继续原冻结测试。
+2026-10-25最新策略：按用户指令将TT-009终止归档（未实施，不计完成），新增[TT-010](tt_010_asr_update_yield_dataset.md)。新数据要求Speak期间出现非backchannel式有效ASR更新即让轮，不等待固定停止词；短附和仍keep。TT-010同时论证播放完成后由运行时注入finish及start闭环。当前共10项：7项完成、1项终止归档、2项未完成；TT-008按原冻结测试完成，本次不构造数据或训练。
 
 原TT-001—007共6/7项完成：TT-001—003已交付，TT-005／006的480ms FDB结果及TT-007的160ms同样本对照均已完成核查并归档；两次各100条、退出码0、未知0。TT-004仍因接话语义标注不足保持未完成。完整指标、分母、时间单位和原始证据位置见[联合结果](../../../reports/textturn/20261025-fdb-action-only/README.md)。
 
@@ -19,7 +19,7 @@
 | TT-005 | [统计 ASR 更新后 Speak／start 与等待拍数](../archive/TextTurn/tt_005_fdb_turn_taking.md) | 50 条真实录音的两项比例与 start 平均等待拍数 | TT-002／003 | 已完成并归档；更新后Speak44/50、start21/50，等待763.00ms |
 | TT-006 | [统计 ASR 更新前连续至少3周期 Speak](../archive/TextTurn/tt_006_fdb_pause_handling.md) | 50 条真实录音的持续 Speak 比例与区间辅助证据 | TT-002／003 | 已完成并归档；更新前连续3周期Speak33/50 |
 | TT-007 | [160ms周期的同样本FDB对照](../archive/TextTurn/tt_007_fdb_160ms.md) | 相同50＋50录音的160ms主指标与时间换算、对照说明 | TT-002／003；复用TT-005／006冻结清单 | 已完成并归档；Speak46/50、start9/50，等待303.45ms；连续3周期Speak46/50 |
-| TT-008 | [UltraChat注入助手正文的两周期重测stop](tt_008_ultrachat_stop_retest.md) | 480ms每周期8 token、160ms每周期3 token的stop、误stop及960ms抢话结果 | TT-002／003及既有测试资产 | 执行中；已提交，480ms首阶段稳定，160ms串行接续 |
+| TT-008 | [UltraChat注入助手正文的两周期重测stop](../archive/TextTurn/tt_008_ultrachat_stop_retest.md) | 480ms每周期8 token、160ms每周期3 token的stop、误stop及960ms抢话结果 | TT-002／003及既有测试资产 | 已完成并归档；两周期各150/150成功，旧合同结果已交付 |
 | TT-009 | [条件性训练数据重构](../archive/TextTurn/tt_009_conditional_data_rebuild.md) | 原条件性方案留档 | 已被TT-010替代 | 用户指令终止并归档；未实施，不计完成 |
 | TT-010 | [非附和式ASR更新让轮与输出生命周期数据改造](tt_010_asr_update_yield_dataset.md) | 非停止词依赖的stop监督、附和对照、finish编码决策和start终态配对合同 | 复用训练／开发来源；不依赖TT-008结论 | 待实施；本次建立工作单，不自动构造或训练 |
 

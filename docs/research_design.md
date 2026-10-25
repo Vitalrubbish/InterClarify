@@ -8,7 +8,7 @@
 
 2026-10-25后续按用户明确要求新增[TT-007：160ms同样本对照](issue/archive/TextTurn/tt_007_fdb_160ms.md)：另以每个真实Nemotron解码完成形成160ms控制周期，复用相同100条录音、模型及原累计预算。此处修改是记录新增实验的周期例外，不改变480ms训练合同或现役控制路径；按用户进一步纠正，FDB仅监控TextTurn动作和状态，不模拟助手回答、生成或播放；start进入Speak、stop回Listen、keep维持，无计时复位。480ms与160ms均采用此监控口径，原带模拟回答的运行撤回保留，周期指标的时间含义以工作单冻结协议为准。
 
-2026-10-25新数据目标：按用户明确修订，Speak期间出现非backchannel式有效ASR文本更新即让轮，不依赖固定停止词；短附和仍保持keep。新建[TT-010](issue/TextTurn/tt_010_asr_update_yield_dataset.md)，替代终止归档的TT-009，讨论由同一输出运行时在音频确实播放完成后注入finish输入事件，使已接受start在完整轨迹中以stop或finish闭合；finish不是模型新增预测动作。具体编码待工作单实施时冻结，本次不改模型或现役运行时；TT-008保持旧冻结合同继续测试。
+2026-10-25新数据目标：按用户明确修订，Speak期间出现非backchannel式有效ASR文本更新即让轮，不依赖固定停止词；短附和仍保持keep。新建[TT-010](issue/TextTurn/tt_010_asr_update_yield_dataset.md)，替代终止归档的TT-009，讨论由同一输出运行时在音频确实播放完成后注入finish输入事件，使已接受start在完整轨迹中以stop或finish闭合；finish不是模型新增预测动作。具体编码待工作单实施时冻结，本次不改模型或现役运行时；TT-008已按旧冻结合同完成测试并归档。
 
 ## 1. 研究背景
 
