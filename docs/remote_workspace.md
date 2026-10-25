@@ -1,5 +1,7 @@
 # 远端工作目录约定
 
+2026-10-25启动TT-008：源码`3fa4481`位于`~/parathink-textturn/source/tt008-r1`，冻结清单`dataset/tt-008-ultrachat-r1/manifest.json`；run为`tt-008-20261025-r1`，作业`job-179292031704516676972-xuan-zhang`。480ms首阶段已稳定运行，160ms在同作业内串行接续；原预算提交前剩7549 GPU秒，单作业上限7200秒。详见[运行记录](../reports/textturn/20261025-ultrachat-prefix-retest/README.md)，尚未完成两周期结果交付。
+
 项目现名为 ParaThink。下表中的 `InterClarify`、`interclarify-*` 是已有服务器目录或环境的真实名称，继续保留以兼容现役资产；GitHub 地址与历史报告链接同样保留，未执行远端仓库或目录迁移。新建通用开发环境默认使用 `parathink-dev`。
 
 根目录为 `/hpc_stor03/sjtu_home/xuan.zhang/`。远端只保留当前源码、模型、数据、现役 conda 环境与评测入口；运行输出使用独立目录，不覆盖既有结果。
