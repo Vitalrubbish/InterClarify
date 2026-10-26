@@ -48,3 +48,41 @@ A10上的`full_clip1`已完成两轮，两轮pilot探针start0/16、stop0/8，de
 不裁剪第1轮结果：pilot探针start16/16、stop8/8，但keep137/291；dev探针start64/80、stop40/40，keep818/1413。该单因素改变恢复了正例动作，同时引入明显误动作，尚不满足预先85%的keep约束，不能据此直接推荐正式方案。已在另外两项结果产生前登记条件性第四臂：仅当前三臂最终均不合格时，补测合法动作CE＋不裁剪，检验两因素交互，见协议。
 
 不裁剪第2轮：pilot探针keep126/291、start16/16、stop8/8；dev探针keep743/1413、start71/80、stop39/40。误动作没有降至约束内，不能仅取消裁剪就宣布方案可用。pilot负例的错误／总数为Listen正常输入44/47、句中停顿32/36、块间空窗40/55，Speak无新更新40/73、附和2/5、播放尾窗2/18；Listen播放后等待0/34。剩余问题集中于持轮与用户／助手输入区分，不能仅凭接话、打断召回上升判通过。
+
+## 三臂最终结果
+
+比较作业正常结束、退出码0。相同NVIDIA A10、两轮完整pilot及固定dev探针的最终结果如下；均为窗口级诊断，不能当作完整机会验收。
+
+| 设置 | pilot keep／start／stop正确数 | dev探针keep／start／stop正确数 | 是否满足预先诊断条件 |
+| --- | --- | --- | --- |
+| 完整词表CE＋clip1 | 291/291、0/16、0/8 | 1413/1413、0/80、0/40 | 否，正例未恢复 |
+| 完整词表CE＋不裁剪 | 126/291、16/16、8/8 | 743/1413、71/80、39/40 | 否，误动作过多 |
+| 合法动作CE＋clip1 | 291/291、0/16、4/8 | 1413/1413、0/80、4/40 | 否，接话仍为零 |
+
+三臂summary已取回本地`artifacts/analysis/textturn/training-diagnostics-20261026/compare-summary.json`，SHA256为`604beabe6e68f24b9f45962e624ad3e28f374e9355b40a02592da808248ed0a6`。完整轨迹确认集尚未使用。
+
+预先登记的追加条件满足；原作业结束且`vc list`无活动任务后，15:03:11提交合法动作CE＋不裁剪，job为`job-179299819049996509767-xuan-zhang`，run为`tt010-diagnostic-interaction-a10-r1`。源码`f22f8a7`，独立worktree`source/tt010-diagnostics-r2`，使用`configs/textturn_training_interaction.json`。同一基模重新开始，原pilot两轮、同seed／日程，仍单A10／8CPU／32GiB及7200秒诊断上限；未启动正式训练或外部测试。
+
+## 四臂最终结论
+
+第四臂完成两轮、退出码0、计算耗时1426.06秒。最终pilot探针keep90/291、start16/16、stop8/8；dev探针keep572/1413（40.48%）、start72/80（90%）、stop40/40（100%）。误动作未满足预先85%负例约束。四臂均无可放行设置，因此预留完整轨迹确认集未使用、未开始full或恢复TT-011，最终`vc list`无活动任务。
+
+第四臂汇总已取回`artifacts/analysis/textturn/training-diagnostics-20261026/interaction-summary.json`，SHA256为`27bc74f92061f263a981a7941ec4f70add33ee7bcea71700624d591e7fb48b8f4`。本轮确认优化机制的问题，但未得到质量合格模型。
+
+## 数据构造的新增核查
+
+只读逐轨迹检查当前冻结数据：pilot的8条、train的42条含stop轨迹，stop后start均为0。train共有452条打断后`post_output_wait`窗口，当前用户正文均非空，标签全部keep。其中按完整当前用户正文汇总：
+
+| 用户正文 | 打断轨迹数 | 后续keep等待窗 |
+| --- | --- | --- |
+| Add a practical example | 18 | 171 |
+| Use a simpler explanation | 4 | 51 |
+| Could you explain the last part | 6 | 65 |
+| That should include the risks | 8 | 88 |
+| Please stop speaking | 6 | 77 |
+
+明确停止请求可以继续keep；前三类明确后续请求及风险补充的上下文需逐例审核，不应仅因属于interrupt变体就一律没有接话正例。生成器当前在`user_segment`完成后直接`drain`及`post_output_wait`，未构造新回复和start。这是打断后重新接话的监督缺口，不等于所有452窗都应机械改start，也不能证明它单独造成全keep。
+
+其余检查：pilot仅4来源、16个start对应8种用户正文、8个stop对应4种前缀；全部start在完整正文后的首个no-voice窗，紧邻前窗已具有相同正文却标keep；句中停顿在非末尾token片段随机插入，stop使用8种固定模板及字符位置界定可判定点。后两项需要依据当前可见语义审核，不能让“源文本是否结束”或“达到字符数”代替语义依据。
+
+下一轮明确方案为：先修复上述数据闭环与语义对照，再将完整normal／interrupt轨迹配对，在每次逻辑更新内合并三类损失后统一裁剪。更新组织先在原数据上做受限验证，再比较修订数据，以区分优化与构造收益。方案已写入[训练方案](../../../docs/dev/TextTurn/retraining_plan.md)，尚未实施或启动。
