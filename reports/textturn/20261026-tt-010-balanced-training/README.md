@@ -1,5 +1,7 @@
 # TT-010 动作平衡重训
 
+2026-10-26约13:10最终核查：训练正常结束、退出码0，pilot两轮开发集各88947窗全部keep，两轮gate均拒绝；平均加权训练loss为5.5404879／3.3917965。未进入full，候选选pilot第1轮、continue_online=false；新token行更新及保存重载一致检查通过。TT-011等待器13:10:26停止、jobs为空，未提交外部测试，随后调度无活动作业。正例稀疏、更新组织及损失诊断见[全keep分析](../20261026-keep-collapse-analysis/README.md)。下方Running记录为历史。
+
 2026-10-26 12:57:37状态核查：pilot第1轮完整开发评估88947/88947，全部keep；正常接话0/800、陈述接话0/400、打断0/400，停顿误start0/737、附和误stop0/242，综合分0.4。该轮development_gate已明确拒绝，原因smooth_floor／declarative_floor／interruption_floor，分别要求至少8／4／4例成功；新门槛已实际拦截全keep候选。第1轮平均加权训练loss为5.5404879。pilot第2轮训练已进入后续开发评估，当前66001/88947（74.20%），已保存预测全部keep，无截断行，完整summary及最终pilot_gate尚未生成。原作业仍是唯一Running任务，无退出码、最终candidate或full训练；等待器PID1400303存活，12:57:29更新waiting_for_training、jobs为空，无TT-011测试目录。12:57:31显存2756MiB、资产约2.81GiB、报告约0.76GiB，均在限制内。此次仅只读监控，未停止、重启或修改任务。
 
 2026-10-26 11:50:42评估核查：pilot第1轮开发集预测42001/88947（47.22%），42001条全部keep、start/stop均0，无截断行；完整summary和gate尚未生成。训练仍为唯一Running作业，未开始pilot第2轮或full，无训练退出码及candidate。等待器PID1400303存活，状态同刻更新waiting_for_training、jobs为空，两项外部测试尚未提交。11:50:39显存2756MiB、资产约2.69GiB、报告约0.65GiB，资源在限。相比11:33的9501窗，评估持续推进，但全部keep现象仍未改善；不把部分预测写成最终质量结论。本次仅只读检查，没有修改或停止作业。
