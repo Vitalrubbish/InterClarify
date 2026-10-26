@@ -2,6 +2,7 @@
   "seed": 20261025,
   "prior_run": "tt-010-balanced-20261026-r2",
   "dev_sources": 20,
+  "confirmation_sources": 20,
   "keep_per_bucket": 2,
   "max_wall_seconds": 7200,
   "arms": [

@@ -1,5 +1,7 @@
 # TextTurn 第一阶段工作单
 
+2026-10-26按用户要求在TT-010内开展训练机制诊断并确定新方案；不新增issue。r2训练已结束且两轮全keep被拒绝，TT-011未提交测试。只读复评作业已Running，后续按冻结协议串行做三个pilot优化对照，不自动启动正式full；见[诊断记录](../../../reports/textturn/20261026-training-diagnostics/README.md)。
+
 2026-10-26重训已启动并确认Running：`job-179298196307743501088-xuan-zhang`，10:32:46开始，run `tt-010-balanced-20261026-r2`，源码`b57b2ce`位于`source/tt010-balanced-r2`。用户授权取消训练时间上限：配置null、内外层训练timeout移除；1%正例门槛、三类等份损失及全部非时长资源限制保留。最近部署核查baseline-dev2501/88947；TT-011新等待器PID1400303、目录`dataset/tt-011-external-r2`，无等待截止，已连续轮询并核实存活，测试尚未提交。见[重训报告](../../../reports/textturn/20261026-tt-010-balanced-training/README.md)。下方旧运行／时限状态为历史。
 
 2026-10-26用户明确要求重新启动训练并取消训练任务时间上限：TT-010新run采用已交付的1%低门槛和三类等份损失，从固定基模重新训练，复用原完整数据。训练配置max_wall_seconds设为null，移除训练进程13800秒及外层14400秒timeout；训练仍按有限epoch自然结束。显存22GiB、单卡／8CPU／32GiB、资产10GiB／报告2GiB及30GiB空盘限制保留。TT-011按既有授权绑定新run重新部署等待，取消训练等待截止和等待器总时限，测试自身每项7200秒不变。不改动旧作业源码或产物，不新增issue。

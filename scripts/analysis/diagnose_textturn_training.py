@@ -16,6 +16,7 @@ TRAINING = Path(__file__).resolve().parents[1] / 'training'
 sys.path.insert(0, str(TRAINING))
 from build_textturn_dataset import ACTIONS
 from textturn_loss import complete_trajectory_groups, stage_loss_weights, trajectory_order
+from score_textturn import score_predictions
 from train_textturn import (action_logits, check_budget, file_hash, load_controller, read_rows,
                             save_adapter, split_path, write_json)
 
@@ -61,17 +62,21 @@ def action_loss(logits, row, token_ids, objective):
     return torch.nn.functional.cross_entropy(scores[None, :], torch.tensor([target], device=logits.device))
 
 
-def evaluate_rows(model, rows, token_ids, output, started, config):
+def evaluate_rows(model, rows, token_ids, output, started, config, complete=False):
     import torch
     output.mkdir(parents=True, exist_ok=False)
     model.eval()
     confusion, totals = Counter(), defaultdict(lambda: defaultdict(float))
+    predictions = []
     with torch.inference_mode(), (output / 'predictions.jsonl').open('w') as stream:
         for i, row in enumerate(rows):
+            torch.cuda.synchronize()
+            begin = time.monotonic()
             scores = action_logits(model, row['input_ids'][:-1])
             actions = scores[token_ids[:3]]
             legal = [0, 1] if row['visible']['state'] == 'Listen' else [0, 2]
             prediction = legal[int(actions[legal].argmax())]
+            elapsed = (time.monotonic()-begin)*1000
             target = list(ACTIONS).index(row['target_action'])
             other = next(a for a in legal if a != target)
             full = float(action_loss(scores, row, token_ids, 'full'))
@@ -85,10 +90,13 @@ def evaluate_rows(model, rows, token_ids, output, started, config):
             stats['legal_ce_sum'] += restricted
             stats['margin_sum'] += margin
             confusion[(key, list(ACTIONS)[prediction])] += 1
-            stream.write(json.dumps(dict(snapshot_id=row['snapshot_id'], target=key,
+            record = dict(snapshot_id=row['snapshot_id'], target=key, control_ms=elapsed,
                 action=list(ACTIONS)[prediction], state=row['visible']['state'],
                 action_logits=actions.tolist(), correct_margin=margin,
-                full_ce=full, legal_ce=restricted)) + '\n')
+                full_ce=full, legal_ce=restricted)
+            stream.write(json.dumps(record) + '\n')
+            if complete:
+                predictions.append(record)
             if (i+1) % 500 == 0:
                 check_budget(started, config, output)
                 print(json.dumps(dict(event='diagnostic_evaluation', output=str(output), completed=i+1,
@@ -100,6 +108,8 @@ def evaluate_rows(model, rows, token_ids, output, started, config):
         result['by_action'][action] = dict(count=n, correct=int(values['correct']),
             accuracy=values['correct']/n, mean_full_ce=values['full_ce_sum']/n,
             mean_legal_ce=values['legal_ce_sum']/n, mean_correct_margin=values['margin_sum']/n)
+    if complete:
+        result['opportunities'], _ = score_predictions(rows, predictions)
     write_json(output / 'summary.json', result)
     return result
 
@@ -227,6 +237,14 @@ def main(args):
         raise ValueError('Diagnostic pilot exceeds the existing budget')
     dev = read_rows(split_path(args.data, manifest, 'dev'))
     dev_probe = select_probe(dev, diagnostic['seed'], diagnostic['dev_sources'], diagnostic['keep_per_bucket'])
+    confirmation = []
+    if args.phase == 'confirm':
+        if args.candidate is None:
+            raise ValueError('Confirm requires an explicitly fixed candidate')
+        sources = sorted({r['source_id'] for r in dev}, key=lambda s: stable_key(diagnostic['seed'], s))
+        sources = set(sources[diagnostic['dev_sources']:diagnostic['dev_sources']+diagnostic['confirmation_sources']])
+        confirmation = [r for r in dev if r['source_id'] in sources]
+        complete_trajectory_groups(confirmation)
     del dev
     pilot_probe = select_probe(pilot, diagnostic['seed'], keep_per_bucket=diagnostic['keep_per_bucket'])
     args.output.mkdir(parents=True)
@@ -237,6 +255,8 @@ def main(args):
         packages={name: importlib.metadata.version(name) for name in ('torch', 'transformers', 'peft')},
         pilot_rows=len(pilot), pilot_probe_ids=[r['snapshot_id'] for r in pilot_probe],
         dev_probe_ids=[r['snapshot_id'] for r in dev_probe], dev_source_ids=sorted({r['source_id'] for r in dev_probe}),
+        confirmation_source_ids=sorted({r['source_id'] for r in confirmation}),
+        candidate_adapter_sha256=file_hash(args.candidate/'adapter_model.safetensors') if args.candidate else None,
         gpu=torch.cuda.get_device_name(0), started_unix=time.time()))
     result = {}
     if args.phase == 'inspect':
@@ -249,23 +269,30 @@ def main(args):
                 result[name]['gradients'] = audit_gradients(model, pilot, ids, args.output/'gradients.json', started, config)
             del model
             release_model()
-    else:
+    elif args.phase == 'compare':
         for arm in diagnostic['arms']:
             model, tokenizer, ids = load_controller(args.model, args.data, config)
             result[arm['name']] = compare_arm(model, tokenizer, pilot,
                 dict(pilot_probe=pilot_probe, dev_probe=dev_probe), ids, arm, args.output/arm['name'], started, config)
             del model
             release_model()
+    else:
+        model, _, ids = load_controller(args.model, args.data, config, args.candidate)
+        for name, rows in dict(pilot=pilot, dev_confirmation=confirmation).items():
+            result[name] = evaluate_rows(model, rows, ids, args.output/name, started, config, complete=True)
+        del model
+        release_model()
     write_json(args.output/'summary.json', result)
     print(json.dumps(dict(event='diagnostic_finished', phase=args.phase, elapsed_seconds=time.monotonic()-started)), flush=True)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--phase', choices=('inspect', 'compare'), required=True)
+    parser.add_argument('--phase', choices=('inspect', 'compare', 'confirm'), required=True)
     parser.add_argument('--model', type=Path, required=True)
     parser.add_argument('--data', type=Path, required=True)
     parser.add_argument('--prior', type=Path, required=True)
+    parser.add_argument('--candidate', type=Path)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--config', type=Path, default=Path('configs/textturn_training_diagnostics.json'))
     main(parser.parse_args())

@@ -5,9 +5,13 @@ ROOT="${TEXTTURN_ROOT:-$HOME/parathink-textturn}"
 ENV_DIR="${TEXTTURN_ENV:-$HOME/interclarify-xturnix-fleurs/envs/xturnix}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 RUN_ID="${TEXTTURN_RUN_ID:?TEXTTURN_RUN_ID is required}"
-PHASE="${TEXTTURN_DIAGNOSTIC_PHASE:?inspect or compare is required}"
+PHASE="${TEXTTURN_DIAGNOSTIC_PHASE:?inspect, compare or confirm is required}"
 case "$RUN_ID" in *[!A-Za-z0-9._-]*|.*) exit 2 ;; esac
-case "$PHASE" in inspect|compare) ;; *) exit 2 ;; esac
+case "$PHASE" in inspect|compare|confirm) ;; *) exit 2 ;; esac
+EXTRA_ARGS=()
+if [ "$PHASE" = confirm ]; then
+  EXTRA_ARGS=(--candidate "${TEXTTURN_DIAGNOSTIC_CANDIDATE:?An explicit candidate is required}")
+fi
 [ ! -e "$ROOT/runs/$RUN_ID" ] || exit 2
 [ -f "$ENV_DIR/conda-meta/history" ] || exit 2
 mkdir -p "$ROOT/submit_logs"
@@ -21,7 +25,7 @@ git -C "$REPO_ROOT" rev-parse HEAD > "$ROOT/submit_logs/$RUN_ID.source_commit.tx
 setsid timeout 7300 "$ENV_DIR/bin/python" -u "$REPO_ROOT/scripts/analysis/diagnose_textturn_training.py" \
   --phase "$PHASE" --model "$ROOT/models/qwen3-0.6b" --data "$ROOT/dataset/tt-010-fulltraj-r1" \
   --prior "$ROOT/runs/tt-010-balanced-20261026-r2" --output "$ROOT/runs/$RUN_ID" \
-  --config "$REPO_ROOT/configs/textturn_training_diagnostics.json" > "$LOG" 2>&1 &
+  --config "$REPO_ROOT/configs/textturn_training_diagnostics.json" "${EXTRA_ARGS[@]}" > "$LOG" 2>&1 &
 TASK_PID=$!
 cleanup() {
   local rc=$?
