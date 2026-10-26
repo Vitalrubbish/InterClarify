@@ -1,5 +1,7 @@
 # 工作单管理
 
+2026-10-27 TT-010[完整修复配置](../dev/TextTurn/dataset_repair_recommendation.md)已整体确认，train／pilot窗口预算确定为100000／10000。按用户最新指令，本轮只更新为已确认，代码、正式JSON和旧冻结集未改动，数据构造、规模预估及训练未启动；TT-010保持打开，不新增issue或恢复外部评测。
+
 2026-10-27按用户指令继续在TT-010内逐项核对修复配置，已确认发布时序参数及普通接话“句末点号弱标记＋首个合格空观察start”。采用弱代理是为自动构造，接受句末可能仍有续说，不用于冒充真实语音金标；[配置记录](../dev/TextTurn/dataset_repair_configuration.md)保留待定项。研究／架构合同已先同步，生成器、冻结集及训练尚未改动或启动，不新增issue。
 
 2026-10-26 TextTurn四臂诊断已完成，均未得到可用设置，无活动作业。沿用TT-010交付[新方案](../dev/TextTurn/retraining_plan.md)：修复打断后重新接话及语义对照，更新内合并三类损失后统一裁剪，分开验证优化与数据收益。方案尚未实现或启动，确认集／full／外部测试均未执行；见[报告](../../reports/textturn/20261026-training-diagnostics/README.md)。
