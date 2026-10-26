@@ -15,6 +15,7 @@ stop只用于用户打断，正常说完由播放完成事件处理。按用户2
 | 文档 | 内容 |
 | --- | --- |
 | [数据修复配置讨论](dataset_repair_configuration.md) | 逐项记录用户选择、继承合同及待定配置，全部对齐后实施 |
+| [数据修复完整推荐](dataset_repair_recommendation.md) | 剩余六组的集中建议，明确待确认的规模预算、标签边界和实施范围 |
 | [既有trace发布节奏](publication_trace_review.md) | 原生160ms解码中的连续更新、词内续写与空串，含本地交互查看器 |
 | [小控制器可行性](controller_feasibility.md) | 短周期与长上下文、异步CoT、单一执行点、训练顺序及后备路线 |
 | [当前数据管线审计](dataset_pipeline_review.md) | 当前完整轨迹版本的逐窗事实、构造问题、覆盖缺口及复现证据 |
