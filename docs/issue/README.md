@@ -1,5 +1,7 @@
 # 工作单管理
 
+2026-10-27按用户指令继续在TT-010内逐项核对修复配置，已确认发布时序参数及普通接话“句末点号弱标记＋首个合格空观察start”。采用弱代理是为自动构造，接受句末可能仍有续说，不用于冒充真实语音金标；[配置记录](../dev/TextTurn/dataset_repair_configuration.md)保留待定项。研究／架构合同已先同步，生成器、冻结集及训练尚未改动或启动，不新增issue。
+
 2026-10-26 TextTurn四臂诊断已完成，均未得到可用设置，无活动作业。沿用TT-010交付[新方案](../dev/TextTurn/retraining_plan.md)：修复打断后重新接话及语义对照，更新内合并三类损失后统一裁剪，分开验证优化与数据收益。方案尚未实现或启动，确认集／full／外部测试均未执行；见[报告](../../reports/textturn/20261026-training-diagnostics/README.md)。
 
 2026-10-26用户要求对TextTurn全keep做测试并确定新训练方案，沿用TT-010，不新增issue。r2训练已结束、两轮dev全keep且被gate拒绝；TT-011停止、未提交外部测试。只读复评作业已Running，后续串行pilot机制对照；见[诊断记录](../../reports/textturn/20261026-training-diagnostics/README.md)。

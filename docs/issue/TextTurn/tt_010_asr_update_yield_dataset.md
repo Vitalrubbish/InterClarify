@@ -1,5 +1,7 @@
 # TT-010：非附和式ASR更新让轮与输出生命周期数据改造
 
+2026-10-27用户逐项确认发布参数与开头空拍，普通接话至少等一个空观察、首个合格空观察start；进一步指定UltraChat句末点号／问号／叹号作为完成及让轮的自动弱标记，接受句末不一定是整轮结束。已先同步研究／架构与[配置记录](../../dev/TextTurn/dataset_repair_configuration.md)，替代普通start人工／教师语义标注前置建议。句末是否强插空拍、多句续说与其他配置仍待核对，尚未修改生成器、冻结集或启动训练，本单保持打开，不新增issue。
+
 2026-10-26用户要求先逐项讨论修复配置、优先自动构造，并从旧trace查看空拍设计。已记录[配置讨论](../../dev/TextTurn/dataset_repair_configuration.md)，交付[发布轨迹分析](../../dev/TextTurn/publication_trace_review.md)及本地交互查看器；只读核查100条FDB回放和6条合成语音保留例子，8774个原生观察与发布增量一致。具体分布、标签和预算仍待对齐，未修改生成器、冻结集或启动训练，不新增issue。
 
 2026-10-26按用户要求交付[小控制器方案](../../dev/TextTurn/controller_feasibility.md)和[训练数据管线审计](../../dev/TextTurn/dataset_pipeline_review.md)。本地conda只读检查当前100818条记录，含pilot重叠；确认预设分支ID进入模型输入、3个打断模板不可达及句式／历史位置混杂。数据修复与优化方案仍未实施，本单保持打开；未新增issue、启动训练或更改研究范围。
