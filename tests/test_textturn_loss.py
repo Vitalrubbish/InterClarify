@@ -56,6 +56,58 @@ class TextTurnLossTests(unittest.TestCase):
                        for i in range(2))/2
         self.assertTrue(torch.allclose(combined, separate))
 
+    def balanced_rows(self):
+        rows = self.rows('keep', 20) + self.rows('start', 2) + self.rows('stop', 1)
+        for row in rows[20:22]:
+            row['target_action'] = 'start'
+        rows[-1]['target_action'] = 'stop'
+        return loss.assign_loss_weights(rows, self.policy())
+
+    def balance(self):
+        return json.loads((ROOT / 'configs/textturn_full_trajectory_training.json').read_text())['loss_balance']
+
+    def test_stage_balancing_allocates_equal_action_mass_without_mutating_frozen_rows(self):
+        rows = self.balanced_rows()
+        raw = [r['loss_weight'] for r in rows]
+        weights, summary = loss.stage_loss_weights(rows, self.balance())
+        self.assertEqual(raw, [r['loss_weight'] for r in rows])
+        self.assertTrue(all(w > 0 for w in weights))
+        self.assertEqual(summary['mean_weight'], 1.)
+        self.assertAlmostEqual(sum(weights), len(rows))
+        for action in ('keep', 'start', 'stop'):
+            self.assertAlmostEqual(summary['action_weight_mass'][action], len(rows) / 3)
+        legacy, stats = loss.stage_loss_weights(rows)
+        self.assertEqual(legacy, raw)
+        self.assertAlmostEqual(stats['mean_weight'], sum(raw)/len(raw))
+
+    def test_balanced_loss_matches_three_class_means_and_accumulated_gradients(self):
+        import torch
+        rows = self.balanced_rows()
+        weights, summary = loss.stage_loss_weights(rows, self.balance())
+        logits = torch.tensor([[.2, -.1, .3]] * len(rows), requires_grad=True)
+        actions = {'keep':0, 'start':1, 'stop':2}
+        targets = torch.tensor([actions[r['target_action']] for r in rows])
+        actual = loss.weighted_action_loss(logits, targets, weights, summary['mean_weight'])
+        ce = torch.nn.functional.cross_entropy(logits, targets, reduction='none')
+        expected = sum(ce[targets == a].mean() for a in actions.values()) / 3
+        self.assertTrue(torch.allclose(actual, expected))
+        accumulated = sum(loss.weighted_action_loss(logits[i:i+1], targets[i:i+1], [weights[i]], 1.)
+                          for i in range(len(rows))) / len(rows)
+        self.assertTrue(torch.allclose(actual, accumulated))
+        grad = torch.autograd.grad(actual, logits, retain_graph=True)[0]
+        accumulated_grad = torch.autograd.grad(accumulated, logits)[0]
+        self.assertTrue(torch.allclose(grad, accumulated_grad))
+
+    def test_balancing_rejects_missing_actions_or_invalid_shares(self):
+        rows = self.balanced_rows()
+        with self.assertRaises(ValueError):
+            loss.stage_loss_weights(rows[:-1], self.balance())
+        for shares in ({'keep':1., 'start':1., 'stop':1.},
+                       {'keep':0., 'start':.5, 'stop':.5},
+                       {'keep':float('nan'), 'start':.5, 'stop':.5}):
+            with self.assertRaises(ValueError):
+                loss.stage_loss_weights(rows, {'method':'stage_action_mass', 'action_shares':shares})
+
     def test_shuffle_preserves_complete_trajectory_order_and_budget_does_not_cut(self):
         rows = self.rows('a', 70) + self.rows('b', 4)
         ordered = loss.trajectory_order(rows, 42)

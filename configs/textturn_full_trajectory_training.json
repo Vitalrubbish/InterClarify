@@ -29,5 +29,20 @@
     },
     "normalization": "fixed_stage_mean_weight",
     "order": "shuffle_trajectories_preserve_windows"
+  },
+  "development_gate": {
+    "minimum_success_rates": {
+      "smooth": 0.01,
+      "declarative": 0.01,
+      "interruption": 0.01
+    }
+  },
+  "loss_balance": {
+    "method": "stage_action_mass",
+    "action_shares": {
+      "keep": 0.3333333333333333,
+      "start": 0.3333333333333333,
+      "stop": 0.3333333333333333
+    }
   }
 }

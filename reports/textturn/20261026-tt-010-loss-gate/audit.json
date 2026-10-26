@@ -1,0 +1,129 @@
+{
+  "dataset_manifest_sha256": "21357f70fb2d382c1ed79741d094aaee9378ec609c5215c7db1afc096b477989",
+  "training_config_sha256": "e05bfdfa5455f7025d193b66fdc058835845decd301f3a9b99bdce09a1c4d33d",
+  "splits": {
+    "pilot": {
+      "snapshots": 1894,
+      "method": "stage_action_mass",
+      "base_weights": {
+        "snapshots": 1894,
+        "raw_weight_sum": 254.0,
+        "mean_weight": 0.1341077085533263,
+        "action_weight_mass": {
+          "keep": 206.00000000000185,
+          "start": 32.0,
+          "stop": 16.0
+        },
+        "min_weight": 0.02197802197802198,
+        "max_weight": 2.0
+      },
+      "action_shares": {
+        "keep": 0.3333333333333333,
+        "start": 0.3333333333333333,
+        "stop": 0.3333333333333333
+      },
+      "action_scale_factors": {
+        "keep": 3.0647249190938233,
+        "start": 19.729166666666664,
+        "stop": 39.45833333333333
+      },
+      "raw_weight_sum": 1893.999999999994,
+      "mean_weight": 1.0,
+      "action_weight_mass": {
+        "keep": 631.3333333333276,
+        "start": 631.3333333333333,
+        "stop": 631.3333333333333
+      },
+      "min_weight": 0.06735659162843569,
+      "max_weight": 78.91666666666666,
+      "effective_action_shares": {
+        "keep": 0.333333333333329,
+        "start": 0.333333333333332,
+        "stop": 0.333333333333332
+      }
+    },
+    "train": {
+      "snapshots": 9977,
+      "method": "stage_action_mass",
+      "base_weights": {
+        "snapshots": 9977,
+        "raw_weight_sum": 1346.0,
+        "mean_weight": 0.13491029367545354,
+        "action_weight_mass": {
+          "keep": 1093.999999999962,
+          "start": 168.0,
+          "stop": 84.0
+        },
+        "min_weight": 0.019230769230769232,
+        "max_weight": 2.0
+      },
+      "action_shares": {
+        "keep": 0.3333333333333333,
+        "start": 0.3333333333333333,
+        "stop": 0.3333333333333333
+      },
+      "action_scale_factors": {
+        "keep": 3.039914686167077,
+        "start": 19.79563492063492,
+        "stop": 39.59126984126984
+      },
+      "raw_weight_sum": 9977.000000000116,
+      "mean_weight": 1.0,
+      "action_weight_mass": {
+        "keep": 3325.666666666782,
+        "start": 3325.6666666666665,
+        "stop": 3325.6666666666665
+      },
+      "min_weight": 0.058459897810905326,
+      "max_weight": 79.18253968253968,
+      "effective_action_shares": {
+        "keep": 0.3333333333333445,
+        "start": 0.33333333333333287,
+        "stop": 0.33333333333333287
+      }
+    }
+  },
+  "historical_pilot_recheck": {
+    "passed": false,
+    "conditions": {
+      "score_improved": true,
+      "pause_false_start_regression": true,
+      "backchannel_false_stop_regression": true,
+      "smooth_complete": true,
+      "smooth_floor": false,
+      "declarative_complete": true,
+      "declarative_floor": false,
+      "interruption_complete": true,
+      "interruption_floor": false,
+      "pause_false_start_complete": true,
+      "backchannel_false_stop_complete": true,
+      "runtime_complete": true
+    },
+    "reasons": [
+      "smooth_floor",
+      "declarative_floor",
+      "interruption_floor"
+    ],
+    "positive_floors": {
+      "smooth": {
+        "minimum_rate": 0.01,
+        "required_successes": 8,
+        "observed_successes": 0,
+        "denominator": 800
+      },
+      "declarative": {
+        "minimum_rate": 0.01,
+        "required_successes": 4,
+        "observed_successes": 0,
+        "denominator": 400
+      },
+      "interruption": {
+        "minimum_rate": 0.01,
+        "required_successes": 4,
+        "observed_successes": 0,
+        "denominator": 400
+      }
+    },
+    "false_action_regression_tolerance": 0.02
+  }
+}

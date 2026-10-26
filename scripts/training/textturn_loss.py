@@ -58,6 +58,32 @@ def weight_summary(rows):
             'max_weight': max(r['loss_weight'] for r in rows)}
 
 
+def stage_loss_weights(rows, policy=None):
+    """Balance action mass using stage-wide constants without changing frozen row weights."""
+    base = weight_summary(rows)
+    if policy is None:
+        return [r['loss_weight'] for r in rows], base
+    shares = policy.get('action_shares', {})
+    actions = {'keep', 'start', 'stop'}
+    if (policy.get('method') != 'stage_action_mass' or set(shares) != actions or
+            any(type(v) not in (int, float) or not math.isfinite(v) or v <= 0 for v in shares.values()) or
+            not math.isclose(math.fsum(shares.values()), 1., abs_tol=1e-12, rel_tol=0)):
+        raise ValueError('Use three positive action shares summing to one')
+    masses = base['action_weight_mass']
+    if set(masses) != actions:
+        raise ValueError('Stage action balancing requires keep, start and stop examples')
+    n = len(rows)
+    factors = {a: n * shares[a] / masses[a] for a in shares}
+    weights = [r['loss_weight'] * factors[r['target_action']] for r in rows]
+    if any(not math.isfinite(w) or w <= 0 for w in weights):
+        raise ValueError('Every effective weight must be finite and positive')
+    effective = {a: math.fsum(w for r, w in zip(rows, weights) if r['target_action'] == a) for a in shares}
+    return weights, {'snapshots': n, 'method': policy['method'], 'base_weights': base,
+                     'action_shares': dict(shares), 'action_scale_factors': factors,
+                     'raw_weight_sum': math.fsum(weights), 'mean_weight': 1.,
+                     'action_weight_mass': effective, 'min_weight': min(weights), 'max_weight': max(weights)}
+
+
 def weighted_action_loss(logits, targets, weights, mean_weight):
     import torch
     if not math.isfinite(mean_weight) or mean_weight <= 0:

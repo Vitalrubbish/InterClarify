@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'scripts' / 'training'))
 from freeze_textturn_full_trajectories import file_hash
 from train_textturn import register_dataset_tokens
+from textturn_loss import stage_loss_weights
 from transformers import AutoTokenizer
 
 
@@ -23,7 +24,6 @@ def audit(data, base, training_config):
     for root, manifest in ((data, m), (base, b)):
         for name, expected in manifest['files'].items():
             assert file_hash(root / name) == expected, (root, name)
-    assert file_hash(ROOT / 'scripts/training/textturn_loss.py') == m['loss_helper_sha256']
     assert file_hash(ROOT / 'scripts/training/freeze_textturn_full_trajectories.py') == m['freezer_sha256']
     assert file_hash(ROOT / 'scripts/training/build_textturn_duplex_dataset.py') == m['builder_sha256']
     config = json.loads(training_config.read_text())
@@ -49,11 +49,12 @@ def audit(data, base, training_config):
     assert not train_groups & dev_groups
     assert {i['source_id'] for i in index if i['split'] == 'dev'} == {
         i['source_id'] for i in original_index if i['split'] == 'dev'}
-    counts, ids, finish_counts = {}, {}, Counter()
+    counts, ids, finish_counts, stage_weights = {}, {}, Counter(), {}
     for split, filename in m['split_files'].items():
         windows = Counter()
         categories, weight_mass = Counter(), defaultdict(float)
         keep_counts, keep_masses = Counter(), defaultdict(float)
+        keep_ranges, weight_rows = {}, []
         row_ids, source_forms = {}, defaultdict(set)
         clocks = {}
         with gzip.open(data / filename, 'rt', encoding='utf-8') as stream:
@@ -78,10 +79,14 @@ def audit(data, base, training_config):
                 finish_counts[split] += bool(positions)
                 categories[action] += 1
                 weight_mass[action] += weight
+                if split in ('train', 'pilot'):
+                    weight_rows.append({'target_action': action, 'loss_weight': weight})
                 if action == 'keep':
                     key = sid, row['visible']['state'], row['category']
                     keep_counts[key] += 1
                     keep_masses[key] += weight
+                    lo, hi = keep_ranges.get(key, (weight, weight))
+                    keep_ranges[key] = min(lo, weight), max(hi, weight)
                 else:
                     assert weight == m['loss_policy']['action_weights'][action]
                 source_forms[row['source_id']].add((row['utterance_form'],row['scenario_variant']))
@@ -91,12 +96,20 @@ def audit(data, base, training_config):
         assert all(len(forms) == 4 for forms in source_forms.values())
         for key, n in keep_counts.items():
             assert math.isclose(keep_masses[key], min(n,m['loss_policy']['keep_group_budget']), abs_tol=1e-9)
+            expected_weight = min(1., m['loss_policy']['keep_group_budget'] / n)
+            assert all(math.isclose(w, expected_weight, abs_tol=1e-12) for w in keep_ranges[key])
         assert dict(categories) == m['statistics'][split]['actions']
         assert len(row_ids) == m['statistics'][split]['snapshots']
         assert math.isclose(sum(weight_mass.values()) / len(row_ids),
                             m['statistics'][split]['mean_weight'], rel_tol=1e-9)
         counts[split] = {'windows':len(row_ids), 'trajectories':len(windows), 'sources':len(source_forms)}
         ids[split] = row_ids
+        if split in ('train', 'pilot'):
+            _, summary = stage_loss_weights(weight_rows, config.get('loss_balance'))
+            if config.get('loss_balance') is not None:
+                for action, share in config['loss_balance']['action_shares'].items():
+                    assert math.isclose(summary['action_weight_mass'][action], len(weight_rows) * share, rel_tol=1e-9)
+            stage_weights[split] = summary
     assert counts['train']['windows'] <= 10000 and counts['pilot']['windows'] <= 2000
     assert all(ids['train'][sid] == digest for sid,digest in ids['pilot'].items())
     prefix = 'tt-010-duplex160-r2:91459:question:normal:'
@@ -107,6 +120,9 @@ def audit(data, base, training_config):
               'keep_group_weight_budget_verified':True,'reviewed_example_windows':70,
               'finish_input_snapshots':dict(finish_counts),'base_events_unchanged':True,
               'pilot_contains_only_whole_train_sources':True,'training_config_sha256':file_hash(training_config)}
+    result.update(frozen_loss_helper_sha256=m['loss_helper_sha256'],
+                  active_loss_helper_sha256=file_hash(ROOT / 'scripts/training/textturn_loss.py'),
+                  stage_loss_weights=stage_weights)
     (data/'audit.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
     return result
 

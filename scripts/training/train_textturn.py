@@ -15,7 +15,8 @@ import time
 
 from build_textturn_dataset import ACTIONS, SILENCE
 from score_textturn import score_file
-from textturn_loss import complete_trajectory_groups, trajectory_order, weight_summary, weighted_action_loss
+from textturn_loss import complete_trajectory_groups, stage_loss_weights, trajectory_order, weighted_action_loss
+from textturn_gate import candidate_gate, development_gate, selection_key
 
 
 def write_json(path, value):
@@ -138,7 +139,7 @@ def save_adapter(model, tokenizer, output):
     tokenizer.save_pretrained(output)
 
 
-def train_stage(model, tokenizer, rows, dev, token_ids, args, config, started, stage, best_score):
+def train_stage(model, tokenizer, rows, dev, token_ids, args, config, started, stage, best_score, baseline):
     import torch
     from transformers import get_cosine_schedule_with_warmup
     optimizer = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad],
@@ -152,7 +153,10 @@ def train_stage(model, tokenizer, rows, dev, token_ids, args, config, started, s
     weighted = config.get('loss_policy') is not None
     if weighted:
         complete_trajectory_groups(rows)
-        weights = weight_summary(rows)
+        effective_weights, weights = stage_loss_weights(rows, config.get('loss_balance'))
+        weights_by_id = {row['snapshot_id']: weight for row, weight in zip(rows, effective_weights)}
+        if len(weights_by_id) != len(rows):
+            raise ValueError('Duplicate snapshot ID in weighted training stage')
         write_json(args.output / f'{stage}-loss_weights.json', weights)
     mean_weight = weights['mean_weight'] if weighted else 1.
     for epoch in range(config['epochs']):
@@ -170,7 +174,7 @@ def train_stage(model, tokenizer, rows, dev, token_ids, args, config, started, s
                 raise ValueError('Only one final action token may be supervised')
             logits = action_logits(model, row['input_ids'][:-1])
             target = torch.tensor([row['input_ids'][-1]], device='cuda')
-            loss = (weighted_action_loss(logits[None, :], target, [row['loss_weight']], mean_weight)
+            loss = (weighted_action_loss(logits[None, :], target, [weights_by_id[row['snapshot_id']]], mean_weight)
                     if weighted else torch.nn.functional.cross_entropy(logits[None, :], target))
             loss_sum += float(loss.detach())
             group_start = index // config['gradient_accumulation'] * config['gradient_accumulation']
@@ -194,10 +198,13 @@ def train_stage(model, tokenizer, rows, dev, token_ids, args, config, started, s
                 last_report = time.monotonic()
         result = evaluate(model, dev, token_ids, args.output / f'{stage}-dev-epoch-{epoch + 1}', started, config)
         record = {'stage': stage, 'epoch': epoch + 1, 'mean_train_loss': loss_sum / len(order), 'dev': result}
+        record['development_gate'] = development_gate(baseline, result, config)
         history.append(record)
         write_json(args.output / f'{stage}-history.json', history)
         save_adapter(model, tokenizer, args.output / 'final')
-        if result['opportunity_score'] > best_score:
+        selection_path = args.output / 'best_selection.json'
+        previous = json.loads(selection_path.read_text()) if selection_path.exists() else None
+        if previous is None or selection_key(record, baseline, config) > selection_key(previous, baseline, config):
             best_score = result['opportunity_score']
             save_adapter(model, tokenizer, args.output / 'best')
             write_json(args.output / 'best_selection.json', record)
@@ -219,6 +226,8 @@ def main(args):
         raise ValueError('Dataset does not permit this training configuration')
     if manifest.get('complete_trajectories') and config.get('loss_policy') != manifest.get('loss_policy'):
         raise ValueError('Training loss policy differs from the complete-trajectory dataset')
+    if config.get('loss_balance') is not None and not manifest.get('complete_trajectories'):
+        raise ValueError('Stage action balancing requires complete weighted trajectories')
     for name, expected in manifest['files'].items():
         if file_hash(args.data / name) != expected:
             raise ValueError(f'Frozen dataset changed: {name}')
@@ -254,15 +263,15 @@ def main(args):
         raise ValueError('Pilot snapshot budget exceeded')
     initial_rows = model.get_input_embeddings().weight[token_ids].detach().float().cpu().clone()
     history, best_score = train_stage(model, tokenizer, pilot, dev, token_ids, args, config, started,
-                                     'pilot', -1.)
+                                     'pilot', -1., baseline)
     selected = json.loads((args.output / 'best_selection.json').read_text())
     candidate_dev = selected['dev']
-    tolerance = config['false_action_regression_tolerance']
-    gate = candidate_dev['opportunity_score'] > baseline['opportunity_score'] and all(
-        candidate_dev[name]['rate'] <= baseline[name]['rate'] + tolerance
-        for name in ('pause_false_start', 'backchannel_false_stop'))
+    pilot_gate = development_gate(baseline, candidate_dev, config)
+    gate = pilot_gate['passed']
     write_json(args.output / 'pilot_gate.json', {'continue_full': gate, 'baseline': baseline,
-                                               'candidate': candidate_dev, 'tolerance': tolerance})
+                                               'candidate': candidate_dev,
+                                               'tolerance': config['false_action_regression_tolerance'],
+                                               'gate': pilot_gate})
     stage = 'pilot'
     if gate:
         del model
@@ -276,7 +285,7 @@ def main(args):
         if len(full) > config['full_snapshots']:
             raise ValueError('Full snapshot budget exceeded')
         _, best_score = train_stage(model, tokenizer, full, dev, token_ids, args, config, started,
-                                    'full', best_score)
+                                    'full', best_score, baseline)
         stage = 'full'
     del model
     gc.collect()
@@ -308,13 +317,17 @@ def main(args):
     if not reload_ok or not learned_rows:
         raise RuntimeError('Saved candidate failed new-token/reload verification')
     selection = json.loads((args.output / 'best_selection.json').read_text())
+    online_gate = candidate_gate(baseline, selection, config, stage)
+    continue_online = gate and online_gate['passed']
+    write_json(args.output / 'online_gate.json', online_gate)
     write_json(args.output / 'candidate.json', {'adapter': str(best.resolve()), 'stage_completed': stage,
                'selected_stage': selection['stage'], 'selected_epoch': selection['epoch'],
-               'dev': selection['dev'], 'continue_online': gate, 'independent_test_used': False,
+               'dev': selection['dev'], 'continue_online': continue_online, 'independent_test_used': False,
+               'development_gate': online_gate,
                'adapter_sha256': file_hash(best / 'adapter_model.safetensors'),
                'elapsed_seconds': time.monotonic() - started,
                'gpu_peak_reserved_gib': torch.cuda.max_memory_reserved() / 1024**3})
-    print(json.dumps({'event': 'training_finished', 'stage': stage, 'continue_online': gate}), flush=True)
+    print(json.dumps({'event': 'training_finished', 'stage': stage, 'continue_online': continue_online}), flush=True)
 
 
 if __name__ == '__main__':
