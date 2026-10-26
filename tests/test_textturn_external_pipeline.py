@@ -90,6 +90,26 @@ class ExternalTests(unittest.TestCase):
             run.return_value.stdout='temporary scheduler outage'
             self.assertRaises(RuntimeError,scheduler)
 
+    def test_unbounded_training_wait_handles_missing_startup_log_and_obeys_final_evidence(self):
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d);(root/'submit_logs').mkdir()
+            p=Pipeline.__new__(Pipeline);p.root=root;p.output=root;p.deadline=None
+            p.protocol={'training_run':'new-run','training_job':'job-1-user'}
+            exit_path=root/'submit_logs/new-run.exit_code.txt'
+            running=({'job-1-user':{'status':'Running'}},'scheduler-running')
+            completed=({'job-1-user':{'status':'Completed'}},'scheduler-completed')
+            with patch('textturn_external_pipeline.scheduler',side_effect=[running,completed]), \
+                    patch('textturn_external_pipeline.time.time',return_value=float('inf')), \
+                    patch('textturn_external_pipeline.time.sleep',side_effect=lambda _:exit_path.write_text('0')), \
+                    patch('textturn_external_pipeline.subprocess.check_output',return_value='EndTime: 2026-10-27 12:00:00'), \
+                    patch.object(p,'save') as save,patch.object(p,'freeze_candidate') as freeze:
+                p.wait_training()
+                self.assertEqual(save.call_args_list[0].args[1]['last_training_log'],[])
+                freeze.assert_called_once()
+            p.deadline=0
+            with patch('textturn_external_pipeline.scheduler',return_value=running),patch.object(p,'save'):
+                self.assertRaises(TimeoutError,p.wait_training)
+
     def test_natural_finish_is_not_a_successful_stop_and_unknown_stays_unknown(self):
         case={'case_id':'c','source_id':'s','mode':'clean_text_events','category':'mixed','initial_state':'Speak',
           'prefix_reviews':[{'turn':'u','prefix':'Please stop','at':.2,'judgment':'non_backchannel'}]}

@@ -3,3 +3,5 @@
 对应 `configs/textturn_external_evaluation.json`。绑定TT-010完整轨迹训练run、调度ID、源码和manifest摘要；训练成功后固定候选，不改模型或阈值。两项新run均为20261026-r1，先UltraChat，再FDB。
 
 仅执行160ms，UltraChat每周期3 token，比TT-010平均每160ms约8/3 token略快；不做因果对照。每项单卡24GiB／8CPU／32GiB／7200秒，预留60秒清理；显存22GiB、资产10GiB、报告2GiB、可用盘30GiB停止线。等待训练截止2026-10-26 03:00（北京时间），保留训练自身13800秒／外层4小时限制。本配置没有累计GPU秒配额。
+
+2026-10-26新训练续接使用独立绑定协议（prepare --config），原r1配置保留历史。新协议记录实际新run／job／commit，training_wait_deadline=null，训练及等待器均无应用层时限；测试本身资源与7200秒上限不变。独立绑定协议摘要在准备与部署报告中登记。

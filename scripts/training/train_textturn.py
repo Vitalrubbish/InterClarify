@@ -93,7 +93,8 @@ def action_logits(model, ids):
 
 def check_budget(started, config, root):
     import torch
-    if time.monotonic() - started > config['max_wall_seconds']:
+    wall_limit = config['max_wall_seconds']
+    if wall_limit is not None and time.monotonic() - started > wall_limit:
         raise RuntimeError('Per-job time budget exceeded')
     if torch.cuda.max_memory_reserved() > config['gpu_stop_gib'] * 1024**3:
         raise RuntimeError('GPU 22GiB stop line exceeded')

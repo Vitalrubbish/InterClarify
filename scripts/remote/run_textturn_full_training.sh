@@ -20,21 +20,33 @@ export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 LOG="$ROOT/submit_logs/$RUN_ID.training.log"
 git -C "$REPO_ROOT" rev-parse HEAD > "$ROOT/submit_logs/$RUN_ID.source_commit.txt"
 "$ENV_DIR/bin/python" -m pip freeze > "$ROOT/submit_logs/$RUN_ID.packages.txt"
-setsid timeout --signal=TERM --kill-after=30 13800 "$ENV_DIR/bin/python" -u \
+setsid "$ENV_DIR/bin/python" -u \
   "$REPO_ROOT/scripts/training/train_textturn.py" \
   --model "$ROOT/models/qwen3-0.6b" --data "$DATA" \
   --config "$REPO_ROOT/configs/textturn_full_trajectory_training.json" --output "$RUN_DIR" > "$LOG" 2>&1 &
 TRAIN_PID=$!
 cleanup() {
-  kill -TERM -- "-$TRAIN_PID" 2>/dev/null || true
-  wait "$TRAIN_PID" 2>/dev/null || true
+  local rc=$?
+  trap - EXIT INT TERM
+  if [ -n "$TRAIN_PID" ]; then
+    kill -TERM -- "-$TRAIN_PID" 2>/dev/null || true
+    sleep 2
+    kill -KILL -- "-$TRAIN_PID" 2>/dev/null || true
+    wait "$TRAIN_PID" 2>/dev/null || true
+  fi
+  printf '%s\n' "$rc" > "$ROOT/submit_logs/$RUN_ID.exit_code.txt"
+  exit "$rc"
 }
-trap cleanup EXIT INT TERM
+trap cleanup EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 while kill -0 "$TRAIN_PID" 2>/dev/null; do
   GPU_MIB=$(nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits | head -1)
-  ASSET_BYTES=$(du -sb "$ROOT/models" "$ROOT/dataset" "$ROOT/runs" | awk '{n+=$1} END {print n}')
+  ASSET_BYTES=$(du -sb "$ROOT/models" "$ROOT/dataset" "$ROOT/runs" | awk '{n+=$1} END {printf "%.0f\n", n}')
   REPORT_BYTES=$(du -sb "$ROOT/runs" | awk '{print $1}')
-  if [ "$GPU_MIB" -ge 22528 ] || [ "$ASSET_BYTES" -ge 10737418240 ] || [ "$REPORT_BYTES" -ge 2147483648 ]; then
+  FREE_KIB=$(df -Pk "$ROOT" | awk 'NR==2 {print $4}')
+  printf '%s %s %s %s %s\n' "$(date -u +%FT%TZ)" "$GPU_MIB" "$ASSET_BYTES" "$REPORT_BYTES" "$FREE_KIB" >> "$ROOT/submit_logs/$RUN_ID.resources.txt"
+  if [ "$GPU_MIB" -ge 22528 ] || [ "$ASSET_BYTES" -ge 10737418240 ] || [ "$REPORT_BYTES" -ge 2147483648 ] || [ "$FREE_KIB" -lt 31457280 ]; then
     echo "Resource stop: gpu_mib=$GPU_MIB asset_bytes=$ASSET_BYTES report_bytes=$REPORT_BYTES" >> "$LOG"
     exit 3
   fi
@@ -44,6 +56,5 @@ set +e
 wait "$TRAIN_PID"
 RC=$?
 set -e
-printf '%s\n' "$RC" > "$ROOT/submit_logs/$RUN_ID.exit_code.txt"
-trap - EXIT INT TERM
+TRAIN_PID=''
 exit "$RC"

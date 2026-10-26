@@ -13,7 +13,7 @@
   "full_snapshots": 10000,
   "false_action_regression_tolerance": 0.02,
   "gpu_stop_gib": 22,
-  "max_wall_seconds": 13800,
+  "max_wall_seconds": null,
   "max_asset_gib": 10,
   "max_report_gib": 2,
   "loss_policy": {

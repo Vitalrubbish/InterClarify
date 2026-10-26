@@ -65,8 +65,9 @@ def review_cases(manifest, review):
     return result
 
 
-def prepare(root, repo, output):
-    protocol = read(repo / 'configs/textturn_external_evaluation.json')
+def prepare(root, repo, output, config_path=None):
+    config_path = (config_path or repo / 'configs/textturn_external_evaluation.json').resolve()
+    protocol = read(config_path)
     review = read(repo / 'configs/textturn_external_prefix_review.json')
     base = root / protocol['ultrachat_baseline']
     if digest(base) != review['baseline_manifest_sha256']:
@@ -90,7 +91,7 @@ def prepare(root, repo, output):
           'ultrachat': ultra, 'fdb': fdb, 'ultrachat_baseline_sha256': digest(base),
           'fdb_baseline_sha256': digest(root / protocol['fdb_baseline']),
           'source_commit': subprocess.check_output(['git', '-C', str(repo), 'rev-parse', 'HEAD'],text=True).strip(),
-          'protocol_sha256': digest(repo / 'configs/textturn_external_evaluation.json'),
+          'protocol_path': str(config_path), 'protocol_sha256': digest(config_path),
           'review_sha256': digest(repo / 'configs/textturn_external_prefix_review.json')})
 
 
@@ -101,12 +102,14 @@ class Pipeline:
         self.root, self.repo, self.output = root, repo, output
         self.prepared = read(output / 'prepared.json')
         self.protocol = self.prepared['protocol']
-        if (digest(repo / 'configs/textturn_external_evaluation.json') != self.prepared['protocol_sha256'] or
+        protocol_path = Path(self.prepared.get('protocol_path', repo / 'configs/textturn_external_evaluation.json'))
+        if (digest(protocol_path) != self.prepared['protocol_sha256'] or
                 digest(repo / 'configs/textturn_external_prefix_review.json') != self.prepared['review_sha256']):
             raise ValueError('Prepared protocol or review changed')
         self.state_path = output / 'state.json'
         self.state = read(self.state_path) if self.state_path.exists() else {'status': 'waiting_for_training', 'jobs': {}}
-        self.deadline = datetime.fromisoformat(self.protocol['training_wait_deadline']).timestamp()
+        deadline = self.protocol['training_wait_deadline']
+        self.deadline = datetime.fromisoformat(deadline).timestamp() if deadline is not None else None
 
     def save(self, status, detail=None):
         self.state.update(status=status, detail=detail, updated_at=datetime.now().astimezone().isoformat())
@@ -162,9 +165,11 @@ class Pipeline:
             if job is None:
                 raise RuntimeError('Training job missing from scheduler history')
             log = self.root / 'submit_logs' / (p['training_run'] + '.training.log')
-            with log.open('rb') as stream:
-                stream.seek(max(0, log.stat().st_size - 2400))
-                progress = stream.read().decode(errors='replace').splitlines()[-1:]
+            progress = []
+            if log.exists():
+                with log.open('rb') as stream:
+                    stream.seek(max(0, log.stat().st_size - 2400))
+                    progress = stream.read().decode(errors='replace').splitlines()[-1:]
             self.save('waiting_for_training', {'job': job, 'last_training_log': progress})
             if job['status'] in TERMINAL:
                 if job['status'] != 'Completed' or not exit_path.exists() or exit_path.read_text().strip() != '0':
@@ -175,7 +180,7 @@ class Pipeline:
                     raise RuntimeError('Training GPU release not confirmed by scheduler')
                 self.freeze_candidate()
                 return
-            if time.time() >= self.deadline:
+            if self.deadline is not None and time.time() >= self.deadline:
                 raise TimeoutError('Training wait deadline exceeded')
             time.sleep(30)
 
@@ -270,10 +275,11 @@ if __name__ == '__main__':
     parser.add_argument('command', choices=['prepare','wait'])
     parser.add_argument('--root', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--config', type=Path)
     args = parser.parse_args()
     repo = Path(__file__).resolve().parents[2]
     if args.command == 'prepare':
-        prepare(args.root, repo, args.output)
+        prepare(args.root, repo, args.output, args.config)
     else:
         # The persistent waiter only performs bounded CPU work on the login node.
         os.sched_setaffinity(0, {min(os.sched_getaffinity(0))})

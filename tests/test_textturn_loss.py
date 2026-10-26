@@ -4,12 +4,14 @@ import json
 from pathlib import Path
 import sys
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts' / 'training'))
 import textturn_loss as loss
 from freeze_textturn_full_trajectories import select_whole_sources
-from train_textturn import register_dataset_tokens
+from train_textturn import check_budget, register_dataset_tokens
 
 
 class TextTurnLossTests(unittest.TestCase):
@@ -107,6 +109,22 @@ class TextTurnLossTests(unittest.TestCase):
                        {'keep':float('nan'), 'start':.5, 'stop':.5}):
             with self.assertRaises(ValueError):
                 loss.stage_loss_weights(rows, {'method':'stage_action_mass', 'action_shares':shares})
+
+    def test_null_training_deadline_retains_resource_checks_and_legacy_limit(self):
+        config = {'max_wall_seconds':None, 'gpu_stop_gib':22}
+        with patch('train_textturn.time.monotonic', return_value=10**9), \
+                patch('torch.cuda.max_memory_reserved', return_value=0) as memory, \
+                patch('train_textturn.shutil.disk_usage', return_value=SimpleNamespace(free=32*1024**3)) as disk:
+            check_budget(0, config, ROOT)
+            with self.assertRaisesRegex(RuntimeError, 'time budget'):
+                check_budget(0, {**config, 'max_wall_seconds':13800}, ROOT)
+            memory.return_value = 23*1024**3
+            with self.assertRaisesRegex(RuntimeError, 'GPU'):
+                check_budget(0, config, ROOT)
+            memory.return_value = 0
+            disk.return_value = SimpleNamespace(free=1)
+            with self.assertRaisesRegex(RuntimeError, 'disk'):
+                check_budget(0, config, ROOT)
 
     def test_shuffle_preserves_complete_trajectory_order_and_budget_does_not_cut(self):
         rows = self.rows('a', 70) + self.rows('b', 4)
