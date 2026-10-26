@@ -20,6 +20,8 @@ def check_trace(trace, stats):
     progress=defaultdict(list)
     for event in trace['events']:
         kind=event['kind'];identity=event.get('output_id')
+        if kind=='asr_update':
+            assert 1 <= len(stats['tokenizer'].encode(event['delta'], add_special_tokens=False).ids) <= 2
         if kind=='start_accepted':
             assert active is None,'Concurrent output owners'
             active=identity;starts[identity]+=1
@@ -83,6 +85,7 @@ def check_rows(path, split, stats):
             if expected=='stop':
                 stats['stop_phase'][(split,v['playback_phase'],v['assistant_generation_complete'])]+=1
             assert row['input_ids'][-1]==stats['token_ids'][ACTIONS[expected]]
+            assert row['input_ids'].count(stats['token_ids']['<finish>'])==sum(e['kind']=='finish' for e in v['runtime_events'])
             for field in ('output_id','source_id','scenario_id','occurred_ms','published_ms','user_version','raw_complete'):
                 assert '"'+field+'":' not in row['prompt']
             counts[expected]+=1;requests.append(row['snapshot_id'])
@@ -96,7 +99,8 @@ def audit(args):
     for name,expected in m['files'].items():assert file_hash(p/name)==expected,name
     assert file_hash(Path(__file__).resolve().parents[1]/'training'/'repair_textturn_dataset.py')==m['builder_sha256']
     assert file_hash(Path(__file__).resolve().parents[1]/'training'/'textturn_input.py')==m['input_mapper_sha256']
-    stats=dict(template_phase=Counter(),stop_phase=Counter(),natural_stops=Counter(),form_position=Counter(),token_ids=m['new_token_ids'])
+    from tokenizers import Tokenizer
+    stats=dict(tokenizer=Tokenizer.from_file(str(p/'tokenizer.json')),template_phase=Counter(),stop_phase=Counter(),natural_stops=Counter(),form_position=Counter(),token_ids=m['new_token_ids'])
     all_requests=set();trace_count=0
     with gzip.open(p/'timelines.jsonl.gz','rt',encoding='utf-8') as stream:
         for line in stream:
