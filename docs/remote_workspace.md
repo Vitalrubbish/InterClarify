@@ -1,5 +1,7 @@
 # 远端工作目录约定
 
+2026-10-26重训已启动并确认Running：`job-179298196307743501088-xuan-zhang`，10:32:46开始，run `tt-010-balanced-20261026-r2`，源码`b57b2ce`位于`source/tt010-balanced-r2`。用户授权取消训练时间上限：配置null、内外层训练timeout移除；1%正例门槛、三类等份损失及全部非时长资源限制保留。最近部署核查baseline-dev2501/88947；TT-011新等待器PID1400303、目录`dataset/tt-011-external-r2`，无等待截止，已连续轮询并核实存活，测试尚未提交。见[重训报告](../reports/textturn/20261026-tt-010-balanced-training/README.md)。下方旧运行／时限状态为历史。
+
 2026-10-26 09:38最新核查：TT-010训练02:14:21超时终止（退出码124、占卡13811秒）；pilot两轮88947窗均全部keep，full第1轮dev仅60001/88947窗，无正式候选及学习／重载验证。TT-011续接器02:14:38因训练失败停止，UltraChat与FDB均未提交，无新测试成绩；当前无活动作业。两单保持未完成，未重启训练／测试或改时限。见[结果核查](../reports/textturn/20261026-tt-011-external-evaluation/README.md)。下方等待／运行状态为历史。
 
 2026-10-26 TT-011已部署：独立源码`source/tt011-external-r1`（`37d9543`），准备目录`dataset/tt-011-external-r1`，等待器Python PID136137／独立supervisor136136，单CPU／2GiB／外层12小时。已连续3次轮询更新，状态`waiting_for_training`，新GPU测试未提交；00:25:56原训练pilot第2轮dev14001/88947且仍唯一活动作业。训练退出码、调度结束、候选gate／学习／重载核查均通过后，自动先160ms UltraChat再160ms action_only FDB。日志`submit_logs/tt011-waiter.log`，状态同准备目录`state.json`；见[运行记录](../reports/textturn/20261026-tt-011-external-evaluation/README.md)。

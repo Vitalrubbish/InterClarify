@@ -1,0 +1,107 @@
+{
+  "status": "passed",
+  "manifest_sha256": "21357f70fb2d382c1ed79741d094aaee9378ec609c5215c7db1afc096b477989",
+  "complete_trajectories": true,
+  "statistics": {
+    "train": {
+      "windows": 9977,
+      "trajectories": 84,
+      "sources": 21
+    },
+    "pilot": {
+      "windows": 1894,
+      "trajectories": 16,
+      "sources": 4
+    },
+    "dev": {
+      "windows": 88947,
+      "trajectories": 800,
+      "sources": 200
+    }
+  },
+  "all_weights_positive": true,
+  "keep_group_weight_budget_verified": true,
+  "reviewed_example_windows": 70,
+  "finish_input_snapshots": {
+    "train": 42,
+    "pilot": 8,
+    "dev": 400
+  },
+  "base_events_unchanged": true,
+  "pilot_contains_only_whole_train_sources": true,
+  "training_config_sha256": "f3a44db1ea5c6b390478f25bd9d7fe1794efdaf00fad6ba5e2755bc3317be5b5",
+  "frozen_loss_helper_sha256": "0fa5c88a8ddf6e1845c9db47291a069b0e89dd109789d3568421b9d43b5e0620",
+  "active_loss_helper_sha256": "acdd6ac5335c5848f499a59ba583278e707d435e3dc4cffc6c75ec4c82603201",
+  "stage_loss_weights": {
+    "train": {
+      "snapshots": 9977,
+      "method": "stage_action_mass",
+      "base_weights": {
+        "snapshots": 9977,
+        "raw_weight_sum": 1346.0,
+        "mean_weight": 0.13491029367545354,
+        "action_weight_mass": {
+          "keep": 1093.999999999962,
+          "start": 168.0,
+          "stop": 84.0
+        },
+        "min_weight": 0.019230769230769232,
+        "max_weight": 2.0
+      },
+      "action_shares": {
+        "keep": 0.3333333333333333,
+        "start": 0.3333333333333333,
+        "stop": 0.3333333333333333
+      },
+      "action_scale_factors": {
+        "keep": 3.039914686167077,
+        "start": 19.79563492063492,
+        "stop": 39.59126984126984
+      },
+      "raw_weight_sum": 9977.000000000116,
+      "mean_weight": 1.0,
+      "action_weight_mass": {
+        "keep": 3325.666666666782,
+        "start": 3325.6666666666665,
+        "stop": 3325.6666666666665
+      },
+      "min_weight": 0.058459897810905326,
+      "max_weight": 79.18253968253968
+    },
+    "pilot": {
+      "snapshots": 1894,
+      "method": "stage_action_mass",
+      "base_weights": {
+        "snapshots": 1894,
+        "raw_weight_sum": 254.0,
+        "mean_weight": 0.1341077085533263,
+        "action_weight_mass": {
+          "keep": 206.00000000000185,
+          "start": 32.0,
+          "stop": 16.0
+        },
+        "min_weight": 0.02197802197802198,
+        "max_weight": 2.0
+      },
+      "action_shares": {
+        "keep": 0.3333333333333333,
+        "start": 0.3333333333333333,
+        "stop": 0.3333333333333333
+      },
+      "action_scale_factors": {
+        "keep": 3.0647249190938233,
+        "start": 19.729166666666664,
+        "stop": 39.45833333333333
+      },
+      "raw_weight_sum": 1893.999999999994,
+      "mean_weight": 1.0,
+      "action_weight_mass": {
+        "keep": 631.3333333333276,
+        "start": 631.3333333333333,
+        "stop": 631.3333333333333
+      },
+      "min_weight": 0.06735659162843569,
+      "max_weight": 78.91666666666666
+    }
+  }
+}

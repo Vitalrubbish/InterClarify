@@ -1,0 +1,137 @@
+{
+  "verified_unix": 1792982121.8926277,
+  "source_commit": "b57b2ce931c8e2bd31e571f93b287823aa53061f",
+  "training_run": "tt-010-balanced-20261026-r2",
+  "training_job": "job-179298196307743501088-xuan-zhang",
+  "run_manifest": {
+    "config": {
+      "model_id": "Qwen/Qwen3-0.6B",
+      "model_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+      "seed": 20261025,
+      "rank": 16,
+      "alpha": 32,
+      "learning_rate": 0.0001,
+      "warmup_fraction": 0.05,
+      "epochs": 2,
+      "gradient_accumulation": 16,
+      "max_length": 2048,
+      "pilot_snapshots": 2000,
+      "full_snapshots": 10000,
+      "false_action_regression_tolerance": 0.02,
+      "gpu_stop_gib": 22,
+      "max_wall_seconds": null,
+      "max_asset_gib": 10,
+      "max_report_gib": 2,
+      "loss_policy": {
+        "keep_group_budget": 2.0,
+        "keep_group_keys": [
+          "scenario_id",
+          "state",
+          "category"
+        ],
+        "action_weights": {
+          "start": 2.0,
+          "stop": 2.0
+        },
+        "normalization": "fixed_stage_mean_weight",
+        "order": "shuffle_trajectories_preserve_windows"
+      },
+      "development_gate": {
+        "minimum_success_rates": {
+          "smooth": 0.01,
+          "declarative": 0.01,
+          "interruption": 0.01
+        }
+      },
+      "loss_balance": {
+        "method": "stage_action_mass",
+        "action_shares": {
+          "keep": 0.3333333333333333,
+          "start": 0.3333333333333333,
+          "stop": 0.3333333333333333
+        }
+      }
+    },
+    "dataset_manifest_sha256": "21357f70fb2d382c1ed79741d094aaee9378ec609c5215c7db1afc096b477989",
+    "packages": {
+      "torch": "2.11.0+cu128",
+      "transformers": "4.57.1",
+      "peft": "0.19.1",
+      "tokenizers": "0.22.2"
+    },
+    "gpu": "NVIDIA GeForce RTX 4090",
+    "started_unix": 1792981982.8243048,
+    "model_config_sha256": "660db3b73d788119c04535e48cf9be5f55bc3100841a718637ae695b442f27dd",
+    "model_weights_sha256": "f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b"
+  },
+  "scheduler_info": "User:  xuan.zhang\nPriority:  3\nSubmitTime:  2026-10-26 10:32:43\nStartTime:   2026-10-26 10:32:46\nEndTime:     -\nOriginalCmd:  vc submit --image docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4 --partition pdgpu-4090 --job textturn-tt-010-balanced-20261026-r2 --num-task 1 --cpu-per-task 8 --mem-per-task 32G --gpu-per-task 1 JOB=1:1 /hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/submit_logs/tt-010-balanced-20261026-r2.scheduler.log --cmd \"TEXTTURN_ROOT=/hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn TEXTTURN_RUN_ID=tt-010-balanced-20261026-r2 bash /hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/source/tt010-balanced-r2/scripts/remote/run_textturn_full_training.sh\"\n\n",
+  "submission": "job-179298196307743501088-xuan-zhang\n",
+  "training_progress": [
+    "{\"event\": \"evaluation_progress\", \"output\": \"/hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/runs/tt-010-balanced-20261026-r2/baseline-dev\", \"completed\": 2501, \"planned\": 88947}"
+  ],
+  "resource_samples": [
+    "2026-10-26T02:34:56Z 1976 2871331196 678912322 934386244",
+    "2026-10-26T02:35:06Z 1976 2871391042 678971755 934386188",
+    "2026-10-26T02:35:16Z 1976 2871391042 678971755 934386184"
+  ],
+  "waiter_pid": 1400303,
+  "waiter_state": {
+    "status": "waiting_for_training",
+    "jobs": {},
+    "detail": {
+      "job": {
+        "status": "Running",
+        "description": "textturn-tt-010-balanced-20261026-r2"
+      },
+      "last_training_log": [
+        "{\"event\": \"evaluation_progress\", \"output\": \"/hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/runs/tt-010-balanced-20261026-r2/baseline-dev\", \"completed\": 2001, \"planned\": 88947}"
+      ]
+    },
+    "updated_at": "2026-10-26T10:35:06.143454+08:00"
+  },
+  "waiter_poll_count": 2,
+  "waiter_cmdline": "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/interclarify-x2-turn-data/bin/python -u /hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/source/tt010-balanced-r2/scripts/remote/textturn_external_pipeline.py wait --root /hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn --output /hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/dataset/tt-011-external-r2 ",
+  "waiter_limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            8388608              unlimited            bytes     \nMax core file size        0                    unlimited            bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             65535                65535                processes \nMax open files            65535                65535                files     \nMax locked memory         unlimited            unlimited            bytes     \nMax address space         2147483648           2147483648           bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       1541148              1541148              signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+  "waiter_affinity": [
+    0
+  ],
+  "protocol": {
+    "training_run": "tt-010-balanced-20261026-r2",
+    "training_job": "job-179298196307743501088-xuan-zhang",
+    "training_source_commit": "b57b2ce931c8e2bd31e571f93b287823aa53061f",
+    "dataset": "tt-010-fulltraj-r1",
+    "dataset_manifest_sha256": "21357f70fb2d382c1ed79741d094aaee9378ec609c5215c7db1afc096b477989",
+    "training_config": "configs/textturn_full_trajectory_training.json",
+    "ultrachat_baseline": "dataset/tt-008-ultrachat-r1/manifest.json",
+    "fdb_baseline": "dataset/tt-007-fdb-160ms-r1/manifest.json",
+    "ultrachat_run": "tt-011-ultrachat-20261026-r2",
+    "fdb_run": "tt-011-fdb-20261026-r2",
+    "configurations": [
+      {
+        "control_ms": 160,
+        "assistant_tokens": 3,
+        "full_lifecycle": true
+      }
+    ],
+    "maximum_job_seconds": 7200,
+    "cleanup_reserve_seconds": 60,
+    "maximum_gpu_mib": 22528,
+    "minimum_free_bytes": 32212254720,
+    "maximum_asset_bytes": 10737418240,
+    "maximum_report_bytes": 2147483648,
+    "training_wait_deadline": null,
+    "maximum_parallel_jobs": 1,
+    "stop_deadline_ms": 1000,
+    "overlap_threshold_ms": 960
+  },
+  "protocol_sha256": "36e33306c8408e9139fb8b4a4fe8a3758a980e85b3e00b53143cd5af2d38fcd5",
+  "prepared_sha256": "ecb33e58780b29e0d3999e14c51e3ceab042ea5cab659812df2d6de071e76bbc",
+  "audit_sha256": "a842775ffa7c18bbad6f5274ffbb140f2bc5cf95c978cbe76688a4f552c6be3a",
+  "preflight": {
+    "status": "passed",
+    "manifest_sha256": "21357f70fb2d382c1ed79741d094aaee9378ec609c5215c7db1afc096b477989",
+    "training_config_sha256": "f3a44db1ea5c6b390478f25bd9d7fe1794efdaf00fad6ba5e2755bc3317be5b5",
+    "wall_limit": null,
+    "files_checked": 12
+  }
+}

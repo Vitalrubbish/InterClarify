@@ -1,10 +1,12 @@
 # TT-011：修复外部测试管线并在训练完成后串行测试
 
+2026-10-26重训已启动并确认Running：`job-179298196307743501088-xuan-zhang`，10:32:46开始，run `tt-010-balanced-20261026-r2`，源码`b57b2ce`位于`source/tt010-balanced-r2`。用户授权取消训练时间上限：配置null、内外层训练timeout移除；1%正例门槛、三类等份损失及全部非时长资源限制保留。最近部署核查baseline-dev2501/88947；TT-011新等待器PID1400303、目录`dataset/tt-011-external-r2`，无等待截止，已连续轮询并核实存活，测试尚未提交。见[重训报告](../../../reports/textturn/20261026-tt-010-balanced-training/README.md)。下方旧运行／时限状态为历史。
+
 2026-10-26用户明确要求重新启动训练并取消训练任务时间上限：TT-010新run采用已交付的1%低门槛和三类等份损失，从固定基模重新训练，复用原完整数据。训练配置max_wall_seconds设为null，移除训练进程13800秒及外层14400秒timeout；训练仍按有限epoch自然结束。显存22GiB、单卡／8CPU／32GiB、资产10GiB／报告2GiB及30GiB空盘限制保留。TT-011按既有授权绑定新run重新部署等待，取消训练等待截止和等待器总时限，测试自身每项7200秒不变。不改动旧作业源码或产物，不新增issue。
 
-状态：训练依赖失败，测试未启动，保持打开。2026-10-26 09:38核查训练已于02:14:21超时退出124，续接器02:14:38停止、jobs为空；没有新测试run或提交记录。两项外部测试均未运行，无测试成绩。详见[运行记录](../../../reports/textturn/20261026-tt-011-external-evaluation/README.md)。
+状态：已重新绑定TT-010动作平衡重训，等待新候选。新等待器已部署并核实存活，尚未提交测试；旧r1失败记录保留，见上方重训报告及[旧运行记录](../../../reports/textturn/20261026-tt-011-external-evaluation/README.md)。
 
-依赖：[TT-010](tt_010_asr_update_yield_dataset.md)完整轨迹训练；训练run为`tt-010-fulltraj-20261025-r1`，调度ID为`job-179293824747465991917-xuan-zhang`。研究与生命周期边界遵循[研究设计](../../research_design.md)及[架构合同](../../research_design/architecture.md)。
+依赖：[TT-010](tt_010_asr_update_yield_dataset.md)动作平衡完整轨迹训练；当前run为`tt-010-balanced-20261026-r2`，调度ID为`job-179298196307743501088-xuan-zhang`。旧r1及其失败证据保留。研究与生命周期边界遵循[研究设计](../../research_design.md)及[架构合同](../../research_design/architecture.md)。
 
 ## 目标与范围
 
