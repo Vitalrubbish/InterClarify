@@ -1,0 +1,1111 @@
+{
+  "inspected_unix": 1792978682.964094,
+  "training_exit_code": "124",
+  "files": {
+    "pilot_gate.json": {
+      "data": {
+        "continue_full": true,
+        "baseline": {
+          "smooth": {
+            "numerator": 0,
+            "denominator": 800,
+            "rate": 0.0,
+            "wilson_95": [
+              4.336808689942018e-19,
+              0.004778876205676033
+            ],
+            "planned": 800,
+            "passed": 0,
+            "failed": 800,
+            "unknown": 0,
+            "actual_errors": 485,
+            "adjudicated": 800,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 0,
+              "denominator": 800,
+              "rate": 0.0,
+              "wilson_95": [
+                4.336808689942018e-19,
+                0.004778876205676033
+              ]
+            },
+            "planned_success_bounds": [
+              0.0,
+              0.0
+            ],
+            "planned_error_bounds": [
+              0.60625,
+              0.60625
+            ]
+          },
+          "declarative": {
+            "numerator": 0,
+            "denominator": 400,
+            "rate": 0.0,
+            "wilson_95": [
+              8.673617379884035e-19,
+              0.009512294334296508
+            ],
+            "planned": 400,
+            "passed": 0,
+            "failed": 400,
+            "unknown": 0,
+            "actual_errors": 85,
+            "adjudicated": 400,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 0,
+              "denominator": 400,
+              "rate": 0.0,
+              "wilson_95": [
+                8.673617379884035e-19,
+                0.009512294334296508
+              ]
+            },
+            "planned_success_bounds": [
+              0.0,
+              0.0
+            ],
+            "planned_error_bounds": [
+              0.2125,
+              0.2125
+            ]
+          },
+          "interruption": {
+            "numerator": 102,
+            "denominator": 400,
+            "rate": 0.255,
+            "wilson_95": [
+              0.21475670087938903,
+              0.2999043233444163
+            ],
+            "planned": 400,
+            "passed": 102,
+            "failed": 298,
+            "unknown": 0,
+            "actual_errors": 143,
+            "adjudicated": 400,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 102,
+              "denominator": 400,
+              "rate": 0.255,
+              "wilson_95": [
+                0.21475670087938903,
+                0.2999043233444163
+              ]
+            },
+            "planned_success_bounds": [
+              0.255,
+              0.255
+            ],
+            "planned_error_bounds": [
+              0.3575,
+              0.3575
+            ]
+          },
+          "pause_false_start": {
+            "numerator": 296,
+            "denominator": 737,
+            "rate": 0.4016282225237449,
+            "wilson_95": [
+              0.366833937621999,
+              0.4374426747711333
+            ],
+            "planned": 737,
+            "passed": 441,
+            "failed": 296,
+            "unknown": 0,
+            "actual_errors": 296,
+            "adjudicated": 737,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 441,
+              "denominator": 737,
+              "rate": 0.5983717774762551,
+              "wilson_95": [
+                0.5625573252288667,
+                0.6331660623780011
+              ]
+            },
+            "planned_success_bounds": [
+              0.5983717774762551,
+              0.5983717774762551
+            ],
+            "planned_error_bounds": [
+              0.4016282225237449,
+              0.4016282225237449
+            ]
+          },
+          "backchannel_false_stop": {
+            "numerator": 120,
+            "denominator": 242,
+            "rate": 0.49586776859504134,
+            "wilson_95": [
+              0.43343292562036473,
+              0.5584317500547877
+            ],
+            "planned": 242,
+            "passed": 122,
+            "failed": 120,
+            "unknown": 0,
+            "actual_errors": 120,
+            "adjudicated": 242,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 122,
+              "denominator": 242,
+              "rate": 0.5041322314049587,
+              "wilson_95": [
+                0.44156824994521227,
+                0.5665670743796352
+              ]
+            },
+            "planned_success_bounds": [
+              0.5041322314049587,
+              0.5041322314049587
+            ],
+            "planned_error_bounds": [
+              0.49586776859504134,
+              0.49586776859504134
+            ]
+          },
+          "runtime": {
+            "numerator": 88947,
+            "denominator": 88947,
+            "rate": 1.0,
+            "wilson_95": [
+              0.9999568136876763,
+              0.9999999999999999
+            ]
+          },
+          "control_ms_p95": 34.02324207127094,
+          "opportunity_score": 0.27150080177624275,
+          "evaluation_mode": "offline_given_state_text_diagnostic",
+          "online_pass": null
+        },
+        "candidate": {
+          "smooth": {
+            "numerator": 0,
+            "denominator": 800,
+            "rate": 0.0,
+            "wilson_95": [
+              4.336808689942018e-19,
+              0.004778876205676033
+            ],
+            "planned": 800,
+            "passed": 0,
+            "failed": 800,
+            "unknown": 0,
+            "actual_errors": 0,
+            "adjudicated": 800,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 0,
+              "denominator": 800,
+              "rate": 0.0,
+              "wilson_95": [
+                4.336808689942018e-19,
+                0.004778876205676033
+              ]
+            },
+            "planned_success_bounds": [
+              0.0,
+              0.0
+            ],
+            "planned_error_bounds": [
+              0.0,
+              0.0
+            ]
+          },
+          "declarative": {
+            "numerator": 0,
+            "denominator": 400,
+            "rate": 0.0,
+            "wilson_95": [
+              8.673617379884035e-19,
+              0.009512294334296508
+            ],
+            "planned": 400,
+            "passed": 0,
+            "failed": 400,
+            "unknown": 0,
+            "actual_errors": 0,
+            "adjudicated": 400,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 0,
+              "denominator": 400,
+              "rate": 0.0,
+              "wilson_95": [
+                8.673617379884035e-19,
+                0.009512294334296508
+              ]
+            },
+            "planned_success_bounds": [
+              0.0,
+              0.0
+            ],
+            "planned_error_bounds": [
+              0.0,
+              0.0
+            ]
+          },
+          "interruption": {
+            "numerator": 0,
+            "denominator": 400,
+            "rate": 0.0,
+            "wilson_95": [
+              8.673617379884035e-19,
+              0.009512294334296508
+            ],
+            "planned": 400,
+            "passed": 0,
+            "failed": 400,
+            "unknown": 0,
+            "actual_errors": 0,
+            "adjudicated": 400,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 0,
+              "denominator": 400,
+              "rate": 0.0,
+              "wilson_95": [
+                8.673617379884035e-19,
+                0.009512294334296508
+              ]
+            },
+            "planned_success_bounds": [
+              0.0,
+              0.0
+            ],
+            "planned_error_bounds": [
+              0.0,
+              0.0
+            ]
+          },
+          "pause_false_start": {
+            "numerator": 0,
+            "denominator": 737,
+            "rate": 0.0,
+            "wilson_95": [
+              0.0,
+              0.0051852643706106006
+            ],
+            "planned": 737,
+            "passed": 737,
+            "failed": 0,
+            "unknown": 0,
+            "actual_errors": 0,
+            "adjudicated": 737,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 737,
+              "denominator": 737,
+              "rate": 1.0,
+              "wilson_95": [
+                0.9948147356293894,
+                0.9999999999999999
+              ]
+            },
+            "planned_success_bounds": [
+              1.0,
+              1.0
+            ],
+            "planned_error_bounds": [
+              0.0,
+              0.0
+            ]
+          },
+          "backchannel_false_stop": {
+            "numerator": 0,
+            "denominator": 242,
+            "rate": 0.0,
+            "wilson_95": [
+              0.0,
+              0.01562575669344655
+            ],
+            "planned": 242,
+            "passed": 242,
+            "failed": 0,
+            "unknown": 0,
+            "actual_errors": 0,
+            "adjudicated": 242,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 242,
+              "denominator": 242,
+              "rate": 1.0,
+              "wilson_95": [
+                0.9843742433065535,
+                1.0
+              ]
+            },
+            "planned_success_bounds": [
+              1.0,
+              1.0
+            ],
+            "planned_error_bounds": [
+              0.0,
+              0.0
+            ]
+          },
+          "runtime": {
+            "numerator": 88947,
+            "denominator": 88947,
+            "rate": 1.0,
+            "wilson_95": [
+              0.9999568136876763,
+              0.9999999999999999
+            ]
+          },
+          "control_ms_p95": 35.880742594599724,
+          "opportunity_score": 0.4,
+          "evaluation_mode": "offline_given_state_text_diagnostic",
+          "online_pass": null
+        },
+        "tolerance": 0.02
+      },
+      "sha256": "7721d438b89b37b9adc09d8c5e0c2b74685164543ebbde3eb4a043c62173460c",
+      "mtime": 1792947972.0
+    },
+    "pilot-history.json": {
+      "data": [
+        {
+          "stage": "pilot",
+          "epoch": 1,
+          "mean_train_loss": 2.397093927552214,
+          "dev": {
+            "smooth": {
+              "numerator": 0,
+              "denominator": 800,
+              "rate": 0.0,
+              "wilson_95": [
+                4.336808689942018e-19,
+                0.004778876205676033
+              ],
+              "planned": 800,
+              "passed": 0,
+              "failed": 800,
+              "unknown": 0,
+              "actual_errors": 0,
+              "adjudicated": 800,
+              "adjudicated_coverage": 1.0,
+              "conditional_success": {
+                "numerator": 0,
+                "denominator": 800,
+                "rate": 0.0,
+                "wilson_95": [
+                  4.336808689942018e-19,
+                  0.004778876205676033
+                ]
+              },
+              "planned_success_bounds": [
+                0.0,
+                0.0
+              ],
+              "planned_error_bounds": [
+                0.0,
+                0.0
+              ]
+            },
+            "declarative": {
+              "numerator": 0,
+              "denominator": 400,
+              "rate": 0.0,
+              "wilson_95": [
+                8.673617379884035e-19,
+                0.009512294334296508
+              ],
+              "planned": 400,
+              "passed": 0,
+              "failed": 400,
+              "unknown": 0,
+              "actual_errors": 0,
+              "adjudicated": 400,
+              "adjudicated_coverage": 1.0,
+              "conditional_success": {
+                "numerator": 0,
+                "denominator": 400,
+                "rate": 0.0,
+                "wilson_95": [
+                  8.673617379884035e-19,
+                  0.009512294334296508
+                ]
+              },
+              "planned_success_bounds": [
+                0.0,
+                0.0
+              ],
+              "planned_error_bounds": [
+                0.0,
+                0.0
+              ]
+            },
+            "interruption": {
+              "numerator": 0,
+              "denominator": 400,
+              "rate": 0.0,
+              "wilson_95": [
+                8.673617379884035e-19,
+                0.009512294334296508
+              ],
+              "planned": 400,
+              "passed": 0,
+              "failed": 400,
+              "unknown": 0,
+              "actual_errors": 0,
+              "adjudicated": 400,
+              "adjudicated_coverage": 1.0,
+              "conditional_success": {
+                "numerator": 0,
+                "denominator": 400,
+                "rate": 0.0,
+                "wilson_95": [
+                  8.673617379884035e-19,
+                  0.009512294334296508
+                ]
+              },
+              "planned_success_bounds": [
+                0.0,
+                0.0
+              ],
+              "planned_error_bounds": [
+                0.0,
+                0.0
+              ]
+            },
+            "pause_false_start": {
+              "numerator": 0,
+              "denominator": 737,
+              "rate": 0.0,
+              "wilson_95": [
+                0.0,
+                0.0051852643706106006
+              ],
+              "planned": 737,
+              "passed": 737,
+              "failed": 0,
+              "unknown": 0,
+              "actual_errors": 0,
+              "adjudicated": 737,
+              "adjudicated_coverage": 1.0,
+              "conditional_success": {
+                "numerator": 737,
+                "denominator": 737,
+                "rate": 1.0,
+                "wilson_95": [
+                  0.9948147356293894,
+                  0.9999999999999999
+                ]
+              },
+              "planned_success_bounds": [
+                1.0,
+                1.0
+              ],
+              "planned_error_bounds": [
+                0.0,
+                0.0
+              ]
+            },
+            "backchannel_false_stop": {
+              "numerator": 0,
+              "denominator": 242,
+              "rate": 0.0,
+              "wilson_95": [
+                0.0,
+                0.01562575669344655
+              ],
+              "planned": 242,
+              "passed": 242,
+              "failed": 0,
+              "unknown": 0,
+              "actual_errors": 0,
+              "adjudicated": 242,
+              "adjudicated_coverage": 1.0,
+              "conditional_success": {
+                "numerator": 242,
+                "denominator": 242,
+                "rate": 1.0,
+                "wilson_95": [
+                  0.9843742433065535,
+                  1.0
+                ]
+              },
+              "planned_success_bounds": [
+                1.0,
+                1.0
+              ],
+              "planned_error_bounds": [
+                0.0,
+                0.0
+              ]
+            },
+            "runtime": {
+              "numerator": 88947,
+              "denominator": 88947,
+              "rate": 1.0,
+              "wilson_95": [
+                0.9999568136876763,
+                0.9999999999999999
+              ]
+            },
+            "control_ms_p95": 35.880742594599724,
+            "opportunity_score": 0.4,
+            "evaluation_mode": "offline_given_state_text_diagnostic",
+            "online_pass": null
+          }
+        },
+        {
+          "stage": "pilot",
+          "epoch": 2,
+          "mean_train_loss": 1.2177403029050033,
+          "dev": {
+            "smooth": {
+              "numerator": 0,
+              "denominator": 800,
+              "rate": 0.0,
+              "wilson_95": [
+                4.336808689942018e-19,
+                0.004778876205676033
+              ],
+              "planned": 800,
+              "passed": 0,
+              "failed": 800,
+              "unknown": 0,
+              "actual_errors": 0,
+              "adjudicated": 800,
+              "adjudicated_coverage": 1.0,
+              "conditional_success": {
+                "numerator": 0,
+                "denominator": 800,
+                "rate": 0.0,
+                "wilson_95": [
+                  4.336808689942018e-19,
+                  0.004778876205676033
+                ]
+              },
+              "planned_success_bounds": [
+                0.0,
+                0.0
+              ],
+              "planned_error_bounds": [
+                0.0,
+                0.0
+              ]
+            },
+            "declarative": {
+              "numerator": 0,
+              "denominator": 400,
+              "rate": 0.0,
+              "wilson_95": [
+                8.673617379884035e-19,
+                0.009512294334296508
+              ],
+              "planned": 400,
+              "passed": 0,
+              "failed": 400,
+              "unknown": 0,
+              "actual_errors": 0,
+              "adjudicated": 400,
+              "adjudicated_coverage": 1.0,
+              "conditional_success": {
+                "numerator": 0,
+                "denominator": 400,
+                "rate": 0.0,
+                "wilson_95": [
+                  8.673617379884035e-19,
+                  0.009512294334296508
+                ]
+              },
+              "planned_success_bounds": [
+                0.0,
+                0.0
+              ],
+              "planned_error_bounds": [
+                0.0,
+                0.0
+              ]
+            },
+            "interruption": {
+              "numerator": 0,
+              "denominator": 400,
+              "rate": 0.0,
+              "wilson_95": [
+                8.673617379884035e-19,
+                0.009512294334296508
+              ],
+              "planned": 400,
+              "passed": 0,
+              "failed": 400,
+              "unknown": 0,
+              "actual_errors": 0,
+              "adjudicated": 400,
+              "adjudicated_coverage": 1.0,
+              "conditional_success": {
+                "numerator": 0,
+                "denominator": 400,
+                "rate": 0.0,
+                "wilson_95": [
+                  8.673617379884035e-19,
+                  0.009512294334296508
+                ]
+              },
+              "planned_success_bounds": [
+                0.0,
+                0.0
+              ],
+              "planned_error_bounds": [
+                0.0,
+                0.0
+              ]
+            },
+            "pause_false_start": {
+              "numerator": 0,
+              "denominator": 737,
+              "rate": 0.0,
+              "wilson_95": [
+                0.0,
+                0.0051852643706106006
+              ],
+              "planned": 737,
+              "passed": 737,
+              "failed": 0,
+              "unknown": 0,
+              "actual_errors": 0,
+              "adjudicated": 737,
+              "adjudicated_coverage": 1.0,
+              "conditional_success": {
+                "numerator": 737,
+                "denominator": 737,
+                "rate": 1.0,
+                "wilson_95": [
+                  0.9948147356293894,
+                  0.9999999999999999
+                ]
+              },
+              "planned_success_bounds": [
+                1.0,
+                1.0
+              ],
+              "planned_error_bounds": [
+                0.0,
+                0.0
+              ]
+            },
+            "backchannel_false_stop": {
+              "numerator": 0,
+              "denominator": 242,
+              "rate": 0.0,
+              "wilson_95": [
+                0.0,
+                0.01562575669344655
+              ],
+              "planned": 242,
+              "passed": 242,
+              "failed": 0,
+              "unknown": 0,
+              "actual_errors": 0,
+              "adjudicated": 242,
+              "adjudicated_coverage": 1.0,
+              "conditional_success": {
+                "numerator": 242,
+                "denominator": 242,
+                "rate": 1.0,
+                "wilson_95": [
+                  0.9843742433065535,
+                  1.0
+                ]
+              },
+              "planned_success_bounds": [
+                1.0,
+                1.0
+              ],
+              "planned_error_bounds": [
+                0.0,
+                0.0
+              ]
+            },
+            "runtime": {
+              "numerator": 88947,
+              "denominator": 88947,
+              "rate": 1.0,
+              "wilson_95": [
+                0.9999568136876763,
+                0.9999999999999999
+              ]
+            },
+            "control_ms_p95": 33.23350101709366,
+            "opportunity_score": 0.4,
+            "evaluation_mode": "offline_given_state_text_diagnostic",
+            "online_pass": null
+          }
+        }
+      ],
+      "sha256": "9814a5166d62733b4c846fe98a6f90a92d64083a28a6f9a9eae88951208fb88a",
+      "mtime": 1792947970.0
+    },
+    "best_selection.json": {
+      "data": {
+        "stage": "pilot",
+        "epoch": 1,
+        "mean_train_loss": 2.397093927552214,
+        "dev": {
+          "smooth": {
+            "numerator": 0,
+            "denominator": 800,
+            "rate": 0.0,
+            "wilson_95": [
+              4.336808689942018e-19,
+              0.004778876205676033
+            ],
+            "planned": 800,
+            "passed": 0,
+            "failed": 800,
+            "unknown": 0,
+            "actual_errors": 0,
+            "adjudicated": 800,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 0,
+              "denominator": 800,
+              "rate": 0.0,
+              "wilson_95": [
+                4.336808689942018e-19,
+                0.004778876205676033
+              ]
+            },
+            "planned_success_bounds": [
+              0.0,
+              0.0
+            ],
+            "planned_error_bounds": [
+              0.0,
+              0.0
+            ]
+          },
+          "declarative": {
+            "numerator": 0,
+            "denominator": 400,
+            "rate": 0.0,
+            "wilson_95": [
+              8.673617379884035e-19,
+              0.009512294334296508
+            ],
+            "planned": 400,
+            "passed": 0,
+            "failed": 400,
+            "unknown": 0,
+            "actual_errors": 0,
+            "adjudicated": 400,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 0,
+              "denominator": 400,
+              "rate": 0.0,
+              "wilson_95": [
+                8.673617379884035e-19,
+                0.009512294334296508
+              ]
+            },
+            "planned_success_bounds": [
+              0.0,
+              0.0
+            ],
+            "planned_error_bounds": [
+              0.0,
+              0.0
+            ]
+          },
+          "interruption": {
+            "numerator": 0,
+            "denominator": 400,
+            "rate": 0.0,
+            "wilson_95": [
+              8.673617379884035e-19,
+              0.009512294334296508
+            ],
+            "planned": 400,
+            "passed": 0,
+            "failed": 400,
+            "unknown": 0,
+            "actual_errors": 0,
+            "adjudicated": 400,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 0,
+              "denominator": 400,
+              "rate": 0.0,
+              "wilson_95": [
+                8.673617379884035e-19,
+                0.009512294334296508
+              ]
+            },
+            "planned_success_bounds": [
+              0.0,
+              0.0
+            ],
+            "planned_error_bounds": [
+              0.0,
+              0.0
+            ]
+          },
+          "pause_false_start": {
+            "numerator": 0,
+            "denominator": 737,
+            "rate": 0.0,
+            "wilson_95": [
+              0.0,
+              0.0051852643706106006
+            ],
+            "planned": 737,
+            "passed": 737,
+            "failed": 0,
+            "unknown": 0,
+            "actual_errors": 0,
+            "adjudicated": 737,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 737,
+              "denominator": 737,
+              "rate": 1.0,
+              "wilson_95": [
+                0.9948147356293894,
+                0.9999999999999999
+              ]
+            },
+            "planned_success_bounds": [
+              1.0,
+              1.0
+            ],
+            "planned_error_bounds": [
+              0.0,
+              0.0
+            ]
+          },
+          "backchannel_false_stop": {
+            "numerator": 0,
+            "denominator": 242,
+            "rate": 0.0,
+            "wilson_95": [
+              0.0,
+              0.01562575669344655
+            ],
+            "planned": 242,
+            "passed": 242,
+            "failed": 0,
+            "unknown": 0,
+            "actual_errors": 0,
+            "adjudicated": 242,
+            "adjudicated_coverage": 1.0,
+            "conditional_success": {
+              "numerator": 242,
+              "denominator": 242,
+              "rate": 1.0,
+              "wilson_95": [
+                0.9843742433065535,
+                1.0
+              ]
+            },
+            "planned_success_bounds": [
+              1.0,
+              1.0
+            ],
+            "planned_error_bounds": [
+              0.0,
+              0.0
+            ]
+          },
+          "runtime": {
+            "numerator": 88947,
+            "denominator": 88947,
+            "rate": 1.0,
+            "wilson_95": [
+              0.9999568136876763,
+              0.9999999999999999
+            ]
+          },
+          "control_ms_p95": 35.880742594599724,
+          "opportunity_score": 0.4,
+          "evaluation_mode": "offline_given_state_text_diagnostic",
+          "online_pass": null
+        }
+      },
+      "sha256": "555cfd98dcce4338c336651fcbb76adf13b145b03f2c884a5093a389b9989026",
+      "mtime": 1792944700.0
+    },
+    "run_manifest.json": {
+      "data": {
+        "config": {
+          "model_id": "Qwen/Qwen3-0.6B",
+          "model_revision": "c1899de289a04d12100db370d81485cdf75e47ca",
+          "seed": 20261025,
+          "rank": 16,
+          "alpha": 32,
+          "learning_rate": 0.0001,
+          "warmup_fraction": 0.05,
+          "epochs": 2,
+          "gradient_accumulation": 16,
+          "max_length": 2048,
+          "pilot_snapshots": 2000,
+          "full_snapshots": 10000,
+          "false_action_regression_tolerance": 0.02,
+          "gpu_stop_gib": 22,
+          "max_wall_seconds": 13800,
+          "max_asset_gib": 10,
+          "max_report_gib": 2,
+          "loss_policy": {
+            "keep_group_budget": 2.0,
+            "keep_group_keys": [
+              "scenario_id",
+              "state",
+              "category"
+            ],
+            "action_weights": {
+              "start": 2.0,
+              "stop": 2.0
+            },
+            "normalization": "fixed_stage_mean_weight",
+            "order": "shuffle_trajectories_preserve_windows"
+          }
+        },
+        "dataset_manifest_sha256": "21357f70fb2d382c1ed79741d094aaee9378ec609c5215c7db1afc096b477989",
+        "packages": {
+          "torch": "2.11.0+cu128",
+          "transformers": "4.57.1",
+          "peft": "0.19.1",
+          "tokenizers": "0.22.2"
+        },
+        "gpu": "NVIDIA GeForce RTX 4090",
+        "started_unix": 1792938260.7704082,
+        "model_config_sha256": "660db3b73d788119c04535e48cf9be5f55bc3100841a718637ae695b442f27dd",
+        "model_weights_sha256": "f47f71177f32bcd101b7573ec9171e6a57f4f4d31148d38e382306f42996874b"
+      },
+      "sha256": "369fd5b2dc0691681579cb57f7f94c6df09d6eb7c457bcebc5c226d3199adc56",
+      "mtime": 1792938262.0
+    }
+  },
+  "missing": [
+    "candidate.json",
+    "learning_verification.json",
+    "reload_verification.json",
+    "full-history.json"
+  ],
+  "prediction_counts": {
+    "baseline-dev": {
+      "records": 88947,
+      "actions": {
+        "start": 10736,
+        "keep": 66127,
+        "stop": 12084
+      },
+      "errors": 0,
+      "partial_lines": 0,
+      "summary_exists": true,
+      "mtime": 1792941219.0
+    },
+    "pilot-dev-epoch-1": {
+      "records": 88947,
+      "actions": {
+        "keep": 88947
+      },
+      "errors": 0,
+      "partial_lines": 0,
+      "summary_exists": true,
+      "mtime": 1792944698.0
+    },
+    "pilot-dev-epoch-2": {
+      "records": 88947,
+      "actions": {
+        "keep": 88947
+      },
+      "errors": 0,
+      "partial_lines": 0,
+      "summary_exists": true,
+      "mtime": 1792947970.0
+    },
+    "full-dev-epoch-1": {
+      "records": 60001,
+      "actions": {
+        "keep": 57640,
+        "start": 2106,
+        "stop": 255
+      },
+      "errors": 0,
+      "partial_lines": 0,
+      "summary_exists": false,
+      "mtime": 1792952041.0
+    }
+  },
+  "last_progress_by_stage": {
+    "/hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/runs/tt-010-fulltraj-20261025-r1/baseline-dev": {
+      "event": "evaluation_progress",
+      "output": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/runs/tt-010-fulltraj-20261025-r1/baseline-dev",
+      "completed": 88501,
+      "planned": 88947
+    },
+    "pilot:1": {
+      "event": "train_progress",
+      "stage": "pilot",
+      "epoch": 1,
+      "completed": 1855,
+      "planned": 1894,
+      "mean_loss": 2.3067830067423043
+    },
+    "/hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/runs/tt-010-fulltraj-20261025-r1/pilot-dev-epoch-1": {
+      "event": "evaluation_progress",
+      "output": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/runs/tt-010-fulltraj-20261025-r1/pilot-dev-epoch-1",
+      "completed": 88501,
+      "planned": 88947
+    },
+    "pilot:2": {
+      "event": "train_progress",
+      "stage": "pilot",
+      "epoch": 2,
+      "completed": 1831,
+      "planned": 1894,
+      "mean_loss": 1.1546080889386423
+    },
+    "/hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/runs/tt-010-fulltraj-20261025-r1/pilot-dev-epoch-2": {
+      "event": "evaluation_progress",
+      "output": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/runs/tt-010-fulltraj-20261025-r1/pilot-dev-epoch-2",
+      "completed": 88501,
+      "planned": 88947
+    },
+    "full:1": {
+      "event": "train_progress",
+      "stage": "full",
+      "epoch": 1,
+      "completed": 9966,
+      "planned": 9977,
+      "mean_loss": 0.8217795923511435
+    },
+    "/hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/runs/tt-010-fulltraj-20261025-r1/full-dev-epoch-1": {
+      "event": "evaluation_progress",
+      "output": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/runs/tt-010-fulltraj-20261025-r1/full-dev-epoch-1",
+      "completed": 60001,
+      "planned": 88947
+    }
+  },
+  "training_log_sha256": "8f52538d406ff6c416ab091e06ccf250587da6949791687d0d4f7402272e3107",
+  "waiter_state": {
+    "status": "stopped",
+    "jobs": {},
+    "detail": "RuntimeError('Training failed: exit_code=124')",
+    "updated_at": "2026-10-26T02:14:38.887982+08:00"
+  },
+  "test_run_directories": [],
+  "scheduler_info": "User:  xuan.zhang\nPriority:  3\nSubmitTime:  2026-10-25 22:24:08\nStartTime:   2026-10-25 22:24:10\nEndTime:   2026-10-26 02:14:21\nOriginalCmd:  vc submit --image docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4 --partition pdgpu-4090 --job textturn-tt-010-fulltraj-20261025-r1 --num-task 1 --cpu-per-task 8 --mem-per-task 32G --gpu-per-task 1 JOB=1:1 /hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/submit_logs/tt-010-fulltraj-20261025-r1.scheduler.log --cmd \"TEXTTURN_ROOT=/hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn TEXTTURN_RUN_ID=tt-010-fulltraj-20261025-r1 timeout --signal=TERM --kill-after=30 14400 bash /hpc_stor03/sjtu_home/xuan.zhang/parathink-textturn/source/tt010-fulltraj-r1/scripts/remote/run_textturn_full_training.sh\"\n\n",
+  "scheduler_history": "------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\nName                                 | queue             | CreationTime        | Status     | CPU | Mem | GPU | duration   | jobDesc                                              | reason | project\n------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\njob-179293824747465991917-xuan-zhang | pdgpu-4090        | 2026-10-25 22:24:08 | Terminated | 8   | 32G | 1   | 0d3h50m11s | textturn-tt-010-fulltraj-20261025-r1                 |        |        \njob-179292031704516676972-xuan-zhang | pdgpu-4090        | 2026-10-25 17:25:17 | Completed  | 8   | 32G | 1   | 0d0h59m18s | textturn-tt-008-20261025-r1                          |        |        \njob-179291166384532199286-xuan-zhang | pdgpu-4090        | 2026-10-25 15:01:04 | Completed  | 8   | 32G | 1   | 0d0h25m40s | textturn-tt-007-20261025-r1                          |        |        \njob-179290983788774807672-xuan-zhang | pdgpu-4090        | 2026-10-25 14:30:38 | Completed  | 8   | 32G | 1   | 0d0h25m30s | textturn-tt-005-006-20261025-r4                      |        |        \njob-179290834177188572331-xuan-zhang | pdgpu-4090        | 2026-10-25 14:05:42 | Canceled   | 8   | 32G | 1   | 0d0h16m52s | textturn-tt-005-006-20261025-r3                      |        |        \njob-179290796687589667659-xuan-zhang | pdgpu-4090        | 2026-10-25 13:59:27 | Canceled   | 8   | 32G | 1   | 0d0h4m55s  | textturn-tt-005-006-20261025-r2                      |        |        \njob-179290769141195852462-xuan-zhang | pdgpu-4090        | 2026-10-25 13:54:51 | Terminated | 8   | 32G | 1   | 0d0h0m11s  | textturn-tt-005-006-20261025-r1                      |        |        \njob-179287011405618549973-xuan-zhang | pdgpu-4090        | 2026-10-25 03:28:34 | Completed  | 8   | 32G | 1   | 0d2h44m55s | textturn-tt-004-20261025-r1                          |        |        \njob-179286310634760697957-xuan-zhang | pdgpu-4090        | 2026-10-25 01:31:46 | Completed  | 8   | 32G | 1   | 0d1h56m7s  | textturn-tt-002-20261025-r1                          |        |        \njob-179281756337954664654-xuan-zhang | pdgpu-4090        | 2026-10-24 12:52:43 | Completed  | 8   | 32G | 1   | 0d0h14m37s | xturnix-time-4090-20261024-r3                        |        |        \njob-179281557459393666619-xuan-zhang | pdgpu-4090        | 2026-10-24 12:19:35 | Terminated | 8   | 32G | 1   | 0d0h6m10s  | xturnix-time-4090-20261024-r2                        |        |        \njob-179281475036898974472-xuan-zhang | pdgpu-a10-minijob | 2026-10-24 12:05:50 | Terminated | 8   | 32G | 1   | 0d0h2m3s   | xturnix-time-20261024-r1                             |        |        \njob-179277747271132523843-xuan-zhang | pdcpu             | 2026-10-24 01:44:33 | Completed  | 4   | 16G | 0   | 0d0h6m35s  | xturnix-pause-usage-cpu-20261024-r3                  |        |        \njob-179277675198310775624-xuan-zhang | pdgpu-4090        | 2026-10-24 01:32:32 | Canceled   | 8   | 32G | 1   | 0d0h0m0s   | xturnix-pause-usage-20261024-r2                      |        |        \njob-179277595040143133715-xuan-zhang | pdgpu-a10-minijob | 2026-10-24 01:19:10 | Canceled   | 8   | 32G | 1   | 0d0h0m0s   | xturnix-pause-usage-20261024-r1                      |        |        \njob-179277094008290558430-xuan-zhang | pdgpu-a10-minijob | 2026-10-23 23:55:40 | Completed  | 8   | 32G | 1   | 0d0h2m22s  | xturnix-listen-calibration-20261023-r1               |        |        \njob-179275630072577789666-xuan-zhang | pdgpu-a10-minijob | 2026-10-23 19:51:41 | Completed  | 8   | 32G | 1   | 0d0h0m37s  | xturnix-pause-probe-xtx-pause-probe-20261023-a10-r4  |        |        \njob-179275585902741423135-xuan-zhang | pdgpu-a10-minijob | 2026-10-23 19:44:19 | Completed  | 8   | 32G | 1   | 0d0h0m30s  | xturnix-pause-probe-xtx-pause-probe-20261023-a10-r3  |        |        \njob-179275554142809060122-xuan-zhang | pdgpu-a10-minijob | 2026-10-23 19:39:02 | Completed  | 8   | 32G | 1   | 0d0h0m28s  | xturnix-pause-probe-xtx-pause-probe-20261023-a10-r2  |        |        \njob-179275524112788081624-xuan-zhang | pdgpu-a10-minijob | 2026-10-23 19:34:01 | Terminated | 8   | 32G | 1   | 0d0h0m0s   | xturnix-pause-probe-xtx-pause-probe-20261023-a10-r1  |        |        \njob-179275462472109601262-xuan-zhang | pdgpu-a10-minijob | 2026-10-23 19:23:45 | Canceled   | 8   | 32G | 1   | 0d0h2m24s  | xturnix-fleurs-formal-xtx-006-formal-20261023-a10-r1 |        |        \njob-179275399554108539917-xuan-zhang | pdgpu-a10-minijob | 2026-10-23 19:13:16 | Completed  | 8   | 32G | 1   | 0d0h4m12s  | xturnix-fleurs-smoke-xtx-005-smoke-20261023-a10-r4   |        |        \njob-179275180269301798619-xuan-zhang | pdgpu-a10-minijob | 2026-10-23 18:36:43 | Terminated | 8   | 32G | 1   | 0d0h1m3s   | xturnix-fleurs-smoke-xtx-005-smoke-20261023-a10-r3   |        |        \njob-179275111392432317016-xuan-zhang | pdgpu-a10-minijob | 2026-10-23 18:25:14 | Terminated | 8   | 32G | 1   | 0d0h0m26s  | xturnix-fleurs-smoke-xtx-005-smoke-20261023-a10-r2   |        |        \njob-179275020357472333954-xuan-zhang | pdgpu-a10-minijob | 2026-10-23 18:10:04 | Terminated | 8   | 32G | 1   | 0d0h0m14s  | xturnix-fleurs-smoke-xtx-005-smoke-20261023-a10-r1   |        |        \njob-179274832337573423694-xuan-zhang | pdgpu-4090        | 2026-10-23 17:38:43 | Canceled   | 8   | 32G | 1   | 0d0h0m0s   | xturnix-fleurs-smoke-xtx-005-smoke-20261023-r1       |        |        \njob-179273870968613116050-xuan-zhang | pdgpu-4090        | 2026-10-23 14:58:30 | Completed  | 8   | 32G | 1   | 0d0h1m21s  | xtx-002-probe-r3                                     |        |        \njob-179273815403674462655-xuan-zhang | pdgpu-4090        | 2026-10-23 14:49:14 | Completed  | 8   | 32G | 1   | 0d0h1m42s  | xtx-002-probe-r2                                     |        |        \njob-179273778992202432535-xuan-zhang | pdgpu-4090        | 2026-10-23 14:43:10 | Terminated | 8   | 32G | 1   | 0d0h1m19s  | xtx-002-probe                                        |        |        \n\n",
+  "best_adapter": {
+    "sha256": "5382dd6bda2e928ccdf08a28cf4f8363dec97927bfc4ffe8b750379d09d04fec",
+    "mtime": 1792944699.0,
+    "bytes": 40442784
+  },
+  "final_adapter": {
+    "sha256": "aca4064a0e418213a5e91b00fc3ddd2e5fb3efaa46f741563504fbaf21b70c57",
+    "mtime": 1792947970.0,
+    "bytes": 40442784
+  }
+}

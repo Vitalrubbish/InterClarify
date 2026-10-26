@@ -1,5 +1,7 @@
 # 远端工作目录约定
 
+2026-10-26 09:38最新核查：TT-010训练02:14:21超时终止（退出码124、占卡13811秒）；pilot两轮88947窗均全部keep，full第1轮dev仅60001/88947窗，无正式候选及学习／重载验证。TT-011续接器02:14:38因训练失败停止，UltraChat与FDB均未提交，无新测试成绩；当前无活动作业。两单保持未完成，未重启训练／测试或改时限。见[结果核查](../reports/textturn/20261026-tt-011-external-evaluation/README.md)。下方等待／运行状态为历史。
+
 2026-10-26 TT-011已部署：独立源码`source/tt011-external-r1`（`37d9543`），准备目录`dataset/tt-011-external-r1`，等待器Python PID136137／独立supervisor136136，单CPU／2GiB／外层12小时。已连续3次轮询更新，状态`waiting_for_training`，新GPU测试未提交；00:25:56原训练pilot第2轮dev14001/88947且仍唯一活动作业。训练退出码、调度结束、候选gate／学习／重载核查均通过后，自动先160ms UltraChat再160ms action_only FDB。日志`submit_logs/tt011-waiter.log`，状态同准备目录`state.json`；见[运行记录](../reports/textturn/20261026-tt-011-external-evaluation/README.md)。
 
 2026-10-25 TT-010完整轨迹训练：用户已授权取消旧累计GPU剩余预算限制，作业`job-179293824747465991917-xuan-zhang`于22:24:10开始并确认Running，source为`~/parathink-textturn/source/tt010-fulltraj-r1`（源码`56102849e3e88209a9943fd1ffa605395534526e`），dataset为`dataset/tt-010-fulltraj-r1`，run为`tt-010-fulltraj-20261025-r1`。RTX4090单卡／8CPU／32GiB，单作业4小时及显存22GiB停止线保留。数据及远端CPU损失核查通过，当前基线评估7001/88947，未宣称模型质量或权重更新。见[训练记录](../reports/textturn/20261025-tt-010-fulltraj-training/README.md)。以下旧3991秒剩余额度仅作历史记录，不约束本次已授权作业。
