@@ -298,7 +298,9 @@ class DuplexReplayState(ReplayState):
         # All runtime times use the same replay-relative clock as the trace.
         for event in events:
             event['consumed_ms'] = max(event['published_ms'], self.snapshot_at * 1000)
-        visible.update(user_turn_id=self.turn, user_version=self.version, played_text=self.played if
+        visible.update(observation_type='text-update' if delta else 'empty-observation',
+                       playback_phase='idle' if self.state == 'Listen' else 'playing' if self.played else 'preparing',
+                       user_turn_id=self.turn, user_version=self.version, played_text=self.played if
                        self.state == 'Speak' else '', output_id=self.output_id,
                        runtime_events=events, latest_terminal=deepcopy(self.latest_terminal))
         return visible

@@ -182,6 +182,9 @@ def source_text(spec, texts):
 
 
 def prompt_for(visible):
+    if visible.get("input_contract") == "textturn-causal-v2":
+        from textturn_input import render_prompt
+        return render_prompt(visible)
     payload = json.dumps(visible, ensure_ascii=False, separators=(',', ':'))
     return ('<|im_start|>system\nChoose one legal TextTurn action. '
             'Listen: keep/start. Speak: keep/stop. Stop only for user interruption.'

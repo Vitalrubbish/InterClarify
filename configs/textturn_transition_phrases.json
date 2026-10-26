@@ -1,0 +1,198 @@
+{
+  "train": [
+    {
+      "id": "train-01",
+      "family": "train-0",
+      "text": "Let me work through the details before giving the complete answer.",
+      "tokens": 12
+    },
+    {
+      "id": "train-02",
+      "family": "train-0",
+      "text": "Let me separate the main points before explaining them in order.",
+      "tokens": 12
+    },
+    {
+      "id": "train-03",
+      "family": "train-0",
+      "text": "Let me check how these parts fit together in this situation.",
+      "tokens": 12
+    },
+    {
+      "id": "train-04",
+      "family": "train-0",
+      "text": "Let me consider the conditions that matter for your request.",
+      "tokens": 11
+    },
+    {
+      "id": "train-05",
+      "family": "train-1",
+      "text": "I will begin with the central idea and then examine the details.",
+      "tokens": 13
+    },
+    {
+      "id": "train-06",
+      "family": "train-1",
+      "text": "I will organize the explanation around the question you have raised.",
+      "tokens": 12
+    },
+    {
+      "id": "train-07",
+      "family": "train-1",
+      "text": "I will look at the practical implications as well as the basic idea.",
+      "tokens": 14
+    },
+    {
+      "id": "train-08",
+      "family": "train-1",
+      "text": "I will work from the information you have provided so far.",
+      "tokens": 12
+    },
+    {
+      "id": "train-09",
+      "family": "train-2",
+      "text": "There are several relevant points to consider before reaching an answer.",
+      "tokens": 12
+    },
+    {
+      "id": "train-10",
+      "family": "train-2",
+      "text": "There are a few distinctions that will help organize this explanation.",
+      "tokens": 12
+    },
+    {
+      "id": "train-11",
+      "family": "train-2",
+      "text": "There are some useful connections to examine in the information provided.",
+      "tokens": 12
+    },
+    {
+      "id": "train-12",
+      "family": "train-2",
+      "text": "There are different aspects of this request that deserve separate attention.",
+      "tokens": 12
+    },
+    {
+      "id": "train-13",
+      "family": "train-3",
+      "text": "First, we can identify the main issue and its surrounding context.",
+      "tokens": 13
+    },
+    {
+      "id": "train-14",
+      "family": "train-3",
+      "text": "First, we can establish what the question is asking us to explain.",
+      "tokens": 14
+    },
+    {
+      "id": "train-15",
+      "family": "train-3",
+      "text": "First, we can consider the available information and the remaining uncertainty.",
+      "tokens": 13
+    },
+    {
+      "id": "train-16",
+      "family": "train-3",
+      "text": "First, we can distinguish the general principle from the specific example.",
+      "tokens": 13
+    },
+    {
+      "id": "train-17",
+      "family": "train-4",
+      "text": "A useful starting point is to consider the situation as a whole.",
+      "tokens": 13
+    },
+    {
+      "id": "train-18",
+      "family": "train-4",
+      "text": "A useful starting point is to identify which details affect the answer.",
+      "tokens": 13
+    },
+    {
+      "id": "train-19",
+      "family": "train-4",
+      "text": "A useful starting point is to connect this request with its context.",
+      "tokens": 13
+    },
+    {
+      "id": "train-20",
+      "family": "train-4",
+      "text": "A useful starting point is to examine the question one part at a time.",
+      "tokens": 15
+    },
+    {
+      "id": "train-21",
+      "family": "train-5",
+      "text": "To address this carefully, I will consider both the context and the details.",
+      "tokens": 15
+    },
+    {
+      "id": "train-22",
+      "family": "train-5",
+      "text": "To explain this clearly, I will work through the relevant points in order.",
+      "tokens": 15
+    },
+    {
+      "id": "train-23",
+      "family": "train-5",
+      "text": "To respond to your request, I will first identify the key considerations.",
+      "tokens": 14
+    },
+    {
+      "id": "train-24",
+      "family": "train-5",
+      "text": "To develop the answer, I will examine how the different pieces relate.",
+      "tokens": 14
+    }
+  ],
+  "dev": [
+    {
+      "id": "dev-01",
+      "family": "dev-0",
+      "text": "Your question calls for a careful look at the information available.",
+      "tokens": 12
+    },
+    {
+      "id": "dev-02",
+      "family": "dev-0",
+      "text": "Your request raises a distinction that deserves a clear explanation.",
+      "tokens": 11
+    },
+    {
+      "id": "dev-03",
+      "family": "dev-1",
+      "text": "Before offering an answer, the relevant conditions need some attention.",
+      "tokens": 12
+    },
+    {
+      "id": "dev-04",
+      "family": "dev-1",
+      "text": "Before drawing conclusions, the relationship between these points needs clarification.",
+      "tokens": 12
+    },
+    {
+      "id": "dev-05",
+      "family": "dev-2",
+      "text": "Working through this question involves connecting the general idea with its context.",
+      "tokens": 13
+    },
+    {
+      "id": "dev-06",
+      "family": "dev-2",
+      "text": "Working through the details will help make the reasoning easier to follow.",
+      "tokens": 13
+    },
+    {
+      "id": "dev-07",
+      "family": "dev-3",
+      "text": "From the context provided, the next step is to examine the main issue.",
+      "tokens": 15
+    },
+    {
+      "id": "dev-08",
+      "family": "dev-3",
+      "text": "From this starting point, the explanation can develop one point at a time.",
+      "tokens": 15
+    }
+  ]
+}

@@ -39,3 +39,6 @@ conda run --no-capture-output -n interclarify-dev python scripts/training/build_
 ```
 
 结果和缺口见[报告](../../../reports/textturn/20261024-tt-001-preview/README.md)。
+
+
+2026-10-27：新版textturn-causal-v2输入显式转交textturn_input.render_prompt投影，旧合同编码保留。

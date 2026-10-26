@@ -13,3 +13,6 @@
 TT-011增加`DuplexReplayState`，只在新配置`full_lifecycle`启用：沿用独立生成时钟，模拟播放落后一个周期，提供output_id、played_text、runtime_events、latest_terminal和用户版本。`terminal`在全部模拟播放完成后提交输入finish，stop闭合后迟到／重复完成仅记stale_callback；每次snapshot只消费一次终态。旧TT-008配置保持历史行为。正式回放出现运行失败将显式非零退出，阻止续接误判。新语义评分由`textturn_external_score`另存，原停止词诊断不代替它。
 
 新生命周期快照同时去除历史user条目末尾句读，与TT-010可见user字段口径一致；保留原始冻结文本供追溯。
+
+
+2026-10-27：DuplexReplayState.snapshot在去句读前记录text-update／empty-observation及实际准备／播放阶段，供新版训练／回放共用输入映射。旧候选保持其原编码。

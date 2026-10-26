@@ -93,3 +93,23 @@ def weighted_action_loss(logits, targets, weights, mean_weight):
     if weights.shape != losses.shape or not torch.isfinite(weights).all() or not (weights > 0).all():
         raise ValueError('One finite positive weight is required per target')
     return (losses * weights).sum() / (losses.numel() * mean_weight)
+
+
+def logical_groups(rows):
+    """Combine complete same-source, same-form trajectories before one optimizer step."""
+    complete_trajectory_groups(rows)
+    grouped = defaultdict(list)
+    for row in rows:
+        key = (row['source_id'], row.get('logical_group', row.get('utterance_form')))
+        grouped[key].append(row)
+    result = []
+    for key, windows in sorted(grouped.items()):
+        masses = {a: math.fsum(r['loss_weight'] for r in windows if r['target_action'] == a)
+                  for a in ('keep', 'start', 'stop')}
+        if any(not math.isfinite(v) or v <= 0 for v in masses.values()):
+            raise ValueError(f'Logical group lacks a positive action mass: {key}')
+        scales = [r['loss_weight'] / (3 * masses[r['target_action']]) for r in windows]
+        if any(not math.isfinite(w) or w <= 0 for w in scales):
+            raise ValueError('Logical group requires finite positive weights')
+        result.append((key, windows, scales))
+    return result

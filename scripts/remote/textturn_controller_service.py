@@ -20,6 +20,7 @@ class Controller:
         config = json.loads(config_path.read_text())
         candidate = json.loads((training / 'candidate.json').read_text())
         manifest = json.loads((data / 'manifest.json').read_text())
+        self.input_contract = manifest.get('input_contract')
         self.identity = None
         if '<finish>' in manifest['new_token_ids']:
             self.identity = validate_candidate(training, data, config_path, model)
@@ -38,6 +39,9 @@ class Controller:
         import torch
         if visible.get('state') not in LEGAL or visible.get('cot') != '':
             raise ValueError('Expected a phase-one legal state and empty CoT')
+        visible = dict(visible)
+        if self.input_contract:
+            visible['input_contract'] = self.input_contract
         ids = self.tokenizer.encode(prompt_for(visible), add_special_tokens=False)
         if len(ids) + 1 > self.maximum:
             raise ValueError('Control input exceeds 2048 tokens')
