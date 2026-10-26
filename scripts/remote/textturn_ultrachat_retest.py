@@ -232,6 +232,7 @@ class DuplexReplayState(ReplayState):
         self.pending_events, self.latest_terminal = [], None
         self.played, self.output_id, self.runtime_sequence = '', None, 0
         self.snapshot_at = 0.
+        self.causal_empty_streak = 0
         super().__init__(case, tokenizer, config, emit)
 
     def begin(self, at):
@@ -290,6 +291,8 @@ class DuplexReplayState(ReplayState):
 
     def snapshot(self, delta, windows):
         visible = super().snapshot(delta, windows)
+        self.causal_empty_streak = self.causal_empty_streak + windows if not delta else 0
+        visible['consecutive_empty_observations'] = self.causal_empty_streak
         visible['history'] = [{**item, 'text': strip_terminal(item['text'])}
                               if item.get('role') == 'user' else item
                               for item in visible['history']]

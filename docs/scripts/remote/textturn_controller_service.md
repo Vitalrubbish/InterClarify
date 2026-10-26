@@ -10,3 +10,5 @@ TT-011：当数据注册了finish时，加载前使用`textturn_candidate.valida
 
 
 2026-10-27：新版数据manifest包含input_contract时，Controller.decide使用同一因果投影移除关联ID和原始时刻；运行时自身仍保存这些字段。
+
+旧manifest没有input_contract时，服务移除新增的更新类型／播放阶段／实际空观察字段，保持历史prompt合同。

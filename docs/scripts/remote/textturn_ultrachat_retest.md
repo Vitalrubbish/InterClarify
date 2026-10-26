@@ -16,3 +16,5 @@ TT-011增加`DuplexReplayState`，只在新配置`full_lifecycle`启用：沿用
 
 
 2026-10-27：DuplexReplayState.snapshot在去句读前记录text-update／empty-observation及实际准备／播放阶段，供新版训练／回放共用输入映射。旧候选保持其原编码。
+
+新版实际空观察数独立按原始delta计数，纯标点更新将其复位；旧字段保留原值以兼容历史候选。

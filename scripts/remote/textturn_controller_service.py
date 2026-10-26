@@ -42,6 +42,9 @@ class Controller:
         visible = dict(visible)
         if self.input_contract:
             visible['input_contract'] = self.input_contract
+        else:
+            for key in ('observation_type', 'playback_phase', 'consecutive_empty_observations'):
+                visible.pop(key, None)
         ids = self.tokenizer.encode(prompt_for(visible), add_special_tokens=False)
         if len(ids) + 1 > self.maximum:
             raise ValueError('Control input exceeds 2048 tokens')
