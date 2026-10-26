@@ -8,7 +8,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'/'training'))
 from repair_textturn_dataset import (complete_prefix, anchor_visible, load_inputs, ReleaseStream,
-                                     RepairTrace, rng_for, audit_row)
+                                     RepairTrace, rng_for, audit_row, assign_pairs)
 from textturn_input import model_visible, render_prompt
 from textturn_loss import logical_groups, assign_loss_weights
 
@@ -111,6 +111,17 @@ class RepairTests(unittest.TestCase):
         bad=[dict(snapshot_id=r['snapshot_id'],action='start',control_ms=1.) for r in rows]
         self.assertEqual(score_opportunities(rows,bad,config)['all']['smooth']['numerator'],0)
         self.assertFalse(score_opportunities(rows,good,config)['all']['passed'])
+
+    def test_pair_assignment_balances_forms_without_removing_history(self):
+        records={str(i):dict(texts=['Earlier question?', 'Earlier answer.', 'Earlier statement.',
+                                   'Earlier explanation.', 'A later question?', 'A complete answer.',
+                                   'A later statement.', 'Short.']) for i in range(4)}
+        index=[dict(source_id=key,split='train') for key in records]
+        pairs=assign_pairs(index,records,self.tokenizer)
+        forms=Counter('question' if '?' in records[key]['texts'][pair] else 'declarative'
+                      for key,pair in pairs.items())
+        self.assertEqual(forms,{'question':2,'declarative':2})
+        self.assertTrue(all(pair>=4 for pair in pairs.values()))
 
     def test_logical_loss_gradient_matches_three_class_means(self):
         import torch

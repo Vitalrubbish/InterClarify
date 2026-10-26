@@ -115,6 +115,13 @@ def audit(args):
     assert not results['train']['source_ids']&results['dev']['source_ids']
     assert row_ids['pilot']<=row_ids['train']
     assert row_ids['train']|row_ids['dev']==all_requests
+    selection=json.loads((p/'selection.json').read_text())
+    for split in ('train','pilot'):
+        forms=Counter(item['form'] for item in selection[split])
+        assert forms['question']==forms['declarative'], 'Source form balance changed'
+    estimate=json.loads((p/'estimate.json').read_text())
+    forms=Counter(item['form'] for item in estimate['candidates'] if item['split']=='dev')
+    assert forms=={'question':100,'declarative':100}
     index=json.loads((p/'split_index.json').read_text());groups=defaultdict(set)
     for item in index:groups[item['duplicate_group']].add(item['split'])
     assert all(len(s)==1 for s in groups.values())

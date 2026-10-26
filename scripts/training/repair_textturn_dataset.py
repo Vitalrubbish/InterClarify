@@ -19,7 +19,7 @@ from build_textturn_duplex_dataset import register_finish
 from textturn_input import CONTRACT, render_prompt
 from textturn_loss import assign_loss_weights, complete_trajectory_groups
 
-VERSION = 'tt-010-repair-20261027-r3'
+VERSION = 'tt-010-repair-20261027-r4'
 BOUNDARY_VERSION = 'prefix-punctuation-v1'
 ABBREVIATIONS = ('mr', 'mrs', 'ms', 'dr', 'prof', 'sr', 'jr', 'st', 'vs', 'etc', 'e.g', 'i.e', 'fig', 'no', 'inc')
 REQUESTS = [
@@ -380,10 +380,31 @@ def load_inputs(legacy):
     return manifest, selected, {i['source_id']:records[i['source_id']] for i in selected}, tokenizer
 
 
-def choose_pair(source, tokenizer):
-    candidates = list(range(4, len(source['texts'])-1, 2))
-    return min(candidates, key=lambda p: len(tokenizer.encode(source['texts'][p+1])) +
-               len(tokenizer.encode(' '.join(source['texts'][:p]))) * .15)
+def assign_pairs(index, records, tokenizer):
+    assignments = {}
+    for split in ('train', 'dev'):
+        items = [item for item in index if item['split'] == split]
+        options, forced, flexible = {}, {}, []
+        for item in items:
+            source = records[item['source_id']]
+            choices = {}
+            for pair in range(4, len(source['texts'])-1, 2):
+                form = 'question' if '?' in source['texts'][pair] else 'declarative'
+                cost = len(tokenizer.encode(source['texts'][pair+1])) + .15 * len(tokenizer.encode(' '.join(source['texts'][:pair])))
+                if form not in choices or cost < choices[form][0]:
+                    choices[form] = (cost, pair)
+            options[item['source_id']] = choices
+            if len(choices) == 1:
+                forced[item['source_id']] = next(iter(choices))
+            else:
+                flexible.append(item['source_id'])
+        need = len(items)//2 - sum(form == 'question' for form in forced.values())
+        if not 0 <= need <= len(flexible):
+            raise ValueError('Existing source pool cannot supply balanced natural forms at shared history positions')
+        flexible.sort(key=lambda key: (options[key]['question'][0]-options[key]['declarative'][0], key))
+        forms = forced | {key: 'question' if i < need else 'declarative' for i,key in enumerate(flexible)}
+        assignments.update({key: options[key][form][1] for key,form in forms.items()})
+    return assignments
 
 
 def source_bundle(source, pair, split, tokenizer, config, phrases):
@@ -415,17 +436,16 @@ def source_bundle(source, pair, split, tokenizer, config, phrases):
 def stratified_select(candidates, limit, minimum):
     buckets = defaultdict(list)
     for item in candidates:
-        buckets[(item['form'], item['position'])].append(item)
+        buckets[item['form']].append(item)
     for bucket in buckets.values():
-        bucket.sort(key=lambda i:(i['windows'],i['tie']))
-    selected,used = [],0
-    while buckets:
-        for key in list(sorted(buckets)):
-            item = buckets[key].pop(0)
-            if used+item['windows']<=limit:
-                selected.append(item); used+=item['windows']
-            if not buckets[key]: del buckets[key]
-    if len(selected)<minimum:
+        bucket.sort(key=lambda i: (i['windows'], i['position'], i['tie']))
+    selected, used = [], 0
+    for question, declarative in zip(buckets['question'], buckets['declarative']):
+        if used + question['windows'] + declarative['windows'] > limit:
+            break
+        selected.extend((question, declarative))
+        used += question['windows'] + declarative['windows']
+    if len(selected) < minimum:
         raise ValueError(f'Complete source budget conflict: {len(selected)} < {minimum}, windows {used}/{limit}')
     return selected
 
@@ -446,10 +466,11 @@ def build(args):
                 raise ValueError('Transition token length changed')
     args.output.mkdir(parents=True)
     cache=args.output/'candidates';cache.mkdir()
+    pair_assignments = assign_pairs(index, records, tokenizer)
     estimate=[]; excluded=[]; aggregate=Counter(); sample=[]
     for ordinal,item in enumerate(index):
         source=records[item['source_id']]
-        pair=choose_pair(source,tokenizer)
+        pair=pair_assignments[item['source_id']]
         try:
             traces,rows=source_bundle(source,pair,item['split'],tokenizer,config,phrases)
         except ValueError as exc:

@@ -17,7 +17,7 @@ fi
 PY="$HOME/interclarify-xturnix-fleurs/envs/xturnix/bin/python"
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 timeout 120 "$PY" -c \
  'import hashlib,json,sys;from pathlib import Path;p=Path(sys.argv[1]);repo=Path(sys.argv[2]);a=json.loads((p/"audit.json").read_text());m=p/"manifest.json";assert a["status"]=="passed" and a["manifest_sha256"]==hashlib.sha256(m.read_bytes()).hexdigest();assert json.loads(m.read_text())["training_allowed"];assert a["training_config_sha256"]==hashlib.sha256((repo/"configs/textturn_repair_pilot.json").read_bytes()).hexdigest();assert a["loss_helper_sha256"]==hashlib.sha256((repo/"scripts/training/textturn_loss.py").read_bytes()).hexdigest()' \
- "$ROOT/dataset/tt-010-repair-20261027-r3" "$REPO_ROOT"
+ "$ROOT/dataset/tt-010-repair-20261027-r4" "$REPO_ROOT"
 [ -z "$(git -C "$REPO_ROOT" status --porcelain)" ] || { echo 'Frozen source must be clean' >&2; exit 2; }
 printf -v command 'TEXTTURN_ROOT=%q TEXTTURN_RUN_ID=%q bash %q' "$ROOT" "$RUN_ID" "$REPO_ROOT/scripts/remote/run_textturn_repair_pilot.sh"
 vc submit --image docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4 \
