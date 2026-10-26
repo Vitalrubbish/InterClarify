@@ -62,11 +62,29 @@ def action_loss(logits, row, token_ids, objective):
     return torch.nn.functional.cross_entropy(scores[None, :], torch.tensor([target], device=logits.device))
 
 
+def ranking_auc(points):
+    """Compute threshold-free pairwise ranking accuracy, assigning half credit to ties."""
+    points = sorted(points)
+    positive = sum(label for _, label in points)
+    negative = len(points)-positive
+    if not positive or not negative:
+        return None
+    rank_sum, i = 0., 0
+    while i < len(points):
+        j = i+1
+        while j < len(points) and points[j][0] == points[i][0]:
+            j += 1
+        rank_sum += sum(label for _, label in points[i:j])*(i+1+j)/2
+        i = j
+    return (rank_sum-positive*(positive+1)/2)/(positive*negative)
+
+
 def evaluate_rows(model, rows, token_ids, output, started, config, complete=False):
     import torch
     output.mkdir(parents=True, exist_ok=False)
     model.eval()
     confusion, totals = Counter(), defaultdict(lambda: defaultdict(float))
+    rankings = defaultdict(list)
     predictions = []
     with torch.inference_mode(), (output / 'predictions.jsonl').open('w') as stream:
         for i, row in enumerate(rows):
@@ -82,6 +100,8 @@ def evaluate_rows(model, rows, token_ids, output, started, config, complete=Fals
             full = float(action_loss(scores, row, token_ids, 'full'))
             restricted = float(action_loss(scores, row, token_ids, 'legal'))
             margin = float(actions[target] - actions[other])
+            active = legal[1]
+            rankings[list(ACTIONS)[active]].append((float(actions[active]-actions[0]), int(target == active)))
             key = row['target_action']
             stats = totals[key]
             stats['count'] += 1
@@ -102,7 +122,8 @@ def evaluate_rows(model, rows, token_ids, output, started, config, complete=Fals
                 print(json.dumps(dict(event='diagnostic_evaluation', output=str(output), completed=i+1,
                                       planned=len(rows))), flush=True)
     result = dict(rows=len(rows), sources=len({r['source_id'] for r in rows}),
-                  confusion={f'{a}->{b}': n for (a, b), n in confusion.items()}, by_action={})
+                  confusion={f'{a}->{b}': n for (a, b), n in confusion.items()}, by_action={},
+                  ranking_auc={a: ranking_auc(points) for a, points in rankings.items()})
     for action, values in totals.items():
         n = int(values['count'])
         result['by_action'][action] = dict(count=n, correct=int(values['correct']),

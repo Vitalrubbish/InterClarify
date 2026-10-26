@@ -12,6 +12,12 @@ SPEC.loader.exec_module(DIAGNOSTICS)
 
 
 class TrainingDiagnosticsTests(unittest.TestCase):
+    def test_ranking_auc_handles_ties_and_has_no_operating_threshold(self):
+        self.assertEqual(DIAGNOSTICS.ranking_auc([(0., 0), (1., 1)]), 1.)
+        self.assertEqual(DIAGNOSTICS.ranking_auc([(0., 1), (1., 0)]), 0.)
+        self.assertEqual(DIAGNOSTICS.ranking_auc([(1., 1), (1., 0)]), .5)
+        self.assertIsNone(DIAGNOSTICS.ranking_auc([(1., 1)]))
+
     def test_legal_loss_excludes_irrelevant_vocabulary_and_rejects_illegal_targets(self):
         scores = torch.tensor([.2, -.4, .7, 100.], requires_grad=True)
         row = dict(target_action='start', visible={'state': 'Listen'})
