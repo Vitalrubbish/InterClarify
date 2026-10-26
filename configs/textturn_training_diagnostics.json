@@ -1,0 +1,12 @@
+{
+  "seed": 20261025,
+  "prior_run": "tt-010-balanced-20261026-r2",
+  "dev_sources": 20,
+  "keep_per_bucket": 2,
+  "max_wall_seconds": 7200,
+  "arms": [
+    {"name": "full_clip1", "objective": "full", "max_grad_norm": 1.0},
+    {"name": "full_no_clip", "objective": "full", "max_grad_norm": null},
+    {"name": "legal_clip1", "objective": "legal", "max_grad_norm": 1.0}
+  ]
+}
