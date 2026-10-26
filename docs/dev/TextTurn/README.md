@@ -1,5 +1,7 @@
 # TextTurn：文本话轮控制器路线
 
+2026-10-27执行更新：按用户明确授权，新版修复数据已冻结并通过CPU全量核查；train160来源／52656窗、pilot54来源／9526窗、dev200来源／75767窗，问句／陈述来源各半。代码及输入映射已提交，远端全量核查通过，作业`job-179305445758727551378-xuan-zhang`已Running，旧pilot两轮后接续新版pilot五轮。最终状态见[修复与训练记录](../../../reports/textturn/20261027-dataset-repair/README.md)，下方“仅确认、未实施”为历史轮次。
+
 2026-10-27：[数据修复完整配置](dataset_repair_recommendation.md)已获用户整体确认，含train／pilot窗口上限100000／10000。按用户最新指令，本轮仅更新文档到已确认，生成器、正式JSON、冻结数据及训练均未改动或启动。TT-010仍保持打开，不能将配置确认写成实现完成。
 
 2026-10-26：按用户要求整理[小控制器可行性与低延迟接入](controller_feasibility.md)，并完成[当前训练数据管线审计](dataset_pipeline_review.md)。新确认预设分支ID进入模型输入、8个打断模板仅5个可达，以及句式与历史位置绑定；数据修复和CoT适配仍未实施。本次沿用TT-010，仅交付文档及本地只读证据，不新增issue或启动训练。当前默认控制窗为160ms，以下480ms为旧合同记录。
@@ -17,7 +19,7 @@ stop只用于用户打断，正常说完由播放完成事件处理。按用户2
 | 文档 | 内容 |
 | --- | --- |
 | [数据修复配置讨论](dataset_repair_configuration.md) | 逐项记录用户选择、继承合同及待定配置，全部对齐后实施 |
-| [数据修复完整配置（已确认）](dataset_repair_recommendation.md) | 六组配置及规模预算已整体确认，尚未实施 |
+| [数据修复完整配置（已确认）](dataset_repair_recommendation.md) | 六组配置及规模预算已确认；新版r5已实现并冻结，训练状态见运行记录 |
 | [既有trace发布节奏](publication_trace_review.md) | 原生160ms解码中的连续更新、词内续写与空串，含本地交互查看器 |
 | [小控制器可行性](controller_feasibility.md) | 短周期与长上下文、异步CoT、单一执行点、训练顺序及后备路线 |
 | [当前数据管线审计](dataset_pipeline_review.md) | 当前完整轨迹版本的逐窗事实、构造问题、覆盖缺口及复现证据 |

@@ -1,5 +1,7 @@
 # TextTurn 第一阶段工作单
 
+2026-10-27执行更新：TT-010新版r5数据已冻结，train160／pilot54／dev200来源、52656／9526／75767窗，全量核查通过。已启动旧pilot两轮→新pilot五轮串行训练，作业`job-179305445758727551378-xuan-zhang`已Running并完成前2次逻辑更新，不自动full或恢复TT-011。最终状态见[运行记录](../../../reports/textturn/20261027-dataset-repair/README.md)。
+
 2026-10-26四臂诊断完成，均无可放行设置，无活动作业；完整确认集未使用，full／TT-011未启动。TT-010已交付[新方案](../../dev/TextTurn/retraining_plan.md)：修复打断后接话及语义边界，完整轨迹组内平衡三类损失后统一裁剪；尚未实施。证据见[报告](../../../reports/textturn/20261026-training-diagnostics/README.md)。
 
 2026-10-26按用户要求在TT-010内开展训练机制诊断并确定新方案；不新增issue。r2训练已结束且两轮全keep被拒绝，TT-011未提交测试。只读复评作业已Running，后续按冻结协议串行做三个pilot优化对照，不自动启动正式full；见[诊断记录](../../../reports/textturn/20261026-training-diagnostics/README.md)。
@@ -34,7 +36,7 @@ TT-008两周期测试已完成并按用户指令归档，各150/150成功、退�
 
 | 编号 | 工作内容 | 交付物 | 依赖 | 状态 |
 | --- | --- | --- | --- | --- |
-| TT-011 | [修复外部测试管线并在训练完成后串行测试](tt_011_post_training_external_evaluation.md) | 新候选兼容的两条回归管线、等待续接、逐例结果与联合报告 | TT-010候选放行 | 已绑定r2新训练；无截止等待器存活，两项测试未提交 |
+| TT-011 | [修复外部测试管线并在训练完成后串行测试](tt_011_post_training_external_evaluation.md) | 新候选兼容的两条回归管线、等待续接、逐例结果与联合报告 | TT-010候选放行 | 旧等待已停止；本轮不恢复外部测试 |
 | TT-001 | [重建四类控制数据](../archive/TextTurn/tt_001_dataset.md) | 480ms 控制事件数据、切分清单与动作监督 | 无 | 已完成并归档；160/200/300对话，完整LFS校验 |
 | TT-002 | [训练 Qwen3-0.6B 控制器](../archive/TextTurn/tt_002_training.md) | 可加载的 adapter、开发集结果与固定候选 | TT-001 | 已完成并归档；full第2轮候选及重载检查通过 |
 | TT-003 | [接入 Nemotron 与 Shared Context](../archive/TextTurn/tt_003_streaming_context.md) | 480ms 观察驱动的控制与下游转写接口 | TT-002；数据来自 TT-001 | 已完成并归档；真实链路及Context一致性已核查 |
@@ -44,7 +46,7 @@ TT-008两周期测试已完成并按用户指令归档，各150/150成功、退�
 | TT-007 | [160ms周期的同样本FDB对照](../archive/TextTurn/tt_007_fdb_160ms.md) | 相同50＋50录音的160ms主指标与时间换算、对照说明 | TT-002／003；复用TT-005／006冻结清单 | 已完成并归档；Speak46/50、start9/50，等待303.45ms；连续3周期Speak46/50 |
 | TT-008 | [UltraChat注入助手正文的两周期重测stop](../archive/TextTurn/tt_008_ultrachat_stop_retest.md) | 480ms每周期8 token、160ms每周期3 token的stop、误stop及960ms抢话结果 | TT-002／003及既有测试资产 | 已完成并归档；两周期各150/150成功，旧合同结果已交付 |
 | TT-009 | [条件性训练数据重构](../archive/TextTurn/tt_009_conditional_data_rebuild.md) | 原条件性方案留档 | 已被TT-010替代 | 用户指令终止并归档；未实施，不计完成 |
-| TT-010 | [非附和式ASR更新让轮与输出生命周期数据改造](tt_010_asr_update_yield_dataset.md) | 非停止词依赖的stop监督、附和对照、finish编码决策和start终态配对合同 | 复用训练／开发来源；不依赖TT-008结论 | r2动作平衡重训Running，训练时间上限已按用户授权取消，基线评估进行中 |
+| TT-010 | [非附和式ASR更新让轮与输出生命周期数据改造](tt_010_asr_update_yield_dataset.md) | 非停止词依赖的stop监督、附和对照、finish编码决策和start终态配对合同 | 复用训练／开发来源；不依赖TT-008结论 | 新版r5数据已冻结及审核通过，有限pilot已Running；旧两轮后串行新版五轮 |
 
 TT-007按用户授权完成同样本160ms对照。三项工作交付完成与模型质量达标分别记录；3周期在480ms／160ms下对应1440ms／480ms，不能当作等时长结果比较。没有更换候选、重训、调阈值或扩大原累计预算。
 
