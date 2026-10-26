@@ -2,6 +2,8 @@
 
 2026-10-26：四臂诊断均未得到可用设置。明确建议是**修复打断后重新接话及语义边界监督，训练时将三类损失在同一次完整轨迹组更新内合并后统一裁剪**。这是根据[诊断报告](../../../reports/textturn/20261026-training-diagnostics/README.md)确定的待验证方案，尚未实现或启动，沿用TT-010，不新增issue。
 
+同日按用户要求补充[可行性方案](controller_feasibility.md)及[数据管线审计](dataset_pipeline_review.md)：新确认output_id暴露normal／interrupt预设分支、模板与阶段索引耦合导致3个模板不可达、句式与历史位置绑定。下一版数据设计需一并审阅这些问题；本次未修改生成器、损失、冻结集或正式配置，不把数据发现单独当作全keep根因。
+
 ## 固定内容
 
 保持Qwen3-0.6B原revision、LoRA rank16／alpha32及现有目标模块；学习新增五个token行，动作仍只有keep／start／stop，finish只作输入。保持单一仲裁器和TTS所有权，不训练ASR、正文、CoT或其他Layer。
