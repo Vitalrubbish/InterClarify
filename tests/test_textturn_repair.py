@@ -8,7 +8,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'/'training'))
 from repair_textturn_dataset import (complete_prefix, anchor_visible, load_inputs, ReleaseStream,
-                                     RepairTrace, rng_for, audit_row, assign_pairs)
+                                     RepairTrace, rng_for, audit_row, assign_pairs, no_reply_prefix)
 from textturn_input import model_visible, render_prompt
 from textturn_loss import logical_groups, assign_loss_weights
 
@@ -27,6 +27,10 @@ class RepairTests(unittest.TestCase):
             self.assertFalse(complete_prefix(text),text)
         self.assertFalse(anchor_visible('I mea',['i meant']))
         self.assertTrue(anchor_visible('Okay. I meant',['i meant']))
+        self.assertTrue(no_reply_prefix('Okay.'))
+        self.assertTrue(no_reply_prefix('Okay. Please stop speaking.'))
+        self.assertFalse(no_reply_prefix('Okay. Could you explain the last point?'))
+        self.assertFalse(no_reply_prefix('Stop speaking. Could you explain that part?'))
 
     def test_punctuation_is_an_update_and_ids_do_not_change_input(self):
         visible=dict(state='Listen',user_text='Done.',observation='.',observation_type='text-update',

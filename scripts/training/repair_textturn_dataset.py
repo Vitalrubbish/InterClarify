@@ -19,7 +19,7 @@ from build_textturn_duplex_dataset import register_finish
 from textturn_input import CONTRACT, render_prompt
 from textturn_loss import assign_loss_weights, complete_trajectory_groups
 
-VERSION = 'tt-010-repair-20261027-r4'
+VERSION = 'tt-010-repair-20261027-r5'
 BOUNDARY_VERSION = 'prefix-punctuation-v1'
 ABBREVIATIONS = ('mr', 'mrs', 'ms', 'dr', 'prof', 'sr', 'jr', 'st', 'vs', 'etc', 'e.g', 'i.e', 'fig', 'no', 'inc')
 REQUESTS = [
@@ -70,6 +70,14 @@ def complete_prefix(text):
 def anchor_visible(prefix, anchors):
     text = prefix.casefold()
     return any(re.search(r'(?<!\w)' + re.escape(a) + r'(?!\w)', text) for a in anchors)
+
+
+def no_reply_prefix(prefix):
+    normalized = re.sub(r'[.?!。！？]+$', '', prefix.strip()).casefold()
+    backchannels = {re.sub(r'[.?!]+$', '', text).casefold() for text in BACKCHANNELS}
+    return (normalized in backchannels or
+            (anchor_visible(prefix, [a for a, _ in STOPS + HELDOUT_STOPS]) and
+             not anchor_visible(prefix, [a for a, _ in REQUESTS + HELDOUT_REQUESTS])))
 
 
 class ReleaseStream:
@@ -267,6 +275,7 @@ class RepairTrace:
         category, action, response, background = 'no_update', 'keep', None, None
         state = 'Speak' if self.active else 'Listen'
         raw_boundary = complete_prefix(self.user)
+        terminal_only = self.extra is not None and no_reply_prefix(self.user)
         anchors = [a for a, _ in REQUESTS + HELDOUT_REQUESTS + STOPS + HELDOUT_STOPS]
         decidable = bool(delta) and anchor_visible(self.user, anchors)
         if origin == 'natural' and delta and state == 'Speak':
@@ -281,7 +290,6 @@ class RepairTrace:
         elif state == 'Speak' and origin == 'extra':
             category = 'backchannel' if not decidable else 'interruption'
         elif state == 'Listen':
-            terminal_only = self.extra_terminal and self.extra is not None
             if not delta and raw_boundary and len(self.user) > self.committed and not terminal_only:
                 action = 'start'
                 category = 'recovery' if self.has_stopped else 'smooth'
@@ -316,7 +324,7 @@ class RepairTrace:
                    dev_suite='heldout' if self.heldout else 'standard',
                    reply_background=background or (self.active['background'] if self.active else 'none'),
                    annotation=dict(raw_prefix=self.user, raw_complete=raw_boundary, decidable=decidable,
-                                   origin=origin, terminal_only=bool(self.extra_terminal and self.extra is not None),
+                                   origin=origin, terminal_only=terminal_only,
                                    method=BOUNDARY_VERSION), playback_simulated=True)
         self.rows.append(row)
         self.emit('control_request', action=action, snapshot_id=row['snapshot_id'])

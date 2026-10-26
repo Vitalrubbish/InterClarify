@@ -5,7 +5,7 @@ ROOT="${TEXTTURN_ROOT:-$HOME/parathink-textturn}"
 ENV_DIR="${TEXTTURN_ENV:-$HOME/interclarify-xturnix-fleurs/envs/xturnix}"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 RUN_ID="${TEXTTURN_RUN_ID:?TEXTTURN_RUN_ID is required}"
-DATA="$ROOT/dataset/tt-010-repair-20261027-r4"
+DATA="$ROOT/dataset/tt-010-repair-20261027-r5"
 case "$RUN_ID" in *[!A-Za-z0-9._-]*|.*) exit 2 ;; esac
 [ ! -e "$ROOT/runs/$RUN_ID" ] && [ -f "$ENV_DIR/conda-meta/history" ] || exit 2
 [ "$(df -Pk "$ROOT" | awk 'NR==2 {print $4}')" -ge 31457280 ] || exit 2
