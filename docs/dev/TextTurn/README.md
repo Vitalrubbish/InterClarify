@@ -18,6 +18,7 @@ stop只用于用户打断，正常说完由播放完成事件处理。按用户2
 
 | 文档 | 内容 |
 | --- | --- |
+| [VoxTurn重新调研](../VoxTurn/research_assessment.md) | 已核对现成权重、真实停顿训练、官方测试及音频接入边界；优先候选，尚未部署 |
 | [数据修复配置讨论](dataset_repair_configuration.md) | 逐项记录用户选择、继承合同及待定配置，全部对齐后实施 |
 | [数据修复完整配置（已确认）](dataset_repair_recommendation.md) | 六组配置及规模预算已确认；新版r5已实现并冻结，训练状态见运行记录 |
 | [既有trace发布节奏](publication_trace_review.md) | 原生160ms解码中的连续更新、词内续写与空串，含本地交互查看器 |
