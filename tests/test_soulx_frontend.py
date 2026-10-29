@@ -115,8 +115,12 @@ class SoulXFrontendTests(unittest.TestCase):
         state = frontend.observe_state('<|user_nonidle|>', '')
         self.assertFalse(state['accepted'])
         self.assertEqual(state['rejection_reason'], 'far_field')
+        frontend.delivery_phase = 'drain'
+        state = frontend.observe_state('<|user_complete|>', '')
+        self.assertFalse(state['accepted'])
+        self.assertEqual(state['rejection_reason'], 'drain')
         stored = [e for e in frontend.context.read_frontend_updates('s')['updates'] if e['kind'] == 'user_state']
-        self.assertEqual(len(stored), 6)
+        self.assertEqual(len(stored), 7)
 
     def test_stop_deduplicates_one_output_and_ledger_keeps_disjoint_ranges(self):
         frontend = protocol_frontend()

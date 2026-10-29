@@ -178,6 +178,8 @@ def replay_case(model, samples, real_count, case, output):
                 if wait_ms > 800:
                     raise RuntimeError('Pending audio exceeded the 800ms bound')
                 before = time.monotonic()
+                if item['synthetic']:
+                    frontend.delivery_phase = 'drain'
                 result = frontend.feed_audio(item['audio'], synthetic=item['synthetic'])
                 ingress.append({'begin': item['begin'], 'end': item['end'], 'synthetic': item['synthetic'],
                                 'queue_ms': wait_ms, 'processing_ms': (time.monotonic() - before) * 1000,
@@ -188,6 +190,11 @@ def replay_case(model, samples, real_count, case, output):
             if reader.is_alive():
                 raise RuntimeError('Audio ingress thread failed to stop')
         before_close = context.get_user_turn(case_id, 'user-1')['transcript']['text']
+        from soulx_frontend import slice_spans
+        pending = slice_spans(frontend._spans(model.buffer), model.config.infer_config.input.audio_back_size, len(model.buffer))
+        pending_real = sum(span['samples'] for span in pending if span['kind'] == 'real')
+        if frontend.processed_until + pending_real != frontend.input_end:
+            raise AssertionError('Real audio accounting does not balance at EOF')
         frontend.close_turn('runtime_audio_case_end')
         view = context.get_user_turn(case_id, 'user-1')
         assert view['transcript']['text'] == before_close
@@ -199,9 +206,11 @@ def replay_case(model, samples, real_count, case, output):
         first_complete = min(accepted_completes, default=float('inf'))
         return {'case_id': case_id, 'passed': True, 'integrity_passed': True,
                 'input_samples': len(samples), 'real_samples': real_count,
+                'processed_real_until': frontend.processed_until, 'pending_real_at_close': pending_real,
                 'audio_ingress_sha256': hashlib.sha256(samples.tobytes()).hexdigest(),
                 'closed_text': before_close, 'assembly_status': view['transcript'].get('assembly_status'),
                 'source_calls': len(observations), 'source_errors': sum(v['call_status'] == 'error' for v in observations),
+                'drain_source_calls': sum(v['delivery_phase'] == 'drain' for v in observations),
                 'source_tags': dict(Counter(t['token'] for v in observations for t in v['tags'])),
                 'state_counts': dict(Counter(v['token'] for v in states)),
                 'accepted_state_counts': dict(Counter(v['token'] for v in states if v['accepted'])),
@@ -267,6 +276,11 @@ def main():
         with torch.inference_mode():
             for _ in range(3):
                 model.process(np.zeros(2560, dtype=np.float32))
+            warmup_started = time.monotonic()
+            warmup_text = model.cascade_asr.recognize(np.zeros(53760, dtype=np.float32), 16000)
+            result['asr_warmup'] = {'samples': 53760, 'synthetic': True, 'text': warmup_text,
+                                    'seconds': time.monotonic() - warmup_started,
+                                    'scope': 'startup only; no logical user turn or Context publication'}
         torch.cuda.synchronize()
         model.reset()
         path = Path(manifest['audio_path'])

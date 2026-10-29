@@ -250,8 +250,10 @@ class SoulXFrontend:
     def _state_predict(self, chunk, back, ahead):
         self.current_chunk, self.current_ahead = chunk, ahead
         real = [s for s in self._spans(chunk) if s['kind'] == 'real']
-        if real:
-            self.processed_until = max(s['end'] for s in real)
+        for span in real:
+            if span['start'] != self.processed_until:
+                raise ValueError('Real audio was skipped, duplicated or reordered across controller resets')
+            self.processed_until = span['end']
         self._calls = []
         result = self._instrumented_state(chunk, back, ahead)
         self._check_pcm_bound()
@@ -355,7 +357,8 @@ class SoulXFrontend:
                      and self.model.get_rms(self.current_chunk) < self.model.config.infer_config.far_field_threshold)
         spans = self._spans(self.current_chunk) + self._spans(self.current_ahead)
         real = [s for s in spans if s['kind'] == 'real']
-        reason = 'unknown_state' if token not in STATE_IDS else 'far_field' if far_field else 'synthetic_only' if not real else None
+        reason = ('drain' if self.delivery_phase != 'online' else 'unknown_state' if token not in STATE_IDS
+                  else 'far_field' if far_field else 'synthetic_only' if not real else None)
         control = self.control
         basis = {'transcript_version': self.snapshot['version'], 'asr_version': self.snapshot['asr_version'],
                  'control_revision': control['control_revision'], 'control_event_id': control['event_id'],
@@ -367,7 +370,8 @@ class SoulXFrontend:
                             raw_token=raw_token, raw_token_id=raw_id,
                             adjustment='native_complete_incomplete_rule' if raw_token != token else None,
                             accepted=reason is None, rejection_reason=reason,
-                            basis=basis, audio_spans=spans, processed_until=self.processed_until,
+                            basis=basis, audio_spans=spans, processed_spans=self._spans(self.current_chunk),
+                            processed_until=self.processed_until, delivery_phase=self.delivery_phase,
                             state_resolved_at=time.monotonic(), source_revision=SOULX_REVISION,
                             depends_on=[self.snapshot['event_id'], control['event_id']],
                             output_id=output.get('output_id') if output else None)
