@@ -1,0 +1,9 @@
+# SenseVoice 原始标签与话轮正文整理
+
+对应 `scripts/runtime/sensevoice_transcript.py`。仅做 CPU 文本整理，不调用 ASR 或改变控制器文本。
+
+`SenseVoiceObservation.parse()` 从原始串分离冻结的已知标签，保存标签顺序、原始字符跨度和正文到原文的跨度映射。普通文字、数字、空格、标点保持；未知标记留在原文及正文中，同时标记未解析，不当作状态 token。
+
+`TurnTranscriptAssembler.apply_window()` 维护完整假设与可修订尾部。同起点窗口替换对应正文；滑窗要求至少两个连续词构成唯一接缝，否则保留旧正文并标缺口。覆盖不连续、倒退、未知标签和 ASR 错误同样显式标记。空识别不抹掉既有正文。`apply_turn_result()` 使用相同覆盖校验，不把筛选后的部分音频当成完整话轮。
+
+更新返回全量正文、Unicode 码点 patch 和独立 ASR 版本。`checkpoint()`／`restore()` 用于发布失败时恢复整理状态；不能用回滚伪造过去已经可见的结果。词锚点是保守的文本依据，没有声学词时间保证；缺口计入覆盖结果。
