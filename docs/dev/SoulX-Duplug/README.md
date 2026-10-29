@@ -1,6 +1,8 @@
 # SoulX-Duplug＋Nemotron 路线
 
-2026-10-24 最新状态：用户已选择启动 [TextTurn 文本控制器路线](../TextTurn/README.md)，本路线转为保留候选，不继续启动适配、617 条回放或训练。以下是此前方案；Shared Context 的按 turn 转写与读取原则由新路线继承，音频同步约定不作为新路线前置。
+2026-10-29 当前选型：用户决定采用 SoulX-Duplug 作为话轮控制器，并指令调研 Nemotron 低延迟适配，不可行时使用 SenseVoiceSmall。[调研结论](asr_adapter_assessment.md)支持优先采用 Nemotron EN160，SenseVoiceSmall 保留为适配失败或组合实测不达要求时的回退；低延迟收益仍需实测，尚未实现或切换运行时。
+
+本轮先确认 ASR 路径，CoT 条件化职责、状态到动作的映射与 Layer 3 定位待后续讨论。下方 617 条测试是此前方案，须重新确认后实施，不因本次选型自动启动。TextTurn 与 XTurnix 保留历史证据，不继承其专属输入、动作 token 或训练参数。
 
 更新：2026-10-24。状态：用户已确认组合与简化测试范围；当前只更新方案，尚未实现适配、运行模型或训练。
 
@@ -16,7 +18,7 @@ Nemotron EN160 是唯一 ASR 来源，持续产生原始转写、增量和版本
 
 ## 实施边界
 
-- Nemotron 替换官方外部 ASR 的适配尚未实现，不能声称已保持 SoulX-Duplug 原配套成绩；音频截止点、文本实际到达、空增量及缓存修订必须可追溯。
+- Nemotron 替换官方外部 ASR 的适配尚未实现，不能声称已保持 SoulX-Duplug 原配套成绩或已验证更低延迟；音频截止点、文本实际到达、空增量、词内增量及缓存修订必须可追溯，具体见[适配调研](asr_adapter_assessment.md)。
 - 第一阶段保留 `user_idle`、`user_nonidle`、`user_backchannel`、`user_complete`、`user_incomplete`，不强制改成 start/keep/stop。
 - 本次更新不启动远端作业、训练或现役切换，不新建未经明确指令的 issue；旧 XTurnix 实现和已取消作业不因选型变化而恢复。
 - 后续 CoT 仍保持文本形式，待 Layer 2 与相应输入、训练合同建立后验证；不将基础测试通过等同于 CoT 能力成立。

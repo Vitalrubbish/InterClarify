@@ -1,12 +1,14 @@
 # 每个用户话轮的转写与 Shared Context 接口
 
-2026-10-24 最新状态：SoulX 路线转为保留候选，当前 [TextTurn](../TextTurn/training_plan.md)继承本文的按 turn 版本化转写与下游读取原则；不继承 SoulX 音频同步前置。新路线的 `no-voice` 只作为静音控制观察，不写成用户转写正文。本文仍为接口设计，未实现。
+2026-10-29 当前选型：用户已选择 SoulX-Duplug；按[适配调研](asr_adapter_assessment.md)优先采用 Nemotron EN160，SenseVoiceSmall 为条件性回退。本文继续作为接口设计，尚未实现。TextTurn 的 `no-voice` 不属于本接口正文，也不能代替 SoulX 音频判断。
 
 更新：2026-10-24。状态：按用户要求补充接口合同，尚未实现。适用于 [SoulX-Duplug＋Nemotron 路线](README.md)；Shared Context 指项目架构中的共享 Context，不另设第二份权威转写。
 
 ## 1. 写入时机与话轮标识
 
-Nemotron 是唯一转写来源。适配层收到在线文本更新后，先写入 Shared Context，再发布可读更新通知，供 SoulX-Duplug 与后续 Layer 1/2 在各自输入边界消费。文本写入不等待 `user_complete`、服务 `speak` 或播放启动；控制器的对齐等待不阻塞下游看到已经可用的转写。
+当前默认 Nemotron 是唯一转写来源。适配层收到在线文本更新后，先写入 Shared Context，再发布可读更新通知，供 SoulX-Duplug 与后续 Layer 1/2 在各自输入边界消费。文本写入不等待 `user_complete`、服务 `speak` 或播放启动；控制器的对齐等待不阻塞下游看到已经可用的转写。
+
+若后续触发 SenseVoiceSmall 回退，独立冻结来源标识 `sensevoice_small`、识别调用与修订合同，并验证窗口转写向同一话轮快照的映射。每个运行和活动话轮只采用一个权威来源，不混合两套文字，也不在话轮中热切换。下文 Nemotron 的原文前缀单调及回写失败行为不能套用到 SenseVoice 的重复窗口识别。
 
 用户话轮使用稳定的 `turn_id`，它与 ASR 会话／generation 标识分别记录。同一用户话轮内的多次 ASR 更新、80ms 音频包、160ms 音频块及表达 micro-turn 均不创建新的用户消息。用户话轮由运行时管理，不能每次状态模型输出 complete 就重新分配标识；模型重复预测不能导致文本重复入库。
 
@@ -19,7 +21,7 @@ Nemotron 是唯一转写来源。适配层收到在线文本更新后，先写�
 | 字段 | 含义 |
 | --- | --- |
 | `session_id`、`turn_id` | 会话与逻辑用户话轮的稳定标识 |
-| `source`、`asr_generation` | 来源固定为 `nemotron`，关联真实 ASR 会话实例 |
+| `source`、`asr_generation` | 当前来源为 `nemotron`，关联真实 ASR 会话实例；回退来源另行冻结为 `sensevoice_small`，同一活动话轮不切换 |
 | `version`、`asr_prefix_version` | 当前话轮快照版本及所依据的上游前缀版本；生命周期更新也可产生新快照版本 |
 | `text` | 当前话轮截至本版本的原始累计转写，保留空格、大小写和标点 |
 | `event_seq` | Context 的有序事件位置，供各消费者保存自己的读取游标 |

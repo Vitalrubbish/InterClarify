@@ -1,6 +1,12 @@
 # Agent 架构设计
 
-更新：2026-10-23。[研究背景与参考文章](../research_design.md) · [边听边想](listening.md) · [边说边想](speaking.md)。
+更新：2026-10-29。[研究背景与参考文章](../research_design.md) · [边听边想](listening.md) · [边说边想](speaking.md)。
+
+当前已确认：话轮控制器采用 **SoulX-Duplug**；依据[低延迟适配调研](../dev/SoulX-Duplug/asr_adapter_assessment.md)，ASR 优先采用现有 Nemotron EN160，适配失败或组合实测不满足后续确认要求时回退 SenseVoiceSmall。Nemotron 路径并行接收同一音频，在线转写先写 Shared Context，再按实际解码完成事件、观察边界与文本版本衔接 SoulX。160ms 分块不作为实际文本或动作延迟承诺，无 ASR 新增文本不等于声学静音；回退时也只保留一个权威转写来源。
+
+本轮为分步修订的第一轮，仅落定选型与 ASR 路径。下方既有正文、图示和两篇能力文档中的 XTurnix／TextTurn 专属输入、触发、动作及训练约定尚待逐项迁移，不作为 SoulX 已确认或已实现的合同，尤其不能将其 keep/start/stop 直接称为 SoulX 原生输出。CoT 条件化职责、五状态到运行时动作的映射和 Layer 3 定位仍待讨论；讨论期间遵守 AGENTS.md 的 Layer 3 修订边界。共享上下文、单一仲裁执行点、单一 TTS 播放所有权及已听内容不可撤销的共同边界继续保持。
+
+以下日期记录及旧控制器正文保留为本轮迁移参考，尚未切换运行时或启动远端作业。
 
 2026-10-27用户确认准备开播期间的控制合同：Speak作为控制模式表示已有活动输出，涵盖准备与播放；播放阶段另记preparing／playing，准备阶段已播正文为空、合法动作keep／stop，不重复start。有效stop也可取消尚未开播的输出；真实播放仍以playback_started及播放游标为准。这替代旧“实际开播才回传Speak”的控制编码，保持三动作、唯一执行点及单一播放所有权。模拟时序和其他已确认参数见[配置记录](../dev/TextTurn/dataset_repair_configuration.md)，尚未实现。
 
