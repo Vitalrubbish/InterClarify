@@ -6,4 +6,6 @@
 
 真实识别回调测试从float64缓存输入，验证generate实际收到float32，并核对调用ID及原文发布。
 
+窗口场景还覆盖相邻片段接入／同片段修订、临时缺口后的唯一锚点恢复，以及没有词界的相邻词内片段必须失败。
+
 运行：`python -m unittest discover -s tests -p 'test_soulx_frontend.py' -v`。全部五状态的协议覆盖不等于音频模型覆盖；真实预测另由远端回放报告。

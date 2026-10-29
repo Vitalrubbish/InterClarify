@@ -63,6 +63,7 @@ class TurnTranscriptAssembler:
         real = [s for s in spans if s['kind'] == 'real']
         text = observation['text']
         reason = None
+        separator = None
         if status == 'error':
             reason = 'asr_error'
         elif not real:
@@ -81,7 +82,12 @@ class TurnTranscriptAssembler:
                 self.tail_start = 0
             elif self.last_start is not None and start == self.last_start:
                 self.text = self.text[:self.tail_start] + text
-            elif self.text and self.assembly_status != 'gap':
+            elif (self.text and self.coverage_complete and start == self.last_end
+                  and re.search(r'[\s.!?,;:。！？；：]$', self.text)):
+                separator = '' if self.text[-1].isspace() or text[0].isspace() else ' '
+                self.tail_start = len(self.text) + len(separator)
+                self.text += separator + text
+            elif self.text and start < self.last_end:
                 new_words = list(WORD.finditer(text))
                 old_words = list(WORD.finditer(self.text[self.tail_start:]))
                 keys = [m.group().casefold() for m in new_words[:2]]
@@ -117,7 +123,7 @@ class TurnTranscriptAssembler:
                 'text_changed': changed, 'text': self.text, 'asr_version': self.asr_version,
                 'base_asr_version': base, 'replace_from': offset, 'replacement': self.text[offset:],
                 'assembly_status': self.assembly_status, 'coverage_complete': self.coverage_complete,
-                'assembly_reason': reason, 'tail_start': self.tail_start}
+                'assembly_reason': reason, 'tail_start': self.tail_start, 'join_separator': separator}
 
     def apply_turn_result(self, observation):
         return self.apply_window(observation)
