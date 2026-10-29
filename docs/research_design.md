@@ -1,6 +1,8 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
-2026-10-29 当前选型：用户决定采用 **SoulX-Duplug 话轮控制器**。按“Nemotron 可低延迟适配则使用，否则改用 SenseVoiceSmall”的指令，[调研](dev/SoulX-Duplug/asr_adapter_assessment.md)支持优先采用 Nemotron EN160，SenseVoiceSmall 作为适配失败或组合实测不满足要求时的回退。这是接口与计算路径的可行性判断，尚无组合延迟或状态质量实测，不表示运行时已经切换。
+2026-10-29 当前选型：用户确认将 **SoulX-Duplug 与 SenseVoiceSmall 合为语音前端**，位于 Layer 0–Layer 2 的输入侧。为先打通链路，首版沿用官方配套 SenseVoiceSmall，后续再评估 Nemotron；调整原因是减少首轮音频／文本与缓存适配工作，不代表组合延迟或质量已有实测结论，见[选型说明](dev/SoulX-Duplug/asr_adapter_assessment.md)。新前端尚未接入现役运行时。
+
+前端包含 ASR 调用、文本整理、SoulX 音频编码和用户状态预测，向共享 Context 发布版本化在线转写与五类状态；文本更新不等待 `user_complete`。Layer 0 系统附和时机、Layer 1 表达和 Layer 2 思考位于 Context 下游。该职责分层允许前端持续接收音频、表达与思考并发执行；后续 CoT 从 Context 反馈至前端，当前不实现条件化扩展。
 
 用户进一步确认：保留 CoT 条件下的主动澄清与话轮决策目标，后续让 SoulX-Duplug 联合读取音频 token、转写文本 token 和 Layer 2 已发布的 CoT token；当前不实现这项扩展。当前保留原生五类用户状态 token，全部送入 Layer 1，由 LLM 决定自身行为；普通正式回答在当前 turn 看到对应的 `user_complete` 后开始生成，看到之前不生成正文。后续 CoT 阶段是否扩展控制器输出另行设计，见[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
 

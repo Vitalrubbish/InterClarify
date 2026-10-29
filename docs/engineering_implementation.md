@@ -4,12 +4,12 @@
 
 ## 1. 运行底座与目标
 
-现役底座仍为 X-Talk `ca9b23c`、DuplexCascade、Nemotron EN160 与 Kokoro，参数见[运行配置](runtime_baseline.md)。目标控制器为 **SoulX-Duplug**；ASR 优先适配 Nemotron，失败或组合实测不满足后续确认要求时回退 SenseVoiceSmall，依据见[适配调研](dev/SoulX-Duplug/asr_adapter_assessment.md)。同一活动话轮只使用一个权威转写来源。
+现役底座仍为 X-Talk `ca9b23c`、DuplexCascade、Nemotron EN160 与 Kokoro，参数见[运行配置](runtime_baseline.md)。目标为 **SoulX-Duplug＋SenseVoiceSmall 语音前端**，位于 Layer 0–Layer 2 输入侧；按用户确认，先沿用官方配套 ASR 打通链路，后续再评估 Nemotron，原因见[选型说明](dev/SoulX-Duplug/asr_adapter_assessment.md)。同一活动话轮只使用一个权威转写来源。
 
 | 模块 | 实施职责 |
 | --- | --- |
-| ASR 与 Shared Context | 持续发布版本化转写，提供下游快照和有序更新读取；写入不等待完成判断 |
-| SoulX-Duplug | 保留音频路径和原生五类用户状态，衔接在线转写；状态全部作为 Layer 1 输入 |
+| 语音前端 | 收入 SenseVoiceSmall 调用与文本整理、SoulX 音频编码及原生五状态预测；向 Context 发布转写与状态，与下游并发执行 |
+| Shared Context | 保存版本化转写，提供下游快照和有序更新读取；写入不等待完成判断，后续向前端反馈已发布 CoT |
 | Layer 1 | 在正常输入边界读取状态与转写，在当前 turn 看到对应 `user_complete` 后开始普通正式回答；负责思考请求与表达 |
 | 输出运行时 | 统一管理 FIFO、TTS 与播放器；活动输出期间的有效 `user_nonidle` 额外直接触发停止，准备阶段也可取消 |
 | Layer 2（后续） | 只发布内部 CoT，供 SoulX 与 Layer 1 使用，不生成话轮建议或待播正文 |
@@ -19,13 +19,14 @@
 
 ## 2. 前端适配顺序
 
-1. **冻结协议与资产**：锁定模型、上游代码与环境版本，核算显存和磁盘峰值，不升级现役 ASR/TTS 环境。
-2. **衔接音频与文本**：Nemotron 与 SoulX 接收同一持续音频，按真实解码完成事件、观察边界和文本版本配对，验证词内增量、文本单次消费及缓存修订。ASR 未就绪不能伪装为空增量，无新增文字不等于声学静音。
-3. **交付 Context 接口**：按稳定 `turn_id` 写入转写，提供快照和按游标读取；用只读消费者替身核查幂等、乱序、关闭及 EOF 分离，见[接口合同](dev/SoulX-Duplug/shared_context_interface.md)。
-4. **验证组合表现**：此前 [Easy Turn 英文集方案](dev/SoulX-Duplug/quality_test.md)计划全量 617 条 Listen 影子回放，报告完整性判断、原生／兜底分支、实测延迟与失败覆盖，执行仍待重新确认。它不承担附和、打断或可听播放验收。
-5. **后续完整链路**：明确状态输入编码、Layer 1 生成边界和直接打断接口，再验证输出标识失效、停播确认及新输出恢复；旧 DuplexCascade 控制不能与新路径重复执行。
+1. **冻结首版资产**：锁定 SoulX、SenseVoiceSmall 及 conda 依赖，英文配置使用 `language=en`，核算显存和磁盘峰值，不升级现役 ASR/TTS 环境。
+2. **接通语音前端**：沿用官方音频编码、ASR 门控、窗口识别及差分／缓存修订路径，将同一来源的中间转写整理为话轮快照。ASR 未就绪与已完成但无新增文字分别记录，无新增文字不等于声学静音。
+3. **交付 Context 接口**：按稳定 `turn_id` 持续写入转写，不等待 `user_complete`；验证窗口重叠、修订和控制器重置不会造成漏字、重复文本或新建话轮。提供快照与游标读取，核查幂等、乱序、关闭及 EOF 分离，见[接口合同](dev/SoulX-Duplug/shared_context_interface.md)。
+4. **打通表达与打断**：明确状态输入编码、Layer 1 生成边界和直接打断接口，验证输出标识失效、停播确认及新输出恢复；旧 DuplexCascade 控制不能与新路径重复执行。
+5. **接入思考并验证重叠**：在研究模块细节确认后，验证用户未说完时转写已可读、Layer 1 可请求思考、Layer 2 可回写结果，前端与表达／思考能够重叠执行。前端 CoT 条件化仍属于后续适配与训练，不是首版链路的先决条件。
+6. **后续评估 Nemotron**：完整链路可运行后，再处理持续 ASR 与 SoulX 的音频／文本对齐、词内增量及缓存衔接，并比较实际文本交付、状态质量和组合延迟。
 
-160ms 是 ASR 名义分块，不是组合延迟承诺。若触发 SenseVoiceSmall 回退，先独立冻结配置、转写修订及 Context 映射，不在活动话轮中热切换。
+窗口调用下的在线转写不等于原生流式 ASR，160ms 也不是组合延迟承诺。上述为后续实施顺序，本次仅修改设计。此前 [Easy Turn 英文集方案](dev/SoulX-Duplug/quality_test.md)保留为 Nemotron 历史设计，不能直接套用首版；其测试范围与验收结论不扩大为完整表达、思考或打断验收。后续替换 ASR 时独立冻结来源、修订及 Context 映射，不在活动话轮中热切换。
 
 ## 3. 后续研究模块
 

@@ -1,6 +1,6 @@
-# SoulX-Duplug＋Nemotron：公开英文集质量与延迟测试
+# SoulX-Duplug＋Nemotron：公开英文集测试历史设计
 
-2026-10-29 当前选型：用户已决定采用 SoulX-Duplug；[ASR 调研](asr_adapter_assessment.md)支持优先适配 Nemotron EN160，适配失败或组合实测不满足后续确认要求时回退 SenseVoiceSmall。本文保留此前 617 条公开英文集验证设计，尚未重新确认执行或提交作业；TextTurn 的 no-voice、动作编码和训练门槛不作为本组合合同。
+2026-10-29 状态：用户已确认首版采用 SoulX-Duplug＋SenseVoiceSmall 语音前端，以先打通链路，后续再评估 Nemotron，见[选型说明](asr_adapter_assessment.md)。本文下述 Nemotron 参数、步骤和资源估计仅保留为此前 617 条公开英文集测试的历史设计，尚未实施，不作为首版执行配置。若复用该测试集，须先冻结 SenseVoiceSmall 版本、窗口转写与修订、Context 映射及资源预检，不能直接套用下文“不加载 SenseVoice”等约定。执行仍待重新确认；TextTurn 的 no-voice、动作编码和训练门槛不作为本组合合同。
 
 本文为 2026-10-24 已确认、现待重新确认执行的验证设计；适配和测试尚未实施。范围仅为单一组合、单一公开集，自建场景、额外开发集、200 条抽样及四类交互预算已撤回。路线入口见[README](README.md)。
 
