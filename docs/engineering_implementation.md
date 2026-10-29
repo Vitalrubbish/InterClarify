@@ -1,5 +1,9 @@
 # 工程实施计划
 
+2026-10-29 当前设计：话轮控制器选用 SoulX-Duplug，ASR 优先 Nemotron EN160，适配失败或实测不满足要求时回退 SenseVoiceSmall，依据见[适配调研](dev/SoulX-Duplug/asr_adapter_assessment.md)。当前保留原生五类用户状态，由唯一输出运行时结合 Listen/Speak 映射执行，具体映射待逐项确认。下方 XTurnix／TextTurn 的专属协议、工作单和训练参数为历史设计，不作为 SoulX 实施授权。
+
+用户明确保留后续音频 token、转写文本 token 与 CoT token 联合决策的目标，**当前暂不实现**。本轮只更新文档，不新增 CoT 注入接口、special token、模型参数、训练数据或远端任务；后续输入格式、缓存、触发与训练以[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)为准，不能直接照搬下方第 4.2 节的旧文本控制器方案。
+
 2026-10-25 最新修订：按用户要求，TT-001重建480ms控制窗；User随机1—2 token／窗，Assistant每窗8 token模拟生成，播放尾窗及下一轮开口等待分开处理。Nemotron底层160ms解码及每次转写写入Context保留；TT-003后续实现三步聚合，并记录新增等待。此前160ms控制触发约定由此替代，现役运行时不在本轮修改范围内。
 
 2026-10-24 路线建立记录：按用户指令新增 [TextTurn](dev/TextTurn/README.md)，采用 Nemotron EN160＋Qwen3-0.6B 文本控制器，复用旧 UltraChat 四类轨迹重建动作监督。无新增 ASR 文本直接作为带延迟静音，不另加 VAD 或补偿。基模、训练方法及通过门槛统一见[训练方案](dev/TextTurn/training_plan.md)。已按用户进一步指令建立 [TT-001—004](issue/TextTurn/README.md)：数据、模型、在线接入及四类验收；必要核查并入实现，不单设工程确认任务。当前均待实施，未重建数据、训练或部署；以下 SoulX 及 XTurnix 内容为此前方案，不继续自动推进。用户已要求的 Shared Context 下游转写接口随新路线保留。
