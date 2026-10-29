@@ -1,6 +1,6 @@
 # SoulX-Duplug 路线
 
-更新：2026-10-29。用户确认以 **SoulX-Duplug＋SenseVoiceSmall 作为语音前端**，位于 Layer 0–Layer 2 输入侧。为先打通链路，首版沿用官方配套 ASR，后续再评估 Nemotron，见[选型说明](asr_adapter_assessment.md)。新组合尚未实现或切换运行时，延迟收益仍需实测。
+更新：2026-10-29。用户确认以 **SoulX-Duplug＋SenseVoiceSmall 作为语音前端**，位于 Layer 0–Layer 2 输入侧。为先打通链路，首版沿用官方配套 ASR，后续再评估 Nemotron，见[选型说明](asr_adapter_assessment.md)。独立前端写入已实现并完成少量音频检查，尚未切换现役Agent。
 
 ## 已确认合同
 
@@ -13,12 +13,12 @@
 
 ## 验证设计与实施状态
 
-本轮完成[ASR 前端设计](asr_frontend_design.md)，涵盖源码采集位置、原始文本与标签保全、滑窗修订、五状态及其文本依据、SharedContext 事务与消费顺序。设计采用同一来源的原始／正文／控制视图，窗口无法唯一拼合时显式报告缺口；现有服务返回包及 TextTurn 的旧 Context 均不能直接满足合同。设计完成不代表已实现或通过实时测试。
+已按[ASR 前端设计](asr_frontend_design.md)实现原始文本与标签保全、滑窗修订、五状态及其文本依据、SharedContext事务与独立消费者。六视图实时回放中145次ASR与299条状态写入一致，两个消费者各读取912事件；2个非静音视图关闭时仍有gap，低音量原幅度识别明显较差，backchannel实际音频预测未覆盖。结果、失败修复及延迟见[实现与检查报告](../../../reports/soulx/20261029-shared-context/README.md)，不能据此宣称识别或五状态语义质量全面通过。
 
-已登录贵州 HPC 确认并复用 TurnControlComparison 的两组模型、冻结源码和共用 conda；ParaThink 独立单卡检查已完成，SoulX 加载／静音前向与 SenseVoice 英文识别通过，退出码 0，见[部署说明](deployment.md)和[实际报告](../../../reports/soulx/20261029-frontend-deployment/README.md)。Context、状态输入和播放仍待接入，不继承其他项目的 `speak` 动作映射。
+已登录贵州 HPC 确认并复用 TurnControlComparison 的两组模型、冻结源码和共用 conda；最初单卡组件加载检查见[部署说明](deployment.md)和[部署报告](../../../reports/soulx/20261029-frontend-deployment/README.md)。随后已提供独立Context实现及状态事件；Layer 1状态token编码、下游模型和真实播放仍待接入，不继承其他项目的 `speak` 动作映射。
 
 此前[质量测试方案](quality_test.md)保留为 Nemotron 历史设计：全量回放英文 Easy Turn 集共 617 条，仅评价 Listen 影子观察与 Context 接口，不包含下游 LLM 或实际播放。首版 ASR 已调整，该方案不能直接执行；若后续复用数据集，须先冻结 SenseVoiceSmall 配置与窗口转写合同，执行另行确认。
 
-首版需验证窗口转写到话轮快照的映射、文本修订、控制器重置后的历史保留，以及中间文字能否及时送达 Layer 1/2。Nemotron 的音频观察配对、词内增量和缓存适配留待后续。此前自建场景、额外开发集和 200 条抽样方案已撤回；TextTurn／XTurnix 仅保留历史协议与证据，不继承其专属输入、动作 token 或训练门槛。
+首版已用实际只读消费者核对话轮快照、修订、重置历史和中间文字可读，仍需区分正文覆盖与接口搬运。Nemotron 的音频观察配对、词内增量和缓存适配留待后续。此前自建场景、额外开发集和200条抽样方案已撤回；TextTurn／XTurnix仅保留历史协议与证据，不继承其专属输入、动作token或训练门槛。
 
-实施顺序及资源见[工程计划](../../engineering_implementation.md)。后续按明确指令建立工作单，代码、配置及少量契约测试同步维护同路径中文说明；本次文档整理不启动远端作业或训练。
+实施顺序及资源见[工程计划](../../engineering_implementation.md)，本轮输入与执行范围见[检查任务说明](frontend_audio_check.md)。实现及少量契约测试均有同路径中文说明；工作单仅按明确建单指令建立，本次没有新建issue或训练。

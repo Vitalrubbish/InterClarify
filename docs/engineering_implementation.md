@@ -1,6 +1,6 @@
 # 工程实施计划
 
-更新：2026-10-29。本文按已确认的 SoulX-Duplug 路线维护实施顺序；研究范围和模块合同分别见[研究方案](research_design.md)与[架构设计](research_design/architecture.md)。已复用 TurnControlComparison 资产完成独立远端加载检查，SoulX 与 SenseVoice 组件通过，见[部署说明](dev/SoulX-Duplug/deployment.md)。新 Context、状态与输出链路尚未接入，不启动训练或历史 benchmark。
+更新：2026-10-29。本文按已确认的SoulX-Duplug路线维护实施顺序；研究范围和模块合同分别见[研究方案](research_design.md)与[架构设计](research_design/architecture.md)。已复用TurnControlComparison资产完成组件加载及独立前端Context实现，六视图实时写入检查见[报告](../reports/soulx/20261029-shared-context/README.md)。下游状态token编码、LLM与真实输出尚未接入，现役Agent未切换，不启动训练或历史benchmark。
 
 ## 1. 运行底座与目标
 
@@ -20,13 +20,13 @@
 ## 2. 前端适配顺序
 
 1. **冻结首版资产**：已复用 SoulX、SenseVoiceSmall 及 conda，英文 `language=en`；远端单卡最小加载检查通过，版本与资源记录见[报告](../reports/soulx/20261029-frontend-deployment/README.md)。未升级现役 ASR/TTS 环境，后续接口验证仍须独立核算资源。
-2. **接通语音前端**：沿用官方音频编码、ASR 门控、窗口识别及差分／缓存修订路径，将同一来源的中间转写整理为话轮快照。[ASR 前端设计](dev/SoulX-Duplug/asr_frontend_design.md)已完成，明确后处理前的来源采集、正文与控制视图区分、滑窗缺口及五状态因果引用；代码尚未实现。ASR 未就绪与已完成但无新增文字分别记录，无新增文字不等于声学静音。
+2. **接通语音前端**：沿用官方音频编码、ASR门控、窗口识别及差分／缓存修订路径，将同一来源的中间转写整理为话轮快照。[前端设计与实现](dev/SoulX-Duplug/asr_frontend_design.md)已提供来源采集、正文与控制视图区分、滑窗缺口及五状态引用；reset保留未处理输入，ASR实参统一float32。写入一致性通过，正文及模型质量限制按报告披露。
 3. **交付 Context 接口**：按稳定 `turn_id` 持续写入转写，不等待 `user_complete`；验证窗口重叠、修订和控制器重置不会造成漏字、重复文本或新建话轮。提供快照与游标读取，核查幂等、乱序、关闭及 EOF 分离，见[接口合同](dev/SoulX-Duplug/shared_context_interface.md)。
 4. **打通表达与打断**：明确状态输入编码、Layer 1 生成边界和直接打断接口，验证输出标识失效、停播确认及新输出恢复；旧 DuplexCascade 控制不能与新路径重复执行。
 5. **接入思考并验证重叠**：在研究模块细节确认后，验证用户未说完时转写已可读、Layer 1 可请求思考、Layer 2 可回写结果，前端与表达／思考能够重叠执行。前端 CoT 条件化仍属于后续适配与训练，不是首版链路的先决条件。
 6. **后续评估 Nemotron**：完整链路可运行后，再处理持续 ASR 与 SoulX 的音频／文本对齐、词内增量及缓存衔接，并比较实际文本交付、状态质量和组合延迟。
 
-窗口调用下的在线转写不等于原生流式 ASR，160ms 也不是组合延迟承诺。当前只完成第 1 步的资产复用与组件检查，其余接入按上列顺序继续。此前 [Easy Turn 英文集方案](dev/SoulX-Duplug/quality_test.md)保留为 Nemotron 历史设计，不能直接套用首版；其测试范围与验收结论不扩大为完整表达、思考或打断验收。后续替换 ASR 时独立冻结来源、修订及 Context 映射，不在活动话轮中热切换。
+窗口调用下的在线转写不等于原生流式ASR，160ms也不是组合延迟承诺。第1步已完成；第2／3步已提供独立实现，并用实际只读消费者验证，剩余正文缺口、低音量识别及未覆盖状态保留。第4步之后的下游接入尚未实施。此前[Easy Turn英文集方案](dev/SoulX-Duplug/quality_test.md)保留为Nemotron历史设计，不能直接套用首版；本轮结果不扩大为完整表达、思考或实际播放验收。后续替换ASR时独立冻结来源、修订及Context映射，不在活动话轮中热切换。
 
 ## 3. 后续研究模块
 

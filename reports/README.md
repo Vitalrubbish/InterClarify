@@ -2,6 +2,12 @@
 
 Git只保留审阅后的README汇总：结论、关键分母、限制、源码／模型版本和原始产物位置。逐例JSON／CSV、trace、样本正文、资源采样与完整manifest保存在远端run及本地artifacts，不再推送到GitHub，也不使用git add -f绕过此规则。
 
+## 当前SoulX前端结果
+
+| 报告 | 状态与用途 |
+| --- | --- |
+| [SharedContext实现与音频检查](soulx/20261029-shared-context/README.md) | 六视图实时回放完成，145次ASR／299条状态／每消费者912事件一致；2个非静音视图仍有正文缺口，backchannel音频预测未覆盖 |
+
 ## 当前TextTurn结果
 
 | 报告 | 状态与用途 |

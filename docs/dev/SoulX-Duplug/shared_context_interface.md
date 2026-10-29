@@ -1,10 +1,10 @@
 # 每个用户话轮的转写与 Shared Context 接口
 
-2026-10-29 当前选型：用户确认首版采用 SoulX-Duplug＋SenseVoiceSmall 语音前端，先打通链路，后续再评估 Nemotron，见[选型说明](asr_adapter_assessment.md)。本接口按版本化话轮快照组织，不预设文本只能追加；尚未实现。TextTurn 的 `no-voice` 不属于本接口正文，也不能代替 SoulX 音频判断。
+2026-10-29 当前选型：用户确认首版采用 SoulX-Duplug＋SenseVoiceSmall 语音前端，先打通链路，后续再评估 Nemotron，见[选型说明](asr_adapter_assessment.md)。本接口按版本化话轮快照组织，不预设文本只能追加；[独立实现](../../scripts/runtime/shared_context.md)与六视图音频写入检查已完成，结果见[报告](../../../reports/soulx/20261029-shared-context/README.md)。现役Agent尚未切换。TextTurn的`no-voice`不属于本接口正文，也不能代替SoulX音频判断。
 
 适用于 [SoulX-Duplug 路线](README.md)；Shared Context 即架构中的共享 Context，不另设第二份权威转写。
 
-本轮已完成[ASR 前端设计](asr_frontend_design.md)：明确原始识别／标签与五状态的采集位置、保守窗口对齐、统一事件事务及延迟观测。本文维护下游接口，详细源头和算法以该设计为准。项目已有 `scripts/runtime/textturn_context.py` 仍是仅接受 Nemotron 及前缀追加的历史实现，不能据此声称本接口已实现。
+原始识别／标签与五状态的采集位置、窗口对齐、统一事件事务及延迟观测见[ASR前端设计](asr_frontend_design.md)。本文维护下游接口，详细源头和算法以该设计为准。新通用实现为`scripts/runtime/shared_context.py`；`scripts/runtime/textturn_context.py`仍按Nemotron历史合同工作。
 
 ## 1. 写入时机与话轮标识
 
@@ -43,7 +43,7 @@ SoulX 原生五类用户状态另外作为状态 token 送入 Layer 1，保留�
 
 ## 3. 对外方法与更新规则
 
-以下是拟实现的逻辑接口，不代表已有函数、HTTP 服务或网络协议。
+以下逻辑接口已提供进程内实现，不代表已有HTTP服务或网络协议。`get_user_turn()`还支持已保留的`at_event_seq`历史读取；未来或已回收水位明确失败。
 
 | 接口 | 核心作用 |
 | --- | --- |
