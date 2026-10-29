@@ -14,7 +14,6 @@ import sys
 import threading
 import time
 import traceback
-import wave
 
 sys.path.insert(0, str(Path(__file__).parents[1] / 'runtime'))
 from shared_context import FrontendConsumer, SharedContext, STATE_IDS
@@ -27,11 +26,11 @@ LOADER_SHA256 = 'da9602cf09f30e42cdd9b7f43fd81b7519255bf0eb0161bc4af0372efe0e190
 
 
 def prepare_manifest(root, target):
+    import soundfile as sf
     audio = root.parent / 'interclarify-xturnix-fleurs/dataset/fleurs_en_us/audio/dev/786465049904960526.wav'
     if hashlib.sha256(audio.read_bytes()).hexdigest() != PROBE_SHA256:
         raise ValueError('Development audio digest differs')
-    with wave.open(str(audio)) as stream:
-        duration = stream.getnframes() / stream.getframerate()
+    duration = sf.info(str(audio)).duration
     reference_path = audio.parents[2] / 'source/en_us/dev.tsv'
     rows = [row.split('\t') for row in reference_path.read_text().splitlines() if audio.name in row.split('\t')]
     if len(rows) != 1:

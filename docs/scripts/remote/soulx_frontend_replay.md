@@ -2,6 +2,8 @@
 
 对应 `scripts/remote/soulx_frontend_replay.py`。`prepare_manifest()` 在轻量 CPU 阶段冻结既有 FLEURS 开发录音摘要、参考文本、完整／截断／重复／静音视图和资源边界。仅一个开发说话来源，派生视图不是独立音频样本集，不属于 benchmark。
 
+开发 WAV 为浮点格式，manifest 用 libsndfile 的只读元数据接口取得时长，避免 Python 3.11 的 `wave` 不支持该格式。该阶段不导入模型、不做推理。
+
 `main()` 校验并复用冻结加载器，在调度 GPU 和既有 conda 中加载模型；三块静音预热后逐样本重新 reset。`replay_case()` 用独立接收线程按80ms真实时间送包，一个模型在途，800ms积压触限失败；合成尾部标记来源，EOF不补造完成状态。
 
 `CaseAudit` 在前端发布前保存原始来源，在提交后让两个独立 `FrontendConsumer` 读取，逐项核对原始generate文本、标签跨度、正文patch、五状态及依据、关闭文本。文件分别保留来源审核和消费者实际读取。停止回调使用输出替身，只检查投递，不宣称真实停播。
