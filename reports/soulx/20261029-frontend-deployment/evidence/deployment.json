@@ -1,0 +1,23 @@
+{
+  "created_at": "2026-10-29T13:20:19.802420+00:00",
+  "asset_root": "/hpc_stor03/sjtu_home/xuan.zhang/turncontrol-comparison",
+  "check_source": "/hpc_stor03/sjtu_home/xuan.zhang/turncontrol-comparison/source/6de0d70",
+  "conda_prefix": "/hpc_stor03/sjtu_home/xuan.zhang/turncontrol-comparison/envs/soulx",
+  "soulx_revision": "61701c4ab8193cc1ee2220d3848872ac6c720142",
+  "sensevoice_revision": "3847d57b6bdf2dd8875cb1508d2af43d80a16bf7",
+  "upstream_revision": "a0b9063843df69619b087b95b74597b2176910b8",
+  "revision_source": "current shared download manifest and file-size checks; no new full-weight hash audit",
+  "asset_manifest_sha256": {
+    "download_plan.json": "d1253541037d477f60101946e2f092bec4d0e182724300e7549ce2fcbb42c96d",
+    "download_verification.json": "61415c9e35b65e71697ebc0c250996618edc2528e00e0929fd52cd9a829937f4"
+  },
+  "scope": "component loading and forward checks; no Context, LLM, TTS or benchmark",
+  "limits": {
+    "gpu": 1,
+    "cpu": 4,
+    "ram_gib": 32,
+    "per_component_seconds": 400,
+    "overall_seconds": 900,
+    "result_budget_gib": 2
+  }
+}

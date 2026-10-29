@@ -1,0 +1,11 @@
+INFO:lightning_fabric.utilities.seed:[rank: 0] Seed set to 42
+Apply block causal attention
+block size: 12
+setting up audio projector...
+setting up lora model...
+loading state dict from /hpc_stor03/sjtu_home/xuan.zhang/turncontrol-comparison/models/soulx-duplug/SoulX-Duplug/SoulX-Duplug-0.6B-Bilingual.pth...
+load_state_dict failed: Error(s) in loading state_dict for State_Prediction_Model:
+	Unexpected key(s) in state_dict: "embed_tokens_func.weight". . Retry with strict=False
+funasr version: 1.2.6.
+[DuplexServer] Model loaded successfully.
+{"component": "soulx", "passed": true, "elapsed_seconds": 72.09904039278626}
