@@ -4,7 +4,7 @@
 
 ParaThink 研究独立 thinking 流在语音 Agent 倾听与表达期间持续工作带来的优势，工作包括 Agent 框架、边听边想与边说边想两组 benchmark，以及大规模对话数据与训练。研究背景、目标、参考文章和三篇子文档见 [docs/research_design.md](docs/research_design.md)，工程安排见 [docs/engineering_implementation.md](docs/engineering_implementation.md)。
 
-当前设计采用 **SoulX-Duplug**，ASR 优先适配 Nemotron EN160，失败或组合实测不满足后续确认要求时回退 SenseVoiceSmall。五类用户状态送入 Layer 1，仅有效用户打断额外直接停止活动输出；具体合同见[架构设计](docs/research_design/architecture.md)。新链路尚未接入，已采用的运行底座仍为 DuplexCascade、Nemotron、Kokoro 与 [X-Talk fork](https://github.com/Vitalrubbish/xtalk) `ca9b23c`。
+当前设计采用 **SoulX-Duplug＋SenseVoiceSmall 语音前端**，先打通链路，后续评估 Nemotron；[ASR 前端设计](docs/dev/SoulX-Duplug/asr_frontend_design.md)说明转写与 special token 如何写入 SharedContext。五类用户状态送入 Layer 1，仅有效用户打断额外直接停止活动输出；具体合同见[架构设计](docs/research_design/architecture.md)。新链路尚未接入，已采用的运行底座仍为 DuplexCascade、Nemotron、Kokoro 与 [X-Talk fork](https://github.com/Vitalrubbish/xtalk) `ca9b23c`。
 
 | 内容 | 位置 |
 | --- | --- |

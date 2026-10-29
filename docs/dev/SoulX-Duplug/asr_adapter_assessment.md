@@ -2,6 +2,8 @@
 
 更新：2026-10-29。首版选型按用户确认改为 SenseVoiceSmall，以先打通 SoulX-Duplug 语音前端与下游链路；Nemotron 适配留待后续评估。本文保留此前依据官方源码和已有服务完成的 Nemotron 可行性分析，没有运行组合模型，不代表端到端延迟验收。
 
+SenseVoice 首版的具体接入已在[ASR 前端设计](asr_frontend_design.md)细化：须在后处理前采集原始结果与标签，在状态合并／reset 前采集五状态；服务增量仅作为控制视图线索，正文通过独立的原始字符映射与保守对齐维护。该设计不改变本页选型，也不将窗口调用宣称为原生流式 ASR。
+
 ## 1. 选型结论
 
 **首版使用官方配套 SenseVoiceSmall，完整链路可运行后再评估 Nemotron。** SoulX-Duplug 与 SenseVoiceSmall 整体归入语音前端，包含音频编码、ASR 调用、文本整理和五状态预测，位于 Layer 0–Layer 2 输入侧。此次调整将快速验证框架放在前面，减少首轮持续 ASR 与 SoulX 的音频／文本及缓存适配工作；不能据此宣称 SenseVoiceSmall 的延迟或识别质量更优。

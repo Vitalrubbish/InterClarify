@@ -13,6 +13,8 @@
 
 ## 验证设计与实施状态
 
+本轮完成[ASR 前端设计](asr_frontend_design.md)，涵盖源码采集位置、原始文本与标签保全、滑窗修订、五状态及其文本依据、SharedContext 事务与消费顺序。设计采用同一来源的原始／正文／控制视图，窗口无法唯一拼合时显式报告缺口；现有服务返回包及 TextTurn 的旧 Context 均不能直接满足合同。设计完成不代表已实现或通过实时测试。
+
 已登录贵州 HPC 确认并复用 TurnControlComparison 的两组模型、冻结源码和共用 conda；ParaThink 独立单卡检查已完成，SoulX 加载／静音前向与 SenseVoice 英文识别通过，退出码 0，见[部署说明](deployment.md)和[实际报告](../../../reports/soulx/20261029-frontend-deployment/README.md)。Context、状态输入和播放仍待接入，不继承其他项目的 `speak` 动作映射。
 
 此前[质量测试方案](quality_test.md)保留为 Nemotron 历史设计：全量回放英文 Easy Turn 集共 617 条，仅评价 Listen 影子观察与 Context 接口，不包含下游 LLM 或实际播放。首版 ASR 已调整，该方案不能直接执行；若后续复用数据集，须先冻结 SenseVoiceSmall 配置与窗口转写合同，执行另行确认。
