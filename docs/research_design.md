@@ -2,9 +2,9 @@
 
 2026-10-29 当前选型：用户决定采用 **SoulX-Duplug 话轮控制器**。按“Nemotron 可低延迟适配则使用，否则改用 SenseVoiceSmall”的指令，[调研](dev/SoulX-Duplug/asr_adapter_assessment.md)支持优先采用 Nemotron EN160，SenseVoiceSmall 作为适配失败或组合实测不满足要求时的回退。这是接口与计算路径的可行性判断，尚无组合延迟或状态质量实测，不表示运行时已经切换。
 
-用户进一步确认：保留 CoT 条件下的主动澄清与话轮决策目标，后续让 SoulX-Duplug 联合读取音频 token、转写文本 token 和 Layer 2 已发布的 CoT token；当前不实现这项扩展。当前阶段保留原生五类用户状态，由唯一输出运行时结合 Listen/Speak 映射执行，后续 CoT 阶段是否扩展输出另行设计。具体输入合同见[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
+用户进一步确认：保留 CoT 条件下的主动澄清与话轮决策目标，后续让 SoulX-Duplug 联合读取音频 token、转写文本 token 和 Layer 2 已发布的 CoT token；当前不实现这项扩展。当前保留原生五类用户状态 token，全部送入 Layer 1，由 LLM 决定自身行为；普通正式回答在当前 turn 看到对应的 `user_complete` 后开始生成，看到之前不生成正文。后续 CoT 阶段是否扩展控制器输出另行设计，见[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
 
-研究任务与单一仲裁执行点、单一 TTS 播放所有权及已听内容不可撤销的边界保持。各用户状态到运行时动作的具体映射及 Layer 3 定位待后续逐项讨论。下列 TextTurn 修订为历史记录，其静音代理、动作编码和训练参数不自动成为 SoulX 合同；既有工作单与作业状态也不因本次选型被重写或恢复。
+研究任务与单一仲裁执行点、单一 TTS 播放所有权及已听内容不可撤销的边界保持。仅有效用户打断额外进入输出运行时：活动输出期间 `user_nonidle` 立即触发停止，涵盖准备与播放。其他状态不进入输出运行时，不映射成 start 或 keep；`user_complete` 不额外发起 LLM 回答调用，`user_backchannel` 由 LLM 读取并决定表达行为。具体路径见[架构第 2.2 节](research_design/architecture.md#22-前端状态与系统附和)。状态输入编码与 Layer 3 定位待后续讨论。下列 TextTurn 修订为历史记录，其专属协议不自动成为 SoulX 合同；既有工作单与作业状态不因本次选型被重写或恢复。
 
 <details>
 <summary>2026-10-24—27 TextTurn 路线与训练修订历史</summary>

@@ -1,5 +1,7 @@
 # 架构图绘制说明
 
+2026-10-29 状态说明：本页所述 TeX 与预览仍是旧 XTurnix 方案，尚未按 SoulX 路线重绘。当前确认的合同是五类状态 token 送 Layer 1，由 LLM 决定自身行为；仅有效用户打断额外直接进入唯一输出执行点。`user_complete` 不触发独立 LLM 调用，`user_backchannel` 不映射成运行时 keep。当前路径以[架构第 2.2 节及其流程图](../research_design/architecture.md#22-前端状态与系统附和)为准，下文旧控制箭头及 start 恢复流程不作为当前合同。
+
 项目名称已更新为 ParaThink，图源与预览文件统一使用 `parathink_method` 前缀，相关链接同步更新。
 
 对应文件：[figures/parathink_method.tex](../../figures/parathink_method.tex)。更新：2026-10-23。

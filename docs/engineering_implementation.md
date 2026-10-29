@@ -1,6 +1,6 @@
 # 工程实施计划
 
-2026-10-29 当前设计：话轮控制器选用 SoulX-Duplug，ASR 优先 Nemotron EN160，适配失败或实测不满足要求时回退 SenseVoiceSmall，依据见[适配调研](dev/SoulX-Duplug/asr_adapter_assessment.md)。当前保留原生五类用户状态，由唯一输出运行时结合 Listen/Speak 映射执行，具体映射待逐项确认。下方 XTurnix／TextTurn 的专属协议、工作单和训练参数为历史设计，不作为 SoulX 实施授权。
+2026-10-29 当前设计：话轮控制器选用 SoulX-Duplug，ASR 优先 Nemotron EN160，适配失败或实测不满足要求时回退 SenseVoiceSmall，依据见[适配调研](dev/SoulX-Duplug/asr_adapter_assessment.md)。当前五类状态 token 全部送给 Layer 1，由 LLM 决定自身行为；普通正式回答在当前 turn 看到 `user_complete` 后开始生成，看到之前不生成正文。仅有效用户打断额外直接停止活动输出，其他状态不进入输出运行时，不转换成 start 或 keep，见[架构第 2.2 节](research_design/architecture.md#22-前端状态与系统附和)。下方 XTurnix／TextTurn 的专属协议、工作单和训练参数为历史设计，不作为 SoulX 实施授权。
 
 用户明确保留后续音频 token、转写文本 token 与 CoT token 联合决策的目标，**当前暂不实现**。本轮只更新文档，不新增 CoT 注入接口、special token、模型参数、训练数据或远端任务；后续输入格式、缓存、触发与训练以[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)为准，不能直接照搬下方第 4.2 节的旧文本控制器方案。
 
