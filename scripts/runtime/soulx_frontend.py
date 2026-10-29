@@ -169,7 +169,7 @@ class SoulXFrontend:
         return {'schema_version': 1, 'event_id': f'{self.session_id}:{self.turn_id}:{self.producer_seq}',
                 'kind': kind, 'session_id': self.session_id, 'turn_id': self.turn_id,
                 'source': source, 'producer_seq': self.producer_seq,
-                'producer_id': self.session_id + ':frontend',
+                'producer_id': f'{self.session_id}:{self.turn_id}:frontend',
                 'asr_generation': self.asr_generation, 'controller_generation': self.controller_generation,
                 'received_at': time.monotonic(), 'clock_id': self.clock_id, **payload}
 
@@ -285,7 +285,7 @@ class SoulXFrontend:
         except Exception as exc:
             error = f'{type(exc).__name__}: {exc}'
         returned = time.monotonic()
-        self.observe_asr(raw, spans, call_id=call_id,
+        self.observe_asr(raw, spans, asr_call_id=call_id,
                          call_kind='window' if self._in_asr else 'turn',
                          call_status='error' if error else 'ok', error=error,
                          asr_started_at=started, asr_returned_at=returned,
@@ -440,9 +440,11 @@ class SoulXFrontend:
         self._commit([event])
         self.snapshot, self.closed, self.delivery_phase = event, True, 'drain'
 
-    def detach(self):
-        if not self.closed:
+    def detach(self, *, aborted=False):
+        if not self.closed and not aborted:
             raise ValueError('Close the logical turn before detaching capture hooks')
+        if aborted:
+            self.closed, self.delivery_phase = True, 'drain'
         for name, method in self._original.items():
             setattr(self.model, name, method)
         self.model.cascade_asr.recognize = self._original_recognize

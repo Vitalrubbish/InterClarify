@@ -42,13 +42,20 @@ def prepare_manifest(root, target):
         {'case_id': 'calibrated_repeat', 'gain': 'rms_005_peak_09', 'seconds': duration, 'repeat': 2, 'tail_seconds': 1.6},
         {'case_id': 'silence', 'gain': 'none', 'seconds': 2, 'repeat': 1, 'tail_seconds': 0},
     ]
+    extra = root / 'models/sensevoice-small/example/en.mp3'
+    if extra.is_file():
+        info = sf.info(str(extra))
+        cases.append({'case_id': 'sensevoice_english', 'gain': 'rms_005_peak_09',
+                      'seconds': min(10., info.duration), 'repeat': 1, 'tail_seconds': 1.6,
+                      'audio_path': str(extra), 'audio_sha256': hashlib.sha256(extra.read_bytes()).hexdigest(),
+                      'native_sample_rate': info.samplerate, 'source': 'frozen SenseVoiceSmall official example'})
     manifest = {'schema': 'soulx-frontend-development-audio-v1', 'created_at': datetime.now(timezone.utc).isoformat(),
                 'audio_path': str(audio), 'audio_sha256': PROBE_SHA256, 'reference_text': rows[0][2],
                 'reference_source_sha256': hashlib.sha256(reference_path.read_bytes()).hexdigest(),
                 'source_revision': '70bb2e84b976b7e960aa89f1c648e09c59f894dd', 'cases': cases,
                 'limits': {'gpu': 1, 'cpu': 4, 'ram_gib': 32, 'seconds': 1200,
                            'pcm_bytes': 4194304, 'audio_queue_ms': 800, 'output_bytes': 134217728},
-                'scope': 'one existing development recording and explicit derived views; not independent speakers or benchmark'}
+                'scope': 'existing development recording, derived views, and optional bundled English example; not a benchmark'}
     with target.open('x') as output:
         json.dump(manifest, output, ensure_ascii=False, indent=2)
         output.write('\n')
@@ -211,9 +218,12 @@ def replay_case(model, samples, real_count, case, output):
                 'stop_requests': stopped, 'ingress': ingress}
     finally:
         if frontend:
-            if not frontend.closed:
-                frontend.close_turn('case_failure')
-            frontend.detach()
+            if sys.exc_info()[0] is not None:
+                frontend.detach(aborted=True)
+            else:
+                if not frontend.closed:
+                    frontend.close_turn('runtime_audio_case_end')
+                frontend.detach()
         audit.close()
 
 
@@ -271,16 +281,32 @@ def main():
         with torch.inference_mode():
             for case in manifest['cases']:
                 model.reset()
+                case_audio, case_sr = audio, sr
+                case_gain = gain
+                if case.get('audio_path'):
+                    import soxr
+                    extra = Path(case['audio_path'])
+                    if hashlib.sha256(extra.read_bytes()).hexdigest() != case['audio_sha256']:
+                        raise ValueError('Additional audio source digest differs')
+                    case_audio, case_sr = sf.read(extra, dtype='float32')
+                    if case_audio.ndim > 1:
+                        case_audio = case_audio.mean(axis=1)
+                    if case_sr != 16000:
+                        case_audio = soxr.resample(case_audio, case_sr, 16000)
+                    case_sr = 16000
+                    case_gain = min(.05 / float(np.sqrt(np.mean(case_audio.astype(np.float64) ** 2))),
+                                    .9 / float(np.max(np.abs(case_audio))))
                 if case['case_id'] == 'silence':
                     samples = np.zeros(int(case['seconds'] * sr), dtype=np.float32)
                 else:
-                    samples = np.tile(audio[:round(case['seconds'] * sr)], case['repeat'])
+                    samples = np.tile(case_audio[:round(case['seconds'] * case_sr)], case['repeat'])
                     if case['gain'] != 'original':
-                        samples = (samples * gain).astype(np.float32)
+                        samples = (samples * case_gain).astype(np.float32)
                 real_count = len(samples)
                 samples = np.concatenate([samples, np.zeros(round(case['tail_seconds'] * sr), dtype=np.float32)])
                 try:
                     record = replay_case(model, samples, real_count, case, args.output)
+                    record['applied_gain'] = case_gain if case['gain'] not in ('original', 'none') else 1.
                 except Exception as exc:
                     record = {'case_id': case['case_id'], 'passed': False,
                               'error': f'{type(exc).__name__}: {exc}', 'traceback': traceback.format_exc()}

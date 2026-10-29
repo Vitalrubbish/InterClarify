@@ -81,6 +81,21 @@ class SoulXFrontendTests(unittest.TestCase):
         frontend.observe_asr('<|en|>late', observation('')['audio_spans'], asr_call_id='c', call_kind='turn')
         self.assertEqual(frontend.context.get_user_turn('s', 't')['transcript']['text'], 'hello')
 
+    def test_recognizer_callback_uses_source_call_id_before_postprocessing(self):
+        frontend = protocol_frontend()
+        frontend.call_sequence, frontend._in_asr = 0, True
+        frontend._spans = lambda audio: observation('')['audio_spans']
+        raw = '<|en|><|NEUTRAL|><|Speech|><|withitn|>The. 123.'
+        frontend.model = SimpleNamespace(cascade_asr=SimpleNamespace(
+            language='en', sensevoice_model=SimpleNamespace(generate=lambda **kwargs: [{'text': raw}]),
+            clean_sensevoice_text=lambda text: text,
+            rich_transcription_postprocess=lambda text: 'CONTROL'))
+        self.assertEqual(frontend._recognize(object()), 'CONTROL')
+        events = frontend.context.read_frontend_updates('s')['updates']
+        source = next(e for e in events if e['kind'] == 'asr_observation')
+        self.assertEqual(source['asr_call_id'], 'g:call:1')
+        self.assertEqual(frontend.snapshot['text'], 'The. 123.')
+
     def test_all_five_tokens_and_far_field_do_not_become_service_actions(self):
         frontend = protocol_frontend()
         frontend.current_chunk, frontend.current_ahead = object(), object()
