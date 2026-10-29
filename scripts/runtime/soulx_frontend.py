@@ -270,9 +270,11 @@ class SoulXFrontend:
         return delta
 
     def _recognize(self, audio, sample_rate=16000, language=None):
+        import numpy as np
         if sample_rate != 16000 or getattr(audio, 'ndim', 1) != 1:
             raise ValueError('Frontend expects mono 16kHz ASR input')
         spans = self._spans(audio)
+        audio = np.asarray(audio, dtype=np.float32)
         self.call_sequence += 1
         call_id = f'{self.asr_generation}:call:{self.call_sequence}'
         started = time.monotonic()
@@ -291,7 +293,7 @@ class SoulXFrontend:
                          call_kind='window' if self._in_asr else 'turn',
                          call_status='error' if error else 'ok', error=error,
                          asr_started_at=started, asr_returned_at=returned,
-                         model_result=result)
+                         model_result=result, asr_input_dtype=str(audio.dtype))
         if error:
             return ''
         native = self.model.cascade_asr

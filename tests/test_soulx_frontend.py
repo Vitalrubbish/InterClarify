@@ -82,15 +82,21 @@ class SoulXFrontendTests(unittest.TestCase):
         self.assertEqual(frontend.context.get_user_turn('s', 't')['transcript']['text'], 'hello')
 
     def test_recognizer_callback_uses_source_call_id_before_postprocessing(self):
+        import numpy as np
         frontend = protocol_frontend()
         frontend.call_sequence, frontend._in_asr = 0, True
         frontend._spans = lambda audio: observation('')['audio_spans']
         raw = '<|en|><|NEUTRAL|><|Speech|><|withitn|>The. 123.'
+        seen = []
+        def generate(**kwargs):
+            seen.append(kwargs['input'].dtype)
+            return [{'text': raw}]
         frontend.model = SimpleNamespace(cascade_asr=SimpleNamespace(
-            language='en', sensevoice_model=SimpleNamespace(generate=lambda **kwargs: [{'text': raw}]),
+            language='en', sensevoice_model=SimpleNamespace(generate=generate),
             clean_sensevoice_text=lambda text: text,
             rich_transcription_postprocess=lambda text: 'CONTROL'))
-        self.assertEqual(frontend._recognize(object()), 'CONTROL')
+        self.assertEqual(frontend._recognize(np.zeros(16000, dtype=np.float64)), 'CONTROL')
+        self.assertEqual(seen, [np.dtype('float32')])
         events = frontend.context.read_frontend_updates('s')['updates']
         source = next(e for e in events if e['kind'] == 'asr_observation')
         self.assertEqual(source['asr_call_id'], 'g:call:1')

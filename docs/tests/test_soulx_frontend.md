@@ -4,4 +4,6 @@
 
 排空分支还检查即使读到原生complete，也只保存诊断，不作为在线有效完成状态。
 
+真实识别回调测试从float64缓存输入，验证generate实际收到float32，并核对调用ID及原文发布。
+
 运行：`python -m unittest discover -s tests -p 'test_soulx_frontend.py' -v`。全部五状态的协议覆盖不等于音频模型覆盖；真实预测另由远端回放报告。

@@ -29,7 +29,8 @@ sha256sum "$SOURCE"/scripts/runtime/{shared_context,sensevoice_transcript,soulx_
   "$SOURCE/scripts/remote/soulx_frontend_replay.py" "$MANIFEST" > "$RUN/source.sha256"
 "$PREFIX/bin/python" -B "$SOURCE/scripts/remote/soulx_frontend_replay.py" \
   --root "$ASSET_ROOT" --check-source "$ASSET_ROOT/source/6de0d70" \
-  --manifest "$RUN/audio_manifest.json" --output "$RUN/replay" > "$RUN/replay.log" 2>&1 &
+  --manifest "$RUN/audio_manifest.json" --output "$RUN/replay" \
+  --timing-mode "${SOULX_TIMING_MODE:-realtime}" > "$RUN/replay.log" 2>&1 &
 REPLAY_PID=$!
 cleanup() { kill "$REPLAY_PID" 2>/dev/null || true; wait "$REPLAY_PID" 2>/dev/null || true; }
 trap 'cleanup; code=1; printf "%s\n" "$code" > "$RUN/exit_code.txt"' TERM INT

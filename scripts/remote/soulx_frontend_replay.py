@@ -131,7 +131,7 @@ def distribution(values):
             'p95_ms': float(np.percentile(values, 95)), 'max_ms': max(values)} if values else {'count': 0}
 
 
-def replay_case(model, samples, real_count, case, output):
+def replay_case(model, samples, real_count, case, output, timing_mode='realtime'):
     import numpy as np
     case_id = case['case_id']
     audit = CaseAudit(case_id, output)
@@ -145,24 +145,27 @@ def replay_case(model, samples, real_count, case, output):
                                  active_output=lambda: {'output_id': case_id + ':output', 'session_id': case_id, 'phase': 'preparing'},
                                  stop_output=lambda event, output_id: stopped.append({'event_id': event['event_id'], 'output_id': output_id, 'at': time.monotonic()}))
         started = time.monotonic()
+        def packets():
+            for offset in range(0, len(samples), 1280):
+                end = min(offset + 1280, len(samples))
+                if stop.wait(max(0, started + end / 16000 - time.monotonic())):
+                    return
+                boundaries = sorted(set([offset, end] + ([real_count] if offset < real_count < end else [])))
+                for begin, finish in zip(boundaries, boundaries[1:]):
+                    yield {'audio': samples[begin:finish].copy(), 'synthetic': begin >= real_count,
+                           'arrived_at': time.monotonic(), 'begin': begin, 'end': finish}
         def feed():
             try:
-                for offset in range(0, len(samples), 1280):
-                    end = min(offset + 1280, len(samples))
-                    if stop.wait(max(0, started + end / 16000 - time.monotonic())):
-                        return
-                    # Derived tail boundaries are aligned to packets by construction.
-                    boundaries = sorted(set([offset, end] + ([real_count] if offset < real_count < end else [])))
-                    for begin, finish in zip(boundaries, boundaries[1:]):
-                        incoming.put_nowait({'audio': samples[begin:finish].copy(),
-                                             'synthetic': begin >= real_count, 'arrived_at': time.monotonic(),
-                                             'begin': begin, 'end': finish})
+                for packet in packets():
+                    incoming.put_nowait(packet)
                 incoming.put({'eof': True}, timeout=3)
             except Exception as exc:
                 failure.append(f'{type(exc).__name__}: {exc}')
                 stop.set()
-        reader = threading.Thread(target=feed, daemon=True)
-        reader.start()
+        reader = threading.Thread(target=feed, daemon=True) if timing_mode == 'realtime' else None
+        iterator = packets() if reader is None else None
+        if reader:
+            reader.start()
         queue_peak_ms = 0
         try:
             while True:
@@ -170,7 +173,7 @@ def replay_case(model, samples, real_count, case, output):
                     raise RuntimeError(f'Audio ingress failed: {failure}')
                 if time.monotonic() - started > 120:
                     raise TimeoutError('Audio case exceeded 120 seconds')
-                item = incoming.get(timeout=5)
+                item = incoming.get(timeout=5) if reader else next(iterator, {'eof': True})
                 if item.get('eof'):
                     break
                 wait_ms = (time.monotonic() - item['arrived_at']) * 1000
@@ -186,9 +189,10 @@ def replay_case(model, samples, real_count, case, output):
                                 'native_result': result})
         finally:
             stop.set()
-            reader.join(timeout=5)
-            if reader.is_alive():
-                raise RuntimeError('Audio ingress thread failed to stop')
+            if reader:
+                reader.join(timeout=5)
+                if reader.is_alive():
+                    raise RuntimeError('Audio ingress thread failed to stop')
         before_close = context.get_user_turn(case_id, 'user-1')['transcript']['text']
         from soulx_frontend import slice_spans
         pending = slice_spans(frontend._spans(model.buffer), model.config.infer_config.input.audio_back_size, len(model.buffer))
@@ -205,6 +209,7 @@ def replay_case(model, samples, real_count, case, output):
         accepted_completes = [v['event_seq'] for v in states if v['accepted'] and v['token'] == '<|user_complete|>']
         first_complete = min(accepted_completes, default=float('inf'))
         return {'case_id': case_id, 'passed': True, 'integrity_passed': True,
+                'timing_mode': timing_mode, 'realtime_claim': timing_mode == 'realtime',
                 'input_samples': len(samples), 'real_samples': real_count,
                 'processed_real_until': frontend.processed_until, 'pending_real_at_close': pending_real,
                 'audio_ingress_sha256': hashlib.sha256(samples.tobytes()).hexdigest(),
@@ -243,6 +248,7 @@ def main():
     parser.add_argument('--manifest', type=Path, required=True)
     parser.add_argument('--output', type=Path)
     parser.add_argument('--prepare-manifest', action='store_true')
+    parser.add_argument('--timing-mode', choices=('realtime', 'causal'), default='realtime')
     args = parser.parse_args()
     if args.prepare_manifest:
         prepare_manifest(args.root, args.manifest)
@@ -255,6 +261,7 @@ def main():
               'manifest_sha256': hashlib.sha256(args.manifest.read_bytes()).hexdigest(),
               'soulx_revision': SOULX_REVISION, 'sensevoice_revision': SENSEVOICE_REVISION,
               'upstream_sha256': UPSTREAM_SHA256, 'cases': [], 'passed': False,
+              'timing_mode': args.timing_mode,
               'source_commit': os.environ.get('SOULX_SOURCE_COMMIT'),
               'packages': {name: importlib.metadata.version(name) for name in ('torch', 'torchaudio', 'transformers', 'funasr', 'numpy')}}
     started = time.monotonic()
@@ -319,7 +326,7 @@ def main():
                 real_count = len(samples)
                 samples = np.concatenate([samples, np.zeros(round(case['tail_seconds'] * sr), dtype=np.float32)])
                 try:
-                    record = replay_case(model, samples, real_count, case, args.output)
+                    record = replay_case(model, samples, real_count, case, args.output, args.timing_mode)
                     record['applied_gain'] = case_gain if case['gain'] not in ('original', 'none') else 1.
                 except Exception as exc:
                     record = {'case_id': case['case_id'], 'passed': False,
