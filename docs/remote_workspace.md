@@ -1,6 +1,6 @@
 # 远端工作目录约定
 
-更新：2026-10-29。本文维护目录与环境位置，历史作业进度统一链接报告；本次未登录服务器，目录存在性和当前作业状态须在执行前核查。
+更新：2026-10-29。本文维护目录与环境位置，历史作业进度统一链接报告；本次已登录贵州 HPC，确认 TurnControlComparison 的 SoulX、SenseVoiceSmall、源码与 conda 目录存在。其他路径和历史作业不由此推断当前状态。
 
 项目现名为 ParaThink。下表中的 `InterClarify`、`interclarify-*` 是已有服务器目录或环境的真实名称，继续保留以兼容现役资产；GitHub 地址与历史报告链接同样保留，未执行远端仓库或目录迁移。新建通用开发环境默认使用 `parathink-dev`。
 
@@ -23,7 +23,10 @@
 | `interclarify-fdb-two-axes-20261021-r4` | FDB 两轴最终结果 |
 | `Full-Duplex-Bench` | 官方 FDB 评分仓库 |
 | `parathink-textturn` | TextTurn独立实验；源码`source/`、冻结集`dataset/`、训练`runs/`、提交日志`submit_logs/` |
-| `parathink-soulx-duplug` | SoulX计划使用的独立根目录，适配尚未实施，不代表目录已创建 |
+| `parathink-soulx-duplug` | ParaThink 前端独立部署与检查根目录，复用下面的资产；状态见[部署记录](dev/SoulX-Duplug/deployment.md) |
+| `turncontrol-comparison/models/soulx-duplug` | 复用 SoulX tokenizer、基座和状态权重，不复制或修改 |
+| `turncontrol-comparison/models/sensevoice-small` | 首版英文 ASR 权重，只读复用 |
+| `turncontrol-comparison/upstream/frozen-20261028/soulx-duplug` | 已核查 `a0b9063` 官方源码，只读复用 |
 
 ## 固定 conda 环境
 
@@ -33,6 +36,7 @@
 | FDB 官方评分 | `~/miniconda3/envs/full-duplex-bench` |
 | ASR 组件 | `~/interclarify-english-integration-20261018-v1/envs/asr` |
 | TTS 组件 | `~/interclarify-english-integration-20261018-v1/envs/tts` |
+| SoulX 与 SenseVoiceSmall | `~/turncontrol-comparison/envs/soulx`，只读复用，不修改该项目依赖 |
 
 `paratalker-dev` 与 `sidecar` 属于其他项目，不纳入 ParaThink 清理。
 

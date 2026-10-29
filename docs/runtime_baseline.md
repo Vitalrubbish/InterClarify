@@ -1,6 +1,6 @@
 # 已采用的运行时配置
 
-更新：2026-10-29。本文记录已采用的运行底座与参数；具体任务配置见 `configs/`，实验结论以对应报告为准。当前目标为 SoulX-Duplug，ASR 优先适配 Nemotron EN160、条件性回退 SenseVoiceSmall，尚未替换现役控制路径，见[架构设计](research_design/architecture.md)。
+更新：2026-10-29。本文记录已采用的运行底座与参数；具体任务配置见 `configs/`，实验结论以对应报告为准。当前目标为 SoulX-Duplug＋SenseVoiceSmall 语音前端，首版先打通链路、后续评估 Nemotron；已有远端资产见[部署说明](dev/SoulX-Duplug/deployment.md)，尚未替换下述现役控制路径，见[架构设计](research_design/architecture.md)。
 
 ## 组件
 

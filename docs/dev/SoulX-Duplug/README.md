@@ -13,6 +13,8 @@
 
 ## 验证设计与实施状态
 
+已登录贵州 HPC 确认 TurnControlComparison 的两组模型、冻结源码和共用 conda 可供复用；ParaThink 独立加载检查入口与运行状态见[部署说明](deployment.md)。组件检查与完整 Context、状态输入和播放接入分别验收，不继承其他项目的 `speak` 动作映射。
+
 此前[质量测试方案](quality_test.md)保留为 Nemotron 历史设计：全量回放英文 Easy Turn 集共 617 条，仅评价 Listen 影子观察与 Context 接口，不包含下游 LLM 或实际播放。首版 ASR 已调整，该方案不能直接执行；若后续复用数据集，须先冻结 SenseVoiceSmall 配置与窗口转写合同，执行另行确认。
 
 首版需验证窗口转写到话轮快照的映射、文本修订、控制器重置后的历史保留，以及中间文字能否及时送达 Layer 1/2。Nemotron 的音频观察配对、词内增量和缓存适配留待后续。此前自建场景、额外开发集和 200 条抽样方案已撤回；TextTurn／XTurnix 仅保留历史协议与证据，不继承其专属输入、动作 token 或训练门槛。
