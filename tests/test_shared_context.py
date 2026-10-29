@@ -69,6 +69,8 @@ class SharedContextTests(unittest.TestCase):
         consumer = FrontendConsumer('s')
         self.assertEqual(consumer.resynchronize(context, 't')['transcript']['text'], 'hello')
         self.assertEqual(list(consumer.states), [])
+        context.release_closed_turn('s', 't')
+        self.assertFalse(context.producers)
 
     def test_patch_and_state_dependency_validation(self):
         context = SharedContext()
@@ -87,6 +89,8 @@ class SharedContextTests(unittest.TestCase):
         read = context.read_frontend_updates('s')['updates']
         self.assertEqual(read[2]['basis']['asr_version'], 0)
         self.assertEqual(context.get_user_turn('s', 't', at_event_seq=3)['transcript']['text'], '')
+        with self.assertRaises(CursorGap):
+            context.get_user_turn('s', 't', at_event_seq=5)
 
 
 if __name__ == '__main__':

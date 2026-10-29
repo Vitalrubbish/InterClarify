@@ -6,6 +6,8 @@
 
 `get_user_turn()` 返回当前正文、最新状态与保留完整性；可在已保留水位查询历史。`read_frontend_updates()` 按统一游标读取，`read_user_transcript_updates()` 仅过滤正文。各 `FrontendConsumer` 单独保存游标，正文替换同一 turn 的视图。重同步只恢复正文，不重放历史控制动作。
 
+历史查询必须使用已经提交的水位，未来或无效序号明确失败；释放已关闭话轮时同时释放其前端producer计数，避免长期会话维护无界生产者索引。
+
 事件环默认最多4096条／16MiB，单条256KiB、正文65536字符、话轮128个。过期游标抛出 `CursorGap`，最新视图明确标记来源引用是否已回收；`release_closed_turn()` 只允许主动释放已关闭话轮。状态历史以事件流为准，最新视图只保留最新观察，防止重复保存大载荷。
 
 本地契约检查见[测试说明](../../tests/test_shared_context.md)；设计与真实音频结果分别见[前端设计](../../dev/SoulX-Duplug/asr_frontend_design.md)及对应实验报告。

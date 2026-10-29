@@ -169,6 +169,8 @@ class SharedContext:
     def get_user_turn(self, session_id, turn_id, at_event_seq=None):
         with self.changed:
             if at_event_seq is not None:
+                if type(at_event_seq) is not int or not 1 <= at_event_seq <= self.sequence:
+                    raise CursorGap('Historical read requires an existing committed sequence')
                 self._check_cursor(at_event_seq - 1)
                 values = [v for v in self.events if v['session_id'] == session_id
                           and v['turn_id'] == turn_id and v['event_seq'] <= at_event_seq]
@@ -216,6 +218,9 @@ class SharedContext:
             key = session_id, turn_id
             if self.latest[key]['transcript']['status'] != 'closed':
                 raise ValueError('Cannot release an active turn')
+            transcript = self.latest[key]['transcript']
+            producer = session_id, transcript.get('producer_id', transcript['source'])
+            self.producers.pop(producer, None)
             del self.latest[key]
 
 
