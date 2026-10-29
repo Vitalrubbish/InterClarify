@@ -2,7 +2,7 @@
 
 2026-10-29 当前选型：用户已选择 SoulX-Duplug；按[适配调研](asr_adapter_assessment.md)优先采用 Nemotron EN160，SenseVoiceSmall 为条件性回退。本文继续作为接口设计，尚未实现。TextTurn 的 `no-voice` 不属于本接口正文，也不能代替 SoulX 音频判断。
 
-更新：2026-10-24。状态：按用户要求补充接口合同，尚未实现。适用于 [SoulX-Duplug＋Nemotron 路线](README.md)；Shared Context 指项目架构中的共享 Context，不另设第二份权威转写。
+适用于 [SoulX-Duplug 路线](README.md)；Shared Context 即架构中的共享 Context，不另设第二份权威转写。
 
 ## 1. 写入时机与话轮标识
 

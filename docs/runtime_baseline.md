@@ -1,6 +1,6 @@
 # 已采用的运行时配置
 
-更新：2026-10-23。本文固定当前已实现运行底座与组件、生成和播放参数；具体任务配置见 `configs/`，实验结论以对应报告为准。下一步规划在现役 Nemotron ASR 后接 XTurnix，尚未替换当前控制路径；Layer 0 当前不实现，系统 backchannel 保留在后续总计划。
+更新：2026-10-29。本文记录已采用的运行底座与参数；具体任务配置见 `configs/`，实验结论以对应报告为准。当前目标为 SoulX-Duplug，ASR 优先适配 Nemotron EN160、条件性回退 SenseVoiceSmall，尚未替换现役控制路径，见[架构设计](research_design/architecture.md)。
 
 ## 组件
 
@@ -25,7 +25,7 @@
 ## 行为边界
 
 - 保持单一仲裁器与单一 TTS 播放所有权；已播放内容不可撤销。
-- 现役双工控制仍由 DuplexCascade 路径执行。目标分工为 Nemotron 输出转写，训练后的 XTurnix 结合对话、已发布 CoT 与运行状态负责全部话轮决策，统一仲裁器执行；Layer 1 负责表达与思考请求，Layer 2 仅向共享上下文发布 CoT，不提供话轮建议，Layer 0 后续只负责系统附和时机。首轮计划见[FLEURS 两组件测试](dev/XTurnix/quality_test_on_fleurs.md)。
+- 现役双工控制仍由 DuplexCascade 路径执行。目标方案中 SoulX 五类用户状态送入 Layer 1，仅有效用户打断额外直接停止活动输出；普通正式回答在 Layer 1 读取对应 `user_complete` 后生成。Layer 2 的 CoT 与 Layer 0 系统附和均属后续接入。
 - 控制信号与思考 token 不直接进入 TTS。
 - 系统 backchannel 当前未实现，后续由 Layer 0 专项训练并接入，未从总计划移除；Layer 2 尚未接入运行链路。
 

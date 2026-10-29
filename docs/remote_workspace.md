@@ -1,14 +1,6 @@
 # 远端工作目录约定
 
-2026-10-26重训已启动并确认Running：`job-179298196307743501088-xuan-zhang`，10:32:46开始，run `tt-010-balanced-20261026-r2`，源码`b57b2ce`位于`source/tt010-balanced-r2`。用户授权取消训练时间上限：配置null、内外层训练timeout移除；1%正例门槛、三类等份损失及全部非时长资源限制保留。最近部署核查baseline-dev2501/88947；TT-011新等待器PID1400303、目录`dataset/tt-011-external-r2`，无等待截止，已连续轮询并核实存活，测试尚未提交。见[重训报告](../reports/textturn/20261026-tt-010-balanced-training/README.md)。下方旧运行／时限状态为历史。
-
-2026-10-26 09:38最新核查：TT-010训练02:14:21超时终止（退出码124、占卡13811秒）；pilot两轮88947窗均全部keep，full第1轮dev仅60001/88947窗，无正式候选及学习／重载验证。TT-011续接器02:14:38因训练失败停止，UltraChat与FDB均未提交，无新测试成绩；当前无活动作业。两单保持未完成，未重启训练／测试或改时限。见[结果核查](../reports/textturn/20261026-tt-011-external-evaluation/README.md)。下方等待／运行状态为历史。
-
-2026-10-26 TT-011已部署：独立源码`source/tt011-external-r1`（`37d9543`），准备目录`dataset/tt-011-external-r1`，等待器Python PID136137／独立supervisor136136，单CPU／2GiB／外层12小时。已连续3次轮询更新，状态`waiting_for_training`，新GPU测试未提交；00:25:56原训练pilot第2轮dev14001/88947且仍唯一活动作业。训练退出码、调度结束、候选gate／学习／重载核查均通过后，自动先160ms UltraChat再160ms action_only FDB。日志`submit_logs/tt011-waiter.log`，状态同准备目录`state.json`；见[运行记录](../reports/textturn/20261026-tt-011-external-evaluation/README.md)。
-
-2026-10-25 TT-010完整轨迹训练：用户已授权取消旧累计GPU剩余预算限制，作业`job-179293824747465991917-xuan-zhang`于22:24:10开始并确认Running，source为`~/parathink-textturn/source/tt010-fulltraj-r1`（源码`56102849e3e88209a9943fd1ffa605395534526e`），dataset为`dataset/tt-010-fulltraj-r1`，run为`tt-010-fulltraj-20261025-r1`。RTX4090单卡／8CPU／32GiB，单作业4小时及显存22GiB停止线保留。数据及远端CPU损失核查通过，当前基线评估7001/88947，未宣称模型质量或权重更新。见[训练记录](../reports/textturn/20261025-tt-010-fulltraj-training/README.md)。以下旧3991秒剩余额度仅作历史记录，不约束本次已授权作业。
-
-2026-10-25启动TT-008：源码`3fa4481`位于`~/parathink-textturn/source/tt008-r1`，冻结清单`dataset/tt-008-ultrachat-r1/manifest.json`；run为`tt-008-20261025-r1`，作业`job-179292031704516676972-xuan-zhang`。两周期各150/150成功、退出码0，2026-10-25 18:24:38结束并按用户指令归档；原预算提交前剩7549 GPU秒，单作业上限7200秒。详见[运行记录](../reports/textturn/20261025-ultrachat-prefix-retest/README.md)，两周期结果已交付；实际占卡3558秒，累计24809秒，原8GPU小时剩3991秒。
+更新：2026-10-29。本文维护目录与环境位置，历史作业进度统一链接报告；本次未登录服务器，目录存在性和当前作业状态须在执行前核查。
 
 项目现名为 ParaThink。下表中的 `InterClarify`、`interclarify-*` 是已有服务器目录或环境的真实名称，继续保留以兼容现役资产；GitHub 地址与历史报告链接同样保留，未执行远端仓库或目录迁移。新建通用开发环境默认使用 `parathink-dev`。
 
@@ -30,6 +22,8 @@
 | `InterClarify/benchmark/fdb_v1_0` | FDB v1.0 评测数据 |
 | `interclarify-fdb-two-axes-20261021-r4` | FDB 两轴最终结果 |
 | `Full-Duplex-Bench` | 官方 FDB 评分仓库 |
+| `parathink-textturn` | TextTurn独立实验；源码`source/`、冻结集`dataset/`、训练`runs/`、提交日志`submit_logs/` |
+| `parathink-soulx-duplug` | SoulX计划使用的独立根目录，适配尚未实施，不代表目录已创建 |
 
 ## 固定 conda 环境
 
@@ -42,31 +36,19 @@
 
 `paratalker-dev` 与 `sidecar` 属于其他项目，不纳入 ParaThink 清理。
 
-## 维护记录
+## 实验与维护记录
 
-2026-10-25最终核查：160ms作业`job-179291166384532199286-xuan-zhang`于15:26:47正常结束，100/100、退出码0、1540秒；480ms为100/100、退出码0、1530秒。两次均未知0，无活动作业。全部200条trace、输入及模型摘要、计时及本地评分产物摘要核对完成，终检JSON为`~/parathink-textturn/inspection/fdb-action-final-audit-20261025.json`。TT-005／006／007已交付归档，本轮累计21251GPU秒，低于8小时。见[联合结果](../reports/textturn/20261025-fdb-action-only/README.md)。
+| 记录 | 证据与状态 |
+| --- | --- |
+| TT-010 r5有限pilot | 最新记录为2026-10-27 12:47，新版两轮评估完成、当时第3／5轮；源码`source/tt010-repair-20261027-r1`，run `tt010-repair-pilot-20261027-r1`，当前状态未重查，见[修复报告](../reports/textturn/20261027-dataset-repair/README.md) |
+| TT-011续接 | r1超时、r2全keep未放行后停止，外部测试未提交；不随有限pilot恢复，见[外部记录](../reports/textturn/20261026-tt-011-external-evaluation/README.md)与[r2报告](../reports/textturn/20261026-tt-010-balanced-training/README.md) |
+| TT-005—008 | FDB两周期及UltraChat重测均交付，见[FDB联合结果](../reports/textturn/20261025-fdb-action-only/README.md)与[UltraChat结果](../reports/textturn/20261025-ultrachat-prefix-retest/README.md) |
+| TextTurn初始训练与验收 | TT-001数据`dataset/tt-001-frozen-r3`，Qwen3-0.6B位于`models/qwen3-0.6b`；训练run `tt-002-20261025-r1`，见[验收报告](../reports/textturn/20261025-tt-004-results/README.md)与[v2评分](../reports/textturn/20261025-scoring-v2/README.md) |
+| XTurnix冻结环境与数据 | 隔离环境`interclarify-xturnix-fleurs/envs/xturnix`、模型`models/xturnix-pt`；[数据报告](../reports/xturnix_fleurs/20261023-xtx-001-data-freeze/README.md)、[协议报告](../reports/xturnix_fleurs/20261023-xtx-002-protocol/README.md) |
+| 2026-10-24阈值实验撤回 | 18个过期worktree、7份脚本已清理；5个原始run及离线输入／日志移至`~/interclarify-retired-threshold-experiments-20261024/`，清单`cleanup_manifest.json`；模型、conda与原始FLEURS/FDB资产保留，明细从Git历史追溯 |
+| 旧X2资产清理 | 2026-10-22曾记录释放约301G；后续代码回退不等于远端资产释放。历史日志`~/cleanup_remote_assets.dry-run.log`、`~/cleanup_remote_assets.execute.log`、`~/cleanup_second.log`，当前环境与空间不能由旧记录推断 |
 
-2026-10-25最新状态：480ms `tt-005-006-20261025-r4`在14:56:10结束，100/100、退出码0、实际1530秒。160ms原续接进程已退出且日志无原因，旧waiting状态已备份；在无活动作业、累计预算核对后补交`tt-007-20261025-r1`，作业`job-179291166384532199286-xuan-zhang`当前Running，源码仍为`4e325bb`、输入及候选不变。补交前剩9089秒，本次上限7200秒。
-
-2026-10-25用户纠正FDB仅监控TextTurn：旧r3已停止，实际占卡1012秒并保留trace。修正源码`4e325bb`冻结在`~/parathink-textturn/source/fdb-action-v1`；480ms run为`tt-005-006-20261025-r4`，作业`job-179290983788774807672-xuan-zhang`运行中。160ms run预留`tt-007-20261025-r1`，清单已冻结，续接器等待r4成功结束并释放GPU后重新核算预算提交，此时尚无160ms GPU作业。r4提交前累计18181秒、剩10619秒。详见[动作监控运行记录](../reports/textturn/20261025-fdb-action-only/README.md)。下方r1—r3条目是历史记录，不代表当前继续执行模拟回答协议。
-
-2026-10-25按用户指令启动TT-005／006：共用源码冻结于`~/parathink-textturn/source/fdb-v3`（`9d5376d`），50＋50录音清单为`dataset/tt-005-006-fdb-r2/manifest.json`。当前run为`tt-005-006-20261025-r3`、调度ID为`job-179290834177188572331-xuan-zhang`，单卡串行、最多2小时。r1摘要抄写错误及r2磁盘监控格式问题已修复并保留原日志、trace和实际占卡；r3提交前累计占卡17169秒，剩11631秒。详见[联合运行记录](../reports/textturn/20261025-fdb-cross-dataset/README.md)。当前为执行阶段，未交付正式成绩、未归档工作单。
-
-2026-10-25评分修复：独立源码`~/parathink-textturn/source/scoring-v2`冻结`ec0bf36`，用已有conda数据环境执行单线程标准库离线重评，2GiB地址空间、60秒超时，无GPU任务。输出`inspection/scoring-v2/formal-r2`及`text-r2`；模型和v1结果未修改。[v2报告](../reports/textturn/20261025-scoring-v2/README.md)记录未知覆盖与训练构造／配比审核，接话语义标注仍不足。
-
-2026-10-25后续核查：TextTurn训练`tt-002-20261025-r1`和评估`tt-004-20261025-r1`均退出码0，评估调度ID为`job-179287011405618549973-xuan-zhang`，当前无活动作业。full第2轮候选保留在训练run的`best`；正式300来源／1200语音场景结果见[核查报告](../reports/textturn/20261025-tt-004-results/README.md)。语音原始未通过，评分口径缺口待修正，不再把pipeline的evaluation_submitted视为未执行。原始日志、adapter及语音资产均未删除，本次只读取并取回结果，无新增GPU作业。
-
-2026-10-25 新建 `~/parathink-textturn`，TT-001正式数据位于 `dataset/tt-001-frozen-r3`，固定Qwen3-0.6B位于 `models/qwen3-0.6b`。训练源码 `source/74b0846`，训练run为 `runs/tt-002-20261025-r1`，4090单卡作业 `job-179286310634760697957-xuan-zhang`。只读复用已由conda创建的XTurnix隔离环境；ASR/TTS仍使用现有各自conda，不在现役环境安装依赖。评估源码位于 `source/evaluation-v1`，续接器状态在 `submit_logs/tt-004-20261025-r1.pipeline.json`；成功放行后才提交评估，不把等待状态写为完成。原主仓库未被reset或覆盖。
-
-2026-10-24 按用户要求将当前实现恢复至阈值实验前的 `13ba980`，清除 XTurnix 实验目录下 18 个过期源码 worktree 与 7 份撤回实验启动脚本。其后产生的 5 个原始 run、离线输入及对应日志已移至 `~/interclarify-retired-threshold-experiments-20261024/`，清单为 `cleanup_manifest.json`；这些只保留历史证据，不是现役入口。模型、conda、现役运行快照和原 FLEURS/FDB 资产保留，详见[回滚记录](dev/XTurnix/rollback_cleanup.md)。
-
-2026-10-23 完成 XTX-002：在 `interclarify-xturnix-fleurs` 下创建隔离 conda 环境 `envs/xturnix`（Python 3.12.15、torch 2.11.0+cu128、transformers 4.57.1），下载并锁定 `models/xturnix-pt`（`xcczach/xturnix-pt@d4b0403`），只读复核 Nemotron `ebe59e5`。dev 协议证据在 `runs/xtx-002-probe-20261023-r3`；未覆盖现役 ASR/TTS/评分环境。证据见 [XTX-002 报告](../reports/xturnix_fleurs/20261023-xtx-002-protocol/README.md)。
-
-2026-10-23 完成 XTX-001：在 `interclarify-xturnix-fleurs` 新建冻结数据目录，只读复用 `interclarify-x2-turn-complete` 的 TSV 与 101 个 WAV 后重新选择并哈希；未删除旧数据，旧目录仍不恢复为现役依赖。证据见 [XTX-001 报告](../reports/xturnix_fleurs/20261023-xtx-001-data-freeze/README.md)。
-
-2026-10-23 仅回退 ParaThink/X-Talk 仓库中的本轮 X2-Turn 实现和测试，保留现役运行基线。本次没有登录服务器删除模型、conda 环境、固定数据或原始报告；此前新增的 `interclarify-x2-turn-complete` 和两个 X2-Turn conda 环境不再作为现役依赖，其当前远端状态仍需另行核查。不能把本次代码回退解释为已释放远端磁盘。
-
-2026-10-22 已完成旧训练/选型资产、旧 X2 环境与缓存清理，记录释放约 301G。现役模型、ASR/TTS conda、评分环境、运行快照及 FDB 数据/最终结果保留，旧 X2 模型与环境不能假定仍存在。完整清理明细可从 Git 历史追溯；远端日志为 `~/cleanup_remote_assets.dry-run.log`、`~/cleanup_remote_assets.execute.log` 和 `~/cleanup_second.log`。这些是当时维护记录，新的作业仍须重新预检磁盘和环境。
+历史`Running`、PID和剩余额度均是当时观察，不代表现在仍有效。TT-010后来取消训练总时限及旧累计GPU预算，有限pilot仍按既定轮数结束，全部非时长资源限制保留；其他实验按各自已确认预算执行。
 
 ## 运行约定
 

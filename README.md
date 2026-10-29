@@ -4,15 +4,15 @@
 
 ParaThink 研究独立 thinking 流在语音 Agent 倾听与表达期间持续工作带来的优势，工作包括 Agent 框架、边听边想与边说边想两组 benchmark，以及大规模对话数据与训练。研究背景、目标、参考文章和三篇子文档见 [docs/research_design.md](docs/research_design.md)，工程安排见 [docs/engineering_implementation.md](docs/engineering_implementation.md)。
 
-当前运行底座保留 DuplexCascade、Nemotron EN160、Kokoro 与 X-Talk `ca9b23c`。2026-10-24 按用户要求回到阈值调整前的 `13ba980`，校准与 ASR 时间策略实验已从当前目录撤回，见[回滚记录](docs/dev/XTurnix/rollback_cleanup.md)。Nemotron ASR＋XTurnix 是待接入方案，尚未部署新控制链路。Layer 1 表达、Layer 2 异步思考、统一仲裁及单一 TTS 播放路径的目标分工见研究文档。运行底座来自独立维护的 [X-Talk fork](https://github.com/Vitalrubbish/xtalk)。
+当前设计采用 **SoulX-Duplug**，ASR 优先适配 Nemotron EN160，失败或组合实测不满足后续确认要求时回退 SenseVoiceSmall。五类用户状态送入 Layer 1，仅有效用户打断额外直接停止活动输出；具体合同见[架构设计](docs/research_design/architecture.md)。新链路尚未接入，已采用的运行底座仍为 DuplexCascade、Nemotron、Kokoro 与 [X-Talk fork](https://github.com/Vitalrubbish/xtalk) `ca9b23c`。
 
 | 内容 | 位置 |
 | --- | --- |
 | 研究方案与评测范围 | [docs/research_design.md](docs/research_design.md) |
-| 工程实施计划：Nemotron＋XTurnix | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
-| FLEURS 两组件质量与延迟测试计划 | [docs/dev/XTurnix/quality_test_on_fleurs.md](docs/dev/XTurnix/quality_test_on_fleurs.md) |
+| 工程实施计划 | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
+| SoulX 路线与待执行的公开英文集验证设计 | [docs/dev/SoulX-Duplug](docs/dev/SoulX-Duplug/README.md) |
 | 本地 conda 环境 | [docs/local_environment.md](docs/local_environment.md)（`parathink-dev`） |
-| 工作单管理 | [XTurnix 工作单](docs/issue/XTurnix/README.md)（保留基点记录，不自动恢复取消测试或训练） |
+| 工作单与历史实验 | [docs/issue/README.md](docs/issue/README.md) |
 | 已采用的运行时配置 | [docs/runtime_baseline.md](docs/runtime_baseline.md) |
 | FDB 评测结果 | [reports/fdb](reports/README.md) |
 | X-Talk 源码版本 | [configs/xtalk_runtime_source.json](configs/xtalk_runtime_source.json) |

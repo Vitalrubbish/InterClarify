@@ -1,40 +1,19 @@
 # 架构图绘制说明
 
-2026-10-29 状态说明：本页所述 TeX 与预览仍是旧 XTurnix 方案，尚未按 SoulX 路线重绘。当前确认的合同是五类状态 token 送 Layer 1，由 LLM 决定自身行为；仅有效用户打断额外直接进入唯一输出执行点。`user_complete` 不触发独立 LLM 调用，`user_backchannel` 不映射成运行时 keep。当前路径以[架构第 2.2 节及其流程图](../research_design/architecture.md#22-前端状态与系统附和)为准，下文旧控制箭头及 start 恢复流程不作为当前合同。
-
-项目名称已更新为 ParaThink，图源与预览文件统一使用 `parathink_method` 前缀，相关链接同步更新。
-
-对应文件：[figures/parathink_method.tex](../../figures/parathink_method.tex)。更新：2026-10-23。
-
-## 整体作用
-
-展示共享 Context、独立话轮控制、并行思考与表达，以及用户打断时的停止和恢复流程。按用户确认的方案，补充绕过 Text FIFO 的优先控制路径、输出标识失效和实际停播确认，并据此同步[架构文档](../research_design/architecture.md)。原因是仅清空文本队列无法阻止已经进入合成、音频缓冲和在途任务的旧输出。
-
-图中保留 Layer 0/1 直接提交 Text FIFO 的结构，不新增独立 Arbiter 模块；唯一仲裁执行点位于输出运行时，统一管理队列、TTS 和播放器。图与文档描述目标合同，不代表打断链路已经实现或通过验证。本次不创建工作单或运行远端作业。
-
-按用户确认的职责调整，Layer 2 标注为仅发布 CoT，XTurnix 标注为负责全部话轮决策。移除将 Layer 2 发布理解为介入建议的歧义，避免任务分析与话轮策略重复承担动作监督。
+更新：2026-10-29。对应[图源](../../figures/parathink_method.tex)，合同见[架构第2节](../research_design/architecture.md#2-模块与动作边界)。本版将XTurnix替换为SoulX-Duplug，并修正状态输入、持续音频及直接打断路径；图描述目标架构，不表示新链路已接入。
 
 ## 结构与绘图元素
 
-文件为 TikZ 绘图源码，没有运行时类或方法。`box` 定义模块，`wide` 定义共享 Context 和输出路径，`eventbox` 定义底部打断时序。`flow` 表示读取或顺序消费；`write` 表示结果与文本写入；`control` 表示橙色话轮决策及优先控制；`thinking` 表示紫色虚线思考请求与结果；`feedback` 表示运行状态回传。`foreach` 为四个并列模块绘制 Context 读取箭头。
+TikZ源码没有运行时类或方法。`box`表示模块，`wide`表示Context和输出路径，`eventbox`表示打断时序；`flow`为读取和顺序消费，`write`为状态／文本写入，`control`为直接打断，`thinking`为思考请求与CoT发布，`feedback`为实际输出状态回传。
 
-Nemotron 将在线转写写入 Context。XTurnix、Layer 0、Layer 1、Layer 2 分别读取当前可用信息，再把话轮动作、附和时机建议、表达输出、CoT 写回 Context。Layer 2 只发布 CoT 正文，不附带继续倾听、建议澄清或 start/keep/stop 标签；任务标识、版本、观察截止点和任务生命周期作为运行时元数据另记。CoT 同时对 XTurnix 和 Layer 1 可见，分别用于独立控制和表达。Layer 1 到 Layer 2 的直接虚线仅代表思考请求。
+同一用户音频分别送Nemotron与SoulX-Duplug。在线转写先写Context；SoulX持续观察音频和对应转写，五类用户状态写入Context，供Layer 1在正常输入边界读取。普通正式回答在当前turn读取对应`user_complete`后生成，不因该状态另建回答调用。其他状态不转换为start或keep，不进入输出运行时。
 
-按用户对触发机制的确认，XTurnix 改为事件驱动：ASR 更新写入 Context 后触发决策；后续实现 Layer 2 后，CoT 写入 Context 也触发决策。不再按固定时间对未变化的输入重复调用。Layer 1 仍在下一次实际输入边界读取新增 CoT。XTurnix 结合最新对话、已发布 CoT 和真实运行状态，独立判断全部话轮动作；决策写入 Context，由输出运行时及时消费。stop 不等待 Layer 1 推理完成，也不作为文本排入 FIFO。CoT 条件化控制仍需训练，不能视为原版权重已经具备。
+Layer 2只发布内部CoT，不生成话轮建议或待播正文。CoT后续供SoulX与Layer 1在各自合法输入边界使用；对应适配和训练尚未实现，独立触发方式与输出是否扩展仍待设计。Layer 1到Layer 2的虚线只表示思考请求。
 
-Text FIFO 直接接收 Layer 0 路径的系统 backchannel 和 Layer 1 的表达文本；Context 不作为队列的文本来源。Layer 0 保留附和时机预测职责，具体附和措辞与编码本图不展开；两条提交路径仍共享唯一 TTS/播放器。每次连续输出分配 `output_id`，文本和音频块携带该标识与 `chunk_id`，FIFO 和播放器只接受当前有效输出。各模块对 Context 的读取和写回关系保留，Layer 1 的生成历史可见，但同一文本不重复注入模型输入。
+Layer 0路径的系统附和和Layer 1表达直接提交同一Text FIFO；附和正文由表达路径提供，Layer 0只预测时机。唯一输出运行时管理FIFO、TTS与播放器，检查`output_id`和`chunk_id`，并回传真实生命周期。生成、提交、取消和播放分别记录，Context不向FIFO提交文本。
 
-## 打断执行与恢复
+## 打断与恢复
 
-底部时序条对应同一个输出运行时的执行顺序：
+活动输出期间有效`user_nonidle`额外直接到达输出运行时，绕过FIFO，不等待Layer 1。底部四步依次为：关闭旧输出标识、停止并取消未播内容、确认关闭后发布Listen、Layer 1读取后续对应`user_complete`后生成新回答并登记新标识。准备阶段可取消尚未开播的输出，播放阶段须记录实际停播确认；迟到结果和旧队列不能恢复。
 
-1. 有效 stop 关闭旧 `output_id`，阻止旧文本继续入队。
-2. 停止当前音频，取消旧标识下尚未播放的队列和音频缓冲，尽力取消在途生成与合成；迟到结果失去播放资格。
-3. 播放器确认实际停播后，回传 Listen 与打断事件；生成、提交、取消和实际播放记录全部保留。
-4. 后续有效 start 才允许使用新的 `output_id` 提交表达；旧队列不自动恢复。
-
-Layer 1 在下一输入边界结合用户新输入和打断事件组织后续表达；活动 Layer 2 任务在自己的短推理边界消费新增观察，不因停播自动重启。图中回传运行状态与事件，不把精确播放位置或逐字已听文本作为 Layer 1 的常规输入。已听内容不可撤销；没有 Layer 3，Layer 2 不生成待播放正文。
-
-## 产物与验证
-
-[预览入口](../../figures/parathink_method_preview.tex)生成[矢量 PDF](../../figures/parathink_method_preview.pdf)和[高清 PNG](../../figures/parathink_method_preview.png)。构建命令见[预览说明](parathink_method_preview.md)。检查编译日志及渲染图中的文字、连线和裁切；此检查不属于模型或运行时测试。
+已听内容不可撤销，真实生成与播放历史保留；Layer 3定位待统一，本版不增加实现。预览产物与编译方法见[预览说明](parathink_method_preview.md)。

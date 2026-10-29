@@ -1,148 +1,53 @@
 # 工程实施计划
 
-2026-10-29 当前设计：话轮控制器选用 SoulX-Duplug，ASR 优先 Nemotron EN160，适配失败或实测不满足要求时回退 SenseVoiceSmall，依据见[适配调研](dev/SoulX-Duplug/asr_adapter_assessment.md)。当前五类状态 token 全部送给 Layer 1，由 LLM 决定自身行为；普通正式回答在当前 turn 看到 `user_complete` 后开始生成，看到之前不生成正文。仅有效用户打断额外直接停止活动输出，其他状态不进入输出运行时，不转换成 start 或 keep，见[架构第 2.2 节](research_design/architecture.md#22-前端状态与系统附和)。下方 XTurnix／TextTurn 的专属协议、工作单和训练参数为历史设计，不作为 SoulX 实施授权。
+更新：2026-10-29。本文按已确认的 SoulX-Duplug 路线整理实施顺序，删除重复旧选型与运行日志；研究范围和模块合同分别见[研究方案](research_design.md)与[架构设计](research_design/architecture.md)。新链路尚未接入，本次整理不启动适配、训练或远端作业。
 
-用户明确保留后续音频 token、转写文本 token 与 CoT token 联合决策的目标，**当前暂不实现**。本轮只更新文档，不新增 CoT 注入接口、special token、模型参数、训练数据或远端任务；后续输入格式、缓存、触发与训练以[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)为准，不能直接照搬下方第 4.2 节的旧文本控制器方案。
+## 1. 运行底座与目标
 
-2026-10-25 最新修订：按用户要求，TT-001重建480ms控制窗；User随机1—2 token／窗，Assistant每窗8 token模拟生成，播放尾窗及下一轮开口等待分开处理。Nemotron底层160ms解码及每次转写写入Context保留；TT-003后续实现三步聚合，并记录新增等待。此前160ms控制触发约定由此替代，现役运行时不在本轮修改范围内。
+现役底座仍为 X-Talk `ca9b23c`、DuplexCascade、Nemotron EN160 与 Kokoro，参数见[运行配置](runtime_baseline.md)。目标控制器为 **SoulX-Duplug**；ASR 优先适配 Nemotron，失败或组合实测不满足后续确认要求时回退 SenseVoiceSmall，依据见[适配调研](dev/SoulX-Duplug/asr_adapter_assessment.md)。同一活动话轮只使用一个权威转写来源。
 
-2026-10-24 路线建立记录：按用户指令新增 [TextTurn](dev/TextTurn/README.md)，采用 Nemotron EN160＋Qwen3-0.6B 文本控制器，复用旧 UltraChat 四类轨迹重建动作监督。无新增 ASR 文本直接作为带延迟静音，不另加 VAD 或补偿。基模、训练方法及通过门槛统一见[训练方案](dev/TextTurn/training_plan.md)。已按用户进一步指令建立 [TT-001—004](issue/TextTurn/README.md)：数据、模型、在线接入及四类验收；必要核查并入实现，不单设工程确认任务。当前均待实施，未重建数据、训练或部署；以下 SoulX 及 XTurnix 内容为此前方案，不继续自动推进。用户已要求的 Shared Context 下游转写接口随新路线保留。
+| 模块 | 实施职责 |
+| --- | --- |
+| ASR 与 Shared Context | 持续发布版本化转写，提供下游快照和有序更新读取；写入不等待完成判断 |
+| SoulX-Duplug | 保留音频路径和原生五类用户状态，衔接在线转写；状态全部作为 Layer 1 输入 |
+| Layer 1 | 在正常输入边界读取状态与转写，在当前 turn 看到对应 `user_complete` 后开始普通正式回答；负责思考请求与表达 |
+| 输出运行时 | 统一管理 FIFO、TTS 与播放器；活动输出期间的有效 `user_nonidle` 额外直接触发停止，准备阶段也可取消 |
+| Layer 2（后续） | 只发布内部 CoT，供 SoulX 与 Layer 1 使用，不生成话轮建议或待播正文 |
+| Layer 0（后续） | 只预测系统附和时机，正文由表达路径提供，经同一输出运行时发声 |
 
-2026-10-24 旧节奏记录（已被上方480ms约定替代）：stop 仅表示用户打断系统，不监督自然完成；控制器匹配 Nemotron 的名义 160ms 解码步骤完成事件，取消 600ms 观察等待，旧数据按新粒度重新分块。首轮质量及延迟门槛放宽，具体数值和计时锚点以 TextTurn 方案为准。解码步骤事件接口尚待适配，现役表达 micro-turn 和服务实现不在本次修改范围内。
+其他用户状态不进入输出运行时，不映射为 start 或 keep；完成状态不新建独立 LLM 回答调用。系统保持唯一仲裁执行点与单一 TTS 播放所有权，已听内容不可撤销。状态、生成、提交、取消与实际播放分别记录，具体打断及恢复规则见[架构第 2 节](research_design/architecture.md#2-模块与动作边界)。
 
-2026-10-24 当前选型：按用户明确决定，后续采用 **SoulX-Duplug＋Nemotron EN160**，Nemotron 为唯一 ASR 来源。当前只更新[路线说明](dev/SoulX-Duplug/README.md)及[质量测试方案](dev/SoulX-Duplug/quality_test.md)，首轮仅回放公开英文 Easy Turn 全集，评价完整性判断与延迟；自建场景及附和／打断测试撤回。适配尚未实现，不启动模型或训练，不切换现役路径。以下 XTurnix 计划与回滚记录保留为历史，不自动恢复旧工作单或已取消测试；后续实施单元按用户明确指令建立。
+## 2. 前端适配顺序
 
-同日按用户补充要求，将[每个用户 turn 的 Shared Context 转写接口](dev/SoulX-Duplug/shared_context_interface.md)纳入后续适配交付：Nemotron 更新先写 Context，提供下游 LLM 的快照及更新读取，独立于控制器完成判断。公开集回放同步用只读消费者替身核验接口，不增加语料或加载下游 LLM；当前仅定义合同，未实现写入路径。
+1. **冻结协议与资产**：锁定模型、上游代码与环境版本，核算显存和磁盘峰值，不升级现役 ASR/TTS 环境。
+2. **衔接音频与文本**：Nemotron 与 SoulX 接收同一持续音频，按真实解码完成事件、观察边界和文本版本配对，验证词内增量、文本单次消费及缓存修订。ASR 未就绪不能伪装为空增量，无新增文字不等于声学静音。
+3. **交付 Context 接口**：按稳定 `turn_id` 写入转写，提供快照和按游标读取；用只读消费者替身核查幂等、乱序、关闭及 EOF 分离，见[接口合同](dev/SoulX-Duplug/shared_context_interface.md)。
+4. **验证组合表现**：此前 [Easy Turn 英文集方案](dev/SoulX-Duplug/quality_test.md)计划全量 617 条 Listen 影子回放，报告完整性判断、原生／兜底分支、实测延迟与失败覆盖，执行仍待重新确认。它不承担附和、打断或可听播放验收。
+5. **后续完整链路**：明确状态输入编码、Layer 1 生成边界和直接打断接口，再验证输出标识失效、停播确认及新输出恢复；旧 DuplexCascade 控制不能与新路径重复执行。
 
-2026-10-24 回滚说明：按用户确认恢复阈值实验前的 `13ba980`，以下为基点计划。校准及 ASR 时间实验实现和报告已从当前目录清理，历史证据见 Git 的 `fa24868`；本次不重新启动旧计划，详情见[回滚记录](dev/XTurnix/rollback_cleanup.md)。
+160ms 是 ASR 名义分块，不是组合延迟承诺。若触发 SenseVoiceSmall 回退，先独立冻结配置、转写修订及 Context 映射，不在活动话轮中热切换。
 
-更新：2026-10-23。当前方案为 **Nemotron EN160 流式 ASR＋XTurnix 话轮控制**。本次将前端与控制分离：Nemotron 提供转写，XTurnix 根据转写历史和系统 Listen/Speak 状态预测动作。调整原因是此前前端方案已回退，现按用户决定验证 XTurnix 与现役 ASR 的组合。本文更新计划，不表示新链路已经部署或通过验收。
+## 3. 后续研究模块
 
-研究背景和范围见[研究主文档](research_design.md)，模块合同见[架构设计](research_design/architecture.md)。本轮已按用户指令拆分为 [XTX-001—006](issue/XTurnix/README.md)；XTX-001 已完成 FLEURS 输入与历史 ASR 基线冻结；XTX-002 已完成隔离环境、模型与协议冻结及 dev 验证；XTX-003 已完成真实时钟回放器与模拟契约验证；XTX-004 已完成离线评分与合成 trace 验证；XTX-005 已完成 A10 远端作业入口与 5 条冒烟并归档；XTX-006 正式 100 条作业已按用户要求取消，随后完成 pause token 诊断，未产生正式成绩。
+SoulX 联合音频 token、转写文本 token 与已发布 CoT token 的目标已确认，当前不实现。序列、边界编码、缓存、触发方式、输出是否扩展及训练配置按[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)后续确定，不继承旧文本控制器协议。
 
-依用户要求先分析并讨论可行性，现调整为 [XTX-007—013](issue/XTurnix/README.md#vad-assisted-training)。XTX-007 已交付[实际分析报告](dev/XTurnix/training_feasibility_assessment.md)，用户同意先启动 40—60 个英文场景审核，分析与讨论已完成并归档。XTX-009 已完成[48 会话首轮来源审核](dev/XTurnix/source_audit.md)，尚无可直接冻结的四类在线监督；因此先补证据的路线继续保留。只允许先进行不依赖部署输入的来源审核，正式冻结仍依赖 XTX-008。输入/环境、校准和微调仍是条件性后续，未获本次实施授权。
+Layer 1 表达与思考调用、Layer 2 分步分析及两组专项训练采用[共同训练约定](research_design/architecture.md#7-共同训练与数据约定)。Layer 0 系统附和专项保留在总计划，具体模型、数据规模和预算实施前细化，当前不采集或训练。Layer 3 定位待统一，不新增实现。
 
-## 1. 当前步骤与边界
+完整话轮评测另行规划，可参考 FDB 的接话、停顿、用户附和及打断子集；系统附和须独立核查合理性与实际发声。控制返回时间不能代替可听响应时间，历史 FDB/FLEURS 作业不自动恢复。
 
-既有 XTX-001—006 是 FLEURS 英文子集的两组件质量测试：真实音频流经 Nemotron，再把在线转写交给 XTurnix，测量最后一个词汇 token 可见到首次有效 `<|start|>` 返回的时间。将该增量与历史 Nemotron 延迟结合，给出音频到控制动作的链路估计。详细定义、分母和限制见[质量测试计划](dev/XTurnix/quality_test_on_fleurs.md)。该冻结范围和已取消状态保持不变。
+## 4. 环境、资源与交付
 
-XTX-007 的分析与讨论已完成，当前只进入用户同意的 XTX-009 首轮来源与可判定性审核，该轮 48 会话已交付；未安装训练环境、实现训练链路、批量准备训练数据或更新参数。正式四类数据冻结、训练和影子验证继续作为条件性后续；即使后续进入，也不训练 Layer 0/1/2、TTS 或 CoT，不切换现役控制器、不恢复 FDB。FLEURS 的末端 start 输出率不称为 FDB TOR，也不代表真实对话的话轮控制准确率。
+本地与远端均使用 conda，真实模型训练和集群测试在远端调度作业执行。SoulX 实验使用独立根目录 `~/parathink-soulx-duplug/`，现役模型与环境只读复用，目录见[远端约定](remote_workspace.md)。
 
-后续完整链路继续保持单一仲裁器和单一 TTS 播放所有权。控制 token、thinking 请求与 CoT 均不进入 TTS；已听内容不可撤销。不设计 Layer 3。按用户确认的分工，Layer 2 只向上下文发布 CoT，不生成话轮建议或候选表达文本；话轮决策全部交给 XTurnix，Layer 1 负责措辞。新工作单不承担完整链路接入或 CoT 条件化控制验收。
+此前公开集验证设计的上限为：1×24GiB GPU、8 CPU、32GiB RAM、batch=1、一个活动作业，显存停止线 22GiB；下载并发≤2、CPU worker≤2，单会话一个在途请求、待处理音频≤800ms。单作业≤4小时，冒烟与正式运行累计≤4 GPU小时；启动空盘≥30GiB，新增资产≤10GiB，其中报告／trace≤2GiB。执行前核算全量时长和峰值，触限停止，不自动扩容。这些限制不覆盖已有 TextTurn 训练的独立授权。
 
-## 2. 现役底座与目标分工
+实施代码、配置及必要契约测试同步维护 `docs` 下同路径中文说明；交付冻结配置、manifest、逐例 trace、汇总、资源记录与中文报告。工作单仅依用户明确指令建立，完成后归档；本次不新建工作单。
 
-现役配置为 X-Talk `ca9b23c134b390107601bc98954ab16276d86db9`、Nemotron EN160、Kokoro `af_heart`、600ms micro-turn、300/1200ms TTS 分段和会话 KV 复用，见[运行配置](runtime_baseline.md)。现役控制仍由 DuplexCascade 路径执行；采用 XTurnix 是目标方案，不冒称已完成替换。
+## 5. 历史路线入口
 
-| 模块 | 职责 | 输出或动作 |
-| --- | --- | --- |
-| Nemotron ASR | 接收持续音频并交付真实增量，保留生命周期与版本 | 累计文本、delta、观察截止点和接收时间 |
-| XTurnix 控制策略 | 结合对话历史与当前 Listen/Speak 状态判断保持或转移；后续训练读取 CoT 并独立权衡介入 | Listen 下 keep/start；Speak 下 keep/stop，及合法动作分数 |
-| Layer 0（后续） | 只预测系统简短附和时机 | 发出附和或继续等待，不预测通用话轮类别 |
-| Layer 1（后续适配） | 请求思考，利用上下文生成澄清、回答或口头纠正 | 待表达文本与 thinking 请求 |
-| Layer 2（后续接入） | 分析事实、缺口和条件依赖，求解任务并更新推导 | 只发布 CoT 至上下文，不提供话轮建议 |
-| 统一仲裁器 | 结合控制策略、Layer 0/1 结果及实际播放状态执行 | 唯一的提交、等待与停止路径 |
-| TTS 与播放器 | 合成并播放已提交表达，回传真实播放状态 | 用户可听音频 |
+| 路线 | 保留状态与证据 |
+| --- | --- |
+| [TextTurn](dev/TextTurn/README.md) | 数据、训练、接入及评测见[工作单](issue/TextTurn/README.md)；TT-010 有限 pilot 最后记录见[修复报告](../reports/textturn/20261027-dataset-repair/README.md)，不自动进入 full 或恢复 TT-011 |
+| [XTurnix](issue/XTurnix/README.md) | XTX-001—005 及可行性分析已归档；正式 FLEURS 作业已取消，来源审核未形成可冻结监督，旧训练草案已撤下 |
 
-XTurnix 不替代 ASR，不输出上一方案的 idle、complete、backchannel 等用户状态类别。其 speaking/keep 表示此时继续说，不等于给出了独立的“用户附和”标签。控制动作与用户语义类别分开记录，不强造一一映射。
-
-## 3. Nemotron 与 XTurnix 接口
-
-### 3.1 在线输入和动作
-
-Nemotron 固定 EN 0.6B、160ms 配置；传输使用真实时钟 80ms 音频包。保留原始文本、token/delta、会话 UUID、前缀版本与可见时间，暂停不结束 ASR，会话真正结束后的排空另列。
-
-XTurnix 首轮使用 `xcczach/xturnix-pt`，冻结权重 revision、tokenizer、官方推理管线与依赖版本。中文微调变体不混入同一汇总；如需比较，另行冻结为独立配置。按状态只允许两个合法动作，取分数最高的动作作为原版基线，不在正式测试上调整 start 阈值。
-
-按[官方推理管线](https://huggingface.co/xcczach/xturnix-pt/blob/main/turn_pipeline.py)移除最后一条用户消息的末尾 Unicode 标点和相邻末尾空白，保留内部标点、大小写及原始 ASR 记录；不能人工补句号。模型只看当时可见前缀，不读取参考转写或未来音频。
-
-ASR 更新与真实的停顿事件可以触发判断。`<|pause|>` 必须来自因果可获得的音频停顿或真实上游分段事件，不能由录音 EOF 或离线认定的最后 token 注入；停顿检测器与阈值在回放前冻结，并记入延迟。单会话最多一个在途控制请求，后续观察有界缓冲，不无限并行。具体触发与末端评分见质量测试计划。
-
-若经 XTX-007 分析讨论同意实施 VAD 辅助方案，再由 XTX-008 冻结版本化外部观测和预处理，区分发声、静音持续时间和转写尚未到达；不将无 ASR 增量当静音，也不在句末拼接合成 pause。实际观测变化触发重判，VAD 不直接判定 start/stop。扩展输入与官方文本管线分别保留基线，训练前后采用相同输入、触发和精度；不改写原 FLEURS 配置。
-
-### 3.2 单一执行路径与状态同步
-
-当前两组件测试只记录动作，不执行 `start` 或停播。完整系统接入时，XTurnix 输出属于决策，实际生成、提交和可听播放属于不同事件；状态由统一运行时依据实际会话及播放状态维护，不能在收到 Layer 2 结果时假装已经开口。
-
-原 `TurnDetectorManager/TurnTakingManager` 与双工适配器不得同时执行开始/停止动作。新控制模式接入同一仲裁路径，旧 DuplexCascade 控制 token 保留真实生成历史但不重复执行。音频暂停、用户让轮、生成启动和实际开始播放分别记账。
-
-文本持续送入表达上下文，不因尚未预测 start 而阻塞 thinking 请求；结果也不能反向改写已生成或已播放的历史。
-
-## 4. XTurnix 试训与后续 CoT 条件化控制
-
-### 4.1 先分析讨论，再决定是否试训
-
-XTX-007 已完成现有证据、数据样例、路线与成本分析，用户同意先补监督证据。后续 48 会话来源审核已完成，仍缺可用 Speak/stop、真实状态与音频时间；因此不能将文本候选直接作为训练金标，也不自动开始上下文/校准实验。
-
-若同意实施候选试训，XTX-008—013 才依次完成输入与环境、数据冻结、未训练基线/校准、训练机制和资源探针、受限 LoRA 试训及独立验证。训练快照≤2,000 条、最多两次试训等仅为待讨论的候选上限；只监督当前动作 token，底座冻结，正文和外部观测不参与预测损失。资源探针中的微量优化同样属于后续实施，不能在分析阶段提前运行。
-
-主结论比较相同扩展输入和开发集校准规则下的未训练与训练模型，同时保留官方文本基线。误抢话、误停、延迟预算和回归幅度在独立测试前冻结，按事件报告覆盖和失败。若没有独立数据收益，停止扩大训练并记录原因；试训成功不表示已经具备 CoT 主动介入能力。
-
-### 4.2 后续 CoT 条件化控制
-
-原版 XTurnix 的 Listen/start 主要针对用户已让轮的情况；我们的主动介入还需要在用户持有话轮时判断是否值得开口。后续控制器应读取明确标识的已发布 CoT、最新用户输入、观察截止点/版本及实际播放状态，独立学习何时 keep、何时 start；用户打断系统仍由 Speak 下的 keep/stop 处理。XTurnix 的目标调度改为事件驱动：ASR 更新触发决策；后续实现 Layer 2 后，CoT 写入 Context 也触发决策，不再按固定时间重复调用未更新的输入。CoT 写入不直接映射为 start，也不自动切换为 Speak。本次同步图示与设计说明，现有两组件测试实现和冻结配置不在本次修改范围。
-
-Layer 2 只发布任务分析 CoT，不输出“继续倾听”“建议澄清”、介入意图或开口就绪字段；全部话轮价值与时机判断由 XTurnix 负责，Layer 1 负责表达。任务标识、发布版本、观察截止点与思考任务生命周期作为运行时元数据另记，不作为话轮建议；不新增独立的任务语义否决层。用户正在自行补充、分析已经过期或本来无需介入时，要保留 keep；已经说话时获得新 CoT，不因此启动第二路播放。
-
-官方管线要求固定状态提示词及 user/assistant 历史格式，不能直接把 tool 结果伪装成用户消息。本项目的分析结果输入格式和对应监督需在实施前另行设计、训练及验证；本轮 FLEURS 测试不注入任何 thinking 结果。
-
-训练数据后续复用[倾听轨迹](research_design/listening.md#7-倾听训练数据与训练目标)和[表达轨迹](research_design/speaking.md#4-表达训练数据与训练目标)，依据当时实际可见的输入独立审核控制动作，不从 Layer 2 建议字段复制。保留普通接话、主动澄清、合理等待、用户附和和打断，以及 CoT 未返回或过期的对照。CoT 输入块在 XTurnix 训练中屏蔽预测损失，只监督合法动作；与 Layer 1 表达监督、Layer 2 可选的 CoT 生成监督分别记账，保持两种能力的训练和测试隔离。
-
-## 5. Layer 0 系统附和的后续安排
-
-Layer 0 继续只预测“发出系统附和／继续等待”，不接管 XTurnix 通用控制、澄清价值或措辞生成。未来输入可结合声学特征、ASR、控制动作及必要历史；正文由 Layer 1 表达路径提供，经同一仲裁器发声。系统附和不代表用户让轮，播放中不叠加另一条音轨。
-
-后续先规划 200 个独立试标机会，再根据覆盖与资源规划 2,000—5,000 个审核后的训练事件；这些只是附和专项参考，不是 thinking 流语料总量。按原对话和说话人分组，重叠窗口不算独立样本，FDB 评测资料不参与训练或阈值选择。
-
-可从语音编码器加小型分类头开始比较声学与文本特征，最多 3 个配置串行、各最多 3 epoch、worker≤2，保留最佳与最终两个检查点。具体模型、阈值、特征和正文方案在实施前确定，本轮不启动。验收重点为机会级命中、误触发、重复、迟到及真实播放，不能靠沉默或只统计附和频率证明合理。
-
-## 6. 后续完整话轮评测
-
-此前取消的 FDB 测试继续暂停。未来如另行开展完整系统评测，应固定 Nemotron 与表达/TTS 配置，对比旧控制和 XTurnix；控制诊断可用相同参考播放，自由生成结果另报实际播放覆盖。
-
-| 数据 | 历史数量 | 后续用途 |
-| --- | ---: | --- |
-| v1.0 candor_pause_handling | 216 | 用户停顿时误接话 |
-| v1.0 synthetic_pause_handling | 137 | 不完整表达与受控停顿 |
-| v1.0 candor_turn_taking | 119 | Smooth TOR、漏接话、提前接话与延迟 |
-| v1.0 synthetic_user_interruption | 200 | 用户打断后的控制与响应 |
-| v1.0 icc_backchannel | 55 | Layer 0 实现后的系统附和诊断 |
-| v1.5 user_backchannel | 99 | 用户附和时误停 |
-| v1.5 user_interruption | 200 | 有效打断与用户附和的区别 |
-
-数量须对正式输入清单重新核查；成对和重复回放不增加独立场景数。原有官方评分提交为 `3e799c45a045256f47d5f1c9cda90157e2d2ec9e`，采用时重新冻结，v1.5 单独锁版本。
-
-正式输出与输入等长，尾窗仅诊断。Pause TOR 与 Smooth/Interruption TOR 的优劣方向分开，延迟与漏答/失败覆盖同时报告。控制 token 到达不是可听响应延迟，内容质量也不能由 TOR 推出。现有 FLEURS 两组件测试不承担上述验收。
-
-## 7. 拟交付文件与说明
-
-拟交付内容按[XTurnix 工作单](issue/XTurnix/README.md)分别实施，本次只创建工作单，不创建代码空壳。实施时按同路径提供中文说明，X-Talk 同步维护其对应文档。
-
-| 拟实现 | 对应说明 | 作用 |
-| --- | --- | --- |
-| `scripts/remote/setup_xturnix_env.sh`、`configs/xturnix_fleurs_test.json` | `docs/scripts/remote/setup_xturnix_env.md`、`docs/configs/xturnix_fleurs_test.md` | 隔离环境准备与模型/协议/资源配置冻结 |
-| `scripts/remote/xturnix_fleurs_test.py` | `docs/scripts/remote/xturnix_fleurs_test.md` | 固定输入、真实时钟回放、ASR/控制事件及独立评分 |
-| `scripts/remote/run_xturnix_fleurs_job.sh` | `docs/scripts/remote/run_xturnix_fleurs_job.md` | 远端预检、串行预热、限额与退出清理 |
-| `tests/test_xturnix_fleurs_test.py` | `docs/tests/test_xturnix_fleurs_test.md` | 少量可手算事件，验证时窗、版本、提前 start 与失败分母 |
-| X-Talk 控制适配与相关事件（后续） | X-Talk 对应中文文档 | XTurnix 决策进入唯一仲裁路径，播放状态回传 |
-| Layer 0 与控制器训练入口（后续） | 实施文件的同路径说明 | 各自职责下的数据构造、训练与验证 |
-
-复用现有[原生 Nemotron 服务](scripts/remote/nemotron_asr_service.md)和持续音频传输，不恢复已撤回的专用部署、回放与评分脚本。
-
-## 8. 环境、资源与实施顺序
-
-本地使用 `parathink-dev`。远端只读复用现役 Nemotron 环境与模型，XTurnix 使用独立 conda，锁定官方实现和模型 revision，不升级或覆盖现役 ASR/TTS/评分环境。资产位置按[远端约定](remote_workspace.md)预检。
-
-| 阶段 | 上限 | 时间与并发 |
-| --- | --- | --- |
-| 数据与环境准备 | 4 CPU、8 GiB RAM、下载并发≤2 | 1 小时，单作业 |
-| 两组件推理 | 优先 1×24 GiB GPU、8 CPU、32 GiB RAM、batch=1 | 4 小时，仅 1 个作业、1 条活动音频 |
-| 已完成的分析与首轮来源审核 | 现有结果、公开资料及 48 会话文本/元数据核查 | 只读采集约 0.85 MiB 响应正文；未启动 GPU、训练环境安装、批量训练数据构造或参数更新 |
-| 条件性 VAD 辅助试训与验证 | 候选上限：1×24 GiB GPU、8 CPU、32 GiB RAM、micro-batch=1；显存停止线 22 GiB | 仅在分析讨论明确进入后适用：单作业≤4 小时、1 个活动作业；最多 2 次试训，阶段累计≤8 GPU 小时（含基线、机制探针与验证），worker≤2 |
-| 汇总评分 | 4 CPU、8 GiB RAM、worker≤2 | 停止推理服务后执行 |
-
-首轮预检峰值，不自动增加卡数或工作数。新增资产≤10 GiB、报告/trace≤2 GiB、启动可用盘≥30 GiB；模型只读复用，不复制大权重。触限则停止并保留失败，日志与检查点有上限。
-
-既有 FLEURS 实施顺序为“冻结输入与历史 ASR 基线 → 锁定 Nemotron/XTurnix/停顿策略 → 实现回放与独立评分 → dev 预热及少量冒烟 → 100 条正式回放 → 独立评分和报告”。权重 revision、停顿检测与阈值、接口轮询周期和请求缓冲上限须在正式回放前固定。真实模型测试在远端执行；XTX-001—005 已完成，XTX-006 正式作业已按用户要求取消，pause 诊断已完成，正式结果尚未产生。
-
-新阶段顺序与验收以 [XTX-007—013](issue/XTurnix/README.md#vad-assisted-training) 为准；当前仅同意 XTX-009 首轮来源审核，该轮已交付，正式冻结仍待前置条件。若后续进入实施，环境、缓存、数据和 adapter 计入阶段累计新增资产上限，不按作业重置预算；代码、配置和测试配套 `docs` 下同路径中文说明。输入、校准及试训不因首轮审核完成而自动启动。
+历史协议及运行证据保留在对应文档和报告，不作为 SoulX 已实现能力或当前实施授权。

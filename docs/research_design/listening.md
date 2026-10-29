@@ -1,8 +1,8 @@
 # 边听边想：主动介入 benchmark 与训练数据
 
-2026-10-29 选型更新：用户确认采用 SoulX-Duplug，并保留后续音频 token、转写文本 token 与 CoT token 联合决策的目标，当前不实现 CoT 扩展。当前五类用户状态 token 全部送给 Layer 1，由 LLM 决定自身行为；普通正式回答在当前 turn 看到 `user_complete` 后开始生成，看到之前不生成正文。仅有效用户打断额外直接干预活动输出，其他状态不进入输出运行时。输入与职责以[架构第 2.2 节](architecture.md#22-前端状态与系统附和)和[第 2.5 节](architecture.md#25-soulx-的-cot-条件化控制)为准，本篇主动介入的独立生成边界及训练仍属后续设计。
+更新：2026-10-29。[研究方案](../research_design.md) · [架构设计](architecture.md) · [边说边想](speaking.md)。
 
-更新：2026-10-23。[研究背景与参考文章](../research_design.md) · [架构设计](architecture.md) · [边说边想](speaking.md)。
+当前采用 SoulX-Duplug，五类状态输入、普通回答生成及直接打断遵循[架构第 2.2 节](architecture.md#22-前端状态与系统附和)。后续音频、转写与 CoT 联合控制尚未实现；主动澄清的独立生成边界仍待设计，见[第 2.5 节](architecture.md#25-soulx-的-cot-条件化控制)。
 
 本文检验倾听期间的 thinking 流能否带来更合理、及时的主动澄清，并设计相应的大规模训练数据。运行合同与训练对象采用架构文档，Layer 3 定位待统一；Layer 2 只向共享上下文发布 CoT，不提供话轮建议或候选问句；后续经适配和训练的 SoulX 提供介入相关判断，Layer 1 读取控制器输出与分析结果决定自身行为并组织实际表达，经统一仲裁和单一播放路径发声。普通回答的 `user_complete` 边界不等于未来主动澄清的全部生成规则，后者需单独设计。
 

@@ -1,18 +1,10 @@
 # 架构图预览入口说明
 
-对应文件：[figures/parathink_method_preview.tex](../../figures/parathink_method_preview.tex)。更新：2026-10-23。
+更新：2026-10-29。对应[预览入口](../../figures/parathink_method_preview.tex)。文件使用`standalone`加载TikZ及[图源](../../figures/parathink_method.tex)，保留16pt留白，没有运行时类或方法。模块、连线和打断时序见[图示说明](parathink_method.md)。
 
-## 整体作用与结构
+同次构建生成[矢量PDF](../../figures/parathink_method_preview.pdf)和[高清PNG](../../figures/parathink_method_preview.png)，均展示SoulX-Duplug状态进入Layer 1、有效用户打断直接停止输出，以及后续CoT条件化目标。
 
-使用 `standalone` 文档类加载 TikZ 库，通过 `input` 包含[架构图源码](../../figures/parathink_method.tex)。外围保留 16pt 留白，图内使用较大英文文字。文件没有运行时类或方法，不包含模型调用或播放逻辑。模块职责和连线解释见[图示说明](parathink_method.md)。
-
-本版展示各模块对共享 Context 的读取和写回、由 ASR 更新及后续 Layer 2 CoT 写入触发的 XTurnix 决策，以及 Layer 0/1 直接提交至 Text FIFO 的输出路径。橙色优先控制线绕过 FIFO，进入兼有唯一仲裁执行点与 TTS/播放器的输出运行时；Context 不向 FIFO 提交文本。底部时序条展示旧 `output_id` 关闭、停播与取消、确认 Listen，以及有效 start 后使用新标识输出。运行时向 Context 回传真实状态和打断事件。
-
-Layer 2 仅将 CoT 发布至 Context，不提供话轮建议；XTurnix 负责全部话轮决策，Layer 1 利用同一 CoT 组织表达。图中 CoT 写回线与控制动作线分开，CoT 条件化控制标注为仍需训练。
-
-产物为可任意放大的[矢量 PDF](../../figures/parathink_method_preview.pdf)，以及便于直接查看的[高清 PNG](../../figures/parathink_method_preview.png)。两者来自同一次构建。
-
-## 构建方式
+## 构建与检查
 
 在项目根目录逐条运行：
 
@@ -24,4 +16,4 @@ cp /tmp/parathink-figure-build/parathink_method_preview.pdf parathink_method_pre
 pdftoppm -png -singlefile -scale-to 3200 parathink_method_preview.pdf parathink_method_preview
 ```
 
-辅助文件保留在临时目录，不纳入 Git。检查编译日志无文字溢出或缺字，并打开 PNG 核对模块、标签、箭头和留白，重点确认控制线绕过 FIFO、停止确认先于 Listen、新输出等待有效 start。对照[架构文档](../research_design/architecture.md)检查模块职责和打断合同。编译通过只证明图可生成，不代表模型能力或工程接入已通过验证。本流程不运行 Python，无需新增 Python 环境。
+辅助文件留在临时目录。检查日志无文字溢出或缺字，并打开PNG核对名称、连线和裁切：音频同时到ASR与SoulX，状态经Context进入Layer 1，仅有效用户打断绕过FIFO；关闭确认先于Listen，新回答遵循`user_complete`可见边界。图文合同以[架构设计](../research_design/architecture.md)为准。编译仅验证图可生成，不代表模型或运行时验收；本流程不运行Python。

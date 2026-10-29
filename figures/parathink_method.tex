@@ -1,4 +1,4 @@
-% Shared-context architecture with priority interruption control.
+% SoulX user-state inputs with a separate priority interruption path.
 \begin{tikzpicture}[x=1cm,y=1cm,font=\sffamily\large,
   >={Latex[length=3mm,width=2mm]},
   box/.style={rounded corners=5pt,draw=black!55,line width=1pt,
@@ -16,7 +16,7 @@
   \node[font=\sffamily\bfseries\LARGE] at (10.5,17)
     {ParaThink: Shared Context, Parallel Thinking and Expression};
   \node[font=\sffamily\normalsize,text=black!65] at (10.5,16.2)
-    {Context-mediated coordination \quad / \quad Independent turn policy \quad / \quad One playback owner};
+    {Shared state inputs \quad / \quad Parallel thinking and expression \quad / \quad One playback owner};
 
   \node[box,fill=teal!9,text width=6cm,minimum height=1.2cm] (asr) at (10.5,14)
     {\textbf{Nemotron Streaming ASR}\\Online transcript + prefix version};
@@ -25,20 +25,20 @@
 
   \node[wide,fill=teal!6,text width=26cm,minimum height=1.8cm] (context) at (10.5,11.2)
     {\textbf{Currently Available Dialogue Context + Runtime State}\\[3pt]
-     Transcript + generated history \enspace / \enspace Layer 2 CoT \enspace / \enspace XTurnix decisions\\
+     Transcript + generated history \enspace / \enspace Layer 2 CoT \enspace / \enspace SoulX-Duplug user states\\
      Backchannel timing suggestions \enspace / \enspace Layer 1 output \enspace / \enspace Listen--Speak state\\
      Interruption events / generated, submitted, canceled and played records};
   \draw[flow] (asr.south) -- node[label,right] {Transcript updates} (context.north);
 
   \node[box,fill=orange!11,minimum height=3.4cm] (turn) at (0,7.2)
-    {\textbf{XTurnix}\\\textbf{Turn Policy}\\[3pt]
-     Listen: keep / start\\Speak: keep / stop\\All turn decisions};
+    {\textbf{SoulX-Duplug}\\\textbf{User-State Model}\\[3pt]
+     Audio + transcript\\Five native user states\\Future: CoT conditioning};
   \node[box,fill=cyan!9,minimum height=3.4cm] (l0) at (7,7.2)
     {\textbf{Layer 0}\\\textbf{Backchannel Timing}\\[3pt]
      System backchannel\\Timing prediction};
   \node[box,fill=blue!8,minimum height=3.4cm] (l1) at (14,7.2)
     {\textbf{Layer 1}\\\textbf{Expression}\\[3pt]
-     Generate spoken text\\Request thinking\\Resume with new input};
+     Read all five user states\\Reply after user\_complete\\Request thinking};
   \node[box,fill=violet!9,minimum height=3.4cm] (l2) at (21,7.2)
     {\textbf{Layer 2}\\\textbf{Async Thinking}\\[3pt]
      Publish CoT only\\No turn-action advice\\Update one active task};
@@ -47,8 +47,10 @@
     \draw[flow] ([xshift=-1.4cm]\name.north |- context.south) --
       node[label,left] {Read} ([xshift=-1.4cm]\name.north);
   }
-  \draw[control] ([xshift=1.4cm]turn.north) --
-    node[label,right] {Actions} ([xshift=1.4cm]turn.north |- context.south);
+  \draw[flow] (audio.west) -- (-4,15.5) -- (-4,8) --
+    node[label,above] {Audio} ([yshift=0.8cm]turn.west);
+  \draw[write] ([xshift=1.4cm]turn.north) --
+    node[label,right] {States} ([xshift=1.4cm]turn.north |- context.south);
   \draw[write] ([xshift=1.4cm]l0.north) --
     node[label,right] {Timing} ([xshift=1.4cm]l0.north |- context.south);
   \draw[write] ([xshift=1.4cm]l1.north) --
@@ -58,9 +60,9 @@
   \draw[thinking] (l1.east) -- node[label,above] {Request} (l2.west);
 
   \node[align=center,font=\sffamily\normalsize,text=orange!70!black] at (0,4.8)
-    {Event-driven turn decisions\\On ASR updates / future CoT writes};
+    {Continuous audio observation\\States reach Layer 1 via Context};
   \node[align=center,font=\sffamily\normalsize,text=violet!75!black] at (19,4.8)
-    {CoT shared with XTurnix + Layer 1\\Layer 1 reads at its next input boundary};
+    {CoT shared with SoulX-Duplug + Layer 1\\Read at legal input boundaries};
 
   \node[wide,fill=blue!5] (fifo) at (10.5,2.4)
     {\textbf{Text FIFO}\\Submitted speech text / system backchannel, in order\\
@@ -74,8 +76,8 @@
      Priority stop: halt audio + cancel pending output\\
      Reject late text / audio carrying an invalid output\_id};
   \draw[flow] (fifo.south) -- node[label,right] {Consume in order} (playback.north);
-  \draw[control] (context.west) -- (-5.2,11.2) -- (-5.2,-1) --
-    node[label,above,text width=5.5cm] {start / stop control\\Bypass Text FIFO\\No Layer 1 wait} (playback.west);
+  \draw[control] (turn.west) -- (-5.7,7.2) -- (-5.7,-1) --
+    node[label,above,text width=5.5cm] {Valid user\_nonidle\\During active output: stop\\Bypass FIFO / no LLM wait} (playback.west);
   \node[font=\sffamily\normalsize] (heard) at (10.5,-3.3) {Audio heard by the user: never revoked};
   \draw[flow] (playback.south) -- (heard.north);
   \draw[feedback] (playback.east) -- (26,-1) --
@@ -88,15 +90,15 @@
   \node[eventbox] (cancel) at (7,-6.1)
     {\textbf{2. Halt + cancel}\\Cancel queued / buffered output\\Discard late text / audio};
   \node[eventbox] (ack) at (14,-6.1)
-    {\textbf{3. Stop acknowledged}\\Publish Listen + interruption\\Keep generated history};
+    {\textbf{3. Closure acknowledged}\\Publish Listen + interruption\\Keep generated history};
   \node[eventbox] (restart) at (21,-6.1)
-    {\textbf{4. Wait for valid start}\\Fresh output\_id + new text\\Old queue stays canceled};
+    {\textbf{4. New Layer 1 reply}\\Read matching user\_complete\\Fresh output\_id; new text};
   \draw[control] (close.east) -- (cancel.west);
   \draw[control] (cancel.east) -- (ack.west);
   \draw[control] (ack.east) -- (restart.west);
 
   \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-8)
-    {ASR updates trigger XTurnix; future Layer 2 CoT writes also trigger a decision, never playback directly.};
+    {Ordinary replies begin after Layer 1 reads user\_complete in the current turn; no separate reply call.};
   \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-8.7)
-    {CoT-conditioned XTurnix requires training \enspace / \enspace Layer 2 CoT is internal, never playable text};
+    {Target architecture; integration pending. CoT conditioning requires training; its trigger and output encoding remain open.};
 \end{tikzpicture}
