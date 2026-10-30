@@ -1,5 +1,8 @@
 # Nemotron＋SoulX：FDB 三类抽样检查
 
+2026-10-30 撤回说明：用户已指令停止 Nemotron＋SoulX 路线，转向官方 SoulX＋SenseVoice 的160ms当前值写入。以下为历史调研／实验记录，不再作为执行计划；专用适配器和入口已移除，源码由 Git 提交 `9fb5319` 追溯。现役独立 Nemotron ASR 服务不属于本次组合回退范围。
+
+
 2026-10-30，用户明确要求在 smooth turn taking、pause handling、user interruption 各抽 10 条实际运行。此次授权扩展既有独立组合探针的数据范围；不新建 issue、不启动训练、不切换现役前端，不恢复历史完整系统评测。
 
 固定随机种子 20261030，候选目录按样本 ID 排序后抽样：Candor 接话 10 条、Candor 停顿 5 条、Synthetic 停顿 5 条、Synthetic 用户打断 10 条。先冻结文件摘要和标注；音频不裁剪、不额外补静音，继续使用既有整段 RMS0.05／峰值0.9标定，并披露它不是线上因果增益控制。标注、参考文字不输入模型。
@@ -14,6 +17,6 @@
 
 为回答此前“是临近句末还是确实在中间”的疑问，离线报告另列比结束边界早1秒以上的样本；这只是提前量分组，不调整模型阈值或改变原有严格边界统计。
 
-脚本和核心方法见[实现说明](../../scripts/remote/nemotron_soulx_fdb.md)，真实结果另写入 reports。
+脚本和核心方法见[实现说明](https://github.com/Vitalrubbish/InterClarify/blob/9fb5319/docs/scripts/remote/nemotron_soulx_fdb.md)，真实结果另写入 reports。
 
 已完成：推理源码`860740c`、离线分组`e6dd306`，远端作业`job-179333017126166764434-xuan-zhang`退出0，30/30条完整实时回放。接话严格边界后complete为2/10，边界前complete为8/10；停顿11个区间中5个出现complete；打断10/10出现新的nonidle，处理音频位置延迟中位880ms。结束后队列为空，详见[实测报告](../../../reports/soulx/20261030-nemotron-fdb30/README.md)。这些结果不代表完成状态质量达标，不自动切换现役路径。

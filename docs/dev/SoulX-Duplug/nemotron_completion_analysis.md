@@ -1,5 +1,8 @@
 # Nemotron 适配后的句中完成：原因与修复方向
 
+2026-10-30 撤回说明：用户已指令停止 Nemotron＋SoulX 路线，转向官方 SoulX＋SenseVoice 的160ms当前值写入。以下为历史调研／实验记录，不再作为执行计划；专用适配器和入口已移除，源码由 Git 提交 `9fb5319` 追溯。现役独立 Nemotron ASR 服务不属于本次组合回退范围。
+
+
 2026-10-30，按用户要求分析。本文仅复核已有源码与轨迹，不修改推理行为、不启动远端作业、不建立 issue。结论是：**当前问题主要涉及外部文本的交付节奏与 SoulX 的状态推断、兜底规则及 reset 衔接，不能仅用 ASR 最终识别准确率解释。** 哪一因素解释了相对 SenseVoice 的质量差异，仍需同条件对照。
 
 ## 1. 已确认的证据
@@ -112,7 +115,7 @@ Context 继续即时发布 Nemotron 原始字符；控制视图可试验只提�
 
 ## 5. 复核依据
 
-- 本地适配：[Nemotron 前端](../../../scripts/runtime/nemotron_soulx_frontend.py)、[SoulX 采集与 reset](../../../scripts/runtime/soulx_frontend.py)、[ASR 服务](../../../scripts/remote/nemotron_asr_service.py)。
+- 本地适配：[Nemotron 前端](https://github.com/Vitalrubbish/InterClarify/blob/9fb5319/scripts/runtime/nemotron_soulx_frontend.py)、[SoulX 采集与 reset](../../../scripts/runtime/soulx_frontend.py)、[ASR 服务](../../../scripts/remote/nemotron_asr_service.py)。
 - 上游 [冻结源码](https://github.com/Soul-AILab/SoulX-Duplug/blob/a0b9063843df69619b087b95b74597b2176910b8/service/model.py#L680-L719)，本次重新取得的文件 SHA256 与已审核值一致：`85d9d049c47d42fda2797806024044d141e2703fd6a63ef2853cbd29887f2a52`。
 - [SoulX 论文](https://arxiv.org/html/2603.14877v1#S3.SS4)：第 3.4／3.6 节的交错序列与 teacher forcing，第 5.1 节的词级对齐说明。输入分布变化的影响属于本项目推断，并非论文已验证 Nemotron 适配效果。
 - 本轮在本地 `interclarify-dev` conda 中读取 30 份原始事件和逐帧 CSV，按 `raw_token`／`token`、`delta_token_ids`、版本及重放字段重新汇总；未重新运行模型。历史 SenseVoice 线索来自已有 `artifacts/soulx/20261030-fdb-stability-r1/collected/traces.jsonl.gz`。

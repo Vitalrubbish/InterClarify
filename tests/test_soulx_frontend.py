@@ -1,12 +1,14 @@
-"""Check label preservation, ambiguous windows and real capture transactions."""
+"""Check source preservation and one text/state overwrite per audio step."""
 from pathlib import Path
 import sys
-import unittest
-from unittest.mock import patch
+import threading
 from types import SimpleNamespace
+import unittest
+
+import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parents[1] / 'scripts/runtime'))
-from shared_context import FrontendConsumer, SharedContext, STATE_IDS
+from shared_context import SharedContext, STATE_IDS
 from sensevoice_transcript import SenseVoiceObservation, TurnTranscriptAssembler
 from soulx_frontend import SoulXFrontend, slice_spans
 
@@ -17,151 +19,148 @@ def observation(text, start=0, end=16000):
 
 
 def protocol_frontend():
-    # Exercise the real publication methods without importing any GPU backend.
-    frontend = SoulXFrontend.__new__(SoulXFrontend)
-    frontend.context = SharedContext()
-    frontend.session_id, frontend.turn_id = 's', 't'
-    frontend.producer_seq = frontend.controller_generation = frontend.control_revision = 0
-    frontend.asr_generation, frontend.clock_id = 'g', 'test'
-    frontend.assembler = TurnTranscriptAssembler()
-    frontend.delivery_phase, frontend.closed = 'online', False
-    frontend.on_commit = frontend.audit = None
-    frontend._calls = []
-    frontend.active_output = frontend.stop_output = None
-    frontend._stopped = set()
-    frontend.processed_until = 16000
-    event = frontend._event('user_transcript', source='sensevoice_small', version=0,
-                            asr_version=0, text='', status='open')
-    frontend._commit([event])
-    frontend.snapshot = event
-    return frontend
+    # Use the real capture/publication path without importing a GPU backend.
+    value = SoulXFrontend.__new__(SoulXFrontend)
+    value.context = SharedContext()
+    value.session_id, value.turn_id = 's', 't'
+    value.controller_generation = value.call_sequence = value.processed_until = 0
+    value.asr_generation, value.clock_id = 'g', 'test'
+    value.assembler = TurnTranscriptAssembler()
+    value.delivery_phase, value.closed = 'online', False
+    value.on_commit = value.audit = value.active_output = value.stop_output = None
+    value._calls, value._arrays, value._stopped = [], {}, set()
+    value._feeding, value._pending_state, value.control = threading.Lock(), None, None
+    value.raw_prediction = None, None
+    value._check_pcm_bound = lambda: None
+    value.snapshot = value.context.open_user_turn('s', 't')
+    value.model = SimpleNamespace(speech_detected=False, get_rms=lambda chunk: .1,
+        config=SimpleNamespace(infer_config=SimpleNamespace(far_field_threshold=.02)))
+    return value
+
+
+def run_frame(value, step, token='<|user_nonidle|>'):
+    chunk = value._record_array(np.zeros(2560, dtype=np.float32),
+        [{'kind': 'real', 'start': step * 2560, 'end': (step + 1) * 2560, 'samples': 2560}])
+    ahead = value._record_array(np.zeros(640, dtype=np.float32),
+        [{'kind': 'real', 'start': (step + 1) * 2560, 'end': (step + 1) * 2560 + 640, 'samples': 640}])
+    value.raw_prediction = STATE_IDS.get(token), token
+    return value._state_predict(chunk, None, ahead)
 
 
 class SoulXFrontendTests(unittest.TestCase):
-    def test_raw_labels_preserve_digits_punctuation_and_unknowns(self):
+    def test_labels_digits_and_window_corrections_remain_source_text(self):
         raw = '<|en|><|NEUTRAL|><|Speech|><|withitn|>The. 123. I\'m here.'
         parsed = SenseVoiceObservation.parse(raw)
         self.assertEqual(parsed['text'], "The. 123. I'm here.")
-        self.assertEqual([t['token'] for t in parsed['tags']],
-                         ['<|en|>', '<|NEUTRAL|>', '<|Speech|>', '<|withitn|>'])
         for span in parsed['character_map']:
             self.assertEqual(parsed['text'][span['text_start']:span['text_end']],
                              raw[span['raw_start']:span['raw_end']])
-        unknown = SenseVoiceObservation.parse('<|en|><|future|>hello<|Speech|>!')
-        self.assertEqual(unknown['text'], '<|future|>hello!')
-        self.assertFalse(unknown['tags'][1]['known'])
-
-    def test_same_origin_revision_unique_slide_and_ambiguous_gap(self):
         assembler = TurnTranscriptAssembler()
         assembler.apply_window(observation('I want to book a flight to Paris', end=32000))
-        update = assembler.apply_window(observation('book a flight to London tomorrow', 16000, 48000))
-        self.assertEqual(update['text'], 'I want to book a flight to London tomorrow')
-        self.assertEqual(update['base_asr_version'], 1)
-        update = assembler.apply_window(observation('yes yes', 32000, 64000))
-        self.assertEqual(update['assembly_status'], 'gap')
-        self.assertEqual(update['asr_version'], 2)
+        update = assembler.apply_window(observation('book a flight to London', 16000, 48000))
+        self.assertEqual(update['text'], 'I want to book a flight to London')
+        self.assertFalse({'asr_version', 'replacement'} & update.keys())
+        self.assertEqual(assembler.apply_window(observation('yes yes', 32000, 64000))['assembly_status'], 'gap')
+        self.assertEqual(assembler.text, 'I want to book a flight to London')
         assembler.apply_window(observation('Corrected full turn.', 0, 64000))
-        self.assertEqual(assembler.text, 'Corrected full turn.')
         self.assertTrue(assembler.coverage_complete)
         assembler.apply_window(observation('New segment.', 64000, 80000))
         self.assertEqual(assembler.text, 'Corrected full turn. New segment.')
-        assembler.apply_window(observation('Revised new segment.', 64000, 90000))
-        self.assertEqual(assembler.text, 'Corrected full turn. Revised new segment.')
-        recovering = TurnTranscriptAssembler()
-        recovering.apply_window(observation('I want to book a flight to Paris', end=48000))
-        recovering.apply_window(observation('bad boundary words', 8000, 52000))
-        repaired = recovering.apply_window(observation('book a flight to London', 16000, 64000))
-        self.assertEqual(repaired['assembly_status'], 'assembled')
-        self.assertEqual(repaired['text'], 'I want to book a flight to London')
         partial = TurnTranscriptAssembler()
         partial.apply_window(observation('inter', end=16000))
         self.assertEqual(partial.apply_window(observation('net', 16000, 32000))['assembly_status'], 'gap')
-        repeat = TurnTranscriptAssembler()
-        repeat.apply_window(observation('yes yes yes yes done', end=32000))
-        self.assertEqual(repeat.apply_window(observation('yes yes done', 16000, 48000))['assembly_status'], 'gap')
 
-    def test_capture_is_visible_before_state_and_close_preserves_text(self):
-        frontend = protocol_frontend()
-        readers = [FrontendConsumer('s'), FrontendConsumer('s')]
-        frontend.observe_asr('<|en|>hello', observation('')['audio_spans'], asr_call_id='a', call_kind='window')
-        for reader in readers:
-            events = reader.consume(frontend.context)
-            self.assertEqual(reader.turns['t']['text'], 'hello')
-            self.assertFalse(any(e['kind'] == 'user_state' for e in events))
-        frontend.observe_asr('', observation('')['audio_spans'], asr_call_id='b', call_kind='window', call_status='error')
-        self.assertEqual(frontend.snapshot['text'], 'hello')
-        frontend.close_turn()
-        frontend.observe_asr('<|en|>late', observation('')['audio_spans'], asr_call_id='c', call_kind='turn')
-        self.assertEqual(frontend.context.get_user_turn('s', 't')['transcript']['text'], 'hello')
+    def test_no_early_text_publish_and_corrections_replace_next_joint_frame(self):
+        value = protocol_frontend()
+        writes = []
+        value.on_commit = lambda context: writes.append(context.get_user_turn('s', 't'))
+        def predict(chunk, back, ahead):
+            value.observe_asr('<|en|>book Beijing tomorrow', observation('')['audio_spans'], asr_call_id='a')
+            self.assertEqual(value.context.get_user_turn('s', 't')['text'], '')
+            value.observe_state('<|user_nonidle|>', 'book')
+        value._instrumented_state = predict
+        run_frame(value, 0)
+        def revise(chunk, back, ahead):
+            value.observe_asr('<|en|>book Shanghai', observation('', end=17000)['audio_spans'], asr_call_id='b')
+            value.observe_state('<|user_incomplete|>', 'Shanghai')
+        value._instrumented_state = revise
+        run_frame(value, 1, '<|user_incomplete|>')
+        value._instrumented_state = lambda *args: value.observe_state('<|user_idle|>', '')
+        run_frame(value, 2, '<|user_idle|>')
+        self.assertEqual(len(writes), 3)
+        self.assertEqual([(v['text'], v['state_token']) for v in writes],
+                         [('book Beijing tomorrow', '<|user_nonidle|>'),
+                          ('book Shanghai', '<|user_incomplete|>'), ('book Shanghai', '<|user_idle|>')])
+        value.close_turn()
+        value.observe_asr('<|en|>late', observation('', end=20000)['audio_spans'], asr_call_id='c')
+        self.assertEqual(value.context.get_user_turn('s', 't')['text'], 'book Shanghai')
 
-    def test_recognizer_callback_uses_source_call_id_before_postprocessing(self):
-        import numpy as np
-        frontend = protocol_frontend()
-        frontend.call_sequence, frontend._in_asr = 0, True
-        frontend._spans = lambda audio: observation('')['audio_spans']
-        raw = '<|en|><|NEUTRAL|><|Speech|><|withitn|>The. 123.'
+    def test_complete_branch_final_asr_and_reset_precede_joint_publication(self):
+        value = protocol_frontend()
+        model = value.model
+        model.buffer = value._record_array(np.zeros(640, dtype=np.float32),
+            [{'kind': 'real', 'start': 2560, 'end': 3200, 'samples': 640}])
+        def reset():
+            for name in ('buffer', 'buffer_for_asr', 'cascade_buffer'):
+                setattr(model, name, np.zeros(640, dtype=np.float32))
+        value._original = {'reset': reset}
+        def predict(chunk, back, ahead):
+            value.observe_asr('book Beijing', observation('')['audio_spans'], asr_call_id='window')
+            value.observe_state('<|user_complete|>', '')
+            value.observe_asr('book Shanghai', observation('', end=17000)['audio_spans'], asr_call_id='turn', call_kind='turn')
+            value._reset_controller()
+        value._instrumented_state = predict
+        run_frame(value, 0, '<|user_complete|>')
+        current = value.context.get_user_turn('s', 't')
+        self.assertEqual((current['text'], current['state_token']), ('book Shanghai', '<|user_complete|>'))
+        self.assertEqual(current['controller_generation'], 0)
+        self.assertEqual(value.controller_generation, 1)
+        self.assertEqual(value._spans(model.buffer)[0]['start'], 2560)
+        self.assertEqual(value.assembler.text, 'book Shanghai')
+
+    def test_float32_recognizer_returns_native_control_text_but_stages_raw_text(self):
+        value = protocol_frontend()
+        value._in_asr = True
+        audio = value._record_array(np.zeros(16000, dtype=np.float64), observation('')['audio_spans'])
         seen = []
         def generate(**kwargs):
             seen.append(kwargs['input'].dtype)
-            return [{'text': raw}]
-        frontend.model = SimpleNamespace(cascade_asr=SimpleNamespace(
-            language='en', sensevoice_model=SimpleNamespace(generate=generate),
-            clean_sensevoice_text=lambda text: text,
-            rich_transcription_postprocess=lambda text: 'CONTROL'))
-        self.assertEqual(frontend._recognize(np.zeros(16000, dtype=np.float64)), 'CONTROL')
+            return [{'text': '<|en|>The. 123.'}]
+        value.model.cascade_asr = SimpleNamespace(language='en', sensevoice_model=SimpleNamespace(generate=generate),
+            clean_sensevoice_text=lambda text: text, rich_transcription_postprocess=lambda text: 'CONTROL')
+        self.assertEqual(value._recognize(audio), 'CONTROL')
         self.assertEqual(seen, [np.dtype('float32')])
-        events = frontend.context.read_frontend_updates('s')['updates']
-        source = next(e for e in events if e['kind'] == 'asr_observation')
-        self.assertEqual(source['asr_call_id'], 'g:call:1')
-        self.assertEqual(frontend.snapshot['text'], 'The. 123.')
+        self.assertEqual(value.assembler.text, 'The. 123.')
+        self.assertEqual(value.context.get_user_turn('s', 't')['text'], '')
+        value.observe_asr('', observation('', end=17000)['audio_spans'], asr_call_id='empty')
+        self.assertEqual(value.assembler.text, 'The. 123.')
 
-    def test_all_five_tokens_and_far_field_do_not_become_service_actions(self):
-        frontend = protocol_frontend()
-        frontend.current_chunk, frontend.current_ahead = object(), object()
-        frontend.model = SimpleNamespace(speech_detected=False,
-             config=SimpleNamespace(infer_config=SimpleNamespace(far_field_threshold=.02)),
-             get_rms=lambda chunk: .1)
-        frontend._spans = lambda array: observation('')['audio_spans']
-        control = frontend._event('control_observation', control_revision=1, asr_call_ids=[])
-        frontend._commit([control])
-        frontend.control = control
-        for token, token_id in STATE_IDS.items():
-            frontend.raw_prediction = token_id, token
-            state = frontend.observe_state(token, '')
-            self.assertTrue(state['accepted'])
-            self.assertEqual(state['token_id'], token_id)
-        frontend.model.get_rms = lambda chunk: 0.
-        state = frontend.observe_state('<|user_nonidle|>', '')
-        self.assertFalse(state['accepted'])
-        self.assertEqual(state['rejection_reason'], 'far_field')
-        frontend.delivery_phase = 'drain'
-        state = frontend.observe_state('<|user_complete|>', '')
-        self.assertFalse(state['accepted'])
-        self.assertEqual(state['rejection_reason'], 'drain')
-        stored = [e for e in frontend.context.read_frontend_updates('s')['updates'] if e['kind'] == 'user_state']
-        self.assertEqual(len(stored), 7)
-
-    def test_stop_deduplicates_one_output_and_ledger_keeps_disjoint_ranges(self):
-        frontend = protocol_frontend()
-        frontend.current_chunk = frontend.current_ahead = object()
-        frontend._spans = lambda array: observation('')['audio_spans']
-        frontend.model = SimpleNamespace(speech_detected=True,
-             config=SimpleNamespace(infer_config=SimpleNamespace(far_field_threshold=.02)))
-        control = frontend._event('control_observation', control_revision=1, asr_call_ids=[])
-        frontend._commit([control])
-        frontend.control, frontend.raw_prediction = control, (151681, '<|user_nonidle|>')
-        frontend.active_output = lambda: {'output_id': 'old', 'phase': 'preparing', 'session_id': 's'}
+    def test_all_states_far_field_drain_and_immediate_stop(self):
+        value = protocol_frontend()
         stopped = []
-        frontend.stop_output = lambda event, output_id: stopped.append(output_id)
-        frontend.observe_state('<|user_nonidle|>', 'hello')
-        frontend.observe_state('<|user_nonidle|>', 'hello')
-        self.assertEqual(stopped, ['old'])
+        value.active_output = lambda: {'output_id': 'o', 'session_id': 's', 'phase': 'preparing'}
+        value.stop_output = lambda state, output: stopped.append((state['processed_until'], output))
+        for step, token in enumerate(STATE_IDS):
+            value._instrumented_state = lambda *args, token=token: value.observe_state(token, '')
+            run_frame(value, step, token)
+            self.assertTrue(value.context.get_user_turn('s', 't')['state_accepted'])
+        self.assertEqual(len(stopped), 1)
+        value.model.get_rms = lambda chunk: 0.
+        value._instrumented_state = lambda *args: value.observe_state('<|user_nonidle|>', '')
+        run_frame(value, 5)
+        self.assertFalse(value.context.get_user_turn('s', 't')['state_accepted'])
+        previous = value.context.get_user_turn('s', 't')
+        value.delivery_phase = 'drain'
+        run_frame(value, 6)
+        self.assertEqual(value.context.get_user_turn('s', 't'), previous)
+        self.assertEqual(len(stopped), 1)
+        value._feeding.acquire()
+        with self.assertRaises(RuntimeError):
+            value.close_turn()
+        value._feeding.release()
         spans = [{'kind': 'synthetic', 'samples': 10},
-                 {'kind': 'real', 'start': 20, 'end': 30, 'samples': 10},
-                 {'kind': 'real', 'start': 40, 'end': 50, 'samples': 10}]
-        sliced = slice_spans(spans, 5, 25)
-        self.assertEqual([s.get('start') for s in sliced], [None, 20, 40])
-        self.assertEqual(sum(s['samples'] for s in sliced), 20)
+                 {'kind': 'real', 'start': 20, 'end': 30, 'samples': 10}]
+        self.assertEqual(sum(v['samples'] for v in slice_spans(spans, 5, 15)), 10)
 
 
 if __name__ == '__main__':

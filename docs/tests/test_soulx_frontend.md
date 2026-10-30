@@ -1,11 +1,7 @@
-# SoulX 前端契约测试
+# SoulX 当前值前端检查
 
-对应 `tests/test_soulx_frontend.py`。六个小场景使用真实解析、整理和发布方法，替换模型依赖，不运行 GPU。覆盖原始标签／数字／缩写、唯一滑窗及歧义、状态前文字可读、空值与关闭排空、五状态／远场、停止幂等及不连续音频账本；新增真实识别回调的调用ID和后处理前写入检查，防止只有直接发布测试而漏掉适配接线错误。
+对应 `tests/test_soulx_frontend.py`。五个CPU场景核对标签与原文映射、窗口修订／缺口；ASR只暂存正文且每块联合写一次；complete后的整段识别及reset先于联合发布；float32识别和原生控制文字保持；五状态、远场拒绝、排空隔离、直接停止幂等及计算期间拒绝关闭。
 
-排空分支还检查即使读到原生complete，也只保存诊断，不作为在线有效完成状态。
+测试执行真实前端采集与发布方法，以轻量状态模型替身触发顺序，不冒充GPU质量测试。`protocol_frontend()`构造无GPU前端，`run_frame()`提供带真实采样账本的160ms块和40ms前瞻。
 
-真实识别回调测试从float64缓存输入，验证generate实际收到float32，并核对调用ID及原文发布。
-
-窗口场景还覆盖相邻片段接入／同片段修订、临时缺口后的唯一锚点恢复，以及没有词界的相邻词内片段必须失败。
-
-运行：`python -m unittest discover -s tests -p 'test_soulx_frontend.py' -v`。全部五状态的协议覆盖不等于音频模型覆盖；真实预测另由远端回放报告。
+运行：`conda run -n interclarify-dev python -m unittest discover -s tests -p 'test_soulx_frontend.py' -v`。真实冻结模型的ASR门控、缓存及整段分支由远端回放验证。

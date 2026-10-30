@@ -1,15 +1,11 @@
-# 通用前端 SharedContext
+# SharedContext 当前用户观察
 
-对应 `scripts/runtime/shared_context.py`。独立于 TextTurn 的历史实现，保存来源观察、控制视图、正文、五状态和生命周期，提供统一有序事件流与话轮视图。内存存储不承诺进程重启后持久化。
+对应 `scripts/runtime/shared_context.py`。`SharedContext` 每个逻辑话轮保存一份最新全文与当前 SoulX 状态，后续整组替换，不保存历史正文、事件环、版本、patch 或读取游标。旧 TextTurn 的同名 Context 独立保留，不受本次修改影响。
 
-2026-10-30加入Nemotron独立适配支持：话轮来源固定为`sensevoice_small`或`nemotron`，同话轮不允许切换；Nemotron额外强制字符前缀只追加，违例明确报错。其他版本、依赖、generation及关闭合同保持。
+`open_user_turn()` 创建 SenseVoice 空话轮；`publish_user_frame()` 校验来源、状态 ID、真实音频进度和大小限制，在短锁内替换整条记录。文字允许修改或删除旧词，重复／倒退音频块不能覆盖当前值。`get_user_turn()` 返回原子副本，读者修改副本不影响后续读取。
 
-`SharedContext.commit_frontend_events()` 在短锁内先校验完整事务，再一起提交；以稳定事件 ID 去重，以 producer ID 和序号检查缺口。校验依赖、正文 patch 重建、ASR 版本、关闭及控制器 generation，错误不会留下半个事务。正文支持替换，不限制前缀追加。
+`close_user_turn()` 保留最后正文和状态并设置关闭原因；关闭后拒绝新帧。`release_closed_turn()` 显式释放已关闭记录。Condition 只用于短锁与变更通知，不保存更新队列。
 
-`get_user_turn()` 返回当前正文、最新状态与保留完整性；可在已保留水位查询历史。`read_frontend_updates()` 按统一游标读取，`read_user_transcript_updates()` 仅过滤正文。各 `FrontendConsumer` 单独保存游标，正文替换同一 turn 的视图。重同步只恢复正文，不重放历史控制动作。
+默认最多128个话轮、正文65536字符、单快照256KiB；触限明确失败，不自动删除活动正文。接纳状态校验原生五类 token 与 ID，拒绝状态保留原因。开轮时尚无状态，以空值标明初始化，不伪造 idle。
 
-历史查询必须使用已经提交的水位，未来或无效序号明确失败；释放已关闭话轮时同时释放其前端producer计数，避免长期会话维护无界生产者索引。
-
-事件环默认最多4096条／16MiB，单条256KiB、正文65536字符、话轮128个。过期游标抛出 `CursorGap`，最新视图明确标记来源引用是否已回收；`release_closed_turn()` 只允许主动释放已关闭话轮。状态历史以事件流为准，最新视图只保留最新观察，防止重复保存大载荷。
-
-本地契约检查见[测试说明](../../tests/test_shared_context.md)；设计与真实音频结果分别见[前端设计](../../dev/SoulX-Duplug/asr_frontend_design.md)及对应实验报告。
+调用方以单写者提交160ms音频处理结果，Layer 1／2在输入边界读最新值；慢消费者可能跳过中间状态。覆盖 Context 不会自动改写在途 LLM 的输入或KV。测试见[当前值检查](../../tests/test_shared_context.md)。

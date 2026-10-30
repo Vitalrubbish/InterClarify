@@ -1,7 +1,6 @@
 """Preserve raw SenseVoice labels and assemble conservative editable turn tails."""
 from __future__ import annotations
 
-from copy import deepcopy
 import re
 
 
@@ -52,7 +51,7 @@ class TurnTranscriptAssembler:
 
     def __init__(self, turn_start=0, max_chars=65536):
         self.turn_start, self.max_chars = turn_start, max_chars
-        self.text, self.asr_version = '', 0
+        self.text = ''
         self.tail_start, self.last_start, self.last_end = 0, None, turn_start
         self.assembly_status, self.coverage_complete = 'empty', False
 
@@ -114,22 +113,10 @@ class TurnTranscriptAssembler:
         else:
             self.assembly_status, self.coverage_complete = 'assembled', True
         changed = old != self.text
-        base = self.asr_version
-        self.asr_version += int(changed)
-        offset = 0
-        while offset < min(len(old), len(self.text)) and old[offset] == self.text[offset]:
-            offset += 1
         return {'changed': changed or previous_status != (self.assembly_status, self.coverage_complete),
-                'text_changed': changed, 'text': self.text, 'asr_version': self.asr_version,
-                'base_asr_version': base, 'replace_from': offset, 'replacement': self.text[offset:],
+                'text_changed': changed, 'text': self.text,
                 'assembly_status': self.assembly_status, 'coverage_complete': self.coverage_complete,
                 'assembly_reason': reason, 'tail_start': self.tail_start, 'join_separator': separator}
 
     def apply_turn_result(self, observation):
         return self.apply_window(observation)
-
-    def checkpoint(self):
-        return deepcopy(self.__dict__)
-
-    def restore(self, checkpoint):
-        self.__dict__.update(checkpoint)

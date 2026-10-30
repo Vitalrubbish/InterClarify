@@ -1,4 +1,4 @@
-"""Capture frozen SoulX internals into a typed, revision-aware SharedContext."""
+"""Publish each frozen SoulX audio step as one current text/state observation."""
 from __future__ import annotations
 
 import ast
@@ -114,17 +114,20 @@ class SoulXFrontend:
                  active_output=None, stop_output=None, on_commit=None, audit=None):
         if hasattr(model, '_pt'):
             raise ValueError('Model already has a frontend owner')
+        audio_config = model.config.infer_config.input
+        if (audio_config.sample_rate, audio_config.chunk_size) != (16000, 2560):
+            raise ValueError('SoulX frontend requires 160ms blocks at 16kHz')
         self.model, self.context = model, context if context is not None else SharedContext()
         self.session_id, self.turn_id = session_id, turn_id
         self.active_output, self.stop_output = active_output, stop_output
         if bool(active_output) != bool(stop_output):
             raise ValueError('Output lookup and stop callback must be supplied together')
         self.on_commit, self.audit = on_commit, audit
-        self.producer_seq = self.controller_generation = self.call_sequence = self.control_revision = 0
+        self.controller_generation = self.call_sequence = 0
         self.asr_generation = f'{session_id}:{turn_id}:{self.transcript_source}'
         self.clock_id = f'{os.uname().nodename}:{os.getpid()}:monotonic'
         self.input_end = self.processed_until = 0
-        self.snapshot, self.control = None, None
+        self.snapshot, self.control, self._pending_state = None, None, None
         self.assembler = TurnTranscriptAssembler()
         self._arrays, self._calls = {}, []
         self._feeding = threading.Lock()
@@ -160,36 +163,17 @@ class SoulXFrontend:
         model.state_predict = self._state_predict
         model.cascade_asr.recognize = self._recognize
         self._register_reset_buffers()
-        event = self._event('user_transcript', source=self.transcript_source,
-                            version=0, asr_version=0, text='', status='open',
-                            assembly_status='empty', coverage_complete=False,
-                            audio_spans=[], audio_observed_until=0)
-        self._commit([event])
-        self.snapshot = event
+        self.snapshot = self.context.open_user_turn(session_id, turn_id)
+        if self.on_commit:
+            self.on_commit(self.context)
 
-    def _event(self, kind, source='soulx_frontend', **payload):
-        # A single producer namespace orders all event kinds in this session.
-        self.producer_seq += 1
-        return {'schema_version': 1, 'event_id': f'{self.session_id}:{self.turn_id}:{self.producer_seq}',
-                'kind': kind, 'session_id': self.session_id, 'turn_id': self.turn_id,
-                'source': source, 'producer_seq': self.producer_seq,
-                'producer_id': f'{self.session_id}:{self.turn_id}:frontend',
-                'asr_generation': self.asr_generation, 'controller_generation': self.controller_generation,
-                'received_at': time.monotonic(), 'clock_id': self.clock_id, **payload}
+    def _audit(self, kind, observation):
+        # Diagnostics are external to SharedContext and never form text history.
+        if self.audit:
+            self.audit(kind, deepcopy(observation))
 
-    def _commit(self, events):
-        # Retrying this exact transaction never repeats GPU computation.
-        for attempt in range(3):
-            try:
-                results = self.context.commit_frontend_events(events)
-                break
-            except (ValueError, RuntimeError):
-                raise
-            except OSError:
-                if attempt == 2:
-                    raise
-        for event, result in zip(events, results):
-            event['committed_seq'] = result['event_seq']
+    def _publish(self, frame):
+        self.snapshot = self.context.publish_user_frame(frame)
         if self.on_commit:
             self.on_commit(self.context)
 
@@ -248,8 +232,8 @@ class SoulXFrontend:
         self.model.buffer = self._record_array(carry, spans)
         self.controller_generation += 1
         self.control = None
-        self._commit([self._event('frontend_lifecycle', reason='controller_reset',
-                                  processed_until=self.processed_until)])
+        self._audit('controller_reset', {'controller_generation': self.controller_generation,
+                                         'processed_until': self.processed_until})
 
     def _state_predict(self, chunk, back, ahead):
         self.current_chunk, self.current_ahead = chunk, ahead
@@ -259,8 +243,18 @@ class SoulXFrontend:
                 raise ValueError('Real audio was skipped, duplicated or reordered across controller resets')
             self.processed_until = span['end']
         self._calls = []
+        self._pending_state = None
         result = self._instrumented_state(chunk, back, ahead)
+        if self._pending_state is None:
+            raise RuntimeError('SoulX did not produce a state for the audio step')
+        frame = {**self._pending_state, 'text': self.assembler.text,
+                 'assembly_status': self.assembler.assembly_status,
+                 'coverage_complete': self.assembler.coverage_complete}
+        self._pending_state = None
         self._check_pcm_bound()
+        if self.delivery_phase == 'online' and not self.closed and real:
+            self._audit('frame_source', frame)
+            self._publish(frame)
         return result
 
     def _asr(self, audio_embeds):
@@ -308,91 +302,64 @@ class SoulXFrontend:
         call_status = metadata.pop('call_status', 'ok')
         if call_status == 'ok' and not parsed['text']:
             call_status = 'ok_empty'
-        observation = self._event('asr_observation', source='sensevoice_small',
-                                  **parsed, **metadata, audio_spans=deepcopy(audio_spans),
-                                  call_status=call_status, delivery_phase=self.delivery_phase,
-                                  source_revision=SENSEVOICE_REVISION)
-        real = [s for s in audio_spans if s['kind'] == 'real']
-        observation['audio_observed_until'] = max((s['end'] for s in real), default=None)
-        checkpoint = self.assembler.checkpoint()
+        observation = dict(parsed, **metadata, audio_spans=deepcopy(audio_spans),
+                           call_status=call_status, delivery_phase=self.delivery_phase,
+                           source_revision=SENSEVOICE_REVISION)
+        real = [span for span in audio_spans if span['kind'] == 'real']
+        observation['audio_observed_until'] = max((span['end'] for span in real), default=None)
         update = self.assembler.apply_window(observation) if self.delivery_phase == 'online' and not self.closed else {'changed': False, 'reason': 'drain'}
-        observation['assembly_result'] = deepcopy(update)
-        events = [observation]
-        if update['changed']:
-            transcript = self._event('user_transcript', source='sensevoice_small',
-                                     **{k: v for k, v in update.items() if k not in ('changed', 'text_changed')},
-                                     version=self.snapshot['version'] + 1, status='open',
-                                     audio_spans=deepcopy(audio_spans),
-                                     audio_observed_until=observation['audio_observed_until'],
-                                     asr_call_ids=[observation['asr_call_id']],
-                                     depends_on=[observation['event_id']], hypothesis=True)
-            events.append(transcript)
-        if self.audit:
-            self.audit('asr_source', deepcopy(observation))
-        try:
-            self._commit(events)
-        except Exception:
-            self.assembler.restore(checkpoint)
-            raise
-        if len(events) > 1:
-            self.snapshot = events[-1]
-        self._calls.append(observation)
-        if len(self._calls) > 4:
-            self._calls.pop(0)
+        observation['assembly_result'] = update
+        self._audit('asr_source', observation)
+        self._calls.append({'asr_call_id': observation['asr_call_id'],
+                            'call_status': call_status,
+                            'audio_observed_until': observation['audio_observed_until']})
+        self._calls = self._calls[-4:]
         return observation
 
     def observe_control(self, delta_text, before):
-        self.control_revision += 1
         history = self.model.past_state['delta_text']
-        corrected = bool(before and history[:-1] != before)
-        event = self._event('control_observation', control_revision=self.control_revision,
-                            control_text=self.model.past_state['cascade_text'], delta_text=delta_text,
-                            delta_token_ids=self.model.model.tokenizer.encode(delta_text, add_special_tokens=False),
-                            previous_delta_before=before[-1] if before else '',
-                            previous_delta_after=history[-2] if len(history) >= 2 else '',
-                            previous_delta_corrected=corrected,
-                            asr_call_ids=[v['asr_call_id'] for v in self._calls],
-                            depends_on=[v['event_id'] for v in self._calls],
-                            asr_status='returned' if self._calls else 'not_requested')
-        self._commit([event])
-        self.control = event
+        self.control = {'control_text': self.model.past_state['cascade_text'],
+                        'delta_text': delta_text,
+                        'previous_delta_corrected': bool(before and history[:-1] != before),
+                        'asr_calls': deepcopy(self._calls)}
+        self._audit('control_source', self.control)
 
     def observe_state(self, token, delta_text):
         raw_id, raw_token = self.raw_prediction
         far_field = (token == '<|user_nonidle|>' and not self.model.speech_detected
                      and self.model.get_rms(self.current_chunk) < self.model.config.infer_config.far_field_threshold)
         spans = self._spans(self.current_chunk) + self._spans(self.current_ahead)
-        real = [s for s in spans if s['kind'] == 'real']
-        reason = ('drain' if self.delivery_phase != 'online' else 'unknown_state' if token not in STATE_IDS
+        real = [span for span in spans if span['kind'] == 'real']
+        reason = ('drain' if self.delivery_phase != 'online' or self.closed
+                  else 'unknown_state' if token not in STATE_IDS
                   else 'far_field' if far_field else 'synthetic_only' if not real else None)
-        control = self.control
-        basis = {'transcript_version': self.snapshot['version'], 'asr_version': self.snapshot['asr_version'],
-                 'control_revision': control['control_revision'], 'control_event_id': control['event_id'],
-                 'control_event_seq': control['committed_seq'],
-                 'asr_call_ids': control['asr_call_ids'], 'basis_event_seq': self.snapshot['committed_seq'],
-                 'audio_observed_until': max((s['end'] for s in real), default=None)}
-        output = deepcopy(self.active_output()) if self.active_output and reason is None and token == '<|user_nonidle|>' else None
-        event = self._event('user_state', token=token, token_id=STATE_IDS.get(token),
-                            raw_token=raw_token, raw_token_id=raw_id,
-                            adjustment='native_complete_incomplete_rule' if raw_token != token else None,
-                            accepted=reason is None, rejection_reason=reason,
-                            basis=basis, audio_spans=spans, processed_spans=self._spans(self.current_chunk),
-                            processed_until=self.processed_until, delivery_phase=self.delivery_phase,
-                            state_resolved_at=time.monotonic(), source_revision=SOULX_REVISION,
-                            depends_on=[self.snapshot['event_id'], control['event_id']],
-                            output_id=output.get('output_id') if output else None)
-        if self.audit:
-            self.audit('state_source', deepcopy(event))
+        frame = {'session_id': self.session_id, 'turn_id': self.turn_id,
+                 'source': self.transcript_source, 'status': 'open',
+                 'state_token': token, 'state_token_id': STATE_IDS.get(token),
+                 'state_accepted': reason is None, 'rejection_reason': reason,
+                 'raw_token': raw_token, 'raw_token_id': raw_id,
+                 'adjustment': 'native_complete_incomplete_rule' if raw_token != token else None,
+                 'controller_generation': self.controller_generation,
+                 'processed_until': self.processed_until,
+                 'audio_observed_until': max((span['end'] for span in real), default=self.processed_until),
+                 'state_resolved_at': time.monotonic(), 'clock_id': self.clock_id,
+                 'delivery_phase': self.delivery_phase}
+        self._pending_state = frame
+        # The native completion branch may run whole-turn ASR and reset after
+        # this hook; publish text and state together only after that branch.
         try:
-            self._commit([event])
-        finally:
-            if output and output.get('output_id') and output['output_id'] not in self._stopped:
-                if output.get('session_id', self.session_id) == self.session_id and output.get('phase') in ('preparing', 'playing'):
+            if reason is None and token == '<|user_nonidle|>' and self.active_output:
+                output = deepcopy(self.active_output())
+                if (output and output.get('output_id') and output['output_id'] not in self._stopped
+                        and output.get('session_id', self.session_id) == self.session_id
+                        and output.get('phase') in ('preparing', 'playing')):
                     if len(self._stopped) >= 4096:
                         raise RuntimeError('Output cancellation history limit exceeded')
-                    self.stop_output(deepcopy(event), output['output_id'])
+                    self.stop_output(deepcopy(frame), output['output_id'])
                     self._stopped.add(output['output_id'])
-        return event
+        finally:
+            self._audit('state_source', frame)
+        return frame
 
     def _check_pcm_bound(self):
         arrays = [record[0]() for record in self._arrays.values()]
@@ -407,6 +374,8 @@ class SoulXFrontend:
         if not self._feeding.acquire(blocking=False):
             raise RuntimeError('Concurrent calls into a stateful SoulX model are forbidden')
         try:
+            if self.closed:
+                raise ValueError('Cannot feed a closed user turn')
             if not isinstance(audio, np.ndarray) or audio.dtype != np.float32 or audio.ndim != 1 or not np.isfinite(audio).all():
                 raise ValueError('Expected finite mono float32 16kHz samples')
             if not 0 < len(audio) <= 12800:
@@ -438,17 +407,17 @@ class SoulXFrontend:
             self._feeding.release()
 
     def close_turn(self, reason='runtime_audio_case_end'):
-        if self.closed:
-            return
-        payload = {k: deepcopy(v) for k, v in self.snapshot.items()
-                   if k not in ('schema_version', 'event_id', 'kind', 'source', 'session_id', 'turn_id',
-                                'producer_seq', 'producer_id', 'asr_generation', 'controller_generation',
-                                'received_at', 'clock_id', 'committed_seq')}
-        payload.update(version=self.snapshot['version'] + 1, status='closed', close_reason=reason,
-                       depends_on=[self.snapshot['event_id']])
-        event = self._event('user_transcript', source=self.transcript_source, **payload)
-        self._commit([event])
-        self.snapshot, self.closed, self.delivery_phase = event, True, 'drain'
+        if not self._feeding.acquire(blocking=False):
+            raise RuntimeError('Cannot close a turn during model computation')
+        try:
+            if self.closed:
+                return
+            self.snapshot = self.context.close_user_turn(self.session_id, self.turn_id, reason)
+            self.closed, self.delivery_phase = True, 'drain'
+            if self.on_commit:
+                self.on_commit(self.context)
+        finally:
+            self._feeding.release()
 
     def detach(self, *, aborted=False):
         if not self.closed and not aborted:

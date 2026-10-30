@@ -2,11 +2,11 @@
 
 更新：2026-10-29。本文按已确认的SoulX-Duplug路线维护实施顺序；研究范围和模块合同分别见[研究方案](research_design.md)与[架构设计](research_design/architecture.md)。已复用TurnControlComparison资产完成组件加载及独立前端Context实现，六视图实时写入检查见[报告](../reports/soulx/20261029-shared-context/README.md)。下游状态token编码、LLM与真实输出尚未接入，现役Agent未切换，不启动训练或历史benchmark。
 
-2026-10-30 用户确认将在线接口简化为每个 160ms 音频处理步骤联合覆盖 text 与状态，不保留历史正文版本，取消 320ms 周期建议。现有代码仍为旧事件协议，后续需按[当前接口](dev/SoulX-Duplug/shared_context_interface.md)改造；旧验收不视为新合同已通过。
+2026-10-30 用户确认将在线接口简化为每个 160ms 音频处理步骤联合覆盖 text 与状态，不保留历史正文版本，取消 320ms 周期建议。当前值接口及前端已改造，本地契约检查通过，真实模型新回放待资源；见[实现报告](../reports/soulx/20261030-current-context/README.md)，不以旧验收替代新合同GPU检查。
 
 ## 1. 运行底座与目标
 
-现役底座仍为 X-Talk `ca9b23c`、DuplexCascade、Nemotron EN160 与 Kokoro，参数见[运行配置](runtime_baseline.md)。目标为 **SoulX-Duplug＋SenseVoiceSmall 语音前端**，位于 Layer 0–Layer 2 输入侧；按用户确认，先沿用官方配套 ASR 打通链路，后续再评估 Nemotron，原因见[选型说明](dev/SoulX-Duplug/asr_adapter_assessment.md)。同一活动话轮只使用一个权威转写来源。
+现役底座仍为 X-Talk `ca9b23c`、DuplexCascade、Nemotron EN160 与 Kokoro，参数见[运行配置](runtime_baseline.md)。目标为 **SoulX-Duplug＋SenseVoiceSmall 语音前端**，位于 Layer 0–Layer 2 输入侧；按用户确认，先沿用官方配套 ASR 打通链路，撤下 Nemotron＋SoulX 独立适配，原因见[选型说明](dev/SoulX-Duplug/asr_adapter_assessment.md)。同一活动话轮只使用一个权威转写来源。
 
 | 模块 | 实施职责 |
 | --- | --- |
@@ -26,7 +26,7 @@
 3. **交付 Context 接口**：按稳定 `turn_id` 持续写入转写，不等待 `user_complete`；验证窗口重叠、修订和控制器重置不会造成漏字、重复文本或新建话轮。提供最新全文与状态的原子读取，核查修订覆盖、reset 连续、关闭及 EOF 分离，见[接口合同](dev/SoulX-Duplug/shared_context_interface.md)。
 4. **打通表达与打断**：明确状态输入编码、Layer 1 生成边界和直接打断接口，验证输出标识失效、停播确认及新输出恢复；旧 DuplexCascade 控制不能与新路径重复执行。
 5. **接入思考并验证重叠**：在研究模块细节确认后，验证用户未说完时转写已可读、Layer 1 可请求思考、Layer 2 可回写结果，前端与表达／思考能够重叠执行。前端 CoT 条件化仍属于后续适配与训练，不是首版链路的先决条件。
-6. **评估 Nemotron**：2026-10-30用户明确授权提前尝试独立Nemotron＋SoulX组合，原因是调查免回写转写对持续Context输入的适用性；不等待LLM／播放接入。按[适配试验](dev/SoulX-Duplug/nemotron_integration.md)处理音频／文本因果上界、词内增量和缓存衔接，保留SenseVoice对照，不自动切换现役Agent。
+6. **撤下 Nemotron 组合**：2026-10-30用户已授权删除专用适配器和探针入口，当前仅实施SoulX＋SenseVoice；以下为此前试验范围，不继续执行。此前2026-10-30用户明确授权提前尝试独立Nemotron＋SoulX组合，原因是调查免回写转写对持续Context输入的适用性；不等待LLM／播放接入。按[适配试验](dev/SoulX-Duplug/nemotron_integration.md)处理音频／文本因果上界、词内增量和缓存衔接，保留SenseVoice对照，不自动切换现役Agent。
 
 Nemotron独立适配的四视图单卡实时探针已完成，正文及消费版本结构一致，未增加固定稳定等待；结果和状态质量／EOF尾部限制见[组合报告](../reports/soulx/20261030-nemotron-integration/README.md)。这不代表第4／5步的下游生成、CoT或真实播放已实施。
 

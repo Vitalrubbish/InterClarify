@@ -1,96 +1,81 @@
-"""Verify atomic publication, real revisions and consumer cursor isolation."""
-from copy import deepcopy
-import sys
+"""Check latest-only corrections, snapshot isolation and turn boundaries."""
 from pathlib import Path
+import sys
+import threading
 import unittest
 
 sys.path.insert(0, str(Path(__file__).parents[1] / 'scripts/runtime'))
-from shared_context import CursorGap, FrontendConsumer, SharedContext
+from shared_context import SharedContext, STATE_IDS
 
 
-def event(seq, kind='frontend_lifecycle', **payload):
-    return {'schema_version': 1, 'event_id': f's:t:{seq}', 'kind': kind,
-            'session_id': 's', 'turn_id': 't', 'source': 'sensevoice_small',
-            'producer_id': 'p', 'producer_seq': seq, 'asr_generation': 'g',
-            'controller_generation': 0, 'received_at': 1., 'clock_id': 'test', **payload}
-
-
-def transcript(seq, version=0, text='', **payload):
-    return event(seq, 'user_transcript', version=version, asr_version=version,
-                 text=text, status='open', **payload)
+def frame(text='hello', end=2560, token='<|user_nonidle|>'):
+    return {'session_id': 's', 'turn_id': 't', 'source': 'sensevoice_small',
+            'text': text, 'state_token': token, 'state_token_id': STATE_IDS[token],
+            'state_accepted': True, 'processed_until': end, 'audio_observed_until': end + 640,
+            'assembly_status': 'assembled', 'coverage_complete': True, 'status': 'open'}
 
 
 class SharedContextTests(unittest.TestCase):
-    def test_revision_and_independent_readers(self):
+    def test_correction_deletion_and_reader_isolation_without_history(self):
         context = SharedContext()
-        readers = [FrontendConsumer('s'), FrontendConsumer('s')]
-        context.publish_user_transcript(transcript(1))
-        context.publish_user_transcript(transcript(2, 1, 'inter', base_asr_version=0,
-                                                     replace_from=0, replacement='inter'))
-        readers[0].consume(context)
-        context.publish_user_transcript(transcript(3, 2, 'internet.', base_asr_version=1,
-                                                     replace_from=5, replacement='net.'))
-        for reader in readers:
-            reader.consume(context)
-            self.assertEqual(reader.turns['t']['text'], 'internet.')
-        self.assertEqual(readers[0].cursor, readers[1].cursor)
-        self.assertEqual(readers[0].consume(context), [])
+        context.open_user_turn('s', 't')
+        first = context.publish_user_frame(frame('book Beijing tomorrow'))
+        context.publish_user_frame(frame('book Shanghai', 5120, '<|user_complete|>'))
+        first['text'] = 'mutated reader'
+        current = context.get_user_turn('s', 't')
+        self.assertEqual((current['text'], current['state_token']), ('book Shanghai', '<|user_complete|>'))
+        self.assertEqual(len(context.latest), 1)
+        self.assertFalse(hasattr(context, 'events'))
+        self.assertFalse({'version', 'asr_version', 'event_seq'} & current.keys())
+        current['text'] = 'mutated again'
+        self.assertEqual(context.get_user_turn('s', 't')['text'], 'book Shanghai')
 
-    def test_atomic_rollback_and_duplicate_conflict(self):
-        context = SharedContext()
-        first = transcript(1)
-        context.publish_user_transcript(first)
-        self.assertEqual(context.publish_user_transcript(first)['status'], 'duplicate')
+    def test_invalid_frame_and_closed_turn_do_not_overwrite_current(self):
+        context = SharedContext(max_turns=1, max_chars=12)
+        context.open_user_turn('s', 't')
+        expected = context.publish_user_frame(frame())
+        for bad in (frame(end=2560), frame(end=1), {**frame(end=5120), 'state_token_id': 0},
+                    {**frame(end=5120), 'source': 'nemotron'}, frame('x' * 13, 5120)):
+            with self.subTest(bad=bad):
+                with self.assertRaises((ValueError, RuntimeError)):
+                    context.publish_user_frame(bad)
+                self.assertEqual(context.get_user_turn('s', 't'), expected)
+        with self.assertRaises(RuntimeError):
+            context.open_user_turn('s', 'other')
+        context.close_user_turn('s', 't', 'eof')
+        self.assertEqual(context.get_user_turn('s', 't')['text'], 'hello')
         with self.assertRaises(ValueError):
-            context.commit_frontend_events([event(2), event(4)])
-        self.assertEqual(context.sequence, 1)
-        conflict = deepcopy(first)
-        conflict['text'] = 'wrong'
-        with self.assertRaises(ValueError):
-            context.publish_user_transcript(conflict)
-        with self.assertRaises(ValueError):
-            context.commit_frontend_events([event(2, depends_on=['missing'])])
-        context.commit_frontend_events([event(2)])
-        self.assertEqual(context.sequence, 2)
-
-    def test_close_empty_result_and_cursor_expiry(self):
-        context = SharedContext(max_updates=3)
-        context.publish_user_transcript(transcript(1))
-        context.publish_user_transcript(transcript(2, 1, 'hello', base_asr_version=0,
-                                                     replace_from=0, replacement='hello'))
-        closed = transcript(3, 2, 'hello', close_reason='eof')
-        closed.update(status='closed', asr_version=1)
-        context.publish_user_transcript(closed)
-        with self.assertRaises(ValueError):
-            context.publish_user_transcript(transcript(4, 3, 'later'))
-        context.commit_frontend_events([event(4)])
-        with self.assertRaises(CursorGap):
-            context.read_frontend_updates('s', 0)
-        consumer = FrontendConsumer('s')
-        self.assertEqual(consumer.resynchronize(context, 't')['transcript']['text'], 'hello')
-        self.assertEqual(list(consumer.states), [])
+            context.publish_user_frame(frame('late', 5120))
         context.release_closed_turn('s', 't')
-        self.assertFalse(context.producers)
+        context.open_user_turn('s', 'new')
+        self.assertEqual(len(context.latest), 1)
 
-    def test_patch_and_state_dependency_validation(self):
+    def test_parallel_reads_never_mix_text_and_state(self):
         context = SharedContext()
-        context.publish_user_transcript(transcript(1))
-        with self.assertRaises(ValueError):
-            context.publish_user_transcript(transcript(2, 1, 'new', base_asr_version=0,
-                                                         replace_from=0, replacement='other'))
-        control = event(2, 'control_observation', control_revision=1)
-        state = event(3, 'user_state', token='<|user_complete|>', token_id=151676,
-                      accepted=True, depends_on=[control['event_id']],
-                      basis={'transcript_version': 0, 'asr_version': 0, 'control_revision': 1,
-                             'control_event_id': control['event_id'], 'control_event_seq': 2})
-        context.commit_frontend_events([control, state])
-        context.publish_user_transcript(transcript(4, 1, 'later', base_asr_version=0,
-                                                     replace_from=0, replacement='later'))
-        read = context.read_frontend_updates('s')['updates']
-        self.assertEqual(read[2]['basis']['asr_version'], 0)
-        self.assertEqual(context.get_user_turn('s', 't', at_event_seq=3)['transcript']['text'], '')
-        with self.assertRaises(CursorGap):
-            context.get_user_turn('s', 't', at_event_seq=5)
+        context.open_user_turn('s', 't')
+        started, finished = threading.Event(), threading.Event()
+        errors = []
+        def write():
+            started.wait()
+            try:
+                for index in range(1, 301):
+                    token = '<|user_nonidle|>' if index % 2 else '<|user_complete|>'
+                    context.publish_user_frame(frame(token, index * 2560, token))
+            except Exception as exc:
+                errors.append(exc)
+            finally:
+                finished.set()
+        thread = threading.Thread(target=write)
+        thread.start()
+        started.set()
+        while not finished.is_set():
+            view = context.get_user_turn('s', 't')
+            if view['state_token'] is not None:
+                self.assertEqual(view['text'], view['state_token'])
+        thread.join(2)
+        self.assertFalse(thread.is_alive())
+        self.assertFalse(errors)
+        self.assertEqual(context.get_user_turn('s', 't')['processed_until'], 300 * 2560)
 
 
 if __name__ == '__main__':

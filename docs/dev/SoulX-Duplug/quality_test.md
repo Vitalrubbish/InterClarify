@@ -1,5 +1,8 @@
 # SoulX-Duplug＋Nemotron：公开英文集测试历史设计
 
+2026-10-30 撤回说明：用户已指令停止 Nemotron＋SoulX 路线，转向官方 SoulX＋SenseVoice 的160ms当前值写入。以下为历史调研／实验记录，不再作为执行计划；专用适配器和入口已移除，源码由 Git 提交 `9fb5319` 追溯。现役独立 Nemotron ASR 服务不属于本次组合回退范围。
+
+
 2026-10-29 状态：用户已确认首版采用 SoulX-Duplug＋SenseVoiceSmall 语音前端，以先打通链路，后续再评估 Nemotron，见[选型说明](asr_adapter_assessment.md)。本文下述 Nemotron 参数、步骤和资源估计仅保留为此前 617 条公开英文集测试的历史设计，尚未实施，不作为首版执行配置。若复用该测试集，须先冻结 SenseVoiceSmall 版本、窗口转写与修订、Context 映射及资源预检，不能直接套用下文“不加载 SenseVoice”等约定。执行仍待重新确认；TextTurn 的 no-voice、动作编码和训练门槛不作为本组合合同。
 
 本文为 2026-10-24 已确认、现待重新确认执行的验证设计；适配和测试尚未实施。范围仅为单一组合、单一公开集，自建场景、额外开发集、200 条抽样及四类交互预算已撤回。路线入口见[README](README.md)。

@@ -1,5 +1,8 @@
 # Nemotron＋SoulX独立适配试验
 
+2026-10-30 撤回说明：用户已指令停止 Nemotron＋SoulX 路线，转向官方 SoulX＋SenseVoice 的160ms当前值写入。以下为历史调研／实验记录，不再作为执行计划；专用适配器和入口已移除，源码由 Git 提交 `9fb5319` 追溯。现役独立 Nemotron ASR 服务不属于本次组合回退范围。
+
+
 2026-10-30，用户明确授权尝试组合。保留SenseVoice首版和现役Agent，本轮仅增加独立英文适配探针，不训练、不恢复旧FDB评测、不自动切换线上来源、不新建issue。
 
 Nemotron固定现有EN0.6B revision `ebe59e5a817142986528bbbee5dba8db7b38ed50`、FP32、lookahead1；SoulX及上游沿用首版冻结。两个既有conda分进程复用单张4090，不改共享环境。资源为1GPU、4CPU、32GiB、一个ParaThink活动作业、最长1800秒、设备显存22GiB停止线、结果128MiB、启动空盘30GiB；单进程模型调用串行，音频积压800ms，触限退出保留结果。

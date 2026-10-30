@@ -1,10 +1,10 @@
 # SoulX-Duplug 路线
 
-更新：2026-10-29。用户确认以 **SoulX-Duplug＋SenseVoiceSmall 作为语音前端**，位于 Layer 0–Layer 2 输入侧。为先打通链路，首版沿用官方配套 ASR，后续再评估 Nemotron，见[选型说明](asr_adapter_assessment.md)。独立前端写入已实现并完成少量音频检查，尚未切换现役Agent。
+更新：2026-10-29。用户确认以 **SoulX-Duplug＋SenseVoiceSmall 作为语音前端**，位于 Layer 0–Layer 2 输入侧。为先打通链路，当前采用官方配套 ASR，撤下 Nemotron＋SoulX 独立适配，见[选型说明](asr_adapter_assessment.md)。独立前端写入已实现并完成少量音频检查，尚未切换现役Agent。
 
 ## 已确认合同
 
-- 前端包含 ASR 调用与文本整理、SoulX 音频编码及状态预测；同一活动话轮只用一个权威 ASR 来源。中间转写持续写入 Shared Context，不等待完成判断，前端内部与下游使用同一来源。2026-10-30 用户确认每个 160ms 音频处理步骤联合覆盖最新全文和本块状态，不保留历史正文版本，取消 320ms 周期建议；新合同尚未实现，读取与关闭规则见[接口设计](shared_context_interface.md)。
+- 前端包含 ASR 调用与文本整理、SoulX 音频编码及状态预测；同一活动话轮只用一个权威 ASR 来源。中间转写持续写入 Shared Context，不等待完成判断，前端内部与下游使用同一来源。2026-10-30 用户确认每个 160ms 音频处理步骤联合覆盖最新全文和本块状态，不保留历史正文版本，取消 320ms 周期建议；新合同已实现并通过本地检查，GPU回放待资源，读取与关闭规则见[接口设计](shared_context_interface.md)。
 - 前端持续接收音频，可与下游表达、思考并发执行。Layer 0 仍负责系统附和时机；未来 CoT 从 Context 反馈至前端，当前不实现条件化扩展。
 - SoulX 保留音频路径和原生五类用户状态，全部送入 Layer 1；普通正式回答在当前 turn 读取对应 `user_complete` 后生成，不额外发起独立回答调用。
 - 活动输出期间有效 `user_nonidle` 额外直接触发停止，涵盖 preparing 和 playing；其他状态不进入输出运行时，不映射为 start 或 keep。完整路径见[架构第 2.2 节](../../research_design/architecture.md#22-前端状态与系统附和)。
@@ -13,7 +13,7 @@
 
 ## 验证设计与实施状态
 
-2026-10-30按用户授权另完成[Nemotron＋SoulX独立适配](nemotron_integration.md)，复用单一Nemotron前缀来源、SoulX音频与五状态；四视图真实时钟探针通过结构和消费一致性检查，105次正文更新、124条状态，回调至正文可见P95约6.06ms，不额外等1秒。尚未切换首版或现役Agent，完成状态时机、完整词提交和EOF尾部仍有边界，见[实际报告](../../../reports/soulx/20261030-nemotron-integration/README.md)。
+2026-10-30用户已指令撤下[Nemotron＋SoulX独立适配](nemotron_integration.md)，该路线保留为历史实验，专用代码／运行入口已移除。此前复用单一Nemotron前缀来源、SoulX音频与五状态；四视图真实时钟探针通过结构和消费一致性检查，105次正文更新、124条状态，回调至正文可见P95约6.06ms，不额外等1秒。尚未切换首版或现役Agent，完成状态时机、完整词提交和EOF尾部仍有边界，见[实际报告](../../../reports/soulx/20261030-nemotron-integration/README.md)。
 
 已按[ASR 前端设计](asr_frontend_design.md)实现原始文本与标签保全、滑窗修订、五状态及其文本依据、SharedContext事务与独立消费者。六视图实时回放中145次ASR与299条状态写入一致，两个消费者各读取912事件；2个非静音视图关闭时仍有gap，低音量原幅度识别明显较差，backchannel实际音频预测未覆盖。结果、失败修复及延迟见[实现与检查报告](../../../reports/soulx/20261029-shared-context/README.md)，不能据此宣称识别或五状态语义质量全面通过。
 

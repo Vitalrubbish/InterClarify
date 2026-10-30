@@ -2,7 +2,7 @@
 
 2026-10-30，按用户明确决定修订：SoulX＋SenseVoice 每处理一个 160ms 音频块，将最新话轮全文和本块状态作为一组原子覆盖到 SharedContext。取消 320ms 正文发布周期；不维护历史正文版本或修订事件流。
 
-这是当前设计合同，现有 [SharedContext 实现](../../scripts/runtime/shared_context.md)仍采用旧版本化事件协议，尚未按此改造。旧运行证据见[报告](../../../reports/soulx/20261029-shared-context/README.md)，不代表新合同已验收。
+这是当前实施合同。已按用户授权重构 [SharedContext 实现](../../scripts/runtime/shared_context.md)，撤下 Nemotron＋SoulX 专用入口，以每个处理步骤的当前值替代旧事件协议；本地检查通过，远端真实模型验证尚待资源，见[报告](../../../reports/soulx/20261030-current-context/README.md)。旧运行证据见[报告](../../../reports/soulx/20261029-shared-context/README.md)，不代表新合同已验收。
 
 ## 1. 写入与读取
 
@@ -10,7 +10,7 @@
 
 更新按音频处理步骤发生，墙钟返回可能受计算和排队影响。无新转写时保留当前正文但仍更新状态；没有可处理音频时不靠定时器制造状态。不要求 ASR 每块调用，不等 complete 才提供文字。
 
-本合同只提供当前值的写入和读取；不要求正文 `version`、`asr_version`、替换 patch、历史查询或事件游标。并发通过串行写入和原子读取解决，不以保存旧正文为前提。实施时具体方法名及调用方迁移同步更新实现说明。
+本合同只提供当前值的写入和读取；不要求正文 `version`、`asr_version`、替换 patch、历史查询或事件游标。并发通过串行写入和原子读取解决，不以保存旧正文为前提。`open_user_turn()`开轮，`publish_user_frame()`覆盖，`get_user_turn()`读取，`close_user_turn()`关闭；回放调用方已迁移。
 
 ## 2. 当前记录
 
@@ -46,4 +46,4 @@ Layer 1／2 在各自输入边界读取最新值；同一话轮全文被更正�
 
 验证重点是修订替换、文本与状态原子一致、无新文本时状态仍更新、reset 连续、关闭与排空分离、直接停止不重复执行，以及实际计算与排队间隔。固定 160ms 更新不表示识别正确、覆盖完整或 Layer 1 已经读到每帧。
 
-原来的有界事件、版本、patch、游标及按历史水位读取仍存在于旧代码中，历史报告和 Nemotron 探针保持原解释；它们不再是此处新 SenseVoice 当前值合同的要求。详细决策见[160ms 联合更新说明](streaming_transcript_publication.md)。
+原有的事件、版本、patch、游标及历史水位接口已移除；旧报告保留原解释，Nemotron组合专用代码和入口已撤下。详细决策见[160ms 联合更新说明](streaming_transcript_publication.md)。

@@ -1,6 +1,6 @@
 # 工作单管理
 
-更新：2026-10-29。本页合并重复进度，区分当前研究路线与历史实验；不新建工作单、不改变原验收结论。按用户确认，当前研究采用 **SoulX-Duplug＋SenseVoiceSmall 语音前端**，先打通链路，后续再评估 Nemotron，见[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。新前端尚未接入，旧 Nemotron 公开英文集方案保留为历史设计，不能直接作为首版执行配置。
+更新：2026-10-29。本页合并重复进度，区分当前研究路线与历史实验；不新建工作单、不改变原验收结论。按用户确认，当前研究采用 **SoulX-Duplug＋SenseVoiceSmall 语音前端**，2026-10-30 按用户指令撤下 Nemotron＋SoulX 适配，实施每个 160ms 音频处理步骤联合覆盖正文和状态的当前值接口，见[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。此次不新建工作单；下游 Agent 尚未切换，旧 Nemotron 公开英文集方案保留为历史设计，不能直接作为首版执行配置。
 
 ## 工作单状态
 

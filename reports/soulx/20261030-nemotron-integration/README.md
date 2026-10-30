@@ -4,7 +4,7 @@
 
 ## 1. 如何结合
 
-实现与冻结范围见[适配设计](../../../docs/dev/SoulX-Duplug/nemotron_integration.md)、[前端实现说明](../../../docs/scripts/runtime/nemotron_soulx_frontend.md)。Nemotron原始累计文字一返回，就由独立轮询线程发布来源事件和正文版本；不受SoulX门控、reset或complete暂停。Context同话轮固定`nemotron`来源，任何已交付字符前缀回写都会报错；源ID与原始文本保留。
+实现与冻结范围见[适配设计](../../../docs/dev/SoulX-Duplug/nemotron_integration.md)、[前端实现说明](https://github.com/Vitalrubbish/InterClarify/blob/9fb5319/docs/scripts/runtime/nemotron_soulx_frontend.md)。Nemotron原始累计文字一返回，就由独立轮询线程发布来源事件和正文版本；不受SoulX门控、reset或complete暂停。Context同话轮固定`nemotron`来源，任何已交付字符前缀回写都会报错；源ID与原始文本保留。
 
 SoulX仍每块编码音频，保留官方ASR门控前向及五状态预测。门控允许时选择保守观察上界不超出本块实际音频范围的已发布源版本，记录Context最新正文版本与**控制器真正消费的版本**；两者可以不同。没有可用前缀时记pending，继续声学路径，不伪装为静音。ASR回调的读取截止可能包含预取，因此只用作保守上界，不把名义160ms解码步当精确词对齐。
 

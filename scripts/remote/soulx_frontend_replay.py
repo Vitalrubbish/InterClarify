@@ -16,7 +16,7 @@ import time
 import traceback
 
 sys.path.insert(0, str(Path(__file__).parents[1] / 'runtime'))
-from shared_context import FrontendConsumer, SharedContext, STATE_IDS
+from shared_context import SharedContext, STATE_IDS
 from soulx_frontend import SoulXFrontend, SOULX_REVISION, SENSEVOICE_REVISION, UPSTREAM_SHA256
 from sensevoice_transcript import SenseVoiceObservation
 
@@ -55,69 +55,53 @@ def prepare_manifest(root, target):
                 'source_revision': '70bb2e84b976b7e960aa89f1c648e09c59f894dd', 'cases': cases,
                 'limits': {'gpu': 1, 'cpu': 4, 'ram_gib': 32, 'seconds': 1200,
                            'pcm_bytes': 4194304, 'audio_queue_ms': 800, 'output_bytes': 134217728},
-                'scope': 'existing development recording, derived views, and optional bundled English example; not a benchmark'}
+                'scope': '160ms current text/state overwrite; existing development views only; no benchmark'}
     with target.open('x') as output:
         json.dump(manifest, output, ensure_ascii=False, indent=2)
         output.write('\n')
 
 
 class CaseAudit:
-    """Check independently retained source results against two actual readers."""
+    """Compare external frame captures with two independent current-value reads."""
 
     def __init__(self, case_id, output):
-        self.readers = [FrontendConsumer(case_id), FrontendConsumer(case_id)]
-        self.source = {}
-        self.events, self.reads = [], [0, 0]
-        self.stream = (output / f'{case_id}.events.jsonl').open('x')
+        self.case_id = case_id
+        self.source, self.snapshots, self.reads = [], [], [0, 0]
+        self.stream = (output / f'{case_id}.snapshots.jsonl').open('x')
         self.audits = (output / f'{case_id}.source.jsonl').open('x')
 
-    def audit(self, kind, event):
-        self.source[event['event_id']] = event
-        self.audits.write(json.dumps({'audit_kind': kind, **event}, ensure_ascii=False) + '\n')
+    def audit(self, kind, observation):
+        record = {'audit_kind': kind, **observation}
+        if kind == 'asr_source' and observation.get('model_result'):
+            raw = observation['model_result'][0]['text']
+            parsed = SenseVoiceObservation.parse(raw)
+            if any(parsed[key] != observation[key] for key in ('raw_text', 'text', 'tags', 'character_map')):
+                raise AssertionError('ASR source text or tags changed before capture')
+        self.source.append(record)
+        self.audits.write(json.dumps(record, ensure_ascii=False) + '\n')
         self.audits.flush()
 
     def consume(self, context):
-        batches = [reader.consume(context) for reader in self.readers]
-        if batches[0] != batches[1]:
-            raise AssertionError('Independent consumers disagree')
-        for index, batch in enumerate(batches):
-            self.reads[index] += len(batch)
-        by_id = {v['event_id']: v for v in self.events}
-        for event in batches[0]:
-            if event['kind'] in ('asr_observation', 'user_state'):
-                source = self.source[event['event_id']]
-                for key in ('raw_text', 'text', 'tags', 'character_map', 'token', 'token_id',
-                            'raw_token', 'raw_token_id', 'accepted', 'basis', 'audio_spans'):
-                    if key in source and source[key] != event[key]:
-                        raise AssertionError(f'Context changed captured {key}')
-            for dependency in event.get('depends_on', []):
-                if dependency not in by_id or by_id[dependency]['event_seq'] >= event['event_seq']:
-                    raise AssertionError('Event became visible before its dependency')
-            if event['kind'] == 'asr_observation':
-                if event['call_status'] != 'error' and event.get('model_result'):
-                    raw = event['model_result'][0]['text']
-                    if raw != event['raw_text']:
-                        raise AssertionError('Raw generate result was changed before capture')
-                    parsed = SenseVoiceObservation.parse(raw)
-                    if any(parsed[key] != event[key] for key in ('text', 'tags', 'character_map')):
-                        raise AssertionError('ASR source parsing is inconsistent')
-                    for tag in event['tags']:
-                        if raw[tag['start']:tag['end']] != tag['token']:
-                            raise AssertionError('Tag character span differs from the raw source')
-            if event['kind'] == 'user_transcript' and event['version']:
-                old = next(v for v in reversed(self.events) if v['kind'] == 'user_transcript')
-                if event['asr_version'] > old['asr_version']:
-                    if old['text'][:event['replace_from']] + event['replacement'] != event['text']:
-                        raise AssertionError('Published transcript patch cannot be reconstructed')
-            if event['kind'] == 'user_state':
-                control = by_id[event['basis']['control_event_id']]
-                if control['event_seq'] != event['basis']['control_event_seq']:
-                    raise AssertionError('State control sequence differs')
-                if event['accepted'] and STATE_IDS.get(event['token']) != event['token_id']:
-                    raise AssertionError('Accepted state token ID differs')
-            self.events.append(event)
-            by_id[event['event_id']] = event
-            self.stream.write(json.dumps({'consumer_read_at': time.monotonic(), **event}, ensure_ascii=False) + '\n')
+        views = [context.get_user_turn(self.case_id, 'user-1') for _ in range(2)]
+        if views[0] != views[1]:
+            raise AssertionError('Independent current-value readers disagree')
+        view = views[0]
+        if view['state_token'] is not None and view['status'] == 'open':
+            captured = next(v for v in reversed(self.source) if v['audit_kind'] == 'frame_source')
+            if any(view[key] != value for key, value in captured.items() if key != 'audit_kind'):
+                raise AssertionError('Context changed the captured text/state frame')
+            if view['state_accepted'] and STATE_IDS.get(view['state_token']) != view['state_token_id']:
+                raise AssertionError('Accepted state token ID differs')
+            previous = self.snapshots[-1]
+            if view['processed_until'] <= previous['processed_until']:
+                raise AssertionError('Frame progress did not advance')
+        if {'version', 'asr_version', 'event_seq', 'replacement'} & view.keys():
+            raise AssertionError('Current-value Context retained a revision protocol')
+        if len(context.latest) != 1 or hasattr(context, 'events'):
+            raise AssertionError('Context retained multiple turn values or event history')
+        self.reads = [count + 1 for count in self.reads]
+        self.snapshots.append(view)
+        self.stream.write(json.dumps({'consumer_read_at': time.monotonic(), **view}, ensure_ascii=False) + '\n')
         self.stream.flush()
 
     def close(self):
@@ -143,7 +127,7 @@ def replay_case(model, samples, real_count, case, output, timing_mode='realtime'
         frontend = SoulXFrontend(model, context, session_id=case_id, turn_id='user-1',
                                  on_commit=audit.consume, audit=audit.audit,
                                  active_output=lambda: {'output_id': case_id + ':output', 'session_id': case_id, 'phase': 'preparing'},
-                                 stop_output=lambda event, output_id: stopped.append({'event_id': event['event_id'], 'output_id': output_id, 'at': time.monotonic()}))
+                                 stop_output=lambda event, output_id: stopped.append({'processed_until': event['processed_until'], 'output_id': output_id, 'at': time.monotonic()}))
         started = time.monotonic()
         def packets():
             for offset in range(0, len(samples), 1280):
@@ -193,7 +177,7 @@ def replay_case(model, samples, real_count, case, output, timing_mode='realtime'
                 reader.join(timeout=5)
                 if reader.is_alive():
                     raise RuntimeError('Audio ingress thread failed to stop')
-        before_close = context.get_user_turn(case_id, 'user-1')['transcript']['text']
+        before_close = context.get_user_turn(case_id, 'user-1')['text']
         from soulx_frontend import slice_spans
         pending = slice_spans(frontend._spans(model.buffer), model.config.infer_config.input.audio_back_size, len(model.buffer))
         pending_real = sum(span['samples'] for span in pending if span['kind'] == 'real')
@@ -201,34 +185,37 @@ def replay_case(model, samples, real_count, case, output, timing_mode='realtime'
             raise AssertionError('Real audio accounting does not balance at EOF')
         frontend.close_turn('runtime_audio_case_end')
         view = context.get_user_turn(case_id, 'user-1')
-        assert view['transcript']['text'] == before_close
-        assert all(reader.turns['user-1']['text'] == before_close for reader in audit.readers)
-        states = [v for v in audit.events if v['kind'] == 'user_state']
-        transcripts = [v for v in audit.events if v['kind'] == 'user_transcript' and v['status'] == 'open' and v['text']]
-        observations = [v for v in audit.events if v['kind'] == 'asr_observation']
-        accepted_completes = [v['event_seq'] for v in states if v['accepted'] and v['token'] == '<|user_complete|>']
-        first_complete = min(accepted_completes, default=float('inf'))
+        assert view['text'] == before_close and view['status'] == 'closed'
+        frames = [v for v in audit.snapshots if v['status'] == 'open' and v['state_token'] is not None]
+        states = [v for v in audit.source if v['audit_kind'] == 'state_source']
+        online_states = [v for v in states if v['delivery_phase'] == 'online']
+        observations = [v for v in audit.source if v['audit_kind'] == 'asr_source']
+        if len(frames) != len(online_states):
+            raise AssertionError('Every online audio state must have one joint Context write')
+        complete_positions = [v['processed_until'] for v in frames
+                              if v['state_accepted'] and v['state_token'] == '<|user_complete|>']
+        first_complete = min(complete_positions, default=float('inf'))
+        text_changes = sum(a['text'] != b['text'] for a, b in zip(audit.snapshots, audit.snapshots[1:]))
         return {'case_id': case_id, 'passed': True, 'integrity_passed': True,
                 'timing_mode': timing_mode, 'realtime_claim': timing_mode == 'realtime',
                 'input_samples': len(samples), 'real_samples': real_count,
                 'processed_real_until': frontend.processed_until, 'pending_real_at_close': pending_real,
                 'audio_ingress_sha256': hashlib.sha256(samples.tobytes()).hexdigest(),
-                'closed_text': before_close, 'assembly_status': view['transcript'].get('assembly_status'),
+                'closed_text': before_close, 'assembly_status': view['assembly_status'],
                 'source_calls': len(observations), 'source_errors': sum(v['call_status'] == 'error' for v in observations),
                 'drain_source_calls': sum(v['delivery_phase'] == 'drain' for v in observations),
                 'source_tags': dict(Counter(t['token'] for v in observations for t in v['tags'])),
-                'state_counts': dict(Counter(v['token'] for v in states)),
-                'accepted_state_counts': dict(Counter(v['token'] for v in states if v['accepted'])),
-                'state_adjustments': sum(v['raw_token'] != v['token'] for v in states),
-                'controller_resets': sum(v['kind'] == 'frontend_lifecycle' for v in audit.events),
-                'text_versions': len(transcripts),
-                'versions_before_complete': sum(v['event_seq'] < first_complete for v in transcripts),
+                'state_counts': dict(Counter(v['state_token'] for v in frames)),
+                'accepted_state_counts': dict(Counter(v['state_token'] for v in frames if v['state_accepted'])),
+                'state_adjustments': sum(v['adjustment'] is not None for v in frames),
+                'controller_resets': sum(v['audit_kind'] == 'controller_reset' for v in audit.source),
+                'frame_writes': len(frames), 'text_changes': text_changes,
+                'nonempty_frames_before_complete': sum(bool(v['text']) and v['processed_until'] < first_complete for v in frames),
                 'unresolved_calls': sum(v['assembly_result'].get('assembly_status') == 'gap' for v in observations),
-                'consumer_events': audit.reads, 'queue_peak_ms': queue_peak_ms,
+                'consumer_reads': audit.reads, 'queue_peak_ms': queue_peak_ms,
                 'postprocess_sha256': frontend.postprocess_sha256,
                 'elapsed_seconds': time.monotonic() - started,
-                'source_publication': distribution([(v['published_at'] - v['asr_returned_at']) * 1000 for v in observations]),
-                'state_publication': distribution([(v['published_at'] - v['state_resolved_at']) * 1000 for v in states]),
+                'state_publication': distribution([(v['published_at'] - v['state_resolved_at']) * 1000 for v in frames]),
                 'stop_requests': stopped, 'ingress': ingress}
     finally:
         if frontend:
@@ -260,7 +247,7 @@ def main():
     result = {'created_at': datetime.now(timezone.utc).isoformat(), 'manifest': manifest,
               'manifest_sha256': hashlib.sha256(args.manifest.read_bytes()).hexdigest(),
               'soulx_revision': SOULX_REVISION, 'sensevoice_revision': SENSEVOICE_REVISION,
-              'upstream_sha256': UPSTREAM_SHA256, 'cases': [], 'passed': False,
+              'upstream_sha256': UPSTREAM_SHA256, 'context_protocol': 'latest_text_state', 'cases': [], 'passed': False,
               'timing_mode': args.timing_mode,
               'source_commit': os.environ.get('SOULX_SOURCE_COMMIT'),
               'packages': {name: importlib.metadata.version(name) for name in ('torch', 'torchaudio', 'transformers', 'funasr', 'numpy')}}
