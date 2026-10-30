@@ -8,7 +8,7 @@ Nemotron沿用EN0.6B revision `ebe59e5a817142986528bbbee5dba8db7b38ed50`、FP32�
 
 每块以步骤编号和真实采样区间配对，另记实际观察上界；名义步骤编号不能代替真实解码完成，也不能证明本步返回的词只来自当前160ms。
 
-本次用户授权先修配对：旧实现将原生ASR首块92.5ms与SoulX首块160ms按同一步号配对，造成后续观察截止持续落后61ms。改为首块只初始化RNNT缓存并单独释放，取实际ASR完整窗口覆盖达到SoulX主块截止的第一个完成步骤，首块正文保留到首次教师注入。两路独立计步，典型配对160→259ms、320→419ms；99ms额外观察如实计入前瞻与延迟。原生窗口不改形状，音频接收继续真实时钟进行。尾部不足下一真实ASR窗口时不产生新在线状态，排空只诊断。本次不修改任何完成规则，见[NTF-003](../../issue/NTF-003.md)。
+本次用户授权先修配对：旧实现将原生ASR首块92.5ms与SoulX首块160ms按同一步号配对，造成后续观察截止持续落后61ms。改为首块只初始化RNNT缓存并单独释放，取实际ASR完整窗口覆盖达到SoulX主块截止的第一个完成步骤，首块正文保留到首次教师注入。两路独立计步，典型配对160→259ms、320→419ms；99ms额外观察如实计入前瞻与延迟。原生窗口不改形状，音频接收继续真实时钟进行。尾部不足下一真实ASR窗口时不产生新在线状态，排空只诊断。本次不修改任何完成规则，进度见[工作单索引](../../issue/README.md)。
 
 ## 2. 同步流程
 
@@ -52,3 +52,5 @@ SoulX reset不重启Nemotron、不清空共享正文、不重复消费旧字。�
 真实时钟回放沿用单作业、1×4090、4CPU、32GiB、显存22GiB、结果128MiB及800ms积压停止线。音频持续到达，计算吞吐不足时如实失败，不放慢回放掩盖积压。
 
 依据：[SoulX推理源码](https://github.com/Soul-AILab/SoulX-Duplug/blob/a0b9063843df69619b087b95b74597b2176910b8/service/model.py)、[token定义](https://github.com/Soul-AILab/SoulX-Duplug/blob/a0b9063843df69619b087b95b74597b2176910b8/config/config.py)、[Nemotron固定版本](https://huggingface.co/nvidia/nemotron-speech-streaming-en-0.6b/blob/ebe59e5a817142986528bbbee5dba8db7b38ed50/README.md)、[独立ASR服务](../../scripts/remote/nemotron_asr_service.md)、[SenseVoice实测](../../../reports/soulx/20261030-delta-context-test/README.md)、[旧组合失败分析](nemotron_completion_analysis.md)。
+
+2026-10-30本次配对修复`98f347e`已实测：预检3/3通过，正式两轮25/30和28/30因800ms积压触限退出1；已记录窗口覆盖及屏障顺序通过。完整样本的部分打断与接话指标改善，按完整观察上界的停顿complete未改善，不能宣称整体质量或实时稳定通过，见[配对复测报告](../../../reports/soulx/20261030-nemotron-teacher-alignment/README.md)。空增量规则保留，未扩大实现。

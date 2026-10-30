@@ -44,6 +44,7 @@
 
 | 记录 | 证据与状态 |
 | --- | --- |
+| 教师文字音频覆盖配对修复 | `parathink-soulx-duplug/source/98f347e`；`runs/nemotron-teacher-align-fdb30-20261030-r1`／`r2` 实际25/30／28/30积压触限，退出1；预检3/3通过，23:39队列为空，见[复测报告](../reports/soulx/20261030-nemotron-teacher-alignment/README.md) |
 | Nemotron Teacher Forcing FDB30 | `parathink-soulx-duplug/source/b143bff` 冻结源码；`runs/nemotron-teacher-smoke-20261030-r2` 预检退出0，`runs/nemotron-teacher-fdb30-20261030-r1` 正式小样本；状态以[报告](../reports/soulx/20261030-nemotron-teacher-fdb30/README.md)为准 |
 | TT-010 r5有限pilot | 最新记录为2026-10-27 12:47，新版两轮评估完成、当时第3／5轮；源码`source/tt010-repair-20261027-r1`，run `tt010-repair-pilot-20261027-r1`，当前状态未重查，见[修复报告](../reports/textturn/20261027-dataset-repair/README.md) |
 | TT-011续接 | r1超时、r2全keep未放行后停止，外部测试未提交；不随有限pilot恢复，见[外部记录](../reports/textturn/20261026-tt-011-external-evaluation/README.md)与[r2报告](../reports/textturn/20261026-tt-010-balanced-training/README.md) |
