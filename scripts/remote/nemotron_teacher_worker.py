@@ -11,7 +11,6 @@ from pathlib import Path
 import socket
 import textwrap
 import time
-import types
 
 from nemotron_asr_service import NativeNemotron, NemotronSession, NemotronService, load_pcm16
 
@@ -51,7 +50,7 @@ def synchronized_sample(model):
         raise ValueError('Transformers generation source digest differs')
     namespace = dict(method.__globals__)
     exec(compile(reorder_sample(inspect.getsource(method)), str(path) + ':teacher-barrier', 'exec'), namespace)
-    return types.MethodType(namespace['_sample'], model)
+    return namespace['_sample']
 
 
 class SynchronizedNemotron(NativeNemotron):
@@ -100,8 +99,9 @@ class SynchronizedNemotron(NativeNemotron):
             def end(self):
                 pass
 
-        override = model.__dict__.get('_sample')
-        model._sample = synchronized_sample(model)
+        model_type = type(model)
+        override = model_type.__dict__.get('_sample')
+        model_type._sample = synchronized_sample(model)
         try:
             with torch.inference_mode():
                 generator = features()
@@ -119,9 +119,9 @@ class SynchronizedNemotron(NativeNemotron):
                                return_dict_in_generate=True, **extra)
         finally:
             if override is None:
-                del model._sample
+                del model_type._sample
             else:
-                model._sample = override
+                model_type._sample = override
 
 
 class BarrierSession(NemotronSession):
