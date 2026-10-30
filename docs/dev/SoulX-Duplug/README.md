@@ -1,8 +1,8 @@
 # SoulX-Duplug 路线
 
-更新：2026-10-29。用户确认以 **SoulX-Duplug＋SenseVoiceSmall 作为语音前端**，位于 Layer 0–Layer 2 输入侧。为先打通链路，当前采用官方配套 ASR，撤下 Nemotron＋SoulX 独立适配，见[选型说明](asr_adapter_assessment.md)。独立前端写入已实现并完成少量音频检查，尚未切换现役Agent。
+更新：2026-10-30。当前实施 **Nemotron Teacher Forcing＋SoulX-Duplug 语音前端**，位于 Layer 0–Layer 2 输入侧。Nemotron 是唯一用户转写来源，SoulX 在逐块教师文字注入后预测五类状态，联合覆盖当前 Context。两份权重固定；下游 Agent 尚未切换。此前 SenseVoiceSmall 首版与 Nemotron 独立门控适配均作为历史对照。
 
-2026-10-30按用户明确指令回滚：撤回`bd86478`的原生delta草稿＋controller片段整段覆盖，撤回`b00afac`与`6930fa7`的固定起点重识别候选文档。运行代码与前端测试恢复到`484ca32`对应基线，保留160ms正文／状态联合覆盖接口；这会恢复旧窗口整理及已知gap，并不表示旧方案质量达标。历史测试报告、原始证据和离线汇总脚本保留，未恢复旧Nemotron组合代码或提交新远端作业。既有conda下前端5项、SharedContext及TextTurn Context共7项、独立Nemotron服务5项检查全部通过；用户原有未提交修改保持不变。
+2026-10-30此前按用户明确指令回滚：撤回`bd86478`的原生delta草稿＋controller片段整段覆盖，撤回`b00afac`与`6930fa7`的固定起点重识别候选文档。运行代码与前端测试恢复到`484ca32`对应基线，保留160ms正文／状态联合覆盖接口；这会恢复旧窗口整理及已知gap，并不表示旧方案质量达标。历史测试报告、原始证据和离线汇总脚本保留，未恢复旧Nemotron组合代码或提交新远端作业。既有conda下前端5项、SharedContext及TextTurn Context共7项、独立Nemotron服务5项检查全部通过；用户原有未提交修改保持不变。
 
 用户已授权 Nemotron 按160ms持续解码、直接 teacher forcing 文字，0.6B仅发布用户状态；两份模型权重固定，通过逐块屏障同步推进，见[工程同步方案](nemotron_teacher_forcing.md)。当前实施与 FDB 三轴各10条实测见[工作单](../../issue/README.md)，SenseVoice及旧独立组合保留为历史基线，不恢复其作业。
 
@@ -27,4 +27,4 @@
 
 首版已用实际只读消费者核对话轮快照、修订、重置历史和中间文字可读，仍需区分正文覆盖与接口搬运。Nemotron 的音频观察配对、词内增量和缓存适配留待后续。此前自建场景、额外开发集和200条抽样方案已撤回；TextTurn／XTurnix仅保留历史协议与证据，不继承其专属输入、动作token或训练门槛。
 
-实施顺序及资源见[工程计划](../../engineering_implementation.md)，本轮输入与执行范围见[检查任务说明](frontend_audio_check.md)。实现及少量契约测试均有同路径中文说明；工作单仅按明确建单指令建立，本次没有新建issue或训练。
+实施顺序及资源见[工程计划](../../engineering_implementation.md)，本轮输入与执行范围见[检查任务说明](frontend_audio_check.md)。实现及少量契约测试均有同路径中文说明；工作单仅按明确建单指令建立，本次教师文字接入与实验已按用户指令建单，仍不训练。
