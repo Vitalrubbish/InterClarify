@@ -2,7 +2,7 @@
 
 2026-10-30，按用户指令撤下Nemotron＋SoulX专用适配和探针，采用官方SoulX＋SenseVoice。每处理一个160ms音频块，前端将最新话轮全文与本块状态原子覆盖到SharedContext，后续识别修订直接替换旧正文。不保存历史正文版本、patch或事件游标，不增加320ms定时器。
 
-当前代码已实现并通过本地契约检查，真实模型新回放仍待远端资源空闲；下游Layer1／2、CoT与真实播放尚未接入。完整验证状态见[实现报告](../../../reports/soulx/20261030-current-context/README.md)。本次不新建issue，不恢复旧训练或FDB评测。
+当前代码已实现，并通过本地契约检查和远端六视图当前值写入检查；下游Layer1／2、CoT与真实播放尚未接入。完整验证状态见[远端报告](../../../reports/soulx/20261030-current-context-test/README.md)。本次不新建issue，不恢复旧训练或FDB评测。
 
 ## 1. 组件与处理顺序
 

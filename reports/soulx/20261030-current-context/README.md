@@ -30,6 +30,8 @@ current = context.get_user_turn("s1", "u1")
 
 ## 远端验证状态
 
+用户随后明确授权启动远端测试，作业`job-179333689216596649227-xuan-zhang`已退出0，六视图全部通过当前值写入检查，269帧联合覆盖，见[远端测试报告](../20261030-current-context-test/README.md)。下文保留此前实施交付时的资源核查记录，不再表示测试尚未进行。
+
 已通过现有SSH入口只读核对远端队列与磁盘。核查时另一个项目作业`job-179333188185739475373-xuan-zhang`正在运行，占用2GPU、12CPU、64GiB；没有取消、修改或抢占该作业。按单活动作业约束，本轮未提交新的真实模型回放，不能宣称GPU验收通过。启动空盘约832GiB，满足30GiB前置要求。
 
 真实模型入口已迁移：`scripts/remote/soulx_frontend_replay.py`与`scripts/remote/run_soulx_frontend_replay.sh`；任务范围与资源见[检查任务](../../../docs/dev/SoulX-Duplug/frontend_audio_check.md)。资源允许时用独立冻结源码、现有六视图manifest、唯一run ID提交1×4090／4CPU／32GiB、最长1200秒的调度作业；设备显存22GiB、结果128MiB、输入积压800ms，触限失败。无需下载或复制模型。

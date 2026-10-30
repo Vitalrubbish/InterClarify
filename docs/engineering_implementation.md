@@ -2,7 +2,7 @@
 
 更新：2026-10-29。本文按已确认的SoulX-Duplug路线维护实施顺序；研究范围和模块合同分别见[研究方案](research_design.md)与[架构设计](research_design/architecture.md)。已复用TurnControlComparison资产完成组件加载及独立前端Context实现，六视图实时写入检查见[报告](../reports/soulx/20261029-shared-context/README.md)。下游状态token编码、LLM与真实输出尚未接入，现役Agent未切换，不启动训练或历史benchmark。
 
-2026-10-30 用户确认将在线接口简化为每个 160ms 音频处理步骤联合覆盖 text 与状态，不保留历史正文版本，取消 320ms 周期建议。当前值接口及前端已改造，本地契约检查通过，真实模型新回放待资源；见[实现报告](../reports/soulx/20261030-current-context/README.md)，不以旧验收替代新合同GPU检查。
+2026-10-30 用户确认将在线接口简化为每个 160ms 音频处理步骤联合覆盖 text 与状态，不保留历史正文版本，取消 320ms 周期建议。当前值接口及前端已改造，本地契约检查及远端六视图写入检查通过；见[测试报告](../reports/soulx/20261030-current-context-test/README.md)，拼合gap与识别／状态质量限制保留。
 
 ## 1. 运行底座与目标
 
