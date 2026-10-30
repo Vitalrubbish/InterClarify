@@ -4,7 +4,7 @@
 
 ## 结论
 
-- `scripts/remote/xturnix_fleurs_test.py` 新增 `score` 入口。它只读取已保存的回放目录、`status.json`、trace 和冻结 manifest，不访问模型服务、不加载权重、不读取音频。
+- `archive/scripts/remote/xturnix_fleurs_test.py` 新增 `score` 入口。它只读取已保存的回放目录、`status.json`、trace 和冻结 manifest，不访问模型服务、不加载权重、不读取音频。
 - `t_asr_last` 取在线阶段最后一次词汇增加或词内补全的客户端接收时刻；仅标点、空白、`post_cutoff` 与 EOF 排空变化不移动锚点。纯回写与空转写分别记为 `asr_rewrite`、`empty_transcript`，主延迟为 null，不回退文件末端。
 - 命中按 `[t_asr_last, t_asr_last+5s]` 且受 `online_cutoff` 限制评分，并要求请求按事件序号晚于锚点、输入版本不低于锚点且 token 前缀包含锚点文本；提前、旧前缀、窗外、截止后、乱序与不完整窗口分别记录。
 - 全部计划样本保留在分母与 CSV 中；未命中、失败、跳过、缺 trace 和无效 trace 的延迟均为 null，不填 0 或 5,000 ms。
@@ -15,11 +15,11 @@
 
 | 文件 | SHA256 |
 | --- | --- |
-| `scripts/remote/xturnix_fleurs_test.py` | `c7b3f31665824f3dc222bbb47c213e16cdd89684657d799cb412e90ae8ca7261` |
-| `tests/test_xturnix_fleurs_test.py` | `dc9604a144dbb3dc394cf25f6e7ad981a7f4fc65b0f6c67fbbf8d0b48afe352c` |
-| `docs/scripts/remote/xturnix_fleurs_test.md` | `b6e651da85a3a3b1c158651c4c2410a6c4719f4407e3325c7affb3222d890d02` |
-| `docs/tests/test_xturnix_fleurs_test.md` | `0fbd642fadd2787227ae5289f9415487cbe334f559cc0b974ebf4563d7c2532e` |
-| `configs/xturnix_fleurs_test.json` | `ae121007859ab3d7c6d07d38688082bffb0a6803cda3490b0c8b34f6b111fb43`（未改动） |
+| `archive/scripts/remote/xturnix_fleurs_test.py` | `c7b3f31665824f3dc222bbb47c213e16cdd89684657d799cb412e90ae8ca7261` |
+| `archive/tests/test_xturnix_fleurs_test.py` | `dc9604a144dbb3dc394cf25f6e7ad981a7f4fc65b0f6c67fbbf8d0b48afe352c` |
+| `docs/archive/scripts/remote/xturnix_fleurs_test.md` | `b6e651da85a3a3b1c158651c4c2410a6c4719f4407e3325c7affb3222d890d02` |
+| `docs/archive/tests/test_xturnix_fleurs_test.md` | `0fbd642fadd2787227ae5289f9415487cbe334f559cc0b974ebf4563d7c2532e` |
+| `archive/configs/xturnix_fleurs_test.json` | `ae121007859ab3d7c6d07d38688082bffb0a6803cda3490b0c8b34f6b111fb43`（未改动） |
 
 配置保持 XTX-002 冻结版本；评分只接受 5 秒主窗口，不新增阈值、声学对齐或模型调用。
 

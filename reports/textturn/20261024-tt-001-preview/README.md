@@ -66,7 +66,7 @@
 
 480ms、8 token和随机等待只是合成调度，没有真实Nemotron／LLM／TTS时间戳，也不具备独立模型评测结果。training_allowed=false、independent_test_ready=false，TT-001不归档。
 
-实现为[构建器](../../../scripts/training/build_textturn_dataset.py)，参数见[配置](../../../configs/textturn_dataset_preview.json)，使用方法见[中文说明](../../../docs/scripts/training/build_textturn_dataset.md)。本地复用conda interclarify-dev、CPU线程1；完整tokenizer及JSONL候选保留artifacts/textturn/tt-001-review-final。目录日期保留首次交付日期，本页更新日期表示当前版本。
+实现为[构建器](../../../archive/scripts/training/build_textturn_dataset.py)，参数见[配置](../../../archive/configs/textturn_dataset_preview.json)，使用方法见[中文说明](../../../docs/archive/scripts/training/build_textturn_dataset.md)。本地复用conda interclarify-dev、CPU线程1；完整tokenizer及JSONL候选保留artifacts/textturn/tt-001-review-final。目录日期保留首次交付日期，本页更新日期表示当前版本。
 
 ## 原始产物保存
 

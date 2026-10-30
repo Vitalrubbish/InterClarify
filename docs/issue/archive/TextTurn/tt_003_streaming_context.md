@@ -1,6 +1,6 @@
 # TT-003：接入 Nemotron 与 Shared Context
 
-状态：已完成并归档（2026-10-25真实链路核查）。依赖：[TT-002](tt_002_training.md)形成可继续验证的候选。依据：[训练方案第 1、5 节](../../../dev/TextTurn/training_plan.md)。
+状态：已完成并归档（2026-10-25真实链路核查）。依赖：[TT-002](tt_002_training.md)形成可继续验证的候选。依据：[训练方案第 1、5 节](../../../archive/dev/TextTurn/training_plan.md)。
 
 ## 目标
 

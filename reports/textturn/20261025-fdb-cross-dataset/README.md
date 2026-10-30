@@ -39,4 +39,4 @@ r1、r2均不作为正式能力成绩，不覆盖失败记录，也不按早期�
 
 实际输出在`~/parathink-textturn/runs/tt-005-006-20261025-r3`：`smoke`为接口检查、`formal/progress.json`为正式进度、`formal/traces`为逐录音证据；服务停止后自动生成`scoring/cases.csv`、`summary.json`、`intervals.json`和中文说明。缺失、失败、未知和50条计划分母全部保留；不称实际扬声器开口延迟或官方TOR。
 
-冻结清单及预算已取回本地`artifacts/textturn/tt-005-006-20261025/`，清单摘要已核对；原始JSON不重复入Git。6项本地conda边界测试通过，覆盖边界、连续周期、合并窗、未知分母、固定抽样、两臂静音及摘要格式。实现说明见[回放](../../../docs/scripts/remote/textturn_fdb_replay.md)、[评分](../../../docs/scripts/training/score_textturn_fdb.md)及[运行任务](../../../docs/scripts/remote/run_textturn_fdb.md)。
+冻结清单及预算已取回本地`artifacts/textturn/tt-005-006-20261025/`，清单摘要已核对；原始JSON不重复入Git。6项本地conda边界测试通过，覆盖边界、连续周期、合并窗、未知分母、固定抽样、两臂静音及摘要格式。实现说明见[回放](../../../docs/archive/scripts/remote/textturn_fdb_replay.md)、[评分](../../../docs/archive/scripts/training/score_textturn_fdb.md)及[运行任务](../../../docs/archive/scripts/remote/run_textturn_fdb.md)。

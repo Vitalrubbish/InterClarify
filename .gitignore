@@ -80,3 +80,7 @@ openai_use.example
 
 # Machine-specific SSH connection instructions (local only).
 remote_connection.local.md
+
+# Archived issues and route documentation are kept locally to avoid cluttering the main tree.
+docs/issue/archive
+docs/archive

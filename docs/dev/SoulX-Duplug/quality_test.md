@@ -23,7 +23,7 @@
 | 音频 | 16 kHz、单声道；80ms 实时传输，SoulX 目标块 160ms、左上下文 960ms、右前瞻 40ms |
 | 状态后处理 | 保留上游合并默认值，当前 YAML 为 `max_wait_num=8`、`max_mistake_num=3`、`far_field_threshold=0.02`；完整合并配置在实施时冻结 |
 
-Nemotron 模型与原生服务的已知合同见[既有组件说明](../../configs/xturnix_fleurs_test.md)，本轮重新记录实际部署和适配版本，不修改旧 XTurnix 冻结配置。Nemotron 臂不加载 SenseVoice，不重新对整轮音频做另一套 ASR，不使用 SoulX 内部生成的词汇替换 Nemotron 的权威转写。若按回退条件改用 SenseVoiceSmall，先冻结其独立配置、Context 来源与修订规则，本文当前的 Nemotron 参数不能直接沿用。
+Nemotron 模型与原生服务的已知合同见[既有组件说明](../../archive/configs/xturnix_fleurs_test.md)，本轮重新记录实际部署和适配版本，不修改旧 XTurnix 冻结配置。Nemotron 臂不加载 SenseVoice，不重新对整轮音频做另一套 ASR，不使用 SoulX 内部生成的词汇替换 Nemotron 的权威转写。若按回退条件改用 SenseVoiceSmall，先冻结其独立配置、Context 来源与修订规则，本文当前的 Nemotron 参数不能直接沿用。
 
 ### 单一转写与输入时序
 

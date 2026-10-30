@@ -1,6 +1,6 @@
 # TT-002：训练 Qwen3-0.6B 控制器
 
-状态：已完成并归档（2026-10-25核查）。依赖：[TT-001](tt_001_dataset.md)。依据：[训练方案](../../../dev/TextTurn/training_plan.md)。
+状态：已完成并归档（2026-10-25核查）。依赖：[TT-001](tt_001_dataset.md)。依据：[训练方案](../../../archive/dev/TextTurn/training_plan.md)。
 
 训练run `tt-002-20261025-r1`退出码0，pilot及full各两轮完成，按开发集选择full第2轮。候选adapter已保存，新增token行更新及重载动作分数一致均通过。训练耗时约1小时56分，未用独立测试选模型。开发集正常接话91.75%、陈述86%、打断100%，停顿／附和错误均0。详见[结果核查](../../../../reports/textturn/20261025-tt-004-results/README.md)。本项训练交付完成不代表语音验收通过。
 

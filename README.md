@@ -11,6 +11,7 @@ ParaThink 研究独立 thinking 流在语音 Agent 倾听与表达期间持续�
 | 研究方案与评测范围 | [docs/research_design.md](docs/research_design.md) |
 | 工程实施计划 | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
 | SoulX 路线与待执行的公开英文集验证设计 | [docs/dev/SoulX-Duplug](docs/dev/SoulX-Duplug/README.md) |
+| 已归档的 TextTurn／VoxTurn／XTurnix 路线 | [docs/archive/dev](docs/archive/dev/README.md) |
 | 本地 conda 环境 | [docs/local_environment.md](docs/local_environment.md)（`parathink-dev`） |
 | 工作单与历史实验 | [docs/issue/README.md](docs/issue/README.md) |
 | 已采用的运行时配置 | [docs/runtime_baseline.md](docs/runtime_baseline.md) |

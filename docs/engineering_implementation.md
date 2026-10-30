@@ -44,15 +44,18 @@ Layer 1 表达与思考调用、Layer 2 分步分析及两组专项训练采用[
 
 本地与远端均使用 conda，真实模型训练和集群测试在远端调度作业执行。SoulX 实验使用独立根目录 `~/parathink-soulx-duplug/`，现役模型与环境只读复用，目录见[远端约定](remote_workspace.md)。
 
-此前公开集验证设计的上限为：1×24GiB GPU、8 CPU、32GiB RAM、batch=1、一个活动作业，显存停止线 22GiB；下载并发≤2、CPU worker≤2，单会话一个在途请求、待处理音频≤800ms。单作业≤4小时，冒烟与正式运行累计≤4 GPU小时；启动空盘≥30GiB，新增资产≤10GiB，其中报告／trace≤2GiB。执行前核算全量时长和峰值，触限停止，不自动扩容。这些限制不覆盖已有 TextTurn 训练的独立授权。
+此前公开集验证设计的上限为：1×24GiB GPU、8 CPU、32GiB RAM、batch=1、一个活动作业，显存停止线 22GiB；下载并发≤2、CPU worker≤2，单会话一个在途请求、待处理音频≤800ms。单作业≤4小时，冒烟与正式运行累计≤4 GPU小时；启动空盘≥30GiB，新增资产≤10GiB，其中报告／trace≤2GiB。执行前核算全量时长和峰值，触限停止，不自动扩容。这些限制不覆盖已归档 TextTurn 训练的历史授权，也不恢复其作业。
 
 实施代码、配置及必要契约测试同步维护 `docs` 下同路径中文说明；交付冻结配置、manifest、逐例 trace、汇总、资源记录与中文报告。工作单仅依用户明确指令建立，完成后归档；本次不新建工作单。
 
 ## 5. 历史路线入口
 
-| 路线 | 保留状态与证据 |
-| --- | --- |
-| [TextTurn](dev/TextTurn/README.md) | 数据、训练、接入及评测见[工作单](issue/TextTurn/README.md)；TT-010 有限 pilot 最后记录见[修复报告](../reports/textturn/20261027-dataset-repair/README.md)，不自动进入 full 或恢复 TT-011 |
-| [XTurnix](issue/XTurnix/README.md) | XTX-001—005 及可行性分析已归档；正式 FLEURS 作业已取消，来源审核未形成可冻结监督，旧训练草案已撤下 |
+TextTurn、VoxTurn、XTurnix 已全部归档，不再有活动工作单；路线说明、实现和证据分别保留在[归档区](archive/dev/README.md)、[archive/](../archive/README.md)和[报告](../reports/README.md)。旧协议不作为 SoulX 已实现能力或当前实施授权。
 
-历史协议及运行证据保留在对应文档和报告，不作为 SoulX 已实现能力或当前实施授权。
+| 路线 | 归档状态与证据 |
+| --- | --- |
+| [TextTurn](archive/dev/TextTurn/README.md) | 数据、训练、接入及评测已归档；TT-010 有限 pilot 最后记录见[修复报告](../reports/textturn/20261027-dataset-repair/README.md)，不恢复 full 或 TT-011 |
+| [VoxTurn](archive/dev/VoxTurn/research_assessment.md) | 仅完成现成权重与接入可行性调研，未部署、未训练 |
+| [XTurnix](archive/dev/XTurnix/README.md) | XTX-001—005 及可行性分析已归档；正式 FLEURS 作业已取消，来源审核未形成可冻结监督 |
+
+历史工作单在本地 `docs/issue/archive/`，不进入 Git；历史协议及运行证据保留在对应归档文档和报告，不作为 SoulX 已实现能力或当前实施授权。

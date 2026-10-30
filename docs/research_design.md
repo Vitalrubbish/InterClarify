@@ -8,7 +8,7 @@
 
 研究任务与单一仲裁执行点、单一 TTS 播放所有权及已听内容不可撤销的边界保持。仅有效用户打断额外进入输出运行时：活动输出期间 `user_nonidle` 立即触发停止，涵盖准备与播放。其他状态不进入输出运行时，不映射成 start 或 keep；`user_complete` 不额外发起 LLM 回答调用，`user_backchannel` 由 LLM 读取并决定表达行为。具体路径见[架构第 2.2 节](research_design/architecture.md#22-前端状态与系统附和)。状态输入编码与 Layer 3 定位待后续讨论。TextTurn 专属协议不自动成为 SoulX 合同，旧作业不因本次选型恢复。
 
-旧 TextTurn／XTurnix 的数据、训练与测试修订统一见[工作单入口](issue/README.md)和对应报告；保留历史合同，不继承为 SoulX 协议。
+旧 TextTurn／VoxTurn／XTurnix 的数据、训练与测试修订已全部归档，入口见[历史路线归档](archive/dev/README.md)和对应报告；历史工作单在本地 `docs/issue/archive/`。保留历史合同，不继承为 SoulX 协议。
 
 ## 1. 研究背景
 

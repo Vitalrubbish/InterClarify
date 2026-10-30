@@ -15,7 +15,7 @@
 
 标注为保守语义规则加代理抽检，非逐例人工审核。正常请求与陈述完整保留；停顿仅放在明确不完整的问句开头。停止指令按首次明确可见的pause/stop/Wait触发，Please前缀保持keep。抽检12条训练来源的完整请求与陈述、4条轨迹的关键窗口，记录见 spot_check.json（原始文件`spot_check.json`已归档）。样例回归及机会评分共11项测试通过；实际模型训练尚待远端运行。
 
-冻结资产位于本地 `artifacts/textturn/tt-001-frozen-r3`，远端目标为 `~/parathink-textturn/dataset/tt-001-frozen-r3`。manifest.json（原始文件`manifest.json`已归档） 保存输入及输出摘要，split_index.json（原始文件`split_index.json`已归档） 保存全部来源和切分。构建入口及说明见 [数据冻结说明](../../../docs/scripts/training/freeze_textturn_dataset.md)。
+冻结资产位于本地 `artifacts/textturn/tt-001-frozen-r3`，远端目标为 `~/parathink-textturn/dataset/tt-001-frozen-r3`。manifest.json（原始文件`manifest.json`已归档） 保存输入及输出摘要，split_index.json（原始文件`split_index.json`已归档） 保存全部来源和切分。构建入口及说明见 [数据冻结说明](../../../docs/archive/scripts/training/freeze_textturn_dataset.md)。
 
 本交付允许TT-002受限机制试训。短附和和停止指令使用小型模板集合，时序及播放均为合成，尚无可回放语音或Nemotron在线成绩；文本模型测试不能作为TT-004在线通过证据。
 

@@ -18,7 +18,7 @@
 | 节点 / GPU | `d6-hpc-gpu-038` / NVIDIA A10，驱动 570.144，24,564 MiB |
 | 时间（UTC） | 19:14:59—19:19:11，退出码 0 |
 | 源码提交 | `eba4cd1` |
-| 配置 | `configs/xturnix_fleurs_test.json`，SHA256 `ae121007859ab3d7c6d07d38688082bffb0a6803cda3490b0c8b34f6b111fb43` |
+| 配置 | `archive/configs/xturnix_fleurs_test.json`，SHA256 `ae121007859ab3d7c6d07d38688082bffb0a6803cda3490b0c8b34f6b111fb43` |
 | 运行目录 | `~/interclarify-xturnix-fleurs/runs/xtx-005-smoke-20261023-a10-r4` |
 | 提交命令 | `XTURNIX_MODE=smoke XTURNIX_RUN_ID=...`，`--partition pdgpu-a10`，8 CPU/32G/1 GPU |
 
@@ -82,7 +82,7 @@
 
 本报告只证明作业入口、服务生命周期、协议回放、评分和清理在 A10 上可执行。它不证明 FLEURS 的 start 命中率或模型质量，也不把 0/5 当作正式成绩。A10 的算力与 XTX-002 的 RTX 4090 不同，控制延迟不能跨硬件直接比较。正式 100 条仍按冻结配置独立回放，不做阈值或抽样调整。
 
-入口说明见 [run_xturnix_fleurs_job](../../../docs/scripts/remote/run_xturnix_fleurs_job.md)。
+入口说明见 [run_xturnix_fleurs_job](../../../docs/archive/scripts/remote/run_xturnix_fleurs_job.md)。
 
 ## 原始产物保存
 

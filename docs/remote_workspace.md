@@ -18,11 +18,11 @@
 | `interclarify-english-integration-20261018-v6` | 组件入口；`envs` 软链到 v1 |
 | `interclarify-runtime-20261021-adopted` | 当前运行时源码快照 |
 | `interclarify-runtime-current` | 指向当前运行时快照的稳定入口 |
-| `interclarify-xturnix-fleurs` | XTurnix FLEURS 冻结输入与后续评测输出；XTX-001 数据在 `dataset/fleurs_en_us`，XTX-002 环境/模型在 `envs/xturnix`、`models/xturnix-pt` |
+| `interclarify-xturnix-fleurs` | 历史归档：XTurnix FLEURS 冻结输入与评测输出；XTX-001 数据在 `dataset/fleurs_en_us`，XTX-002 环境/模型在 `envs/xturnix`、`models/xturnix-pt` |
 | `InterClarify/benchmark/fdb_v1_0` | FDB v1.0 评测数据 |
 | `interclarify-fdb-two-axes-20261021-r4` | FDB 两轴最终结果 |
 | `Full-Duplex-Bench` | 官方 FDB 评分仓库 |
-| `parathink-textturn` | TextTurn独立实验；源码`source/`、冻结集`dataset/`、训练`runs/`、提交日志`submit_logs/` |
+| `parathink-textturn` | 历史归档：TextTurn 独立实验；源码`source/`、冻结集`dataset/`、训练`runs/`、提交日志`submit_logs/` |
 | `parathink-soulx-duplug` | ParaThink 前端独立部署与检查根目录，复用下面的资产；状态见[部署记录](dev/SoulX-Duplug/deployment.md) |
 | `turncontrol-comparison/models/soulx-duplug` | 复用 SoulX tokenizer、基座和状态权重，不复制或修改 |
 | `turncontrol-comparison/models/sensevoice-small` | 首版英文 ASR 权重，只读复用 |

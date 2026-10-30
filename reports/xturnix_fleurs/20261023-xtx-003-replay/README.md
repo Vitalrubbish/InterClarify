@@ -4,7 +4,7 @@
 
 ## 结论
 
-- `scripts/remote/xturnix_fleurs_test.py` 新增 `replay` 入口，按 XTX-002 冻结配置逐条串行回放：80ms 音频包、80ms/5.04 秒静音尾窗、5 秒主窗口、EOF 排空，以及 Listen 条件下不执行 start 的影子决策。
+- `archive/scripts/remote/xturnix_fleurs_test.py` 新增 `replay` 入口，按 XTX-002 冻结配置逐条串行回放：80ms 音频包、80ms/5.04 秒静音尾窗、5 秒主窗口、EOF 排空，以及 Listen 条件下不执行 start 的影子决策。
 - ASR 前缀由独立轮询线程读取，控制调度器最多一个在途请求、只保留最新未开始前缀；排队、替换、截止丢弃和截止后返回均写入 trace。
 - 每条录音使用独立 ASR 会话与空的控制器历史。失败样本保留在 `status.json`；会话清理失败或控制线程无法停止时停止后续样本并记 `skipped`，避免污染。
 - 参考答案不进入在线控制输入；控制请求只使用当时已观察到的 ASR 文本，trace 保留输入版本、请求 ID、发送/返回单调时钟、动作与分数。
@@ -14,11 +14,11 @@
 
 | 文件 | SHA256 |
 | --- | --- |
-| `scripts/remote/xturnix_fleurs_test.py` | `bc439ae31fc0eedd6beeed733795582b2149f0c05b663f0b15ddf02e992e89d7` |
-| `tests/test_xturnix_fleurs_test.py` | `dca5a63bd6d9ecc99748fddf5d7c279c3e648af028dcf975c83a996ddce72e08` |
-| `docs/scripts/remote/xturnix_fleurs_test.md` | `4ad6dca852a6de9236e60b4992b1f947a105ea0446ec943adc8b444fbcce7408` |
-| `docs/tests/test_xturnix_fleurs_test.md` | `d9fdc032f9bae311d266caac0db0af6ba4a2413201b9b615332dfa8d2ee68047` |
-| `configs/xturnix_fleurs_test.json` | `ae121007859ab3d7c6d07d38688082bffb0a6803cda3490b0c8b34f6b111fb43`（未改动） |
+| `archive/scripts/remote/xturnix_fleurs_test.py` | `bc439ae31fc0eedd6beeed733795582b2149f0c05b663f0b15ddf02e992e89d7` |
+| `archive/tests/test_xturnix_fleurs_test.py` | `dca5a63bd6d9ecc99748fddf5d7c279c3e648af028dcf975c83a996ddce72e08` |
+| `docs/archive/scripts/remote/xturnix_fleurs_test.md` | `4ad6dca852a6de9236e60b4992b1f947a105ea0446ec943adc8b444fbcce7408` |
+| `docs/archive/tests/test_xturnix_fleurs_test.md` | `d9fdc032f9bae311d266caac0db0af6ba4a2413201b9b615332dfa8d2ee68047` |
+| `archive/configs/xturnix_fleurs_test.json` | `ae121007859ab3d7c6d07d38688082bffb0a6803cda3490b0c8b34f6b111fb43`（未改动） |
 
 配置仍为 XTX-002 冻结版本；回放器不接受 80ms 传输、160ms 模型分块、单在途/单排队、5 秒尾窗或 5 秒主窗口的任何放宽，也拒绝启用 pause 注入。
 

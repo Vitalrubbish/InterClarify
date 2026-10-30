@@ -18,7 +18,7 @@
 
 实测pilot1894窗各类有效质量631.3333；train9977窗各类3325.6667。全部有效权重为正，原始行内loss_weight没有改写。当前train每个start有效系数约39.59、stop约79.18，keep随基础分组变化。该方法平衡损失系数，实际梯度还受到误差、梯度裁剪和轨迹顺序影响；等份额可能提高误动作，需后续开发集检验，不能宣称消除全部keep退化。
 
-完整公式、类的设计取舍及核心方法见[损失说明](../../../docs/scripts/training/textturn_loss.md)；低门槛细节见[放行说明](../../../docs/scripts/training/textturn_gate.md)。新代码均有docs对应路径说明。
+完整公式、类的设计取舍及核心方法见[损失说明](../../../docs/archive/scripts/training/textturn_loss.md)；低门槛细节见[放行说明](../../../docs/archive/scripts/training/textturn_gate.md)。新代码均有docs对应路径说明。
 
 ## 验证与限制
 

@@ -31,7 +31,7 @@
 
 例如`56986:question:normal`在“What are some”后实际抽到1窗句中停顿，随后继续同一用户句子；助手表达中在另一随机位置抽到“I see.”。`43513:question:interrupt`在“How can I reduce physical and”后抽到5窗停顿，助手表达中随机出现“Mm-hm.”。这是真实构造事件中的位置，不是展示时补写的示例。
 
-新增6组数据边界测试及TextTurn回归合计41项通过；另独立核查完整事件、前缀审核、20343个正式快照的模型输入编码、句读、掩码及闭环。实现与证据入口见[构造说明](../../../docs/scripts/training/build_textturn_duplex_dataset.md)、[核查说明](../../../docs/scripts/analysis/audit_textturn_duplex_dataset.md)、[重建合同](../../../docs/dev/TextTurn/tt_010_rebuild.md)。
+新增6组数据边界测试及TextTurn回归合计41项通过；另独立核查完整事件、前缀审核、20343个正式快照的模型输入编码、句读、掩码及闭环。实现与证据入口见[构造说明](../../../docs/archive/scripts/training/build_textturn_duplex_dataset.md)、[核查说明](../../../docs/archive/scripts/analysis/audit_textturn_duplex_dataset.md)、[重建合同](../../../docs/archive/dev/TextTurn/tt_010_rebuild.md)。
 
 ## 资源、失败记录与边界
 

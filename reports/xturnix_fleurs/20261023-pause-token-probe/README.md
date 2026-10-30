@@ -99,7 +99,7 @@
 - 正式 100 条作业已按用户要求取消，未产生正式成绩；XTX-006 仍未完成。
 - 探针只加载 XTurnix，不加载 Nemotron、不访问 ASR 服务、不写正式 run 目录。
 - 若目标是“朗读句末检测/端点检测”，应换用端点检测或专门的话轮结束模型；XTurnix-PT 不是该任务模型。若目标是验证 XTurnix 的话轮判断，输入应是自然对话中的让轮点，并只把真实因果 pause 作为闸门。
-- 入口与参数见 [xturnix_pause_probe](../../../docs/scripts/remote/xturnix_pause_probe.md)。
+- 入口与参数见 [xturnix_pause_probe](../../../docs/archive/scripts/remote/xturnix_pause_probe.md)。
 
 ## 原始产物保存
 

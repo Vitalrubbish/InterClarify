@@ -30,7 +30,7 @@
 
 ## 复现及摘要
 
-[冻结入口](../../../docs/scripts/training/freeze_textturn_full_trajectories.md)、[损失函数](../../../docs/scripts/training/textturn_loss.md)、[完整性核查](../../../docs/scripts/analysis/audit_textturn_full_trajectories.md)、[远端提交](../../../docs/scripts/remote/submit_textturn_full_training.md)。旧在线ASR、噪声及真实播放覆盖不足的结论不因本次训练启动而改变。
+[冻结入口](../../../docs/archive/scripts/training/freeze_textturn_full_trajectories.md)、[损失函数](../../../docs/archive/scripts/training/textturn_loss.md)、[完整性核查](../../../docs/archive/scripts/analysis/audit_textturn_full_trajectories.md)、[远端提交](../../../docs/archive/scripts/remote/submit_textturn_full_training.md)。旧在线ASR、噪声及真实播放覆盖不足的结论不因本次训练启动而改变。
 
 manifest SHA256：`21357f70fb2d382c1ed79741d094aaee9378ec609c5215c7db1afc096b477989`。
 

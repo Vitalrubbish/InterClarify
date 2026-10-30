@@ -12,7 +12,7 @@ Git只保留审阅后的README汇总：结论、关键分母、限制、源码�
 | [FDB原始转写稳定与提交等待](soulx/20261030-fdb-asr-stability/README.md) | 672条ASR轨迹重建通过；7103个可确认前缀端点三次确认新增等待中位481ms、P95约1603ms；5894个端点缺证据，三次一致仍有后续改写 |
 | [Nemotron＋SoulX独立适配](soulx/20261030-nemotron-integration/README.md) | 四视图单卡实时探针完成；105次正文更新、124条状态，回调至正文可见P95约6.06ms；无固定稳定等待，状态语义及尾部收尾仍待验证 |
 
-## 当前TextTurn结果
+## 历史 TextTurn 结果（路线已归档）
 
 | 报告 | 状态与用途 |
 | --- | --- |
@@ -26,7 +26,7 @@ Git只保留审阅后的README汇总：结论、关键分母、限制、源码�
 | [数据冻结](textturn/20261025-tt-001-freeze/README.md) | train/dev/test为160/200/300来源，训练10000窗 |
 | [早期检查样例](textturn/20261024-tt-001-preview/README.md) | 历史review批次，非正式训练或验收成绩 |
 
-[FDB各50条外部测试](../docs/dev/TextTurn/fdb_cross_dataset_plan.md)及160ms同样本对照均已交付；两次3周期门槛的名义时长不同，等待均值须保留各自有效样本分母，不代替完整四类验收。
+[FDB 各 50 条外部测试](../docs/archive/dev/TextTurn/fdb_cross_dataset_plan.md)及 160ms 同样本对照均已交付；TextTurn 路线已归档，两次 3 周期门槛的名义时长不同，等待均值须保留各自有效样本分母，不代替完整四类验收。
 
 ## 历史结果
 

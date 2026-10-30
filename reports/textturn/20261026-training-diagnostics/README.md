@@ -1,6 +1,6 @@
 # TextTurn训练机制诊断与方案
 
-2026-10-26按用户要求在TT-010内测试并确定新训练方案，不新增issue。诊断设计在执行前已记录于[协议](../../../docs/dev/TextTurn/training_diagnostics.md)，正式训练代码、冻结数据和TT-011外部回归保持原状。
+2026-10-26按用户要求在TT-010内测试并确定新训练方案，不新增issue。诊断设计在执行前已记录于[协议](../../../docs/archive/dev/TextTurn/training_diagnostics.md)，正式训练代码、冻结数据和TT-011外部回归保持原状。
 
 ## 执行记录
 
@@ -61,7 +61,7 @@ A10上的`full_clip1`已完成两轮，两轮pilot探针start0/16、stop0/8，de
 
 三臂summary已取回本地`artifacts/analysis/textturn/training-diagnostics-20261026/compare-summary.json`，SHA256为`604beabe6e68f24b9f45962e624ad3e28f374e9355b40a02592da808248ed0a6`。完整轨迹确认集尚未使用。
 
-预先登记的追加条件满足；原作业结束且`vc list`无活动任务后，15:03:11提交合法动作CE＋不裁剪，job为`job-179299819049996509767-xuan-zhang`，run为`tt010-diagnostic-interaction-a10-r1`。源码`f22f8a7`，独立worktree`source/tt010-diagnostics-r2`，使用`configs/textturn_training_interaction.json`。同一基模重新开始，原pilot两轮、同seed／日程，仍单A10／8CPU／32GiB及7200秒诊断上限；未启动正式训练或外部测试。
+预先登记的追加条件满足；原作业结束且`vc list`无活动任务后，15:03:11提交合法动作CE＋不裁剪，job为`job-179299819049996509767-xuan-zhang`，run为`tt010-diagnostic-interaction-a10-r1`。源码`f22f8a7`，独立worktree`source/tt010-diagnostics-r2`，使用`archive/configs/textturn_training_interaction.json`。同一基模重新开始，原pilot两轮、同seed／日程，仍单A10／8CPU／32GiB及7200秒诊断上限；未启动正式训练或外部测试。
 
 ## 四臂最终结论
 
@@ -85,4 +85,4 @@ A10上的`full_clip1`已完成两轮，两轮pilot探针start0/16、stop0/8，de
 
 其余检查：pilot仅4来源、16个start对应8种用户正文、8个stop对应4种前缀；全部start在完整正文后的首个no-voice窗，紧邻前窗已具有相同正文却标keep；句中停顿在非末尾token片段随机插入，stop使用8种固定模板及字符位置界定可判定点。后两项需要依据当前可见语义审核，不能让“源文本是否结束”或“达到字符数”代替语义依据。
 
-下一轮明确方案为：先修复上述数据闭环与语义对照，再将完整normal／interrupt轨迹配对，在每次逻辑更新内合并三类损失后统一裁剪。更新组织先在原数据上做受限验证，再比较修订数据，以区分优化与构造收益。方案已写入[训练方案](../../../docs/dev/TextTurn/retraining_plan.md)，尚未实施或启动。
+下一轮明确方案为：先修复上述数据闭环与语义对照，再将完整normal／interrupt轨迹配对，在每次逻辑更新内合并三类损失后统一裁剪。更新组织先在原数据上做受限验证，再比较修订数据，以区分优化与构造收益。方案已写入[训练方案](../../../docs/archive/dev/TextTurn/retraining_plan.md)，尚未实施或启动。
