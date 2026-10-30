@@ -90,6 +90,35 @@ def rpc(path, operation, **payload):
     return response
 
 
+class AudioProgressPairing:
+    """Pair by arrived PCM coverage while keeping native and teacher steps separate."""
+
+    def __init__(self):
+        self.native_seq = self.teacher_seq = self.observed_end = self.next_end = 0
+
+    def accept(self, step, target_end):
+        if step['step_seq'] != self.native_seq + 1 or step['eof_received']:
+            raise ValueError('Unordered or drained native step in online pairing')
+        end = step['feature_end_sample']
+        if (step['consumed_samples'] != end or end > step['received_samples']
+                or end <= self.observed_end or step['next_feature_end_sample'] <= end):
+            raise ValueError('Invalid native PCM coverage')
+        if self.next_end and end != self.next_end:
+            raise ValueError('Native feature window differs from announced next window')
+        if target_end != (self.teacher_seq + 1) * 2560:
+            raise ValueError('Teacher audio target skipped or duplicated')
+        startup = end < target_end
+        if startup and (self.native_seq != 0 or self.teacher_seq != 0):
+            raise ValueError('Only the first short native chunk may precede a teacher step')
+        if not startup and self.observed_end >= target_end:
+            raise ValueError('Pairing skipped an earlier sufficient native window')
+        self.native_seq, self.observed_end = step['step_seq'], end
+        self.next_end = step['next_feature_end_sample']
+        if not startup:
+            self.teacher_seq += 1
+        return 'startup' if startup else 'context'
+
+
 def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
     import numpy as np
     import torch
@@ -128,17 +157,22 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
 
     reader = threading.Thread(target=feed, daemon=True)
     reader.start()
+    pairing = AudioProgressPairing()
     seq, pending_step = 0, None
+    startup_steps = []
+    previous_released_at = None
     file = (output / f'{case_id}.frames.jsonl').open('x')
+    startup_file = (output / f'{case_id}.startup.jsonl').open('x')
     try:
         while True:
             begin, end = seq * 2560, (seq + 1) * 2560
             with arrived:
-                while state['end'] < end + ahead_size and not state['eof'] and not state['error']:
+                required_end = max(end + ahead_size, pairing.next_end)
+                while state['end'] < required_end and not state['eof'] and not state['error']:
                     arrived.wait(.05)
                 if state['error']:
                     raise RuntimeError(state['error'])
-                if state['end'] < end + ahead_size:
+                if state['end'] < required_end:
                     break
                 if state['end'] - begin > 12800:
                     raise RuntimeError('Teacher processing backlog exceeded 800ms')
@@ -150,7 +184,7 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
             while pending_step is None:
                 if state['error']:
                     raise RuntimeError(state['error'])
-                batch = rpc(path, 'poll', session_id=identity, after=seq)
+                batch = rpc(path, 'poll', session_id=identity, after=pairing.native_seq)
                 if batch['steps']:
                     if len(batch['steps']) != 1:
                         raise AssertionError('ASR decoded beyond its publication barrier')
@@ -160,25 +194,38 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
                     raise RuntimeError('ASR completion backlog exceeded 800ms')
                 stopped.wait(.002)
             step = pending_step
-            if step['step_seq'] != seq + 1 or step['eof_received']:
-                raise AssertionError('Unpaired or drained ASR step in online controller')
+            kind = pairing.accept(step, end)
+            if previous_released_at is not None and step['decode_started_at'] < previous_released_at:
+                raise AssertionError('ASR advanced before its preceding barrier release')
+            if kind == 'startup':
+                startup = {'native_step': step, 'startup_recorded_at': time.monotonic()}
+                startup_file.write(json.dumps(startup, ensure_ascii=False) + '\n')
+                startup_file.flush()
+                release = rpc(path, 'release', session_id=identity, step_seq=step['step_seq'],
+                              published_at=startup['startup_recorded_at'], publication_kind='startup')
+                startup_steps.append(dict(startup, **release))
+                previous_released_at = release['released_at']
+                pending_step = None
+                continue
             observed = max(end + ahead_size, step['consumed_samples'])
             with arrived:
                 if step['consumed_samples'] > state['end']:
                     raise AssertionError('ASR observation exceeds arrived PCM')
             with torch.inference_mode():
-                frame = frontend.process_step(step, chunk, back, ahead, end, observed)
+                frame = frontend.process_step(dict(step, step_seq=seq + 1), chunk, back, ahead, end, observed)
+            frame.update(native_step=step, teacher_step_seq=seq + 1, pairing_mode='audio_coverage',
+                         asr_observation_ahead_ms=(step['consumed_samples'] - end) / 16)
             if not (step['decode_completed_at'] <= frame['controller_started_at'] <= frame['teacher_injected_at']
                     <= frame['state_resolved_at'] <= frame['published_at']):
                 raise AssertionError('Teacher publication order is invalid')
-            if ledger and step['decode_started_at'] < ledger[-1]['released_at']:
-                raise AssertionError('ASR advanced before the preceding Context publication')
             backlog_ms = (time.monotonic() - started - end / 16000) * 1000
             if backlog_ms > 800:
                 raise RuntimeError('Joint publication backlog exceeded 800ms')
-            release = rpc(path, 'release', session_id=identity, step_seq=seq + 1,
+            release = rpc(path, 'release', session_id=identity, step_seq=step['step_seq'],
                           published_at=frame['published_at'])
-            frame.update(release, backlog_ms=backlog_ms)
+            frame.update(release, backlog_ms=backlog_ms,
+                         observed_backlog_ms=backlog_ms - (observed - end) / 16)
+            previous_released_at = release['released_at']
             ledger.append(frame)
             file.write(json.dumps(frame, ensure_ascii=False) + '\n')
             file.flush()
@@ -195,7 +242,7 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
         rpc(path, 'push', session_id=identity, eof=True)
         deadline = time.monotonic() + 10
         while True:
-            batch = rpc(path, 'poll', session_id=identity, after=seq)
+            batch = rpc(path, 'poll', session_id=identity, after=pairing.native_seq)
             if batch['ended']:
                 break
             if time.monotonic() > deadline:
@@ -204,6 +251,8 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
         drained = batch['steps'][-1]['text'] if batch['steps'] else online
         return {'case_id': case_id, 'passed': True, 'online_text': online, 'drained_text': drained,
                 'frames': len(ledger), 'real_samples': len(audio), 'processed_samples': seq * 2560,
+                'pairing_mode': 'audio_coverage', 'startup_steps': startup_steps,
+                'last_online_native_step': pairing.native_seq,
                 'pending_real_samples': len(audio) - seq * 2560,
                 'state_counts': dict(Counter(v['state_token'] for v in ledger)),
                 'raw_state_counts': dict(Counter(v['raw_token'] for v in ledger)),
@@ -216,6 +265,7 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
         reader.join(3)
         frontend.kv = None
         file.close()
+        startup_file.close()
         rpc(path, 'close', session_id=identity)
         if reader.is_alive():
             raise RuntimeError('Ingress thread did not terminate')
@@ -239,6 +289,7 @@ def run(args):
     args.output.mkdir(exist_ok=False)
     write_json(args.output / 'input_manifest.json', dict(manifest, samples=samples))
     result = {'passed': False, 'cases': [], 'teacher_forcing': True, 'timing_mode': 'realtime',
+              'pairing_mode': 'audio_coverage',
               'sensevoice_loaded': False, 'empty_nonidle_rule': not args.disable_empty_rule,
               'manifest_sha256': digest(args.manifest),
               'source_commit': __import__('os').environ.get('SOULX_SOURCE_COMMIT'),
@@ -327,7 +378,9 @@ def analyze(args):
         if frames:
             columns = ['processed_until', 'audio_observed_until', 'text', 'delta_text', 'raw_token',
                        'state_token', 'state_accepted', 'adjustment', 'teacher_char_end',
-                       'teacher_injected_at', 'state_resolved_at', 'published_at', 'released_at', 'backlog_ms']
+                       'teacher_injected_at', 'state_resolved_at', 'published_at', 'released_at', 'backlog_ms',
+                       'step_seq', 'teacher_step_seq', 'pairing_mode', 'asr_observation_ahead_ms',
+                       'observed_backlog_ms']
             with (args.output / (sample['case_id'] + '.trace.csv')).open('w') as stream:
                 writer = csv.DictWriter(stream, fieldnames=columns, extrasaction='ignore')
                 writer.writeheader()
@@ -343,7 +396,8 @@ def analyze(args):
                 group['samples_with_' + key] = sum(bool(r.get(key)) for r in rows)
         if task == 'pause_handling':
             pauses = [p for r in rows for p in r['pause_intervals']]
-            group.update(pause_intervals=len(pauses), pause_intervals_with_complete=sum(p['complete_count'] > 0 for p in pauses))
+            group.update(pause_intervals=len(pauses), pause_intervals_with_complete=sum(p['complete_count'] > 0 for p in pauses),
+                         pause_intervals_with_observed_complete=sum(p['observed_complete_count'] > 0 for p in pauses))
         if task == 'user_interruption':
             group['nonidle_delays_ms'] = [r['nonidle_delay_ms'] for r in rows if r.get('nonidle_delay_ms') is not None]
         for key, prefix in (('word_errors', 'online'), ('drained_word_errors', 'drained')):

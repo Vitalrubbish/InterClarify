@@ -76,6 +76,8 @@ class SynchronizedNemotron(NativeNemotron):
                 frames = processor.num_mel_frames_first_audio_chunk if first else processor.num_mel_frames_per_audio_chunk
                 seq += 1
                 step = {'step_seq': seq, 'feature_start_sample': start, 'feature_end_sample': start + size,
+                        'next_feature_end_sample': (frame_index + frames) * processor.feature_extractor.hop_length
+                        - processor.feature_extractor.n_fft // 2 + processor.num_samples_per_audio_chunk,
                         'consumed_samples': source.consumed, 'received_samples': source.received,
                         'nominal_audio_start_ms': (seq - 1) * 160, 'nominal_audio_end_ms': seq * 160,
                         'decode_started_at': time.monotonic(), 'eof_received': source.eof}
@@ -146,15 +148,19 @@ class BarrierSession(NemotronSession):
             if self.source.cancelled:
                 raise InterruptedError('Teacher stream cancelled at barrier')
 
-    def release(self, seq, published_at):
+    def release(self, seq, published_at, publication_kind='context'):
         with self.source.condition:
             if seq != self.released_seq + 1 or seq != self.step_seq:
                 raise ValueError('Release must acknowledge exactly the pending decoder step')
+            if publication_kind not in ('context', 'startup'):
+                raise ValueError('Unknown barrier publication kind')
+            if publication_kind == 'startup' and (seq != 1 or self.steps[-1]['feature_end_sample'] >= 2560):
+                raise ValueError('Only the initial short ASR chunk can use startup release')
             if not self.steps[-1]['decode_completed_at'] <= published_at <= time.monotonic():
-                raise ValueError('Invalid Context publication timestamp')
+                raise ValueError('Invalid barrier publication timestamp')
             self.released_seq, self.released_at = seq, time.monotonic()
             self.source.condition.notify_all()
-            return {'released_at': self.released_at, 'step_seq': seq}
+            return {'released_at': self.released_at, 'step_seq': seq, 'publication_kind': publication_kind}
 
 
 def main():
@@ -202,7 +208,8 @@ def main():
                         elif operation == 'poll':
                             response = session.read_steps(request['after'])
                         elif operation == 'release':
-                            response = session.release(request['step_seq'], request['published_at'])
+                            response = session.release(request['step_seq'], request['published_at'],
+                                                       request.get('publication_kind', 'context'))
                         else:
                             raise ValueError('Unknown operation')
                 except Exception as exc:

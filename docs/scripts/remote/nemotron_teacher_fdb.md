@@ -5,3 +5,7 @@
 `run()` 复用历史30条冻结 manifest，逐文件核对 SHA256；参考与标注仅供离线分析。`load_controller()` 摘要校验只读加载器，并以会报错的空 ASR 替换 SenseVoice 类，确保无第二识别来源。`analyze()` 计算在线及排空 WER、标注边界前后 complete、停顿 complete 和打断 nonidle 延迟，并保存逐样本全文与状态依据。无参考的接话组不计算 WER；状态时序是诊断，不是下游播放成功率。
 
 运行入口和资源限制见[脚本](run_nemotron_teacher_fdb.md)，30条约513.2秒，旧结果保留。
+
+NTF-003 修正：`AudioProgressPairing` 分别跟踪原生解码步和SoulX状态步，核对连续窗口及实际观察范围；`accept()`只允许首个不足主块覆盖的步骤作为startup，正常配对必须覆盖主块截止且前一ASR窗口尚未覆盖该截止。首块独立写入startup审计后释放，不产生状态；首块文字包含在首个正常教师累计正文中。`run_case()`根据解码器报告的`next_feature_end_sample`等待真实音频，EOF不足该窗口则停止在线循环。原生步号保存在`native_step`，教师步号单列；正常发布后才释放对应的原生步骤。
+
+每帧额外记录`asr_observation_ahead_ms`、实际原生步号和配对模式；正文与规则不变。覆盖条件以原始PCM窗口为准，只保证读取范围已覆盖，不承诺ASR内部缓存进度或词级对齐。完整观察上界可能比SoulX原有40ms前瞻多出约59ms，质量比较同时列主块与观察位置。

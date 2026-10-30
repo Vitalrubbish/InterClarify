@@ -3,6 +3,7 @@ from pathlib import Path
 from types import SimpleNamespace
 import hashlib
 import sys
+import tempfile
 import threading
 import time
 import unittest
@@ -12,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).parents[1] / 'scripts/remote'))
 sys.path.insert(0, str(Path(__file__).parents[1] / 'scripts/runtime'))
 from nemotron_teacher_worker import BarrierSession, reorder_sample
 from nemotron_teacher_frontend import TeacherCursor, NemotronTeacherFrontend
+from nemotron_teacher_fdb import AudioProgressPairing, run_case
 from shared_context import STATE_IDS
 
 
@@ -142,6 +144,93 @@ class TeacherInputTests(unittest.TestCase):
             self.assertEqual(frames[2]['adjustment'], 'empty_nonidle_count' if enabled else None)
             if not enabled:
                 self.assertEqual(frames[3]['adjustment'], 'nonidle_to_idle')
+
+
+class AudioPairingTests(unittest.TestCase):
+    @staticmethod
+    def native(seq, end, next_end, text=''):
+        return dict(step_seq=seq, feature_end_sample=end, next_feature_end_sample=next_end,
+                    consumed_samples=end, received_samples=end, eof_received=False, text=text)
+
+    def test_short_startup_then_first_sufficient_window(self):
+        pairing = AudioProgressPairing()
+        cursor = TeacherCursor()
+        first = self.native(1, 1480, 4144, 'inter')
+        self.assertEqual(pairing.accept(first, 2560), 'startup')
+        self.assertEqual((pairing.native_seq, pairing.teacher_seq), (1, 0))
+        second = self.native(2, 4144, 6704, 'internet')
+        self.assertEqual(pairing.accept(second, 2560), 'context')
+        self.assertEqual(cursor.advance(dict(second, step_seq=pairing.teacher_seq)), 'internet')
+        third = self.native(3, 6704, 9264, 'internet works')
+        self.assertEqual(pairing.accept(third, 5120), 'context')
+        self.assertEqual(cursor.advance(dict(third, step_seq=pairing.teacher_seq)), ' works')
+        self.assertEqual((pairing.native_seq, pairing.teacher_seq), (3, 2))
+
+    def test_reject_missing_coverage_skipped_steps_and_drain(self):
+        for second in (self.native(2, 2500, 5060), self.native(3, 4144, 6704),
+                       dict(self.native(2, 4144, 6704), eof_received=True),
+                       self.native(2, 4304, 6864)):
+            pairing = AudioProgressPairing()
+            pairing.accept(self.native(1, 1480, 4144), 2560)
+            with self.subTest(second=second), self.assertRaises(ValueError):
+                pairing.accept(second, 2560)
+
+    def test_realtime_eof_and_startup_text_with_actual_barrier(self):
+        import json
+        import numpy as np
+        class Engine:
+            supports_decode_steps = True
+            def run(self, source, emit, complete):
+                seq, start, size = 1, 0, 1480
+                while True:
+                    audio = source.read(start, size)
+                    if audio is None:
+                        return
+                    end = start + size
+                    emit('inter' if seq == 1 else 'internet' if not source.eof else 'internet tail', [seq])
+                    complete(dict(step_seq=seq, feature_start_sample=start, feature_end_sample=end,
+                                  next_feature_end_sample=4144 if seq == 1 else end + 2560,
+                                  consumed_samples=source.consumed, received_samples=source.received,
+                                  eof_received=source.eof, decode_started_at=time.monotonic(),
+                                  decode_completed_at=time.monotonic()))
+                    start, size, seq = (1184 if seq == 1 else start + 2560), 2960, seq + 1
+        session = BarrierSession(Engine())
+        releases = []
+        def fake_rpc(path, operation, **payload):
+            if operation == 'create':
+                return {'session_id': session.id}
+            if operation == 'push':
+                import base64
+                session.source.append(base64.b64decode(payload.get('audio', '')), eof=payload.get('eof', False))
+                return session.snapshot()
+            if operation == 'poll':
+                return session.read_steps(payload['after'])
+            if operation == 'release':
+                releases.append((payload['step_seq'], payload.get('publication_kind', 'context')))
+                return session.release(payload['step_seq'], payload['published_at'], payload.get('publication_kind', 'context'))
+            if operation == 'close':
+                session.source.cancel()
+                session.worker.join(1)
+                return {'ok': True}
+            raise AssertionError(operation)
+        model = FakeModel([STATE_IDS['<|user_nonidle|>']] * 4)
+        model.config.infer_config.input = SimpleNamespace(audio_back_size=0, audio_ahead_size=640)
+        source_hash = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
+        with tempfile.TemporaryDirectory() as temporary, patch('nemotron_teacher_fdb.rpc', fake_rpc), \
+                patch('nemotron_teacher_frontend.UPSTREAM_SHA256', source_hash):
+            record = run_case(model, np.ones(8000, np.float32) * .1, 'eof', None, Path(temporary))
+            frames = [json.loads(line) for line in (Path(temporary) / 'eof.frames.jsonl').read_text().splitlines()]
+        self.assertTrue(record['passed'])
+        self.assertEqual(record['frames'], 2)
+        self.assertEqual(record['online_text'], 'internet')
+        self.assertEqual(record['drained_text'], 'internet tail')
+        self.assertEqual(releases, [(1, 'startup'), (2, 'context'), (3, 'context')])
+        self.assertEqual(frames[0]['delta_text'], 'internet')
+        self.assertEqual(frames[1]['delta_text'], '')
+        self.assertEqual(frames[0]['native_step']['step_seq'], 2)
+        self.assertEqual(frames[0]['teacher_step_seq'], 1)
+        self.assertEqual(frames[0]['asr_observation_ahead_ms'], 99)
+        self.assertFalse(session.worker.is_alive())
 
 
 if __name__ == '__main__':
