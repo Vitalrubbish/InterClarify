@@ -2,6 +2,7 @@
 from pathlib import Path
 from types import SimpleNamespace
 import hashlib
+import re
 import sys
 import tempfile
 import threading
@@ -12,7 +13,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).parents[1] / 'scripts/remote'))
 sys.path.insert(0, str(Path(__file__).parents[1] / 'scripts/runtime'))
 from nemotron_teacher_worker import BarrierSession, reorder_sample
-from nemotron_teacher_frontend import TeacherCursor, NemotronTeacherFrontend
+from nemotron_teacher_frontend import TeacherCursor, NemotronTeacherFrontend, official_control_text
 from nemotron_teacher_fdb import AudioProgressPairing, run_case
 from shared_context import STATE_IDS
 
@@ -71,16 +72,37 @@ class BarrierTests(unittest.TestCase):
                 cursor.advance(step)
 
 
+def remove_leading_backchannel(text):
+    return text.lstrip('嗯啊 .,!?')
+
+
+def zh_remove_punc(text):
+    return re.sub(r'[^A-Za-z0-9 \u4e00-\u9fff]', '', text)
+
+
+def zh_norm(text):
+    return text
+
+
+def split_cn_en(text):
+    return re.findall(r'[\u4e00-\u9fff]|[A-Za-z]+|[0-9]+', text)
+
+
+def check_en(text):
+    return text.isascii()
+
+
 class FakeModel:
-    def __init__(self, predictions):
+    def __init__(self, predictions, gates=()):
         import torch
-        self.calls, self.predictions = [], iter(predictions)
+        self.calls, self.histories, self.predictions = [], [], iter(predictions)
+        self.gates = iter(gates)
         class Tokenizer:
             all_special_ids = list(STATE_IDS.values()) + [151679]
             def encode(self, text, **kwargs):
-                return [STATE_IDS[text]] if text in STATE_IDS else [ord(c) for c in text]
+                return [STATE_IDS[text]] if text in STATE_IDS else [1001] if text == 'inter' else [1002] if text == 'internet' else [ord(c) for c in text]
             def decode(self, ids, **kwargs):
-                return next((s for s, i in STATE_IDS.items() if ids == [i]), ''.join(chr(i) for i in ids))
+                return next((s for s, i in STATE_IDS.items() if ids == [i]), ''.join('inter' if i == 1001 else 'internet' if i == 1002 else chr(i) for i in ids))
         self.model = SimpleNamespace(tokenizer=Tokenizer(), asr_eos_token_id=151679, llm=self.forward)
         self.device = 'cpu'
         self.text_embeds = torch.tensor([[-1.]])
@@ -98,18 +120,22 @@ class FakeModel:
         return .1
     def forward(self, inputs_embeds, past_key_values, use_cache):
         import torch
-        self.calls.append(inputs_embeds.flatten().tolist())
+        values = inputs_embeds.flatten().tolist()
+        self.calls.append(values)
+        cache = past_key_values if past_key_values is not None else []
+        cache.extend(values)
+        self.histories.append(list(cache))
         logits = torch.zeros(1, 1, 151682)
-        logits[0, 0, next(self.predictions)] = 10
+        logits[0, 0, next(self.predictions) if values[-1] == 151679 else next(self.gates, 65)] = 10
         logits[0, 0, STATE_IDS['<|user_incomplete|>']] += 1
-        return SimpleNamespace(logits=logits, past_key_values=object())
+        return SimpleNamespace(logits=logits, past_key_values=cache)
 
 
 class TeacherInputTests(unittest.TestCase):
-    def make(self, predictions, **kwargs):
+    def make(self, predictions, gates=(), **kwargs):
         source_hash = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
-        with patch('nemotron_teacher_frontend.UPSTREAM_SHA256', source_hash):
-            return NemotronTeacherFrontend(FakeModel(predictions), 'test', **kwargs)
+        with patch('nemotron_teacher_frontend.UPSTREAM_SHA256', source_hash), patch('nemotron_teacher_frontend.verify_tools'):
+            return NemotronTeacherFrontend(FakeModel(predictions, gates), 'test', **kwargs)
 
     def step(self, frontend, seq, text):
         return frontend.process_step({'step_seq': seq, 'text': text}, None, None, None, seq * 2560, seq * 2560)
@@ -117,24 +143,95 @@ class TeacherInputTests(unittest.TestCase):
     def test_exact_teacher_delta_and_one_state_feedback_across_reset(self):
         nonidle, complete = STATE_IDS['<|user_nonidle|>'], STATE_IDS['<|user_complete|>']
         front = self.make([complete, nonidle, nonidle])
-        self.step(front, 1, 'inter')
+        first = self.step(front, 1, 'Hello,')
         self.assertEqual(front.generation, 1)
-        kv = front.kv
-        self.step(front, 2, 'internet')
-        self.assertIsNot(front.kv, kv)
-        self.step(front, 3, 'internet')
+        second = self.step(front, 2, 'Hello, world!')
+        third = self.step(front, 3, 'Hello, world!')
         calls = front.model.calls
-        self.assertEqual(calls[0], [-1, -2, -3] + list(map(ord, 'inter')) + [151679])
-        self.assertEqual(calls[1], [complete, -2, -3] + list(map(ord, 'net')) + [151679])
-        self.assertEqual(calls[2], [nonidle, -2, -3, 151679])
-        self.assertEqual(front.close()['text'], 'internet')
+        self.assertEqual(calls[0], [-1, -2, -3])
+        self.assertEqual(calls[1], list(map(ord, 'Hello')) + [151679])
+        self.assertEqual(calls[2], [complete, -2, -3])
+        self.assertEqual(calls[3], list(map(ord, ' world')) + [151679])
+        self.assertEqual(calls[4:], [[nonidle, -2, -3], [151679]])
+        self.assertEqual(first['control_text'], 'Hello')
+        self.assertEqual(second['text'], 'Hello, world!')
+        self.assertEqual(third['delta_text'], '')
+        self.assertEqual(front.close()['text'], 'Hello, world!')
 
     def test_unknown_token_is_never_fed_back(self):
-        front = self.make([65, STATE_IDS['<|user_nonidle|>']])
+        front = self.make([66, STATE_IDS['<|user_nonidle|>']])
         first = self.step(front, 1, '')
         self.assertFalse(first['state_accepted'])
         self.step(front, 2, 'a')
-        self.assertEqual(front.model.calls[1], [-2, -3, ord('a'), 151679])
+        self.assertEqual(front.model.calls[2], [-2, -3])
+        self.assertNotIn(65, front.model.kv if hasattr(front.model, 'kv') else front.kv)
+        self.assertNotIn(66, front.kv)
+
+    def test_closed_gate_retains_updates_until_open_and_eof(self):
+        front = self.make([STATE_IDS['<|user_nonidle|>']] * 4, gates=[151679, 151679, 65, 151679])
+        one = self.step(front, 1, 'Hello,')
+        two = self.step(front, 2, 'Hello, world!')
+        self.assertEqual(front.teacher_ids, [])
+        three = self.step(front, 3, 'Hello, world!')
+        self.assertEqual(three['delta_text'], 'Hello world')
+        four = self.step(front, 4, 'Hello, world! Again.')
+        self.assertEqual(four['control_consumption'], 'closed_pending')
+        self.assertEqual(four['pending_token_range'], [11, 17])
+        self.assertEqual(two['text'], 'Hello, world!')
+        self.assertEqual(one['teacher_source_status'], 'completed_new')
+        calls = len(front.model.calls)
+        self.assertEqual(front.close()['text'], 'Hello, world! Again.')
+        self.assertEqual(len(front.model.calls), calls)
+
+    def test_word_extension_revises_mutable_cache_and_preserves_real_state(self):
+        complete, nonidle = STATE_IDS['<|user_complete|>'], STATE_IDS['<|user_nonidle|>']
+        front = self.make([complete, nonidle])
+        self.step(front, 1, 'inter')
+        saved = list(front.checkpoint['kv'])
+        self.assertEqual(saved, [-1, -2, -3])
+        second = self.step(front, 2, 'internet')
+        self.assertEqual(second['cache_revision']['replay_mode'], 'recent_checkpoint')
+        self.assertEqual(front.checkpoint['kv'], saved)
+        self.assertEqual(front.kv, [-1, -2, -3, 1002, 151679, complete, -2, -3, 151679])
+        self.assertEqual(front.teacher_ids, [1002])
+        self.assertNotIn(65, front.kv)
+        self.assertEqual(front.context.get_user_turn('test', 'user-1')['text'], 'internet')
+
+    def test_older_revision_uses_bounded_rebuild(self):
+        nonidle = STATE_IDS['<|user_nonidle|>']
+        front = self.make([nonidle] * 3)
+        with patch('nemotron_teacher_frontend.official_control_text', side_effect=['ab', 'ab c', 'ax c']):
+            self.step(front, 1, '1')
+            self.step(front, 2, '12')
+            third = self.step(front, 3, '123')
+        self.assertEqual(third['cache_revision']['replay_mode'], 'bounded_rebuild')
+        self.assertEqual(front.teacher_ids, list(map(ord, 'ax c')))
+        self.assertEqual(front.kv, [-1, -2, -3, 97, 120, 151679, nonidle, -2, -3, 32, 99, 151679,
+                                   nonidle, -2, -3, 151679])
+        self.assertEqual(third['cache_revision']['revision_from_step'], 1)
+
+    def test_limits_fail_without_publishing_new_state(self):
+        nonidle = STATE_IDS['<|user_nonidle|>']
+        front = self.make([nonidle], max_tokens=3)
+        with self.assertRaisesRegex(RuntimeError, 'token limit'):
+            self.step(front, 1, '')
+        for limits in ({'max_rebuilds': 0}, {'max_replay_tokens': 1}):
+            front = self.make([nonidle, nonidle], **limits)
+            self.step(front, 1, 'inter')
+            with self.assertRaisesRegex(RuntimeError, 'replay limit'):
+                self.step(front, 2, 'internet')
+
+    def test_official_formatter_calls_frozen_pipeline(self):
+        front = self.make([])
+        with patch(__name__ + '.remove_leading_backchannel', return_value=' ab! ') as leading, \
+             patch(__name__ + '.zh_remove_punc', return_value='ab') as punctuation, \
+             patch(__name__ + '.zh_norm', return_value='AB') as norm, \
+             patch(__name__ + '.split_cn_en', return_value=['AB', '中']) as split:
+            self.assertEqual(official_control_text(front.model, 'raw'), 'AB 中')
+            leading.assert_called_once_with('raw')
+            punctuation.assert_called_once_with('ab!')
+            norm.assert_called_once_with('ab')
+            split.assert_called_once_with('AB')
 
     def test_empty_nonidle_rule_ablation_preserves_transition_rule(self):
         nonidle, idle = STATE_IDS['<|user_nonidle|>'], STATE_IDS['<|user_idle|>']
@@ -217,7 +314,7 @@ class AudioPairingTests(unittest.TestCase):
         model.config.infer_config.input = SimpleNamespace(audio_back_size=0, audio_ahead_size=640)
         source_hash = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
         with tempfile.TemporaryDirectory() as temporary, patch('nemotron_teacher_fdb.rpc', fake_rpc), \
-                patch('nemotron_teacher_frontend.UPSTREAM_SHA256', source_hash):
+                patch('nemotron_teacher_frontend.UPSTREAM_SHA256', source_hash), patch('nemotron_teacher_frontend.verify_tools'):
             record = run_case(model, np.ones(8000, np.float32) * .1, 'eof', None, Path(temporary))
             frames = [json.loads(line) for line in (Path(temporary) / 'eof.frames.jsonl').read_text().splitlines()]
         self.assertTrue(record['passed'])

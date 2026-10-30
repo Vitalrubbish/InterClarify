@@ -1,7 +1,11 @@
 # Nemotron 教师文字前端
 
-`NemotronTeacherFrontend` 只使用固定 SoulX 音频编码与 LLM 权重，独占本逻辑话轮 KV；不调用 SenseVoice 或原生文字门控。`process_step()` 在 ASR 单步完成后输入待反馈状态、当前音频 embedding、原始新增文字的 tokenizer 编码和 ASR 结束符，贪心预测一个状态，联合覆盖 SharedContext。未知输出不作为下一步输入。
+`TeacherCursor`核查原始字符只追加和解码步连续；原始累计正文始终联合发布至SharedContext。`official_control_text()`只调用冻结上游的去前导附和、去标点、归一化及中英文分隔函数，不清洗共享正文；工具文件摘要独立校验。
 
-字符游标由原始累计正文推进，每段仅注入一次，不补空格；累计 token 解码必须还原教师正文。`reset_controller()` 只清理计数和发声标志，保留 KV、教师正文与待反馈状态；`close()` 保留最后在线正文并释放 KV。序列 token 总数有上限。
+`NemotronTeacherFrontend.process_step()`先输入提示（仅首次）、前步有效状态和当前音频，argmax非ASR结束符才开门。普通预测不反馈；开门时修订已消费token并追加待消费token，关门时保持教师积压；两种情况均单独输入EOS预测新状态。原始空增量与本步实际控制delta分别记录，空增量规则使用实际消费及修订delta。未知状态不反馈。
 
-原始状态与发布状态分开，`nonidle_to_idle` 和 `empty_nonidle_count` 独立标记；可关闭后者。音频块、回看和前瞻由回放器按真实采样位置提供，观察上界同时包含 Nemotron 的实际窗口。每步外部审计记录教师输入、预测、联合发布的时间；Context 不保存历史版本。
+内部按步骤保存有界CPU输入embedding账本、控制token区间及EOS；最近消费片段前的KV以深拷贝保存。`_revise()`从最早受影响片段恢复独立检查点，重放修订文字、EOS、实际状态与音频；超出最近片段则从空KV重建，不生成或重新发布历史状态。原始prefix的归一化重分词按同token区间更新历史片段，新增尾部只在当前步输入。累计序列8192、修订128次和累计重放65536token为硬上限。
+
+`reset_controller()`保持逻辑话轮KV、教师游标、检查点和待反馈状态，只清理计数及发声标志。`close()`保留最后正文与未消费token诊断并释放KV及账本，不强开门、不补静音、不回填EOF文字。
+
+逐帧审计记录原始截止、规范化控制全文、可用/消费/待消费token、门控预测、实际注入和历史修订范围、重放方式/耗时/上限、输入顺序及时间。SharedContext只存当前原始正文及状态。音频覆盖配对、规则、soft reset和远场阈值保持NTF-003约定。

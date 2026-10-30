@@ -1,0 +1,22 @@
+{
+  "issue": "NTF-004",
+  "baseline_commit": "98f347e",
+  "control_mode": "official_format_gated_teacher",
+  "upstream_commit": "a0b9063843df69619b087b95b74597b2176910b8",
+  "manifest_sha256": "403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cde4f3c07",
+  "sequence_tokens": 8192,
+  "max_rebuilds": 128,
+  "max_replay_tokens": 65536,
+  "reset": "soft",
+  "empty_nonidle_rule": true,
+  "nonidle_to_idle_rule": true,
+  "pairing": "audio_coverage",
+  "backlog_limit_ms": 800,
+  "concurrency": 1,
+  "gpu": "1x4090",
+  "cpu": 4,
+  "memory_gib": 32,
+  "gpu_stop_mib": 22528,
+  "output_limit_mib": 128,
+  "job_timeout_seconds": 1800
+}

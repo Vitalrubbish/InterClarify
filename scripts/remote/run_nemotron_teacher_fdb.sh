@@ -40,7 +40,8 @@ cleanup() {
 trap cleanup EXIT
 trap 'exit 143' TERM
 sha256sum "$SOURCE"/scripts/runtime/{shared_context,nemotron_teacher_frontend}.py \
-  "$SOURCE"/scripts/remote/{nemotron_asr_service,nemotron_teacher_worker,nemotron_teacher_fdb}.py > "$RUN/source.sha256"
+  "$SOURCE"/scripts/remote/{nemotron_asr_service,nemotron_teacher_worker,nemotron_teacher_fdb}.py \
+  "$SOURCE/configs/nemotron_teacher_gated.json" > "$RUN/source.sha256"
 cp "${SOULX_FDB_MANIFEST:?set frozen manifest}" "$RUN/frozen_manifest.json"
 sha256sum "$RUN/frozen_manifest.json" >> "$RUN/source.sha256"
 PROBE=("$SOURCE/scripts/remote/nemotron_teacher_fdb.py" run --manifest "$RUN/frozen_manifest.json")
@@ -69,6 +70,8 @@ while kill -0 "$MODEL_PID" 2>/dev/null; do
   (( GPU_MIB <= 22528 )) || exit 2
   sleep 2
 done
-wait "$MODEL_PID"
+MODEL_CODE=0
+wait "$MODEL_PID" || MODEL_CODE=$?
 "$SOULX_PREFIX/bin/python" -B "$SOURCE/scripts/remote/nemotron_teacher_fdb.py" analyze \
   --probe "$RUN/probe" --output "$RUN/analysis" > "$RUN/analysis.log" 2>&1
+exit "$MODEL_CODE"
