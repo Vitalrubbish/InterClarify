@@ -1,6 +1,6 @@
 # 用户话轮的 SharedContext 当前值接口
 
-2026-10-30，按用户明确决定修订：SoulX＋SenseVoice 每处理一个 160ms 音频块，将最新话轮全文和本块状态作为一组原子覆盖到 SharedContext。取消 320ms 正文发布周期；不维护历史正文版本或修订事件流。
+2026-10-30，按用户明确决定修订：语音前端每处理一个 160ms 音频块，将最新话轮全文和本块状态作为一组原子覆盖到 SharedContext。取消 320ms 正文发布周期；不维护历史正文版本或修订事件流。
 
 这是当前实施合同。已按用户授权重构 [SharedContext 实现](../../scripts/runtime/shared_context.md)，撤下 Nemotron＋SoulX 专用入口，以每个处理步骤的当前值替代旧事件协议；本地检查和远端六视图写入／读取检查均已通过，识别及状态语义边界另列，见[远端报告](../../../reports/soulx/20261030-current-context-test/README.md)。旧运行证据见[报告](../../../reports/soulx/20261029-shared-context/README.md)，不代表新合同已验收。
 
@@ -34,7 +34,7 @@ SenseVoice 窗口返回先整理为话轮全文，保留原文可用数字、标
 
 成功修订可增加、删除或替换旧词，SharedContext 直接覆盖旧值。识别异常、暂未调用和普通空返回不清空已有文字；无法可靠拼合时保留最后可重建正文并标记缺口。
 
-controller reset 不清空正文、不改变逻辑 `turn_id`。同话轮固定 SenseVoice 来源，不在中途切换另一套识别器。运行时确认逻辑结束后保留最后在线全文并关闭；关闭不制造 complete。EOF 后才产生的识别结果另作排空诊断，不倒填在线记录。
+controller reset 不清空正文、不改变逻辑 `turn_id`。开轮时固定 SenseVoice 或 Nemotron 来源，不在中途切换另一套识别器。Nemotron 逐步返回的原始累计文字直接作为正文，不经过 SenseVoice 拼合器。运行时确认逻辑结束后保留最后在线全文并关闭；关闭不制造 complete。EOF 后才产生的识别结果另作排空诊断，不倒填在线记录。
 
 ## 4. 下游消费
 

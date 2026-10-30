@@ -1,6 +1,6 @@
 # 远端工作目录约定
 
-更新：2026-10-29。本文维护目录与环境位置，历史作业进度统一链接报告；本次已登录贵州 HPC，确认 TurnControlComparison 的 SoulX、SenseVoiceSmall、源码与 conda 目录存在。其他路径和历史作业不由此推断当前状态。
+更新：2026-10-30。本文维护目录与环境位置，历史作业进度统一链接报告；本次已登录贵州 HPC，复用 Nemotron 与 SoulX 的模型及两组 conda，实施教师文字同步前端。其他路径和历史作业不由此推断当前状态。
 
 项目现名为 ParaThink。下表中的 `InterClarify`、`interclarify-*` 是已有服务器目录或环境的真实名称，继续保留以兼容现役资产；GitHub 地址与历史报告链接同样保留，未执行远端仓库或目录迁移。新建通用开发环境默认使用 `parathink-dev`。
 
@@ -44,6 +44,7 @@
 
 | 记录 | 证据与状态 |
 | --- | --- |
+| Nemotron Teacher Forcing FDB30 | `parathink-soulx-duplug/source/b143bff` 冻结源码；`runs/nemotron-teacher-smoke-20261030-r2` 预检退出0，`runs/nemotron-teacher-fdb30-20261030-r1` 正式小样本；状态以[报告](../reports/soulx/20261030-nemotron-teacher-fdb30/README.md)为准 |
 | TT-010 r5有限pilot | 最新记录为2026-10-27 12:47，新版两轮评估完成、当时第3／5轮；源码`source/tt010-repair-20261027-r1`，run `tt010-repair-pilot-20261027-r1`，当前状态未重查，见[修复报告](../reports/textturn/20261027-dataset-repair/README.md) |
 | TT-011续接 | r1超时、r2全keep未放行后停止，外部测试未提交；不随有限pilot恢复，见[外部记录](../reports/textturn/20261026-tt-011-external-evaluation/README.md)与[r2报告](../reports/textturn/20261026-tt-010-balanced-training/README.md) |
 | TT-005—008 | FDB两周期及UltraChat重测均交付，见[FDB联合结果](../reports/textturn/20261025-fdb-action-only/README.md)与[UltraChat结果](../reports/textturn/20261025-ultrachat-prefix-retest/README.md) |

@@ -8,11 +8,11 @@
 
 2026-10-30 最新用户授权覆盖下述历史首版选型：实施 [Nemotron Teacher Forcing 同步前端](dev/SoulX-Duplug/nemotron_teacher_forcing.md)，替代该实验路径的 SenseVoice 门控与滑窗识别，并运行 FDB 三轴各10条固定小样本。两份模型权重固定，不接下游、不训练；具体资源与验收见 [NTF 工作单](issue/README.md)。
 
-现役底座仍为 X-Talk `ca9b23c`、DuplexCascade、Nemotron EN160 与 Kokoro，参数见[运行配置](runtime_baseline.md)。目标为 **SoulX-Duplug＋SenseVoiceSmall 语音前端**，位于 Layer 0–Layer 2 输入侧；按用户确认，先沿用官方配套 ASR 打通链路，撤下 Nemotron＋SoulX 独立适配，原因见[选型说明](dev/SoulX-Duplug/asr_adapter_assessment.md)。同一活动话轮只使用一个权威转写来源。
+现役底座仍为 X-Talk `ca9b23c`、DuplexCascade、Nemotron EN160 与 Kokoro，参数见[运行配置](runtime_baseline.md)。目标为 **Nemotron Teacher Forcing＋SoulX-Duplug 语音前端**，位于 Layer 0–Layer 2 输入侧；每步先取得 Nemotron 文字，再注入 SoulX 并预测状态，发布后解除解码屏障。同一活动话轮只使用一个权威转写来源。SenseVoice 首版及旧 Nemotron 独立组合保留为历史基线。
 
 | 模块 | 实施职责 |
 | --- | --- |
-| 语音前端 | 收入 SenseVoiceSmall 调用与文本整理、SoulX 音频编码及原生五状态预测；向 Context 发布转写与状态，与下游并发执行 |
+| 语音前端 | 收入 Nemotron 原生流式 ASR、逐步教师文字、SoulX 音频编码及五状态预测；向 Context 联合发布转写与状态，与下游并发执行 |
 | Shared Context | 保存每个话轮最新全文与当前状态，整组原子覆盖和读取；不保留历史正文版本，不等待完成判断，后续向前端反馈已发布 CoT |
 | Layer 1 | 在正常输入边界读取状态与转写，在当前 turn 看到对应 `user_complete` 后开始普通正式回答；负责思考请求与表达 |
 | 输出运行时 | 统一管理 FIFO、TTS 与播放器；活动输出期间的有效 `user_nonidle` 额外直接触发停止，准备阶段也可取消 |
@@ -24,11 +24,11 @@
 ## 2. 前端适配顺序
 
 1. **冻结首版资产**：已复用 SoulX、SenseVoiceSmall 及 conda，英文 `language=en`；远端单卡最小加载检查通过，版本与资源记录见[报告](../reports/soulx/20261029-frontend-deployment/README.md)。未升级现役 ASR/TTS 环境，后续接口验证仍须独立核算资源。
-2. **接通语音前端**：沿用官方音频编码、ASR门控、窗口识别及差分／缓存修订路径，将同一来源的中间转写整理为话轮快照。[前端设计与实现](dev/SoulX-Duplug/asr_frontend_design.md)已提供来源采集、正文与控制视图区分、滑窗缺口及五状态引用；reset保留未处理输入，ASR实参统一float32。写入一致性通过，正文及模型质量限制按报告披露。
+2. **接通语音前端**：当前已实现[教师文字前端](scripts/runtime/nemotron_teacher_frontend.md)和[同步解码进程](scripts/remote/nemotron_teacher_worker.md)，固定权重、跳过原生文字门控、保留原始增量且不补空格，软重置保留语义 KV。此前 SenseVoice 滑窗、差分与缓存修订仅作历史对照。
 3. **交付 Context 接口**：按稳定 `turn_id` 持续写入转写，不等待 `user_complete`；验证窗口重叠、修订和控制器重置不会造成漏字、重复文本或新建话轮。提供最新全文与状态的原子读取，核查修订覆盖、reset 连续、关闭及 EOF 分离，见[接口合同](dev/SoulX-Duplug/shared_context_interface.md)。
 4. **打通表达与打断**：明确状态输入编码、Layer 1 生成边界和直接打断接口，验证输出标识失效、停播确认及新输出恢复；旧 DuplexCascade 控制不能与新路径重复执行。
 5. **接入思考并验证重叠**：在研究模块细节确认后，验证用户未说完时转写已可读、Layer 1 可请求思考、Layer 2 可回写结果，前端与表达／思考能够重叠执行。前端 CoT 条件化仍属于后续适配与训练，不是首版链路的先决条件。
-6. **撤下 Nemotron 组合**：2026-10-30用户已授权删除专用适配器和探针入口，当前仅实施SoulX＋SenseVoice；以下为此前试验范围，不继续执行。此前2026-10-30用户明确授权提前尝试独立Nemotron＋SoulX组合，原因是调查免回写转写对持续Context输入的适用性；不等待LLM／播放接入。按[适配试验](dev/SoulX-Duplug/nemotron_integration.md)处理音频／文本因果上界、词内增量和缓存衔接，保留SenseVoice对照，不自动切换现役Agent。
+6. **小样本质量验证**：按最新授权复用 FDB 三轴各10条冻结样本，真实时钟、单卡、单作业运行，联合核查文字质量和状态时机；见[报告](../reports/soulx/20261030-nemotron-teacher-fdb30/README.md)。先前独立门控组合已撤下，其历史结果不等于当前教师文字实验结果。
 
 Nemotron独立适配的四视图单卡实时探针已完成，正文及消费版本结构一致，未增加固定稳定等待；结果和状态质量／EOF尾部限制见[组合报告](../reports/soulx/20261030-nemotron-integration/README.md)。这不代表第4／5步的下游生成、CoT或真实播放已实施。
 
