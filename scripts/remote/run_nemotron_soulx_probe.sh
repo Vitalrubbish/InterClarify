@@ -41,6 +41,12 @@ trap cleanup EXIT
 trap 'exit 143' TERM
 sha256sum "$SOURCE"/scripts/runtime/{shared_context,soulx_frontend,nemotron_soulx_frontend}.py \
   "$SOURCE"/scripts/remote/{nemotron_asr_service,nemotron_probe_worker,nemotron_soulx_probe}.py > "$RUN/source.sha256"
+PROBE=("$SOURCE/scripts/remote/nemotron_soulx_probe.py")
+if [[ -n "${SOULX_FDB_MANIFEST:-}" ]]; then
+  cp "$SOULX_FDB_MANIFEST" "$RUN/frozen_manifest.json"
+  PROBE=("$SOURCE/scripts/remote/nemotron_soulx_fdb.py" run --manifest "$RUN/frozen_manifest.json")
+  sha256sum "$SOURCE/scripts/remote/nemotron_soulx_fdb.py" "$RUN/frozen_manifest.json" >> "$RUN/source.sha256"
+fi
 "$ASR_PREFIX/bin/python" -B "$SOURCE/scripts/remote/nemotron_probe_worker.py" \
   --model "$HOME/interclarify-asr-selection/models/nemotron_en" \
   --warmup-audio "$HOME/interclarify-xturnix-fleurs/dataset/fleurs_en_us/audio/dev/786465049904960526.wav" \
@@ -52,7 +58,7 @@ while [[ ! -S "$SOCKET" ]]; do
   (( SECONDS - STARTED < 300 )) || exit 124
   sleep 1
 done
-"$SOULX_PREFIX/bin/python" -B "$SOURCE/scripts/remote/nemotron_soulx_probe.py" \
+"$SOULX_PREFIX/bin/python" -B "${PROBE[@]}" \
   --assets "$ASSETS" --check-source "$ASSETS/source/6de0d70" --socket "$SOCKET" \
   --output "$RUN/probe" > "$RUN/probe.log" 2>&1 &
 MODEL_PID=$!
