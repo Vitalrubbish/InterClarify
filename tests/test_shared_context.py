@@ -16,6 +16,14 @@ def frame(text='hello', end=2560, token='<|user_nonidle|>'):
 
 
 class SharedContextTests(unittest.TestCase):
+    def test_explicit_nemotron_source_is_fixed_for_turn(self):
+        context = SharedContext()
+        context.open_user_turn('s', 't', source='nemotron')
+        context.publish_user_frame(dict(frame(), source='nemotron'))
+        with self.assertRaises(ValueError):
+            context.publish_user_frame(frame(end=5120))
+        self.assertEqual(context.get_user_turn('s', 't')['source'], 'nemotron')
+
     def test_correction_deletion_and_reader_isolation_without_history(self):
         context = SharedContext()
         context.open_user_turn('s', 't')

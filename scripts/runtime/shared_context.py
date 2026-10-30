@@ -40,15 +40,17 @@ class SharedContext:
         self.changed.notify_all()
         return deepcopy(value)
 
-    def open_user_turn(self, session_id, turn_id):
-        """Open one empty SenseVoice turn; reuse requires explicit closed-turn release."""
+    def open_user_turn(self, session_id, turn_id, source='sensevoice_small'):
+        """Fix one ASR source for the entire logical turn."""
         key = self._key(session_id, turn_id)
+        if source not in ('sensevoice_small', 'nemotron'):
+            raise ValueError('Unsupported transcript source')
         with self.changed:
             if key in self.latest:
                 raise ValueError('User turn already exists')
             if len(self.latest) >= self.max_turns:
                 raise RuntimeError('Context turn limit exceeded')
-            value = {'session_id': session_id, 'turn_id': turn_id, 'source': 'sensevoice_small',
+            value = {'session_id': session_id, 'turn_id': turn_id, 'source': source,
                      'text': '', 'state_token': None, 'state_token_id': None,
                      'state_accepted': False, 'rejection_reason': 'initializing',
                      'processed_until': 0, 'audio_observed_until': 0,
@@ -67,7 +69,7 @@ class SharedContext:
         if {'version', 'asr_version', 'replace_from', 'replacement', 'event_seq'} & value.keys():
             raise ValueError('User frames contain current values, not transcript revisions')
         key = self._key(value['session_id'], value['turn_id'])
-        if value['source'] != 'sensevoice_small' or value['status'] != 'open':
+        if value['source'] not in ('sensevoice_small', 'nemotron') or value['status'] != 'open':
             raise ValueError('Unsupported user frame source or lifecycle')
         if not isinstance(value['text'], str):
             raise ValueError('Transcript must be a string')
@@ -82,6 +84,8 @@ class SharedContext:
             raise ValueError('Invalid audio observation range')
         with self.changed:
             old = self.latest[key]
+            if value['source'] != old['source']:
+                raise ValueError('Transcript source cannot change within a turn')
             if old['status'] != 'open':
                 raise ValueError('Cannot update a closed user turn')
             if end <= old['processed_until']:

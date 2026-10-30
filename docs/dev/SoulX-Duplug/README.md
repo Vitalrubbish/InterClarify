@@ -4,7 +4,7 @@
 
 2026-10-30按用户明确指令回滚：撤回`bd86478`的原生delta草稿＋controller片段整段覆盖，撤回`b00afac`与`6930fa7`的固定起点重识别候选文档。运行代码与前端测试恢复到`484ca32`对应基线，保留160ms正文／状态联合覆盖接口；这会恢复旧窗口整理及已知gap，并不表示旧方案质量达标。历史测试报告、原始证据和离线汇总脚本保留，未恢复旧Nemotron组合代码或提交新远端作业。既有conda下前端5项、SharedContext及TextTurn Context共7项、独立Nemotron服务5项检查全部通过；用户原有未提交修改保持不变。
 
-用户提出Nemotron按160ms持续解码、直接teacher forcing文字，0.6B仅发布用户状态；两份模型权重固定，通过逐块屏障同步推进，见[工程同步方案](nemotron_teacher_forcing.md)。尚未接入运行代码。
+用户已授权 Nemotron 按160ms持续解码、直接 teacher forcing 文字，0.6B仅发布用户状态；两份模型权重固定，通过逐块屏障同步推进，见[工程同步方案](nemotron_teacher_forcing.md)。当前实施与 FDB 三轴各10条实测见[工作单](../../issue/README.md)，SenseVoice及旧独立组合保留为历史基线，不恢复其作业。
 
 ## 已确认合同
 

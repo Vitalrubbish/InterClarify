@@ -6,6 +6,8 @@
 
 ## 1. 运行底座与目标
 
+2026-10-30 最新用户授权覆盖下述历史首版选型：实施 [Nemotron Teacher Forcing 同步前端](dev/SoulX-Duplug/nemotron_teacher_forcing.md)，替代该实验路径的 SenseVoice 门控与滑窗识别，并运行 FDB 三轴各10条固定小样本。两份模型权重固定，不接下游、不训练；具体资源与验收见 [NTF 工作单](issue/README.md)。
+
 现役底座仍为 X-Talk `ca9b23c`、DuplexCascade、Nemotron EN160 与 Kokoro，参数见[运行配置](runtime_baseline.md)。目标为 **SoulX-Duplug＋SenseVoiceSmall 语音前端**，位于 Layer 0–Layer 2 输入侧；按用户确认，先沿用官方配套 ASR 打通链路，撤下 Nemotron＋SoulX 独立适配，原因见[选型说明](dev/SoulX-Duplug/asr_adapter_assessment.md)。同一活动话轮只使用一个权威转写来源。
 
 | 模块 | 实施职责 |

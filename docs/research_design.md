@@ -1,6 +1,6 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
-2026-10-29 当前选型：用户确认将 **SoulX-Duplug 与 SenseVoiceSmall 合为语音前端**，位于 Layer 0–Layer 2 的输入侧。为先打通链路，首版沿用官方配套 SenseVoiceSmall，本轮撤回 Nemotron＋SoulX 独立适配，采用 SenseVoice；调整原因是减少首轮音频／文本与缓存适配工作，不代表组合延迟或质量已有实测结论，见[选型说明](dev/SoulX-Duplug/asr_adapter_assessment.md)。新前端尚未接入现役运行时。
+2026-10-30 当前选型：用户已授权按[工程同步方案](dev/SoulX-Duplug/nemotron_teacher_forcing.md)将 **Nemotron ASR 作为 SoulX-Duplug 的 Teacher Forcing ASR**。前端位于 Layer 0–Layer 2 输入侧；Nemotron 提供唯一转写，SoulX 保留音频路径并在每步教师文字注入后预测五状态，两者以逐步屏障推进。替换原因是消除旧独立组合的门控消费滞后和 SenseVoice 滑窗差分问题；质量由 FDB 三轴固定小样本验证，不预先宣称改善。模型权重固定，不训练，尚未切换现役下游 Agent。SenseVoice 保留为历史基线。
 
 前端包含 ASR 调用、文本整理、SoulX 音频编码和用户状态预测，每处理一个 160ms 音频块，将最新话轮全文和本块五类状态之一原子写入共享 Context；修订直接覆盖旧正文，不保留历史正文版本，也不等待 `user_complete`。2026-10-30 按用户决定以此替代版本化转写和 320ms 正文周期建议，原因是简化存储与读取；用户已进一步授权撤下 Nemotron 组合并实施当前值写入，进展见[接口合同](dev/SoulX-Duplug/shared_context_interface.md)。Layer 0 系统附和时机、Layer 1 表达和 Layer 2 思考位于 Context 下游。该职责分层允许前端持续接收音频、表达与思考并发执行；后续 CoT 从 Context 反馈至前端，当前不实现条件化扩展。
 

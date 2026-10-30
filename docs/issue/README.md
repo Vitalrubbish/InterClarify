@@ -1,8 +1,13 @@
 # 工作单管理
 
-更新：2026-10-30。当前活动研究路线仅 **SoulX-Duplug＋SenseVoiceSmall 语音前端**，见[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。TextTurn、VoxTurn、XTurnix 三条历史路线已按用户指令归档：路线文档移至[归档区](../archive/dev/README.md)，对应实现移至 [archive/](../../archive/README.md)，历史工作单保留在本地 `docs/issue/archive/`（不进入 Git）。
+更新：2026-10-30。当前活动研究路线为 **Nemotron Teacher Forcing＋SoulX-Duplug 语音前端**，见[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。TextTurn、VoxTurn、XTurnix 三条历史路线已按用户指令归档：路线文档移至[归档区](../archive/dev/README.md)，对应实现移至 [archive/](../../archive/README.md)，历史工作单保留在本地 `docs/issue/archive/`（不进入 Git）。
 
-当前没有活动工作单。下游 Agent 尚未切换到 SoulX，旧 Nemotron 公开英文集方案和旧文本控制器合同只作为历史设计，不恢复作业。
+当前用户已授权 Nemotron Teacher Forcing 接入与 FDB 三轴固定小样本实验。下游 Agent 尚未切换到 SoulX，旧 Nemotron 公开英文集方案和旧文本控制器合同只作为历史设计，不恢复作业。
+
+| 工作单 | 状态 |
+| --- | --- |
+| [NTF-001](NTF-001.md) | 进行中：单步屏障与教师文字注入 |
+| [NTF-002](NTF-002.md) | 待接入验证：三轴各10条远端实时回放 |
 
 ## 路线状态
 
