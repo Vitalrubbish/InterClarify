@@ -2,7 +2,7 @@
 
 更新：2026-10-29。用户确认以 **SoulX-Duplug＋SenseVoiceSmall 作为语音前端**，位于 Layer 0–Layer 2 输入侧。为先打通链路，当前采用官方配套 ASR，撤下 Nemotron＋SoulX 独立适配，见[选型说明](asr_adapter_assessment.md)。独立前端写入已实现并完成少量音频检查，尚未切换现役Agent。
 
-2026-10-30正文策略更新：按用户决定，倾听期间由原生ASR delta历史及修订形成草稿，完成后用已有整段识别覆盖对应controller片段；reset保留逻辑话轮前文。已移除独立窗口词锚点拼接，没有新增ASR调用；本地6项前端检查通过，真实模型尚未按新策略复测。旧远端报告保留原有验证边界，详见[前端设计](asr_frontend_design.md)。
+2026-10-30正文策略更新：按用户决定，倾听期间由原生ASR delta历史及修订形成草稿，完成后用已有整段识别覆盖对应controller片段；reset保留逻辑话轮前文。已移除独立窗口词锚点拼接，没有新增ASR调用；本地6项前端检查通过，随后[远端六视图复测](../../../reports/soulx/20261030-delta-context-test/README.md)完成269帧联合覆盖，但暴露重复词、错误分段和未修订尾词，不能视为正文质量通过。按用户要求进一步形成[可靠流式转写方案调研](reliable_streaming_transcription.md)，候选尚未替换当前实现。
 
 ## 已确认合同
 

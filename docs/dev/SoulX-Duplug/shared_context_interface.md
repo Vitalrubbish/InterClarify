@@ -2,7 +2,7 @@
 
 2026-10-30，按用户明确决定修订：SoulX＋SenseVoice 每处理一个 160ms 音频块，将最新话轮全文和本块状态作为一组原子覆盖到 SharedContext。取消 320ms 正文发布周期；不维护历史正文版本或修订事件流。
 
-这是当前实施合同。已按用户授权重构 [SharedContext 实现](../../scripts/runtime/shared_context.md)，撤下 Nemotron＋SoulX 专用入口，以每个处理步骤的当前值替代旧事件协议。此前接口的本地检查和远端六视图写入／读取检查已通过，见[远端报告](../../../reports/soulx/20261030-current-context-test/README.md)；本次增量草稿与整段覆盖策略已通过6项本地前端检查，尚未进行真实模型复测。旧运行证据见[报告](../../../reports/soulx/20261029-shared-context/README.md)，不能替代新策略验收。
+这是当前实施合同。已按用户授权重构 [SharedContext 实现](../../scripts/runtime/shared_context.md)，撤下 Nemotron＋SoulX 专用入口，以每个处理步骤的当前值替代旧事件协议。此前接口的本地检查和远端六视图写入／读取检查已通过，见[远端报告](../../../reports/soulx/20261030-current-context-test/README.md)；增量草稿与整段覆盖策略随后也完成[真实模型复测](../../../reports/soulx/20261030-delta-context-test/README.md)，写入检查通过，正文质量仍不足。[新候选调研](reliable_streaming_transcription.md)不自动修改本合同。旧运行证据见[报告](../../../reports/soulx/20261029-shared-context/README.md)，不能替代新策略验收。
 
 ## 1. 写入与读取
 
