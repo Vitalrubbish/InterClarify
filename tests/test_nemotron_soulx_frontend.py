@@ -68,13 +68,13 @@ class NemotronSoulXTests(unittest.TestCase):
         self.assertTrue(fresh_prefix(True, {'text': 'hello more'}, 5))
 
     def test_context_refuses_source_switch_and_native_rewrite(self):
-        value = frontend()
-        value.accept_asr_event(event(1, 'hello'))
         for source, text in (('nemotron', 'other'), ('sensevoice_small', 'hello more')):
+            value = frontend()
+            value.accept_asr_event(event(1, 'hello'))
             snapshot = value._event('user_transcript', source=source, text=text,
                                     version=2, asr_version=2, base_asr_version=1,
                                     replace_from=0, replacement=text, status='open')
-            with self.assertRaises(ValueError):
+            with self.assertRaisesRegex(ValueError, 'source changed|rewrote'):
                 value.context.publish_user_transcript(snapshot)
 
 

@@ -4,4 +4,6 @@
 
 补充检查同一个原始字符前缀在控制器reset后不能被重新计作新内容，门控关闭时不消费，即使已有更长来源。
 
+来源切换和前缀回写各自使用新建fixture并检查错误原因，避免前一个失败事务留下的序号缺口使后一个断言误通过。
+
 运行：`python -m unittest discover -s tests -p 'test_nemotron_soulx_frontend.py' -v`。真实音频、缓存重放与共享GPU行为由远端组合探针验证。

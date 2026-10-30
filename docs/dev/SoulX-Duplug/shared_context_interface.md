@@ -4,6 +4,8 @@
 
 适用于 [SoulX-Duplug 路线](README.md)；Shared Context 即架构中的共享 Context，不另设第二份权威转写。
 
+2026-10-30新增[Nemotron独立适配](nemotron_integration.md)探针：通用Context允许在开轮时固定`nemotron`来源并强制前缀追加，不允许同话轮切换来源。状态额外保存`consumed_asr_version`及保守观察上界，区分最新Context版本和控制器已消费版本。下文SenseVoice规则仍适用于原首版；新路径不复用其窗口拼合。
+
 原始识别／标签与五状态的采集位置、窗口对齐、统一事件事务及延迟观测见[ASR前端设计](asr_frontend_design.md)。本文维护下游接口，详细源头和算法以该设计为准。新通用实现为`scripts/runtime/shared_context.py`；`scripts/runtime/textturn_context.py`仍按Nemotron历史合同工作。
 
 ## 1. 写入时机与话轮标识

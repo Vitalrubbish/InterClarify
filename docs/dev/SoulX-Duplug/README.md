@@ -13,6 +13,8 @@
 
 ## 验证设计与实施状态
 
+2026-10-30按用户授权另完成[Nemotron＋SoulX独立适配](nemotron_integration.md)，复用单一Nemotron前缀来源、SoulX音频与五状态；四视图真实时钟探针通过结构和消费一致性检查，105次正文更新、124条状态，回调至正文可见P95约6.06ms，不额外等1秒。尚未切换首版或现役Agent，完成状态时机、完整词提交和EOF尾部仍有边界，见[实际报告](../../../reports/soulx/20261030-nemotron-integration/README.md)。
+
 已按[ASR 前端设计](asr_frontend_design.md)实现原始文本与标签保全、滑窗修订、五状态及其文本依据、SharedContext事务与独立消费者。六视图实时回放中145次ASR与299条状态写入一致，两个消费者各读取912事件；2个非静音视图关闭时仍有gap，低音量原幅度识别明显较差，backchannel实际音频预测未覆盖。结果、失败修复及延迟见[实现与检查报告](../../../reports/soulx/20261029-shared-context/README.md)，不能据此宣称识别或五状态语义质量全面通过。
 
 已登录贵州 HPC 确认并复用 TurnControlComparison 的两组模型、冻结源码和共用 conda；最初单卡组件加载检查见[部署说明](deployment.md)和[部署报告](../../../reports/soulx/20261029-frontend-deployment/README.md)。随后已提供独立Context实现及状态事件；Layer 1状态token编码、下游模型和真实播放仍待接入，不继承其他项目的 `speak` 动作映射。
