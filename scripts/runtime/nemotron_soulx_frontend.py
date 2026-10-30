@@ -24,6 +24,11 @@ def token_patch(old, new):
     return index
 
 
+def fresh_prefix(gate, candidate, consumed_chars):
+    """A controller reset cannot turn an unchanged source prefix into new speech."""
+    return bool(gate and candidate and len(candidate['text']) > consumed_chars)
+
+
 class NemotronSoulXFrontend(SoulXFrontend):
     """Publish ASR independently, select causal prefixes, and replay revised tokens."""
 
@@ -106,11 +111,15 @@ class NemotronSoulXFrontend(SoulXFrontend):
                 eligible = [p for p in self.prefixes if p['observed_until'] <= watermark]
                 candidate = deepcopy(eligible[-1]) if eligible else None
             consumed_now = self.consumed_chars
-            if gate and candidate and len(candidate['text']) >= self.text_base:
+            previous_normalized = model.past_state.get('cascade_text', '')
+            old_words = split_cn_en(previous_normalized)
+            new_word_delta = ''
+            if fresh_prefix(gate, candidate, self.consumed_chars):
                 raw = candidate['text'][self.text_base:]
                 tokens = split_cn_en(zh_norm(zh_remove_punc(remove_leading_backchannel(raw).strip())))
                 normalized = ''.join((part + ' ') if check_en(part) else part for part in tokens).strip()
                 ids = model.model.tokenizer.encode(normalized, add_special_tokens=False)
+                new_word_delta = ''.join((part + ' ') if check_en(part) else part for part in tokens[len(old_words):]).strip()
                 consumed_now = max(consumed_now, len(candidate['text']))
                 self.selected = candidate
             else:
@@ -123,18 +132,25 @@ class NemotronSoulXFrontend(SoulXFrontend):
             self.frames.append(frame)
             rewritten = prefix < len(self.control_ids)
             if rewritten:
+                # Correct already-consumed words in their old cache slot, while
+                # keeping newly added words after the current audio whenever
+                # the tokenizer exposes an exact boundary in the full sequence.
+                prior_text = ''.join((part + ' ') if check_en(part) else part for part in tokens[:len(old_words)]).strip()
+                prior_ids = model.model.tokenizer.encode(prior_text, add_special_tokens=False)
+                split = len(prior_ids) if len(prior_ids) >= prefix and ids[:len(prior_ids)] == prior_ids else len(ids)
                 offset, owner = 0, None
                 for index, old in enumerate(self.frames[:-1]):
                     finish = offset + len(old['text_ids'])
                     if prefix < finish:
                         owner = index
-                        old['text_ids'] = old['text_ids'][:prefix - offset] + ids[prefix:]
+                        old['text_ids'] = old['text_ids'][:prefix - offset] + ids[prefix:split]
                         break
                     offset = finish
                 if owner is None:
                     raise RuntimeError('Token rewrite has no recorded cache owner')
                 for old in self.frames[owner + 1:]:
                     old['text_ids'] = []
+                frame['text_ids'] = ids[split:]
                 pieces = [model.text_embeds]
                 for index, old in enumerate(self.frames):
                     pieces.append(old['audio'])
@@ -173,6 +189,7 @@ class NemotronSoulXFrontend(SoulXFrontend):
                                 consumed_source_prefix_version=selected['source_prefix_version'] if selected else 0,
                                 consumed_source_observed_until=selected['observed_until'] if selected else None,
                                 audio_observed_until=watermark, text_base=self.text_base,
+                                consumed_character_end=self.consumed_chars,
                                 token_replayed=rewritten, replay_count=self.replay_count,
                                 asr_call_ids=[selected['event_id']] if selected else [],
                                 depends_on=[selected['event_id']] if selected else [])
@@ -181,7 +198,7 @@ class NemotronSoulXFrontend(SoulXFrontend):
             self.control = event
         # Match native correction behavior: replayed prior text is no new current
         # delta, although its cached semantic input has been corrected.
-        return model.past_state['delta_text'][-1]
+        return model.past_state['delta_text'][-1] or new_word_delta
 
     def observe_state(self, token, delta_text):
         with self.publication_lock:

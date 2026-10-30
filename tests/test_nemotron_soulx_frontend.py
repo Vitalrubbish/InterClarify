@@ -8,7 +8,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).parents[1] / 'scripts/runtime'))
 from shared_context import SharedContext, FrontendConsumer
-from nemotron_soulx_frontend import NemotronSoulXFrontend, token_patch
+from nemotron_soulx_frontend import NemotronSoulXFrontend, token_patch, fresh_prefix
 
 
 def frontend():
@@ -63,6 +63,9 @@ class NemotronSoulXTests(unittest.TestCase):
         self.assertEqual(value.native_text, 'hello world')
         self.assertEqual(token_patch([1, 2, 3], [1, 7, 8]), 1)
         self.assertEqual(token_patch([1, 2], [1, 2, 3]), 2)
+        self.assertFalse(fresh_prefix(True, {'text': 'hello'}, 5))
+        self.assertFalse(fresh_prefix(False, {'text': 'hello more'}, 5))
+        self.assertTrue(fresh_prefix(True, {'text': 'hello more'}, 5))
 
     def test_context_refuses_source_switch_and_native_rewrite(self):
         value = frontend()
