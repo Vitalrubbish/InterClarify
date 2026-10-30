@@ -133,6 +133,8 @@ class NemotronTeacherFrontend:
         if self.tokens + 1 > self.max_tokens:
             raise RuntimeError('Teacher controller token limit exceeded')
         self.kv = self._forward(torch.cat(parts, dim=0), kv).past_key_values
+        if str(self.model.device).startswith('cuda'):
+            torch.cuda.synchronize()
         return {'revised_segments': [{'step': i + 1, 'begin': e['begin'], 'end': e['end'], 'ids': e['ids']}
                                      for i, e in enumerate(self.entries[:-1]) if i >= affected],
                 'revision_from_token': common, 'revision_from_step': affected + 1,
@@ -200,6 +202,8 @@ class NemotronTeacherFrontend:
         raw_id = int(torch.argmax(logits).item())
         raw = tokenizer.decode([raw_id], skip_special_tokens=False)
         self.kv = outputs.past_key_values
+        if hasattr(self.kv, 'get_seq_length') and self.kv.get_seq_length() != self.tokens:
+            raise RuntimeError('Teacher KV length differs from input ledger')
         token, token_id, adjustment = raw, raw_id, None
         self.mistakes = self.mistakes + 1 if raw == '<|user_nonidle|>' and not delta else 0
         transition = self.previous_state == '<|user_nonidle|>' and raw == '<|user_idle|>'
