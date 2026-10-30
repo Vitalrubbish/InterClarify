@@ -8,7 +8,7 @@
 
 2026-10-30 最新用户授权覆盖下述历史首版选型：实施 [Nemotron Teacher Forcing 同步前端](dev/SoulX-Duplug/nemotron_teacher_forcing.md)，替代该实验路径的 SenseVoice 门控与滑窗识别，并运行 FDB 三轴各10条固定小样本。两份模型权重固定，不接下游、不训练；具体资源与验收见 [NTF 工作单](issue/README.md)。
 
-现役底座仍为 X-Talk `ca9b23c`、DuplexCascade、Nemotron EN160 与 Kokoro，参数见[运行配置](runtime_baseline.md)。目标为 **Nemotron Teacher Forcing＋SoulX-Duplug 语音前端**，位于 Layer 0–Layer 2 输入侧；每步先取得 Nemotron 文字，再注入 SoulX 并预测状态，发布后解除解码屏障。同一活动话轮只使用一个权威转写来源。SenseVoice 首版及旧 Nemotron 独立组合保留为历史基线。
+现役底座仍为 X-Talk `ca9b23c`、DuplexCascade、Nemotron EN160 与 Kokoro，参数见[运行配置](runtime_baseline.md)。目标为 **Nemotron Teacher Forcing＋SoulX-Duplug 语音前端**，位于 Layer 0–Layer 2 输入侧；每步先取得Nemotron文字，经SoulX音频门控后按需消费规范化教师文字，再输入EOS预测状态，发布后解除解码屏障。同一活动话轮只使用一个权威转写来源。SenseVoice 首版及旧 Nemotron 独立组合保留为历史基线。
 
 | 模块 | 实施职责 |
 | --- | --- |
@@ -24,7 +24,7 @@
 ## 2. 前端适配顺序
 
 1. **冻结首版资产**：已复用 SoulX、SenseVoiceSmall 及 conda，英文 `language=en`；远端单卡最小加载检查通过，版本与资源记录见[报告](../reports/soulx/20261029-frontend-deployment/README.md)。未升级现役 ASR/TTS 环境，后续接口验证仍须独立核算资源。
-2. **接通语音前端**：当前已实现[教师文字前端](scripts/runtime/nemotron_teacher_frontend.md)和[同步解码进程](scripts/remote/nemotron_teacher_worker.md)，固定权重、跳过原生文字门控、保留原始增量且不补空格，软重置保留语义 KV。此前 SenseVoice 滑窗、差分与缓存修订仅作历史对照。
+2. **接通语音前端**：当前已实现[教师文字前端](scripts/runtime/nemotron_teacher_frontend.md)和[同步解码进程](scripts/remote/nemotron_teacher_worker.md)，固定权重；NTF-004按官方格式规范化控制文字并恢复文字门控，原始累计正文始终发布，软重置保留语义KV。已消费token修订从独立检查点或有界账本重算，普通门控预测不写KV。此前 SenseVoice 滑窗、差分与缓存修订仅作历史对照。
 3. **交付 Context 接口**：按稳定 `turn_id` 持续写入转写，不等待 `user_complete`；验证窗口重叠、修订和控制器重置不会造成漏字、重复文本或新建话轮。提供最新全文与状态的原子读取，核查修订覆盖、reset 连续、关闭及 EOF 分离，见[接口合同](dev/SoulX-Duplug/shared_context_interface.md)。
 4. **打通表达与打断**：明确状态输入编码、Layer 1 生成边界和直接打断接口，验证输出标识失效、停播确认及新输出恢复；旧 DuplexCascade 控制不能与新路径重复执行。
 5. **接入思考并验证重叠**：在研究模块细节确认后，验证用户未说完时转写已可读、Layer 1 可请求思考、Layer 2 可回写结果，前端与表达／思考能够重叠执行。前端 CoT 条件化仍属于后续适配与训练，不是首版链路的先决条件。

@@ -210,6 +210,34 @@ class TeacherInputTests(unittest.TestCase):
                                    nonidle, -2, -3, 151679])
         self.assertEqual(third['cache_revision']['revision_from_step'], 1)
 
+    def test_closed_gate_defers_consumed_token_revision(self):
+        nonidle = STATE_IDS['<|user_nonidle|>']
+        front = self.make([nonidle] * 3, gates=[65, 151679, 65])
+        self.step(front, 1, 'inter')
+        closed = self.step(front, 2, 'internet')
+        self.assertEqual(front.teacher_ids, [1001])
+        self.assertEqual(closed['pending_token_range'], [0, 1])
+        opened = self.step(front, 3, 'internet')
+        self.assertEqual(opened['raw_delta_text'], '')
+        self.assertEqual(opened['delta_text'], 'internet')
+        self.assertEqual(opened['cache_revision']['replay_mode'], 'recent_checkpoint')
+        self.assertNotIn(1001, front.kv)
+        self.assertEqual(front.kv.count(1002), 1)
+        self.assertEqual(front.kv.count(nonidle), 2)
+
+    def test_normalized_prefix_contraction_replays_without_duplicate_text(self):
+        nonidle = STATE_IDS['<|user_nonidle|>']
+        front = self.make([nonidle] * 3)
+        with patch('nemotron_teacher_frontend.official_control_text', side_effect=['ab', 'a', '']):
+            self.step(front, 1, '1')
+            second = self.step(front, 2, '12')
+            third = self.step(front, 3, '123')
+        self.assertEqual(second['consumed_token_ids'], [97])
+        self.assertEqual(third['consumed_token_ids'], [])
+        self.assertNotIn(97, front.kv)
+        self.assertNotIn(98, front.kv)
+        self.assertEqual(front.kv.count(151679), 3)
+
     def test_limits_fail_without_publishing_new_state(self):
         nonidle = STATE_IDS['<|user_nonidle|>']
         front = self.make([nonidle], max_tokens=3)
