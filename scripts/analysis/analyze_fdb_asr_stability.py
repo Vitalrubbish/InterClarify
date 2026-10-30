@@ -287,6 +287,16 @@ def analyze(input_dir, output):
                     continue
                 group = analyze_group(key, rows)
                 group['coverage_epoch'] = key[3]
+                for track in group['tracks']:
+                    evidence = final_evidence(rows, track['last_revision_call'], 3)
+                    track['confirmed_three'] = bool(evidence)
+                    first = next(row for row in rows if row['call_index'] == track['first_slot_call'])
+                    stable = next(row for row in rows if row['call_index'] == track['last_revision_call'])
+                    confirmation = evidence[-1] if evidence else None
+                    track['confirmation_call'] = confirmation['call_index'] if confirmation else None
+                    track['confirmation_delay_from_first_slot_ms'] = (confirmation['returned_at'] - first['returned_at']) * 1000 if confirmation else None
+                    track['confirmation_delay_from_final_text_ms'] = (confirmation['returned_at'] - stable['returned_at']) * 1000 if confirmation else None
+                    track['confirmation_extra_updates'] = confirmation['call_index'] - first['call_index'] if confirmation else None
                 group['subset'], group['sample_id'] = sample['subset'], sample['id']
                 eligible.append(group)
             valid.extend(eligible)
@@ -332,6 +342,21 @@ def common_cohort(policies):
             'three_minus_two_ms': distribution([row['wait_ms'] - doubles[key(row)]['wait_ms'] for row in triples])}
 
 
+def final_evidence(rows, final_start_call, required):
+    """Require genuinely consecutive model ASR calls, each with fresh audio."""
+    run = []
+    for row in rows:
+        if row['call_index'] < final_start_call:
+            continue
+        if run and (row['source_index'] != run[-1]['source_index'] + 1
+                    or row['audio_end'] <= run[-1]['audio_end']):
+            run = []
+        run.append(row)
+        if len(run) >= required:
+            return run[-required:]
+    return []
+
+
 def confirmation_policies(groups):
     """Separate first-hypothesis waiting from extra evidence after final text appears."""
     result = {}
@@ -342,16 +367,11 @@ def confirmation_policies(groups):
             by_call = {row['call_index']: row for row in rows}
             for track in group['tracks']:
                 final_start = by_call[track['last_revision_call']]
-                evidence = []
-                for row in rows:
-                    if row['call_index'] < final_start['call_index']:
-                        continue
-                    if not evidence or row['audio_end'] > evidence[-1]['audio_end']:
-                        evidence.append(row)
-                if len(evidence) < required:
+                evidence = final_evidence(rows, final_start['call_index'], required)
+                if not evidence:
                     unfinished += 1
                     continue
-                confirmation = evidence[required - 1]
+                confirmation = evidence[-1]
                 first = by_call[track['first_slot_call']]
                 wait.append((confirmation['returned_at'] - first['returned_at']) * 1000)
                 revision.append((final_start['returned_at'] - first['returned_at']) * 1000)
