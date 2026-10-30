@@ -251,6 +251,7 @@ def analyze_case(sample, record, events, output):
                 'complete_before_boundary': [r for r in selected if r['processed_seconds'] < boundary],
                 'complete_observed_before_boundary': [r for r in selected if r['observed_seconds'] < boundary],
                 'complete_more_than_160ms_early': [r for r in selected if r['processed_seconds'] < boundary - .16],
+                'complete_more_than_1s_early': [r for r in selected if r['processed_seconds'] < boundary - 1.],
                 'complete_at_or_after_boundary': later,
                 'first_later_delay_seconds': later[0]['processed_seconds'] - boundary if later else None}
     if sample['task'] == 'smooth_turn_taking':
@@ -302,7 +303,7 @@ def analyze(args):
                  'complete_events': sum(len(r['complete']) for r in rows)}
         if task != 'pause_handling':
             for key in ('complete_before_boundary', 'complete_observed_before_boundary',
-                        'complete_more_than_160ms_early', 'complete_at_or_after_boundary'):
+                        'complete_more_than_160ms_early', 'complete_more_than_1s_early', 'complete_at_or_after_boundary'):
                 group['samples_with_' + key] = sum(bool(r['turn_end'][key]) for r in rows)
             if task == 'user_interruption':
                 group['samples_with_nonidle_during_interruption'] = sum(r['interruption']['first_nonidle'] is not None for r in rows)
