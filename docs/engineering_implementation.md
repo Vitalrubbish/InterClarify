@@ -4,6 +4,8 @@
 
 2026-10-30 用户确认将在线接口简化为每个 160ms 音频处理步骤联合覆盖 text 与状态，不保留历史正文版本，取消 320ms 周期建议。当前值接口及前端已改造，本地契约检查及远端六视图写入检查通过；见[测试报告](../reports/soulx/20261030-current-context-test/README.md)，拼合gap与识别／状态质量限制保留。
 
+同日用户进一步确认：正文改为倾听时累积原生ASR delta并同步其修订，完成后用整段SenseVoice结果覆盖所属草稿，以减少独立窗口拼接。controller reset保留逻辑话轮前文；独立前端已实现并通过6项本地CPU检查，真实模型尚未复测，旧六视图不作为该策略的验证结果。此次不新增ASR、模型调用或工作单。
+
 ## 1. 运行底座与目标
 
 现役底座仍为 X-Talk `ca9b23c`、DuplexCascade、Nemotron EN160 与 Kokoro，参数见[运行配置](runtime_baseline.md)。目标为 **SoulX-Duplug＋SenseVoiceSmall 语音前端**，位于 Layer 0–Layer 2 输入侧；按用户确认，先沿用官方配套 ASR 打通链路，撤下 Nemotron＋SoulX 独立适配，原因见[选型说明](dev/SoulX-Duplug/asr_adapter_assessment.md)。同一活动话轮只使用一个权威转写来源。

@@ -231,6 +231,8 @@ class SoulXFrontend:
         self._register_reset_buffers()
         self.model.buffer = self._record_array(carry, spans)
         self.controller_generation += 1
+        if self.delivery_phase == 'online' and not self.closed:
+            self.assembler.begin_generation(self.controller_generation, self.processed_until)
         self.control = None
         self._audit('controller_reset', {'controller_generation': self.controller_generation,
                                          'processed_until': self.processed_until})
@@ -307,7 +309,14 @@ class SoulXFrontend:
                            source_revision=SENSEVOICE_REVISION)
         real = [span for span in audio_spans if span['kind'] == 'real']
         observation['audio_observed_until'] = max((span['end'] for span in real), default=None)
-        update = self.assembler.apply_window(observation) if self.delivery_phase == 'online' and not self.closed else {'changed': False, 'reason': 'drain'}
+        if self.delivery_phase != 'online' or self.closed:
+            update = {'changed': False, 'reason': 'drain'}
+        elif observation.get('call_kind') == 'turn':
+            update = self.assembler.apply_turn_result(observation, self.controller_generation)
+        elif call_status == 'error' or any(not tag['known'] for tag in parsed['tags']):
+            update = self.assembler.note_failure('asr_error' if call_status == 'error' else 'unknown_tag')
+        else:
+            update = {'changed': False, 'reason': 'window_source_only'}
         observation['assembly_result'] = update
         self._audit('asr_source', observation)
         self._calls.append({'asr_call_id': observation['asr_call_id'],
@@ -318,10 +327,13 @@ class SoulXFrontend:
 
     def observe_control(self, delta_text, before):
         history = self.model.past_state['delta_text']
+        update = (self.assembler.apply_deltas(history, self.controller_generation)
+                  if self.delivery_phase == 'online' and not self.closed
+                  else {'changed': False, 'reason': 'drain'})
         self.control = {'control_text': self.model.past_state['cascade_text'],
                         'delta_text': delta_text,
                         'previous_delta_corrected': bool(before and history[:-1] != before),
-                        'asr_calls': deepcopy(self._calls)}
+                        'asr_calls': deepcopy(self._calls), 'assembly_result': update}
         self._audit('control_source', self.control)
 
     def observe_state(self, token, delta_text):

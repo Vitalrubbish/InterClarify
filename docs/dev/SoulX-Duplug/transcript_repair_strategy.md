@@ -1,5 +1,7 @@
 # 转写拼接缺口的修复策略
 
+2026-10-30状态更新：用户已选择“原生ASR delta草稿＋完成后整段覆盖”，用于简化正文整理；当前实现见[前端设计](asr_frontend_design.md)。本页保留此前失败证据与候选分析，不再作为当前实施计划，不新增补识别。
+
 2026-10-30，按用户要求分析稳定修复方案。本文为候选方案，不修改模型或在线代码，不新建issue，不启动训练或远端作业。继续采用SoulX＋SenseVoice、每个160ms音频步骤联合覆盖SharedContext的已确认合同。
 
 ## 1. 已核验的具体失败
@@ -59,7 +61,7 @@ SoulX内部的SenseVoice窗口调用与控制文字暂时保持原路径，正�
 
 ## 7. 参考与证据边界
 
-- [当前拼接实现](../../../scripts/runtime/sensevoice_transcript.py)：只取开头两词、限制尾部范围及全局gap阻断的具体位置。
+- 旧拼接实现由Git提交`da5064e`追溯；[当前模块](../../../scripts/runtime/sensevoice_transcript.py)已改为原生增量草稿与整段覆盖，不再包含该词锚点规则。
 - [当前远端报告](../../../reports/soulx/20261030-current-context-test/README.md)：真实来源、资源和写入检查，不作为修复方案有效性的证据。
 - [FunAudioLLM论文](https://fun-audio-llm.github.io/pdf/FunAudioLLM.pdf)：SenseVoice并非为原生流式转写设计，窗口化部署需要额外处理输入与输出衔接。
 - [Turning Whisper into Real-Time Transcription System](https://arxiv.org/abs/2307.14743)：局部一致性与自适应等待是可参考的流式提交思路；研究对象是Whisper，不能作为本项目SenseVoice适配已验证的结果。

@@ -2,6 +2,8 @@
 
 更新：2026-10-29。用户确认以 **SoulX-Duplug＋SenseVoiceSmall 作为语音前端**，位于 Layer 0–Layer 2 输入侧。为先打通链路，当前采用官方配套 ASR，撤下 Nemotron＋SoulX 独立适配，见[选型说明](asr_adapter_assessment.md)。独立前端写入已实现并完成少量音频检查，尚未切换现役Agent。
 
+2026-10-30正文策略更新：按用户决定，倾听期间由原生ASR delta历史及修订形成草稿，完成后用已有整段识别覆盖对应controller片段；reset保留逻辑话轮前文。已移除独立窗口词锚点拼接，没有新增ASR调用；本地6项前端检查通过，真实模型尚未按新策略复测。旧远端报告保留原有验证边界，详见[前端设计](asr_frontend_design.md)。
+
 ## 已确认合同
 
 - 前端包含 ASR 调用与文本整理、SoulX 音频编码及状态预测；同一活动话轮只用一个权威 ASR 来源。中间转写持续写入 Shared Context，不等待完成判断，前端内部与下游使用同一来源。2026-10-30 用户确认每个 160ms 音频处理步骤联合覆盖最新全文和本块状态，不保留历史正文版本，取消 320ms 周期建议；新合同已实现，本地检查及远端六视图当前值写入检查通过，见[报告](../../../reports/soulx/20261030-current-context-test/README.md)，读取与关闭规则见[接口设计](shared_context_interface.md)。
