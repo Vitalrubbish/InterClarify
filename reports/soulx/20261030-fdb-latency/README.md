@@ -2,6 +2,8 @@
 
 2026-10-30，按用户要求实际登录贵州HPC，只读核对已有FDB最终报告，没有运行模型、重新评分或修改原始结果。当前报告能给出的是完整系统的响应延迟；没有“临时转写到稳定”的字段，不能将以下数值解释成ASR稳定时间。
 
+用户随后明确要求分析ASR轨迹，已另行完成[672条原始轨迹的稳定时间与提交等待统计](../20261030-fdb-asr-stability/README.md)。该后续分析直接读ASR更新，不使用本文完整回复指标代替。
+
 ## 数据来源与配置
 
 远端原件为`/hpc_stor03/sjtu_home/xuan.zhang/turncontrol-comparison/campaigns/20261030-syn-r1/final-report.json`，SHA256为`cf1b49d865b1babd74444cc94987a7f12979ecc8ae27a1333519e6db7449411e`，本次实际读取确认`passed=true`、1344条唯一记录、评分窗口`zero_to_frozen_input_end`。远端管理状态为complete；与已有本地同摘要报告逐项核对一致。
