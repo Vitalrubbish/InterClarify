@@ -1,6 +1,6 @@
 # 工程实施计划
 
-更新：2026-10-29。本文按已确认的SoulX-Duplug路线维护实施顺序；研究范围和模块合同分别见[研究方案](research_design.md)与[架构设计](research_design/architecture.md)。已复用TurnControlComparison资产完成组件加载及独立前端Context实现，六视图实时写入检查见[报告](../reports/soulx/20261029-shared-context/README.md)。下游状态token编码、LLM与真实输出尚未接入，现役Agent未切换，不启动训练或历史benchmark。
+更新：2026-10-31。本文按已确认的SoulX-Duplug路线维护实施顺序；研究范围和模块合同分别见[研究方案](research_design.md)与[架构设计](research_design/architecture.md)。已复用TurnControlComparison资产完成组件加载及独立前端Context实现，六视图实时写入检查见[报告](../reports/soulx/20261029-shared-context/README.md)。下游状态token编码、LLM与真实输出尚未接入，现役Agent未切换，不启动训练或历史benchmark。
 
 2026-10-30 用户确认将在线接口简化为每个 160ms 音频处理步骤联合覆盖 text 与状态，不保留历史正文版本，取消 320ms 周期建议。当前值接口及前端已改造，本地契约检查及远端六视图写入检查通过；见[测试报告](../reports/soulx/20261030-current-context-test/README.md)，拼合gap与识别／状态质量限制保留。
 
@@ -28,7 +28,7 @@
 3. **交付 Context 接口**：按稳定 `turn_id` 持续写入转写，不等待 `user_complete`；验证窗口重叠、修订和控制器重置不会造成漏字、重复文本或新建话轮。提供最新全文与状态的原子读取，核查修订覆盖、reset 连续、关闭及 EOF 分离，见[接口合同](dev/SoulX-Duplug/shared_context_interface.md)。
 4. **打通表达与打断**：明确状态输入编码、Layer 1 生成边界和直接打断接口，验证输出标识失效、停播确认及新输出恢复；旧 DuplexCascade 控制不能与新路径重复执行。
 5. **接入思考并验证重叠**：在研究模块细节确认后，验证用户未说完时转写已可读、Layer 1 可请求思考、Layer 2 可回写结果，前端与表达／思考能够重叠执行。前端 CoT 条件化仍属于后续适配与训练，不是首版链路的先决条件。
-6. **小样本质量验证**：按最新授权复用 FDB 三轴各10条冻结样本，真实时钟、单卡、单作业运行，联合核查文字质量和状态时机；见[报告](../reports/soulx/20261030-nemotron-teacher-fdb30/README.md)。先前独立门控组合已撤下，其历史结果不等于当前教师文字实验结果。
+6. **小样本质量验证**：按最新授权复用 FDB 三轴各10条冻结样本，真实时钟、单卡、单作业运行，联合核查文字质量和状态时机；最新NTF-004官方格式与门控对照已交付，正式25/30积压触限、未见整体改善，见[报告](../reports/soulx/20261031-nemotron-teacher-gate/README.md)。先前独立门控组合已撤下，其历史结果不等于当前教师文字实验结果。
 
 Nemotron独立适配的四视图单卡实时探针已完成，正文及消费版本结构一致，未增加固定稳定等待；结果和状态质量／EOF尾部限制见[组合报告](../reports/soulx/20261030-nemotron-integration/README.md)。这不代表第4／5步的下游生成、CoT或真实播放已实施。
 

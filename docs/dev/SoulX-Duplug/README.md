@@ -1,6 +1,6 @@
 # SoulX-Duplug 路线
 
-更新：2026-10-30。当前实施 **Nemotron Teacher Forcing＋SoulX-Duplug 语音前端**，位于 Layer 0–Layer 2 输入侧。Nemotron 是唯一用户转写来源，SoulX 在逐块教师文字注入后预测五类状态，联合覆盖当前 Context。两份权重固定；下游 Agent 尚未切换。此前 SenseVoiceSmall 首版与 Nemotron 独立门控适配均作为历史对照。
+更新：2026-10-31。当前实施 **Nemotron Teacher Forcing＋SoulX-Duplug 语音前端**，位于 Layer 0–Layer 2 输入侧。Nemotron 是唯一用户转写来源，SoulX 在逐块教师文字注入后预测五类状态，联合覆盖当前 Context。两份权重固定；下游 Agent 尚未切换。此前 SenseVoiceSmall 首版与 Nemotron 独立门控适配均作为历史对照。
 
 2026-10-30此前按用户明确指令回滚：撤回`bd86478`的原生delta草稿＋controller片段整段覆盖，撤回`b00afac`与`6930fa7`的固定起点重识别候选文档。运行代码与前端测试恢复到`484ca32`对应基线，保留160ms正文／状态联合覆盖接口；这会恢复旧窗口整理及已知gap，并不表示旧方案质量达标。历史测试报告、原始证据和离线汇总脚本保留，未恢复旧Nemotron组合代码或提交新远端作业。既有conda下前端5项、SharedContext及TextTurn Context共7项、独立Nemotron服务5项检查全部通过；用户原有未提交修改保持不变。
 
@@ -31,4 +31,4 @@
 
 实施顺序及资源见[工程计划](../../engineering_implementation.md)，本轮输入与执行范围见[检查任务说明](frontend_audio_check.md)。实现及少量契约测试均有同路径中文说明；工作单仅按明确建单指令建立，本次教师文字接入与实验已按用户指令建单，仍不训练。
 
-2026-10-31按用户授权实施NTF-004：恢复官方控制文字格式与门控，保留Nemotron原始正文发布、音频覆盖配对、soft reset和原状态规则；独立审计待消费文字与缓存修订。当前正在执行远端预检与固定FDB30复测，结果交付后更新入口。
+2026-10-31按用户授权实施NTF-004：恢复官方控制文字格式与门控，保留Nemotron原始正文发布、音频覆盖配对、soft reset和原状态规则；独立审计待消费文字与缓存修订。本地30项、远端预检3/3通过；正式25/30完整、5条积压触限，状态未整体改善，EOF仍有待消费尾部。详见[对照报告](../../../reports/soulx/20261031-nemotron-teacher-gate/README.md)。工作单已归档，队列已清空。

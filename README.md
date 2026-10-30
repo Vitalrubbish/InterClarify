@@ -4,13 +4,13 @@
 
 ParaThink 研究独立 thinking 流在语音 Agent 倾听与表达期间持续工作带来的优势，工作包括 Agent 框架、边听边想与边说边想两组 benchmark，以及大规模对话数据与训练。研究背景、目标、参考文章和三篇子文档见 [docs/research_design.md](docs/research_design.md)，工程安排见 [docs/engineering_implementation.md](docs/engineering_implementation.md)。
 
-当前设计采用 **SoulX-Duplug＋SenseVoiceSmall 语音前端**，先打通链路，后续评估 Nemotron；[ASR 前端设计](docs/dev/SoulX-Duplug/asr_frontend_design.md)说明转写与 special token 如何写入 SharedContext。五类用户状态送入 Layer 1，仅有效用户打断额外直接停止活动输出；具体合同见[架构设计](docs/research_design/architecture.md)。新链路尚未接入，已采用的运行底座仍为 DuplexCascade、Nemotron、Kokoro 与 [X-Talk fork](https://github.com/Vitalrubbish/xtalk) `ca9b23c`。
+当前研究前端采用 **Nemotron Teacher Forcing＋SoulX-Duplug**，Nemotron原始正文与五状态逐步联合写入SharedContext。最新官方控制格式与文字门控对照已交付，但完整回放25/30、5条积压触限，状态未整体改善，见[报告](reports/soulx/20261031-nemotron-teacher-gate/README.md)。五类用户状态送入 Layer 1，仅有效用户打断额外直接停止活动输出；具体合同见[架构设计](docs/research_design/architecture.md)。新链路尚未接入，已采用的运行底座仍为 DuplexCascade、Nemotron、Kokoro 与 [X-Talk fork](https://github.com/Vitalrubbish/xtalk) `ca9b23c`。
 
 | 内容 | 位置 |
 | --- | --- |
 | 研究方案与评测范围 | [docs/research_design.md](docs/research_design.md) |
 | 工程实施计划 | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
-| SoulX 路线与待执行的公开英文集验证设计 | [docs/dev/SoulX-Duplug](docs/dev/SoulX-Duplug/README.md) |
+| SoulX 前端路线与对照实验 | [docs/dev/SoulX-Duplug](docs/dev/SoulX-Duplug/README.md) |
 | 已归档的 TextTurn／VoxTurn／XTurnix 路线 | [docs/archive/dev](docs/archive/dev/README.md) |
 | 本地 conda 环境 | [docs/local_environment.md](docs/local_environment.md)（`parathink-dev`） |
 | 工作单与历史实验 | [docs/issue/README.md](docs/issue/README.md) |

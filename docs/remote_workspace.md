@@ -1,6 +1,6 @@
 # 远端工作目录约定
 
-更新：2026-10-30。本文维护目录与环境位置，历史作业进度统一链接报告；本次已登录贵州 HPC，复用 Nemotron 与 SoulX 的模型及两组 conda，实施教师文字同步前端。其他路径和历史作业不由此推断当前状态。
+更新：2026-10-31。本文维护目录与环境位置，历史作业进度统一链接报告；本次已登录贵州 HPC，复用 Nemotron 与 SoulX 的模型及两组 conda，实施教师文字同步前端。其他路径和历史作业不由此推断当前状态。
 
 项目现名为 ParaThink。下表中的 `InterClarify`、`interclarify-*` 是已有服务器目录或环境的真实名称，继续保留以兼容现役资产；GitHub 地址与历史报告链接同样保留，未执行远端仓库或目录迁移。新建通用开发环境默认使用 `parathink-dev`。
 
@@ -44,6 +44,7 @@
 
 | 记录 | 证据与状态 |
 | --- | --- |
+| 官方格式与门控教师对照 | `parathink-soulx-duplug/source/ba3ba47`；预检3/3通过，`runs/nemotron-teacher-gate-fdb30-20261031-r1`正式25/30、5条积压触限退出1；未见整体质量改善，01:06:38队列为空，见[报告](../reports/soulx/20261031-nemotron-teacher-gate/README.md) |
 | 教师文字音频覆盖配对修复 | `parathink-soulx-duplug/source/98f347e`；`runs/nemotron-teacher-align-fdb30-20261030-r1`／`r2` 实际25/30／28/30积压触限，退出1；预检3/3通过，23:39队列为空，见[复测报告](../reports/soulx/20261030-nemotron-teacher-alignment/README.md) |
 | Nemotron Teacher Forcing FDB30 | `parathink-soulx-duplug/source/b143bff` 冻结源码；`runs/nemotron-teacher-smoke-20261030-r2` 预检退出0，`runs/nemotron-teacher-fdb30-20261030-r1` 正式小样本；状态以[报告](../reports/soulx/20261030-nemotron-teacher-fdb30/README.md)为准 |
 | TT-010 r5有限pilot | 最新记录为2026-10-27 12:47，新版两轮评估完成、当时第3／5轮；源码`source/tt010-repair-20261027-r1`，run `tt010-repair-pilot-20261027-r1`，当前状态未重查，见[修复报告](../reports/textturn/20261027-dataset-repair/README.md) |

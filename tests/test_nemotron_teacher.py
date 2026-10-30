@@ -98,15 +98,15 @@ class FakeModel:
         self.calls, self.histories, self.predictions = [], [], iter(predictions)
         self.gates = iter(gates)
         class Tokenizer:
-            all_special_ids = list(STATE_IDS.values()) + [151679]
+            all_special_ids = list(STATE_IDS.values()) + [151674]
             def encode(self, text, **kwargs):
                 return [STATE_IDS[text]] if text in STATE_IDS else [1001] if text == 'inter' else [1002] if text == 'internet' else [ord(c) for c in text]
             def decode(self, ids, **kwargs):
                 return next((s for s, i in STATE_IDS.items() if ids == [i]), ''.join('inter' if i == 1001 else 'internet' if i == 1002 else chr(i) for i in ids))
-        self.model = SimpleNamespace(tokenizer=Tokenizer(), asr_eos_token_id=151679, llm=self.forward)
+        self.model = SimpleNamespace(tokenizer=Tokenizer(), asr_eos_token_id=151674, llm=self.forward)
         self.device = 'cpu'
         self.text_embeds = torch.tensor([[-1.]])
-        self.audio_eos_token = torch.tensor([151679])
+        self.audio_eos_token = torch.tensor([151674])
         self.audio_eos_embeds = self.embed_tokens_func(self.audio_eos_token)
         self.config = SimpleNamespace(infer_config=SimpleNamespace(max_mistake_num=3, far_field_threshold=.001))
     def embed_tokens_func(self, ids):
@@ -126,7 +126,7 @@ class FakeModel:
         cache.extend(values)
         self.histories.append(list(cache))
         logits = torch.zeros(1, 1, 151682)
-        logits[0, 0, next(self.predictions) if values[-1] == 151679 else next(self.gates, 65)] = 10
+        logits[0, 0, next(self.predictions) if values[-1] == 151674 else next(self.gates, 65)] = 10
         logits[0, 0, STATE_IDS['<|user_incomplete|>']] += 1
         return SimpleNamespace(logits=logits, past_key_values=cache)
 
@@ -149,10 +149,10 @@ class TeacherInputTests(unittest.TestCase):
         third = self.step(front, 3, 'Hello, world!')
         calls = front.model.calls
         self.assertEqual(calls[0], [-1, -2, -3])
-        self.assertEqual(calls[1], list(map(ord, 'Hello')) + [151679])
+        self.assertEqual(calls[1], list(map(ord, 'Hello')) + [151674])
         self.assertEqual(calls[2], [complete, -2, -3])
-        self.assertEqual(calls[3], list(map(ord, ' world')) + [151679])
-        self.assertEqual(calls[4:], [[nonidle, -2, -3], [151679]])
+        self.assertEqual(calls[3], list(map(ord, ' world')) + [151674])
+        self.assertEqual(calls[4:], [[nonidle, -2, -3], [151674]])
         self.assertEqual(first['control_text'], 'Hello')
         self.assertEqual(second['text'], 'Hello, world!')
         self.assertEqual(third['delta_text'], '')
@@ -168,7 +168,7 @@ class TeacherInputTests(unittest.TestCase):
         self.assertNotIn(66, front.kv)
 
     def test_closed_gate_retains_updates_until_open_and_eof(self):
-        front = self.make([STATE_IDS['<|user_nonidle|>']] * 4, gates=[151679, 151679, 65, 151679])
+        front = self.make([STATE_IDS['<|user_nonidle|>']] * 4, gates=[151674, 151674, 65, 151674])
         one = self.step(front, 1, 'Hello,')
         two = self.step(front, 2, 'Hello, world!')
         self.assertEqual(front.teacher_ids, [])
@@ -192,7 +192,7 @@ class TeacherInputTests(unittest.TestCase):
         second = self.step(front, 2, 'internet')
         self.assertEqual(second['cache_revision']['replay_mode'], 'recent_checkpoint')
         self.assertEqual(front.checkpoint['kv'], saved)
-        self.assertEqual(front.kv, [-1, -2, -3, 1002, 151679, complete, -2, -3, 151679])
+        self.assertEqual(front.kv, [-1, -2, -3, 1002, 151674, complete, -2, -3, 151674])
         self.assertEqual(front.teacher_ids, [1002])
         self.assertNotIn(65, front.kv)
         self.assertEqual(front.context.get_user_turn('test', 'user-1')['text'], 'internet')
@@ -206,13 +206,13 @@ class TeacherInputTests(unittest.TestCase):
             third = self.step(front, 3, '123')
         self.assertEqual(third['cache_revision']['replay_mode'], 'bounded_rebuild')
         self.assertEqual(front.teacher_ids, list(map(ord, 'ax c')))
-        self.assertEqual(front.kv, [-1, -2, -3, 97, 120, 151679, nonidle, -2, -3, 32, 99, 151679,
-                                   nonidle, -2, -3, 151679])
+        self.assertEqual(front.kv, [-1, -2, -3, 97, 120, 151674, nonidle, -2, -3, 32, 99, 151674,
+                                   nonidle, -2, -3, 151674])
         self.assertEqual(third['cache_revision']['revision_from_step'], 1)
 
     def test_closed_gate_defers_consumed_token_revision(self):
         nonidle = STATE_IDS['<|user_nonidle|>']
-        front = self.make([nonidle] * 3, gates=[65, 151679, 65])
+        front = self.make([nonidle] * 3, gates=[65, 151674, 65])
         self.step(front, 1, 'inter')
         closed = self.step(front, 2, 'internet')
         self.assertEqual(front.teacher_ids, [1001])
@@ -236,7 +236,7 @@ class TeacherInputTests(unittest.TestCase):
         self.assertEqual(third['consumed_token_ids'], [])
         self.assertNotIn(97, front.kv)
         self.assertNotIn(98, front.kv)
-        self.assertEqual(front.kv.count(151679), 3)
+        self.assertEqual(front.kv.count(151674), 3)
 
     def test_limits_fail_without_publishing_new_state(self):
         nonidle = STATE_IDS['<|user_nonidle|>']
