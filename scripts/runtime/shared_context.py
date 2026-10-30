@@ -136,7 +136,7 @@ class SharedContext:
 
     @staticmethod
     def _validate_transcript(value, old):
-        if value['source'] != 'sensevoice_small' or value['status'] not in ('open', 'closed'):
+        if value['source'] not in ('sensevoice_small', 'nemotron') or value['status'] not in ('open', 'closed'):
             raise ValueError('Unsupported transcript source or lifecycle')
         if not isinstance(value['text'], str) or len(value['text']) > 65536:
             raise ValueError('Invalid transcript text or length')
@@ -150,6 +150,10 @@ class SharedContext:
             raise ValueError('Transcript version gap or update after close')
         if value['asr_generation'] != old['asr_generation']:
             raise ValueError('ASR source generation changed within a turn')
+        if value['source'] != old['source']:
+            raise ValueError('Transcript source changed within a turn')
+        if value['source'] == 'nemotron' and not value['text'].startswith(old['text']):
+            raise ValueError('Native Nemotron transcript rewrote a delivered prefix')
         changed = value['text'] != old['text']
         if value['asr_version'] != old['asr_version'] + int(changed):
             raise ValueError('ASR version must count actual text changes')

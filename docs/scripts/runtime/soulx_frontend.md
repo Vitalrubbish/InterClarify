@@ -2,6 +2,8 @@
 
 对应 `scripts/runtime/soulx_frontend.py`。`SoulXFrontend` 绑定一个已加载的 SoulX 模型、一个 SharedContext 与稳定的会话／话轮 ID；不启动下游 LLM 或播放器。构造时检查五状态 tokenizer 往返、配置 ID、FunASR 标签字典和后处理文件摘要。
 
+2026-10-30将转写来源提为类属性，默认仍为SenseVoice。Nemotron子类可复用音频账本／状态采集，跳过与其无关的SenseVoice后处理校验；开轮和关轮使用相同固定来源，不让子类快照被误写成SenseVoice。SenseVoice默认行为不变。
+
 `instrument_methods()` 校验官方 `service/model.py` 摘要，只对四个方法做内存 AST 变换。五处音频拼接、一处窗口裁剪、一处 argmax 采集与一处最终状态采集必须全部匹配，否则拒绝启动；不编辑共享上游源码。官方 ASR 门控、文本归一化和 KV 修订保持。
 
 `feed_audio()` 接收有限的16kHz单声道float32包，禁止并发操作模型，处理缓冲内所有完整块。数组弱引用账本追踪真实采样范围、历史回补和合成填充；`slice_spans()` 同步窗口裁剪。控制器 reset 保留未处理输入 PCM，模型 KV 与识别窗口仍重置，话轮不关闭。

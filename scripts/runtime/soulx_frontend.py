@@ -108,6 +108,8 @@ def instrument_methods(model):
 class SoulXFrontend:
     """Own capture hooks, audio provenance and one stable logical user turn."""
 
+    transcript_source = 'sensevoice_small'
+
     def __init__(self, model, context=None, session_id='session', turn_id='turn',
                  active_output=None, stop_output=None, on_commit=None, audit=None):
         if hasattr(model, '_pt'):
@@ -119,7 +121,7 @@ class SoulXFrontend:
             raise ValueError('Output lookup and stop callback must be supplied together')
         self.on_commit, self.audit = on_commit, audit
         self.producer_seq = self.controller_generation = self.call_sequence = self.control_revision = 0
-        self.asr_generation = f'{session_id}:{turn_id}:sensevoice'
+        self.asr_generation = f'{session_id}:{turn_id}:{self.transcript_source}'
         self.clock_id = f'{os.uname().nodename}:{os.getpid()}:monotonic'
         self.input_end = self.processed_until = 0
         self.snapshot, self.control = None, None
@@ -136,12 +138,14 @@ class SoulXFrontend:
             config_name = token[2:-2] + '_token_id'
             if ids != [expected] or tokenizer.decode(ids, skip_special_tokens=False) != token or getattr(model.config.model_config, config_name) != expected:
                 raise ValueError(f'Invalid SoulX token mapping: {token}')
-        from funasr.utils import postprocess_utils
-        if frozenset(postprocess_utils.emoji_dict) != KNOWN_TAGS | {'<|nospeech|><|Event_UNK|>'}:
-            raise ValueError('Installed SenseVoice postprocessing label table differs')
-        self.postprocess_sha256 = hashlib.sha256(Path(postprocess_utils.__file__).read_bytes()).hexdigest()
-        if self.postprocess_sha256 != '199fb27009931c33e1b80bca8436a249b6ced43897854a3f910222be5c525d85':
-            raise ValueError('Installed FunASR 1.2.6 postprocessing digest differs')
+        self.postprocess_sha256 = None
+        if self.transcript_source == 'sensevoice_small':
+            from funasr.utils import postprocess_utils
+            if frozenset(postprocess_utils.emoji_dict) != KNOWN_TAGS | {'<|nospeech|><|Event_UNK|>'}:
+                raise ValueError('Installed SenseVoice postprocessing label table differs')
+            self.postprocess_sha256 = hashlib.sha256(Path(postprocess_utils.__file__).read_bytes()).hexdigest()
+            if self.postprocess_sha256 != '199fb27009931c33e1b80bca8436a249b6ced43897854a3f910222be5c525d85':
+                raise ValueError('Installed FunASR 1.2.6 postprocessing digest differs')
         patched = instrument_methods(model)
         self._original = {name: getattr(model, name) for name in
                           ('reset', 'get_chunk', 'infer', '_asr', '_state_predict', 'state_predict')}
@@ -156,7 +160,7 @@ class SoulXFrontend:
         model.state_predict = self._state_predict
         model.cascade_asr.recognize = self._recognize
         self._register_reset_buffers()
-        event = self._event('user_transcript', source='sensevoice_small',
+        event = self._event('user_transcript', source=self.transcript_source,
                             version=0, asr_version=0, text='', status='open',
                             assembly_status='empty', coverage_complete=False,
                             audio_spans=[], audio_observed_until=0)
@@ -442,7 +446,7 @@ class SoulXFrontend:
                                 'received_at', 'clock_id', 'committed_seq')}
         payload.update(version=self.snapshot['version'] + 1, status='closed', close_reason=reason,
                        depends_on=[self.snapshot['event_id']])
-        event = self._event('user_transcript', source='sensevoice_small', **payload)
+        event = self._event('user_transcript', source=self.transcript_source, **payload)
         self._commit([event])
         self.snapshot, self.closed, self.delivery_phase = event, True, 'drain'
 
