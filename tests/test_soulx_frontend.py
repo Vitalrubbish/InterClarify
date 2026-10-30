@@ -1,4 +1,4 @@
-"""Check native delta drafts, completion refinement, and atomic frame writes."""
+"""Check source preservation and one text/state overwrite per audio step."""
 from pathlib import Path
 import sys
 import threading
@@ -34,7 +34,6 @@ def protocol_frontend():
     value._check_pcm_bound = lambda: None
     value.snapshot = value.context.open_user_turn('s', 't')
     value.model = SimpleNamespace(speech_detected=False, get_rms=lambda chunk: .1,
-        past_state={'delta_text': [], 'cascade_text': ''},
         config=SimpleNamespace(infer_config=SimpleNamespace(far_field_threshold=.02)))
     return value
 
@@ -48,14 +47,8 @@ def run_frame(value, step, token='<|user_nonidle|>'):
     return value._state_predict(chunk, None, ahead)
 
 
-def native_control(value, history):
-    before = list(value.model.past_state['delta_text'])
-    value.model.past_state = {'delta_text': list(history), 'cascade_text': 'native window'}
-    value.observe_control(history[-1] if history else '', before)
-
-
 class SoulXFrontendTests(unittest.TestCase):
-    def test_labels_and_delta_revisions_then_segment_refinement(self):
+    def test_labels_digits_and_window_corrections_remain_source_text(self):
         raw = '<|en|><|NEUTRAL|><|Speech|><|withitn|>The. 123. I\'m here.'
         parsed = SenseVoiceObservation.parse(raw)
         self.assertEqual(parsed['text'], "The. 123. I'm here.")
@@ -63,64 +56,32 @@ class SoulXFrontendTests(unittest.TestCase):
             self.assertEqual(parsed['text'][span['text_start']:span['text_end']],
                              raw[span['raw_start']:span['raw_end']])
         assembler = TurnTranscriptAssembler()
-        assembler.apply_deltas(['我想去', '北京'], 0)
-        update = assembler.apply_deltas(['我想去', '上海', '订票', ''], 0)
-        self.assertEqual(update['text'], '我想去上海订票')
+        assembler.apply_window(observation('I want to book a flight to Paris', end=32000))
+        update = assembler.apply_window(observation('book a flight to London', 16000, 48000))
+        self.assertEqual(update['text'], 'I want to book a flight to London')
         self.assertFalse({'asr_version', 'replacement'} & update.keys())
-        assembler.apply_deltas(['我想去', '', '订票', ''], 0)
-        self.assertEqual(assembler.text, '我想去订票')
-        assembler.apply_turn_result(observation('我想去上海订票。', end=5120), 0)
+        self.assertEqual(assembler.apply_window(observation('yes yes', 32000, 64000))['assembly_status'], 'gap')
+        self.assertEqual(assembler.text, 'I want to book a flight to London')
+        assembler.apply_window(observation('Corrected full turn.', 0, 64000))
         self.assertTrue(assembler.coverage_complete)
-        assembler.begin_generation(1, 5120)
-        assembler.apply_deltas(['Another', 'request', ''], 1)
-        self.assertEqual(assembler.text, '我想去上海订票。Another request')
-        assembler.apply_turn_result(observation('Another request, corrected.', 5120, 10240), 1)
-        self.assertEqual(assembler.text, '我想去上海订票。Another request, corrected.')
-
-    def test_failed_refinement_preserves_draft_and_valid_result_recovers(self):
-        assembler = TurnTranscriptAssembler()
-        assembler.apply_deltas(['book', 'a flight'], 0)
-        self.assertFalse(assembler.apply_turn_result(observation(''), 0)['changed'])
-        failed = observation('')
-        failed['call_status'] = 'error'
-        assembler.apply_turn_result(failed, 0)
-        self.assertEqual(assembler.text, 'book a flight')
-        self.assertFalse(assembler.coverage_complete)
-        discontinuous = observation('must not replace')
-        discontinuous['audio_spans'] = [
-            {'kind': 'real', 'start': 0, 'end': 1280, 'samples': 1280},
-            {'kind': 'real', 'start': 2560, 'end': 5120, 'samples': 2560}]
-        assembler.apply_turn_result(discontinuous, 0)
-        self.assertEqual(assembler.text, 'book a flight')
-        assembler.apply_turn_result(observation('Book a flight.', end=5120), 0)
-        self.assertTrue(assembler.coverage_complete)
-        assembler.begin_generation(1, 5120)
-        assembler.apply_deltas(['next', 'request'], 1)
-        assembler.apply_turn_result(observation('wrong segment', 0, 7680), 1)
-        self.assertEqual(assembler.text, 'Book a flight. next request')
-        assembler.apply_turn_result(observation('Next request.', 5120, 7680), 1)
-        self.assertEqual(assembler.text, 'Book a flight. Next request.')
-        self.assertTrue(assembler.coverage_complete)
-        bounded = TurnTranscriptAssembler(max_chars=5)
-        bounded.apply_deltas(['book'], 0)
-        with self.assertRaises(RuntimeError):
-            bounded.apply_turn_result(observation('Too long.'), 0)
-        self.assertEqual(bounded.text, 'book')
+        assembler.apply_window(observation('New segment.', 64000, 80000))
+        self.assertEqual(assembler.text, 'Corrected full turn. New segment.')
+        partial = TurnTranscriptAssembler()
+        partial.apply_window(observation('inter', end=16000))
+        self.assertEqual(partial.apply_window(observation('net', 16000, 32000))['assembly_status'], 'gap')
 
     def test_no_early_text_publish_and_corrections_replace_next_joint_frame(self):
         value = protocol_frontend()
         writes = []
         value.on_commit = lambda context: writes.append(context.get_user_turn('s', 't'))
         def predict(chunk, back, ahead):
-            value.observe_asr('<|en|>raw window is diagnostic', observation('')['audio_spans'], asr_call_id='a', call_kind='window')
-            self.assertEqual(value.assembler.text, '')
-            native_control(value, ['book', 'Beijing', 'tomorrow'])
+            value.observe_asr('<|en|>book Beijing tomorrow', observation('')['audio_spans'], asr_call_id='a')
             self.assertEqual(value.context.get_user_turn('s', 't')['text'], '')
             value.observe_state('<|user_nonidle|>', 'book')
         value._instrumented_state = predict
         run_frame(value, 0)
         def revise(chunk, back, ahead):
-            native_control(value, ['book', 'Shanghai', ''])
+            value.observe_asr('<|en|>book Shanghai', observation('', end=17000)['audio_spans'], asr_call_id='b')
             value.observe_state('<|user_incomplete|>', 'Shanghai')
         value._instrumented_state = revise
         run_frame(value, 1, '<|user_incomplete|>')
@@ -144,26 +105,20 @@ class SoulXFrontendTests(unittest.TestCase):
                 setattr(model, name, np.zeros(640, dtype=np.float32))
         value._original = {'reset': reset}
         def predict(chunk, back, ahead):
-            native_control(value, ['book', 'Beijing'])
+            value.observe_asr('book Beijing', observation('')['audio_spans'], asr_call_id='window')
             value.observe_state('<|user_complete|>', '')
-            value.observe_asr('Book Shanghai.', observation('', end=2560)['audio_spans'], asr_call_id='turn', call_kind='turn')
+            value.observe_asr('book Shanghai', observation('', end=17000)['audio_spans'], asr_call_id='turn', call_kind='turn')
             value._reset_controller()
         value._instrumented_state = predict
         run_frame(value, 0, '<|user_complete|>')
         current = value.context.get_user_turn('s', 't')
-        self.assertEqual((current['text'], current['state_token']), ('Book Shanghai.', '<|user_complete|>'))
+        self.assertEqual((current['text'], current['state_token']), ('book Shanghai', '<|user_complete|>'))
         self.assertEqual(current['controller_generation'], 0)
         self.assertEqual(value.controller_generation, 1)
         self.assertEqual(value._spans(model.buffer)[0]['start'], 2560)
-        self.assertEqual(value.assembler.text, 'Book Shanghai.')
-        def following(chunk, back, ahead):
-            native_control(value, ['another', 'request'])
-            value.observe_state('<|user_nonidle|>', 'request')
-        value._instrumented_state = following
-        run_frame(value, 1)
-        self.assertEqual(value.context.get_user_turn('s', 't')['text'], 'Book Shanghai. another request')
+        self.assertEqual(value.assembler.text, 'book Shanghai')
 
-    def test_float32_recognizer_keeps_raw_window_diagnostic(self):
+    def test_float32_recognizer_returns_native_control_text_but_stages_raw_text(self):
         value = protocol_frontend()
         value._in_asr = True
         audio = value._record_array(np.zeros(16000, dtype=np.float64), observation('')['audio_spans'])
@@ -175,11 +130,10 @@ class SoulXFrontendTests(unittest.TestCase):
             clean_sensevoice_text=lambda text: text, rich_transcription_postprocess=lambda text: 'CONTROL')
         self.assertEqual(value._recognize(audio), 'CONTROL')
         self.assertEqual(seen, [np.dtype('float32')])
-        self.assertEqual(value.assembler.text, '')
+        self.assertEqual(value.assembler.text, 'The. 123.')
         self.assertEqual(value.context.get_user_turn('s', 't')['text'], '')
-        native_control(value, ['CONTROL'])
         value.observe_asr('', observation('', end=17000)['audio_spans'], asr_call_id='empty')
-        self.assertEqual(value.assembler.text, 'CONTROL')
+        self.assertEqual(value.assembler.text, 'The. 123.')
 
     def test_all_states_far_field_drain_and_immediate_stop(self):
         value = protocol_frontend()

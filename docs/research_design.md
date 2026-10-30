@@ -4,8 +4,6 @@
 
 前端包含 ASR 调用、文本整理、SoulX 音频编码和用户状态预测，每处理一个 160ms 音频块，将最新话轮全文和本块五类状态之一原子写入共享 Context；修订直接覆盖旧正文，不保留历史正文版本，也不等待 `user_complete`。2026-10-30 按用户决定以此替代版本化转写和 320ms 正文周期建议，原因是简化存储与读取；用户已进一步授权撤下 Nemotron 组合并实施当前值写入，进展见[接口合同](dev/SoulX-Duplug/shared_context_interface.md)。Layer 0 系统附和时机、Layer 1 表达和 Layer 2 思考位于 Context 下游。该职责分层允许前端持续接收音频、表达与思考并发执行；后续 CoT 从 Context 反馈至前端，当前不实现条件化扩展。
 
-2026-10-30 用户进一步确认正文策略：倾听时复用 SoulX 的 `asr_delta`，同步其上一周期修订，形成当前草稿；完成分支的整段 SenseVoice 结果返回后覆盖对应草稿。此调整用于减少额外滑窗拼接，不新增 ASR 或补识别。内部 controller reset 不改变逻辑话轮，后续整段结果只覆盖所属 controller 片段，保留此前片段；原始窗口文字继续留作诊断，草稿接受原生控制文字的规范化。每个 160ms 步骤仍联合覆盖正文与状态，EOF 排空不回填在线结果。
-
 用户进一步确认：保留 CoT 条件下的主动澄清与话轮决策目标，后续让 SoulX-Duplug 联合读取音频 token、转写文本 token 和 Layer 2 已发布的 CoT token；当前不实现这项扩展。当前保留原生五类用户状态 token，全部送入 Layer 1，由 LLM 决定自身行为；普通正式回答在当前 turn 看到对应的 `user_complete` 后开始生成，看到之前不生成正文。后续 CoT 阶段是否扩展控制器输出另行设计，见[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
 
 研究任务与单一仲裁执行点、单一 TTS 播放所有权及已听内容不可撤销的边界保持。仅有效用户打断额外进入输出运行时：活动输出期间 `user_nonidle` 立即触发停止，涵盖准备与播放。其他状态不进入输出运行时，不映射成 start 或 keep；`user_complete` 不额外发起 LLM 回答调用，`user_backchannel` 由 LLM 读取并决定表达行为。具体路径见[架构第 2.2 节](research_design/architecture.md#22-前端状态与系统附和)。状态输入编码与 Layer 3 定位待后续讨论。TextTurn 专属协议不自动成为 SoulX 合同，旧作业不因本次选型恢复。
