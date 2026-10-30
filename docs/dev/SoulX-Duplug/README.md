@@ -4,6 +4,8 @@
 
 2026-10-30按用户明确指令回滚：撤回`bd86478`的原生delta草稿＋controller片段整段覆盖，撤回`b00afac`与`6930fa7`的固定起点重识别候选文档。运行代码与前端测试恢复到`484ca32`对应基线，保留160ms正文／状态联合覆盖接口；这会恢复旧窗口整理及已知gap，并不表示旧方案质量达标。历史测试报告、原始证据和离线汇总脚本保留，未恢复旧Nemotron组合代码或提交新远端作业。既有conda下前端5项、SharedContext及TextTurn Context共7项、独立Nemotron服务5项检查全部通过；用户原有未提交修改保持不变。
 
+用户进一步提出Nemotron按160ms持续解码、直接teacher forcing文字、0.6B仅发布状态special token，见[方案讨论](nemotron_teacher_forcing.md)。该候选区分模型内部KV与共享Context，说明自生成正文丢弃、ASR结束符、空delta规则及解码同步；尚未接入或切换现行实现。
+
 ## 已确认合同
 
 - 前端包含 ASR 调用与文本整理、SoulX 音频编码及状态预测；同一活动话轮只用一个权威 ASR 来源。中间转写持续写入 Shared Context，不等待完成判断，前端内部与下游使用同一来源。2026-10-30 用户确认每个 160ms 音频处理步骤联合覆盖最新全文和本块状态，不保留历史正文版本，取消 320ms 周期建议；新合同已实现，本地检查及远端六视图当前值写入检查通过，见[报告](../../../reports/soulx/20261030-current-context-test/README.md)，读取与关闭规则见[接口设计](shared_context_interface.md)。
