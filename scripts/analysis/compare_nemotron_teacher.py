@@ -64,6 +64,7 @@ def audit_teacher(frames):
     previous, last_release, feedback = '', None, None
     consumed, available, available_at, segments, lags = [], [], [], [], []
     pending_streak = maximum_streak = 0
+    pending_ages, pending_age = [], 0
     for seq, f in enumerate(frames, 1):
         native = f['native_step']
         assert f['teacher_step_seq'] == seq and native['step_seq'] == seq + 1
@@ -82,7 +83,7 @@ def audit_teacher(frames):
             common += 1
         available_at = available_at[:common] + [native['decode_completed_at']] * (len(new) - common)
         if f['gate_open']:
-            assert f['gate_token_id'] != 151679
+            assert f['gate_token_id'] != 151674
             shared = 0
             for a, b in zip(consumed, new):
                 if a != b:
@@ -91,7 +92,7 @@ def audit_teacher(frames):
             lags.extend((f['teacher_injected_at'] - value) * 1000 for value in available_at[shared:])
             assert f['consumed_token_ids'] == new
         else:
-            assert f['gate_token_id'] == 151679
+            assert f['gate_token_id'] == 151674
             assert f['consumed_token_ids'] == consumed and not f['teacher_token_ids']
             assert not f['cache_revision']
         for segment in f['cache_revision'].get('revised_segments', []):
@@ -99,6 +100,14 @@ def audit_teacher(frames):
         segments.append(f['teacher_token_ids'])
         assert [token for segment in segments for token in segment] == f['consumed_token_ids']
         pending = f['available_token_ids'] != f['consumed_token_ids']
+        shared = 0
+        for a, b in zip(f['consumed_token_ids'], new):
+            if a != b:
+                break
+            shared += 1
+        pending_age = (f['state_resolved_at'] - min(available_at[shared:], default=native['decode_completed_at'])) * 1000 if pending else 0
+        if pending:
+            pending_ages.append(pending_age)
         pending_streak = pending_streak + 1 if pending else 0
         maximum_streak = max(maximum_streak, pending_streak)
         previous, last_release = f['text'], f['released_at']
@@ -106,6 +115,7 @@ def audit_teacher(frames):
         consumed, available = f['consumed_token_ids'], new
     return {'frames_checked': len(frames), 'token_available_to_input_ms': distribution(lags),
             'max_pending_streak_frames': maximum_streak,
+            'pending_age_ms': distribution(pending_ages), 'eof_pending_age_ms': pending_age,
             'gate_open_frames': sum(f['gate_open'] for f in frames),
             'pending_frames': sum(f['available_token_ids'] != f['consumed_token_ids'] for f in frames),
             'eof_pending_range': frames[-1]['pending_token_range'] if frames else None,
@@ -173,7 +183,14 @@ def compare(baseline, candidate):
                 words = sum(v['reference_words'] for v in scores)
                 errors = sum(v['errors'] for v in scores)
                 groups[arm][task][mode + '_wer'] = {'words': words, 'errors': errors, 'wer': errors / words if words else None}
-    return {'groups': groups, 'samples': rows, 'excluded': failures, 'teacher_audit': audits,
+    paired = {}
+    for task in ('smooth_turn_taking', 'user_interruption'):
+        selected = [r for r in rows if r['task'] == task]
+        for key in ('after_wall_ms', 'nonidle_wall_ms') if task == 'user_interruption' else ('after_wall_ms',):
+            paired[task + '_' + key + '_candidate_minus_baseline'] = distribution([
+                r['candidate'][key] - r['baseline'][key] for r in selected
+                if r['candidate'][key] is not None and r['baseline'][key] is not None])
+    return {'groups': groups, 'paired_wall_deltas_ms': paired, 'samples': rows, 'excluded': failures, 'teacher_audit': audits,
             'run_success': {k: {'passed': sum(r['passed'] for r in result['cases']), 'total': len(manifest['samples'])} for k, result in results.items()},
             'timing': {k: {'backlog_ms': distribution([f['backlog_ms'] for f in fs]),
                            'observed_backlog_ms': distribution([f['observed_backlog_ms'] for f in fs])} for k, fs in all_frames.items()},
