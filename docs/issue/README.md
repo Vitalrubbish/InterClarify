@@ -1,10 +1,12 @@
 # 工作单管理
 
-更新：2026-10-31。当前活动研究路线为 **Nemotron Teacher Forcing＋SoulX-Duplug 语音前端**，见[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。TextTurn、VoxTurn、XTurnix 三条历史路线已按用户指令归档：路线文档移至[归档区](../archive/dev/README.md)，对应实现移至 [archive/](../../archive/README.md)，历史工作单保留在本地 `docs/issue/archive/`（不进入 Git）。
+更新：2026-10-31。当前确认的下一步路线为 **SoulX＋SenseVoice控制、Nemotron正文与缓存状态配对发布**，设计已记录、代码待切换，见[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。TextTurn、VoxTurn、XTurnix 三条历史路线已按用户指令归档：路线文档移至[归档区](../archive/dev/README.md)，对应实现移至 [archive/](../../archive/README.md)，历史工作单保留在本地 `docs/issue/archive/`（不进入 Git）。
 
 当前用户已授权 Nemotron Teacher Forcing 接入与 FDB 三轴固定小样本实验。下游 Agent 尚未切换到 SoulX，旧 Nemotron 公开英文集方案和旧文本控制器合同只作为历史设计，不恢复作业。
 
-当前无活动工作单。NTF-004已完成并归档至本地`archive/`：官方控制格式、门控和教师缓存修订已交付，本地30项、远端预检3/3通过；正式25/30完整、5条积压触限退出1。共同23条中停顿complete不变、打断nonidle 7/7→6/7，未见整体改善；EOF仍有待消费控制文字。见[对照报告](../../reports/soulx/20261031-nemotron-teacher-gate/README.md)。01:06:38 CST队列为空，未继续重试或切换现役Agent。
+当前活动工作单：[NTF-005](NTF-005.md)，设计已确认、待实施：SoulX每160ms独立产生状态并缓存，待同段Nemotron完成解码后联合发布；两路计算不受跨路逐步屏障阻塞。本次记录设计，不启动远端作业。
+
+NTF-004已完成并归档至本地`archive/`：官方控制格式、门控和教师缓存修订已交付，本地30项、远端预检3/3通过；正式25/30完整、5条积压触限退出1。共同23条中停顿complete不变、打断nonidle 7/7→6/7，未见整体改善；EOF仍有待消费控制文字。见[对照报告](../../reports/soulx/20261031-nemotron-teacher-gate/README.md)。01:06:38 CST队列为空，未继续重试或切换现役Agent。
 
 NTF-003 已完成并归档至本地 `archive/`：真实音频覆盖配对已修正，空增量规则保留；正式两轮25/30、28/30因800ms积压触限退出1，完整样本有部分改善但整体实时验收未通过，见[配对复测报告](../../reports/soulx/20261030-nemotron-teacher-alignment/README.md)。23:39远端队列为空，不继续重试或扩展规则修改。
 

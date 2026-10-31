@@ -4,6 +4,8 @@
 
 语音前端采用 **SoulX-Duplug＋SenseVoiceSmall**，整体位于 Layer 0–Layer 2 的输入侧。按用户确认，为先打通链路，首版沿用官方 ASR 配套路径，撤下 Nemotron＋SoulX 独立适配；原因与适配缺口见[选型说明](../dev/SoulX-Duplug/asr_adapter_assessment.md)。新链路尚未接入，现役底座和实施顺序见[工程计划](../engineering_implementation.md)。本次调整模块归属与实施顺序，研究目标保持不变。
 
+2026-10-31最新确认的下一步设计为[双ASR缓存发布](../dev/SoulX-Duplug/dual_asr_publication.md)：SenseVoice仅提供0.6B控制文字，Nemotron提供SharedContext唯一正文；SoulX每160ms产生状态并缓存，同段Nemotron解码完成后按音频顺序联合发布。两路计算独立推进，160ms不承诺墙钟发布间隔。该组合待实施，以下首版已实现路径保留为历史依据。有效nonidle的直接停止合同保持，本次只调整SharedContext可见时机。
+
 当前五类用户状态均作为 token 送入 Layer 1，普通正式回答在当前 turn 读取对应 `user_complete` 后生成；仅活动输出期间的有效 `user_nonidle` 额外直接停止输出。其他状态不映射成运行时 start/keep。后续音频、转写与 CoT 联合控制的目标已确认，当前不实现；输出是否扩展与 Layer 3 定位仍待讨论。
 
 [架构图 PDF](../../figures/parathink_method_preview.pdf) · [图示说明](../figures/parathink_method.md)。图展示目标合同，不表示已完成接入或验证。TextTurn／XTurnix 专属协议与历史状态见[工作单](../issue/README.md)。
