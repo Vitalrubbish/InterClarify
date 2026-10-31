@@ -83,6 +83,7 @@ def run_case(model, audio, case_id, path, output, frontend_factory=DualASRFronte
                 packet = np.frombuffer(pcm, '<i2').astype(np.float32) / 32768
                 with guard:
                     progress['arrived'] = end
+                    progress['soulx_observed'] = getattr(frontend, 'observed_input', 0)
                     unread = end - progress['soulx_observed']
                     progress['peak_soulx_unread'] = max(progress['peak_soulx_unread'], unread)
                     if unread > 12800:
