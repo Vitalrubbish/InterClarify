@@ -111,7 +111,8 @@ class SoulXFrontend:
     transcript_source = 'sensevoice_small'
 
     def __init__(self, model, context=None, session_id='session', turn_id='turn',
-                 active_output=None, stop_output=None, on_commit=None, audit=None):
+                 active_output=None, stop_output=None, on_commit=None, audit=None,
+                 frame_sink=None, publication_source=None):
         if hasattr(model, '_pt'):
             raise ValueError('Model already has a frontend owner')
         audio_config = model.config.infer_config.input
@@ -123,6 +124,8 @@ class SoulXFrontend:
         if bool(active_output) != bool(stop_output):
             raise ValueError('Output lookup and stop callback must be supplied together')
         self.on_commit, self.audit = on_commit, audit
+        self.frame_sink = frame_sink
+        self.publication_source = publication_source or self.transcript_source
         self.controller_generation = self.call_sequence = 0
         self.asr_generation = f'{session_id}:{turn_id}:{self.transcript_source}'
         self.clock_id = f'{os.uname().nodename}:{os.getpid()}:monotonic'
@@ -163,7 +166,7 @@ class SoulXFrontend:
         model.state_predict = self._state_predict
         model.cascade_asr.recognize = self._recognize
         self._register_reset_buffers()
-        self.snapshot = self.context.open_user_turn(session_id, turn_id)
+        self.snapshot = self.context.open_user_turn(session_id, turn_id, self.publication_source)
         if self.on_commit:
             self.on_commit(self.context)
 
@@ -236,25 +239,40 @@ class SoulXFrontend:
                                          'processed_until': self.processed_until})
 
     def _state_predict(self, chunk, back, ahead):
+        started = time.monotonic()
         self.current_chunk, self.current_ahead = chunk, ahead
+        audio_spans = {name: self._spans(array) if array is not None else []
+                       for name, array in (('main', chunk), ('back', back), ('ahead', ahead))}
+        self.observed_input = max((s['end'] for spans in audio_spans.values()
+                                   for s in spans if s['kind'] == 'real'), default=self.processed_until)
         real = [s for s in self._spans(chunk) if s['kind'] == 'real']
         for span in real:
             if span['start'] != self.processed_until:
                 raise ValueError('Real audio was skipped, duplicated or reordered across controller resets')
             self.processed_until = span['end']
         self._calls = []
+        self._step_control = None
         self._pending_state = None
         result = self._instrumented_state(chunk, back, ahead)
         if self._pending_state is None:
             raise RuntimeError('SoulX did not produce a state for the audio step')
         frame = {**self._pending_state, 'text': self.assembler.text,
                  'assembly_status': self.assembler.assembly_status,
-                 'coverage_complete': self.assembler.coverage_complete}
+                 'coverage_complete': self.assembler.coverage_complete,
+                 'controller_started_at': started, 'controller_completed_at': time.monotonic(),
+                 'soulx_audio_spans': audio_spans, 'control': deepcopy(self._step_control),
+                 'asr_calls': deepcopy(self._calls),
+                 'gate_open': any(c['call_kind'] == 'window' for c in self._calls)}
+        frame['audio_observed_until'] = max(frame['audio_observed_until'],
+            max((c['audio_observed_until'] or 0 for c in self._calls), default=0))
         self._pending_state = None
         self._check_pcm_bound()
         if self.delivery_phase == 'online' and not self.closed and real:
             self._audit('frame_source', frame)
-            self._publish(frame)
+            if getattr(self, 'frame_sink', None):
+                self.frame_sink(frame)
+            else:
+                self._publish(frame)
         return result
 
     def _asr(self, audio_embeds):
@@ -311,6 +329,7 @@ class SoulXFrontend:
         observation['assembly_result'] = update
         self._audit('asr_source', observation)
         self._calls.append({'asr_call_id': observation['asr_call_id'],
+                            'call_kind': observation.get('call_kind', 'window'),
                             'call_status': call_status,
                             'audio_observed_until': observation['audio_observed_until']})
         self._calls = self._calls[-4:]
@@ -322,6 +341,7 @@ class SoulXFrontend:
                         'delta_text': delta_text,
                         'previous_delta_corrected': bool(before and history[:-1] != before),
                         'asr_calls': deepcopy(self._calls)}
+        self._step_control = deepcopy(self.control)
         self._audit('control_source', self.control)
 
     def observe_state(self, token, delta_text):
@@ -340,6 +360,8 @@ class SoulXFrontend:
                  'raw_token': raw_token, 'raw_token_id': raw_id,
                  'adjustment': 'native_complete_incomplete_rule' if raw_token != token else None,
                  'controller_generation': self.controller_generation,
+                 'control_text': getattr(self.model, 'past_state', {}).get('cascade_text', ''),
+                 'delta_text': delta_text,
                  'processed_until': self.processed_until,
                  'audio_observed_until': max((span['end'] for span in real), default=self.processed_until),
                  'state_resolved_at': time.monotonic(), 'clock_id': self.clock_id,
@@ -366,6 +388,13 @@ class SoulXFrontend:
         size = sum(array.nbytes for array in arrays if array is not None)
         if size > 4 * 1024 * 1024:
             raise RuntimeError('Frontend PCM byte limit exceeded')
+
+    def pcm_metrics(self):
+        arrays = [record[0]() for record in self._arrays.values()]
+        return {'retained_pcm_bytes': sum(a.nbytes for a in arrays if a is not None),
+                'input_samples': self.input_end,
+                'unprocessed_main_samples': self.input_end - self.processed_until,
+                'unread_samples': max(0, self.input_end - getattr(self, 'observed_input', 0))}
 
     def feed_audio(self, audio, *, synthetic=False, reason='explicit_silence_tail'):
         import numpy as np

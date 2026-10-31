@@ -1,6 +1,6 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
-2026-10-31 当前确认的下一步选型为 **SoulX-Duplug＋SenseVoice控制路径、独立Nemotron正文与缓存状态配对发布**，见[双ASR方案](dev/SoulX-Duplug/dual_asr_publication.md)和[NTF-005](issue/NTF-005.md)。前端位于Layer 0–Layer 2输入侧：SenseVoice保留官方滑窗、门控、文字修订及controller reset，为0.6B提供控制文字；Nemotron保留原生流式缓存，为SharedContext提供唯一原始正文。SoulX每160ms独立预测状态并缓存，待真实采样覆盖配对的Nemotron解码完成后，再按音频顺序联合发布正文与状态；两路不再等待本步发布后才继续计算。本次确认设计，代码尚未切换，不预先宣称质量或实时性改善。两套ASR及SoulX权重固定，不训练，尚未切换现役下游Agent。
+2026-10-31 当前确认的下一步选型为 **SoulX-Duplug＋SenseVoice控制路径、独立Nemotron正文与缓存状态配对发布**，见[双ASR方案](dev/SoulX-Duplug/dual_asr_publication.md)和[NTF-005](issue/NTF-005.md)。前端位于Layer 0–Layer 2输入侧：SenseVoice保留官方滑窗、门控、文字修订及controller reset，为0.6B提供控制文字；Nemotron保留原生流式缓存，为SharedContext提供唯一原始正文。SoulX每160ms独立预测状态并缓存，待真实采样覆盖配对的Nemotron解码完成后，再按音频顺序联合发布正文与状态；两路不再等待本步发布后才继续计算。NTF-005已启动实施并提供独立双ASR入口，正在验证，不预先宣称质量或实时性改善。两套ASR及SoulX权重固定，不训练，尚未切换现役下游Agent。
 
 NTF-004官方格式与门控对照已交付：预检3/3通过，正式25/30完整、5条积压触限，状态指标未整体改善；共享正文与控制文字消费分别审计，未切换下游Agent，见[对照报告](../reports/soulx/20261031-nemotron-teacher-gate/README.md)。
 

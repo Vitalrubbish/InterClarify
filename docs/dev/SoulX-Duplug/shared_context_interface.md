@@ -2,7 +2,7 @@
 
 2026-10-30，按用户明确决定修订：语音前端每处理一个 160ms 音频块，将最新话轮全文和本块状态作为一组原子覆盖到 SharedContext。取消 320ms 正文发布周期；不维护历史正文版本或修订事件流。
 
-2026-10-31新增确认：NTF-005恢复SenseVoice作为0.6B控制文字，Nemotron提供共享正文；SoulX状态先按音频块暂存，待对应Nemotron解码完成再联合发布。两路计算独立推进，只约束发布；完整配对及EOF规则见[双ASR发布方案](dual_asr_publication.md)。设计已记录、待实施，以下历史实现验收不表示该组合已运行。
+2026-10-31新增确认：NTF-005恢复SenseVoice作为0.6B控制文字，Nemotron提供共享正文；SoulX状态先按音频块暂存，待对应Nemotron解码完成再联合发布。两路计算独立推进，只约束发布；完整配对及EOF规则见[双ASR发布方案](dual_asr_publication.md)。独立入口已提供、验证进行中，以下历史实现验收不表示该组合已通过真实模型验证。
 
 这是当前实施合同。已按用户授权重构 [SharedContext 实现](../../scripts/runtime/shared_context.md)，撤下 Nemotron＋SoulX 专用入口，以每个处理步骤的当前值替代旧事件协议；本地检查和远端六视图写入／读取检查均已通过，识别及状态语义边界另列，见[远端报告](../../../reports/soulx/20261030-current-context-test/README.md)。旧运行证据见[报告](../../../reports/soulx/20261029-shared-context/README.md)，不代表新合同已验收。
 

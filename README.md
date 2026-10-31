@@ -4,7 +4,7 @@
 
 ParaThink 研究独立 thinking 流在语音 Agent 倾听与表达期间持续工作带来的优势，工作包括 Agent 框架、边听边想与边说边想两组 benchmark，以及大规模对话数据与训练。研究背景、目标、参考文章和三篇子文档见 [docs/research_design.md](docs/research_design.md)，工程安排见 [docs/engineering_implementation.md](docs/engineering_implementation.md)。
 
-当前研究前端采用 **Nemotron Teacher Forcing＋SoulX-Duplug**，Nemotron原始正文与五状态逐步联合写入SharedContext。最新官方控制格式与文字门控对照已交付，但完整回放25/30、5条积压触限，状态未整体改善，见[报告](reports/soulx/20261031-nemotron-teacher-gate/README.md)。下一步已确认[双ASR缓存发布设计](docs/dev/SoulX-Duplug/dual_asr_publication.md)：SenseVoice供0.6B控制，状态暂存至对应Nemotron解码完成后与其正文联合发布，代码待实施。五类用户状态送入 Layer 1，仅有效用户打断额外直接停止活动输出；具体合同见[架构设计](docs/research_design/architecture.md)。新链路尚未接入，已采用的运行底座仍为 DuplexCascade、Nemotron、Kokoro 与 [X-Talk fork](https://github.com/Vitalrubbish/xtalk) `ca9b23c`。
+当前研究前端采用 **Nemotron Teacher Forcing＋SoulX-Duplug**，Nemotron原始正文与五状态逐步联合写入SharedContext。最新官方控制格式与文字门控对照已交付，但完整回放25/30、5条积压触限，状态未整体改善，见[报告](reports/soulx/20261031-nemotron-teacher-gate/README.md)。下一步已确认[双ASR缓存发布设计](docs/dev/SoulX-Duplug/dual_asr_publication.md)：SenseVoice供0.6B控制，状态暂存至对应Nemotron解码完成后与其正文联合发布，NTF-005已启动、实现已提供并正在验证。五类用户状态送入 Layer 1，仅有效用户打断额外直接停止活动输出；具体合同见[架构设计](docs/research_design/architecture.md)。新链路尚未接入，已采用的运行底座仍为 DuplexCascade、Nemotron、Kokoro 与 [X-Talk fork](https://github.com/Vitalrubbish/xtalk) `ca9b23c`。
 
 | 内容 | 位置 |
 | --- | --- |
