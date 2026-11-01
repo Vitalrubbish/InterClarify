@@ -288,6 +288,62 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
             raise RuntimeError('Ingress thread did not terminate')
 
 
+def warmup_controller(model, output):
+    """Exercise silence, non-silent audio and the teacher text path before timing."""
+    import numpy as np
+    import torch
+    rng = np.random.default_rng(42)
+    input_cfg = model.config.infer_config.input
+    back_size, ahead_size = input_cfg.audio_back_size, input_cfg.audio_ahead_size
+    def signal(seconds):
+        count = round(seconds * 16000)
+        if count == 0:
+            return np.zeros(0, np.float32)
+        time = np.arange(count) / 16000
+        tone = .05 * np.sin(2 * np.pi * 220 * time) + .01 * rng.standard_normal(count)
+        return tone.astype(np.float32)
+    signals = [('silence_160ms', np.zeros(2560, np.float32)),
+               ('silence_1280ms', np.zeros(20480, np.float32)),
+               ('silence_2560ms', np.zeros(40960, np.float32)),
+               ('tone_3360ms_a', signal(3.36)),
+               ('tone_3360ms_b', signal(3.36)),
+               ('tone_10080ms', signal(10.08))]
+    records = []
+    for name, samples in signals:
+        started = time.monotonic()
+        blocks = 0
+        first_block = None
+        for offset in range(0, len(samples), 2560):
+            block = samples[offset:offset + 2560]
+            if len(block) < 2560:
+                block = np.pad(block, (0, 2560 - len(block)))
+            back = np.zeros(back_size, np.float32)
+            ahead = np.zeros(ahead_size, np.float32)
+            ids = model._audio_to_tokens(back, block, ahead)
+            model._tokens_to_embeds(ids)
+            blocks += 1
+            if first_block is None:
+                first_block = time.monotonic() - started
+        torch.cuda.synchronize()
+        records.append({'name': name, 'samples': len(samples), 'blocks': blocks,
+                        'sha256': __import__('hashlib').sha256(samples.tobytes()).hexdigest(),
+                        'seconds': time.monotonic() - started, 'first_block_seconds': first_block,
+                        'synthetic': True, 'non_silent': 'tone' in name})
+    warm = NemotronTeacherFrontend(model, 'warmup')
+    text_started = time.monotonic()
+    with torch.inference_mode():
+        for seq, text in enumerate(['warm ', 'warm up ', 'warm up the teacher path'], 1):
+            warm.process_step({'step_seq': seq, 'text': text}, np.zeros(2560, np.float32),
+                              np.zeros(back_size, np.float32), np.zeros(ahead_size, np.float32),
+                              seq * 2560, seq * 2560)
+    warm.close()
+    torch.cuda.synchronize()
+    records.append({'name': 'teacher_text', 'blocks': 3, 'seconds': time.monotonic() - text_started,
+                    'synthetic': True, 'non_silent': True})
+    model.reset()
+    return records
+
+
 def run(args):
     import numpy as np
     import soundfile as sf
@@ -314,16 +370,10 @@ def run(args):
               'soulx_revision': '61701c4ab8193cc1ee2220d3848872ac6c720142'}
     try:
         controller, result['checkpoint_checks'] = load_controller(args)
-        # Exercise the real forced-input path before the clock starts.
-        warm = NemotronTeacherFrontend(controller, 'warmup')
-        with torch.inference_mode():
-            for seq in range(1, 4):
-                warm.process_step({'step_seq': seq, 'text': ''}, np.zeros(2560, np.float32),
-                                  np.zeros(controller.config.infer_config.input.audio_back_size, np.float32),
-                                  np.zeros(controller.config.infer_config.input.audio_ahead_size, np.float32),
-                                  seq * 2560, seq * 2560)
-        warm.close()
-        torch.cuda.synchronize()
+        result['warmup'] = warmup_controller(controller, args.output)
+        warmup_file = args.output.parent / 'asr_ready.json'
+        if warmup_file.exists():
+            result['nemotron_warmup'] = json.loads(warmup_file.read_text())
         for sample in samples:
             try:
                 path = Path(sample['input'])
