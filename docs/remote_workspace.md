@@ -1,6 +1,6 @@
 # 远端工作目录约定
 
-更新：2026-11-01。本文维护目录与环境位置，历史作业进度统一链接报告；本次已登录贵州 HPC，复用Nemotron与SoulX/SenseVoice模型及两组conda，完成独立双ASR固定实验结果核查。其他路径和历史作业不由此推断当前状态。
+更新：2026-11-01。本文维护目录与环境位置，历史作业进度统一链接报告；本次已登录贵州 HPC，复用Nemotron与SoulX模型及两组conda，完成教师文本纯追加与单块缓冲三轴预检。SenseVoice旧双ASR路径已归档。其他路径和历史作业不由此推断当前状态。
 
 项目现名为 ParaThink。下表中的 `InterClarify`、`interclarify-*` 是已有服务器目录或环境的真实名称，继续保留以兼容现役资产；GitHub 地址与历史报告链接同样保留，未执行远端仓库或目录迁移。新建通用开发环境默认使用 `parathink-dev`。
 
@@ -44,6 +44,7 @@
 
 | 记录 | 证据与状态 |
 | --- | --- |
+| 教师单块缓冲与即时发布 | `parathink-soulx-duplug/source/4c81904`；`runs/ntf008-teacher-smoke-20261101-r2` 三轴预检3/3、退出0，主块发布P95≤240.9ms、`buffer_overflow=0`，complete无重识别；`r1`失败run保留，见[报告](../reports/soulx/20261101-ntf008-teacher-buffer/README.md) |
 | 教师文本纯追加 | `parathink-soulx-duplug/source/e54a9fe`；`runs/ntf007-teacher-smoke-20261101-r1` 三轴预检3/3、退出0，104项本地通过；无门控、检查点或重放，最大积压555ms，见[报告](../reports/soulx/20261101-ntf007-teacher-append-only/README.md) |
 | 双ASR独立计算与配对发布 | `parathink-soulx-duplug/source/101b61a`；预检3/3通过，`runs/dual-asr-fdb30-20261031-r1`正式18/30、12条800ms触限、退出1；2134帧配对审计通过，实时及整体质量未通过；11-01队列为空，见[报告](../reports/soulx/20261031-dual-asr-publication/README.md) |
 | 官方格式与门控教师对照 | `parathink-soulx-duplug/source/ba3ba47`；预检3/3通过，`runs/nemotron-teacher-gate-fdb30-20261031-r1`正式25/30、5条积压触限退出1；未见整体质量改善，01:06:38队列为空，见[报告](../reports/soulx/20261031-nemotron-teacher-gate/README.md) |

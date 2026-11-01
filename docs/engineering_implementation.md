@@ -8,7 +8,7 @@
 
 2026-10-30 最新用户授权覆盖下述历史首版选型：实施 [Nemotron Teacher Forcing 同步前端](dev/SoulX-Duplug/nemotron_teacher_forcing.md)，替代该实验路径的 SenseVoice 门控与滑窗识别，并运行 FDB 三轴各10条固定小样本。两份模型权重固定，不接下游、不训练；具体资源与验收见 [NTF 工作单](issue/README.md)。
 
-2026-11-01 最新路线为 Nemotron 唯一教师文本：NTF-007 已交付纯追加文本路径，三轴预检3/3，见[报告](../reports/soulx/20261101-ntf007-teacher-append-only/README.md)；NTF-008 正在实现单块缓冲、`A_n→T_n→EOS` 逐帧对齐，删除双ASR配对器与complete后整轮重识别；NTF-009 做固定30条同卡对照。此前双ASR路线见[归档方案](archive/dev/SoulX-Duplug/dual_asr_publication.md)，正式18/30完整、12条800ms触限，实时及整体状态质量未通过。
+2026-11-01 最新路线为 Nemotron 唯一教师文本：NTF-007 已交付纯追加文本路径，NTF-008 已交付音频embedding有界缓冲、`A_n→T_n→EOS` 对齐、双ASR配对器删除和complete不重识别；两轮三轴预检3/3，见[报告](../reports/soulx/20261101-ntf008-teacher-buffer/README.md)。下一步 NTF-009 做固定30条同卡对照。此前双ASR路线见[归档方案](archive/dev/SoulX-Duplug/dual_asr_publication.md)，正式18/30完整、12条800ms触限，实时及整体状态质量未通过。
 
 现役底座仍为 X-Talk `ca9b23c`、DuplexCascade、Nemotron EN160 与 Kokoro，参数见[运行配置](runtime_baseline.md)。此前实验为 **Nemotron Teacher Forcing＋SoulX-Duplug 语音前端**，位于 Layer 0–Layer 2 输入侧；每步先取得Nemotron文字，经SoulX音频门控后按需消费规范化教师文字，再输入EOS预测状态，发布后解除解码屏障。同一活动话轮只使用一个权威转写来源。SenseVoice 首版及旧 Nemotron 独立组合保留为历史基线。
 

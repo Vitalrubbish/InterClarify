@@ -1,10 +1,10 @@
 # SoulX-Duplug 路线
 
-更新：2026-11-01。路线已改为 **Nemotron 作为唯一教师文本、取消 SenseVoice 滑窗与双路配对发布**。NTF-007 已交付纯追加文本路径并通过三轴预检3/3，见[报告](../../../reports/soulx/20261101-ntf007-teacher-append-only/README.md)；下一步按 NTF-008 做单块音频缓冲与 `A_n → T_n → <|end_of_sentence|>` 逐帧对齐，再进入 NTF-009 的固定30条同卡对照。此前 SoulX＋SenseVoice控制、独立Nemotron正文与配对发布保留为历史对照，不再运行。
+更新：2026-11-01。路线为 **Nemotron 作为唯一教师文本、取消 SenseVoice 滑窗与双路配对发布**。NTF-007/008 已交付：纯追加文本路径、最多4块音频embedding缓冲、首个覆盖主块截止的流式ASR配对、complete不重识别；三轴预检3/3，见[NTF-007报告](../../../reports/soulx/20261101-ntf007-teacher-append-only/README.md)与[NTF-008报告](../../../reports/soulx/20261101-ntf008-teacher-buffer/README.md)。下一步执行 NTF-009 的固定30条同卡对照。此前 SoulX＋SenseVoice控制、独立Nemotron正文与配对发布保留为历史对照，不再运行。
 
 ## 已确认合同
 
-- 前端包含Nemotron教师文本、SoulX音频编码及状态预测；同一活动话轮的SharedContext正文只用Nemotron一个权威来源，不再使用SenseVoice控制文字或双路配对队列。当前NTF-007已交付逐帧直接发布，NTF-008正在改为单块缓冲、音频→文本→结束符严格对齐，并删除`PairedPublisher`及complete后整轮重识别。读取与关闭规则见[接口设计](shared_context_interface.md)，最新结果见[纯追加报告](../../../reports/soulx/20261101-ntf007-teacher-append-only/README.md)。
+- 前端包含Nemotron教师文本、SoulX音频编码及状态预测；同一活动话轮的SharedContext正文只用Nemotron一个权威来源，不再使用SenseVoice控制文字或双路配对队列。NTF-007/008 已交付逐帧即时发布、音频embedding有界缓冲和 `A_n→T_n→EOS` 对齐，`PairedPublisher`及complete后整轮重识别已删除。读取与关闭规则见[接口设计](shared_context_interface.md)，最新结果见[NTF-008报告](../../../reports/soulx/20261101-ntf008-teacher-buffer/README.md)。
 - 2026-10-31历史：曾采用[双ASR缓存发布](../../archive/dev/SoulX-Duplug/dual_asr_publication.md)，SenseVoice提供控制文字、Nemotron独立提供正文，状态配对后发布。NTF-005正式18/30完整、12条触及800ms停止线，实时与状态质量未通过，见[报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)。该路线已由 Nemotron 唯一教师文本取代，代码与文档已归档。
 
 2026-10-30此前按用户明确指令回滚：撤回`bd86478`的原生delta草稿＋controller片段整段覆盖，撤回`b00afac`与`6930fa7`的固定起点重识别候选文档。运行代码与前端测试恢复到`484ca32`对应基线，保留160ms正文／状态联合覆盖接口；这会恢复旧窗口整理及已知gap，并不表示旧方案质量达标。历史测试报告、原始证据和离线汇总脚本保留，未恢复旧Nemotron组合代码或提交新远端作业。既有conda下前端5项、SharedContext及TextTurn Context共7项、独立Nemotron服务5项检查全部通过；用户原有未提交修改保持不变。

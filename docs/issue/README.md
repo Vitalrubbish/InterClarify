@@ -4,14 +4,16 @@
 
 当前用户已授权 Nemotron Teacher Forcing 接入与 FDB 三轴固定小样本实验。下游 Agent 尚未切换到 SoulX，旧 Nemotron 公开英文集方案和旧文本控制器合同只作为历史设计，不恢复作业。
 
-当前活动工作单按顺序为 [NTF-006](NTF-006.md) → [NTF-008](NTF-008.md) → [NTF-009](NTF-009.md)。NTF-006 本地实现完成，远端字段验收并入 NTF-008；NTF-007 已完成并归档（append-only 文本路径，本地、远端三轴预检3/3）；NTF-008 本地完成（音频embedding有界缓冲、首块不特判、字段接入、complete不重识别），待远端预检；009 尚未实施。
+当前唯一活动工作单为 [NTF-009](NTF-009.md)，依赖已完成的 NTF-007／008。NTF-006 已完成并归档：字段在 NTF-008 教师链路验证，`model_complete`、`no_speech`与远场拒绝正常，`wait_fallback`保留为历史 SenseVoice 语义。NTF-008 已完成并归档：音频embedding有界缓冲、首块不特判、配对器删除、complete不重识别，三轴预检3/3、退出0。
+
+NTF-008 本地90项、远端 `ntf008-teacher-smoke-20261101-r2` 三轴预检3/3通过；主块到发布P95 240.9/230.0/234.2ms，完整观察P95 141.9/131.0/135.2ms，`buffer_overflow=0`，每例1条EOF部分块；打断ID104 nonidle延迟680ms。首轮`r1`因批量流式步骤假设失败，已保留失败run并在`4c81904`修复。详见[报告](../reports/soulx/20261101-ntf008-teacher-buffer/README.md)。
 
 NTF-007 已完成并归档至本地 `archive/`：删除教师文本门控、`_revise()`、KV检查点、输入账本和三项缓存上限，改为增量追加与尾部重编码审计。远端 `ntf007-teacher-smoke-20261101-r1` 三轴预检3/3、退出0，逐帧确认控制文字前缀追加、token累计一致、原始增量与Nemotron正文一致，最大积压555.0ms；EOF保留尾词诊断。详见[报告](../reports/soulx/20261101-ntf007-teacher-append-only/README.md)。
 
+NTF-006 已完成并归档至本地 `archive/`：`service_state`、`service_completion_source`、`speech_detected`、`service_text`与`no_speech`门控在NTF-008教师帧中发布并验证；`wait_fallback`属于已归档的SenseVoice外层，现役路径不产生。
+
 | 单 | 工作单元 | 依赖 |
 | --- | --- | --- |
-| NTF-006 | 官方外层 `speak` 兜底与 `speech_detected` 门控的可见字段；本地完成，字段验收并入 NTF-008；配对器相关要求在 NTF-008 一并移除 | — |
-| NTF-008 | 方案 A 单块音频缓冲，输入顺序严格为音频→文本→结束符；删除配对器与complete后整轮重识别，状态即时发布；本地完成，待远端预检 | 006、007 |
 | NTF-009 | 固定 FDB30 同卡对照与延迟验收，不设分卡臂 | 008 |
 
 NTF-005已完成并归档至本地`archive/`：双ASR独立计算与有界配对已交付，本地100项、预检3/3通过；正式18/30完整、12条触及800ms停止线，退出1，2134帧来源及配对审计通过。共同18条打断nonidle 4/6→6/6，但接话和主块口径停顿退化，状态未整体改善；完整样本EOF保留14个未配齐状态。见[正式报告](../../reports/soulx/20261031-dual-asr-publication/README.md)。11-01 10:12及收尾复查队列为空，不追加重跑，不切换下游Agent。
