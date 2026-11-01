@@ -70,7 +70,7 @@ def tail_replace_count(previous, current):
 
 
 class TeacherTextBuffer:
-    """Append canonical tokens for completed words and keep one pending word."""
+    """Append canonical tokens for space-terminated words plus one pending tail."""
 
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
@@ -78,7 +78,7 @@ class TeacherTextBuffer:
         self.committed_ids = []
         self.pending_text = ''
         self.pending_ids = []
-        self.degraded_prefix = False
+        self.tail_rewritten = False
 
     def _encode(self, text):
         if not text:
@@ -88,12 +88,13 @@ class TeacherTextBuffer:
             raise ValueError('ASR control text contains structural special tokens')
         return ids
 
-    def _degraded_append(self, control_text):
+    def _extension(self, control_text):
+        """A word already committed grew; append only the new characters."""
         extension = control_text[len(self.committed_text):]
         new_ids = self._encode(extension)
         self.committed_text = control_text
         self.committed_ids = self.committed_ids + new_ids
-        self.degraded_prefix = True
+        self.tail_rewritten = True
         self.pending_text, self.pending_ids = '', []
         return {'committed_ids': new_ids, 'committed_text': extension,
                 'pending_ids': [], 'pending_text': '',
@@ -102,7 +103,7 @@ class TeacherTextBuffer:
                 'post_pause_extension': True}
 
     def update(self, control_text, commit_pending=False):
-        """Re-tokenize completed words and append only the new canonical suffix."""
+        """Commit space-terminated words; commit the tail only on a quiet step."""
         if not control_text.startswith(self.committed_text):
             raise ValueError('Teacher control text rewrote committed history: '
                              f'committed={self.committed_text[-80:]!r} control={control_text[:80]!r}')
@@ -115,7 +116,7 @@ class TeacherTextBuffer:
             if len(stable_text) < len(self.committed_text):
                 if (len(control_text) > len(self.committed_text)
                         and not control_text[len(self.committed_text)].isspace()):
-                    return self._degraded_append(control_text)
+                    return self._extension(control_text)
                 stable_text = self.committed_text
                 pending_text = ''
             else:
@@ -124,7 +125,7 @@ class TeacherTextBuffer:
             if (control_text.startswith(self.committed_text)
                     and len(control_text) > len(self.committed_text)
                     and not control_text[len(self.committed_text)].isspace()):
-                return self._degraded_append(control_text)
+                return self._extension(control_text)
             raise ValueError('Teacher control text rewrote committed history: '
                              f'committed={self.committed_text[-80:]!r} stable={stable_text[:80]!r}')
         new_text = stable_text[len(self.committed_text):]
@@ -132,7 +133,7 @@ class TeacherTextBuffer:
         previous_pending = self.pending_ids
         pending_ids = self._encode(leading + pending_text) if pending_text else []
         replaced = tail_replace_count(previous_pending, pending_ids)
-        if self.degraded_prefix:
+        if self.tail_rewritten:
             new_ids = self._encode(new_text)
             self.committed_text = stable_text
             self.committed_ids = self.committed_ids + new_ids
@@ -169,7 +170,6 @@ class NemotronTeacherFrontend:
         self.empty_nonidle_rule = empty_nonidle_rule
         self.control_text = ''
         self.rerecognition_calls = 0
-        self.pause_steps = 0
         self.audio_buffer = deque()
         self.audio_overflow = 0
         self.max_audio_blocks = 4
@@ -217,9 +217,8 @@ class NemotronTeacherFrontend:
         raw_delta = self.cursor.advance(step)
         model = self.model
         self.control_text = official_control_text(model, self.cursor.text)
-        # A word boundary or two empty ASR steps makes the pending word final.
-        self.pause_steps = 0 if raw_delta else self.pause_steps + 1
-        update = self.text.update(self.control_text, commit_pending=self.pause_steps >= 2)
+        # A quiet ASR step makes the pending word final when no space follows.
+        update = self.text.update(self.control_text, commit_pending=not raw_delta)
         ids = update['committed_ids']
         if self.audio_buffer:
             audio_ids, audio_embeds = self.audio_buffer.popleft()

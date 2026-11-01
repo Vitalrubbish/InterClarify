@@ -150,34 +150,29 @@ class TeacherInputTests(unittest.TestCase):
 
     def test_fragments_append_once_and_only_the_tail_is_reencoded(self):
         nonidle = STATE_IDS['<|user_nonidle|>']
-        front = self.make([nonidle] * 5)
+        front = self.make([nonidle] * 4)
         first = self.step(front, 1, 'inter')
         second = self.step(front, 2, 'internet')
         third = self.step(front, 3, 'internet works')
         fourth = self.step(front, 4, 'internet works')
-        fifth = self.step(front, 5, 'internet works')
         work = 3000 + sum(map(ord, 'works'))
         self.assertEqual(first['teacher_token_ids'], [])
         self.assertEqual(second['teacher_token_ids'], [])
         self.assertEqual(third['teacher_token_ids'], [1002])
-        self.assertEqual(fourth['teacher_token_ids'], [])
-        self.assertEqual(fifth['teacher_token_ids'], [work])
+        self.assertEqual(fourth['teacher_token_ids'], [work])
         self.assertEqual([first['text_commit_index'], second['text_commit_index'],
-                          third['text_commit_index'], fourth['text_commit_index'],
-                          fifth['text_commit_index']], [0, 0, 1, 1, 2])
+                          third['text_commit_index'], fourth['text_commit_index']],
+                         [0, 0, 1, 2])
         self.assertEqual([first['tail_reencode_count'], second['tail_reencode_count'],
-                          third['tail_reencode_count'], fourth['tail_reencode_count'],
-                          fifth['tail_reencode_count']], [1, 1, 1, 1, 0])
+                          third['tail_reencode_count'], fourth['tail_reencode_count']], [1, 1, 1, 0])
         self.assertEqual([first['tail_replace_tokens'], second['tail_replace_tokens'],
-                          third['tail_replace_tokens'], fourth['tail_replace_tokens'],
-                          fifth['tail_replace_tokens']], [0, 1, 1, 0, 1])
+                          third['tail_replace_tokens'], fourth['tail_replace_tokens']], [0, 1, 1, 1])
         self.assertEqual(front.teacher_ids, front.model.model.tokenizer.encode('internet works'))
         self.assertEqual(front.teacher_ids, [1002, work])
         self.assertEqual(front.model.calls[0], [-1, -2, -3, 151674])
         self.assertEqual(front.model.calls[1], [nonidle, -2, -3, 151674])
         self.assertEqual(front.model.calls[2], [nonidle, -2, -3, 1002, 151674])
-        self.assertEqual(front.model.calls[3], [nonidle, -2, -3, 151674])
-        self.assertEqual(front.model.calls[4], [nonidle, -2, -3, work, 151674])
+        self.assertEqual(front.model.calls[3], [nonidle, -2, -3, work, 151674])
         self.assertFalse(hasattr(front, '_revise'))
         self.assertFalse(hasattr(front, 'checkpoint'))
         self.assertFalse(hasattr(front, 'entries'))
@@ -362,10 +357,10 @@ class AudioPairingTests(unittest.TestCase):
         self.assertEqual(record['frames'], 2)
         self.assertEqual(record['online_text'], 'internet')
         self.assertEqual(record['drained_text'], 'internet tail')
-        self.assertEqual(record['teacher_tail']['pending_text'], 'internet')
+        self.assertEqual(record['teacher_tail']['pending_text'], '')
         self.assertEqual(releases, [(2, 'context'), (3, 'context')])
         self.assertEqual(frames[0]['delta_text'], '')
-        self.assertEqual(frames[1]['delta_text'], '')
+        self.assertEqual(frames[1]['delta_text'], 'internet')
         self.assertEqual(frames[0]['native_step']['step_seq'], 2)
         self.assertEqual(frames[0]['teacher_step_seq'], 1)
         self.assertEqual(frames[0]['asr_observation_ahead_ms'], 99)
