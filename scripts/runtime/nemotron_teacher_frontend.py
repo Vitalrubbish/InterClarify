@@ -78,6 +78,7 @@ class TeacherTextBuffer:
         self.committed_ids = []
         self.pending_text = ''
         self.pending_ids = []
+        self.degraded_prefix = False
 
     def _encode(self, text):
         if not text:
@@ -91,6 +92,17 @@ class TeacherTextBuffer:
         """Re-tokenize completed words and append only the new canonical suffix."""
         if not control_text.startswith(self.committed_text):
             raise ValueError('Teacher control text rewrote committed history')
+        if self.degraded_prefix:
+            new_text = control_text[len(self.committed_text):]
+            new_ids = self._encode(new_text)
+            self.committed_text = control_text
+            self.committed_ids = self.committed_ids + new_ids
+            self.pending_text, self.pending_ids = '', []
+            return {'committed_ids': new_ids, 'committed_text': new_text,
+                    'pending_ids': [], 'pending_text': '',
+                    'text_commit_index': len(self.committed_ids),
+                    'tail_reencode_count': 0, 'tail_replace_tokens': 0,
+                    'post_pause_extension': False}
         words = control_text.split(' ') if control_text else []
         if commit_pending:
             stable_text = control_text
@@ -99,7 +111,19 @@ class TeacherTextBuffer:
             stable_text = ' '.join(words[:-1]) if len(words) > 1 else ''
             pending_text = words[-1] if words else ''
         if not stable_text.startswith(self.committed_text):
-            raise ValueError('Teacher control text rewrote committed history')
+            extension = control_text[len(self.committed_text):]
+            if not extension or extension.startswith(' '):
+                raise ValueError('Teacher control text rewrote committed history')
+            new_ids = self._encode(extension)
+            self.committed_text = control_text
+            self.committed_ids = self.committed_ids + new_ids
+            self.degraded_prefix = True
+            self.pending_text, self.pending_ids = '', []
+            return {'committed_ids': new_ids, 'committed_text': extension,
+                    'pending_ids': [], 'pending_text': '',
+                    'text_commit_index': len(self.committed_ids),
+                    'tail_reencode_count': 0, 'tail_replace_tokens': 0,
+                    'post_pause_extension': True}
         stable_ids = self._encode(stable_text)
         if stable_ids[:len(self.committed_ids)] != self.committed_ids:
             raise ValueError('Canonical tokenization changed committed history')
@@ -116,7 +140,8 @@ class TeacherTextBuffer:
                 'pending_ids': pending_ids, 'pending_text': pending_text,
                 'text_commit_index': len(stable_ids),
                 'tail_reencode_count': 1 if pending_text else 0,
-                'tail_replace_tokens': replaced}
+                'tail_replace_tokens': replaced,
+                'post_pause_extension': False}
 
 
 class NemotronTeacherFrontend:
@@ -136,6 +161,7 @@ class NemotronTeacherFrontend:
         self.empty_nonidle_rule = empty_nonidle_rule
         self.control_text = ''
         self.rerecognition_calls = 0
+        self.pause_steps = 0
         self.audio_buffer = deque()
         self.audio_overflow = 0
         self.max_audio_blocks = 4
@@ -183,8 +209,9 @@ class NemotronTeacherFrontend:
         raw_delta = self.cursor.advance(step)
         model = self.model
         self.control_text = official_control_text(model, self.cursor.text)
-        # A word boundary or a decoder pause makes the pending word final.
-        update = self.text.update(self.control_text, commit_pending=not raw_delta)
+        # A word boundary or two empty ASR steps makes the pending word final.
+        self.pause_steps = 0 if raw_delta else self.pause_steps + 1
+        update = self.text.update(self.control_text, commit_pending=self.pause_steps >= 2)
         ids = update['committed_ids']
         if self.audio_buffer:
             audio_ids, audio_embeds = self.audio_buffer.popleft()
@@ -256,6 +283,7 @@ class NemotronTeacherFrontend:
                      text_commit_index=update['text_commit_index'],
                      tail_reencode_count=update['tail_reencode_count'],
                      tail_replace_tokens=update['tail_replace_tokens'],
+                     post_pause_extension=update['post_pause_extension'],
                      text_injected_tokens=len(ids),
                      teacher_source_status='completed_new' if raw_delta else 'completed_empty',
                      control_consumption='consumed' if ids else 'pending_tail' if update['pending_text'] else 'no_delta',
