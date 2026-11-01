@@ -157,7 +157,7 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
     reader.start()
     pairing = AudioProgressPairing()
     seq, max_blocks = 0, 4
-    overflow, eof_partial = [], None
+    overflow, eof_partial, pending_steps = [], None, []
     file = (output / f'{case_id}.frames.jsonl').open('x')
     try:
         while True:
@@ -195,15 +195,15 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
             while True:
                 if state['error']:
                     raise RuntimeError(state['error'])
-                batch = rpc(path, 'poll', session_id=identity, after=pairing.native_seq)
-                if not batch['steps']:
+                if not pending_steps:
+                    batch = rpc(path, 'poll', session_id=identity, after=pairing.native_seq)
+                    pending_steps.extend(batch['steps'])
+                if not pending_steps:
                     if time.monotonic() - (started + end / 16000) > .8:
                         raise RuntimeError('ASR completion backlog exceeded 800ms')
                     stopped.wait(.002)
                     continue
-                if len(batch['steps']) != 1:
-                    raise AssertionError('ASR decoded beyond its bounded lookahead')
-                step = batch['steps'][0]
+                step = pending_steps.pop(0)
                 kind = pairing.accept(step, end)
                 if kind == 'context':
                     break
