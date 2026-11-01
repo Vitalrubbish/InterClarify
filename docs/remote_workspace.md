@@ -44,6 +44,7 @@
 
 | 记录 | 证据与状态 |
 | --- | --- |
+| 固定FDB30同卡对照 | `parathink-soulx-duplug/source/4568ecf`；`runs/ntf009-teacher-fdb30-20261101-r1` 30/30完整、退出0，主块P95 219.2ms、无800ms；状态语义未整体改善，见[报告](../reports/soulx/20261101-ntf009-teacher-fdb30/README.md) |
 | 教师单块缓冲与即时发布 | `parathink-soulx-duplug/source/4c81904`；`runs/ntf008-teacher-smoke-20261101-r2` 三轴预检3/3、退出0，主块发布P95≤240.9ms、`buffer_overflow=0`，complete无重识别；`r1`失败run保留，见[报告](../reports/soulx/20261101-ntf008-teacher-buffer/README.md) |
 | 教师文本纯追加 | `parathink-soulx-duplug/source/e54a9fe`；`runs/ntf007-teacher-smoke-20261101-r1` 三轴预检3/3、退出0，104项本地通过；无门控、检查点或重放，最大积压555ms，见[报告](../reports/soulx/20261101-ntf007-teacher-append-only/README.md) |
 | 双ASR独立计算与配对发布 | `parathink-soulx-duplug/source/101b61a`；预检3/3通过，`runs/dual-asr-fdb30-20261031-r1`正式18/30、12条800ms触限、退出1；2134帧配对审计通过，实时及整体质量未通过；11-01队列为空，见[报告](../reports/soulx/20261031-dual-asr-publication/README.md) |

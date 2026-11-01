@@ -1,6 +1,6 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
-2026-11-01 当前路线为 **Nemotron 作为唯一教师文本、取消 SenseVoice 滑窗与双路配对发布**。NTF-007/008 已交付纯追加文本路径、音频embedding有界缓冲与 `A_n → T_n → <|end_of_sentence|>` 逐帧对齐，三轴预检3/3，见[NTF-008报告](../reports/soulx/20261101-ntf008-teacher-buffer/README.md)；下一步 NTF-009 固定30条同卡对照。此前 SoulX＋SenseVoice控制、独立Nemotron正文与配对发布保留为历史对照，见[已归档方案](archive/dev/SoulX-Duplug/dual_asr_publication.md)与[NTF-005结果](../reports/soulx/20261031-dual-asr-publication/README.md)。模型权重固定，不训练，尚未切换现役下游Agent。
+2026-11-01 当前路线为 **Nemotron 作为唯一教师文本、取消 SenseVoice 滑窗与双路配对发布**。NTF-007/008/009 已完成并归档：纯追加文本、音频embedding有界缓冲、`A_n → T_n → <|end_of_sentence|>` 对齐；固定30条同卡30/30完整、退出0，主块P95 219.2ms，状态语义未整体改善，见[NTF-009报告](../reports/soulx/20261101-ntf009-teacher-fdb30/README.md)。此前 SoulX＋SenseVoice控制、独立Nemotron正文与配对发布保留为历史对照，见[已归档方案](archive/dev/SoulX-Duplug/dual_asr_publication.md)与[NTF-005结果](../reports/soulx/20261031-dual-asr-publication/README.md)。模型权重固定，不训练，尚未切换现役下游Agent。
 
 NTF-004官方格式与门控对照已交付：预检3/3通过，正式25/30完整、5条积压触限，状态指标未整体改善；共享正文与控制文字消费分别审计，未切换下游Agent，见[对照报告](../reports/soulx/20261031-nemotron-teacher-gate/README.md)。
 
