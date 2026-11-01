@@ -158,8 +158,7 @@ class X2Engine:
             raise AssertionError(f'Unexpected mel contract: {self.last_shape}')
         output = self.model.model.get_audio_features(
             input_features=features.to('cuda', dtype=self.model.dtype),
-            padding_cache=self.padding, past_key_values=self.audio_past, use_cache=True,
-            use_padding_cache=True)
+            padding_cache=self.padding, past_key_values=self.audio_past, use_cache=True)
         self.padding, self.audio_past = output.padding_cache, output.past_key_values
         shapes = {str(key): list(layer.cache.shape) for key, layer in self.padding.layers.items()}
         self.last_shape['padding_cache'] = shapes

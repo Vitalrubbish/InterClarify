@@ -1,6 +1,7 @@
 """Check EOS-only commits, frame coverage, and strict feasibility gates."""
 import importlib.util
 from pathlib import Path
+from types import SimpleNamespace
 import unittest
 
 PATH = Path(__file__).resolve().parents[1] / 'scripts/remote/x2_streaming_probe.py'
@@ -58,6 +59,46 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(probe.frame_window(0, 3000), (1280, 1480, 0))
         self.assertEqual(probe.frame_window(1, 3000), (2560, 2760, 0))
         self.assertEqual(probe.frame_window(2, 3000), (3000, 3000, 1040))
+
+    def test_encoder_wrapper_owns_padding_flag_and_retains_caches(self):
+        class Features:
+            shape = (1, 128, 8)
+
+            def to(self, *args, **kwargs):
+                return self
+
+        def cache():
+            return SimpleNamespace(layers={
+                'conv1': SimpleNamespace(cache=SimpleNamespace(shape=(1, 128, 2))),
+                'conv2': SimpleNamespace(cache=SimpleNamespace(shape=(1, 1280, 1)))})
+
+        calls, next_padding, next_past = [], cache(), object()
+
+        def tower(*, input_features, padding_cache, past_key_values, use_padding_cache):
+            self.assertTrue(use_padding_cache)
+            calls.append((padding_cache, past_key_values))
+            return SimpleNamespace(padding_cache=next_padding, past_key_values=next_past,
+                                   pooler_output=SimpleNamespace(shape=(1, 1, 3072)))
+
+        def get_audio_features(*, input_features, padding_cache, past_key_values, use_cache, **kwargs):
+            return tower(input_features=input_features, padding_cache=padding_cache,
+                         past_key_values=past_key_values, use_padding_cache=use_cache, **kwargs)
+
+        engine = probe.X2Engine.__new__(probe.X2Engine)
+        initial_padding = cache()
+        engine.padding, engine.audio_past = initial_padding, None
+        engine.config = {'next_mel_frames': 8}
+        engine.processor = lambda *args, **kwargs: SimpleNamespace(input_features=Features())
+        embedder = SimpleNamespace(conv1=SimpleNamespace(in_channels=128, left_pad=2),
+                                   conv2=SimpleNamespace(in_channels=1280, left_pad=1))
+        engine.model = SimpleNamespace(dtype='bf16', model=SimpleNamespace(
+            get_audio_features=get_audio_features, audio_tower=SimpleNamespace(embedder=embedder)))
+        engine.encode([0] * 1680)
+        engine.encode([0] * 1680)
+        self.assertIs(calls[0][0], initial_padding)
+        self.assertIsNone(calls[0][1])
+        self.assertIs(calls[1][0], next_padding)
+        self.assertIs(calls[1][1], next_past)
 
     def test_gate_includes_four_distinct_cases_and_continuous_stream(self):
         cases = [dict(case_id=str(i), completed=True, x2_rtf=.6,

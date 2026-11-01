@@ -22,3 +22,7 @@
 `main()`先校验模型和官方依赖文件摘要，再执行3.36s合成音合同自检；失败立即停止。之后测冻结FDB30中的最长用例、停顿16和接话102，最后按原清单顺序拼接恰好60s音频。逐条校验全部冻结文件摘要，增益沿用`min(0.05/rms,0.9/peak)`。四条必须全部完成，RTF≤0.6、积压P95≤320ms、漂移≤160ms、显存≤12288MiB，才通过NTF-011。
 
 结果包含`result.json`、逐帧`*.frames.jsonl`及逐token的`*.tokens.jsonl`。异常或门槛失败退出1，不启动NTF-012。
+
+## r1调用缺陷与修复
+
+锁定Transformers的`get_audio_features()`内部自行设置`use_padding_cache=use_cache`。`encode()`仅传`use_cache=True`及实际缓存对象，避免从`**kwargs`重复传同名参数。r1在合成自检处因重复参数失败，未进入真实用例；r2保持原合同重测。CPU回归用例复现包装器向内层转发参数的边界，并检查缓存跨增量调用延续。
