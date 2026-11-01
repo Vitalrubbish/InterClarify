@@ -44,6 +44,7 @@
 
 | 记录 | 证据与状态 |
 | --- | --- |
+| 教师文本纯追加 | `parathink-soulx-duplug/source/e54a9fe`；`runs/ntf007-teacher-smoke-20261101-r1` 三轴预检3/3、退出0，104项本地通过；无门控、检查点或重放，最大积压555ms，见[报告](../reports/soulx/20261101-ntf007-teacher-append-only/README.md) |
 | 双ASR独立计算与配对发布 | `parathink-soulx-duplug/source/101b61a`；预检3/3通过，`runs/dual-asr-fdb30-20261031-r1`正式18/30、12条800ms触限、退出1；2134帧配对审计通过，实时及整体质量未通过；11-01队列为空，见[报告](../reports/soulx/20261031-dual-asr-publication/README.md) |
 | 官方格式与门控教师对照 | `parathink-soulx-duplug/source/ba3ba47`；预检3/3通过，`runs/nemotron-teacher-gate-fdb30-20261031-r1`正式25/30、5条积压触限退出1；未见整体质量改善，01:06:38队列为空，见[报告](../reports/soulx/20261031-nemotron-teacher-gate/README.md) |
 | 教师文字音频覆盖配对修复 | `parathink-soulx-duplug/source/98f347e`；`runs/nemotron-teacher-align-fdb30-20261030-r1`／`r2` 实际25/30／28/30积压触限，退出1；预检3/3通过，23:39队列为空，见[复测报告](../reports/soulx/20261030-nemotron-teacher-alignment/README.md) |

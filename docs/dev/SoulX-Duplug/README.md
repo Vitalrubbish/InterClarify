@@ -1,8 +1,11 @@
 # SoulX-Duplug 路线
 
-更新：2026-11-01。最新已运行实验为 **SoulX＋SenseVoice控制、独立Nemotron正文与状态配对发布**，位于Layer 0–Layer 2输入侧。SenseVoice为0.6B提供官方控制文字，Nemotron为SharedContext提供唯一正文；权重固定，下游Agent尚未切换。教师文字路径和此前独立组合均保留为历史对照。
+更新：2026-11-01。路线已改为 **Nemotron 作为唯一教师文本、取消 SenseVoice 滑窗与双路配对发布**。NTF-007 已交付纯追加文本路径并通过三轴预检3/3，见[报告](../../../reports/soulx/20261101-ntf007-teacher-append-only/README.md)；下一步按 NTF-008 做单块音频缓冲与 `A_n → T_n → <|end_of_sentence|>` 逐帧对齐，再进入 NTF-009 的固定30条同卡对照。此前 SoulX＋SenseVoice控制、独立Nemotron正文与配对发布保留为历史对照，不再运行。
 
-2026-10-31用户确认下一步采用[双ASR缓存发布](dual_asr_publication.md)：恢复SenseVoice为0.6B提供控制文字，Nemotron独立提供SharedContext正文；SoulX每160ms产生状态先缓存，待对应Nemotron解码完成后联合发布，两路计算各自推进。NTF-005已交付并归档，预检3/3、2134条正式帧来源和配对审计通过；正式18/30完整、12条触及800ms停止线，实时未通过、状态未整体改善，见[报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)；下述教师文字路线保留为已运行实验。
+## 已确认合同
+
+- 前端包含Nemotron教师文本、SoulX音频编码及状态预测；同一活动话轮的SharedContext正文只用Nemotron一个权威来源，不再使用SenseVoice控制文字或双路配对队列。当前NTF-007仍是逐帧直接发布；NTF-008将改为单块缓冲、音频→文本→结束符严格对齐，并删除`PairedPublisher`。读取与关闭规则见[接口设计](shared_context_interface.md)，最新结果见[纯追加报告](../../../reports/soulx/20261101-ntf007-teacher-append-only/README.md)。
+- 2026-10-31历史：曾采用[双ASR缓存发布](dual_asr_publication.md)，SenseVoice提供控制文字、Nemotron独立提供正文，状态配对后发布。NTF-005正式18/30完整、12条触及800ms停止线，实时与状态质量未通过，见[报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)。该路线已由 Nemotron 唯一教师文本取代。
 
 2026-10-30此前按用户明确指令回滚：撤回`bd86478`的原生delta草稿＋controller片段整段覆盖，撤回`b00afac`与`6930fa7`的固定起点重识别候选文档。运行代码与前端测试恢复到`484ca32`对应基线，保留160ms正文／状态联合覆盖接口；这会恢复旧窗口整理及已知gap，并不表示旧方案质量达标。历史测试报告、原始证据和离线汇总脚本保留，未恢复旧Nemotron组合代码或提交新远端作业。既有conda下前端5项、SharedContext及TextTurn Context共7项、独立Nemotron服务5项检查全部通过；用户原有未提交修改保持不变。
 
@@ -15,7 +18,7 @@
 - SoulX 保留音频路径和原生五类用户状态，全部送入 Layer 1；普通正式回答在当前 turn 读取对应 `user_complete` 后生成，不额外发起独立回答调用。
 - 活动输出期间有效 `user_nonidle` 额外直接触发停止，涵盖 preparing 和 playing；其他状态不进入输出运行时，不映射为 start 或 keep。完整路径见[架构第 2.2 节](../../research_design/architecture.md#22-前端状态与系统附和)。
 - 后续联合音频 token、转写文本 token 与已发布 CoT token 的目标已确认，当前不实现。输入序列、缓存、触发、输出是否扩展及训练方式见[架构第 2.5 节](../../research_design/architecture.md#25-soulx-的-cot-条件化控制)。
-- 保持单一仲裁执行点、单一 TTS 播放所有权和已听内容不可撤销；Layer 3 定位待统一。
+- 保持单一仲裁执行点、单一 TTS 播放所有权和已听内容不可撤销；
 
 ## 验证设计与实施状态
 
