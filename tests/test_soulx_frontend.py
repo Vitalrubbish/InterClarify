@@ -135,16 +135,87 @@ class SoulXFrontendTests(unittest.TestCase):
         value.observe_asr('', observation('', end=17000)['audio_spans'], asr_call_id='empty')
         self.assertEqual(value.assembler.text, 'The. 123.')
 
+    def test_wait_fallback_is_visible_without_rewriting_native_state_or_text(self):
+        value = protocol_frontend()
+        value.observe_asr('<|en|>Nemotron body', observation('', end=2560)['audio_spans'], asr_call_id='a')
+        calls = {'count': 0}
+        def predict(chunk, back, ahead):
+            calls['count'] += 1
+            if calls['count'] == 1:
+                value.observe_state('<|user_incomplete|>', 'body')
+                return {'state': 'idle'}
+            value.observe_state('<|user_idle|>', '')
+            if calls['count'] <= 8:
+                return {'state': 'idle'}
+            return {'state': 'speak', 'text': 'official whole-turn text'}
+        value._instrumented_state = predict
+        for step in range(9):
+            token = '<|user_incomplete|>' if step == 0 else '<|user_idle|>'
+            run_frame(value, step, token)
+            current = value.context.get_user_turn('s', 't')
+            if step < 8:
+                self.assertIsNone(current['service_completion_source'])
+                self.assertEqual(current['service_state'], 'idle')
+        final = value.context.get_user_turn('s', 't')
+        self.assertEqual(final['service_state'], 'speak')
+        self.assertEqual(final['service_completion_source'], 'wait_fallback')
+        self.assertEqual(final['state_token'], '<|user_idle|>')
+        self.assertTrue(final['state_accepted'])
+        self.assertEqual(final['text'], 'Nemotron body')
+        self.assertEqual(final['service_text'], 'official whole-turn text')
+        self.assertFalse(final['speech_detected'])
+
+    def test_direct_complete_requires_speech_and_reports_model_completion(self):
+        value = protocol_frontend()
+        value.model.speech_detected = True
+        def predict(chunk, back, ahead):
+            value.observe_state('<|user_complete|>', '')
+            return {'state': 'speak', 'text': 'official whole-turn text'}
+        value._instrumented_state = predict
+        run_frame(value, 0, '<|user_complete|>')
+        current = value.context.get_user_turn('s', 't')
+        self.assertTrue(current['state_accepted'])
+        self.assertEqual(current['service_completion_source'], 'model_complete')
+        self.assertEqual(current['service_text'], 'official whole-turn text')
+        self.assertEqual(current['text'], '')
+
+    def test_complete_without_speech_is_rejected_for_every_service_result(self):
+        for result in ({'state': 'idle'}, {'state': 'speak', 'text': 'ignored'}):
+            with self.subTest(result=result):
+                value = protocol_frontend()
+                value.model.speech_detected = False
+                def predict(chunk, back, ahead, result=result):
+                    value.observe_state('<|user_complete|>', '')
+                    return result
+                value._instrumented_state = predict
+                run_frame(value, 0, '<|user_complete|>')
+                current = value.context.get_user_turn('s', 't')
+                self.assertFalse(current['state_accepted'])
+                self.assertEqual(current['rejection_reason'], 'no_speech')
+                self.assertIsNone(current['service_completion_source'])
+                self.assertFalse(current['speech_detected'])
+
+    def test_frozen_run_config_matches_official_overrides(self):
+        import yaml
+        path = (Path(__file__).parents[1] / 'reports/soulx/20261029-frontend-deployment'
+                / 'evidence/soulx/soulx_config.yaml')
+        infer = yaml.safe_load(path.read_text())['infer_config']
+        self.assertEqual((infer['max_wait_num'], infer['max_mistake_num'],
+                          infer['far_field_threshold']), (8, 3, .02))
+
     def test_all_states_far_field_drain_and_immediate_stop(self):
         value = protocol_frontend()
         stopped = []
         value.active_output = lambda: {'output_id': 'o', 'session_id': 's', 'phase': 'preparing'}
         value.stop_output = lambda state, output: stopped.append((state['processed_until'], output))
         for step, token in enumerate(STATE_IDS):
+            if token == '<|user_complete|>':
+                value.model.speech_detected = True
             value._instrumented_state = lambda *args, token=token: value.observe_state(token, '')
             run_frame(value, step, token)
             self.assertTrue(value.context.get_user_turn('s', 't')['state_accepted'])
         self.assertEqual(len(stopped), 1)
+        value.model.speech_detected = False
         value.model.get_rms = lambda chunk: 0.
         value._instrumented_state = lambda *args: value.observe_state('<|user_nonidle|>', '')
         run_frame(value, 5)

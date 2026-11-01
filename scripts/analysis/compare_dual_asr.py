@@ -26,7 +26,8 @@ def audit_case(frames, source, native):
         assert frame['text'] == first['text'], 'Published text differs from its frozen native step'
         for key in ('state_token', 'state_token_id', 'raw_token', 'state_accepted',
                     'controller_generation', 'state_resolved_at', 'controller_completed_at',
-                    'control_text', 'delta_text'):
+                    'control_text', 'delta_text', 'speech_detected', 'service_state',
+                    'service_completion_source', 'service_text'):
             assert frame[key] == original[key], f'Cached state changed: {key}'
         assert first['consumed_samples'] == first['feature_end_sample'] <= first['received_samples']
         assert frame['audio_observed_until'] == max(required, first['feature_end_sample'])

@@ -2,7 +2,7 @@
 
 对应 `scripts/runtime/shared_context.py`。`SharedContext` 每个逻辑话轮保存一份最新全文与当前 SoulX 状态，后续整组替换，不保存历史正文、事件环、版本、patch 或读取游标。旧 TextTurn 的同名 Context 独立保留，不受本次修改影响。
 
-`open_user_turn()` 创建指定来源的空话轮，默认 SenseVoice，也支持 Nemotron；来源在话轮内固定。`publish_user_frame()` 校验来源、状态 ID、真实音频进度和大小限制，在短锁内替换整条记录。文字允许修改或删除旧词，重复／倒退音频块不能覆盖当前值。`get_user_turn()` 返回原子副本，读者修改副本不影响后续读取。
+`open_user_turn()` 创建指定来源的空话轮，默认 SenseVoice，也支持 Nemotron；来源在话轮内固定。记录同时初始化服务层字段：`service_state`、`service_completion_source`、`speech_detected`、`service_text`。`publish_user_frame()` 校验来源、状态 ID、真实音频进度和大小限制，并校验服务字段：只有`service_state='speak'`才能携带完成来源；`model_complete`必须同时是已接纳的原生`user_complete`且`speech_detected=True`；`wait_fallback`不得指向原生`user_complete`；`no_speech`拒绝只用于未确认语音的complete。旧帧缺少这些字段时按默认值补齐。在短锁内替换整条记录。文字允许修改或删除旧词，重复／倒退音频块不能覆盖当前值。`get_user_turn()` 返回原子副本，读者修改副本不影响后续读取。`service_text`只作诊断，不替换正文。
 
 `close_user_turn()` 保留最后正文和状态并设置关闭原因；关闭后拒绝新帧。`release_closed_turn()` 显式释放已关闭记录。Condition 只用于短锁与变更通知，不保存更新队列。
 

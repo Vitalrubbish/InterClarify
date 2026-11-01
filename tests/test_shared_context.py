@@ -16,6 +16,32 @@ def frame(text='hello', end=2560, token='<|user_nonidle|>'):
 
 
 class SharedContextTests(unittest.TestCase):
+    def test_service_fields_default_and_validate_completion_semantics(self):
+        context = SharedContext()
+        opened = context.open_user_turn('s', 't')
+        self.assertEqual((opened['service_state'], opened['service_completion_source'],
+                          opened['speech_detected'], opened['service_text']),
+                         (None, None, False, ''))
+        self.assertFalse(context.publish_user_frame(frame())['speech_detected'])
+        fallback = context.publish_user_frame(dict(
+            frame(end=5120, token='<|user_idle|>'), service_state='speak',
+            service_completion_source='wait_fallback', service_text='diagnostic'))
+        self.assertEqual((fallback['service_completion_source'], fallback['service_text']),
+                         ('wait_fallback', 'diagnostic'))
+        for bad in ({'service_state': 'speak', 'service_completion_source': 'model_complete'},
+                    {'service_state': 'speak', 'service_completion_source': 'model_complete',
+                     'speech_detected': True},
+                    {'service_state': 'idle', 'service_completion_source': 'wait_fallback'},
+                    {'service_state': 'speak', 'speech_detected': 'yes'},
+                    {'service_state': 'unknown'},
+                    {'state_accepted': False, 'rejection_reason': 'no_speech'},
+                    {'service_state': 'speak', 'service_completion_source': 'wait_fallback',
+                     'state_token': '<|user_complete|>'}):
+            with self.subTest(bad=bad):
+                with self.assertRaises(ValueError):
+                    context.publish_user_frame(dict(frame(end=7680), **bad))
+        self.assertEqual(context.get_user_turn('s', 't')['processed_until'], 5120)
+
     def test_explicit_nemotron_source_is_fixed_for_turn(self):
         context = SharedContext()
         context.open_user_turn('s', 't', source='nemotron')

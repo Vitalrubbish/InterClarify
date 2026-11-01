@@ -29,7 +29,7 @@
 
 `SharedContext.open_user_turn()`创建空记录；`publish_user_frame()`联合替换当前全文与当前状态；`get_user_turn()`返回同一组副本。逻辑话轮标识稳定，不因每块更新、内部reset或complete重复预测而新建用户消息。
 
-帧包含`text`、`state_token`、`state_token_id`、`state_accepted`、真实处理截止、观察上界、覆盖标志及必要来源信息。只允许SenseVoice来源；不要求正文版本、历史查询或事件流。无新正文仍提交本块状态。
+帧包含`text`、`state_token`、`state_token_id`、`state_accepted`、真实处理截止、观察上界、覆盖标志及必要来源信息。只允许SenseVoice来源；不要求正文版本、历史查询或事件流。无新正文仍提交本块状态。官方服务层结果另以`service_state`、`service_completion_source`、`speech_detected`、`service_text`保存：`wait_fallback`仅表示等待8个idle后的接话兜底，原生complete仍是`model_complete`；无语音的complete以`no_speech`拒绝。服务文字只作诊断，不进入正文。
 
 原始argmax与规则调整后的有效状态分别记录，五类token与冻结词表ID核对。远场拒绝、未知状态、合成音频和排空阶段不作为有效控制输入；排空结果只进Context之外的诊断记录，不替换在线当前值。
 

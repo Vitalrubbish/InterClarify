@@ -263,6 +263,7 @@ class SoulXFrontend:
                  'soulx_audio_spans': audio_spans, 'control': deepcopy(self._step_control),
                  'asr_calls': deepcopy(self._calls),
                  'gate_open': any(c['call_kind'] == 'window' for c in self._calls)}
+        self._attach_service_result(frame, result)
         frame['audio_observed_until'] = max(frame['audio_observed_until'],
             max((c['audio_observed_until'] or 0 for c in self._calls), default=0))
         self._pending_state = None
@@ -274,6 +275,35 @@ class SoulXFrontend:
             else:
                 self._publish(frame)
         return result
+
+    @staticmethod
+    def service_result(result):
+        """Read the official outer service state and its diagnostic text."""
+        if isinstance(result, dict):
+            state, text = result.get('state'), result.get('text')
+        else:
+            state, text = result, None
+        return state, '' if text is None else str(text)
+
+    def _attach_service_result(self, frame, result):
+        """Keep service completion separate from the native five-state token."""
+        state, text = self.service_result(result)
+        if state not in (None, 'idle', 'nonidle', 'speak', 'blank'):
+            raise ValueError(f'Unexpected official service state: {state!r}')
+        frame.update(service_state=state, service_text=text)
+        completion = None
+        if state == 'speak':
+            if frame['state_token'] == '<|user_complete|>':
+                if frame['state_accepted'] and frame['speech_detected']:
+                    completion = 'model_complete'
+            else:
+                completion = 'wait_fallback'
+        frame['service_completion_source'] = completion
+        self._audit('service_source', {'processed_until': frame['processed_until'],
+                                       'state_token': frame['state_token'],
+                                       'service_state': state, 'service_text': text,
+                                       'service_completion_source': completion})
+
 
     def _asr(self, audio_embeds):
         before = list(self.model.past_state.get('delta_text', []))
@@ -346,13 +376,16 @@ class SoulXFrontend:
 
     def observe_state(self, token, delta_text):
         raw_id, raw_token = self.raw_prediction
-        far_field = (token == '<|user_nonidle|>' and not self.model.speech_detected
+        speech_detected = bool(getattr(self.model, 'speech_detected', False))
+        far_field = (token == '<|user_nonidle|>' and not speech_detected
                      and self.model.get_rms(self.current_chunk) < self.model.config.infer_config.far_field_threshold)
         spans = self._spans(self.current_chunk) + self._spans(self.current_ahead)
         real = [span for span in spans if span['kind'] == 'real']
         reason = ('drain' if self.delivery_phase != 'online' or self.closed
                   else 'unknown_state' if token not in STATE_IDS
-                  else 'far_field' if far_field else 'synthetic_only' if not real else None)
+                  else 'far_field' if far_field
+                  else 'no_speech' if token == '<|user_complete|>' and not speech_detected
+                  else 'synthetic_only' if not real else None)
         frame = {'session_id': self.session_id, 'turn_id': self.turn_id,
                  'source': self.transcript_source, 'status': 'open',
                  'state_token': token, 'state_token_id': STATE_IDS.get(token),
@@ -365,7 +398,9 @@ class SoulXFrontend:
                  'processed_until': self.processed_until,
                  'audio_observed_until': max((span['end'] for span in real), default=self.processed_until),
                  'state_resolved_at': time.monotonic(), 'clock_id': self.clock_id,
-                 'delivery_phase': self.delivery_phase}
+                 'delivery_phase': self.delivery_phase,
+                 'speech_detected': speech_detected,
+                 'service_state': None, 'service_completion_source': None, 'service_text': ''}
         self._pending_state = frame
         # The native completion branch may run whole-turn ASR and reset after
         # this hook; publish text and state together only after that branch.

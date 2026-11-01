@@ -29,7 +29,9 @@ def state(seq, observed=None, token='<|user_nonidle|>'):
                 state_accepted=True, rejection_reason=None, processed_until=seq * 2560,
                 audio_observed_until=observed or seq * 2560 + 640,
                 controller_started_at=now, controller_completed_at=now, state_resolved_at=now,
-                coverage_complete=True, assembly_status='assembled', controller_generation=0)
+                coverage_complete=True, assembly_status='assembled', controller_generation=0,
+                delta_text='', speech_detected=True, service_state='nonidle',
+                service_completion_source=None, service_text='')
 
 
 def step(seq, text=''):
@@ -71,6 +73,25 @@ class PairingTests(unittest.TestCase):
                 self.assertEqual(frames[0]['soulx_audio_observed_until'], 3200)
                 self.assertGreaterEqual(frames[0]['published_at'], frames[0]['state_resolved_at'])
                 self.assertGreaterEqual(frames[0]['published_at'], frames[0]['native_step']['decode_completed_at'])
+
+    def test_service_completion_fields_survive_pairing_audit(self):
+        pub = self.make()
+        value = dict(state(1, token='<|user_idle|>'), service_state='speak',
+                     service_completion_source='wait_fallback',
+                     service_text='diagnostic only', speech_detected=False)
+        pub.submit_state(value)
+        native = [step(1, 'RNNT text'), step(2, 'RNNT text')]
+        for snapshot in native:
+            pub.submit_step(snapshot)
+        frames = pub.publish_ready()
+        self.assertEqual(frames[0]['service_completion_source'], 'wait_fallback')
+        self.assertEqual(frames[0]['service_text'], 'diagnostic only')
+        self.assertEqual(frames[0]['text'], 'RNNT text')
+        source = [dict(value, audit_kind='frame_source')]
+        self.assertEqual(audit_case(frames, source, native)['audited_frames'], 1)
+        source[0]['service_text'] = 'rewritten'
+        with self.assertRaisesRegex(AssertionError, 'Cached state changed: service_text'):
+            audit_case(frames, source, native)
 
     def test_real_lookahead_requires_later_step_instead_of_equal_step_number(self):
         pub = self.make()
@@ -295,6 +316,7 @@ class NativeControllerTests(unittest.TestCase):
             front.observe_state('<|user_complete|>', '')
             front._reset_controller()
         front._instrumented_state = complete
+        front.model.speech_detected = True
         run_frame(front, 1, '<|user_complete|>')
         self.assertEqual(resets, ['official'])
         self.assertEqual(front.controller_generation, 1)
@@ -347,6 +369,7 @@ class NativeControllerTests(unittest.TestCase):
             front.input_end = 0
             front.audit = kwargs['audit']
             front.frame_sink = publisher.submit_state
+            front.model.speech_detected = True
             front._instrumented_state = lambda *args: front.observe_state('<|user_complete|>', '')
             def feed(packet):
                 seen_audio.append(packet.copy())

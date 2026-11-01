@@ -6,9 +6,9 @@
 
 `_recognize()` 将同次音频转为float32，在后处理之前取得原始SenseVoice文字和标签，更新话轮正文整理器，再向官方推断路径返回其原有控制文字。`observe_asr()` 只推进前端当前草稿，不单独更新SharedContext；诊断通过可选`audit`回调输出到Context之外。
 
-`observe_state()` 暂存本块原始／规则修正状态，执行远场与排空过滤。有效nonidle仍在此即时向匹配活动输出提交一次停止，不等待整段识别、下游LLM或正文写入；对同一output_id去重。
+`observe_state()` 暂存本块原始／规则修正状态，执行远场与排空过滤。原生`user_complete`若官方`speech_detected`仍为假，则以`no_speech`拒绝，不产生完成信号；该快照随帧保存。有效nonidle仍在此即时向匹配活动输出提交一次停止，不等待整段识别、下游LLM或正文写入；对同一output_id去重。
 
-`_state_predict()` 在官方外层状态处理返回后组装并发布一帧。因此complete分支后续的整段识别及内部reset已执行，最新正文与触发本块的状态一同可读。状态携带预测时的controller generation，reset不会使complete被改成下一generation的空状态。未调用ASR的块沿用正文，仍更新状态。drain阶段仅诊断，不覆盖在线记录。
+`_state_predict()` 在官方外层状态处理返回后组装并发布一帧。外层返回的服务状态与整段识别文字写入`service_state`、`service_text`；`service_completion_source`区分`model_complete`与`wait_fallback`，原生`state_token`与`state_accepted`保持模型语义，不把`speak`反写成`user_complete`。因此complete分支后续的整段识别及内部reset已执行，最新正文与触发本块的状态一同可读。状态携带预测时的controller generation，reset不会使complete被改成下一generation的空状态。未调用ASR的块沿用正文，仍更新状态。drain阶段仅诊断，不覆盖在线记录。服务结果另以`service_source`审计事件写出，诊断文字不覆盖正文。
 
 `_reset_controller()` 重置模型内部状态但保留未处理PCM及逻辑话轮正文。`feed_audio()` 使用单模型计算锁、16kHz单声道float32输入、800ms单包与4MiB PCM上限；采样账本检查真实音频无跳过、重复或倒退。`close_turn()` 拒绝与计算并发，保留最后联合观察并关闭；`detach()` 恢复官方方法，不留下旧采集钩子。
 

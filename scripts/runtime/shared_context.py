@@ -10,6 +10,10 @@ import time
 STATE_IDS = {'<|user_idle|>': 151680, '<|user_nonidle|>': 151681,
              '<|user_backchannel|>': 151677, '<|user_complete|>': 151676,
              '<|user_incomplete|>': 151678}
+SERVICE_STATES = (None, 'idle', 'nonidle', 'speak', 'blank')
+COMPLETION_SOURCES = (None, 'model_complete', 'wait_fallback')
+SERVICE_FIELDS = {'service_state': None, 'service_completion_source': None,
+                  'speech_detected': False, 'service_text': ''}
 
 
 class SharedContext:
@@ -55,7 +59,8 @@ class SharedContext:
                      'state_accepted': False, 'rejection_reason': 'initializing',
                      'processed_until': 0, 'audio_observed_until': 0,
                      'assembly_status': 'empty', 'coverage_complete': False,
-                     'status': 'open', 'published_at': time.monotonic()}
+                     'status': 'open', 'published_at': time.monotonic(),
+                     **SERVICE_FIELDS}
             return self._store(key, value)
 
     def publish_user_frame(self, frame):
@@ -66,6 +71,8 @@ class SharedContext:
                     'coverage_complete', 'assembly_status', 'status'}
         if not required <= value.keys():
             raise ValueError('Incomplete user frame')
+        for name, default in SERVICE_FIELDS.items():
+            value.setdefault(name, default)
         if {'version', 'asr_version', 'replace_from', 'replacement', 'event_seq'} & value.keys():
             raise ValueError('User frames contain current values, not transcript revisions')
         key = self._key(value['session_id'], value['turn_id'])
@@ -79,6 +86,25 @@ class SharedContext:
                 or type(value['state_token_id']) is not int
                 or STATE_IDS[value['state_token']] != value['state_token_id']):
             raise ValueError('Invalid accepted SoulX state')
+        if value['service_state'] not in SERVICE_STATES:
+            raise ValueError('Invalid official service state')
+        if value['service_completion_source'] not in COMPLETION_SOURCES:
+            raise ValueError('Invalid official completion source')
+        if type(value['speech_detected']) is not bool:
+            raise ValueError('Invalid speech detection flag')
+        if not isinstance(value['service_text'], str) or len(value['service_text']) > self.max_chars:
+            raise ValueError('Invalid official service text')
+        source = value['service_completion_source']
+        if source is not None and value['service_state'] != 'speak':
+            raise ValueError('Completion signal requires the official speak state')
+        if source == 'model_complete' and (value['state_token'] != '<|user_complete|>'
+                or not value['state_accepted'] or not value['speech_detected']):
+            raise ValueError('Model completion must be an accepted native complete with speech')
+        if source == 'wait_fallback' and value['state_token'] == '<|user_complete|>':
+            raise ValueError('Wait fallback cannot rewrite a native complete')
+        if value.get('rejection_reason') == 'no_speech' and (value['state_token'] != '<|user_complete|>'
+                or value['speech_detected']):
+            raise ValueError('No-speech rejection only applies to an unconfirmed native complete')
         end, observed = value['processed_until'], value['audio_observed_until']
         if type(end) is not int or type(observed) is not int or not 0 <= end <= observed:
             raise ValueError('Invalid audio observation range')
