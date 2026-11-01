@@ -1,6 +1,6 @@
 # 工作单管理
 
-更新：2026-11-01。当前确认的下一步路线改为 **Nemotron 作为唯一教师文本、取消 SenseVoice 滑窗、按方案 A 以整块缓冲对齐训练序列**，拆为 [NTF-007](NTF-007.md)／[NTF-008](NTF-008.md)／[NTF-009](NTF-009.md)，只测同卡、不训练。此前 **SoulX＋SenseVoice控制、Nemotron正文与缓存状态配对发布**已完成功能与固定实验，实时及整体质量未通过，见[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。TextTurn、VoxTurn、XTurnix 三条历史路线已按用户指令归档：路线文档移至[归档区](../archive/dev/README.md)，对应实现移至 [archive/](../../archive/README.md)，历史工作单保留在本地 `docs/issue/archive/`（不进入 Git）。
+更新：2026-11-01。当前确认的下一步路线为 **先验证X2Streaming-ASR单帧实时门槛，通过后替换Nemotron教师文本，保留整块缓冲对齐训练序列**，拆为 [NTF-007](NTF-007.md)／[NTF-008](NTF-008.md)／[NTF-009](NTF-009.md)，只测同卡、不训练。此前 **SoulX＋SenseVoice控制、Nemotron正文与缓存状态配对发布**已完成功能与固定实验，实时及整体质量未通过，见[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。TextTurn、VoxTurn、XTurnix 三条历史路线已按用户指令归档：路线文档移至[归档区](../archive/dev/README.md)，对应实现移至 [archive/](../../archive/README.md)，历史工作单保留在本地 `docs/issue/archive/`（不进入 Git）。
 
 当前用户已授权 Nemotron Teacher Forcing 接入与 FDB 三轴固定小样本实验。下游 Agent 尚未切换到 SoulX，旧 Nemotron 公开英文集方案和旧文本控制器合同只作为历史设计，不恢复作业。
 
