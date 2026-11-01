@@ -4,9 +4,9 @@
 
 当前用户已授权 Nemotron Teacher Forcing 接入与 FDB 三轴固定小样本实验。下游 Agent 尚未切换到 SoulX，旧 Nemotron 公开英文集方案和旧文本控制器合同只作为历史设计，不恢复作业。
 
-当前没有活动工作单。NTF-001—009 均已完成并归档；最新 NTF-009 固定30条同卡对照 30/30完整、退出0、主块P95 219.2ms、无800ms触发，但状态语义未整体改善。后续若继续，需按用户明确指令另建工作单。
+当前没有活动工作单。NTF-001—009 均已完成并归档；最新 NTF-009 固定30条同卡对照 30/30完整、退出0、主块P95 219.2ms、无800ms触发，状态指标混合改善（接话提前complete减少、打断结束后complete增加，停顿区间计数受±40ms边界影响）。后续若继续，需按用户明确指令另建工作单。
 
-NTF-009 已完成并归档至本地 `archive/`：固定FDB30同卡、源码`4568ecf`、run `ntf009-teacher-fdb30-20261101-r1`。预热按合同执行；30/30完整、退出0，最大主块积压663.8ms，主块发布P50/P95 205.9/219.2ms，完整观察P95 120.2ms；`buffer_overflow=0`，30条EOF部分块逐例记录，complete无重识别。同25条中停顿complete 2/7→0/7、打断边界前complete 2/9→4/9，状态质量不宣称改善。详见[报告](../reports/soulx/20261101-ntf009-teacher-fdb30/README.md)。
+NTF-009 已完成并归档至本地 `archive/`：固定FDB30同卡、源码`4568ecf`、run `ntf009-teacher-fdb30-20261101-r1`。预热按合同执行；30/30完整、退出0，最大主块积压663.8ms，主块发布P50/P95 205.9/219.2ms，完整观察P95 120.2ms；`buffer_overflow=0`，30条EOF部分块逐例记录，complete无重识别。同25条中接话提前complete 6/9→5/9、>160ms提前6/9→4/9，打断结束后complete 2/9→4/9；停顿区间内complete 2/7→0/7，其中ID127在区间起点前40ms。详见[报告](../reports/soulx/20261101-ntf009-teacher-fdb30/README.md)。
 
 NTF-008 已完成并归档至本地 `archive/`：音频embedding有界缓冲、首块不特判、配对器删除、complete不重识别，三轴预检3/3、退出0；首轮`r1`批量步骤失败已保留并在`4c81904`修复。详见[报告](../reports/soulx/20261101-ntf008-teacher-buffer/README.md)。
 

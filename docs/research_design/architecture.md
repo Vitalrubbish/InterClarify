@@ -4,7 +4,7 @@
 
 语音前端采用 **SoulX-Duplug＋SenseVoiceSmall**，整体位于 Layer 0–Layer 2 的输入侧。按用户确认，为先打通链路，首版沿用官方 ASR 配套路径，撤下 Nemotron＋SoulX 独立适配；原因与适配缺口见[选型说明](../dev/SoulX-Duplug/asr_adapter_assessment.md)。新链路尚未接入，现役底座和实施顺序见[工程计划](../engineering_implementation.md)。本次调整模块归属与实施顺序，研究目标保持不变。
 
-2026-11-01 路线改为 **Nemotron 唯一教师文本**：NTF-007/008/009 已交付并归档，固定30条同卡对照30/30完整、主块P95 219.2ms、无800ms，状态语义未整体改善；complete后整轮重识别已删除。此前[双ASR缓存发布](../archive/dev/SoulX-Duplug/dual_asr_publication.md)保留为历史，正式18/30完整、12条800ms触限。有效nonidle的直接停止合同保持。
+2026-11-01 路线改为 **Nemotron 唯一教师文本**：NTF-007/008/009 已交付并归档，固定30条同卡对照30/30完整、主块P95 219.2ms、无800ms，状态指标混合改善；complete后整轮重识别已删除。此前[双ASR缓存发布](../archive/dev/SoulX-Duplug/dual_asr_publication.md)保留为历史，正式18/30完整、12条800ms触限。有效nonidle的直接停止合同保持。
 
 当前五类用户状态均作为 token 送入 Layer 1，普通正式回答在当前 turn 读取对应 `user_complete` 后生成；仅活动输出期间的有效 `user_nonidle` 额外直接停止输出。其他状态不映射成运行时 start/keep。后续音频、转写与 CoT 联合控制的目标已确认，当前不实现；输出是否扩展仍待讨论。
 
