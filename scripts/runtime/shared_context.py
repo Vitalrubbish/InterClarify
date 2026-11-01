@@ -14,6 +14,7 @@ SERVICE_STATES = (None, 'idle', 'nonidle', 'speak', 'blank')
 COMPLETION_SOURCES = (None, 'model_complete', 'wait_fallback')
 SERVICE_FIELDS = {'service_state': None, 'service_completion_source': None,
                   'speech_detected': False, 'service_text': ''}
+TRANSCRIPT_SOURCES = ('sensevoice_small', 'nemotron', 'x2_streaming_asr')
 
 
 class SharedContext:
@@ -47,7 +48,7 @@ class SharedContext:
     def open_user_turn(self, session_id, turn_id, source='sensevoice_small'):
         """Fix one ASR source for the entire logical turn."""
         key = self._key(session_id, turn_id)
-        if source not in ('sensevoice_small', 'nemotron'):
+        if source not in TRANSCRIPT_SOURCES:
             raise ValueError('Unsupported transcript source')
         with self.changed:
             if key in self.latest:
@@ -76,7 +77,7 @@ class SharedContext:
         if {'version', 'asr_version', 'replace_from', 'replacement', 'event_seq'} & value.keys():
             raise ValueError('User frames contain current values, not transcript revisions')
         key = self._key(value['session_id'], value['turn_id'])
-        if value['source'] not in ('sensevoice_small', 'nemotron') or value['status'] != 'open':
+        if value['source'] not in TRANSCRIPT_SOURCES or value['status'] != 'open':
             raise ValueError('Unsupported user frame source or lifecycle')
         if not isinstance(value['text'], str):
             raise ValueError('Transcript must be a string')
