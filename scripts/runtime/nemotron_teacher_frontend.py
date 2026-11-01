@@ -92,7 +92,8 @@ class TeacherTextBuffer:
         """Re-tokenize completed words and append only the new canonical suffix."""
         if not control_text.startswith(self.committed_text):
             raise ValueError('Teacher control text rewrote committed history: '
-                             f'{self.committed_text[-40:]!r} -> {control_text[:80]!r}')
+                             f'raw={self.cursor.text[-80:]!r} committed={self.committed_text[-80:]!r} '
+                             f'control={control_text[:80]!r}')
         if self.degraded_prefix:
             new_text = control_text[len(self.committed_text):]
             new_ids = self._encode(new_text)
