@@ -1,10 +1,10 @@
 # 工作单管理
 
-更新：2026-10-31。当前确认的下一步路线为 **SoulX＋SenseVoice控制、Nemotron正文与缓存状态配对发布**，实现已启动、验证中，见[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。TextTurn、VoxTurn、XTurnix 三条历史路线已按用户指令归档：路线文档移至[归档区](../archive/dev/README.md)，对应实现移至 [archive/](../../archive/README.md)，历史工作单保留在本地 `docs/issue/archive/`（不进入 Git）。
+更新：2026-11-01。当前确认的下一步路线为 **SoulX＋SenseVoice控制、Nemotron正文与缓存状态配对发布**，功能与固定实验已交付，实时及整体质量未通过，见[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。TextTurn、VoxTurn、XTurnix 三条历史路线已按用户指令归档：路线文档移至[归档区](../archive/dev/README.md)，对应实现移至 [archive/](../../archive/README.md)，历史工作单保留在本地 `docs/issue/archive/`（不进入 Git）。
 
 当前用户已授权 Nemotron Teacher Forcing 接入与 FDB 三轴固定小样本实验。下游 Agent 尚未切换到 SoulX，旧 Nemotron 公开英文集方案和旧文本控制器合同只作为历史设计，不恢复作业。
 
-当前活动工作单：[NTF-005](NTF-005.md)，用户已启动实施与验证：SenseVoice原生控制、独立Nemotron解码和有界配对发布已提供，正执行本地及远端验证；两路计算不受跨路逐步屏障阻塞。官方启动首块的真实120ms主块按采样账本保留，不改写为160ms。真实模型按本单先三轴预检再固定FDB30，不切换下游Agent。
+当前无活动工作单。NTF-005已完成并归档至本地`archive/`：双ASR独立计算与有界配对已交付，本地100项、预检3/3通过；正式18/30完整、12条触及800ms停止线，退出1，2134帧来源及配对审计通过。共同18条打断nonidle 4/6→6/6，但接话和主块口径停顿退化，状态未整体改善；完整样本EOF保留14个未配齐状态。见[正式报告](../../reports/soulx/20261031-dual-asr-publication/README.md)。11-01 10:12及收尾复查队列为空，不追加重跑，不切换下游Agent。
 
 NTF-004已完成并归档至本地`archive/`：官方控制格式、门控和教师缓存修订已交付，本地30项、远端预检3/3通过；正式25/30完整、5条积压触限退出1。共同23条中停顿complete不变、打断nonidle 7/7→6/7，未见整体改善；EOF仍有待消费控制文字。见[对照报告](../../reports/soulx/20261031-nemotron-teacher-gate/README.md)。01:06:38 CST队列为空，未继续重试或切换现役Agent。
 

@@ -1,8 +1,8 @@
 # SoulX-Duplug 路线
 
-更新：2026-10-31。已运行的实验为 **Nemotron Teacher Forcing＋SoulX-Duplug 语音前端**，位于 Layer 0–Layer 2 输入侧。Nemotron 是唯一用户转写来源，SoulX 在逐块教师文字注入后预测五类状态，联合覆盖当前 Context。两份权重固定；下游 Agent 尚未切换。此前 SenseVoiceSmall 首版与 Nemotron 独立门控适配均作为历史对照。
+更新：2026-11-01。最新已运行实验为 **SoulX＋SenseVoice控制、独立Nemotron正文与状态配对发布**，位于Layer 0–Layer 2输入侧。SenseVoice为0.6B提供官方控制文字，Nemotron为SharedContext提供唯一正文；权重固定，下游Agent尚未切换。教师文字路径和此前独立组合均保留为历史对照。
 
-2026-10-31用户确认下一步采用[双ASR缓存发布](dual_asr_publication.md)：恢复SenseVoice为0.6B提供控制文字，Nemotron独立提供SharedContext正文；SoulX每160ms产生状态先缓存，待对应Nemotron解码完成后联合发布，两路计算各自推进。[NTF-005](../../issue/NTF-005.md)已启动，实现与本地协议检查已提供，远端验证进行中；下述教师文字路线保留为已运行实验。
+2026-10-31用户确认下一步采用[双ASR缓存发布](dual_asr_publication.md)：恢复SenseVoice为0.6B提供控制文字，Nemotron独立提供SharedContext正文；SoulX每160ms产生状态先缓存，待对应Nemotron解码完成后联合发布，两路计算各自推进。NTF-005已交付并归档，预检3/3、2134条正式帧来源和配对审计通过；正式18/30完整、12条触及800ms停止线，实时未通过、状态未整体改善，见[报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)；下述教师文字路线保留为已运行实验。
 
 2026-10-30此前按用户明确指令回滚：撤回`bd86478`的原生delta草稿＋controller片段整段覆盖，撤回`b00afac`与`6930fa7`的固定起点重识别候选文档。运行代码与前端测试恢复到`484ca32`对应基线，保留160ms正文／状态联合覆盖接口；这会恢复旧窗口整理及已知gap，并不表示旧方案质量达标。历史测试报告、原始证据和离线汇总脚本保留，未恢复旧Nemotron组合代码或提交新远端作业。既有conda下前端5项、SharedContext及TextTurn Context共7项、独立Nemotron服务5项检查全部通过；用户原有未提交修改保持不变。
 
@@ -10,7 +10,7 @@
 
 ## 已确认合同
 
-- 前端包含 ASR 调用与文本整理、SoulX 音频编码及状态预测；同一活动话轮只用一个权威 ASR 来源。中间转写持续写入 Shared Context，不等待完成判断，前端内部与下游使用同一来源。2026-10-30 用户确认每个 160ms 音频处理步骤联合覆盖最新全文和本块状态，不保留历史正文版本，取消 320ms 周期建议；新合同已实现，本地检查及远端六视图当前值写入检查通过，见[报告](../../../reports/soulx/20261030-current-context-test/README.md)，读取与关闭规则见[接口设计](shared_context_interface.md)。
+- 前端包含ASR调用与文本整理、SoulX音频编码及状态预测；同一活动话轮的SharedContext正文只用Nemotron一个权威来源，内部SenseVoice控制文字独立审计，不作为共享正文。每160ms状态先缓存，与首次充分覆盖实际音频的Nemotron步骤配齐后联合覆盖当前值；不等待complete，不保留历史正文版本。读取与关闭规则见[接口设计](shared_context_interface.md)，最新结构与实时结果见[双ASR报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)；历史六视图当前值验证不替代双ASR实时验收。
 - 前端持续接收音频，可与下游表达、思考并发执行。Layer 0 仍负责系统附和时机；未来 CoT 从 Context 反馈至前端，当前不实现条件化扩展。
 - SoulX 保留音频路径和原生五类用户状态，全部送入 Layer 1；普通正式回答在当前 turn 读取对应 `user_complete` 后生成，不额外发起独立回答调用。
 - 活动输出期间有效 `user_nonidle` 额外直接触发停止，涵盖 preparing 和 playing；其他状态不进入输出运行时，不映射为 start 或 keep。完整路径见[架构第 2.2 节](../../research_design/architecture.md#22-前端状态与系统附和)。

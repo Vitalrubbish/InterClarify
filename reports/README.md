@@ -6,6 +6,7 @@ Git只保留审阅后的README汇总：结论、关键分母、限制、源码�
 
 | 报告 | 状态与用途 |
 | --- | --- |
+| [双ASR独立计算与配对发布](soulx/20261031-dual-asr-publication/README.md) | 预检3/3与2134帧结构审计通过；正式18/30、12条800ms触限，实时未通过；共同18条打断检出提高，接话及主块口径停顿退化，状态未整体改善 |
 | [官方格式与文字门控教师对照](soulx/20261031-nemotron-teacher-gate/README.md) | 工程对齐与预检通过；正式25/30积压触限，整体未改善；共同23条打断nonidle 7/7→6/7，6/25完整样本EOF仍待消费控制文字 |
 | [Nemotron真实音频进度配对复测](soulx/20261030-nemotron-teacher-alignment/README.md) | 配对修复与预检通过；完整复测25/30、28/30积压触限，实时未通过；同8条打断nonidle 7/8→8/8，完整观察口径停顿complete仍6/11 |
 | [Nemotron Teacher Forcing 与 FDB三轴](soulx/20261030-nemotron-teacher-fdb30/README.md) | 30/30条、3185帧同步顺序通过；在线WER停顿12.85%／打断8.47%，状态质量没有整体改善，原始与规则分别核查 |
