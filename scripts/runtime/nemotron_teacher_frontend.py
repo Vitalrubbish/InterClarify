@@ -106,17 +106,6 @@ class TeacherTextBuffer:
         if not control_text.startswith(self.committed_text):
             raise ValueError('Teacher control text rewrote committed history: '
                              f'committed={self.committed_text[-80:]!r} control={control_text[:80]!r}')
-        if self.degraded_prefix:
-            new_text = control_text[len(self.committed_text):]
-            new_ids = self._encode(new_text)
-            self.committed_text = control_text
-            self.committed_ids = self.committed_ids + new_ids
-            self.pending_text, self.pending_ids = '', []
-            return {'committed_ids': new_ids, 'committed_text': new_text,
-                    'pending_ids': [], 'pending_text': '',
-                    'text_commit_index': len(self.committed_ids),
-                    'tail_reencode_count': 0, 'tail_replace_tokens': 0,
-                    'post_pause_extension': False}
         words = control_text.split(' ') if control_text else []
         if commit_pending:
             stable_text = control_text
@@ -138,21 +127,26 @@ class TeacherTextBuffer:
                 return self._degraded_append(control_text)
             raise ValueError('Teacher control text rewrote committed history: '
                              f'committed={self.committed_text[-80:]!r} stable={stable_text[:80]!r}')
-        stable_ids = self._encode(stable_text)
-        if stable_ids[:len(self.committed_ids)] != self.committed_ids:
-            raise ValueError('Canonical tokenization changed committed history')
-        new_ids = stable_ids[len(self.committed_ids):]
+        new_text = stable_text[len(self.committed_text):]
         leading = ' ' if stable_text else ''
         previous_pending = self.pending_ids
         pending_ids = self._encode(leading + pending_text) if pending_text else []
         replaced = tail_replace_count(previous_pending, pending_ids)
-        delta_text = stable_text[len(self.committed_text):]
-        self.committed_text = stable_text
-        self.committed_ids = stable_ids
+        if self.degraded_prefix:
+            new_ids = self._encode(new_text)
+            self.committed_text = stable_text
+            self.committed_ids = self.committed_ids + new_ids
+        else:
+            stable_ids = self._encode(stable_text)
+            if stable_ids[:len(self.committed_ids)] != self.committed_ids:
+                raise ValueError('Canonical tokenization changed committed history')
+            new_ids = stable_ids[len(self.committed_ids):]
+            self.committed_text = stable_text
+            self.committed_ids = stable_ids
         self.pending_text, self.pending_ids = pending_text, pending_ids
-        return {'committed_ids': new_ids, 'committed_text': delta_text,
+        return {'committed_ids': new_ids, 'committed_text': new_text,
                 'pending_ids': pending_ids, 'pending_text': pending_text,
-                'text_commit_index': len(stable_ids),
+                'text_commit_index': len(self.committed_ids),
                 'tail_reencode_count': 1 if pending_text else 0,
                 'tail_replace_tokens': replaced,
                 'post_pause_extension': False}
