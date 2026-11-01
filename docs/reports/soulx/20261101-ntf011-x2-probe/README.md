@@ -26,3 +26,7 @@
 原始文件已取回至本地`artifacts/soulx/20261101-ntf011-x2-probe-r1/`，含`probe/result.json`、traceback、`probe.log`、显存采样、退出码、冻结清单及源码摘要。远端证据包SHA256：`25b68039a5b907e6bf89497dc13f232b6b98b7c894edcce732ed0d6ccac9dc20`，取回后校验一致。
 
 清单SHA256：`403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cdee4f3c07`。
+
+## r2重跑登记
+
+修复源码`aa95a00`已推送，探针10项本地用例及diff检查通过。独立run `ntf011-x2-probe-20261101-r2`已提交，作业`job-179354052458984466423-xuan-zhang`，2026-11-01 21:42:04 CST提交；沿用原资源与验收阈值。此登记只证明重跑已提交，不表示已有性能结果。
