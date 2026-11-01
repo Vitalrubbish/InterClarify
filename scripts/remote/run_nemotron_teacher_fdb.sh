@@ -46,6 +46,7 @@ cp "${SOULX_FDB_MANIFEST:?set frozen manifest}" "$RUN/frozen_manifest.json"
 sha256sum "$RUN/frozen_manifest.json" >> "$RUN/source.sha256"
 PROBE=("$SOURCE/scripts/remote/nemotron_teacher_fdb.py" run --manifest "$RUN/frozen_manifest.json")
 [[ "${SOULX_TEACHER_SMOKE:-0}" == 0 ]] || PROBE+=(--smoke)
+[[ -z "${SOULX_TEACHER_CASE:-}" ]] || PROBE+=(--case "$SOULX_TEACHER_CASE")
 [[ "${SOULX_DISABLE_EMPTY_RULE:-0}" == 0 ]] || PROBE+=(--disable-empty-rule)
 "$ASR_PREFIX/bin/python" -B "$SOURCE/scripts/remote/nemotron_teacher_worker.py" \
   --model "$HOME/interclarify-asr-selection/models/nemotron_en" \

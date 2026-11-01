@@ -360,6 +360,10 @@ def run(args):
     if args.smoke:
         samples = [next(s for s in samples if s['task'] == task)
                    for task in ('smooth_turn_taking', 'pause_handling', 'user_interruption')]
+    if args.case:
+        samples = [s for s in samples if s['case_id'] == args.case]
+        if len(samples) != 1:
+            raise ValueError('Requested case is absent from the frozen manifest')
     args.output.mkdir(exist_ok=False)
     write_json(args.output / 'input_manifest.json', dict(manifest, samples=samples))
     result = {'passed': False, 'cases': [], 'teacher_forcing': True, 'timing_mode': 'realtime',
@@ -493,6 +497,7 @@ def main():
         infer.add_argument('--' + name, type=Path, required=True)
     infer.add_argument('--disable-empty-rule', action='store_true')
     infer.add_argument('--smoke', action='store_true')
+    infer.add_argument('--case')
     inspect = commands.add_parser('analyze')
     inspect.add_argument('--probe', type=Path, required=True)
     inspect.add_argument('--output', type=Path, required=True)
