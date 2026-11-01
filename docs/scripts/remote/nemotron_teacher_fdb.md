@@ -11,3 +11,5 @@ NTF-003 修正：`AudioProgressPairing` 分别跟踪原生解码步和SoulX状�
 每帧额外记录`asr_observation_ahead_ms`、实际原生步号和配对模式；`backlog_ms`从主块截止计时，`observed_backlog_ms`扣除完整观察范围，区分前瞻等待与之后的处理／排队。正文与规则不变。覆盖条件以原始PCM窗口为准，只保证读取范围已覆盖，不承诺ASR内部缓存进度或词级对齐。完整观察上界可能比SoulX原有40ms前瞻多出约59ms，质量比较同时列主块与观察位置。
 
 NTF-004结果与逐帧审计增加控制配置、门控比例、消费滞后、待消费尾部、KV重放次数和时间。离线分析即使运行失败也可读取部分轨迹；共同完整样本与共同音频覆盖分列，失败不进入质量成功率。
+
+NTF-007起逐帧审计改为`text_commit_index`、`text_injected_tokens`、`tail_reencode_count`、`tail_replace_tokens`、`pending_text`和`kv_tokens`；不再记录门控、检查点或重放字段。`teacher_tail`保存关闭时的已注入token、未完成尾词及其编码。历史NTF-004报告仍由旧分析脚本读取，新帧要使用新字段。

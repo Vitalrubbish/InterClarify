@@ -41,7 +41,7 @@ trap cleanup EXIT
 trap 'exit 143' TERM
 sha256sum "$SOURCE"/scripts/runtime/{shared_context,nemotron_teacher_frontend}.py \
   "$SOURCE"/scripts/remote/{nemotron_asr_service,nemotron_teacher_worker,nemotron_teacher_fdb}.py \
-  "$SOURCE/configs/nemotron_teacher_gated.json" > "$RUN/source.sha256"
+  "$SOURCE/configs/nemotron_teacher_append_only.json" > "$RUN/source.sha256"
 cp "${SOULX_FDB_MANIFEST:?set frozen manifest}" "$RUN/frozen_manifest.json"
 sha256sum "$RUN/frozen_manifest.json" >> "$RUN/source.sha256"
 PROBE=("$SOURCE/scripts/remote/nemotron_teacher_fdb.py" run --manifest "$RUN/frozen_manifest.json")

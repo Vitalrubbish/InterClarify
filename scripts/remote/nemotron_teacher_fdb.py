@@ -238,8 +238,10 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
         reader.join(2)
         if reader.is_alive() or state['error']:
             raise RuntimeError(state['error'] or 'Ingress failed to terminate')
-        pending_tail = {'available_token_ids': frontend.available_ids, 'consumed_token_ids': frontend.teacher_ids,
-                        'pending_token_range': ledger[-1]['pending_token_range'] if ledger else [0, 0],
+        pending_tail = {'committed_token_ids': frontend.teacher_ids,
+                        'pending_text': frontend.text.pending_text,
+                        'pending_token_ids': frontend.text.pending_ids,
+                        'text_commit_index': len(frontend.text.committed_ids),
                         'control_text': frontend.control_text}
         online = frontend.close()['text']
         rpc(path, 'push', session_id=identity, eof=True)
@@ -254,10 +256,12 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
         drained = batch['steps'][-1]['text'] if batch['steps'] else online
         return {'case_id': case_id, 'passed': True, 'online_text': online, 'drained_text': drained,
                 'teacher_tail': pending_tail,
-                'gate_open_frames': sum(f['gate_open'] for f in ledger),
-                'pending_frames': sum(f['pending_token_range'][0] < f['pending_token_range'][1] for f in ledger),
-                'cache_rebuilds': frontend.rebuilds, 'cache_replay_tokens': frontend.replay_tokens,
-                'cache_replay_seconds': sum(f['cache_revision'].get('replay_seconds', 0) for f in ledger),
+                'pending_tail_frames': sum(f['control_consumption'] == 'pending_tail' for f in ledger),
+                'text_commit_index': len(frontend.text.committed_ids),
+                'tail_reencode_count': sum(f['tail_reencode_count'] for f in ledger),
+                'tail_replace_tokens': sum(f['tail_replace_tokens'] for f in ledger),
+                'text_injected_tokens': sum(f['text_injected_tokens'] for f in ledger),
+                'empty_text_frames': sum(f['text_injected_tokens'] == 0 for f in ledger),
                 'frames': len(ledger), 'real_samples': len(audio), 'processed_samples': seq * 2560,
                 'pairing_mode': 'audio_coverage', 'startup_steps': startup_steps,
                 'last_online_native_step': pairing.native_seq,
@@ -271,8 +275,7 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
     finally:
         stopped.set()
         reader.join(3)
-        frontend.kv, frontend.checkpoint = None, None
-        frontend.entries.clear()
+        frontend.kv = None
         file.close()
         startup_file.close()
         rpc(path, 'close', session_id=identity)
@@ -298,8 +301,7 @@ def run(args):
     args.output.mkdir(exist_ok=False)
     write_json(args.output / 'input_manifest.json', dict(manifest, samples=samples))
     result = {'passed': False, 'cases': [], 'teacher_forcing': True, 'timing_mode': 'realtime',
-              'pairing_mode': 'audio_coverage', 'control_mode': 'official_format_gated_teacher',
-              'cache_limits': {'sequence_tokens': 8192, 'rebuilds': 128, 'replay_tokens': 65536},
+              'pairing_mode': 'audio_coverage', 'control_mode': 'official_format_append_only_teacher',
               'sensevoice_loaded': False, 'empty_nonidle_rule': not args.disable_empty_rule,
               'manifest_sha256': digest(args.manifest),
               'source_commit': __import__('os').environ.get('SOULX_SOURCE_COMMIT'),
@@ -388,6 +390,8 @@ def analyze(args):
         if frames:
             columns = ['processed_until', 'audio_observed_until', 'text', 'delta_text', 'raw_token',
                        'state_token', 'state_accepted', 'adjustment', 'teacher_char_end',
+                       'text_commit_index', 'text_injected_tokens', 'tail_reencode_count',
+                       'tail_replace_tokens', 'control_consumption', 'kv_tokens',
                        'teacher_injected_at', 'state_resolved_at', 'published_at', 'released_at', 'backlog_ms',
                        'step_seq', 'teacher_step_seq', 'pairing_mode', 'asr_observation_ahead_ms',
                        'observed_backlog_ms']

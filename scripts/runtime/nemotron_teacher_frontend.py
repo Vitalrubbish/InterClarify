@@ -1,7 +1,6 @@
 """Force native ASR increments into SoulX and publish one joint current value."""
 from __future__ import annotations
 
-from copy import deepcopy
 import hashlib
 import inspect
 from pathlib import Path
@@ -51,26 +50,85 @@ class TeacherCursor:
         return delta
 
 
-class NemotronTeacherFrontend:
-    """Own one bounded audio/text KV and fixed-source logical user turn."""
+def validate_tail_range(begin, count, length):
+    """A replacement is legal only when it ends exactly at the sequence tail."""
+    if type(begin) is not int or type(count) is not int or type(length) is not int:
+        raise TypeError('Tail replacement needs integer positions')
+    if begin < 0 or count < 0 or begin + count != length:
+        raise ValueError('Tail replacement must end at the sequence tail')
 
-    def __init__(self, model, session_id, context=None, *, empty_nonidle_rule=True, max_tokens=8192,
-                 max_rebuilds=128, max_replay_tokens=65536):
+
+def tail_replace_count(previous, current):
+    """Count the old pending-tail tokens replaced by the new tail encoding."""
+    common = 0
+    while common < len(previous) and common < len(current) and previous[common] == current[common]:
+        common += 1
+    replaced = len(previous) - common
+    validate_tail_range(common, replaced, len(previous))
+    return replaced
+
+
+class TeacherTextBuffer:
+    """Append each new control fragment once and re-encode only the last word tail."""
+
+    def __init__(self, tokenizer):
+        self.tokenizer = tokenizer
+        self.control_text = ''
+        self.committed_ids = []
+        self.pending_text = ''
+        self.pending_ids = []
+
+    def _encode(self, text):
+        if not text:
+            return []
+        ids = self.tokenizer.encode(text, add_special_tokens=False)
+        if any(i in self.tokenizer.all_special_ids for i in ids):
+            raise ValueError('ASR control text contains structural special tokens')
+        return ids
+
+    def update(self, control_text):
+        """Append only the new fragment; never re-tokenize committed history."""
+        if not control_text.startswith(self.control_text):
+            raise ValueError('Teacher control text rewrote committed history')
+        previous = self.control_text
+        new_text = control_text[len(previous):]
+        boundary = control_text.rfind(' ') + 1
+        stable_chars = max(0, min(len(new_text), boundary - len(previous)))
+        stable_new, tail_new = new_text[:stable_chars], new_text[stable_chars:]
+        stable_ids, tail_ids = self._encode(stable_new), self._encode(tail_new)
+        new_ids = stable_ids + tail_ids
+        pending_text = control_text[boundary:]
+        continuing = (bool(self.pending_text) and pending_text.startswith(self.pending_text)
+                      and pending_text != self.pending_text)
+        self.control_text = control_text
+        self.committed_ids = self.committed_ids + new_ids
+        self.pending_text, self.pending_ids = pending_text, self._encode(pending_text)
+        if tail_ids:
+            validate_tail_range(len(self.committed_ids) - len(tail_ids), len(tail_ids),
+                                len(self.committed_ids))
+        return {'committed_ids': new_ids, 'committed_text': new_text,
+                'pending_ids': self.pending_ids, 'pending_text': pending_text,
+                'text_commit_index': len(self.committed_ids),
+                'tail_reencode_count': 1 if continuing else 0,
+                'tail_replace_tokens': len(tail_ids)}
+
+
+class NemotronTeacherFrontend:
+    """Own one append-only audio/text KV and fixed-source logical user turn."""
+
+    def __init__(self, model, session_id, context=None, *, empty_nonidle_rule=True):
         if hashlib.sha256(Path(inspect.getfile(type(model))).read_bytes()).hexdigest() != UPSTREAM_SHA256:
             raise ValueError('SoulX source digest differs')
         verify_tools(model)
         self.model, self.session_id = model, session_id
         self.context = context if context is not None else SharedContext()
-        self.cursor, self.teacher_ids = TeacherCursor(), []
-        self.kv, self.pending_state = None, None
+        self.cursor = TeacherCursor()
+        self.text = TeacherTextBuffer(model.model.tokenizer)
+        self.kv, self.kv_length, self.pending_state = None, 0, None
         self.previous_state, self.mistakes, self.speech_detected = None, 0, False
-        self.tokens, self.max_tokens = 0, max_tokens
         self.generation, self.closed = 0, False
         self.empty_nonidle_rule = empty_nonidle_rule
-        self.control_text, self.available_ids = '', []
-        self.entries, self.checkpoint = [], None
-        self.rebuilds = self.replay_tokens = 0
-        self.max_rebuilds, self.max_replay_tokens = max_rebuilds, max_replay_tokens
+        self.control_text = ''
         tokenizer = model.model.tokenizer
         for token, expected in STATE_IDS.items():
             if tokenizer.encode(token, add_special_tokens=False) != [expected]:
@@ -78,6 +136,10 @@ class NemotronTeacherFrontend:
         if model.audio_eos_token.tolist() != [model.model.asr_eos_token_id]:
             raise ValueError('SoulX ASR EOS mapping differs')
         self.context.open_user_turn(session_id, 'user-1', source='nemotron')
+
+    @property
+    def teacher_ids(self):
+        return self.text.committed_ids
 
     def reset_controller(self):
         """Preserve semantic KV, source cursor and the one pending valid state."""
@@ -93,118 +155,41 @@ class NemotronTeacherFrontend:
         with torch.inference_mode():
             return self.model.model.llm(inputs_embeds=embeds.unsqueeze(0), past_key_values=kv, use_cache=True)
 
-    def _revise(self, desired, common):
-        """Replay real input history from an immutable valid checkpoint."""
-        import torch
-        started = time.monotonic()
-        affected = next(i for i, entry in enumerate(self.entries[:-1])
-                        if entry['end'] > common)
-        position = 0
-        revised_end = min(len(self.teacher_ids), len(desired))
-        for entry in self.entries[:-1]:
-            end = min(entry['end'], revised_end)
-            entry['ids'] = desired[position:end]
-            entry['begin'], entry['end'] = position, end
-            position = end
-        self.teacher_ids = desired[:revised_end]
-        recent = self.checkpoint is not None and self.checkpoint['index'] == affected
-        parts = []
-        if recent:
-            # Copy again: a DynamicCache may mutate the supplied object in place.
-            kv = deepcopy(self.checkpoint['kv'])
-            start = affected
-        else:
-            kv, start = None, 0
-            self.checkpoint = None
-        for index in range(start, len(self.entries)):
-            entry = self.entries[index]
-            if not (recent and index == start):
-                parts.append(entry['pre'].to(self.model.device))
-            if index < len(self.entries) - 1:
-                if entry['ids']:
-                    parts.append(self._embed(entry['ids']))
-                parts.append(self.model.audio_eos_embeds)
-        count = sum(part.shape[0] for part in parts)
-        self.rebuilds += 1
-        self.replay_tokens += count
-        if self.rebuilds > self.max_rebuilds or self.replay_tokens > self.max_replay_tokens:
-            raise RuntimeError('Teacher cache replay limit exceeded')
-        self.tokens = sum(e['pre'].shape[0] + len(e['ids']) + 1 for e in self.entries[:-1]) + self.entries[-1]['pre'].shape[0]
-        if self.tokens + 1 > self.max_tokens:
-            raise RuntimeError('Teacher controller token limit exceeded')
-        self.kv = self._forward(torch.cat(parts, dim=0), kv).past_key_values
-        if str(self.model.device).startswith('cuda'):
-            torch.cuda.synchronize()
-        return {'revised_segments': [{'step': i + 1, 'begin': e['begin'], 'end': e['end'], 'ids': e['ids']}
-                                     for i, e in enumerate(self.entries[:-1]) if i >= affected],
-                'revision_from_token': common, 'revision_from_step': affected + 1,
-                'replay_mode': 'recent_checkpoint' if recent else 'bounded_rebuild',
-                'replayed_tokens': count, 'replay_seconds': time.monotonic() - started}
-
     def process_step(self, step, chunk, back, ahead, processed_until, observed_until):
         import torch
         if self.closed:
             raise ValueError('Cannot process a closed turn')
         started = time.monotonic()
         raw_delta = self.cursor.advance(step)
-        model, tokenizer = self.model, self.model.model.tokenizer
+        model = self.model
         self.control_text = official_control_text(model, self.cursor.text)
-        desired = tokenizer.encode(self.control_text, add_special_tokens=False) if self.control_text else []
-        if any(i in tokenizer.all_special_ids for i in desired):
-            raise ValueError('ASR control text contains structural special tokens')
-        self.available_ids = desired
-        if len(desired) > self.max_tokens:
-            raise RuntimeError('Teacher control text token limit exceeded')
+        # A word boundary or a decoder pause makes the pending word final.
+        update = self.text.update(self.control_text)
+        ids = update['committed_ids']
         parts = [model.text_embeds] if self.kv is None else []
         feedback = self.pending_state
         if feedback is not None:
             parts.append(self._embed([feedback]))
         audio_ids = model._audio_to_tokens(back, chunk, ahead)
         parts.append(model._tokens_to_embeds(audio_ids))
-        pre = torch.cat(parts, dim=0)
-        self.tokens += pre.shape[0]
-        if self.tokens + 1 > self.max_tokens:
-            raise RuntimeError('Teacher controller token limit exceeded')
-        gate = self._forward(pre, self.kv)
-        self.kv = gate.past_key_values
-        gate_id = int(torch.argmax(gate.logits[0, -1]).item())
-        opened = gate_id != model.model.asr_eos_token_id
-        gate_resolved_at = time.monotonic()
-        self.entries.append({'pre': pre.detach().cpu().clone(), 'ids': [],
-                             'begin': len(self.teacher_ids), 'end': len(self.teacher_ids)})
-        common = 0
-        for old, new in zip(self.teacher_ids, desired):
-            if old != new:
-                break
-            common += 1
-        revision = {}
-        before = len(self.teacher_ids)
-        ids = []
-        if opened:
-            if common < len(self.teacher_ids):
-                revision = self._revise(desired, common)
-            begin = len(self.teacher_ids)
-            ids = desired[begin:]
-            if ids:
-                self.checkpoint = {'index': len(self.entries) - 1, 'kv': deepcopy(self.kv)}
-            self.entries[-1].update(ids=list(ids), begin=begin, end=len(desired))
-            self.teacher_ids = list(desired)
-        actual_delta = desired[common:] if opened and revision else ids
-        delta = tokenizer.decode(actual_delta, skip_special_tokens=False,
-                                 clean_up_tokenization_spaces=False) if actual_delta else ''
-        self.tokens += len(ids) + 1
-        if self.tokens > self.max_tokens:
-            raise RuntimeError('Teacher controller token limit exceeded')
+        if ids:
+            parts.append(self._embed(ids))
+        parts.append(model.audio_eos_embeds)
+        inputs = torch.cat(parts, dim=0)
+        outputs = self._forward(inputs, self.kv)
+        self.kv = outputs.past_key_values
+        self.kv_length += inputs.shape[0]
+        if hasattr(self.kv, 'get_seq_length') and self.kv.get_seq_length() != self.kv_length:
+            raise RuntimeError('Teacher KV length differs from input ledger')
+        if str(model.device).startswith('cuda'):
+            torch.cuda.synchronize()
         teacher_injected_at = time.monotonic()
-        state_parts = ([self._embed(ids)] if ids else []) + [model.audio_eos_embeds]
-        outputs = self._forward(torch.cat(state_parts, dim=0), self.kv)
         logits = outputs.logits[0, -1]
         raw_id = int(torch.argmax(logits).item())
+        tokenizer = model.model.tokenizer
         raw = tokenizer.decode([raw_id], skip_special_tokens=False)
-        self.kv = outputs.past_key_values
-        if hasattr(self.kv, 'get_seq_length') and self.kv.get_seq_length() != self.tokens:
-            raise RuntimeError('Teacher KV length differs from input ledger')
         token, token_id, adjustment = raw, raw_id, None
+        delta = update['committed_text']
         self.mistakes = self.mistakes + 1 if raw == '<|user_nonidle|>' and not delta else 0
         transition = self.previous_state == '<|user_nonidle|>' and raw == '<|user_idle|>'
         empty_rule = self.empty_nonidle_rule and self.mistakes >= model.config.infer_config.max_mistake_num
@@ -213,7 +198,8 @@ class NemotronTeacherFrontend:
             token_id = STATE_IDS[token]
             adjustment = 'nonidle_to_idle' if transition else 'empty_nonidle_count'
         valid = token in STATE_IDS and STATE_IDS[token] == token_id
-        far_field = valid and token == '<|user_nonidle|>' and not self.speech_detected and model.get_rms(chunk) < model.config.infer_config.far_field_threshold
+        far_field = (valid and token == '<|user_nonidle|>' and not self.speech_detected
+                     and model.get_rms(chunk) < model.config.infer_config.far_field_threshold)
         reason = 'unknown_state' if not valid else 'far_field' if far_field else None
         self.pending_state = token_id if reason is None else None
         self.previous_state = token if reason is None else None
@@ -227,19 +213,21 @@ class NemotronTeacherFrontend:
                  'raw_token': raw, 'raw_token_id': raw_id, 'adjustment': adjustment,
                  'controller_generation': self.generation, 'state_resolved_at': resolved}
         snapshot = self.context.publish_user_frame(frame)
-        audit = dict(snapshot, native_step=step, delta_text=delta, raw_delta_text=raw_delta, teacher_token_ids=ids,
-                     control_text=self.control_text, available_token_ids=desired,
-                     consumed_token_ids=list(self.teacher_ids),
-                     consumed_token_end=len(self.teacher_ids), available_token_end=len(desired),
-                     pending_token_range=[common if common < len(self.teacher_ids) and not opened else len(self.teacher_ids), len(desired)],
-                     consumed_before=before, gate_open=opened, gate_token_id=gate_id,
+        audit = dict(snapshot, native_step=step, delta_text=delta, raw_delta_text=raw_delta,
+                     teacher_token_ids=ids, control_text=self.control_text,
+                     committed_text=self.text.control_text,
+                     committed_token_end=update['text_commit_index'],
+                     pending_text=update['pending_text'], pending_token_ids=update['pending_ids'],
+                     text_commit_index=update['text_commit_index'],
+                     tail_reencode_count=update['tail_reencode_count'],
+                     tail_replace_tokens=update['tail_replace_tokens'],
+                     text_injected_tokens=len(ids),
                      teacher_source_status='completed_new' if raw_delta else 'completed_empty',
-                     control_consumption='closed_pending' if not opened and desired != self.teacher_ids else 'consumed' if actual_delta else 'no_delta',
-                     feedback_state_id=feedback, audio_token_ids=audio_ids, gate_resolved_at=gate_resolved_at,
-                     cache_rebuilds=self.rebuilds,
-                     cache_replay_tokens=self.replay_tokens, cache_revision=revision,
+                     control_consumption='consumed' if ids else 'pending_tail' if update['pending_text'] else 'no_delta',
+                     feedback_state_id=feedback, audio_token_ids=audio_ids,
+                     kv_tokens=self.kv_length,
                      teacher_char_end=len(self.cursor.text), teacher_injected_at=teacher_injected_at,
-                     controller_started_at=started, kv_tokens=self.tokens,
+                     controller_started_at=started,
                      empty_nonidle_count=self.mistakes, empty_nonidle_rule=self.empty_nonidle_rule)
         if reason is not None or token == '<|user_complete|>' or (token == '<|user_backchannel|>' and not self.speech_detected):
             self.reset_controller()
@@ -247,6 +235,6 @@ class NemotronTeacherFrontend:
 
     def close(self):
         self.closed = True
-        self.kv, self.pending_state, self.checkpoint = None, None, None
-        self.entries.clear()
+        self.kv, self.pending_state = None, None
+        self.kv_length = 0
         return self.context.close_user_turn(self.session_id, 'user-1', 'audio_eof')

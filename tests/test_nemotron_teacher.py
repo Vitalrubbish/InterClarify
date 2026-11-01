@@ -132,122 +132,75 @@ class FakeModel:
 
 
 class TeacherInputTests(unittest.TestCase):
-    def make(self, predictions, gates=(), **kwargs):
+    def make(self, predictions, **kwargs):
         source_hash = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
         with patch('nemotron_teacher_frontend.UPSTREAM_SHA256', source_hash), patch('nemotron_teacher_frontend.verify_tools'):
-            return NemotronTeacherFrontend(FakeModel(predictions, gates), 'test', **kwargs)
+            return NemotronTeacherFrontend(FakeModel(predictions), 'test', **kwargs)
 
     def step(self, frontend, seq, text):
         return frontend.process_step({'step_seq': seq, 'text': text}, None, None, None, seq * 2560, seq * 2560)
 
-    def test_exact_teacher_delta_and_one_state_feedback_across_reset(self):
-        nonidle, complete = STATE_IDS['<|user_nonidle|>'], STATE_IDS['<|user_complete|>']
-        front = self.make([complete, nonidle, nonidle])
-        first = self.step(front, 1, 'Hello,')
-        self.assertEqual(front.generation, 1)
-        second = self.step(front, 2, 'Hello, world!')
-        third = self.step(front, 3, 'Hello, world!')
-        calls = front.model.calls
-        self.assertEqual(calls[0], [-1, -2, -3])
-        self.assertEqual(calls[1], list(map(ord, 'Hello')) + [151674])
-        self.assertEqual(calls[2], [complete, -2, -3])
-        self.assertEqual(calls[3], list(map(ord, ' world')) + [151674])
-        self.assertEqual(calls[4:], [[nonidle, -2, -3], [151674]])
-        self.assertEqual(first['control_text'], 'Hello')
-        self.assertEqual(second['text'], 'Hello, world!')
-        self.assertEqual(third['delta_text'], '')
-        self.assertEqual(front.close()['text'], 'Hello, world!')
+    def test_fragments_append_once_and_only_the_tail_is_reencoded(self):
+        nonidle = STATE_IDS['<|user_nonidle|>']
+        front = self.make([nonidle] * 4)
+        first = self.step(front, 1, 'inter')
+        second = self.step(front, 2, 'internet')
+        third = self.step(front, 3, 'internet works')
+        fourth = self.step(front, 4, 'internet works')
+        self.assertEqual(first['teacher_token_ids'], [1001])
+        self.assertEqual(first['tail_reencode_count'], 0)
+        self.assertEqual(second['teacher_token_ids'], list(map(ord, 'net')))
+        self.assertEqual(second['tail_reencode_count'], 1)
+        self.assertEqual(second['tail_replace_tokens'], 3)
+        self.assertEqual(third['teacher_token_ids'], [32] + list(map(ord, 'works')))
+        self.assertEqual(fourth['teacher_token_ids'], [])
+        self.assertEqual([first['text_commit_index'], second['text_commit_index'],
+                          third['text_commit_index'], fourth['text_commit_index']],
+                         [1, 4, 10, 10])
+        self.assertEqual(front.teacher_ids, [1001] + list(map(ord, 'net')) + [32] + list(map(ord, 'works')))
+        self.assertEqual(front.model.calls[0], [-1, -2, -3, 1001, 151674])
+        self.assertEqual(front.model.calls[1], [nonidle, -2, -3] + list(map(ord, 'net')) + [151674])
+        self.assertEqual(front.kv, [-1, -2, -3, 1001, 151674, nonidle, -2, -3]
+                         + list(map(ord, 'net')) + [151674, nonidle, -2, -3, 32]
+                         + list(map(ord, 'works')) + [151674, nonidle, -2, -3, 151674])
+        self.assertFalse(hasattr(front, '_revise'))
+        self.assertFalse(hasattr(front, 'checkpoint'))
+        self.assertFalse(hasattr(front, 'entries'))
+        self.assertFalse(hasattr(front, 'rebuilds'))
+
+    def test_rewritten_control_prefix_is_rejected(self):
+        nonidle = STATE_IDS['<|user_nonidle|>']
+        front = self.make([nonidle] * 3)
+        with patch('nemotron_teacher_frontend.official_control_text', side_effect=['ab', 'ac']):
+            self.step(front, 1, '1')
+            with self.assertRaisesRegex(ValueError, 'rewrote committed history'):
+                self.step(front, 2, '12')
+
+    def test_tail_range_must_end_at_sequence_tail(self):
+        from nemotron_teacher_frontend import validate_tail_range, tail_replace_count
+        validate_tail_range(2, 1, 3)
+        for bad in ((1, 1, 3), (0, 2, 1), (-1, 1, 0)):
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                validate_tail_range(*bad)
+        self.assertEqual(tail_replace_count([1001], [1002]), 1)
+        self.assertEqual(tail_replace_count([1, 2, 3], [1, 2, 3]), 0)
 
     def test_unknown_token_is_never_fed_back(self):
-        front = self.make([66, STATE_IDS['<|user_nonidle|>']])
+        nonidle = STATE_IDS['<|user_nonidle|>']
+        front = self.make([66, nonidle])
         first = self.step(front, 1, '')
         self.assertFalse(first['state_accepted'])
         self.step(front, 2, 'a')
-        self.assertEqual(front.model.calls[2], [-2, -3])
-        self.assertNotIn(65, front.model.kv if hasattr(front.model, 'kv') else front.kv)
+        self.assertEqual(front.model.calls[1], [-2, -3, 97, 151674])
         self.assertNotIn(66, front.kv)
 
-    def test_closed_gate_retains_updates_until_open_and_eof(self):
-        front = self.make([STATE_IDS['<|user_nonidle|>']] * 4, gates=[151674, 151674, 65, 151674])
-        one = self.step(front, 1, 'Hello,')
-        two = self.step(front, 2, 'Hello, world!')
+    def test_empty_text_blocks_stay_empty(self):
+        nonidle = STATE_IDS['<|user_nonidle|>']
+        front = self.make([nonidle] * 3)
+        frames = [self.step(front, seq, '') for seq in range(1, 4)]
+        self.assertEqual([f['text_injected_tokens'] for f in frames], [0, 0, 0])
         self.assertEqual(front.teacher_ids, [])
-        three = self.step(front, 3, 'Hello, world!')
-        self.assertEqual(three['delta_text'], 'Hello world')
-        four = self.step(front, 4, 'Hello, world! Again.')
-        self.assertEqual(four['control_consumption'], 'closed_pending')
-        self.assertEqual(four['pending_token_range'], [11, 17])
-        self.assertEqual(two['text'], 'Hello, world!')
-        self.assertEqual(one['teacher_source_status'], 'completed_new')
-        calls = len(front.model.calls)
-        self.assertEqual(front.close()['text'], 'Hello, world! Again.')
-        self.assertEqual(len(front.model.calls), calls)
-
-    def test_word_extension_revises_mutable_cache_and_preserves_real_state(self):
-        complete, nonidle = STATE_IDS['<|user_complete|>'], STATE_IDS['<|user_nonidle|>']
-        front = self.make([complete, nonidle])
-        self.step(front, 1, 'inter')
-        saved = list(front.checkpoint['kv'])
-        self.assertEqual(saved, [-1, -2, -3])
-        second = self.step(front, 2, 'internet')
-        self.assertEqual(second['cache_revision']['replay_mode'], 'recent_checkpoint')
-        self.assertEqual(front.checkpoint['kv'], saved)
-        self.assertEqual(front.kv, [-1, -2, -3, 1002, 151674, complete, -2, -3, 151674])
-        self.assertEqual(front.teacher_ids, [1002])
-        self.assertNotIn(65, front.kv)
-        self.assertEqual(front.context.get_user_turn('test', 'user-1')['text'], 'internet')
-
-    def test_older_revision_uses_bounded_rebuild(self):
-        nonidle = STATE_IDS['<|user_nonidle|>']
-        front = self.make([nonidle] * 3)
-        with patch('nemotron_teacher_frontend.official_control_text', side_effect=['ab', 'ab c', 'ax c']):
-            self.step(front, 1, '1')
-            self.step(front, 2, '12')
-            third = self.step(front, 3, '123')
-        self.assertEqual(third['cache_revision']['replay_mode'], 'bounded_rebuild')
-        self.assertEqual(front.teacher_ids, list(map(ord, 'ax c')))
-        self.assertEqual(front.kv, [-1, -2, -3, 97, 120, 151674, nonidle, -2, -3, 32, 99, 151674,
-                                   nonidle, -2, -3, 151674])
-        self.assertEqual(third['cache_revision']['revision_from_step'], 1)
-
-    def test_closed_gate_defers_consumed_token_revision(self):
-        nonidle = STATE_IDS['<|user_nonidle|>']
-        front = self.make([nonidle] * 3, gates=[65, 151674, 65])
-        self.step(front, 1, 'inter')
-        closed = self.step(front, 2, 'internet')
-        self.assertEqual(front.teacher_ids, [1001])
-        self.assertEqual(closed['pending_token_range'], [0, 1])
-        opened = self.step(front, 3, 'internet')
-        self.assertEqual(opened['raw_delta_text'], '')
-        self.assertEqual(opened['delta_text'], 'internet')
-        self.assertEqual(opened['cache_revision']['replay_mode'], 'recent_checkpoint')
-        self.assertNotIn(1001, front.kv)
-        self.assertEqual(front.kv.count(1002), 1)
-        self.assertEqual(front.kv.count(nonidle), 2)
-
-    def test_normalized_prefix_contraction_replays_without_duplicate_text(self):
-        nonidle = STATE_IDS['<|user_nonidle|>']
-        front = self.make([nonidle] * 3)
-        with patch('nemotron_teacher_frontend.official_control_text', side_effect=['ab', 'a', '']):
-            self.step(front, 1, '1')
-            second = self.step(front, 2, '12')
-            third = self.step(front, 3, '123')
-        self.assertEqual(second['consumed_token_ids'], [97])
-        self.assertEqual(third['consumed_token_ids'], [])
-        self.assertNotIn(97, front.kv)
-        self.assertNotIn(98, front.kv)
-        self.assertEqual(front.kv.count(151674), 3)
-
-    def test_limits_fail_without_publishing_new_state(self):
-        nonidle = STATE_IDS['<|user_nonidle|>']
-        front = self.make([nonidle], max_tokens=3)
-        with self.assertRaisesRegex(RuntimeError, 'token limit'):
-            self.step(front, 1, '')
-        for limits in ({'max_rebuilds': 0}, {'max_replay_tokens': 1}):
-            front = self.make([nonidle, nonidle], **limits)
-            self.step(front, 1, 'inter')
-            with self.assertRaisesRegex(RuntimeError, 'replay limit'):
-                self.step(front, 2, 'internet')
+        self.assertEqual([f['control_consumption'] for f in frames], ['no_delta', 'no_delta', 'no_delta'])
 
     def test_official_formatter_calls_frozen_pipeline(self):
         front = self.make([])
@@ -269,6 +222,15 @@ class TeacherInputTests(unittest.TestCase):
             self.assertEqual(frames[2]['adjustment'], 'empty_nonidle_count' if enabled else None)
             if not enabled:
                 self.assertEqual(frames[3]['adjustment'], 'nonidle_to_idle')
+
+    def test_complete_uses_delivered_text_without_extra_forward(self):
+        nonidle = STATE_IDS['<|user_nonidle|>']
+        front = self.make([nonidle] * 3)
+        self.step(front, 1, 'hello world')
+        calls = len(front.model.calls)
+        front.close()
+        self.assertEqual(len(front.model.calls), calls)
+        self.assertEqual(front.context.get_user_turn('test', 'user-1')['text'], 'hello world')
 
 
 class AudioPairingTests(unittest.TestCase):
