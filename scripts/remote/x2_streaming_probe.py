@@ -506,12 +506,12 @@ def contract_check(model, processor, config):
         'left_pad_mel_frames': left_pad == expected_left_pad,
         'first_user_mel_frames': first_user
                                  == config.get('contract', {}).get('first_user_mel_frames'),
-        'first_input_tokens': run.feeds[0]['features_shape'][-1] // int(processor.audio_length_per_tok)
+        'first_input_tokens': result['feeds'][0]['features_shape'][-1] // int(processor.audio_length_per_tok)
                               == int(processor.num_delay_tokens) + 1 + expected_left_pad
                               // int(processor.audio_length_per_tok),
         'subsequent_feature_frames': all(
             value['features_shape'][-1] == int(processor.audio_length_per_tok)
-            for value in run.feeds[1:]),
+            for value in result['feeds'][1:]),
         'first_cache': first_cache == expected_cache,
         'second_cache': second_cache == expected_cache,
         'tokens': len(result['records']) > 0,
@@ -524,8 +524,8 @@ def contract_check(model, processor, config):
         'first_user_mel_frames': first_user,
         'left_pad_mel_frames': left_pad,
         'expected_first_mel_frames': total_frames,
-        'first_tokens': run.feeds[0]['features_shape'][-1] // int(processor.audio_length_per_tok),
-        'subsequent_shapes': sorted({tuple(v['features_shape']) for v in run.feeds[1:]}),
+        'first_tokens': result['feeds'][0]['features_shape'][-1] // int(processor.audio_length_per_tok),
+        'subsequent_shapes': sorted({tuple(v['features_shape']) for v in result['feeds'][1:]}),
         'expected_padding_cache': expected_cache,
         'first_padding_cache': first_cache,
         'second_padding_cache': second_cache,
