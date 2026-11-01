@@ -8,6 +8,8 @@
 
 Nemotron独立流式识别，保留原生RNNT缓存。每个真正完成的解码步骤保存当时原始累计正文、实际读取范围和完成时间，允许无新增文字。SenseVoice正文不写SharedContext，Nemotron正文不注入0.6B。恢复官方controller reset不重启Nemotron、不清空逻辑话轮正文。
 
+实现核查补充：当前适配器调用官方reset清理语义状态后，恢复整个旧音频buffer；原生reset本会重新初始化回看和前瞻padding。这是保持真实PCM连续的兼容行为，并非原始运行时reset完全等价。已记录到[差异审计](../../../reports/soulx/20261031-dual-asr-publication/README.md)，不能因模型配置相同就宣称原系统精确复现。
+
 ## 配对与发布
 
 ```text
