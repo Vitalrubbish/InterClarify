@@ -10,4 +10,6 @@ NTF-007改为纯追加契约：每步新控制片段只追加一次，历史toke
 
 NTF-008增加：首个不足主块的流式步骤只跳过、不单独release；屏障最多4步前瞻且可按范围释放；complete无前置nonidle时`no_speech`拒绝、有语音时`model_complete`；complete只flush文本且`whole_turn_rerecognition_calls=0`；EOF保留`eof_partial`诊断。
 
+NTF-010改为词级规范分词：已完成词稳定追加、未完成词不进入KV、空ASR增量提交尾词；新增用例检查累计token等于规范分词、跨步词片段不产生非规范子词、历史token不变、无重放属性。
+
 真实模型与替身统一使用冻结ASR结束符ID151674；与五类状态token独立核查，结束符不能作为普通正文或状态反馈。

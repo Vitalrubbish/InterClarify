@@ -70,11 +70,11 @@ def tail_replace_count(previous, current):
 
 
 class TeacherTextBuffer:
-    """Append each new control fragment once and re-encode only the last word tail."""
+    """Append canonical tokens for completed words and keep one pending word."""
 
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
-        self.control_text = ''
+        self.committed_text = ''
         self.committed_ids = []
         self.pending_text = ''
         self.pending_ids = []
@@ -87,31 +87,36 @@ class TeacherTextBuffer:
             raise ValueError('ASR control text contains structural special tokens')
         return ids
 
-    def update(self, control_text):
-        """Append only the new fragment; never re-tokenize committed history."""
-        if not control_text.startswith(self.control_text):
+    def update(self, control_text, commit_pending=False):
+        """Re-tokenize completed words and append only the new canonical suffix."""
+        if not control_text.startswith(self.committed_text):
             raise ValueError('Teacher control text rewrote committed history')
-        previous = self.control_text
-        new_text = control_text[len(previous):]
-        boundary = control_text.rfind(' ') + 1
-        stable_chars = max(0, min(len(new_text), boundary - len(previous)))
-        stable_new, tail_new = new_text[:stable_chars], new_text[stable_chars:]
-        stable_ids, tail_ids = self._encode(stable_new), self._encode(tail_new)
-        new_ids = stable_ids + tail_ids
-        pending_text = control_text[boundary:]
-        continuing = (bool(self.pending_text) and pending_text.startswith(self.pending_text)
-                      and pending_text != self.pending_text)
-        self.control_text = control_text
-        self.committed_ids = self.committed_ids + new_ids
-        self.pending_text, self.pending_ids = pending_text, self._encode(pending_text)
-        if tail_ids:
-            validate_tail_range(len(self.committed_ids) - len(tail_ids), len(tail_ids),
-                                len(self.committed_ids))
-        return {'committed_ids': new_ids, 'committed_text': new_text,
-                'pending_ids': self.pending_ids, 'pending_text': pending_text,
-                'text_commit_index': len(self.committed_ids),
-                'tail_reencode_count': 1 if continuing else 0,
-                'tail_replace_tokens': len(tail_ids)}
+        words = control_text.split(' ') if control_text else []
+        if commit_pending:
+            stable_text = control_text
+            pending_text = ''
+        else:
+            stable_text = ' '.join(words[:-1]) if len(words) > 1 else ''
+            pending_text = words[-1] if words else ''
+        if not stable_text.startswith(self.committed_text):
+            raise ValueError('Teacher control text rewrote committed history')
+        stable_ids = self._encode(stable_text)
+        if stable_ids[:len(self.committed_ids)] != self.committed_ids:
+            raise ValueError('Canonical tokenization changed committed history')
+        new_ids = stable_ids[len(self.committed_ids):]
+        leading = ' ' if stable_text else ''
+        previous_pending = self.pending_ids
+        pending_ids = self._encode(leading + pending_text) if pending_text else []
+        replaced = tail_replace_count(previous_pending, pending_ids)
+        delta_text = stable_text[len(self.committed_text):]
+        self.committed_text = stable_text
+        self.committed_ids = stable_ids
+        self.pending_text, self.pending_ids = pending_text, pending_ids
+        return {'committed_ids': new_ids, 'committed_text': delta_text,
+                'pending_ids': pending_ids, 'pending_text': pending_text,
+                'text_commit_index': len(stable_ids),
+                'tail_reencode_count': 1 if pending_text else 0,
+                'tail_replace_tokens': replaced}
 
 
 class NemotronTeacherFrontend:
@@ -179,7 +184,7 @@ class NemotronTeacherFrontend:
         model = self.model
         self.control_text = official_control_text(model, self.cursor.text)
         # A word boundary or a decoder pause makes the pending word final.
-        update = self.text.update(self.control_text)
+        update = self.text.update(self.control_text, commit_pending=not raw_delta)
         ids = update['committed_ids']
         if self.audio_buffer:
             audio_ids, audio_embeds = self.audio_buffer.popleft()
@@ -209,7 +214,7 @@ class NemotronTeacherFrontend:
         raw = tokenizer.decode([raw_id], skip_special_tokens=False)
         token, token_id, adjustment = raw, raw_id, None
         delta = update['committed_text']
-        self.mistakes = self.mistakes + 1 if raw == '<|user_nonidle|>' and not delta else 0
+        self.mistakes = self.mistakes + 1 if raw == '<|user_nonidle|>' and not raw_delta else 0
         transition = self.previous_state == '<|user_nonidle|>' and raw == '<|user_idle|>'
         empty_rule = self.empty_nonidle_rule and self.mistakes >= model.config.infer_config.max_mistake_num
         if transition or empty_rule:
@@ -245,7 +250,7 @@ class NemotronTeacherFrontend:
         snapshot = self.context.publish_user_frame(frame)
         audit = dict(snapshot, native_step=step, delta_text=delta, raw_delta_text=raw_delta,
                      teacher_token_ids=ids, control_text=self.control_text,
-                     committed_text=self.text.control_text,
+                     committed_text=self.text.committed_text,
                      committed_token_end=update['text_commit_index'],
                      pending_text=update['pending_text'], pending_token_ids=update['pending_ids'],
                      text_commit_index=update['text_commit_index'],

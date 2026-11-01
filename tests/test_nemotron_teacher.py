@@ -100,9 +100,17 @@ class FakeModel:
         class Tokenizer:
             all_special_ids = list(STATE_IDS.values()) + [151674]
             def encode(self, text, **kwargs):
-                return [STATE_IDS[text]] if text in STATE_IDS else [1001] if text == 'inter' else [1002] if text == 'internet' else [ord(c) for c in text]
+                if text in STATE_IDS:
+                    return [STATE_IDS[text]]
+                result = []
+                for word in text.split(' ') if text else []:
+                    if not word:
+                        continue
+                    result.append(1001 if word == 'inter' else 1002 if word == 'internet'
+                                  else 3000 + sum(map(ord, word)))
+                return result
             def decode(self, ids, **kwargs):
-                return next((s for s, i in STATE_IDS.items() if ids == [i]), ''.join('inter' if i == 1001 else 'internet' if i == 1002 else chr(i) for i in ids))
+                return next((s for s, i in STATE_IDS.items() if ids == [i]), '')
         self.model = SimpleNamespace(tokenizer=Tokenizer(), asr_eos_token_id=151674, llm=self.forward)
         self.device = 'cpu'
         self.text_embeds = torch.tensor([[-1.]])
@@ -147,22 +155,24 @@ class TeacherInputTests(unittest.TestCase):
         second = self.step(front, 2, 'internet')
         third = self.step(front, 3, 'internet works')
         fourth = self.step(front, 4, 'internet works')
-        self.assertEqual(first['teacher_token_ids'], [1001])
-        self.assertEqual(first['tail_reencode_count'], 0)
-        self.assertEqual(second['teacher_token_ids'], list(map(ord, 'net')))
-        self.assertEqual(second['tail_reencode_count'], 1)
-        self.assertEqual(second['tail_replace_tokens'], 3)
-        self.assertEqual(third['teacher_token_ids'], [32] + list(map(ord, 'works')))
-        self.assertEqual(fourth['teacher_token_ids'], [])
+        work = 3000 + sum(map(ord, 'works'))
+        self.assertEqual(first['teacher_token_ids'], [])
+        self.assertEqual(second['teacher_token_ids'], [])
+        self.assertEqual(third['teacher_token_ids'], [1002])
+        self.assertEqual(fourth['teacher_token_ids'], [work])
         self.assertEqual([first['text_commit_index'], second['text_commit_index'],
                           third['text_commit_index'], fourth['text_commit_index']],
-                         [1, 4, 10, 10])
-        self.assertEqual(front.teacher_ids, [1001] + list(map(ord, 'net')) + [32] + list(map(ord, 'works')))
-        self.assertEqual(front.model.calls[0], [-1, -2, -3, 1001, 151674])
-        self.assertEqual(front.model.calls[1], [nonidle, -2, -3] + list(map(ord, 'net')) + [151674])
-        self.assertEqual(front.kv, [-1, -2, -3, 1001, 151674, nonidle, -2, -3]
-                         + list(map(ord, 'net')) + [151674, nonidle, -2, -3, 32]
-                         + list(map(ord, 'works')) + [151674, nonidle, -2, -3, 151674])
+                         [0, 0, 1, 2])
+        self.assertEqual([first['tail_reencode_count'], second['tail_reencode_count'],
+                          third['tail_reencode_count'], fourth['tail_reencode_count']], [1, 1, 1, 0])
+        self.assertEqual([first['tail_replace_tokens'], second['tail_replace_tokens'],
+                          third['tail_replace_tokens'], fourth['tail_replace_tokens']], [0, 1, 1, 1])
+        self.assertEqual(front.teacher_ids, front.model.model.tokenizer.encode('internet works'))
+        self.assertEqual(front.teacher_ids, [1002, work])
+        self.assertEqual(front.model.calls[0], [-1, -2, -3, 151674])
+        self.assertEqual(front.model.calls[1], [nonidle, -2, -3, 151674])
+        self.assertEqual(front.model.calls[2], [nonidle, -2, -3, 1002, 151674])
+        self.assertEqual(front.model.calls[3], [nonidle, -2, -3, work, 151674])
         self.assertFalse(hasattr(front, '_revise'))
         self.assertFalse(hasattr(front, 'checkpoint'))
         self.assertFalse(hasattr(front, 'entries'))
@@ -171,7 +181,7 @@ class TeacherInputTests(unittest.TestCase):
     def test_rewritten_control_prefix_is_rejected(self):
         nonidle = STATE_IDS['<|user_nonidle|>']
         front = self.make([nonidle] * 3)
-        with patch('nemotron_teacher_frontend.official_control_text', side_effect=['ab', 'ac']):
+        with patch('nemotron_teacher_frontend.official_control_text', side_effect=['ab cd', 'ac cd']):
             self.step(front, 1, '1')
             with self.assertRaisesRegex(ValueError, 'rewrote committed history'):
                 self.step(front, 2, '12')
@@ -191,8 +201,8 @@ class TeacherInputTests(unittest.TestCase):
         first = self.step(front, 1, '')
         self.assertFalse(first['state_accepted'])
         self.step(front, 2, 'a')
-        self.assertEqual(front.model.calls[1], [-2, -3, 97, 151674])
         self.assertNotIn(66, front.kv)
+        self.assertEqual(front.model.calls[1], [-2, -3, 151674])
 
     def test_empty_text_blocks_stay_empty(self):
         nonidle = STATE_IDS['<|user_nonidle|>']
@@ -347,9 +357,10 @@ class AudioPairingTests(unittest.TestCase):
         self.assertEqual(record['frames'], 2)
         self.assertEqual(record['online_text'], 'internet')
         self.assertEqual(record['drained_text'], 'internet tail')
+        self.assertEqual(record['teacher_tail']['pending_text'], '')
         self.assertEqual(releases, [(2, 'context'), (3, 'context')])
-        self.assertEqual(frames[0]['delta_text'], 'internet')
-        self.assertEqual(frames[1]['delta_text'], '')
+        self.assertEqual(frames[0]['delta_text'], '')
+        self.assertEqual(frames[1]['delta_text'], 'internet')
         self.assertEqual(frames[0]['native_step']['step_seq'], 2)
         self.assertEqual(frames[0]['teacher_step_seq'], 1)
         self.assertEqual(frames[0]['asr_observation_ahead_ms'], 99)
