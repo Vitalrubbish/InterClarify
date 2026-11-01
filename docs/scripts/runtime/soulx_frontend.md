@@ -1,6 +1,8 @@
-# SoulX＋SenseVoice 当前值前端
+# SoulX＋SenseVoice 当前值前端（历史）
 
-对应 `scripts/runtime/soulx_frontend.py`。`SoulXFrontend` 管理一个稳定逻辑话轮，复用官方SenseVoice、音频编码、门控、KV修正与五状态预测。默认每160ms联合发布SenseVoice正文和状态；NTF-005增加可选的`frame_sink`和独立`publication_source`，由双ASR组合器接收冻结状态，配对Nemotron正文后发布，SenseVoice控制输入保持原生。
+对应 `scripts/runtime/soulx_frontend.py`。**2026-11-01 起不再是现役链路**：当前路线以 Nemotron 为唯一教师文本，使用 `nemotron_teacher_frontend.py`；本模块及官方整段识别路径仅保留为历史对照，不再启动远端作业。以下说明记录其原有行为。
+
+`SoulXFrontend` 管理一个稳定逻辑话轮，复用官方SenseVoice、音频编码、门控、KV修正与五状态预测。默认每160ms联合发布SenseVoice正文和状态；NTF-005增加可选的`frame_sink`和独立`publication_source`，由双ASR组合器接收冻结状态，配对Nemotron正文后发布，SenseVoice控制输入保持原生。
 
 `instrument_methods()` 校验冻结`service/model.py`摘要后，用AST插入原始预测与状态回调，以及音频拼接／裁剪采样账本。模型、权重和共享上游目录不修改。附加状态仍逐项校验tokenizer与配置ID，FunASR1.2.6后处理字典与摘要保持冻结。
 

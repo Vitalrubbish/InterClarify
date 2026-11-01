@@ -1,6 +1,7 @@
 """Force native ASR increments into SoulX and publish one joint current value."""
 from __future__ import annotations
 
+from collections import deque
 import hashlib
 import inspect
 from pathlib import Path
@@ -129,6 +130,10 @@ class NemotronTeacherFrontend:
         self.generation, self.closed = 0, False
         self.empty_nonidle_rule = empty_nonidle_rule
         self.control_text = ''
+        self.rerecognition_calls = 0
+        self.audio_buffer = deque()
+        self.audio_overflow = 0
+        self.max_audio_blocks = 4
         tokenizer = model.model.tokenizer
         for token, expected in STATE_IDS.items():
             if tokenizer.encode(token, add_special_tokens=False) != [expected]:
@@ -155,6 +160,16 @@ class NemotronTeacherFrontend:
         with torch.inference_mode():
             return self.model.model.llm(inputs_embeds=embeds.unsqueeze(0), past_key_values=kv, use_cache=True)
 
+    def prepare_audio(self, back, chunk, ahead):
+        """Encode one block now; the state step consumes it after text is ready."""
+        ids = self.model._audio_to_tokens(back, chunk, ahead)
+        embeds = self.model._tokens_to_embeds(ids)
+        if len(self.audio_buffer) >= self.max_audio_blocks:
+            self.audio_buffer.popleft()
+            self.audio_overflow += 1
+        self.audio_buffer.append((ids, embeds))
+        return ids
+
     def process_step(self, step, chunk, back, ahead, processed_until, observed_until):
         import torch
         if self.closed:
@@ -166,12 +181,16 @@ class NemotronTeacherFrontend:
         # A word boundary or a decoder pause makes the pending word final.
         update = self.text.update(self.control_text)
         ids = update['committed_ids']
+        if self.audio_buffer:
+            audio_ids, audio_embeds = self.audio_buffer.popleft()
+        else:
+            audio_ids = model._audio_to_tokens(back, chunk, ahead)
+            audio_embeds = model._tokens_to_embeds(audio_ids)
         parts = [model.text_embeds] if self.kv is None else []
         feedback = self.pending_state
         if feedback is not None:
             parts.append(self._embed([feedback]))
-        audio_ids = model._audio_to_tokens(back, chunk, ahead)
-        parts.append(model._tokens_to_embeds(audio_ids))
+        parts.append(audio_embeds)
         if ids:
             parts.append(self._embed(ids))
         parts.append(model.audio_eos_embeds)
@@ -198,20 +217,31 @@ class NemotronTeacherFrontend:
             token_id = STATE_IDS[token]
             adjustment = 'nonidle_to_idle' if transition else 'empty_nonidle_count'
         valid = token in STATE_IDS and STATE_IDS[token] == token_id
-        far_field = (valid and token == '<|user_nonidle|>' and not self.speech_detected
+        speech_before = self.speech_detected
+        far_field = (valid and token == '<|user_nonidle|>' and not speech_before
                      and model.get_rms(chunk) < model.config.infer_config.far_field_threshold)
-        reason = 'unknown_state' if not valid else 'far_field' if far_field else None
+        reason = ('unknown_state' if not valid else 'far_field' if far_field
+                  else 'no_speech' if token == '<|user_complete|>' and not speech_before else None)
         self.pending_state = token_id if reason is None else None
         self.previous_state = token if reason is None else None
         self.speech_detected |= reason is None and token == '<|user_nonidle|>'
         resolved = time.monotonic()
+        service_state = ('speak' if token in ('<|user_complete|>', '<|user_incomplete|>') and reason is None
+                         else 'idle' if token == '<|user_idle|>' and reason is None
+                         else 'nonidle' if token in ('<|user_nonidle|>', '<|user_backchannel|>') and reason is None
+                         else None)
+        completion = ('model_complete' if service_state == 'speak' and token == '<|user_complete|>'
+                      and speech_before else None)
+        service_text = self.text.pending_text if service_state == 'speak' else ''
         frame = {'session_id': self.session_id, 'turn_id': 'user-1', 'source': 'nemotron',
                  'text': self.cursor.text, 'state_token': token, 'state_token_id': token_id if valid else None,
                  'state_accepted': reason is None, 'rejection_reason': reason,
                  'processed_until': processed_until, 'audio_observed_until': observed_until,
                  'assembly_status': 'native_prefix', 'coverage_complete': True, 'status': 'open',
                  'raw_token': raw, 'raw_token_id': raw_id, 'adjustment': adjustment,
-                 'controller_generation': self.generation, 'state_resolved_at': resolved}
+                 'controller_generation': self.generation, 'state_resolved_at': resolved,
+                 'speech_detected': speech_before, 'service_state': service_state,
+                 'service_completion_source': completion, 'service_text': service_text}
         snapshot = self.context.publish_user_frame(frame)
         audit = dict(snapshot, native_step=step, delta_text=delta, raw_delta_text=raw_delta,
                      teacher_token_ids=ids, control_text=self.control_text,
@@ -226,6 +256,10 @@ class NemotronTeacherFrontend:
                      control_consumption='consumed' if ids else 'pending_tail' if update['pending_text'] else 'no_delta',
                      feedback_state_id=feedback, audio_token_ids=audio_ids,
                      kv_tokens=self.kv_length,
+                     audio_buffer_depth=len(self.audio_buffer),
+                     audio_buffer_overflow=self.audio_overflow,
+                     whole_turn_rerecognition_calls=self.rerecognition_calls,
+                     flushed_text_chars=len(service_text),
                      teacher_char_end=len(self.cursor.text), teacher_injected_at=teacher_injected_at,
                      controller_started_at=started,
                      empty_nonidle_count=self.mistakes, empty_nonidle_rule=self.empty_nonidle_rule)

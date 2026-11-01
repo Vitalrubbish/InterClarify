@@ -8,7 +8,7 @@
 
 2026-10-30 最新用户授权覆盖下述历史首版选型：实施 [Nemotron Teacher Forcing 同步前端](dev/SoulX-Duplug/nemotron_teacher_forcing.md)，替代该实验路径的 SenseVoice 门控与滑窗识别，并运行 FDB 三轴各10条固定小样本。两份模型权重固定，不接下游、不训练；具体资源与验收见 [NTF 工作单](issue/README.md)。
 
-2026-10-31最新设计改为[双ASR缓存发布](dev/SoulX-Duplug/dual_asr_publication.md)，NTF-005已交付并归档，见[正式结果](../reports/soulx/20261031-dual-asr-publication/README.md)：SenseVoice恢复官方控制路径，SoulX每160ms独立预测状态并暂存；Nemotron独立完成对应音频范围解码，单写者配对发布其正文和缓存状态。两路计算不等待对方发布，SharedContext仍只保留当前值。本轮预检3/3通过、正式18/30完整，12条触及800ms停止线，实时及整体状态质量未通过；没有切换下游。以下教师文字路径作为历史对照。
+2026-11-01 最新路线为 Nemotron 唯一教师文本：NTF-007 已交付纯追加文本路径，三轴预检3/3，见[报告](../reports/soulx/20261101-ntf007-teacher-append-only/README.md)；NTF-008 正在实现单块缓冲、`A_n→T_n→EOS` 逐帧对齐，删除双ASR配对器与complete后整轮重识别；NTF-009 做固定30条同卡对照。此前双ASR路线见[归档方案](archive/dev/SoulX-Duplug/dual_asr_publication.md)，正式18/30完整、12条800ms触限，实时及整体状态质量未通过。
 
 现役底座仍为 X-Talk `ca9b23c`、DuplexCascade、Nemotron EN160 与 Kokoro，参数见[运行配置](runtime_baseline.md)。此前实验为 **Nemotron Teacher Forcing＋SoulX-Duplug 语音前端**，位于 Layer 0–Layer 2 输入侧；每步先取得Nemotron文字，经SoulX音频门控后按需消费规范化教师文字，再输入EOS预测状态，发布后解除解码屏障。同一活动话轮只使用一个权威转写来源。SenseVoice 首版及旧 Nemotron 独立组合保留为历史基线。
 
@@ -26,11 +26,11 @@
 ## 2. 前端适配顺序
 
 1. **冻结首版资产**：已复用 SoulX、SenseVoiceSmall 及 conda，英文 `language=en`；远端单卡最小加载检查通过，版本与资源记录见[报告](../reports/soulx/20261029-frontend-deployment/README.md)。未升级现役 ASR/TTS 环境，后续接口验证仍须独立核算资源。
-2. **接通语音前端**：最新已实现[双ASR配对器](scripts/runtime/dual_asr_frontend.md)和[独立解码进程](scripts/remote/dual_asr_worker.md)，SenseVoice恢复官方滑窗、门控、修订和reset，Nemotron独立提供共享正文。两路计算无跨路逐步屏障；有界队列按真实覆盖冻结配对。NTF-004[教师文字前端](scripts/runtime/nemotron_teacher_frontend.md)及其soft reset保留为历史对照。
+2. **接通语音前端**：现役路径为[Nemotron 教师文字前端](scripts/runtime/nemotron_teacher_frontend.md)，流式ASR提供唯一文本，SoulX只预测五类状态；NTF-007 已交付纯追加文本路径，NTF-008 正在实现单块缓冲与 `A_n→T_n→EOS` 对齐。旧双ASR配对器与独立解码进程已移除，文档归档在`docs/archive/`。
 3. **交付 Context 接口**：按稳定 `turn_id` 持续写入转写，不等待 `user_complete`；验证窗口重叠、修订和控制器重置不会造成漏字、重复文本或新建话轮。提供最新全文与状态的原子读取，核查修订覆盖、reset 连续、关闭及 EOF 分离，见[接口合同](dev/SoulX-Duplug/shared_context_interface.md)。
 4. **打通表达与打断**：明确状态输入编码、Layer 1 生成边界和直接打断接口，验证输出标识失效、停播确认及新输出恢复；旧 DuplexCascade 控制不能与新路径重复执行。
 5. **接入思考并验证重叠**：在研究模块细节确认后，验证用户未说完时转写已可读、Layer 1 可请求思考、Layer 2 可回写结果，前端与表达／思考能够重叠执行。前端 CoT 条件化仍属于后续适配与训练，不是首版链路的先决条件。
-6. **小样本质量验证**：复用FDB三轴各10条冻结样本，真实时钟、单卡、单作业运行。最新NTF-005双ASR实验已交付，正式18/30完整、12条800ms触限；共同18条打断检出改善，接话及主块口径停顿退化，实时和整体质量未通过，见[报告](../reports/soulx/20261031-dual-asr-publication/README.md)。本单归档，不继续重试或扩展模型/规则。
+6. **小样本质量验证**：复用FDB三轴各10条冻结样本，真实时钟、单卡、单作业运行。NTF-007 三轴预检3/3通过，下一轮NTF-009做固定30条同卡对照。历史双ASR实验正式18/30完整、12条800ms触限，实时和整体质量未通过，见[报告](../reports/soulx/20261031-dual-asr-publication/README.md)。
 
 Nemotron独立适配的四视图单卡实时探针已完成，正文及消费版本结构一致，未增加固定稳定等待；结果和状态质量／EOF尾部限制见[组合报告](../reports/soulx/20261030-nemotron-integration/README.md)。这不代表第4／5步的下游生成、CoT或真实播放已实施。
 
@@ -40,7 +40,7 @@ Nemotron独立适配的四视图单卡实时探针已完成，正文及消费版
 
 SoulX 联合音频 token、转写文本 token 与已发布 CoT token 的目标已确认，当前不实现。序列、边界编码、缓存、触发方式、输出是否扩展及训练配置按[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)后续确定，不继承旧文本控制器协议。
 
-Layer 1 表达与思考调用、Layer 2 分步分析及两组专项训练采用[共同训练约定](research_design/architecture.md#7-共同训练与数据约定)。Layer 0 系统附和专项保留在总计划，具体模型、数据规模和预算实施前细化，当前不采集或训练。Layer 3 定位待统一，不新增实现。
+Layer 1 表达与思考调用、Layer 2 分步分析及两组专项训练采用[共同训练约定](research_design/architecture.md#7-共同训练与数据约定)。Layer 0 系统附和专项保留在总计划，具体模型、数据规模和预算实施前细化，当前不采集或训练。
 
 完整话轮评测另行规划，可参考 FDB 的接话、停顿、用户附和及打断子集；系统附和须独立核查合理性与实际发声。控制返回时间不能代替可听响应时间，历史 FDB/FLEURS 作业不自动恢复。
 

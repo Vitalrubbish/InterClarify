@@ -1,6 +1,6 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
-2026-10-31 当前确认的下一步选型为 **SoulX-Duplug＋SenseVoice控制路径、独立Nemotron正文与缓存状态配对发布**，见[双ASR方案](dev/SoulX-Duplug/dual_asr_publication.md)和[NTF-005结果](../reports/soulx/20261031-dual-asr-publication/README.md)。前端位于Layer 0–Layer 2输入侧：SenseVoice保留官方滑窗、门控、文字修订及controller reset，为0.6B提供控制文字；Nemotron保留原生流式缓存，为SharedContext提供唯一原始正文。SoulX每160ms独立预测状态并缓存，待真实采样覆盖配对的Nemotron解码完成后，再按音频顺序联合发布正文与状态；两路不再等待本步发布后才继续计算。NTF-005独立双ASR入口与固定实验已交付并归档：正式18/30完整、12条触及800ms停止线，实时未通过、状态质量未整体改善。两套ASR及SoulX权重固定，不训练，尚未切换现役下游Agent。
+2026-11-01 当前路线为 **Nemotron 作为唯一教师文本、取消 SenseVoice 滑窗与双路配对发布**。NTF-007 已完成纯追加文本路径并通过三轴预检3/3，见[报告](../reports/soulx/20261101-ntf007-teacher-append-only/README.md)；NTF-008 正在实现单块缓冲与 `A_n → T_n → <|end_of_sentence|>` 逐帧对齐，之后进入 NTF-009 的固定30条同卡对照。此前 SoulX＋SenseVoice控制、独立Nemotron正文与配对发布保留为历史对照，见[已归档方案](archive/dev/SoulX-Duplug/dual_asr_publication.md)与[NTF-005结果](../reports/soulx/20261031-dual-asr-publication/README.md)。模型权重固定，不训练，尚未切换现役下游Agent。
 
 NTF-004官方格式与门控对照已交付：预检3/3通过，正式25/30完整、5条积压触限，状态指标未整体改善；共享正文与控制文字消费分别审计，未切换下游Agent，见[对照报告](../reports/soulx/20261031-nemotron-teacher-gate/README.md)。
 
@@ -8,7 +8,7 @@ NTF-004官方格式与门控对照已交付：预检3/3通过，正式25/30完�
 
 用户进一步确认：保留 CoT 条件下的主动澄清与话轮决策目标，后续让 SoulX-Duplug 联合读取音频 token、转写文本 token 和 Layer 2 已发布的 CoT token；当前不实现这项扩展。当前保留原生五类用户状态 token，全部送入 Layer 1，由 LLM 决定自身行为；普通正式回答在当前 turn 看到对应的 `user_complete` 后开始生成，看到之前不生成正文。后续 CoT 阶段是否扩展控制器输出另行设计，见[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
 
-研究任务与单一仲裁执行点、单一 TTS 播放所有权及已听内容不可撤销的边界保持。仅有效用户打断额外进入输出运行时：活动输出期间 `user_nonidle` 立即触发停止，涵盖准备与播放。其他状态不进入输出运行时，不映射成 start 或 keep；`user_complete` 不额外发起 LLM 回答调用，`user_backchannel` 由 LLM 读取并决定表达行为。具体路径见[架构第 2.2 节](research_design/architecture.md#22-前端状态与系统附和)。状态输入编码与 Layer 3 定位待后续讨论。TextTurn 专属协议不自动成为 SoulX 合同，旧作业不因本次选型恢复。
+研究任务与单一仲裁执行点、单一 TTS 播放所有权及已听内容不可撤销的边界保持。仅有效用户打断额外进入输出运行时：活动输出期间 `user_nonidle` 立即触发停止，涵盖准备与播放。其他状态不进入输出运行时，不映射成 start 或 keep；`user_complete` 不额外发起 LLM 回答调用，`user_backchannel` 由 LLM 读取并决定表达行为。具体路径见[架构第 2.2 节](research_design/architecture.md#22-前端状态与系统附和)。状态输入编码待后续讨论。TextTurn 专属协议不自动成为 SoulX 合同，旧作业不因本次选型恢复。
 
 旧 TextTurn／VoxTurn／XTurnix 的数据、训练与测试修订已全部归档，入口见[历史路线归档](archive/dev/README.md)和对应报告；历史工作单在本地 `docs/issue/archive/`。保留历史合同，不继承为 SoulX 协议。
 
@@ -45,7 +45,7 @@ thinking 流是与表达分工的内部任务分析过程。“独立”表示�
 
 系统主动纠正用户、提醒遗漏、调整用户任务顺序，以及紧急提醒、闲聊插话和情绪支持留作后续扩展。系统自我修正属于表达任务，不能据此扩展为主动纠正用户。
 
-两项任务采用同一 Agent。Layer 2 只发布 CoT，不提供话轮状态转移建议或候选表达文本，Layer 1 负责思考请求与语言表达。目标控制器 SoulX-Duplug 后续结合音频、转写和 CoT 共同判断等待与介入，保留主动澄清能力的研究目标；当前不实现 CoT 注入或相应训练，普通状态预测不等于已经具备该能力。CoT 的序列组织、边界编码、缓存与训练方式待后续设计。Layer 3 定位待统一，本轮不新增实现。所有输出经单一仲裁器与单一 TTS 播放路径，已听内容不可撤销。具体合同统一写在架构文档，TextTurn 的动作与训练规则保留在历史记录和原工作单。
+两项任务采用同一 Agent。Layer 2 只发布 CoT，不提供话轮状态转移建议或候选表达文本，Layer 1 负责思考请求与语言表达。目标控制器 SoulX-Duplug 后续结合音频、转写和 CoT 共同判断等待与介入，保留主动澄清能力的研究目标；当前不实现 CoT 注入或相应训练，普通状态预测不等于已经具备该能力。CoT 的序列组织、边界编码、缓存与训练方式待后续设计。本项目不设 Layer 3，本轮不新增修订或回滚实现。所有输出经单一仲裁器与单一 TTS 播放路径，已听内容不可撤销。具体合同统一写在架构文档，TextTurn 的动作与训练规则保留在历史记录和原工作单。
 
 ## 4. 文档树与阅读顺序
 

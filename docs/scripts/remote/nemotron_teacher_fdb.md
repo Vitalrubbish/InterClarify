@@ -13,3 +13,5 @@ NTF-003 修正：`AudioProgressPairing` 分别跟踪原生解码步和SoulX状�
 NTF-004结果与逐帧审计增加控制配置、门控比例、消费滞后、待消费尾部、KV重放次数和时间。离线分析即使运行失败也可读取部分轨迹；共同完整样本与共同音频覆盖分列，失败不进入质量成功率。
 
 NTF-007起逐帧审计改为`text_commit_index`、`text_injected_tokens`、`tail_reencode_count`、`tail_replace_tokens`、`pending_text`和`kv_tokens`；不再记录门控、检查点或重放字段。`teacher_tail`保存关闭时的已注入token、未完成尾词及其编码。历史NTF-004报告仍由旧分析脚本读取，新帧要使用新字段。
+
+NTF-008起不再有`startup`发布：首个不足主块的流式ASR步骤只被跳过，音频块由首次覆盖主块截止的步骤配对。`BarrierSession`允许最多4步前瞻；`run_case()`记录`buffer_depth`、`buffer_overflow`和`eof_partial`，EOF不足下一窗口时保留已到达文本诊断而不补静音。教师帧同时带`service_state`、`service_completion_source`、`speech_detected`、`service_text`；complete只flush文本并软reset，`whole_turn_rerecognition_calls=0`。

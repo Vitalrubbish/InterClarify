@@ -8,4 +8,6 @@ NTF-003 增加实际采样进度配对用例：92.5ms首块不产生状态，259
 
 NTF-007改为纯追加契约：每步新控制片段只追加一次，历史token逐字节不变；检查尾部词重编码计数与token数、尾部范围越界报错、无`_revise`／检查点／账本属性、空文本块保持为空，以及关闭时不追加前向。旧门控、跨片段重建和缓存上限用例随实现删除，历史报告仍保留。
 
+NTF-008增加：首个不足主块的流式步骤只跳过、不单独release；屏障最多4步前瞻且可按范围释放；complete无前置nonidle时`no_speech`拒绝、有语音时`model_complete`；complete只flush文本且`whole_turn_rerecognition_calls=0`；EOF保留`eof_partial`诊断。
+
 真实模型与替身统一使用冻结ASR结束符ID151674；与五类状态token独立核查，结束符不能作为普通正文或状态反馈。

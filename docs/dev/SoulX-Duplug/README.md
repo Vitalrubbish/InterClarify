@@ -4,16 +4,13 @@
 
 ## 已确认合同
 
-- 前端包含Nemotron教师文本、SoulX音频编码及状态预测；同一活动话轮的SharedContext正文只用Nemotron一个权威来源，不再使用SenseVoice控制文字或双路配对队列。当前NTF-007仍是逐帧直接发布；NTF-008将改为单块缓冲、音频→文本→结束符严格对齐，并删除`PairedPublisher`。读取与关闭规则见[接口设计](shared_context_interface.md)，最新结果见[纯追加报告](../../../reports/soulx/20261101-ntf007-teacher-append-only/README.md)。
-- 2026-10-31历史：曾采用[双ASR缓存发布](dual_asr_publication.md)，SenseVoice提供控制文字、Nemotron独立提供正文，状态配对后发布。NTF-005正式18/30完整、12条触及800ms停止线，实时与状态质量未通过，见[报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)。该路线已由 Nemotron 唯一教师文本取代。
+- 前端包含Nemotron教师文本、SoulX音频编码及状态预测；同一活动话轮的SharedContext正文只用Nemotron一个权威来源，不再使用SenseVoice控制文字或双路配对队列。当前NTF-007已交付逐帧直接发布，NTF-008正在改为单块缓冲、音频→文本→结束符严格对齐，并删除`PairedPublisher`及complete后整轮重识别。读取与关闭规则见[接口设计](shared_context_interface.md)，最新结果见[纯追加报告](../../../reports/soulx/20261101-ntf007-teacher-append-only/README.md)。
+- 2026-10-31历史：曾采用[双ASR缓存发布](../../archive/dev/SoulX-Duplug/dual_asr_publication.md)，SenseVoice提供控制文字、Nemotron独立提供正文，状态配对后发布。NTF-005正式18/30完整、12条触及800ms停止线，实时与状态质量未通过，见[报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)。该路线已由 Nemotron 唯一教师文本取代，代码与文档已归档。
 
 2026-10-30此前按用户明确指令回滚：撤回`bd86478`的原生delta草稿＋controller片段整段覆盖，撤回`b00afac`与`6930fa7`的固定起点重识别候选文档。运行代码与前端测试恢复到`484ca32`对应基线，保留160ms正文／状态联合覆盖接口；这会恢复旧窗口整理及已知gap，并不表示旧方案质量达标。历史测试报告、原始证据和离线汇总脚本保留，未恢复旧Nemotron组合代码或提交新远端作业。既有conda下前端5项、SharedContext及TextTurn Context共7项、独立Nemotron服务5项检查全部通过；用户原有未提交修改保持不变。
 
 用户已授权 Nemotron 按160ms持续解码、直接 teacher forcing 文字，0.6B仅发布用户状态；两份模型权重固定，通过逐块屏障同步推进，见[工程同步方案](nemotron_teacher_forcing.md)。接入及 FDB 三轴各10条实测已完成：3185帧同步顺序通过，状态质量没有整体改善，见[报告](../../../reports/soulx/20261030-nemotron-teacher-fdb30/README.md)；[工作单](../../issue/README.md)已归档。SenseVoice及旧独立组合保留为历史基线，不恢复其作业。
 
-## 已确认合同
-
-- 前端包含ASR调用与文本整理、SoulX音频编码及状态预测；同一活动话轮的SharedContext正文只用Nemotron一个权威来源，内部SenseVoice控制文字独立审计，不作为共享正文。每160ms状态先缓存，与首次充分覆盖实际音频的Nemotron步骤配齐后联合覆盖当前值；不等待complete，不保留历史正文版本。读取与关闭规则见[接口设计](shared_context_interface.md)，最新结构与实时结果见[双ASR报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)；历史六视图当前值验证不替代双ASR实时验收。
 - 前端持续接收音频，可与下游表达、思考并发执行。Layer 0 仍负责系统附和时机；未来 CoT 从 Context 反馈至前端，当前不实现条件化扩展。
 - SoulX 保留音频路径和原生五类用户状态，全部送入 Layer 1；普通正式回答在当前 turn 读取对应 `user_complete` 后生成，不额外发起独立回答调用。
 - 活动输出期间有效 `user_nonidle` 额外直接触发停止，涵盖 preparing 和 playing；其他状态不进入输出运行时，不映射为 start 或 keep。完整路径见[架构第 2.2 节](../../research_design/architecture.md#22-前端状态与系统附和)。

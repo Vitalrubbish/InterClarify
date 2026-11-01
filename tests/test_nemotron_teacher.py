@@ -43,16 +43,16 @@ class BarrierTests(unittest.TestCase):
             def run(self, source, emit, complete):
                 emit('inter', [1])
                 complete({'step_seq': 1, 'decode_completed_at': time.monotonic()})
-                advanced.set()
                 complete({'step_seq': 2, 'decode_completed_at': time.monotonic()})
-        session = BarrierSession(Engine())
+                advanced.set()
+        session = BarrierSession(Engine(), max_ahead=1)
         deadline = time.monotonic() + 1
         while session.step_seq != 1 and time.monotonic() < deadline:
             time.sleep(.001)
         self.assertEqual(session.read_steps()['steps'][0]['text'], 'inter')
         self.assertFalse(advanced.is_set())
         with self.assertRaises(ValueError):
-            session.release(2, time.monotonic())
+            session.release(3, time.monotonic())
         session.release(1, time.monotonic())
         self.assertTrue(advanced.wait(1))
         with self.assertRaises(ValueError):
@@ -223,6 +223,42 @@ class TeacherInputTests(unittest.TestCase):
             if not enabled:
                 self.assertEqual(frames[3]['adjustment'], 'nonidle_to_idle')
 
+    def test_audio_embedding_buffer_is_bounded_and_drops_oldest(self):
+        nonidle = STATE_IDS['<|user_nonidle|>']
+        front = self.make([nonidle] * 2)
+        for _ in range(5):
+            front.prepare_audio(None, None, None)
+        self.assertEqual(len(front.audio_buffer), 4)
+        self.assertEqual(front.audio_overflow, 1)
+        frame = self.step(front, 1, '')
+        self.assertEqual(frame['audio_buffer_depth'], 3)
+        self.assertEqual(frame['audio_buffer_overflow'], 1)
+
+    def test_complete_without_speech_is_rejected_without_rerecognition(self):
+        complete = STATE_IDS['<|user_complete|>']
+        front = self.make([complete])
+        frame = self.step(front, 1, 'hello')
+        self.assertFalse(frame['state_accepted'])
+        self.assertEqual(frame['rejection_reason'], 'no_speech')
+        self.assertIsNone(frame['service_state'])
+        self.assertIsNone(frame['service_completion_source'])
+        self.assertEqual(frame['whole_turn_rerecognition_calls'], 0)
+        self.assertEqual(frame['service_text'], '')
+
+    def test_complete_after_speech_reports_model_completion_and_flushes_text(self):
+        nonidle, complete = STATE_IDS['<|user_nonidle|>'], STATE_IDS['<|user_complete|>']
+        front = self.make([nonidle, complete])
+        first = self.step(front, 1, 'hello ')
+        second = self.step(front, 2, 'hello world')
+        self.assertTrue(first['speech_detected'] is False)
+        self.assertTrue(second['state_accepted'])
+        self.assertEqual(second['speech_detected'], True)
+        self.assertEqual(second['service_state'], 'speak')
+        self.assertEqual(second['service_completion_source'], 'model_complete')
+        self.assertEqual(second['service_text'], 'world')
+        self.assertEqual(second['whole_turn_rerecognition_calls'], 0)
+        self.assertEqual(second['text'], 'hello world')
+
     def test_complete_uses_delivered_text_without_extra_forward(self):
         nonidle = STATE_IDS['<|user_nonidle|>']
         front = self.make([nonidle] * 3)
@@ -243,7 +279,7 @@ class AudioPairingTests(unittest.TestCase):
         pairing = AudioProgressPairing()
         cursor = TeacherCursor()
         first = self.native(1, 1480, 4144, 'inter')
-        self.assertEqual(pairing.accept(first, 2560), 'startup')
+        self.assertEqual(pairing.accept(first, 2560), 'skip')
         self.assertEqual((pairing.native_seq, pairing.teacher_seq), (1, 0))
         second = self.native(2, 4144, 6704, 'internet')
         self.assertEqual(pairing.accept(second, 2560), 'context')
@@ -311,7 +347,7 @@ class AudioPairingTests(unittest.TestCase):
         self.assertEqual(record['frames'], 2)
         self.assertEqual(record['online_text'], 'internet')
         self.assertEqual(record['drained_text'], 'internet tail')
-        self.assertEqual(releases, [(1, 'startup'), (2, 'context'), (3, 'context')])
+        self.assertEqual(releases, [(2, 'context'), (3, 'context')])
         self.assertEqual(frames[0]['delta_text'], 'internet')
         self.assertEqual(frames[1]['delta_text'], '')
         self.assertEqual(frames[0]['native_step']['step_seq'], 2)

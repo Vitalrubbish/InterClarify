@@ -91,7 +91,7 @@ def rpc(path, operation, **payload):
 
 
 class AudioProgressPairing:
-    """Pair by arrived PCM coverage while keeping native and teacher steps separate."""
+    """Pair the first native window covering each main block, without a first-block exception."""
 
     def __init__(self):
         self.native_seq = self.teacher_seq = self.observed_end = self.next_end = 0
@@ -107,16 +107,14 @@ class AudioProgressPairing:
             raise ValueError('Native feature window differs from announced next window')
         if target_end != (self.teacher_seq + 1) * 2560:
             raise ValueError('Teacher audio target skipped or duplicated')
-        startup = end < target_end
-        if startup and (self.native_seq != 0 or self.teacher_seq != 0):
-            raise ValueError('Only the first short native chunk may precede a teacher step')
-        if not startup and self.observed_end >= target_end:
+        if self.observed_end >= target_end:
             raise ValueError('Pairing skipped an earlier sufficient native window')
         self.native_seq, self.observed_end = step['step_seq'], end
         self.next_end = step['next_feature_end_sample']
-        if not startup:
-            self.teacher_seq += 1
-        return 'startup' if startup else 'context'
+        if end < target_end:
+            return 'skip'
+        self.teacher_seq += 1
+        return 'context'
 
 
 def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
@@ -158,11 +156,9 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
     reader = threading.Thread(target=feed, daemon=True)
     reader.start()
     pairing = AudioProgressPairing()
-    seq, pending_step = 0, None
-    startup_steps = []
-    previous_released_at = None
+    seq, max_blocks = 0, 4
+    overflow, eof_partial = [], None
     file = (output / f'{case_id}.frames.jsonl').open('x')
-    startup_file = (output / f'{case_id}.startup.jsonl').open('x')
     try:
         while True:
             begin, end = seq * 2560, (seq + 1) * 2560
@@ -173,6 +169,9 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
                 if state['error']:
                     raise RuntimeError(state['error'])
                 if state['end'] < required_end:
+                    eof_partial = {'begin': begin, 'end': state['end'],
+                                   'reason': 'insufficient_native_window',
+                                   'arrived_text': frontend.cursor.text}
                     break
                 if state['end'] - begin > 12800:
                     raise RuntimeError('Teacher processing backlog exceeded 800ms')
@@ -181,32 +180,33 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
                               (max(0, back_size - begin), 0))
                 chunk = buffer[begin - base:end - base].copy()
                 ahead = buffer[end - base:end + ahead_size - base].copy()
-            while pending_step is None:
+            if pairing.native_seq - pairing.teacher_seq > max_blocks:
+                overflow.append({'begin': begin, 'end': end, 'depth': pairing.native_seq - pairing.teacher_seq,
+                                 'at': time.monotonic(), 'reason': 'pair_buffer_overflow'})
+                pairing.teacher_seq += 1
+                seq += 1
+                with arrived:
+                    retain = max(0, end - back_size)
+                    buffer = buffer[retain - base:]
+                    base = retain
+                continue
+            with torch.inference_mode():
+                frontend.prepare_audio(back, chunk, ahead)
+            while True:
                 if state['error']:
                     raise RuntimeError(state['error'])
                 batch = rpc(path, 'poll', session_id=identity, after=pairing.native_seq)
-                if batch['steps']:
-                    if len(batch['steps']) != 1:
-                        raise AssertionError('ASR decoded beyond its publication barrier')
-                    pending_step = batch['steps'][0]
+                if not batch['steps']:
+                    if time.monotonic() - (started + end / 16000) > .8:
+                        raise RuntimeError('ASR completion backlog exceeded 800ms')
+                    stopped.wait(.002)
+                    continue
+                if len(batch['steps']) != 1:
+                    raise AssertionError('ASR decoded beyond its bounded lookahead')
+                step = batch['steps'][0]
+                kind = pairing.accept(step, end)
+                if kind == 'context':
                     break
-                if time.monotonic() - (started + end / 16000) > .8:
-                    raise RuntimeError('ASR completion backlog exceeded 800ms')
-                stopped.wait(.002)
-            step = pending_step
-            kind = pairing.accept(step, end)
-            if previous_released_at is not None and step['decode_started_at'] < previous_released_at:
-                raise AssertionError('ASR advanced before its preceding barrier release')
-            if kind == 'startup':
-                startup = {'native_step': step, 'startup_recorded_at': time.monotonic()}
-                startup_file.write(json.dumps(startup, ensure_ascii=False) + '\n')
-                startup_file.flush()
-                release = rpc(path, 'release', session_id=identity, step_seq=step['step_seq'],
-                              published_at=startup['startup_recorded_at'], publication_kind='startup')
-                startup_steps.append(dict(startup, **release))
-                previous_released_at = release['released_at']
-                pending_step = None
-                continue
             observed = max(end + ahead_size, step['consumed_samples'])
             with arrived:
                 if step['consumed_samples'] > state['end']:
@@ -214,7 +214,9 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
             with torch.inference_mode():
                 frame = frontend.process_step(dict(step, step_seq=seq + 1), chunk, back, ahead, end, observed)
             frame.update(native_step=step, teacher_step_seq=seq + 1, pairing_mode='audio_coverage',
-                         asr_observation_ahead_ms=(step['consumed_samples'] - end) / 16)
+                         asr_observation_ahead_ms=(step['consumed_samples'] - end) / 16,
+                         buffer_depth=pairing.native_seq - pairing.teacher_seq,
+                         buffer_overflow=len(overflow))
             if not (step['decode_completed_at'] <= frame['controller_started_at'] <= frame['teacher_injected_at']
                     <= frame['state_resolved_at'] <= frame['published_at']):
                 raise AssertionError('Teacher publication order is invalid')
@@ -225,12 +227,10 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
                           published_at=frame['published_at'])
             frame.update(release, backlog_ms=backlog_ms,
                          observed_backlog_ms=backlog_ms - (observed - end) / 16)
-            previous_released_at = release['released_at']
             ledger.append(frame)
             file.write(json.dumps(frame, ensure_ascii=False) + '\n')
             file.flush()
             seq += 1
-            pending_step = None
             with arrived:
                 retain = max(0, end - back_size)
                 buffer = buffer[retain - base:]
@@ -263,7 +263,13 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
                 'text_injected_tokens': sum(f['text_injected_tokens'] for f in ledger),
                 'empty_text_frames': sum(f['text_injected_tokens'] == 0 for f in ledger),
                 'frames': len(ledger), 'real_samples': len(audio), 'processed_samples': seq * 2560,
-                'pairing_mode': 'audio_coverage', 'startup_steps': startup_steps,
+                'pairing_mode': 'audio_coverage',
+                'buffer_overflow': overflow, 'buffer_overflow_frames': len(overflow),
+                'buffer_depth_max': max((f['buffer_depth'] for f in ledger), default=0),
+                'audio_buffer_overflow': frontend.audio_overflow,
+                'audio_buffer_depth_max': max((f['audio_buffer_depth'] for f in ledger), default=0),
+                'eof_partial': eof_partial,
+                'whole_turn_rerecognition_calls': 0,
                 'last_online_native_step': pairing.native_seq,
                 'pending_real_samples': len(audio) - seq * 2560,
                 'state_counts': dict(Counter(v['state_token'] for v in ledger)),
@@ -277,7 +283,6 @@ def run_case(model, audio, case_id, path, output, empty_nonidle_rule=True):
         reader.join(3)
         frontend.kv = None
         file.close()
-        startup_file.close()
         rpc(path, 'close', session_id=identity)
         if reader.is_alive():
             raise RuntimeError('Ingress thread did not terminate')
@@ -392,6 +397,8 @@ def analyze(args):
                        'state_token', 'state_accepted', 'adjustment', 'teacher_char_end',
                        'text_commit_index', 'text_injected_tokens', 'tail_reencode_count',
                        'tail_replace_tokens', 'control_consumption', 'kv_tokens',
+                       'audio_buffer_depth', 'audio_buffer_overflow', 'buffer_depth',
+                       'buffer_overflow', 'whole_turn_rerecognition_calls',
                        'teacher_injected_at', 'state_resolved_at', 'published_at', 'released_at', 'backlog_ms',
                        'step_seq', 'teacher_step_seq', 'pairing_mode', 'asr_observation_ahead_ms',
                        'observed_backlog_ms']

@@ -127,11 +127,12 @@ class SynchronizedNemotron(NativeNemotron):
 
 
 class BarrierSession(NemotronSession):
-    """Wait for the matching Context publication without blocking audio ingress."""
+    """Allow bounded decoder lookahead without blocking audio ingress."""
 
-    def __init__(self, engine):
+    def __init__(self, engine, max_ahead=4):
         self.released_seq = 0
         self.released_at = None
+        self.max_ahead = max_ahead
         super().__init__(engine)
         self.source.max_pending = 12800
 
@@ -140,7 +141,8 @@ class BarrierSession(NemotronSession):
         super().complete_step(step)
         with self.source.condition:
             deadline = time.monotonic() + 5
-            while self.released_seq < step['step_seq'] and not self.source.eof and not self.source.cancelled:
+            while (step['step_seq'] - self.released_seq > self.max_ahead
+                   and not self.source.eof and not self.source.cancelled):
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
                     raise TimeoutError('Teacher publication barrier timed out')
@@ -150,13 +152,11 @@ class BarrierSession(NemotronSession):
 
     def release(self, seq, published_at, publication_kind='context'):
         with self.source.condition:
-            if seq != self.released_seq + 1 or seq != self.step_seq:
-                raise ValueError('Release must acknowledge exactly the pending decoder step')
-            if publication_kind not in ('context', 'startup'):
-                raise ValueError('Unknown barrier publication kind')
-            if publication_kind == 'startup' and (seq != 1 or self.steps[-1]['feature_end_sample'] >= 2560):
-                raise ValueError('Only the initial short ASR chunk can use startup release')
-            if not self.steps[-1]['decode_completed_at'] <= published_at <= time.monotonic():
+            if not self.released_seq < seq <= self.step_seq:
+                raise ValueError('Release must acknowledge pending decoder steps in order')
+            if publication_kind != 'context':
+                raise ValueError('Only context releases are supported by the streaming path')
+            if not self.steps[seq - 1]['decode_completed_at'] <= published_at <= time.monotonic():
                 raise ValueError('Invalid barrier publication timestamp')
             self.released_seq, self.released_at = seq, time.monotonic()
             self.source.condition.notify_all()
