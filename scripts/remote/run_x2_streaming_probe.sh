@@ -53,6 +53,7 @@ PROBE=("$SOURCE/scripts/remote/x2_streaming_probe.py"
   --output "$RUN/probe" --config "$CONFIG")
 [[ "${SOULX_X2_CASE:-}" == "" ]] || PROBE+=(--case "$SOULX_X2_CASE")
 [[ "${SOULX_X2_SKIP_CONTINUOUS:-0}" == 0 ]] || PROBE+=(--skip-continuous)
+[[ "${SOULX_X2_CONTRACT_ONLY:-0}" == 0 ]] || PROBE+=(--contract-only)
 timeout --signal=TERM --kill-after=20s 1700s \
   "$ASR_PREFIX/bin/python" -B "${PROBE[@]}" > "$RUN/probe.log" 2>&1 &
 MODEL_PID=$!

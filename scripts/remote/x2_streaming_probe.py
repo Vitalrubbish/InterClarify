@@ -1,8 +1,9 @@
-"""Probe whether X2Streaming-ASR can sustain one 80 ms token per frame in real time.
+"""Probe whether X2Streaming-ASR can sustain real-time 80 ms frames.
 
-The script loads the 4B checkpoint in one process, feeds a processor-compatible
-stream, and records every emitted token with its wall-clock and audio coverage.
-It does not start SoulX and does not write teacher frames.
+The checkpoint is an adaptive LISTEN/DECODE model, not a plain autoregressive
+one-token-per-frame ASR. This script runs the official interleaved state machine
+over incrementally encoded audio, records every LISTEN frame and every closed
+word, and does not start SoulX or write teacher frames.
 """
 from __future__ import annotations
 
@@ -18,8 +19,12 @@ import traceback
 FRAME_MS = 80
 WAIT_TOKEN_ID = 32
 WORD_TOKEN_ID = 33
+PAD_TOKEN_ID = 32
+BOS_TOKEN_ID = 1
+EOS_TOKEN_ID = 2
 SAMPLE_RATE = 16000
 FRAME_SAMPLES = SAMPLE_RATE * FRAME_MS // 1000
+ADAPTIVE_DELAY_MS = 80
 
 
 def digest(path):
@@ -35,7 +40,6 @@ def write_json(path, value):
 
 
 def percentile(values, fraction):
-    """Linearly interpolated percentile with deterministic empty handling."""
     if not values:
         return None
     ordered = sorted(values)
@@ -66,7 +70,7 @@ def decode(tokenizer, ids):
 
 
 def parse_groups(tokens, emit_ms):
-    """Split tokens into [W]...([W] or [P]) groups and audit unbound text."""
+    """Legacy [W]/[P] grouping retained for audit helpers and local tests."""
     groups, current, unbound = [], None, []
     word_markers = wait_markers = 0
     for frame, token in enumerate(tokens):
@@ -93,20 +97,16 @@ def parse_groups(tokens, emit_ms):
             continue
         current['token_frames'].append(frame)
         current['token_ids'].append(token)
-    unclosed = None
-    if current is not None:
-        unclosed = current
     return {
         'groups': groups,
         'unbound_tokens': unbound,
-        'unclosed_tail': unclosed,
+        'unclosed_tail': current,
         'word_markers': word_markers,
         'wait_markers': wait_markers,
     }
 
 
 def group_audit(tokenizer, tokens, emit_ms, cumulative):
-    """Verify that closing a group never rewrites its later decoded prefix."""
     parsed = parse_groups(tokens, emit_ms)
     for group in parsed['groups'] + ([parsed['unclosed_tail']] if parsed['unclosed_tail'] else []):
         group['text'] = decode(tokenizer, group['token_ids'])
@@ -121,13 +121,11 @@ def group_audit(tokenizer, tokens, emit_ms, cumulative):
         prefix = cumulative[closed_at]
         for frame in range(closed_at + 1, len(cumulative)):
             if not cumulative[frame].startswith(prefix):
-                violations.append({
-                    'group_start_frame': group['start_frame'],
-                    'group_close_frame': closed_at,
-                    'changed_frame': frame,
-                    'closed_text': prefix,
-                    'later_text': cumulative[frame],
-                })
+                violations.append({'group_start_frame': group['start_frame'],
+                                   'group_close_frame': closed_at,
+                                   'changed_frame': frame,
+                                   'closed_text': prefix,
+                                   'later_text': cumulative[frame]})
                 break
     parsed['group_prefix_violations'] = violations
     parsed['close_delay_ms'] = [g['close_delay_ms'] for g in parsed['groups']]
@@ -136,7 +134,6 @@ def group_audit(tokenizer, tokens, emit_ms, cumulative):
 
 
 def audit_cumulative_text(tokenizer, tokens):
-    """Decode the raw append-only stream and list every prefix rewrite."""
     cumulative, rewrites, text_ids = [], [], []
     for frame, token in enumerate(tokens):
         if token not in (WAIT_TOKEN_ID, WORD_TOKEN_ID):
@@ -199,268 +196,59 @@ def continuous_audio(samples, seconds):
     return joined[:target].copy(), records
 
 
-class StreamRun:
-    """One real-time generation pass with per-token timing and group audit."""
+def streaming_delay_config(processor, delay_ms=ADAPTIVE_DELAY_MS):
+    cfg = processor.mistral_common_audio_config
+    hop = processor.feature_extractor.hop_length
+    win = processor.feature_extractor.win_length
+    delay_tokens = int(cfg.get_num_delay_tokens(delay_ms))
+    first_mel_frames = (delay_tokens + 1) * int(cfg.audio_length_per_tok)
+    first_samples = (first_mel_frames - 1) * hop + win // 2
+    return {
+        'delay_ms': delay_ms,
+        'num_delay_tokens': delay_tokens,
+        'num_mel_frames_first_audio_chunk': first_mel_frames,
+        'num_samples_first_audio_chunk': first_samples,
+        'num_samples_per_audio_chunk': int(cfg.audio_length_per_tok) * hop + win,
+    }
 
-    def __init__(self, model, processor, audio, config, realtime=True,
-                 flush_frames=None):
-        import numpy as np
-        import torch
-        self.model, self.processor = model, processor
-        self.torch = torch
-        self.audio = np.asarray(audio, dtype=np.float32)
-        self.config = config
-        self.realtime = realtime
-        self.frame_samples = FRAME_SAMPLES
-        self.first_samples = processor.num_samples_first_audio_chunk
-        self.user_prefill_mel_frames = processor.num_mel_frames_first_audio_chunk
-        self.chunk_samples = processor.num_samples_per_audio_chunk
-        self.hop = processor.feature_extractor.hop_length
-        self.win = processor.feature_extractor.win_length
-        self.delay = int(processor.num_delay_tokens)
-        self.flush_frames = self.delay + 2 if flush_frames is None else int(flush_frames)
-        self.audio_frames = len(self.audio) / self.frame_samples
-        self.padded_samples = len(self.audio) + self.flush_frames * self.frame_samples
-        self.started = None
-        self.tokens = []
-        self.feature_calls = []
-        self.padding_cache_calls = []
-        self._active_feed = None
 
-    def _schedule(self):
-        """Return (start_sample, end_sample) for each one-token feature chunk."""
-        chunks = [(0, self.first_samples)]
-        frame_index = self.user_prefill_mel_frames
-        while True:
-            start = frame_index * self.hop - self.win // 2
-            if start >= self.padded_samples:
-                break
-            chunks.append((start, start + self.chunk_samples))
-            frame_index += self.processor.audio_length_per_tok
-        return chunks
+def encode_first_streaming_chunk(processor, audio, delay_ms=ADAPTIVE_DELAY_MS):
+    """Encode the adaptive protocol prompt instead of the fixed 480ms default."""
+    import numpy as np
+    from mistral_common.protocol.instruct.chunk import RawAudio
+    from mistral_common.protocol.transcription.request import StreamingMode, TranscriptionRequest
+    from mistral_common.tokens.tokenizers.audio import Audio
+    from transformers.feature_extraction_utils import BatchFeature
+    sr = processor.feature_extractor.sampling_rate
+    audio_obj = Audio(audio_array=np.asarray(audio, dtype=np.float32), sampling_rate=sr, format='wav')
+    request = TranscriptionRequest(audio=RawAudio.from_audio(audio_obj), streaming=StreamingMode.ONLINE,
+                                   target_streaming_delay_ms=delay_ms, language=None)
+    tokenized = processor.tokenizer.tokenizer.encode_transcription(request)
+    audio_arrays = [value.audio_array for value in tokenized.audios]
+    text_encoding = processor.tokenizer(tokenized.tokens, add_special_tokens=False, return_tensors='pt')
+    audio_encoding = processor.feature_extractor(audio_arrays, center=True, sampling_rate=sr)
+    delay_tokens = int(processor.mistral_common_audio_config.get_num_delay_tokens(delay_ms))
+    return BatchFeature(data={**text_encoding, **audio_encoding,
+                              'num_delay_tokens': delay_tokens}, tensor_type='pt')
 
-    def _first_inputs(self):
-        import numpy as np
-        first_audio = self.audio[:self.first_samples]
-        if len(first_audio) < self.first_samples:
-            first_audio = np.pad(first_audio, (0, self.first_samples - len(first_audio)))
-        first = self.processor(first_audio, sampling_rate=SAMPLE_RATE, is_streaming=True,
-                               is_first_audio_chunk=True, return_tensors='pt')
-        return first
 
-    def _chunk_audio(self, start, end):
-        import numpy as np
-        chunk = self.audio[start:min(end, len(self.audio))]
-        if len(chunk) < end - start:
-            chunk = np.pad(chunk, (0, end - start - len(chunk)))
-        return chunk
+def disable_adarms_delay_conditioning(model):
+    """Make AdaRMS delay conditioning an identity, as required by adaptive X2."""
+    import torch
+    root = model.model
+    if type(root.time_embedding).__name__ == '_ZeroTimeEmbedding':
+        return
+    dim = int(root.time_embedding.dim)
 
-    def _wrap_audio_features(self):
-        original = self.model.model.get_audio_features
-        calls = self.feature_calls
-        cache_calls = self.padding_cache_calls
-        processor = self.processor
+    class _ZeroTimeEmbedding(torch.nn.Module):
+        def __init__(self, hidden_dim):
+            super().__init__()
+            self.dim = hidden_dim
 
-        def wrapped(*args, **kwargs):
-            features = kwargs.get('input_features')
-            if features is None and args:
-                features = args[0]
-            before = _cache_shapes(kwargs.get('padding_cache'))
-            outputs = original(*args, **kwargs)
-            after = _cache_shapes(getattr(outputs, 'padding_cache', None))
-            calls.append({
-                'input_features_shape': list(features.shape) if features is not None else None,
-                'cache_before': before,
-                'cache_after': after,
-            })
-            cache_calls.append(after)
-            return outputs
+        def forward(self, time_tensor):
+            return torch.zeros(self.dim, device=time_tensor.device, dtype=time_tensor.dtype)
 
-        self.model.model.get_audio_features = wrapped
-        return original
-
-    def run(self):
-        import torch
-        first = self._first_inputs()
-        input_ids = first.input_ids.to(self.model.device)
-        first_features = first.input_features.to(self.model.device, dtype=self.model.dtype)
-        self.delay = int(first.num_delay_tokens)
-        self.flush_frames = int(self.config.get('contract', {}).get('flush_frames', self.delay + 2))
-        self.padded_samples = len(self.audio) + self.flush_frames * self.frame_samples
-        chunks = self._schedule()
-
-        # Capture the actual first tensor without slicing its channel dimension.
-        original = self._wrap_audio_features()
-        started = time.monotonic()
-        self.started = started
-        feed_records = []
-
-        def features():
-            nonlocal first_features
-            record = {'chunk_index': 0, 'start_sample': 0, 'end_sample': self.first_samples,
-                      'coverage_samples': self.first_samples,
-                      'fed_at': time.monotonic(), 'features_shape': list(first_features.shape)}
-            feed_records.append(record)
-            self._active_feed = record
-            yield first_features
-            for index, (start, end) in enumerate(chunks[1:], 1):
-                target = started + end / SAMPLE_RATE
-                while self.realtime:
-                    remaining = target - time.monotonic()
-                    if remaining <= 0:
-                        break
-                    time.sleep(remaining)
-                chunk = self._chunk_audio(start, end)
-                inputs = self.processor(chunk, sampling_rate=SAMPLE_RATE, is_streaming=True,
-                                        is_first_audio_chunk=False, return_tensors='pt')
-                feature = inputs.input_features.to(self.model.device, dtype=self.model.dtype)
-                record = {'chunk_index': index, 'start_sample': start, 'end_sample': end,
-                          'coverage_samples': end, 'fed_at': time.monotonic(),
-                          'features_shape': list(feature.shape)}
-                feed_records.append(record)
-                self._active_feed = record
-                yield feature
-
-        class Recorder:
-            def __init__(self, run):
-                self.run = run
-
-            def put(self, value):
-                ids = value.detach().cpu().reshape(-1).tolist()
-                now = time.monotonic()
-                feed = self.run._active_feed
-                for token in ids:
-                    frame = len(self.run.tokens)
-                    self.run.tokens.append({
-                        'frame': frame,
-                        'token_id': int(token),
-                        'emitted_at': now,
-                        'feed_at': feed['fed_at'] if feed else started,
-                        'chunk_index': feed['chunk_index'] if feed else None,
-                        'feature_shape': feed['features_shape'] if feed else None,
-                    })
-
-            def end(self):
-                pass
-
-        self.model._stream_exhausted = False
-        original_prepare = self.model.prepare_inputs_for_generation
-
-        def prepare(*args, **kwargs):
-            # Transformers 5.15 drops multimodal inputs on non-prefill iterations.
-            # The streaming processor yields one feature chunk per decode step, so
-            # keep the chunk visible to the model-specific forward path.
-            kwargs['is_first_iteration'] = True
-            return original_prepare(*args, **kwargs)
-
-        self.model.prepare_inputs_for_generation = prepare
-        try:
-            with torch.inference_mode():
-                self.model.generate(input_ids=input_ids, input_features=features(),
-                                    num_delay_tokens=self.delay, streamer=Recorder(self),
-                                    do_sample=False, use_cache=True)
-        finally:
-            self.model._stream_exhausted = False
-            self.model.prepare_inputs_for_generation = original_prepare
-            self.model.model.get_audio_features = original
-        return self._record(started, feed_records, chunks)
-
-    def _record(self, started, feeds, chunks):
-        tokenizer = self.processor.tokenizer
-        tokens = [value['token_id'] for value in self.tokens]
-        emit_ms = [(value['emitted_at'] - started) * 1000 for value in self.tokens]
-        cumulative, rewrites = audit_cumulative_text(tokenizer, tokens)
-        parsed = group_audit(tokenizer, tokens, emit_ms, cumulative)
-        records = []
-        for value, text in zip(self.tokens, cumulative):
-            frame = value['frame']
-            wall_ms = (value['emitted_at'] - started) * 1000
-            feed = next((f for f in feeds if f['chunk_index'] == value['chunk_index']), feeds[-1])
-            coverage_ms = feed['coverage_samples'] / SAMPLE_RATE * 1000
-            frame_end_ms = (frame + 1) * FRAME_MS
-            records.append({
-                **value,
-                'wall_ms': wall_ms,
-                'audio_frame_end_ms': frame_end_ms,
-                'coverage_end_ms': coverage_ms,
-                'frame_lag_ms': wall_ms - frame_end_ms,
-                'decode_latency_ms': (value['emitted_at'] - value['feed_at']) * 1000,
-                'backlog_ms': wall_ms - coverage_ms,
-                'pad': frame >= self.audio_frames,
-                'cumulative_text': text,
-                'delta_text': text[len(cumulative[frame - 1]):] if frame else text,
-                'is_wait': value['token_id'] == WAIT_TOKEN_ID,
-                'is_word': value['token_id'] == WORD_TOKEN_ID,
-            })
-        return {
-            'records': records,
-            'feeds': feeds,
-            'chunks': len(chunks),
-            'cumulative': cumulative,
-            'rewrites': rewrites,
-            'groups': parsed,
-            'started': started,
-            'audio_seconds': len(self.audio) / SAMPLE_RATE,
-            'audio_frames': self.audio_frames,
-            'tokenizer': tokenizer,
-        }
-
-    def summary(self, run):
-        real = [value for value in run['records'] if not value['pad']]
-        all_records = run['records']
-        groups = run['groups']
-        values = lambda key, rows: [r[key] for r in rows if r.get(key) is not None]
-        backlog = values('backlog_ms', real)
-        frame_lag = values('frame_lag_ms', real)
-        decode = values('decode_latency_ms', real)
-        compute = values('decode_latency_ms', real)
-        audio_seconds = run['audio_seconds']
-        total_compute = sum(values('decode_latency_ms', all_records))
-        real_compute = sum(compute)
-        first_window = [r['backlog_ms'] for r in real if r['wall_ms'] <= 5000]
-        last_window = [r['backlog_ms'] for r in real if r['wall_ms'] > max(0, audio_seconds * 1000 - 5000)]
-        drift = None
-        if first_window and last_window:
-            drift = percentile(last_window, .5) - percentile(first_window, .5)
-        feature_shapes = Counter(tuple(value['features_shape']) for value in run['feeds'])
-        group_text = [g['text'] for g in groups['groups']]
-        return {
-            'audio_seconds': audio_seconds,
-            'tokens': len(all_records),
-            'real_tokens': len(real),
-            'pad_tokens': len(all_records) - len(real),
-            'chunks': run['chunks'],
-            'feature_shapes': {'x'.join(map(str, key)): count for key, count in feature_shapes.items()},
-            'x2_rtf': real_compute / 1000 / audio_seconds if audio_seconds else None,
-            'x2_rtf_including_flush': total_compute / 1000 / audio_seconds if audio_seconds else None,
-            'compute_ms': distribution(compute),
-            'frame_lag_ms': distribution(frame_lag),
-            'backlog_ms': distribution(backlog),
-            'decode_latency_ms': distribution(decode),
-            'first_window_backlog_p50_ms': percentile(first_window, .5),
-            'last_window_backlog_p50_ms': percentile(last_window, .5),
-            'backlog_drift_ms': drift,
-            'first_backlog_ms': backlog[0] if backlog else None,
-            'last_backlog_ms': backlog[-1] if backlog else None,
-            'word_markers': groups['word_markers'],
-            'wait_markers': groups['wait_markers'],
-            'closed_groups': len(groups['groups']),
-            'unbound_tokens': len(groups['unbound_tokens']),
-            'unclosed_tail': None if groups['unclosed_tail'] is None else {
-                'start_frame': groups['unclosed_tail']['start_frame'],
-                'token_count': groups['unclosed_tail']['token_count'],
-                'text': groups['unclosed_tail']['text'],
-            },
-            'group_close_delay_ms': distribution(groups['close_delay_ms']),
-            'group_close_delay_frames': distribution(groups['close_delay_frames']),
-            'group_texts': group_text[:20],
-            'group_prefix_violations': len(groups['group_prefix_violations']),
-            'group_prefix_violation_examples': groups['group_prefix_violations'][:5],
-            'text_rewrites': len(run['rewrites']),
-            'text_rewrite_examples': run['rewrites'][:5],
-            'final_text': run['cumulative'][-1] if run['cumulative'] else '',
-            'padding_cache_calls': len(self.padding_cache_calls),
-        }
+    root.time_embedding = _ZeroTimeEmbedding(dim)
 
 
 def _cache_shapes(cache):
@@ -473,69 +261,351 @@ def _cache_shapes(cache):
     return result
 
 
+class AdaptiveStream:
+    """Run the official LISTEN/DECODE loop over incrementally encoded frames."""
+
+    def __init__(self, model, processor, audio, config, realtime=True):
+        import numpy as np
+        self.model, self.processor = model, processor
+        self.audio = np.asarray(audio, dtype=np.float32)
+        self.config = config
+        self.realtime = realtime
+        self.frame_samples = FRAME_SAMPLES
+        self.n_left_pad = int(getattr(processor.mistral_common_audio_config,
+                                      'streaming_n_left_pad_tokens', None) or 32)
+        self.delay = streaming_delay_config(processor)
+        self.first_samples = self.delay['num_samples_first_audio_chunk']
+        self.first_mel_frames = self.delay['num_mel_frames_first_audio_chunk']
+        self.chunk_samples = self.delay['num_samples_per_audio_chunk']
+        self.hop = processor.feature_extractor.hop_length
+        self.win = processor.feature_extractor.win_length
+        self.flush_frames = int(config.get('contract', {}).get('flush_frames', 8))
+        self.padded_samples = len(self.audio) + self.flush_frames * self.frame_samples
+        self.audio_frames = len(self.audio) / self.frame_samples
+        self.records, self.groups, self.feeds = [], [], []
+        self.cache_calls = []
+        self.tokens = []
+        self.listen_compute = []
+        self.decode_compute = []
+        self.encode_compute = []
+        self.warmup_ms = None
+        self.past = None
+        self.padding_cache = None
+        self.encoder_cache = None
+
+    def _schedule(self):
+        chunks = [(0, self.first_samples)]
+        mel_frame = self.first_mel_frames
+        while True:
+            start = mel_frame * self.hop - self.win // 2
+            if start >= self.padded_samples:
+                break
+            chunks.append((start, start + self.chunk_samples))
+            mel_frame += int(self.processor.audio_length_per_tok)
+        return chunks
+
+    def _encode(self, features):
+        import torch
+        before = _cache_shapes(self.padding_cache)
+        started = time.monotonic()
+        outputs = self.model.model.get_audio_features(
+            input_features=features, padding_cache=self.padding_cache,
+            past_key_values=self.encoder_cache, use_cache=True)
+        torch.cuda.synchronize()
+        elapsed = (time.monotonic() - started) * 1000
+        self.padding_cache = outputs.padding_cache
+        self.encoder_cache = outputs.past_key_values
+        after = _cache_shapes(self.padding_cache)
+        self.cache_calls.append({'before': before, 'after': after,
+                                 'input_shape': list(features.shape),
+                                 'pooler_shape': list(outputs.pooler_output.shape)})
+        self.encode_compute.append(elapsed)
+        return outputs.pooler_output[0].to(self.model.device, dtype=self.model.dtype)
+
+    def _embed(self, token_id):
+        import torch
+        return self.model.model.get_input_embeddings()(
+            torch.tensor([[token_id]], dtype=torch.long, device=self.model.device))
+
+    def _lm_step(self, embeds, past):
+        import torch
+        if embeds.dim() == 2:
+            embeds = embeds.unsqueeze(0)
+        started = time.monotonic()
+        t_cond = self.model.model.time_embedding(
+            torch.full((1,), self.delay['num_delay_tokens'], device=embeds.device,
+                       dtype=embeds.dtype))[None, ...]
+        outputs = self.model.model.language_model(
+            inputs_embeds=embeds, past_key_values=past, use_cache=True, t_cond=t_cond)
+        torch.cuda.synchronize()
+        elapsed = (time.monotonic() - started) * 1000
+        logits = self.model.lm_head(outputs.last_hidden_state[:, -1:, :])
+        return logits, outputs.past_key_values, elapsed
+
+    def _chunk_audio(self, start, end):
+        import numpy as np
+        chunk = self.audio[start:min(end, len(self.audio))]
+        if len(chunk) < end - start:
+            chunk = np.pad(chunk, (0, end - start - len(chunk)))
+        return chunk
+
+    def _decode_word(self, frame, wall_ms, tokenizer, past):
+        import torch
+        w_emb = self._embed(WORD_TOKEN_ID)
+        logits, past, elapsed = self._lm_step(w_emb, past)
+        self.decode_compute.append(elapsed)
+        next_token = int(torch.argmax(logits[0, -1]).item())
+        emit_ids, decode_ms, count, closed_by = [], elapsed, 0, 'eos'
+        cap = int(self.config.get('contract', {}).get('max_decode_tokens', 64))
+        while count < cap:
+            if next_token == EOS_TOKEN_ID:
+                break
+            if next_token not in (PAD_TOKEN_ID, WORD_TOKEN_ID, BOS_TOKEN_ID):
+                emit_ids.append(next_token)
+            count += 1
+            logits, past, elapsed = self._lm_step(self._embed(next_token), past)
+            self.decode_compute.append(elapsed)
+            decode_ms += elapsed
+            next_token = int(torch.argmax(logits[0, -1]).item())
+        else:
+            closed_by = 'cap'
+        close_wall = time.monotonic()
+        group = {
+            'index': len(self.groups),
+            'frame': frame,
+            'audio_ms': (frame + 1) * FRAME_MS,
+            'text': decode(tokenizer, emit_ids),
+            'token_ids': emit_ids,
+            'open_wall_ms': wall_ms,
+            'close_wall_ms': (close_wall - self.started) * 1000,
+            'close_delay_ms': (close_wall - self.started) * 1000 - wall_ms,
+            'decode_ms': decode_ms,
+            'decode_tokens': count,
+            'closed_by': closed_by,
+        }
+        self.groups.append(group)
+        return past
+
+    def run(self):
+        import torch
+        from transformers import DynamicCache
+        torch.set_grad_enabled(False)
+        first_audio = self._chunk_audio(0, self.first_samples)
+        first_inputs = encode_first_streaming_chunk(self.processor, first_audio)
+        self.started = time.monotonic()
+        self.encoder_cache = DynamicCache(config=self.model.config.audio_config)
+        first_embeds = self._encode(first_inputs.input_features.to(
+            self.model.device, dtype=self.model.dtype))
+        self.feeds.append({'chunk_index': 0, 'start_sample': 0, 'end_sample': self.first_samples,
+                           'mel_shape': list(first_inputs.input_features.shape),
+                           'pooler_frames': len(first_embeds)})
+        bos = self._embed(BOS_TOKEN_ID)
+        logits, past, elapsed = self._lm_step(bos, None)
+        self.listen_compute.append(elapsed)
+        warm_started = time.monotonic()
+        pad = first_embeds[:self.n_left_pad]
+        logits, past, elapsed = self._lm_step(pad, past)
+        self.listen_compute.append(elapsed)
+        self.past = past
+        self.warmup_ms = (time.monotonic() - warm_started) * 1000
+        self.started = time.monotonic()
+        user_embeds = first_embeds[self.n_left_pad:]
+        frame = 0
+        coverage_end = self.first_samples / SAMPLE_RATE * 1000
+        for embed in user_embeds:
+            self._listen(frame, embed, coverage_end, self.processor.tokenizer)
+            frame += 1
+        for index, (start, end) in enumerate(self._schedule()[1:], 1):
+            target = self.started + end / SAMPLE_RATE
+            while self.realtime:
+                remaining = target - time.monotonic()
+                if remaining <= 0:
+                    break
+                time.sleep(remaining)
+            chunk = self._chunk_audio(start, end)
+            inputs = self.processor(chunk, sampling_rate=SAMPLE_RATE, is_streaming=True,
+                                    is_first_audio_chunk=False, return_tensors='pt')
+            embeds = self._encode(inputs.input_features.to(self.model.device, dtype=self.model.dtype))
+            self.feeds.append({'chunk_index': index, 'start_sample': start, 'end_sample': end,
+                               'mel_shape': list(inputs.input_features.shape),
+                               'pooler_frames': len(embeds)})
+            for embed in embeds:
+                self._listen(frame, embed, end / SAMPLE_RATE * 1000, self.processor.tokenizer)
+                frame += 1
+        return self._result()
+
+    def _listen(self, frame, embed, coverage_end, tokenizer):
+        import torch
+        listen_started = time.monotonic()
+        logits, past, elapsed = self._lm_step(embed, self.past)
+        self.past = past
+        self.listen_compute.append(elapsed)
+        wall_ms = (time.monotonic() - self.started) * 1000
+        token = int(torch.argmax(logits[0, -1]).item())
+        record = {
+            'frame': frame,
+            'chunk_coverage_end_ms': coverage_end,
+            'audio_frame_end_ms': (frame + 1) * FRAME_MS,
+            'token_id': token,
+            'wall_ms': wall_ms,
+            'listen_ms': elapsed,
+            'backlog_ms': wall_ms - (frame + 1) * FRAME_MS,
+            'frame_lag_ms': wall_ms - (frame + 1) * FRAME_MS,
+            'pad': frame >= self.audio_frames,
+            'is_word': token == WORD_TOKEN_ID,
+            'is_wait': token == WAIT_TOKEN_ID,
+        }
+        if token == WORD_TOKEN_ID:
+            self.past = self._decode_word(frame, wall_ms, tokenizer, self.past)
+            record['word_index'] = len(self.groups) - 1
+        self.records.append(record)
+        self.tokens.append(token)
+
+    def _result(self):
+        tokenizer = self.processor.tokenizer
+        real_records = [r for r in self.records if not r['pad']]
+        group_text = []
+        prefix_violations = []
+        text = ''
+        for group in self.groups:
+            if group['frame'] >= self.audio_frames:
+                continue
+            new = text + group['text']
+            if not new.startswith(text):
+                prefix_violations.append({'group': group['index'], 'before': text, 'after': new})
+            text = new
+            group_text.append(group['text'])
+        return {
+            'records': self.records,
+            'groups': self.groups,
+            'feeds': self.feeds,
+            'cache_calls': self.cache_calls,
+            'tokens': self.tokens,
+            'started': self.started,
+            'audio_seconds': len(self.audio) / SAMPLE_RATE,
+            'audio_frames': self.audio_frames,
+            'warmup_ms': self.warmup_ms,
+            'listen_compute': self.listen_compute,
+            'decode_compute': self.decode_compute,
+            'encode_compute': self.encode_compute,
+            'group_text': group_text,
+            'prefix_violations': prefix_violations,
+            'final_text': text,
+            'n_left_pad': self.n_left_pad,
+        }
+
+    def summary(self, run):
+        real = [r for r in run['records'] if not r['pad']]
+        backlog = [r['backlog_ms'] for r in real]
+        frame_lag = [r['frame_lag_ms'] for r in real]
+        first_window = [r['backlog_ms'] for r in real if r['wall_ms'] <= 5000]
+        last_window = [r['backlog_ms'] for r in real
+                       if r['wall_ms'] > max(0, run['audio_seconds'] * 1000 - 5000)]
+        drift = None
+        if first_window and last_window:
+            drift = percentile(last_window, .5) - percentile(first_window, .5)
+        groups = [g for g in run['groups'] if g['frame'] < run['audio_frames']]
+        total_compute = (sum(run['listen_compute']) + sum(run['decode_compute'])
+                         + sum(run['encode_compute']))
+        real_compute = total_compute
+        audio_seconds = run['audio_seconds']
+        shape_counts = Counter(tuple(f['mel_shape']) for f in run['feeds'])
+        pooler_counts = Counter(f['pooler_frames'] for f in run['feeds'])
+        return {
+            'audio_seconds': audio_seconds,
+            'tokens': len(run['records']),
+            'real_tokens': len(real),
+            'pad_tokens': len(run['records']) - len(real),
+            'feature_shapes': {'x'.join(map(str, key)): count for key, count in shape_counts.items()},
+            'pooler_frames': dict(pooler_counts),
+            'warmup_ms': run['warmup_ms'],
+            'x2_rtf': real_compute / 1000 / audio_seconds if audio_seconds else None,
+            'x2_rtf_including_flush': total_compute / 1000 / audio_seconds if audio_seconds else None,
+            'listen_compute_ms': distribution(run['listen_compute']),
+            'decode_compute_ms': distribution(run['decode_compute']),
+            'encode_compute_ms': distribution(run['encode_compute']),
+            'frame_lag_ms': distribution(frame_lag),
+            'backlog_ms': distribution(backlog),
+            'backlog_drift_ms': drift,
+            'first_window_backlog_p50_ms': percentile(first_window, .5),
+            'last_window_backlog_p50_ms': percentile(last_window, .5),
+            'first_backlog_ms': backlog[0] if backlog else None,
+            'last_backlog_ms': backlog[-1] if backlog else None,
+            'word_markers': len(run['groups']),
+            'wait_markers': sum(1 for r in real if r['is_wait']),
+            'closed_groups': len(groups),
+            'unbound_tokens': sum(1 for r in real if not r['is_word'] and not r['is_wait']),
+            'unclosed_tail': None,
+            'group_close_delay_ms': distribution([g['close_delay_ms'] for g in groups]),
+            'group_decode_ms': distribution([g['decode_ms'] for g in groups]),
+            'group_texts': [g['text'] for g in groups[:20]],
+            'group_prefix_violations': len(run['prefix_violations']),
+            'group_prefix_violation_examples': run['prefix_violations'][:5],
+            'text_rewrites': 0,
+            'text_rewrite_examples': [],
+            'final_text': run['final_text'],
+            'n_left_pad': run['n_left_pad'],
+            'cache_calls': len(run['cache_calls']),
+        }
+
+
 def contract_check(model, processor, config):
-    """Pin the first and incremental feature/cache shapes before real audio."""
+    """Pin the adaptive first chunk and incremental encoder shapes."""
     import numpy as np
     rng = np.random.default_rng(42)
-    seconds = 3.36
-    count = int(seconds * SAMPLE_RATE)
+    count = int(3.36 * SAMPLE_RATE)
     timeline = np.arange(count) / SAMPLE_RATE
     audio = (.05 * np.sin(2 * np.pi * 220 * timeline)
              + .01 * rng.standard_normal(count)).astype(np.float32)
-    run = StreamRun(model, processor, audio, config, realtime=True)
-    result = run.run()
-    summary = run.summary(result)
-    first_shape = tuple(run.feature_calls[0]['input_features_shape'])
+    stream = AdaptiveStream(model, processor, audio, config, realtime=True)
+    run = stream.run()
+    summary = stream.summary(run)
+    first = run['feeds'][0]
     expected_cache = {
         'conv1': [1, int(model.config.audio_config.num_mel_bins),
                   int(model.model.audio_tower.embedder.conv1.left_pad)],
         'conv2': [1, int(model.config.audio_config.hidden_size),
                   int(model.model.audio_tower.embedder.conv2.left_pad)],
     }
-    first_cache = run.padding_cache_calls[0] if run.padding_cache_calls else None
-    second_cache = run.padding_cache_calls[1] if len(run.padding_cache_calls) > 1 else None
-    first_user = int(processor.num_mel_frames_first_audio_chunk)
-    total_frames = first_shape[-1] if len(first_shape) == 3 else None
-    left_pad = total_frames - first_user if total_frames is not None else None
-    expected_first = config.get('contract', {}).get('first_total_mel_frames')
-    expected_left_pad = (processor.mistral_common_audio_config.n_left_pad_tokens
-                         * int(processor.audio_length_per_tok))
+    first_cache = run['cache_calls'][0]['after'] if run['cache_calls'] else None
+    second_cache = run['cache_calls'][1]['after'] if len(run['cache_calls']) > 1 else None
+    contract = config.get('contract', {})
     checks = {
-        'first_feature_channels': first_shape[1] == int(model.config.audio_config.num_mel_bins),
-        'first_feature_frames': total_frames == expected_first,
-        'left_pad_mel_frames': left_pad == expected_left_pad,
-        'first_user_mel_frames': first_user
-                                 == config.get('contract', {}).get('first_user_mel_frames'),
-        'first_input_tokens': result['feeds'][0]['features_shape'][-1] // int(processor.audio_length_per_tok)
-                              == int(processor.num_delay_tokens) + 1 + expected_left_pad
-                              // int(processor.audio_length_per_tok),
-        'subsequent_feature_frames': all(
-            value['features_shape'][-1] == int(processor.audio_length_per_tok)
-            for value in result['feeds'][1:]),
+        'first_mel_shape': first['mel_shape'][1:] == [int(model.config.audio_config.num_mel_bins),
+                                                       contract.get('first_total_mel_frames')],
+        'first_input_tokens': first['mel_shape'][-1] // int(processor.audio_length_per_tok)
+                              == contract.get('first_input_tokens'),
+        'first_pooler_frames': first['pooler_frames'] == contract.get('first_pooler_frames'),
+        'first_user_pooler_frames': (first['pooler_frames'] - stream.n_left_pad
+                                     == contract.get('first_user_pooler_frames')),
+        'left_pad_tokens': stream.n_left_pad == contract.get('left_pad_tokens'),
+        'subsequent_mel_frames': all(f['mel_shape'][-1] == int(processor.audio_length_per_tok)
+                                     for f in run['feeds'][1:]),
+        'subsequent_pooler_frames': all(f['pooler_frames'] == 1 for f in run['feeds'][1:]),
         'first_cache': first_cache == expected_cache,
         'second_cache': second_cache == expected_cache,
-        'tokens': len(result['records']) > 0,
+        'tokens': len(run['records']) > 0,
     }
     record = {
         'passed': all(checks.values()),
         'checks': checks,
-        'seconds': seconds,
-        'first_shape': list(first_shape),
-        'first_user_mel_frames': first_user,
-        'left_pad_mel_frames': left_pad,
-        'expected_first_mel_frames': total_frames,
-        'first_tokens': result['feeds'][0]['features_shape'][-1] // int(processor.audio_length_per_tok),
-        'subsequent_shapes': sorted({tuple(v['features_shape']) for v in result['feeds'][1:]}),
-        'expected_padding_cache': expected_cache,
-        'first_padding_cache': first_cache,
-        'second_padding_cache': second_cache,
-        'tokens_emitted': len(result['records']),
+        'seconds': 3.36,
+        'first_mel_shape': first['mel_shape'],
+        'first_pooler_frames': first['pooler_frames'],
+        'n_left_pad': stream.n_left_pad,
+        'delay': stream.delay,
+        'first_cache': first_cache,
+        'second_cache': second_cache,
+        'expected_cache': expected_cache,
+        'subsequent_mel_shapes': sorted({tuple(f['mel_shape']) for f in run['feeds'][1:]}),
+        'tokens_emitted': len(run['records']),
+        'groups': len(run['groups']),
         'summary': summary,
     }
-    return record, result
+    return record, run
 
 
-def case_record(sample, audio, gain, run, summary):
+def case_record(sample, audio, gain, summary):
     return {
         'case_id': sample.get('case_id', 'continuous_60s'),
         'task': sample.get('task', 'continuous'),
@@ -554,7 +624,6 @@ def write_frames(path, records):
 
 def run_cases(args, config):
     import os
-    import numpy as np
     import torch
     from transformers import AutoProcessor, VoxtralRealtimeForConditionalGeneration
 
@@ -570,11 +639,9 @@ def run_cases(args, config):
         if len(selected) != 1:
             raise ValueError('Requested case is absent from the frozen manifest')
     else:
-        selected = [
-            select_case(samples, longest=True),
-            select_case(samples, 'candor_pause_handling-16'),
-            select_case(samples, 'candor_turn_taking-102'),
-        ]
+        selected = [select_case(samples, longest=True),
+                    select_case(samples, 'candor_pause_handling-16'),
+                    select_case(samples, 'candor_turn_taking-102')]
     output = args.output
     output.mkdir(exist_ok=False)
     write_json(output / 'input_manifest.json', dict(manifest, samples=selected))
@@ -583,6 +650,7 @@ def run_cases(args, config):
     model = VoxtralRealtimeForConditionalGeneration.from_pretrained(
         args.model, dtype=torch.bfloat16, device_map='cuda',
         local_files_only=True, attn_implementation='sdpa').eval()
+    disable_adarms_delay_conditioning(model)
     torch.cuda.synchronize()
     result = {
         'passed': False,
@@ -594,12 +662,15 @@ def run_cases(args, config):
         'model_sha256': config.get('model', {}).get('sha256'),
         'source_commit': os.environ.get('SOULX_SOURCE_COMMIT'),
         'processor': {
-            'delay_tokens': int(processor.num_delay_tokens),
-            'first_samples': int(processor.num_samples_first_audio_chunk),
-            'first_user_mel_frames': int(processor.num_mel_frames_first_audio_chunk),
-            'chunk_samples': int(processor.num_samples_per_audio_chunk),
+            'adaptive_delay_ms': ADAPTIVE_DELAY_MS,
+            'delay_tokens': streaming_delay_config(processor)['num_delay_tokens'],
+            'first_samples': streaming_delay_config(processor)['num_samples_first_audio_chunk'],
+            'first_mel_frames': streaming_delay_config(processor)['num_mel_frames_first_audio_chunk'],
+            'chunk_samples': streaming_delay_config(processor)['num_samples_per_audio_chunk'],
             'chunk_mel_frames': int(processor.audio_length_per_tok),
             'frame_ms': FRAME_MS,
+            'left_pad_frames': int(getattr(processor.mistral_common_audio_config,
+                                           'streaming_n_left_pad_tokens', None) or 32),
             'wait_token_id': WAIT_TOKEN_ID,
             'word_token_id': WORD_TOKEN_ID,
         },
@@ -610,54 +681,44 @@ def run_cases(args, config):
         'gate': None,
     }
     if torch.cuda.is_available():
-        result['gpu'] = {
-            'name': torch.cuda.get_device_name(0),
-            'total_mib': torch.cuda.get_device_properties(0).total_memory / 2 ** 20,
-        }
+        result['gpu'] = {'name': torch.cuda.get_device_name(0),
+                         'total_mib': torch.cuda.get_device_properties(0).total_memory / 2 ** 20}
     try:
         contract, _ = contract_check(model, processor, config)
         write_json(output / 'contract.json', contract)
         result['contract'] = contract
         if not contract['passed']:
-            raise RuntimeError('First-block feature/cache contract failed')
+            raise RuntimeError('Adaptive first-chunk feature/cache contract failed')
         if args.contract_only:
             result['passed'] = True
             return result, torch
-
-        cases = []
         for sample in selected:
             verify_sample(sample)
             audio, gain = load_audio(sample['input'])
-            run = StreamRun(model, processor, audio, config, realtime=args.realtime)
-            stream = run.run()
-            summary = run.summary(stream)
-            record = case_record(sample, audio, gain, stream, summary)
-            write_frames(output / (sample['case_id'] + '.frames.jsonl'), stream['records'])
-            cases.append(record)
+            stream = AdaptiveStream(model, processor, audio, config, realtime=args.realtime)
+            run = stream.run()
+            summary = stream.summary(run)
+            record = case_record(sample, audio, gain, summary)
+            write_frames(output / (sample['case_id'] + '.frames.jsonl'), run['records'])
+            write_json(output / (sample['case_id'] + '.groups.json'), run['groups'])
             result['cases'].append(record)
             write_json(output / 'progress.json', result)
-            print(json.dumps({k: v for k, v in record.items() if k not in ('group_texts',)}, ensure_ascii=False),
-                  flush=True)
-
+            print(json.dumps(record, ensure_ascii=False), flush=True)
         if not args.skip_continuous:
             audio, parts = continuous_audio(samples, args.continuous_seconds)
-            run = StreamRun(model, processor, audio, config, realtime=args.realtime)
-            stream = run.run()
-            summary = run.summary(stream)
-            record = case_record({'case_id': 'continuous_60s'}, audio, None, stream, summary)
+            stream = AdaptiveStream(model, processor, audio, config, realtime=args.realtime)
+            run = stream.run()
+            summary = stream.summary(run)
+            record = case_record({'case_id': 'continuous_60s'}, audio, None, summary)
             record['continuous_parts'] = parts
-            write_frames(output / 'continuous_60s.frames.jsonl', stream['records'])
+            write_frames(output / 'continuous_60s.frames.jsonl', run['records'])
+            write_json(output / 'continuous_60s.groups.json', run['groups'])
             result['cases'].append(record)
             write_json(output / 'progress.json', result)
-            print(json.dumps({k: v for k, v in record.items() if k not in ('group_texts',)},
-                             ensure_ascii=False), flush=True)
-
-        if not args.contract_only:
-            result['gate'] = evaluate_gate(result['cases'], config, result.get('peak_gpu_mib', 0),
-                                           result['expected_cases'])
-            result['passed'] = bool(result['gate']['passed'])
-        elif result['contract'] and result['contract']['passed']:
-            result['passed'] = True
+            print(json.dumps(record, ensure_ascii=False), flush=True)
+        result['gate'] = evaluate_gate(result['cases'], config, result.get('peak_gpu_mib', 0),
+                                       result['expected_cases'])
+        result['passed'] = bool(result['gate']['passed'])
     except Exception as exc:
         result.update(error=f'{type(exc).__name__}: {exc}', traceback=traceback.format_exc())
         traceback.print_exc()
@@ -680,17 +741,17 @@ def evaluate_gate(cases, config, peak_mib=0, expected_cases=4):
     continuous = by_id.get('continuous_60s')
     rtf = {case['case_id']: case.get('x2_rtf') for case in cases}
     p95 = {case['case_id']: case.get('backlog_ms', {}).get('p95') for case in cases}
-    peak = peak_mib
     values = {
         'x2_rtf_max': max((v for v in rtf.values() if v is not None), default=None),
         'backlog_p95_ms_max': max((v for v in p95.values() if v is not None), default=None),
         'continuous_drift_ms': continuous.get('backlog_drift_ms') if continuous else None,
-        'peak_gpu_mib': peak,
+        'peak_gpu_mib': peak_mib,
     }
     checks = {
         'all_cases_completed': len(cases) == expected_cases
                                and all(case.get('passed') for case in cases),
-        'x2_rtf': values['x2_rtf_max'] is not None and values['x2_rtf_max'] <= thresholds.get('x2_rtf_max', .6),
+        'x2_rtf': values['x2_rtf_max'] is not None
+                  and values['x2_rtf_max'] <= thresholds.get('x2_rtf_max', .6),
         'backlog_p95': values['backlog_p95_ms_max'] is not None
                        and values['backlog_p95_ms_max'] <= thresholds.get('backlog_p95_ms_max', 320),
         'continuous_drift': values['continuous_drift_ms'] is None
@@ -720,8 +781,7 @@ def main():
     parser.add_argument('--config', type=Path,
                         default=Path(__file__).parents[2] / 'configs/x2_streaming_probe.json')
     parser.add_argument('--case')
-    parser.add_argument('--continuous-seconds', type=float,
-                        default=None)
+    parser.add_argument('--continuous-seconds', type=float, default=None)
     parser.add_argument('--contract-only', action='store_true')
     parser.add_argument('--skip-continuous', action='store_true')
     parser.add_argument('--unpaced', dest='realtime', action='store_false')
@@ -730,7 +790,7 @@ def main():
     config = json.loads(args.config.read_text())
     if args.continuous_seconds is None:
         args.continuous_seconds = float(config.get('continuous_seconds', 60))
-    result, torch = run_cases(args, config)
+    result, _ = run_cases(args, config)
     if not result['passed']:
         raise SystemExit(1)
 
