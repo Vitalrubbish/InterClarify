@@ -1,0 +1,50 @@
+{
+  "issue": "NTF-011",
+  "model": {
+    "name": "X2Streaming-ASR-4B",
+    "repository": "X-Square-Robot/X2Streaming-ASR-4B",
+    "revision": "4c8df16",
+    "relative_path": "turncontrol-comparison/models/x2streaming-asr",
+    "weight_file": "model.safetensors",
+    "weight_bytes": 8859465384,
+    "sha256": "fadba62dde440bb7e31c011f2b85b3d3bc5d6b1a1c265ebc4f968c28b5bfe5c1",
+    "dtype": "bfloat16"
+  },
+  "contract": {
+    "sample_rate": 16000,
+    "frame_ms": 80,
+    "frame_samples": 1280,
+    "wait_token_id": 32,
+    "word_token_id": 33,
+    "delay_tokens": 6,
+    "first_user_samples": 9000,
+    "first_user_mel_frames": 56,
+    "left_pad_mel_frames": 256,
+    "first_total_mel_frames": 312,
+    "chunk_samples": 1680,
+    "chunk_mel_frames": 8,
+    "first_input_tokens": 39,
+    "flush_frames": 8
+  },
+  "case_ids": {
+    "longest": true,
+    "pause": "candor_pause_handling-16",
+    "turn_taking": "candor_turn_taking-102"
+  },
+  "continuous_seconds": 60,
+  "gpu_memory_fraction": 0.55,
+  "gate": {
+    "x2_rtf_max": 0.6,
+    "backlog_p95_ms_max": 320,
+    "continuous_drift_ms_max": 160,
+    "peak_gpu_mib_max": 12288
+  },
+  "limits": {
+    "gpu": "1x4090",
+    "cpu": 4,
+    "memory_gib": 32,
+    "gpu_stop_mib": 22528,
+    "output_limit_mib": 256,
+    "job_timeout_seconds": 1800
+  }
+}
