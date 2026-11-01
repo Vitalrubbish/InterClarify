@@ -99,3 +99,13 @@ ID20与ID9正好是r6没有检出nonidle、本轮新增检出的两条。原先�
 ## 证据
 
 本地`artifacts/soulx/20261101-ntf013-regression-analysis/`保存`regression_summary.json`、`word_timing.json`、逐事件和词提交时差复核脚本。原始帧仍在两轮冻结artifact目录中。分析工作单NTF-013完成后归档；不修改冻结实现和既有实验结果。
+
+## 2026-11-02补充：SenseVoice也会遇到空步规则风险
+
+用户追问指出，这条规则同样作用于官方SenseVoice路径。复核冻结`_asr()`与`_state_predict()`确认：SenseVoice门控未调用识别、滑窗识别与历史相同、仅修订历史但没有新增字等情况，均可能返回空`delta_text`；之后仍进入相同的nonidle计数与complete／incomplete强制选择。同步窗口识别并不能保证每160ms都有新文字。
+
+重新从`artifacts/soulx/20261030-delta-context-r1/evidence/replay/*.source.jsonl`仅选取`audit_kind=state_source`且`delivery_phase=online`的记录，得到269帧，9次nonidle→incomplete、2次nonidle→complete。两次complete均在`calibrated_full`／`calibrated_repeat`的4.44s且被接纳。这证明SenseVoice路径实际也触发规则；规则触发次数本身不等于误判次数。
+
+因此，“旧空步规则与X2不匹配”应精确理解为**通用规则在本次X2接入中表现出风险**，不能解释为SenseVoice没有该问题。32→71只是r6与X2之间的比较，尚无相同FDB30、同等预热及明确控制器合同下的SenseVoice对照。历史六视图与FDB30的样本、reset及门控路径不同，不能直接比较触发率或把历史11次与当前71次作优劣排序。
+
+现有证据能证明该规则直接制造了某些提前complete，不能证明它是X2相对SenseVoice差异的主因。相对差异取决于连续空增量、原始nonidle、状态反馈、门控和reset的联合轨迹。要验证归因，需要在每种固定ASR接入内分别开／关规则并完整重放，再比较规则效应是否随ASR变化；不能从规则的存在直接推出路线优劣。本补充未修改实现或启动实验。
