@@ -344,13 +344,24 @@ class StreamRun:
                 pass
 
         self.model._stream_exhausted = False
+        original_prepare = self.model.prepare_inputs_for_generation
+
+        def prepare(*args, **kwargs):
+            # Transformers 5.15 drops multimodal inputs on non-prefill iterations.
+            # The streaming processor yields one feature chunk per decode step, so
+            # keep the chunk visible to the model-specific forward path.
+            kwargs['is_first_iteration'] = True
+            return original_prepare(*args, **kwargs)
+
+        self.model.prepare_inputs_for_generation = prepare
         try:
             with torch.inference_mode():
                 self.model.generate(input_ids=input_ids, input_features=features(),
                                     num_delay_tokens=self.delay, streamer=Recorder(self),
-                                    do_sample=False)
+                                    do_sample=False, use_cache=True)
         finally:
             self.model._stream_exhausted = False
+            self.model.prepare_inputs_for_generation = original_prepare
             self.model.model.get_audio_features = original
         return self._record(started, feed_records, chunks)
 

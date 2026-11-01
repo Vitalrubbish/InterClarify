@@ -22,6 +22,8 @@
 - 生成器用绝对起始时刻计算目标时间，因此计算慢于 80ms 时不会通过延后 `sleep` 把积压藏起来；
 - 音频结束后补 8 个 80ms 静音帧（`flush_frames`），只为收尾输出和组闭合；这些 token 标为 `pad`，不计入实时门槛的 `x2_rtf` 与 `backlog` 分布。
 
+Transformers 5.15 的通用 `prepare_inputs_for_generation` 会在非 prefill 迭代丢弃 `input_features`，而 X2 的流式协议每步都需要一个新特征块。探针因此在单次 generation 期间把 `is_first_iteration` 固定为真，只绕过这个通用丢弃分支；`input_ids` 切片、KV cache 和音频 encoder cache 仍由模型自身处理。这个兼容层只影响本探针与后续 worker，不修改 Transformers 源码。
+
 `[P]`（id 32）与 `[W]`（id 33）按模型合同分组：`[W]` 开始一个词，遇到下一个 `[P]` 或 `[W]` 时闭合。没有前导 `[W]` 的文本 token 记为 `unbound`；流结束仍未闭合的组单独记录，不冒充已闭合词。
 
 ## 逐帧字段
