@@ -88,12 +88,24 @@ class TeacherTextBuffer:
             raise ValueError('ASR control text contains structural special tokens')
         return ids
 
+    def _degraded_append(self, control_text):
+        extension = control_text[len(self.committed_text):]
+        new_ids = self._encode(extension)
+        self.committed_text = control_text
+        self.committed_ids = self.committed_ids + new_ids
+        self.degraded_prefix = True
+        self.pending_text, self.pending_ids = '', []
+        return {'committed_ids': new_ids, 'committed_text': extension,
+                'pending_ids': [], 'pending_text': '',
+                'text_commit_index': len(self.committed_ids),
+                'tail_reencode_count': 0, 'tail_replace_tokens': 0,
+                'post_pause_extension': True}
+
     def update(self, control_text, commit_pending=False):
         """Re-tokenize completed words and append only the new canonical suffix."""
         if not control_text.startswith(self.committed_text):
             raise ValueError('Teacher control text rewrote committed history: '
-                             f'raw={self.cursor.text[-80:]!r} committed={self.committed_text[-80:]!r} '
-                             f'control={control_text[:80]!r}')
+                             f'committed={self.committed_text[-80:]!r} control={control_text[:80]!r}')
         if self.degraded_prefix:
             new_text = control_text[len(self.committed_text):]
             new_ids = self._encode(new_text)
@@ -111,22 +123,21 @@ class TeacherTextBuffer:
             pending_text = ''
         else:
             stable_text = ' '.join(words[:-1]) if len(words) > 1 else ''
-            pending_text = words[-1] if words else ''
+            if len(stable_text) < len(self.committed_text):
+                if (len(control_text) > len(self.committed_text)
+                        and not control_text[len(self.committed_text)].isspace()):
+                    return self._degraded_append(control_text)
+                stable_text = self.committed_text
+                pending_text = ''
+            else:
+                pending_text = control_text[len(stable_text):].lstrip(' ')
         if not stable_text.startswith(self.committed_text):
-            extension = control_text[len(self.committed_text):]
-            if not extension or extension.startswith(' '):
-                raise ValueError('Teacher control text rewrote committed history: '
-                                 f'{self.committed_text[-40:]!r} -> {stable_text[:80]!r}')
-            new_ids = self._encode(extension)
-            self.committed_text = control_text
-            self.committed_ids = self.committed_ids + new_ids
-            self.degraded_prefix = True
-            self.pending_text, self.pending_ids = '', []
-            return {'committed_ids': new_ids, 'committed_text': extension,
-                    'pending_ids': [], 'pending_text': '',
-                    'text_commit_index': len(self.committed_ids),
-                    'tail_reencode_count': 0, 'tail_replace_tokens': 0,
-                    'post_pause_extension': True}
+            if (control_text.startswith(self.committed_text)
+                    and len(control_text) > len(self.committed_text)
+                    and not control_text[len(self.committed_text)].isspace()):
+                return self._degraded_append(control_text)
+            raise ValueError('Teacher control text rewrote committed history: '
+                             f'committed={self.committed_text[-80:]!r} stable={stable_text[:80]!r}')
         stable_ids = self._encode(stable_text)
         if stable_ids[:len(self.committed_ids)] != self.committed_ids:
             raise ValueError('Canonical tokenization changed committed history')
