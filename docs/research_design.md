@@ -4,11 +4,11 @@
 
 此前comparison旧实验已清除，官方源码已重新克隆并纳入子模块，见[源码说明](third_party/soulx-duplug.md)与[清理报告](reports/soulx/20261102-source-reset/README.md)。Nemotron／X2教师替换和双ASR配对发布保留为历史实验，不恢复旧入口。X2同卡30/30、实时及分词规范性通过，但状态未整体改善，见[报告](reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)与[归因](reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)。此前双ASR18/30完整、12条800ms触限，存在非静音、多长度预热不足的配置差异，见[历史审计](../reports/soulx/20261031-dual-asr-publication/README.md)。预热不足是优先验证假设，尚不能认定是全部积压的原因。模型权重固定，不训练，尚未切换现役下游Agent。
 
-当前前端保持两路职责：SoulX通过原生SenseVoice教师和音频预测五状态，X2独立以真实EOS闭合组提供完整词正文，不进入状态KV。两路同源PCM、各自发布；模型推进以160ms为屏障，X2两个80ms步及SoulX本步均结束后进入下一周期，实际采样／前瞻范围另记。内部reset不清空外接正文；四类非complete即时交付，只有complete按真实进度与正文提交进行有界交接。原始状态、交接等待和正文覆盖分别评价，不用延后ready宣称原生状态改善。实现和有限验证依NTF-015→016→017→020→018→019推进。
+当前前端保持两路职责：SoulX通过原生SenseVoice教师和音频预测五状态，X2独立以真实EOS闭合组提供完整词正文，不进入状态KV。两路同源PCM；每160ms等X2两个80ms步及SoulX本步均结束后，将文本和状态token一次原子写入SharedContext，成功后推进下一周期，实际采样／前瞻范围另记。先完成结果只在内部暂存，不写PCM、不设前端停止旁路。内部reset不清空外接正文；只有complete另按已提交真实进度与正文进行有界交接。原始状态、交接等待和正文覆盖分别评价，不用延后ready宣称原生状态改善。实现和有限验证依NTF-015→016→017→020→018→019推进。
 
-此前已确认的下游分工与普通回答生成边界保留：独立正文方案中，四类非complete立即交付，complete须经数据交接ready后才供Layer 1在当前turn生成普通回答；pending仅作诊断，ready不保证尾词必齐。具体[接口合同](dev/SoulX-Duplug/shared_context_interface.md)由NTF-017／020负责，当前尚未实现，不以交接延迟改善原始状态指标。保留CoT条件下的主动澄清与话轮决策目标，后续让SoulX联合读取音频、转写和Layer 2已发布CoT；后续扩展见[架构第2.5节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
+此前已确认的下游分工与普通回答生成边界保留：独立正文方案中，四类非complete在所属160ms批次联合提交后供下游消费，complete还须经数据交接ready后才供Layer 1在当前turn生成普通回答；pending仅作诊断，ready不保证尾词必齐。具体[接口合同](dev/SoulX-Duplug/shared_context_interface.md)由NTF-017／020负责，当前尚未实现，不以交接延迟改善原始状态指标。保留CoT条件下的主动澄清与话轮决策目标，后续让SoulX联合读取音频、转写和Layer 2已发布CoT；后续扩展见[架构第2.5节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
 
-研究任务与单一仲裁执行点、单一 TTS 播放所有权及已听内容不可撤销的边界保持。仅有效用户打断额外进入输出运行时：活动输出期间 `user_nonidle` 立即触发停止，涵盖准备与播放。其他状态不进入输出运行时，不映射成 start 或 keep；`user_complete` 不额外发起 LLM 回答调用，`user_backchannel` 由 LLM 读取并决定表达行为。具体路径见[架构第 2.2 节](research_design/architecture.md#22-前端状态与系统附和)。状态输入编码待后续讨论。TextTurn 专属协议不自动成为 SoulX 合同，旧作业不因本次选型恢复。
+研究任务与单一仲裁执行点、单一 TTS 播放所有权及已听内容不可撤销的边界保持。用户状态统一随正文联合提交，前端不再为`user_nonidle`设置专用停止钩子；下游读取同一快照后，由既有唯一输出运行时按准备／播放生命周期处理有效打断。其他状态不进入输出运行时，不映射成 start 或 keep；`user_complete` 不额外发起 LLM 回答调用，`user_backchannel` 由 LLM 读取并决定表达行为。具体路径见[架构第 2.2 节](research_design/architecture.md#22-前端状态与系统附和)。状态输入编码待后续讨论。TextTurn 专属协议不自动成为 SoulX 合同，旧作业不因本次选型恢复。
 
 旧 TextTurn／VoxTurn／XTurnix 的数据、训练与测试修订已全部归档，入口见[历史路线归档](archive/dev/README.md)和对应报告；历史工作单在本地 `docs/issue/archive/`。保留历史合同，不继承为 SoulX 协议。
 

@@ -1,5 +1,7 @@
 # 同源PCM账本与160ms推进屏障
 
+本说明记录016已交付代码。最新NTF-017合同将推进顺序改为两路完成→文本／状态联合写入成功→下一批次，并移除前端专用停止旁路；当前代码尚未迁移。
+
 对应实现：`scripts/runtime/dual_audio.py`，工作单NTF-016。输入合同和原生padding映射见[设计第2.2节](../../dev/SoulX-Duplug/independent_streaming_frontend.md#22-ntf-015016采样映射与实现冻结)。
 
 ## 类设计

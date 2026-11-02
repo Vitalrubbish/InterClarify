@@ -1,17 +1,17 @@
 # 工作单管理
 
-更新：2026-11-02。当前为**SoulX原生SenseVoice控制＋独立X2完整词正文**路线。NTF-015／016已完成本地实现与契约验收并归档，见[交付记录](../reports/soulx/20261102-native-independent-frontend/README.md)；NTF-017／020／018／019继续待实施。路线恢复范围见[恢复记录](../reports/soulx/20261102-external-asr-plan-restore/README.md)，合同见[独立前端设计](../dev/SoulX-Duplug/independent_streaming_frontend.md)、[Context接口](../dev/SoulX-Duplug/shared_context_interface.md)及[工程计划](../engineering_implementation.md)。
+更新：2026-11-02。当前为**SoulX原生SenseVoice控制＋独立X2完整词正文**路线。NTF-015／016已完成本地实现与契约验收并归档，见[交付记录](../reports/soulx/20261102-native-independent-frontend/README.md)；NTF-017／020／018／019继续待实施；017已按最新要求改为160ms双路完成后联合提交文本／状态，移除前端专用停止旁路。路线恢复范围见[恢复记录](../reports/soulx/20261102-external-asr-plan-restore/README.md)，合同见[独立前端设计](../dev/SoulX-Duplug/independent_streaming_frontend.md)、[Context接口](../dev/SoulX-Duplug/shared_context_interface.md)及[工程计划](../engineering_implementation.md)。
 
 ## 当前工作单
 
 | 工作单 | 工作单元 | 依赖 | 状态 |
 | --- | --- | --- | --- |
-| [NTF-017](NTF-017.md) | 异步SharedContext更新与生命周期 | NTF-015／016 | 待实施 |
+| [NTF-017](NTF-017.md) | 160ms双路完成后的文本／状态联合写入与生命周期 | NTF-015／016 | 待实施 |
 | [NTF-020](NTF-020.md) | 仅complete的回答交接同步 | NTF-015—017 | 待实施 |
 | [NTF-018](NTF-018.md) | 全链路预热与远端积压归因 | NTF-015—017／020 | 待实施 |
 | [NTF-019](NTF-019.md) | 独立前端单／双路固定FDB30验收 | NTF-018完整预热与实时门槛通过 | 待实施 |
 
-015／016已交付原生封装、冻结加载器、同源账本、160ms屏障及独立X2回调，28项新增检查与全量134项通过，未验证真实权重／实时性。后续顺序为017→020→018→019。SoulX保留原生SenseVoice教师、门控、修订、反馈及reset；X2只提供独立正文，每160ms等待两路实际完成再推进；当前结果各自即时交付。complete交接和原子Context属于后续实现，ready不承诺尾词必齐。
+015／016已交付原生封装、冻结加载器、同源账本、160ms屏障及独立X2回调，28项新增检查与全量134项通过，未验证真实权重／实时性。后续顺序为017→020→018→019。SoulX保留原生SenseVoice教师、门控、修订、反馈及reset；X2只提供独立正文，NTF-017将改为每160ms两路实际完成后联合写入文本／状态token，成功后再推进，取消前端专用停止钩子；015／016既有代码回调尚待迁移。complete交接和原子Context属于后续实现，ready不承诺尾词必齐。
 
 本次没有提交真实模型新作业，远端只读取得既有资产校验清单。远端沿用conda、单活动作业、1×4090、4CPU、32GiB、显存22GiB和在线800ms停止线；NTF-018最多2作业、NTF-019最多2作业，各≤1800秒／128MiB，合计计划上限2 GPU小时／512MiB。启动前冻结实际矩阵与输入；不自动使用已归档调研的作业额度，不训练、不接LLM／CoT／TTS、不切换现役Agent。
 
@@ -23,6 +23,7 @@
 | NTF-023—025 | 归档当前active计划 | 未实施归档，不记为已完成 |
 | NTF-026 | 保留已完成的历史归档 | 调研入口监控修复随分支撤回，不恢复为活动实现 |
 | NTF-027 | 本次Git与工作单维护 | 已完成并归档，范围见恢复记录 |
+| NTF-029 | 160ms双路完成后联合写入合同修订 | 已完成并归档；只改任务单与设计，017实现仍待执行，见[修订记录](../reports/soulx/20261102-joint-publication-contract/README.md) |
 | NTF-015／016 | 本地实现与契约验收完成后归档 | 原生控制、同源PCM／屏障、独立X2适配已交付；真实模型验证留给018／019 |
 | NTF-017—020 | 继续active | Context、交接与真实模型验证待实施 |
 

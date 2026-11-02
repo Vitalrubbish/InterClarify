@@ -1,5 +1,7 @@
 # 原生SoulX控制封装
 
+本说明记录015已交付代码。最新NTF-017合同将撤回前端active_output／stop_output专用停止接入，状态回调只暂存到当前160ms批次，两路完成后与正文共同写Context；当前代码尚未迁移。
+
 对应实现：`scripts/runtime/native_soulx.py`，工作单NTF-015。`NativeSoulX`只发布控制状态和内部诊断，不向SharedContext写正文，不使用历史教师替换封装。
 
 ## 类与输入

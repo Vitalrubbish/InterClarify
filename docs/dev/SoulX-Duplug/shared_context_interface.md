@@ -1,70 +1,58 @@
-# 用户话轮的 SharedContext 当前值接口
+# 用户话轮的 SharedContext 联合快照接口
 
-2026-11-02，状态：当前接口设计，尚未实施。NTF-015／016已提供独立状态、闭合正文及80ms进度回调，见[交付记录](../../reports/soulx/20261102-native-independent-frontend/README.md)；本接口的原子独立更新仍由NTF-017实施，仅complete交接由NTF-020实施，实际链路由NTF-018／019验证。完整合同见[独立前端](independent_streaming_frontend.md)，当前工作见[索引](../../issue/README.md)。
+2026-11-02，状态：NTF-017待实施合同。用户最新确认每160ms批次在SoulX与X2均处理完成后，统一写入文本和状态token；不写原始PCM，也不设置前端专用停止钩子。此修订替代此前正文／状态独立立即写入方案。NTF-015／016已交付的内部回调仍待迁移，历史结果见[交付记录](../../reports/soulx/20261102-native-independent-frontend/README.md)。[工作单](../../issue/NTF-017.md)和[前端设计](independent_streaming_frontend.md)为实施依据。
 
-## 1. 独立更新与原子读取
+## 1. 每160ms联合提交
 
-同一逻辑用户话轮以稳定session_id／turn_id定位一份当前记录。X2在EOS闭合组后追加完整词，SoulX原始状态立即记录；四类非complete状态立即供下游读取，只有complete用于开始回答时经过交接同步。结果发布无逐块配对或固定周期；模型推进按[设计第2.1节](independent_streaming_frontend.md#21-每160ms音频步的推进屏障)执行每160ms屏障，X2两个80ms步与SoulX本步均完成后才进入下一周期。交接pending不增加新的推进阻塞。
+同一逻辑用户话轮以稳定session_id／turn_id定位一份当前记录，step_id标记160ms源音频批次。SoulX完成本次原生调用及其反馈、服务／reset，X2顺序完成两个80ms音频步及可能的DECODE至真实EOS，才允许一次联合写入。两路可以串行计算；任何先完成结果均只留在本批次有界暂存器。
 
-Context不接收生成中的BPE／子词草稿。一个闭合组可有多个完整词，按官方组拼接规则一次发布；不要求一词一快照，不为组内各词伪造独立时标，也不改变下游tokenizer。已有正文不可回改，WAIT、WORD、空格或空ASR步都不能替代EOS。
+写入内容为本批次最新X2闭合组累计正文、SoulX状态token／有效性、控制代次、服务来源及两路真实进度。Context不保存PCM、开放组子词或两路计算中的半帧。X2第一帧产生的文字等本160ms批次完成后可见；WAIT无新字仍完成本步，联合提交保留原正文，不等新词、下一组EOS或整轮识别。
 
-每个写入在短锁内与记录最新值合并，只改变本路字段，再提供完整快照的原子读取。不能将线程此前读到的旧整帧写回，覆盖另一条路的新结果。推理、网络等待和落盘均不持锁；来源内的迟到或重复提交需拒绝，跨路进度允许不同。
+联合入口在短锁内校验身份、当前批次、两侧完成及追加前缀，合并最新生命周期／交接字段，再一次替换当前前端观察。读取返回完整副本，只能看到上一个或当前完整批次。不能把工作线程此前读取的整份快照回写覆盖较新交接或生命周期。推理、网络、日志和消费者不持该锁。
 
-仍只提供当前值，不增加历史正文、正文版本、替换patch、历史查询或事件游标。本次允许每话轮最多一条当前complete交接记录，用于有界等待与取消，替代此前完全不保留complete的约束；不建立历史事件队列或消费ack。实现时分别提供正文、原始状态、解码进度和交接更新入口；旧publish_user_frame的整帧覆盖及单一进度约束须迁移，不假定现实现已支持。
+严格顺序为两路完成→联合提交成功→允许下一批次模型推进；写入失败即终止样本，不释放下一步。输入生产者持续按真实时钟到达。complete ready不作为该提交或下一周期推进条件；消费者无需ack。仍不增加历史正文、版本查询、patch或无界待发布队列。
 
 ## 2. 当前记录与时间边界
 
 | 字段组 | 含义 |
 | --- | --- |
-| session_id／turn_id／status | 稳定身份、open或closed；关闭不等于语义完成 |
-| text／source | X2的EOS闭合组累计全文，来源固定为x2_streaming_asr；开放组子词不进入正文，内部SenseVoice文字只作控制与诊断 |
-| text_observed_until | 产生该正文时ASR实际已观察的真实采样上界，不证明此前所有词已发射 |
-| text_available_at／text_published_at | EOS实际闭合且组拼接完成的时间与Context写入时间，采用可比较单调时钟 |
-| state_token／state_accepted | 最新原生五状态及有效性；外层service_state、完成来源分别保留 |
-| controller_generation | 原生reset后的控制代次，不是新逻辑话轮 |
-| state_processed_until／state_observed_until | 状态主块与完整音频观察的真实采样上界，padding另记 |
-| state_available_at／state_published_at | 状态实际可用与发布的可比较单调时间 |
-| asr_processed_until／asr_observed_until／asr_progress_available_at | X2完成整步解码的主块、真实观察边界和可用时间；WAIT无新字也推进，不等于正文观察范围 |
-| completion_id／completion_status | 单个当前交接身份与none／pending／ready／cancelled／timed_out；原始complete不等于ready |
-| completion_target_sample／deadline／ready_at | 创建时固定的原始complete实际观察截止、交接截止及实际ready时间；包含原始来源与对应正文已提交组数 |
-| 完整性字段 | 区分传输／整理缺口和ASR尾部状态；没有可靠尾词信号则为unknown |
+| session_id／turn_id／status | 稳定身份与open／closed，内部reset不创建新话轮 |
+| step_id／batch_published_at | 最新已联合提交的源批次和原子写入时间，不是历史正文版本 |
+| source／text／committed_groups | 来源固定x2_streaming_asr、EOS闭合组累计全文及已提交组数，不含子词草稿 |
+| text_observed_until／text_available_at／text_published_at | 产生当前正文的真实观察上界、实际闭合拼接时间和首次联合发布该正文的时间；无新字时不刷新 |
+| state_token／state_accepted／controller_generation | 本批次原生五状态、有效性与控制代次；service_state和完成来源分别记录 |
+| state_processed_until／state_observed_until／state_available_at／state_published_at | 本批次状态的真实主块、观察边界、原始可用时间及联合发布时间，padding另计 |
+| asr_processed_until／asr_observed_until／asr_progress_available_at | X2本批次最后实际完成80ms步的真实处理／观察边界及实际可用时间；WAIT也推进 |
+| completion_id／completion_status | 至多一条当前交接及none／pending／ready／cancelled／timed_out，原始complete不等于ready |
+| completion_target_sample／deadline／ready_at | 固定原始complete实际观察目标、交接截止与实际ready时间，保留对应已提交组数 |
+| 完整性 | 传输／整理缺口、后端明确尾部状态；缺乏可靠尾词信号时为unknown |
 
-旧processed_until若保留，只兼容表示SoulX主块截止；正文更新不要求它增长。各组时序只由所属路推进，状态变化不刷新正文时间，正文变化不刷新状态时间。原子快照不表示音文同块对齐，也不保证尾词完整。ASR暂时无新增token不等于静音或句子结束。
+有新正文时，text_published_at与本批次state_published_at均取batch_published_at；各自available_at保留模型实际完成时刻。正文不变时保留此前text_observed_until、text_available_at和text_published_at，继续推进当前批次、状态及ASR进度。可用到发布的等待必须包含本160ms屏障，不能回填成提前可见。
 
-解码进度独立于正文：X2收包、特征预取不能推进已完成进度，必须完成该80ms步及其DECODE；WAIT完成而正文不变时，仅推进进度字段，不改text_available_at。否则complete会因“没有新字就没有进度”而无限等待。调度器另持有本160ms步的两侧完成标记与释放时间；它不要求当前文字变更，也不以completion_status=ready为释放条件。
+旧processed_until若保留，只兼容SoulX真实主块截止。两侧同一step_id不证明实际观察范围相同：startup／reset padding、回看及前瞻沿用[采样映射](independent_streaming_frontend.md#22-ntf-015016采样映射与实现冻结)。ASR处理／观察范围不保证此前所有词已发射，WAIT不等于静音或句子结束。
 
-## 3. 生命周期与正文来源
+## 3. 生命周期与失败
 
-控制器reset不清空正文，不结束X2Streaming-ASR，不创建新turn_id；外部PCM账本与内部控制缓存分开管理。user_complete不触发ASR结束、正文重识别或final标记。内部SenseVoice完整话轮识别仍可按原生服务执行，结果不覆盖共享正文。
+模型侧只保存当前批次的一条控制回执、两条80ms进度和至多两组闭合正文。X2每步进度仍在内部诊断中分别记录，供后续联合提交校验；收包、特征预取不算解码完成。
 
-X2已闭合组按官方规则形成只追加累计正文，不经SenseVoice拼合或SoulX控制归一化。空返回和识别异常不清空已有文字；不允许缺少结果时换成内部窗口文字。任一路失败显式终止验证样本并保留记录。
+reset不结束X2、不清空正文、不改变全局step_id；原生SenseVoice整轮识别仍属控制诊断，不覆盖正文。complete不触发ASR结束、额外重识别或final标记。EOF只按实际存在的终止帧验收完整批次，不补造状态或EOS；开放组、未处理PCM和drain保留在诊断中，不回填在线正文。
 
-只有运行时显式关闭才终结逻辑话轮；关闭后拒绝两路迟到回调。EOF不补造complete或EOS，不强制提交开放组；在线已闭合正文、开放组token、未处理真实采样和显式drain诊断分别保留，排空结果不回填在线记录。组闭合不等于整轮转写完成。
+任一路错误、缺失／重复／过期回执、Context校验／容量失败或关闭／取消均不得提交半帧，上一完整快照保留，失败样本显式停止。关闭后拒绝迟到回调，旧结果不能重开话轮。原子关闭／交接超时可更新生命周期元数据，但不能在两路未完成时单独刷新文本、状态token或ASR进度。
 
-## 4. 下游消费与直接停止
+## 4. 下游消费与complete交接
 
-Layer 1／2在各自输入边界读取最新快照；一次更新不创建新用户消息，不自动改变已建立的模型输入／KV、已生成或已听内容。正文、状态与元数据分开编码，ASR标签没有控制权限。
+Layer 1／2在各自合法输入边界读取同一份已提交文本和状态。一次联合写入不创建新用户消息，不自动回改已构造的模型输入、KV、生成历史或已听内容。前端不直接操作输出；不再为nonidle设置早于联合提交的停止钩子。下游读取本批次快照后按既有输出生命周期处理，唯一输出执行点、停止幂等和实际停播确认仍保留。
 
-四类非complete原始状态直接供Layer 1读取。原始complete只作诊断与pending来源，不作为已可回答的complete token直接编码到Layer 1输入。必须在交接ready后，将对应complete与当前已闭合正文在同一输入边界交付；仅state_accepted=true不足以开始正式回答。普通回答仍在当前turn现有生成流程内开始，不新建独立回答调用。
+所有五状态采用相同的160ms提交门槛。四类非complete在提交后可供正常消费；原始complete同样在本批次提交，只有NTF-020额外数据交接通过才可用于正式回答。候选固定原始state_observed_until为C、原始state_available_at与控制代次，不能把批次发布时间当作新的起算点。
 
-交接固定原始complete的state_observed_until为目标C，等待X2完成覆盖C及原生真实前瞻的步骤、当前DECODE真实EOS闭合、相应闭合组全部提交；领先时可立即ready，不要求新词或下一个EOS。所有检查及ready标记与最新正文在同一锁内提交；正文不复制为历史版本，保留对应已提交组数供审计。
+NTF-020只使用已提交批次的真实ASR进度和闭合正文检查ready；若本批次已覆盖目标即可在同次事务中ready，否则pending直到后续已联合提交批次满足条件。对应nonidle／incomplete也在所属批次提交后才取消旧候选，不使用未发布的内部状态提前改变下游行为。idle／backchannel和内部reset不自动取消；Layer 1按completion_id至多使用一次。
 
-pending和尚未使用的ready遇后到有效nonidle／incomplete即取消；nonidle直接停止仍即时执行。idle／backchannel和内部reset不取消，ready记录不随下一帧idle消失。Layer 1按completion_id最多使用一次，不增加消费ack；关闭或新合法交接替换后，迟到结果不能复活旧候选。取消与放行在同一执行域串行判断，已构造的模型输入不会被Context自动回改。
+ready及取消与最新正文在同一锁内复核，不能覆盖更新批次。非阻塞超时定时器只修改交接元数据；首轮timeout为800ms，deadline与原始complete到ready的既有800ms总延迟线取较早者，屏障和提交等待计入同一预算。重复complete不续期，超时标记失败，不强行ready；EOF不能用drain补足在线覆盖。
 
-交接采用非阻塞定时器。首轮completion_wait_timeout_ms=800，deadline与原始complete主块到交接的既有800ms总延迟停止线取较早者，不能叠加预算；重复complete不续期。超时则timed_out、验证样本失败并保留证据，不强制ready或提交半词。EOF真实前瞻不足不得用drain补成在线就绪。
+屏障完成不代表尾词齐备；ready只承诺真实计算与正文提交条件。继续保留unknown尾部并统计ready后新增文字，不增加空步、固定额外延时或强制EOS规则。
 
-ready只表示上述计算／提交同步通过，不保证此前所有词已发射；尾词未知保留unknown并统计ready后追加的文字。初版不增加空步计数、固定160／320ms延后或必须等待下一个EOS的规则，具体边界见[设计第4.1节](independent_streaming_frontend.md#41-仅-complete-的回答交接同步)。
+## 5. 验收与迁移
 
-活动输出期间有效nonidle直接调用唯一停止执行点，不等待ASR、Context消费者或日志；其他状态不映射为start／keep。停止请求与物理停播分别记录。
+NTF-017覆盖两种完成顺序、暂存不可见、一次联合提交、WAIT不刷新正文时间、提交成功后才推进、并发读取／关闭和失败无半帧。NTF-020覆盖仅基于已提交批次的ready／取消／超时，NTF-018／019记录原始计算、屏障等待、联合发布时间及读取时间，不用发布延迟伪装原始状态改善。
 
-## 5. 验收与历史
-
-NTF-017／020已恢复为active，负责交错更新、生命周期及complete同步；NTF-018／019负责完整预热和原始状态／ready交接验收。以上仍为待实施合同，不能因工作单恢复就当作已交付。原始状态与交接质量仍须分别报告，不能用延后ready伪装SoulX原始状态改善。
-
-历史[160ms联合发布](streaming_transcript_publication.md)、[双ASR配对发布](../../archive/dev/SoulX-Duplug/dual_asr_publication.md)与教师同步均已被本合同替代。旧[六视图接口检查](../../../reports/soulx/20261030-current-context-test/README.md)和[双ASR18/30报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)保留原解释，不作为新接口通过证据。
-
-## 6. 160ms推进与Context更新
-
-屏障只限制下一音频步的模型调用。当前X2第一个80ms闭合组、两次WAIT进度和SoulX状态均各自就绪更新，Context锁、日志及消费者不阻塞整步完成回执。step_id不表示文字版本或同一声学词尾，实际主块／观察范围继续分别保存；单个原子快照可处于本周期两侧先后完成的中间状态。
-
-当complete目标所需的真实观察范围只能在后续周期覆盖时，先按两侧完成条件释放当前推进屏障，交接保持pending并独立计时。禁止以ready等待屏障、再以屏障等待ready；EOF未完成周期不能借drain补成在线交接。
+现有015／016的独立回调和停止钩子是此前合同的实现事实；NTF-017需调整SharedContext及三份适配模块、测试和同路径说明。当前未实施本合同，也未重新运行模型。旧[160ms联合发布](streaming_transcript_publication.md)只作历史参考，不恢复教师注入、整个旧buffer回写或基于步号伪造真实窗口对齐。

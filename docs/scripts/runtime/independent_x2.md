@@ -1,5 +1,7 @@
 # 独立X2完整词正文
 
+本说明记录016已交付代码。最新NTF-017合同要求80ms回调仅暂存结果，第一帧闭合正文不提前写Context，待本160ms两路均完成后联合提交文本与状态；当前代码尚未迁移。
+
 对应实现：`scripts/runtime/independent_x2.py`，工作单NTF-016。正文来源固定为`x2_streaming_asr`；本模块不接受SoulX状态或控制文字，因此complete和原生reset不会结束或重置ASR。
 
 ## 类设计
