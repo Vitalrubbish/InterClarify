@@ -1,13 +1,13 @@
 # 工作单管理
 
-更新：2026-11-02。用户已确认 **SoulX原生控制＋独立原生流式转写**，并要求建立相关工作单。新方案保留SenseVoice内部教师链路，Nemotron仅供共享正文，两路各自就绪即发布，不等待逐块配齐。设计见[独立流式前端](../dev/SoulX-Duplug/independent_streaming_frontend.md)、[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。
+更新：2026-11-02。用户已确认 **SoulX原生控制＋独立X2Streaming-ASR整词转写**，并要求建立相关工作单。按进一步指定，正文来源改为X2，以EOS闭合组中的完整词追加Context，不暴露子词草稿；原先拟用Nemotron的选型被替代。SoulX保留SenseVoice内部教师，两路各自就绪发布，不等待逐块配齐。设计见[独立流式前端](../dev/SoulX-Duplug/independent_streaming_frontend.md)、[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。
 
 ## 当前工作单
 
 | 工作单 | 工作单元 | 依赖 | 状态 |
 | --- | --- | --- | --- |
 | [NTF-015](NTF-015.md) | 保留原生协议的SoulX控制封装及reset审计 | 无 | 待实施 |
-| [NTF-016](NTF-016.md) | 同源音频分发与独立Nemotron流式正文 | NTF-015输入合同 | 待实施 |
+| [NTF-016](NTF-016.md) | 同源音频分发与X2的EOS完整词正文 | NTF-015输入合同 | 待实施 |
 | [NTF-017](NTF-017.md) | 正文／状态独立更新、原子快照与生命周期 | NTF-015／016 | 待实施 |
 | [NTF-018](NTF-018.md) | 完整预热、远端积压归因及实时门槛 | NTF-015—017 | 待实施 |
 | [NTF-019](NTF-019.md) | 固定FDB30单路／双路验收 | NTF-018通过 | 待实施 |

@@ -1,6 +1,6 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
-2026-11-02 用户确认采用 **SoulX-Duplug原生控制＋独立原生流式转写**，并要求拆分工作单。控制器保留SenseVoice内部教师、文字门控、窗口修订、状态反馈和原生reset；独立Nemotron仅提供共享正文，不向SoulX注入教师文本。理由是先获得持续转写，同时尽量保持原生控制输入协议，避免将教师替换、时序和缓存改造混为一次变化。方案见[独立流式前端](dev/SoulX-Duplug/independent_streaming_frontend.md)，实施单见[NTF-015—019](issue/README.md)。本轮只交付设计与建单，尚未实现或启动远端作业。
+2026-11-02 用户确认采用 **SoulX-Duplug原生控制＋独立X2Streaming-ASR整词转写**，并要求拆分工作单。控制器保留SenseVoice内部教师、文字门控、窗口修订、状态反馈和原生reset；独立X2仅提供共享正文，不向SoulX注入教师文本。按用户进一步指定，正文在X2发射组EOS闭合后以完整词追加，子词草稿不进入Context；一组可含多个词，不要求一词一快照。该决定替代原先拟用Nemotron的正文选型，旨在保持原生控制输入协议的同时提供整词流式正文。方案见[独立流式前端](dev/SoulX-Duplug/independent_streaming_frontend.md)，实施单见[NTF-015—019](issue/README.md)。本轮只修订设计与工作单，尚未实现或启动远端作业。
 
 此前comparison旧实验已清除，官方源码已重新克隆并纳入子模块，见[源码说明](third_party/soulx-duplug.md)与[清理报告](reports/soulx/20261102-source-reset/README.md)。Nemotron／X2教师替换和双ASR配对发布保留为历史实验，不恢复旧入口。X2同卡30/30、实时及分词规范性通过，但状态未整体改善，见[报告](reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)与[归因](reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)。此前双ASR18/30完整、12条800ms触限，存在非静音、多长度预热不足的配置差异，见[历史审计](../reports/soulx/20261031-dual-asr-publication/README.md)。预热不足是优先验证假设，尚不能认定是全部积压的原因。模型权重固定，不训练，尚未切换现役下游Agent。
 

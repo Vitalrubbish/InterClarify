@@ -1,17 +1,17 @@
 # 工程实施计划
 
-更新：2026-11-02。用户已确认[原生SoulX控制＋独立Nemotron流式正文](dev/SoulX-Duplug/independent_streaming_frontend.md)，并要求建立[NTF-015—019](issue/README.md)。本轮仅设计与建单，尚未实现新链路或启动远端作业。研究范围见[研究方案](research_design.md)，职责与下游边界见[架构](research_design/architecture.md)。
+更新：2026-11-02。用户已确认[原生SoulX控制＋独立X2Streaming-ASR整词正文](dev/SoulX-Duplug/independent_streaming_frontend.md)，并要求建立[NTF-015—019](issue/README.md)。本轮仅设计与建单，尚未实现新链路或启动远端作业。研究范围见[研究方案](research_design.md)，职责与下游边界见[架构](research_design/architecture.md)。
 
 ## 1. 当前目标与运行底座
 
-目标前端位于Layer 0–Layer 2输入侧。SoulX内部保留SenseVoice教师、文字门控、窗口修订、状态反馈及原生reset；Nemotron独立持续解码，只提供共享正文，不向SoulX注入外部教师文字。两路接收同一PCM，各自就绪即更新Context，不等待逐块配齐。
+目标前端位于Layer 0–Layer 2输入侧。SoulX内部保留SenseVoice教师、文字门控、窗口修订、状态反馈及原生reset；按用户指定，X2Streaming-ASR独立持续解码，只在EOS闭合组后以完整词追加共享正文，不暴露组内子词，不向SoulX注入外部教师文字。两路接收同一PCM，各自就绪即更新Context，不等待逐块配齐。
 
 现役底座仍为X-Talk ca9b23c、DuplexCascade、Nemotron EN160与Kokoro，见[运行配置](runtime_baseline.md)。本轮不切换现役Agent；官方源码使用[本地子模块和远端独立checkout](third_party/soulx-duplug.md)，不恢复已退役comparison加载器。
 
 | 模块 | 当前设计职责 |
 | --- | --- |
 | SoulX原生控制 | 保留内部教师协议和五状态，提供实际输入／状态来源及时间边界 |
-| 独立Nemotron | 复用锁定EN0.6B、FP32、lookahead 1与流式缓存，提供当前原始正文 |
+| 独立X2Streaming-ASR | 复用锁定4B模型、BF16与原生80ms自适应缓存，EOS闭合后按完整词追加正文 |
 | SharedContext | 正文／状态分别更新所属字段，短锁合并并原子读取；只保存当前值，分别记录进度与时间 |
 | Layer 1 | 后续在输入边界读取正文及状态，实际读到当前turn有效complete后开始普通正式回答 |
 | 输出运行时 | 有效nonidle直接提交唯一停止执行点；其他状态不映射start／keep |
@@ -24,7 +24,7 @@
 | 顺序 | 工作单 | 交付与进入下一步的条件 |
 | --- | --- | --- |
 | 1 | [NTF-015](issue/NTF-015.md) | 原生控制封装与reset／采样账本审计；不套用旧教师和buffer写回补丁 |
-| 2 | [NTF-016](issue/NTF-016.md) | 同源PCM分发与独立原生流式正文，无跨路计算屏障 |
+| 2 | [NTF-016](issue/NTF-016.md) | 同源PCM分发、X2原生80ms解码与EOS完整词提交，无跨路屏障或旧教师两帧聚合 |
 | 3 | [NTF-017](issue/NTF-017.md) | 异步字段合并、原子快照、关闭与迟到处理，必要契约检查通过 |
 | 4 | [NTF-018](issue/NTF-018.md) | 完整预热及有限预热对照，双路三轴预检3/3完整、无过载才进入正式验收 |
 | 5 | [NTF-019](issue/NTF-019.md) | 同一冻结FDB30单路／双路对照；30/30、退出0、无过载为实时完整性门槛，质量单列 |
