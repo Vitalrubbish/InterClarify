@@ -1,33 +1,28 @@
-# 同源PCM账本与160ms推进屏障
+# 同源PCM与160ms联合提交
 
-本说明记录016已交付代码。最新NTF-017合同将推进顺序改为两路完成→文本／状态联合写入成功→下一批次，并移除前端专用停止旁路；当前代码尚未迁移。
-
-对应实现：`scripts/runtime/dual_audio.py`，工作单NTF-016。输入合同和原生padding映射见[设计第2.2节](../../dev/SoulX-Duplug/independent_streaming_frontend.md#22-ntf-015016采样映射与实现冻结)。
+对应`scripts/runtime/dual_audio.py`。NTF-017将016计算屏障扩展为“两路完成→联合提交成功→下一批次”；同源采样合同见[设计第2.2节](../../dev/SoulX-Duplug/independent_streaming_frontend.md#22-ntf-015016采样映射与实现冻结)。
 
 ## 类设计
 
-`PCMLedger`保存单份连续、不可被调用方回改的16kHz单声道float32 PCM。`append()`拒绝隐式dtype转换、非有限值和幅度越界；增益固定1。每个传输包保存源采样区间和摘要，模型窗口独立构造，不将传输包视为160ms模型步。`window()`返回PCM副本和真实／合成span；真实前瞻未到达则不运行，只在明确EOF时添加右padding。`discard_before()`仅释放两路未来计算／reset均不再需要的旧采样。
+`PCMLedger`保存单份连续16kHz、单声道、单位增益float32 PCM。append拒绝隐式转换、非有限值和幅度越界；window返回副本及真实／合成span，真实前瞻不足时等待输入，仅显式EOF允许右padding。discard_before释放两路后续计算不再需要的采样；输入到达时间独立于调度开始。
 
-`StepBarrier`持有唯一当前批次、全局step_id和取消代次。`begin()`冻结源批次、输入实际到达就绪时间与模型调度开始时间；输入就绪取覆盖所需采样的真实包到达时刻，EOF padding取显式EOF时刻，不拿调度开始冒充。`acknowledge()`拒绝错误步号、重复、过期或已取消回执；`release()`必须同时收到两路完成，保存完成时间、屏障等待及释放时间。内部reset不改变该步号。
+`StepBarrier`保存唯一当前批次、身份、全局step_id和取消代次。begin建立当前暂存区；acknowledge拒绝重复、缺失、过期或取消回执。release必须取得本批次已成功提交的快照，随后才递增step_id。reset不改变全局批次。
 
-`DualAudioFrontend`协调一个原生控制器与一个独立X2，要求同session／turn。默认一个调度worker串行执行两路，同一周期内可选择先控制或先ASR；这符合屏障允许串行计算的合同，没有新增GPU并发假设。每个周期X2连续完成两个80ms帧，SoulX完成一次原生调用，才可启动下一周期。
+`DualAudioFrontend`显式持有一个原生控制器、独立X2和已开轮的joint Context。独占两路暂存回调，拒绝调用方预先绑定外部回调；当前批次至多一条状态、两条正文通知及两条进度。默认单worker串行计算，可选择两种顺序，不增加GPU并发假设。
 
-## 核心方法与使用
-
-独立生产者按真实音频时钟持续调用`append_pcm()`，单调度worker反复调用`advance()`。模型执行不持有生产者所需锁；屏障等待不会暂停收音。真实前瞻不足时`advance()`返回None，由调用者等待新包；不可把该返回误当EOF。
+## 核心流程
 
 ```python
-controller = load_native_controller(upstream, soulx_assets, sensevoice_assets, run_dir,
-                                    on_state=receive_state)
-asr = IndependentX2.load(x2_assets, x2_source, x2_config,
-                          on_text=receive_text, on_progress=receive_progress)
-frontend = DualAudioFrontend(controller, asr)
+context.open_user_turn(session_id, turn_id, source='x2_streaming_asr')
+controller = load_native_controller(..., session_id=session_id, turn_id=turn_id)
+asr = IndependentX2.load(..., session_id=session_id, turn_id=turn_id)
+frontend = DualAudioFrontend(controller, asr, context=context)
 ```
 
-生产者与推进循环由后续远端入口负责。`receive_state/text/progress`须同步、短时返回；推理、日志、网络和消费者等待不能放进这些回调。当前第一帧闭合正文在本步第二帧和另一条路径之前即可交付，complete pending也不参与屏障释放条件。
+独立生产者按真实时钟持续append_pcm；调度worker调用advance。每批次完成SoulX原生调用和X2两个80ms步，回调仅送_stage暂存；两路回执齐备后publish_joint_batch一次提交。Context失败或校验错误立即终止，屏障不释放。下一批不等待complete ready、日志或消费者，前端没有同步on_step消费者回调；下游自行读取完整快照，不需要ack。
 
-`finish_input()`只标记EOF。最后不足160ms的批次允许显式padding，只运行仍有真实音频的X2帧，回执标记terminal；缺少任一路完成、失败或取消仍不能放行。全部源批次结束后`advance()`返回None，剩余控制PCM与开放组由`diagnostics()`保留，不额外伪造步骤。
+推理不持生产者锁或Context锁。finish_input仅标EOF；最后不足160ms的批次按实际存在帧数核对，全部源批次结束后advance返回None，不额外drain、补EOS或补complete。取消／close使屏障和话轮关闭，随后关闭两路；原有完整正文与状态不被部分结果覆盖。若极小容量连关闭元数据也无法写入，close_failure单独保存，模型仍停止，原观察保留。
 
-每路未完成真实PCM上限12800采样（800ms），超过上限的传输包在复制前拒绝；总PCM上限4MiB，包含账本和控制器持有的PCM，并在模型拼接、切块／reset及X2窗口分配前预留预算。真实处理进度较到达时钟落后超过800ms同样失败。生产者持续到达和每次推进均检查上限；不通过减速送音或丢帧恢复。`cancel()`／`close()`先在短锁中取消屏障，再在锁外停止两路发布，避免关闭与回调交错死锁；设备工作结束后才能`controller.detach()`。EOF、显式关闭、取消及内部reset彼此独立。
+每路未读真实PCM和在线进度上限800ms，总PCM上限4MiB；传输包、拼接、切块、reset及X2窗口在分配前检查，不减速送音、不丢帧。diagnostics保留最后完整批次、失败暂存、两路实际进度、开放组及各路未处理真实采样。
 
-`diagnostics()`保存最后已释放批次、当前未完成屏障、两路实际进度、原生状态／内部事件、正文和未闭合尾部；失败样本由远端入口落盘。该模块没有Context、回答交接、调度提交、LLM或TTS逻辑。
+advance返回的lane_compute_seconds、wait_seconds、commit_seconds分别描述模型调用、先完成侧等另一侧和提交耗时；保留input_ready_at、started_at、完成／发布／释放时间。消费者通过Context可选读取计时独立测量。日志由调用方在锁外落盘；本模块不接LLM、TTS或真实播放，NTF-020交接逻辑待实施。

@@ -1,4 +1,4 @@
-% Speech frontend feeding shared context with a separate interruption path.
+% Native control and independent X2 text share one atomic batch publication path.
 \begin{tikzpicture}[x=1cm,y=1cm,font=\sffamily\large,
   >={Latex[length=3mm,width=2mm]},
   box/.style={rounded corners=5pt,draw=black!55,line width=1pt,
@@ -22,24 +22,24 @@
 
   \node[frontend] (front) at (10.5,15.3) {};
   \node[font=\sffamily\bfseries\Large] at (10.5,16.9)
-    {Speech Frontend: SoulX-Duplug + SenseVoiceSmall};
+    {Speech Frontend: Native SoulX Control + Independent X2 Text};
   \node[font=\sffamily\normalsize] (audio) at (10.5,18.3) {Incoming user audio};
   \draw[flow] (audio.south) -- (front.north);
   \node[box,fill=teal!9,text width=6.4cm,minimum height=1.9cm] (asr) at (3.5,15.2)
-    {\textbf{Online ASR + Text Assembly}\\SenseVoiceSmall (first version)\\Versioned transcript updates};
+    {\textbf{Independent X2 Streaming ASR}\\Two native 80 ms audio steps\\LISTEN / DECODE to real EOS};
   \node[box,fill=orange!11,text width=7.4cm,minimum height=1.9cm] (turn) at (17,15.2)
-    {\textbf{SoulX-Duplug User-State Model}\\Audio encoding + transcript input\\Five native user states};
-  \draw[flow] (asr.east) -- node[label,above] {Transcript} (turn.west);
+    {\textbf{Native SoulX + SenseVoiceSmall}\\Internal ASR / rules / feedback / reset\\Five native user states};
+  \node[font=\sffamily\normalsize,text width=4cm,align=center] at (10,15.2)
+    {Same continuous PCM\\Independent text / control};
   \node[font=\sffamily\normalsize,text=black!65] at (10.5,13.6)
-    {Continuous audio observation; publish text before user\_complete. Nemotron: later evaluation.};
+    {Each 160 ms: finish both lanes, atomically publish, then advance. WAIT also completes a step.};
 
   \node[wide,fill=teal!6,text width=26cm,minimum height=1.8cm] (context) at (10.5,10.7)
     {\textbf{Shared Context: Available Dialogue + Runtime State}\\[3pt]
-     Versioned transcript + generated history \enspace / \enspace SoulX-Duplug user states \enspace / \enspace Layer 2 CoT\\
+     Current EOS-closed text + five states + real progress \enspace / \enspace One joint batch snapshot \enspace / \enspace Layer 2 CoT\\
      Backchannel timing suggestions \enspace / \enspace Layer 1 output \enspace / \enspace Listen--Speak state\\
      Interruption events / generated, submitted, canceled and played records};
-  \draw[write] (asr.south |- front.south) -- node[label,right] {Versioned transcript} (asr.south |- context.north);
-  \draw[write] (turn.south |- front.south) -- node[label,right] {Five user states} (turn.south |- context.north);
+  \draw[write] (front.south) -- node[label,right] {One atomic 160 ms commit: text + states + progress} (context.north);
   \draw[future] ([xshift=11.8cm]context.north) -- (22.3,12.5) --
     (24.6,12.5) -- (24.6,15.2) -- (turn.east);
   \node[font=\sffamily\normalsize,rotate=90,text=violet!80!black] at (25.1,13.85)
@@ -50,7 +50,7 @@
      System backchannel\\Timing prediction};
   \node[box,fill=blue!8,minimum height=3.4cm] (l1) at (10.5,6.9)
     {\textbf{Layer 1}\\\textbf{Expression}\\[3pt]
-     Read all five user states\\Reply after user\_complete\\Request thinking};
+     Read the joint snapshot\\Reply only after complete is ready\\Request thinking};
   \node[box,fill=violet!9,minimum height=3.4cm] (l2) at (19,6.9)
     {\textbf{Layer 2}\\\textbf{Async Thinking}\\[3pt]
      Publish CoT only\\No turn-action advice\\Update one active task};
@@ -81,9 +81,9 @@
      Priority stop: halt audio + cancel pending output\\
      Reject late text / audio carrying an invalid output\_id};
   \draw[flow] (fifo.south) -- node[label,right] {Consume in order} (playback.north);
-  \draw[control] (front.west) -- (-5.2,15.3) -- (-5.2,-1) -- (playback.west);
+  \draw[control] (context.west) -- (-5.2,10.7) -- (-5.2,-1) -- (playback.west);
   \node[label,text=orange!75!black,text width=3.6cm] at (-3.1,0.5)
-    {Valid user\_nonidle\\During active output: stop\\Bypass FIFO / no LLM wait};
+    {Committed nonidle\\Match output ID\\Stop once};
   \node[font=\sffamily\normalsize] (heard) at (10.5,-3.3) {Audio heard by the user: never revoked};
   \draw[flow] (playback.south) -- (heard.north);
   \draw[feedback] (playback.east) -- (26.5,-1) --
@@ -98,13 +98,13 @@
   \node[eventbox] (ack) at (14.2,-6.1)
     {\textbf{3. Closure acknowledged}\\Publish Listen + interruption\\Keep generated history};
   \node[eventbox] (restart) at (21.6,-6.1)
-    {\textbf{4. New Layer 1 reply}\\Read matching user\_complete\\Fresh output\_id; new text};
+    {\textbf{4. New Layer 1 reply}\\Read ready complete + latest text\\Fresh output\_id; new text};
   \draw[control] (close.east) -- (cancel.west);
   \draw[control] (cancel.east) -- (ack.west);
   \draw[control] (ack.east) -- (restart.west);
 
   \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-8)
-    {Ordinary replies begin after Layer 1 reads user\_complete in the current turn; no separate reply call.};
+    {Only committed snapshots reach consumers. Complete additionally waits for the data handoff (NTF-020).};
   \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-8.7)
-    {Target architecture; integration pending. Dotted feedback: future CoT adaptation and training, not implemented.};
+    {NTF-017: local contract checks. Real-model validation, answer handoff and CoT integration remain pending.};
 \end{tikzpicture}

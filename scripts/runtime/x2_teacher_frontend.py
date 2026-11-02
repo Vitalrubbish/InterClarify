@@ -32,7 +32,8 @@ class X2Context:
         self.context = context
 
     def open_user_turn(self, session_id, turn_id, source):
-        return self.context.open_user_turn(session_id, turn_id, source='x2_streaming_asr')
+        return self.context.open_user_turn(session_id, turn_id, source='x2_streaming_asr',
+                                            publication_mode='legacy_frame')
 
     def publish_user_frame(self, frame):
         return self.context.publish_user_frame(dict(frame, source='x2_streaming_asr'))

@@ -1,4 +1,4 @@
-"""Publish EOS-closed X2 text and independent 80 ms decode progress."""
+"""Stage EOS-closed X2 text and actual 80 ms decode progress."""
 from __future__ import annotations
 
 from copy import deepcopy
@@ -42,7 +42,8 @@ class IndependentX2:
         self._feeding = threading.Lock()
         self._publishing = threading.RLock()
         self.text_available_at = self.progress_available_at = None
-        self.published_text, self.published_groups, self.failure = '', 0, None
+        self.text_observed_until = 0
+        self.failure = None
         self.groups = ClosedText(lambda ids: engine.processor.tokenizer.decode(ids, skip_special_tokens=True), engine.join)
         engine.groups = self.groups
 
@@ -85,6 +86,7 @@ class IndependentX2:
         try:
             if self.closed or not self.is_live():
                 raise RuntimeError('X2 is closed')
+            started_at = self.clock()
             start, end = self.frame_index * 1280, (self.frame_index + 1) * 1280
             if ledger.eof and start >= ledger.end:
                 raise EOFError('No real audio remains for an X2 step')
@@ -109,15 +111,15 @@ class IndependentX2:
                       'asr_observed_until': self.observed_until,
                       'committed_groups': self.groups.count}
             with self._publishing:
-                if not self.closed and self.is_live():
-                    if self.groups.text != previous:
-                        self.text_available_at = self.clock()
-                        if self.on_text:
-                            self.on_text(dict(common, text=self.groups.text, delta=self.groups.text[len(previous):],
-                                              source='x2_streaming_asr', text_available_at=self.text_available_at,
-                                              text_observed_until=self.observed_until))
-                        self.published_text = self.groups.text
-                    self.published_groups = self.groups.count
+                if self.closed or not self.is_live():
+                    raise RuntimeError('X2 completed after cancellation')
+                if self.groups.text != previous:
+                    self.text_available_at = self.clock()
+                    self.text_observed_until = self.observed_until
+                    if self.on_text:
+                        self.on_text(dict(common, text=self.groups.text, delta=self.groups.text[len(previous):],
+                                          source='x2_streaming_asr', text_available_at=self.text_available_at,
+                                          text_observed_until=self.text_observed_until))
             self.progress_available_at = self.clock()
             progress = dict(common, asr_progress_available_at=self.progress_available_at,
                             decoding=False, open_group_tokens=[], decision=result['decision'])
@@ -125,8 +127,9 @@ class IndependentX2:
                 if not self.closed and self.is_live() and self.on_progress:
                     self.on_progress(deepcopy(progress))
             self.frame_index += 1
-            return dict(progress, lane='asr', completed_at=self.clock(), input_spans=spans,
-                        input_sha256=ledger.digest(audio), text_available_at=self.text_available_at)
+            return dict(progress, lane='asr', started_at=started_at, completed_at=self.clock(), input_spans=spans,
+                        input_sha256=ledger.digest(audio), text=self.groups.text,
+                        text_observed_until=self.text_observed_until, text_available_at=self.text_available_at)
         except Exception as exc:
             self.closed, self.failure = True, str(exc)
             raise
@@ -138,8 +141,7 @@ class IndependentX2:
             self.closed = True
 
     def diagnostics(self):
-        return {'text': self.published_text, 'committed_groups': self.published_groups,
-                'decoded_text': self.groups.text, 'decoded_groups': self.groups.count,
+        return {'decoded_text': self.groups.text, 'decoded_groups': self.groups.count,
                 'processed_until': self.processed_until, 'observed_until': self.observed_until,
                 'open_group_tokens': list(self.open_tokens), 'decoding': self.decoding,
                 'tail_status': 'unknown', 'closed': self.closed, 'failure': self.failure}

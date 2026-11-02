@@ -1,6 +1,6 @@
 # 工程实施计划
 
-更新：2026-11-02。当前路线为**原生SoulX＋SenseVoice控制、独立X2完整词正文、仅complete交接同步**。NTF-015／016已完成本地实现与契约验收并归档，见[交付记录](reports/soulx/20261102-native-independent-frontend/README.md)；NTF-017／020／018／019仍待实施。本次没有提交远端模型作业，路线恢复历史见[恢复记录](reports/soulx/20261102-external-asr-plan-restore/README.md)。
+更新：2026-11-03。当前路线为**原生SoulX＋SenseVoice控制、独立X2完整词正文、仅complete交接同步**。NTF-015／016／017已完成本地实现与契约验收并归档，见[交付记录](reports/soulx/20261102-native-independent-frontend/README.md)；NTF-020／018／019仍待实施。本次没有提交远端模型作业，路线恢复历史见[恢复记录](reports/soulx/20261102-external-asr-plan-restore/README.md)。
 
 ## 1. 当前目标与运行底座
 
@@ -16,12 +16,12 @@ SoulX保留内部SenseVoice教师、门控、滑窗差分／KV修订、状态规
 | --- | --- | --- |
 | 1 | [NTF-015](reports/soulx/20261102-native-independent-frontend/README.md) | 已完成：原生协议控制封装、冻结加载器、状态来源与reset审计 |
 | 2 | [NTF-016](reports/soulx/20261102-native-independent-frontend/README.md) | 已完成：同源PCM、X2原生80ms适配、160ms屏障、EOS正文／真实进度回调 |
-| 3 | [NTF-017](issue/NTF-017.md) | 160ms两路完成后文本／状态／进度联合写入、移除前端停止旁路、短锁生命周期；同步图源 |
+| 3 | [NTF-017](reports/soulx/20261102-ntf017-joint-publication/README.md) | 已完成联合提交、停止旁路撤回、短锁生命周期和图源同步，本地144项检查通过 |
 | 4 | [NTF-020](issue/NTF-020.md) | 仅complete的进度追齐、取消、去重和有界超时 |
 | 5 | [NTF-018](issue/NTF-018.md) | 同一拓扑完整预热、有限预热对照和单路参考；预检3/3完整、退出0且无800ms过载 |
 | 6 | [NTF-019](issue/NTF-019.md) | 原固定FDB30单／双路验收，分别评价原始状态、正文、实际交接与尾部 |
 
-015／016本地验收已完成，尚未进行真实权重等价性／实时性验收。下一步为017原子Context及020交接，018通过后才启动019。NTF-017需将015／016既有回调迁移到当前批次暂存，再联合写入Context，移除前端专用停止接入；原历史验收不能代替新合同检查。内部reset不清正文，交接pending不阻止联合提交成功后的下一批推进，生产者持续收音。
+015／016／017本地验收已完成，尚未进行真实权重等价性／实时性验收。下一步为020交接，018通过后才启动019。既有回调已迁移到当前批次暂存，成功联合写入Context后才推进，前端专用停止接入已删除；144项全量检查通过。内部reset不清正文，交接pending不阻止联合提交成功后的下一批推进，生产者持续收音。
 
 ## 3. 资源与执行边界
 
@@ -35,8 +35,8 @@ SoulX保留内部SenseVoice教师、门控、滑窗差分／KV修订、状态规
 
 NTF-021／022已完成调研，相关实现从main撤回，原始结果与离线bundle保留；NTF-023—025未实施归档，NTF-026的入口修复随实验分支撤回。当前不继续最小X2教师替换或其消融，不能把外接路线选择解释为已证明教师适配不可能。详见[本次记录](reports/soulx/20261102-external-asr-plan-restore/README.md)。
 
-普通回答生成边界、单一输出执行点及TTS播放所有权保持；状态统一经联合快照交付，撤回前端专用停止旁路。后续CoT条件化控制目标仍见[架构第2.5节](research_design/architecture.md#25-soulx-的-cot-条件化控制)，本次不构造训练数据或注入CoT。图源改造由恢复后的NTF-017执行，本次不修改图文件。
+普通回答生成边界、单一输出执行点及TTS播放所有权保持；状态统一经联合快照交付，撤回前端专用停止旁路。后续CoT条件化控制目标仍见[架构第2.5节](research_design/architecture.md#25-soulx-的-cot-条件化控制)，本次不构造训练数据或注入CoT。图源及PDF／PNG已由NTF-017同步；不表示回答或播放链路已实现。
 
 历史[X2教师30条](reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)、[归因](reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)与[双ASR实验](../reports/soulx/20261031-dual-asr-publication/README.md)保留原分母和限制。TextTurn、VoxTurn、XTurnix继续归档，不恢复旧训练或已取消benchmark。
 
-160ms推进合同见[设计第2.1节](dev/SoulX-Duplug/independent_streaming_frontend.md#21-每160ms音频步的推进屏障)，015／016已实现计算基础，NTF-017负责本次联合发布迁移；原作业矩阵与资源预算不扩大。
+160ms推进合同见[设计第2.1节](dev/SoulX-Duplug/independent_streaming_frontend.md#21-每160ms音频步的推进屏障)，015／016已实现计算基础，NTF-017已完成本次联合发布迁移；原作业矩阵与资源预算不扩大。

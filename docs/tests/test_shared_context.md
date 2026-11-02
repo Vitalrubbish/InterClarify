@@ -5,3 +5,5 @@
 使用既有conda运行：`conda run -n interclarify-dev python -m unittest discover -s tests -p 'test_shared_context.py' -v`。不加载模型，不将存储正确性当作识别质量。
 
 NTF-012新增X2来源的开轮、原子发布与来源不可变校验；状态规则与限额不变。
+
+NTF-017新增固定发布模式检查：X2默认joint，旧教师必须显式legacy_frame；帧字段不能切换模式，旧入口不能更新联合话轮。关闭元数据因容量失败时仍保留终止屏障，恢复容量后迟到写入仍被拒绝。联合事务、并发副本、交接元数据与失败无半帧的检查统一在test_independent_frontend.py。

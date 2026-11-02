@@ -105,7 +105,7 @@ class NativeSoulX:
     """Own one native controller; external PCM survives internal reset."""
 
     def __init__(self, model, *, synchronize, source_path=None, on_state=None,
-                 active_output=None, stop_output=None, session_id='session', turn_id='turn',
+                 session_id='session', turn_id='turn',
                  is_live=lambda: True, clock=time.monotonic):
         cfg = model.config.infer_config
         inp = cfg.input
@@ -115,15 +115,12 @@ class NativeSoulX:
             raise ValueError('Native English SenseVoice is required')
         if hasattr(model, '_native') or hasattr(model, '_pt'):
             raise ValueError('Controller already has an owner')
-        if bool(active_output) != bool(stop_output):
-            raise ValueError('Output lookup and stop callback must be paired')
         methods = capture_methods(model, source_path)
         self.model, self.synchronize, self.clock = model, synchronize, clock
         self.on_state, self.is_live = on_state, is_live
-        self.active_output, self.stop_output = active_output, stop_output
         self.session_id, self.turn_id = session_id, turn_id
         self.generation = self.processed_until = self.submitted_until = 0
-        self.closed, self._arrays, self._stopped = False, {}, set()
+        self.closed, self._arrays = False, {}
         self._feeding = threading.Lock()
         self._publishing = threading.RLock()
         self._original = {name: getattr(model, name) for name in (*methods, 'reset', 'get_chunk')}
@@ -223,16 +220,8 @@ class NativeSoulX:
                  'state_available_at': self.clock()}
         self._frame = frame
         with self._publishing:
-            if not self.closed and self.is_live():
-                if rejected is None and token == '<|user_nonidle|>' and self.active_output:
-                    output = self.active_output()
-                    if (output and output.get('session_id') == self.session_id
-                            and output.get('phase') in ('preparing', 'playing')
-                            and output.get('output_id') is not None and output['output_id'] not in self._stopped):
-                        self._stopped.add(output['output_id'])
-                        self.stop_output(deepcopy(frame), deepcopy(output))
-                if not self.closed and self.is_live() and self.on_state:
-                    self.on_state(deepcopy(frame))
+            if not self.closed and self.is_live() and self.on_state:
+                self.on_state(deepcopy(frame))
         self._events.append(dict(frame, kind='state'))
 
     def step(self, ledger, step_id):
@@ -241,6 +230,7 @@ class NativeSoulX:
         try:
             if self.closed or not self.is_live():
                 raise RuntimeError('Native controller is closed')
+            started_at = self.clock()
             self._events, self._frame, self._step_id = [], None, step_id
             self.raw_prediction = (None, None)
             start = self.submitted_until
@@ -257,11 +247,14 @@ class NativeSoulX:
             if service_state == 'speak':
                 source = ('model_complete' if self._frame['state_token'] == '<|user_complete|>'
                           and self._frame['state_accepted'] else 'wait_fallback')
-            return {'lane': 'controller', 'step_id': step_id, 'completed_at': self.clock(),
+            if self.closed or not self.is_live():
+                raise RuntimeError('Native call completed after cancellation')
+            return {'lane': 'controller', 'session_id': self.session_id, 'turn_id': self.turn_id,
+                    'step_id': step_id, 'started_at': started_at, 'completed_at': self.clock(),
                     'processed_until': self.processed_until, 'submitted_until': self.submitted_until,
                     'windows': self._windows, 'state': deepcopy(self._frame),
                     'service_state': service_state, 'service_completion_source': source,
-                    'service_text': result.get('text'), 'native_result': result,
+                    'service_text': result.get('text') or '', 'native_result': result,
                     'generation_after': self.generation, 'events': deepcopy(self._events)}
         except Exception as exc:
             self.closed, self.failure = True, str(exc)

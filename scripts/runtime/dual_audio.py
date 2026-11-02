@@ -100,17 +100,20 @@ class PCMLedger:
 class StepBarrier:
     """Reject stale/missing acknowledgements and retain both lane timings."""
 
-    def __init__(self, clock=time.monotonic):
+    def __init__(self, clock=time.monotonic, session_id='session', turn_id='turn'):
+        self.session_id, self.turn_id = session_id, turn_id
         self.clock, self.step_id, self.epoch = clock, 0, 0
         self.current, self.cancelled = None, False
 
     def begin(self, source_start, source_end, input_ready_at=None):
         if self.cancelled or self.current is not None:
             raise RuntimeError('Previous step has not released or barrier is cancelled')
-        self.current = {'epoch': self.epoch, 'step_id': self.step_id,
+        self.current = {'session_id': self.session_id, 'turn_id': self.turn_id,
+                        'epoch': self.epoch, 'step_id': self.step_id,
                         'source_start': source_start, 'source_end': source_end,
                         'input_ready_at': self.clock() if input_ready_at is None else input_ready_at,
-                        'started_at': self.clock(), 'receipts': {}}
+                        'started_at': self.clock(), 'receipts': {},
+                        'staged': {'state': None, 'text': [], 'progress': []}}
         return self.epoch, self.step_id
 
     def acknowledge(self, ticket, receipt):
@@ -123,12 +126,18 @@ class StepBarrier:
             raise ValueError('Receipt predates the current step')
         self.current['receipts'][lane] = deepcopy(receipt)
 
-    def release(self):
+    def release(self, snapshot):
         if self.cancelled or self.current is None or set(self.current['receipts']) != {'asr', 'controller'}:
             raise RuntimeError('Both lanes must actually complete before release')
+        if (snapshot['step_id'] != self.step_id or snapshot['session_id'] != self.session_id
+                or snapshot['turn_id'] != self.turn_id or snapshot['status'] != 'open'
+                or snapshot['batch_published_at'] < max(row['completed_at'] for row in self.current['receipts'].values())):
+            raise ValueError('A successfully published joint snapshot is required')
         result = self.current
+        result['batch_published_at'] = snapshot['batch_published_at']
+        result['lanes_completed_at'] = max(row['completed_at'] for row in result['receipts'].values())
         result['released_at'] = self.clock()
-        result['wait_seconds'] = {lane: result['released_at'] - row['completed_at']
+        result['wait_seconds'] = {lane: result['lanes_completed_at'] - row['completed_at']
                                   for lane, row in result['receipts'].items()}
         self.current = None
         self.step_id += 1
@@ -142,15 +151,24 @@ class StepBarrier:
 class DualAudioFrontend:
     """Accept PCM independently of model execution; one worker advances both lanes."""
 
-    def __init__(self, controller, asr, *, clock=time.monotonic, on_step=None,
+    def __init__(self, controller, asr, *, context, clock=time.monotonic,
                  order=('controller', 'asr')):
         if tuple(order) not in (('controller', 'asr'), ('asr', 'controller')):
             raise ValueError('Each lane must run exactly once per cycle')
-        self.controller, self.asr, self.clock, self.on_step = controller, asr, clock, on_step
+        self.controller, self.asr, self.clock, self.context = controller, asr, clock, context
         if (controller.session_id, controller.turn_id) != (asr.session_id, asr.turn_id):
             raise ValueError('Controller and ASR must belong to the same logical turn')
-        self.order, self.ledger, self.barrier = order, PCMLedger(clock), StepBarrier(clock)
+        initial = context.get_user_turn(controller.session_id, controller.turn_id)
+        if (initial['source'] != 'x2_streaming_asr' or initial.get('publication_mode') != 'joint'
+                or initial['status'] != 'open'
+                or initial['step_id'] != -1 or controller.processed_until or asr.frame_index):
+            raise ValueError('Frontend requires a fresh open independent-ASR turn')
+        if controller.on_state or asr.on_text or asr.on_progress:
+            raise ValueError('Lane callbacks belong exclusively to the batch stager')
+        self.order, self.ledger = order, PCMLedger(clock)
+        self.barrier = StepBarrier(clock, controller.session_id, controller.turn_id)
         self.closed, self.failure, self.started_at = False, None, None
+        self.close_failure = None
         self._state_lock, self._worker = threading.RLock(), threading.Lock()
         self.last_step = None
         self._asr_completed_until = self._controller_completed_until = 0
@@ -158,6 +176,25 @@ class DualAudioFrontend:
         controller.is_live = lambda: not self.closed and controller_live()
         asr.is_live = lambda: not self.closed and asr_live()
         controller.reserve_pcm = self._reserve_pcm
+        controller.on_state = lambda row: self._stage('state', row)
+        asr.on_text = lambda row: self._stage('text', row)
+        asr.on_progress = lambda row: self._stage('progress', row)
+
+    def _stage(self, kind, row):
+        with self._state_lock:
+            current = self.barrier.current
+            if self.closed or current is None or any(row.get(k) != current[k]
+                    for k in ('session_id', 'turn_id', 'step_id')):
+                raise RuntimeError('Late callback cannot enter the current batch')
+            staged = current['staged']
+            if kind == 'state':
+                if staged[kind] is not None:
+                    raise ValueError('Duplicate controller callback')
+                staged[kind] = deepcopy(row)
+            else:
+                if len(staged[kind]) >= 2:
+                    raise ValueError('Batch staging capacity exceeded')
+                staged[kind].append(deepcopy(row))
 
     def _reserve_pcm(self, additional_bytes):
         with self._state_lock:
@@ -211,6 +248,8 @@ class DualAudioFrontend:
             with self._state_lock:
                 if self.closed:
                     raise RuntimeError('Frontend is closed')
+                if self.context.get_user_turn(self.controller.session_id, self.controller.turn_id)['status'] != 'open':
+                    raise RuntimeError('Logical user turn is closed')
                 self._check_bounds()
                 source_start = self.barrier.step_id * 2560
                 if self.ledger.eof and source_start >= self.ledger.end:
@@ -236,7 +275,8 @@ class DualAudioFrontend:
                             self._asr_completed_until = self.asr.processed_until
                     if not frames:
                         raise RuntimeError('EOF without an ASR completion cannot release a step')
-                    receipt = {'lane': 'asr', 'step_id': ticket[1], 'frames': frames,
+                    receipt = {'lane': 'asr', 'session_id': self.asr.session_id,
+                               'turn_id': self.asr.turn_id, 'step_id': ticket[1], 'frames': frames,
                                'terminal': self.ledger.eof and self.asr.processed_until == self.ledger.end,
                                'processed_until': self.asr.processed_until, 'completed_at': self.clock()}
                 with self._state_lock:
@@ -245,12 +285,23 @@ class DualAudioFrontend:
                     self.barrier.acknowledge(ticket, receipt)
                     self._check_bounds()
             with self._state_lock:
-                result = self.barrier.release()
+                if self.closed:
+                    raise RuntimeError('Frontend closed before joint publication')
+                batch = self.barrier.current
+                batch.update(input_end=self.ledger.end, input_eof=self.ledger.eof)
+                commit_started = self.clock()
+                snapshot = self.context.publish_joint_batch(batch)
+                result = self.barrier.release(snapshot)
+                result.update(commit_started_at=commit_started, commit_completed_at=self.clock(),
+                              commit_seconds=self.clock() - commit_started,
+                              lane_compute_seconds={
+                                  'controller': batch['receipts']['controller']['completed_at'] -
+                                                batch['receipts']['controller']['started_at'],
+                                  'asr': sum(row['completed_at'] - row['started_at']
+                                             for row in batch['receipts']['asr']['frames'])})
                 self.last_step = deepcopy(result)
                 retain = min(self.controller.processed_until, max(0, self.asr.frame_index * 1280 - 200))
                 self.ledger.discard_before(retain)
-            if self.on_step and not self.closed:
-                self.on_step(deepcopy(result))
             return result
         except Exception as exc:
             self.cancel(str(exc))
@@ -263,6 +314,10 @@ class DualAudioFrontend:
             if not self.closed:
                 self.closed, self.failure = True, reason
                 self.barrier.cancel()
+                try:
+                    self.context.close_user_turn(self.controller.session_id, self.controller.turn_id, reason)
+                except Exception as exc:
+                    self.close_failure = str(exc)
         self.controller.cancel()
         self.asr.cancel()
 
@@ -271,11 +326,16 @@ class DualAudioFrontend:
 
     def diagnostics(self):
         with self._state_lock:
-            return {'closed': self.closed, 'reason': self.failure, 'input_end': self.ledger.end,
+            snapshot = self.context.get_user_turn(self.controller.session_id, self.controller.turn_id)
+            return {'closed': self.closed, 'reason': self.failure, 'close_failure': self.close_failure,
+                    'input_end': self.ledger.end,
                     'input_eof': self.ledger.eof, 'pcm_bytes': self.ledger.nbytes + self.controller.pcm_bytes(),
                     'controller_processed_until': self.controller.processed_until,
                     'controller_state': deepcopy(self.controller._frame),
                     'controller_events': deepcopy(self.controller._events),
                     'controller_failure': self.controller.failure,
                     'asr': self.asr.diagnostics(), 'last_step': deepcopy(self.last_step),
-                    'pending_step': deepcopy(self.barrier.current)}
+                    'pending_step': deepcopy(self.barrier.current), 'snapshot': snapshot,
+                    'unprocessed_real_samples': {
+                        'controller': self.ledger.end - self.controller.processed_until,
+                        'asr': self.ledger.end - self.asr.processed_until}}

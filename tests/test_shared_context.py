@@ -50,6 +50,31 @@ class SharedContextTests(unittest.TestCase):
             context.publish_user_frame(frame(end=5120))
         self.assertEqual(context.get_user_turn('s', 't')['source'], 'nemotron')
 
+    def test_publication_mode_is_fixed_and_legacy_teacher_requires_explicit_open(self):
+        context = SharedContext()
+        opened = context.open_user_turn('s', 't', 'x2_streaming_asr')
+        self.assertEqual(opened['publication_mode'], 'joint')
+        with self.assertRaises(ValueError):
+            context.publish_user_frame(dict(frame(), source='x2_streaming_asr', publication_mode='legacy_frame'))
+        self.assertEqual(context.get_user_turn('s', 't'), opened)
+        context.open_user_turn('s', 'legacy', 'x2_streaming_asr', publication_mode='legacy_frame')
+        result = context.publish_user_frame(dict(frame(), turn_id='legacy', source='x2_streaming_asr',
+                                                  publication_mode='joint'))
+        self.assertEqual(result['publication_mode'], 'legacy_frame')
+
+    def test_close_capacity_failure_still_fences_late_writes(self):
+        context = SharedContext()
+        context.open_user_turn('s', 't')
+        previous = context.publish_user_frame(frame())
+        context.max_snapshot_bytes = 1
+        with self.assertRaises(RuntimeError):
+            context.close_user_turn('s', 't', 'close_capacity_test')
+        context.max_snapshot_bytes = 256 * 1024
+        with self.assertRaises(ValueError):
+            context.publish_user_frame(frame(end=5120))
+        self.assertEqual(context.get_user_turn('s', 't'), previous)
+        context.release_closed_turn('s', 't')
+
     def test_correction_deletion_and_reader_isolation_without_history(self):
         context = SharedContext()
         context.open_user_turn('s', 't')

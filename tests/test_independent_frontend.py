@@ -1,5 +1,6 @@
 """Exercise EOS publication, source identity, barriers and bounded lifecycle failures."""
 from contextlib import nullcontext
+from copy import deepcopy
 from pathlib import Path
 import sys
 import threading
@@ -16,6 +17,7 @@ from independent_x2 import ClosedText, IndependentX2
 from x2_streaming_probe import decode_emit
 from test_native_soulx import official_model, SOURCE
 from native_soulx import NativeSoulX, pcm_digest
+from shared_context import SharedContext
 
 
 class FakeEngine:
@@ -113,7 +115,8 @@ class X2Tests(unittest.TestCase):
             return step(audio, callback)
 
         engine.step = cancel_first
-        asr.step(self.ledger(), 0)
+        with self.assertRaises(RuntimeError):
+            asr.step(self.ledger(), 0)
         self.assertEqual((text, progress), ([], []))
         with self.assertRaises(RuntimeError):
             asr.step(self.ledger(), 1)
@@ -124,11 +127,12 @@ class AudioTests(unittest.TestCase):
         self.clock = Clock()
         controller = NativeSoulX(official_model(predictions or [99, 6] * 10),
                                  source_path=SOURCE, synchronize=lambda: None, clock=self.clock,
-                                 on_state=kwargs.pop('on_state', None))
+                                 session_id='session', turn_id='turn')
         self.addCleanup(controller.detach)
-        asr = IndependentX2(FakeEngine(emissions or [None] * 20), clock=self.clock,
-                            on_text=kwargs.pop('on_text', None), on_progress=kwargs.pop('on_progress', None))
-        return DualAudioFrontend(controller, asr, clock=self.clock, order=order, **kwargs)
+        asr = IndependentX2(FakeEngine(emissions or [None] * 20), clock=self.clock)
+        context = kwargs.pop('context', SharedContext(clock=self.clock))
+        context.open_user_turn('session', 'turn', 'x2_streaming_asr')
+        return DualAudioFrontend(controller, asr, context=context, clock=self.clock, order=order, **kwargs)
 
     def test_both_orders_require_both_receipts_and_do_not_wait_for_text(self):
         for order in (('asr', 'controller'), ('controller', 'asr')):
@@ -173,15 +177,53 @@ class AudioTests(unittest.TestCase):
         self.assertLess(second['input_ready_at'], first['released_at'])
         self.assertGreaterEqual(second['started_at'], first['released_at'])
 
-    def test_first_x2_group_publishes_before_second_frame_and_before_control(self):
-        events = []
-        frontend = self.make(('asr', 'controller'), emissions=[[10, 11, 2], None],
-                             on_text=lambda row: events.append(('text', row['frame_index'])),
-                             on_progress=lambda row: events.append(('progress', row['frame_index'])),
-                             on_state=lambda row: events.append(('state', row['step_id'])))
-        frontend.append_pcm(np.full(2760, .1, np.float32))
+    def view(self, frontend):
+        return frontend.context.get_user_turn('session', 'turn')
+
+    def test_first_group_and_nonidle_stay_invisible_until_both_lanes_complete(self):
+        for order in (('asr', 'controller'), ('controller', 'asr')):
+            frontend = self.make(order, predictions=[99, 5], emissions=[[10, 11, 2], None])
+            original_engine = frontend.asr.engine.step
+            observations = []
+
+            def inspect_step(audio, callback):
+                observations.append(self.view(frontend))
+                self.clock.now += .01
+                return original_engine(audio, callback)
+
+            frontend.asr.engine.step = inspect_step
+            original_sync = frontend.controller.synchronize
+
+            def inspect_device():
+                self.assertEqual(self.view(frontend)['step_id'], -1)
+                self.clock.now += .01
+                original_sync()
+
+            frontend.controller.synchronize = inspect_device
+            frontend.append_pcm(np.full(2760, .1, np.float32))
+            result = frontend.advance()
+            self.assertEqual([v['text'] for v in observations], ['', ''])
+            view = self.view(frontend)
+            self.assertEqual((view['text'], view['state_token']), ('international', '<|user_nonidle|>'))
+            self.assertEqual(view['text_published_at'], view['state_published_at'])
+            self.assertGreater(view['batch_published_at'], view['text_available_at'])
+            self.assertGreaterEqual(view['batch_published_at'], result['lanes_completed_at'])
+            self.assertFalse(hasattr(frontend.controller, 'stop_output'))
+
+    def test_wait_batch_preserves_text_times_but_advances_state_and_progress(self):
+        frontend = self.make(emissions=[[12, 2], None, None, None])
+        frontend.append_pcm(np.full(5320, .1, np.float32))
         frontend.advance()
-        self.assertEqual(events, [('text', 0), ('progress', 0), ('progress', 1), ('state', 0)])
+        first = self.view(frontend)
+        self.clock.now += .05
+        frontend.advance()
+        second = self.view(frontend)
+        for field in ('text', 'text_available_at', 'text_published_at', 'text_observed_until'):
+            self.assertEqual(second[field], first[field])
+        self.assertEqual(second['asr_processed_until'], 5120)
+        self.assertGreater(second['batch_published_at'], first['batch_published_at'])
+        self.assertGreater(second['asr_progress_available_at'], first['asr_progress_available_at'])
+        self.assertEqual(second['completion_status'], 'none')
 
     def test_native_reset_preserves_unread_pcm_and_x2_text_across_cycles(self):
         frontend = self.make(predictions=[99, 3, 99, 6], emissions=[[12, 2], None, [13, 2], None])
@@ -289,9 +331,7 @@ class AudioTests(unittest.TestCase):
 
     def test_close_or_overflow_during_inference_rejects_late_results(self):
         for reason in ('close', 'overflow'):
-            events = []
-            frontend = self.make(('asr', 'controller'), emissions=[[12, 2], None],
-                                 on_text=events.append, on_state=events.append, on_progress=events.append)
+            frontend = self.make(('asr', 'controller'), emissions=[[12, 2], None])
             frontend.append_pcm(np.zeros(2760, np.float32))
             step = frontend.asr.engine.step
 
@@ -306,25 +346,27 @@ class AudioTests(unittest.TestCase):
             frontend.asr.engine.step = abort
             with self.assertRaises(RuntimeError):
                 frontend.advance()
-            self.assertEqual(events, [])
+            self.assertEqual(self.view(frontend)['step_id'], -1)
             self.assertEqual(frontend.barrier.step_id, 0)
             with self.assertRaises(RuntimeError):
                 frontend.append_pcm(np.zeros(1, np.float32))
 
-    def test_close_waits_for_an_active_short_callback_and_suppresses_the_rest(self):
-        entered, proceed, close_started, close_finished = [threading.Event() for _ in range(4)]
-        events, errors = [], []
+    def test_close_during_second_decode_preserves_previous_complete_snapshot(self):
+        frontend = self.make(('asr', 'controller'), emissions=[[12, 2], None, [13, 2], None])
+        frontend.append_pcm(np.full(5320, .1, np.float32))
+        frontend.advance()
+        first = self.view(frontend)
+        original = frontend.asr.engine.step
+        entered, proceed = threading.Event(), threading.Event()
+        errors = []
 
-        def receive(row):
-            events.append('text')
+        def delayed(audio, callback):
             entered.set()
             if not proceed.wait(5):
-                raise TimeoutError('Test callback was not released')
+                raise TimeoutError('Decode was not released')
+            return original(audio, callback)
 
-        frontend = self.make(('asr', 'controller'), emissions=[[12, 2], None], on_text=receive,
-                             on_progress=lambda row: events.append('progress'),
-                             on_state=lambda row: events.append('state'))
-        frontend.append_pcm(np.zeros(2760, np.float32))
+        frontend.asr.engine.step = delayed
 
         def advance():
             try:
@@ -332,28 +374,81 @@ class AudioTests(unittest.TestCase):
             except RuntimeError as exc:
                 errors.append(str(exc))
 
-        def close():
-            close_started.set()
-            frontend.close()
-            close_finished.set()
-
-        worker, closer = threading.Thread(target=advance), threading.Thread(target=close)
+        worker = threading.Thread(target=advance)
         worker.start()
         try:
             self.assertTrue(entered.wait(5))
-            closer.start()
-            self.assertTrue(close_started.wait(5))
-            self.assertFalse(close_finished.wait(.02))
+            frontend.close()
+            self.assertEqual(self.view(frontend)['status'], 'closed')
         finally:
             proceed.set()
             worker.join(5)
-            if closer.ident is not None:
-                closer.join(5)
         self.assertFalse(worker.is_alive())
-        self.assertFalse(closer.is_alive())
-        self.assertTrue(close_finished.is_set())
-        self.assertEqual(events, ['text'])
         self.assertEqual(len(errors), 1)
+        self.assertEqual(self.view(frontend)['text'], first['text'])
+        self.assertEqual(self.view(frontend)['step_id'], first['step_id'])
+        self.assertEqual(frontend.barrier.step_id, 1)
+
+    def test_commit_failure_never_releases_or_changes_previous_observation(self):
+        for kind in ('text', 'bytes', 'store'):
+            frontend = self.make(emissions=[[12, 2], None, [13, 2], None])
+            frontend.append_pcm(np.full(5320, .1, np.float32))
+            frontend.advance()
+            previous = self.view(frontend)
+            if kind == 'text':
+                frontend.context.max_chars = len(previous['text'])
+            elif kind == 'bytes':
+                frontend.context.max_snapshot_bytes = 512
+            else:
+                def fail(*args):
+                    raise RuntimeError('Injected write failure')
+                frontend.context.publish_joint_batch = fail
+            with self.assertRaises(RuntimeError):
+                frontend.advance()
+            current = self.view(frontend)
+            for field in ('step_id', 'text', 'state_token', 'batch_published_at'):
+                self.assertEqual(current[field], previous[field])
+            self.assertTrue(frontend.closed)
+            self.assertTrue(frontend.asr.closed)
+            self.assertEqual(frontend.barrier.step_id, 1)
+
+    def test_next_model_batch_cannot_begin_until_commit_returns(self):
+        frontend = self.make()
+        frontend.append_pcm(np.zeros(5320, np.float32))
+        publish = frontend.context.publish_joint_batch
+        entered, proceed = threading.Event(), threading.Event()
+        errors = []
+
+        def delayed(batch):
+            entered.set()
+            if not proceed.wait(5):
+                raise TimeoutError('Commit was not released')
+            return publish(batch)
+
+        frontend.context.publish_joint_batch = delayed
+
+        def advance():
+            try:
+                frontend.advance()
+            except Exception as exc:
+                errors.append(exc)
+
+        worker = threading.Thread(target=advance)
+        worker.start()
+        try:
+            self.assertTrue(entered.wait(5))
+            self.assertEqual(frontend.barrier.step_id, 0)
+            self.assertEqual(frontend.asr.frame_index, 2)
+            self.assertEqual(self.view(frontend)['step_id'], -1)
+            with self.assertRaises(RuntimeError):
+                frontend.advance()
+        finally:
+            proceed.set()
+            worker.join(5)
+        self.assertFalse(errors)
+        self.assertFalse(worker.is_alive())
+        frontend.advance()
+        self.assertEqual(self.view(frontend)['step_id'], 1)
 
     def test_barrier_rejects_missing_duplicate_stale_and_cancelled_receipts(self):
         clock = Clock()
@@ -364,17 +459,159 @@ class AudioTests(unittest.TestCase):
         row = {'lane': 'asr', 'step_id': 0, 'completed_at': clock()}
         barrier.acknowledge(ticket, row)
         with self.assertRaises(RuntimeError):
-            barrier.release()
+            barrier.release({})
         with self.assertRaises(ValueError):
             barrier.acknowledge(ticket, row)
         barrier.acknowledge(ticket, dict(row, lane='controller'))
-        barrier.release()
+        barrier.release(dict(step_id=0, session_id='session', turn_id='turn',
+                             status='open', batch_published_at=clock()))
         new_ticket = barrier.begin(2560, 5120)
         with self.assertRaises(RuntimeError):
             barrier.acknowledge(ticket, row)
         barrier.cancel()
         with self.assertRaises(RuntimeError):
             barrier.acknowledge(new_ticket, dict(row, step_id=1))
+
+    def test_joint_context_rejects_malformed_receipts_without_half_writes(self):
+        frontend = self.make(emissions=[[12, 2], [13, 2]])
+        frontend.append_pcm(np.full(2760, .1, np.float32))
+        batch = frontend.advance()
+        mutations = [
+            lambda b: b['receipts'].pop('controller'),
+            lambda b: b['receipts']['asr']['frames'].pop(),
+            lambda b: b['receipts']['asr']['frames'].append(b['receipts']['asr']['frames'][0]),
+            lambda b: b['receipts']['controller'].update(session_id='other'),
+            lambda b: b['receipts']['asr'].update(step_id=2),
+            lambda b: b['receipts']['controller'].update(completed_at=99),
+            lambda b: b['receipts']['controller'].pop('started_at'),
+            lambda b: b['receipts']['controller'].update(started_at=float('nan')),
+            lambda b: b['receipts']['asr']['frames'][0].update(started_at=101),
+            lambda b: b['receipts']['asr']['frames'][1].pop('started_at'),
+            lambda b: b['receipts']['controller'].update(generation_after=5),
+            lambda b: b['receipts']['asr']['frames'][0].update(decoding=True),
+            lambda b: b['receipts']['asr']['frames'][0].update(open_group_tokens=[10]),
+            lambda b: b['receipts']['asr']['frames'][0].update(asr_processed_until=0),
+            lambda b: b['receipts']['asr']['frames'][0].update(text='rewritten'),
+            lambda b: b['staged']['progress'].__setitem__(0, {}),
+            lambda b: b['staged']['text'].pop(),
+            lambda b: b['staged'].update(state=None),
+            lambda b: b.update(source_end=100),
+            lambda b: b['receipts']['asr']['frames'][1].update(text_available_at=float('nan')),
+        ]
+        for mutate in mutations:
+            with self.subTest(mutation=mutations.index(mutate)):
+                context = SharedContext(clock=self.clock)
+                previous = context.open_user_turn('session', 'turn', 'x2_streaming_asr')
+                candidate = deepcopy(batch)
+                mutate(candidate)
+                with self.assertRaises((ValueError, KeyError)):
+                    context.publish_joint_batch(candidate)
+                self.assertEqual(context.get_user_turn('session', 'turn'), previous)
+        previous = self.view(frontend)
+        with self.assertRaises(ValueError):
+            frontend.context.publish_joint_batch(batch)
+        with self.assertRaises(ValueError):
+            frontend.context.publish_user_frame(previous)
+        self.assertEqual(self.view(frontend), previous)
+
+    def test_handoff_updates_merge_with_new_batch_and_reject_stale_writers(self):
+        frontend = self.make(emissions=[[12, 2], None, [13, 2], None])
+        frontend.append_pcm(np.full(5320, .1, np.float32))
+        frontend.advance()
+        context = frontend.context
+        context.update_completion('session', 'turn', expected_step_id=0, expected_completion_id=None,
+                                  expected_completion_status='none',
+                                  fields={'completion_id': 'c1', 'completion_status': 'pending'})
+        frontend.advance()
+        current = self.view(frontend)
+        self.assertEqual(current['completion_id'], 'c1')
+        self.assertEqual(current['completion_status'], 'pending')
+        with self.assertRaises(ValueError):
+            context.update_completion('session', 'turn', expected_step_id=0, expected_completion_id='c1',
+                                      expected_completion_status='pending', fields={'completion_status': 'ready'})
+        context.update_completion('session', 'turn', expected_step_id=1, expected_completion_id='c1',
+                                  expected_completion_status='pending', fields={'completion_status': 'cancelled'})
+        with self.assertRaises(ValueError):
+            context.update_completion('session', 'turn', expected_step_id=1, expected_completion_id='c1',
+                                      expected_completion_status='pending', fields={'completion_status': 'ready'})
+        self.assertEqual(self.view(frontend)['text'], 'hello world again')
+        with self.assertRaises(ValueError):
+            context.update_completion('session', 'turn', expected_step_id=1, expected_completion_id='c1',
+                                      expected_completion_status='cancelled', fields={'text': 'stale'})
+        frontend.close()
+        with self.assertRaises(ValueError):
+            context.update_completion('session', 'turn', expected_step_id=1, expected_completion_id='c1',
+                                      expected_completion_status='cancelled', fields={'completion_status': 'ready'})
+
+    def test_concurrent_readers_only_observe_complete_batches_and_receive_copies(self):
+        frontend = self.make(emissions=[[13, 2], None] * 8)
+        done, entered = threading.Event(), threading.Event()
+        errors, observations = [], []
+
+        def read():
+            entered.set()
+            try:
+                while not done.is_set():
+                    timed = frontend.context.get_user_turn('session', 'turn', with_timing=True)
+                    view = timed['snapshot']
+                    self.assertGreaterEqual(timed['read_seconds'], 0)
+                    if view['step_id'] >= 0:
+                        self.assertEqual(view['committed_groups'], view['step_id'] + 1)
+                        self.assertEqual(view['text'], ' '.join(['again'] * view['committed_groups']))
+                        self.assertEqual(view['asr_processed_until'], (view['step_id'] + 1) * 2560)
+                        self.assertEqual(view['text_published_at'], view['state_published_at'])
+                        observations.append(view)
+                        view['controller_windows']['main']['spans'].clear()
+            except Exception as exc:
+                errors.append(exc)
+
+        reader = threading.Thread(target=read)
+        reader.start()
+        try:
+            self.assertTrue(entered.wait(5))
+            frontend.append_pcm(np.full(2760, .1, np.float32))
+            for index in range(8):
+                if index:
+                    frontend.append_pcm(np.full(2560, .1, np.float32))
+                frontend.advance()
+        finally:
+            done.set()
+            reader.join(5)
+        self.assertFalse(reader.is_alive())
+        self.assertFalse(errors)
+        self.assertTrue(observations)
+        self.assertTrue(self.view(frontend)['controller_windows']['main']['spans'])
+        self.assertEqual(len(frontend.context.latest), 1)
+
+    def test_eof_frame_counts_and_tail_coverage_remain_explicit(self):
+        for length in (1, 777, 1280, 1281, 2559, 2560, 2761):
+            with self.subTest(length=length):
+                frontend = self.make()
+                frontend.append_pcm(np.full(length, .1, np.float32))
+                frontend.finish_input()
+                while frontend.advance() is not None:
+                    pass
+                view = self.view(frontend)
+                self.assertEqual(view['asr_processed_until'], length)
+                self.assertTrue(view['terminal_batch'])
+                self.assertEqual(view['partial_batch'], length % 2560 != 0)
+                self.assertEqual(view['tail_status'], 'unknown')
+                self.assertFalse(view['coverage_complete'])
+                self.assertEqual(view['completion_status'], 'none')
+                self.assertEqual(frontend.diagnostics()['unprocessed_real_samples']['asr'], 0)
+
+    def test_external_close_and_delayed_callbacks_cannot_revive_a_turn(self):
+        frontend = self.make()
+        frontend.append_pcm(np.zeros(5320, np.float32))
+        frontend.advance()
+        row = deepcopy(frontend.last_step['staged']['state'])
+        with self.assertRaises(RuntimeError):
+            frontend._stage('state', row)
+        frontend.context.close_user_turn('session', 'turn', 'external_close')
+        with self.assertRaises(RuntimeError):
+            frontend.advance()
+        self.assertEqual(frontend.asr.frame_index, 2)
+        self.assertEqual(self.view(frontend)['step_id'], 0)
 
     def test_pcm_rejects_implicit_conversion_and_eof_writes(self):
         ledger = PCMLedger()

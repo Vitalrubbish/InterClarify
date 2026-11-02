@@ -140,17 +140,15 @@ class NativeTests(unittest.TestCase):
         self.assertEqual(results[0]['windows']['main']['spans'][0]['samples'], 640)
         self.assertEqual(results[0]['state']['state_observed_until'], 2560)
 
-    def test_stop_precedes_publication_and_is_once_per_output(self):
+    def test_nonidle_is_only_staged_and_has_no_output_hook(self):
         model = official_model([0, 5, 99, 5, 99, 5], ['hello'])
-        order, output = [], {'session_id': 's', 'output_id': 'o1', 'phase': 'preparing'}
-        wrapper = self.attach(model, session_id='s', active_output=lambda: output,
-                              stop_output=lambda *args: order.append('stop'),
-                              on_state=lambda _: order.append('state'))
+        order = []
+        wrapper = self.attach(model, session_id='s', on_state=lambda _: order.append('state'))
         for step in range(3):
-            if step == 2:
-                output['output_id'] = 'o2'
             wrapper.step(self.ledger(), step)
-        self.assertEqual(order, ['stop', 'state', 'state', 'stop', 'state'])
+        self.assertEqual(order, ['state'] * 3)
+        self.assertFalse(hasattr(wrapper, 'active_output'))
+        self.assertFalse(hasattr(wrapper, 'stop_output'))
 
     def test_far_field_complete_rejection_and_service_fallback_are_separate(self):
         for token in (5, 3):

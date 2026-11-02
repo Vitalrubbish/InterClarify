@@ -1,6 +1,6 @@
 # 用户话轮的 SharedContext 联合快照接口
 
-2026-11-02，状态：NTF-017待实施合同。用户最新确认每160ms批次在SoulX与X2均处理完成后，统一写入文本和状态token；不写原始PCM，也不设置前端专用停止钩子。此修订替代此前正文／状态独立立即写入方案。NTF-015／016已交付的内部回调仍待迁移，历史结果见[交付记录](../../reports/soulx/20261102-native-independent-frontend/README.md)。[工作单](../../issue/NTF-017.md)和[前端设计](independent_streaming_frontend.md)为实施依据。
+2026-11-03，状态：NTF-017已完成本地联合提交实现与契约验收；NTF-020回答交接待实施。用户最新确认每160ms批次在SoulX与X2均处理完成后，统一写入文本和状态token；不写原始PCM，也不设置前端专用停止钩子。此修订替代此前正文／状态独立立即写入方案。NTF-015／016内部回调现只送批次暂存器，停止钩子已移除；历史结果见[交付记录](../../reports/soulx/20261102-native-independent-frontend/README.md)。[NTF-017交付](../../reports/soulx/20261102-ntf017-joint-publication/README.md)和[前端设计](independent_streaming_frontend.md)为实施依据。
 
 ## 1. 每160ms联合提交
 
@@ -55,4 +55,4 @@ ready及取消与最新正文在同一锁内复核，不能覆盖更新批次。
 
 NTF-017覆盖两种完成顺序、暂存不可见、一次联合提交、WAIT不刷新正文时间、提交成功后才推进、并发读取／关闭和失败无半帧。NTF-020覆盖仅基于已提交批次的ready／取消／超时，NTF-018／019记录原始计算、屏障等待、联合发布时间及读取时间，不用发布延迟伪装原始状态改善。
 
-现有015／016的独立回调和停止钩子是此前合同的实现事实；NTF-017需调整SharedContext及三份适配模块、测试和同路径说明。当前未实施本合同，也未重新运行模型。旧[160ms联合发布](streaming_transcript_publication.md)只作历史参考，不恢复教师注入、整个旧buffer回写或基于步号伪造真实窗口对齐。
+NTF-017已迁移SharedContext及三份适配模块、必要测试与同路径说明，未运行真实模型。X2开轮默认joint；历史教师显式legacy_frame，两种模式在话轮内固定且不能互相写入。当前只预留单条交接元数据和比较更新接口，ready／取消／超时语义仍由NTF-020实现。旧[160ms联合发布](streaming_transcript_publication.md)只作历史参考，不恢复教师注入、整个旧buffer回写或基于步号伪造真实窗口对齐。

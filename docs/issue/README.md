@@ -1,19 +1,18 @@
 # 工作单管理
 
-更新：2026-11-02。当前为**SoulX原生SenseVoice控制＋独立X2完整词正文**路线。NTF-015／016已完成本地实现与契约验收并归档，见[交付记录](../reports/soulx/20261102-native-independent-frontend/README.md)；NTF-017／020／018／019继续待实施；017已按最新要求改为160ms双路完成后联合提交文本／状态，移除前端专用停止旁路。路线恢复范围见[恢复记录](../reports/soulx/20261102-external-asr-plan-restore/README.md)，合同见[独立前端设计](../dev/SoulX-Duplug/independent_streaming_frontend.md)、[Context接口](../dev/SoulX-Duplug/shared_context_interface.md)及[工程计划](../engineering_implementation.md)。
+更新：2026-11-03。当前为**SoulX原生SenseVoice控制＋独立X2完整词正文**路线。NTF-015／016已完成本地实现与契约验收并归档，见[交付记录](../reports/soulx/20261102-native-independent-frontend/README.md)；[NTF-017](../reports/soulx/20261102-ntf017-joint-publication/README.md)已完成160ms联合提交、停止旁路撤回及本地144项全量验收并归档；NTF-020／018／019继续待实施。路线恢复范围见[恢复记录](../reports/soulx/20261102-external-asr-plan-restore/README.md)，合同见[独立前端设计](../dev/SoulX-Duplug/independent_streaming_frontend.md)、[Context接口](../dev/SoulX-Duplug/shared_context_interface.md)及[工程计划](../engineering_implementation.md)。
 
 ## 当前工作单
 
 | 工作单 | 工作单元 | 依赖 | 状态 |
 | --- | --- | --- | --- |
-| [NTF-017](NTF-017.md) | 160ms双路完成后的文本／状态联合写入与生命周期 | NTF-015／016 | 待实施 |
 | [NTF-020](NTF-020.md) | 仅complete的回答交接同步 | NTF-015—017 | 待实施 |
 | [NTF-018](NTF-018.md) | 全链路预热与远端积压归因 | NTF-015—017／020 | 待实施 |
 | [NTF-019](NTF-019.md) | 独立前端单／双路固定FDB30验收 | NTF-018完整预热与实时门槛通过 | 待实施 |
 
-015／016已交付原生封装、冻结加载器、同源账本、160ms屏障及独立X2回调，28项新增检查与全量134项通过，未验证真实权重／实时性。后续顺序为017→020→018→019。SoulX保留原生SenseVoice教师、门控、修订、反馈及reset；X2只提供独立正文，NTF-017将改为每160ms两路实际完成后联合写入文本／状态token，成功后再推进，取消前端专用停止钩子；015／016既有代码回调尚待迁移。complete交接和原子Context属于后续实现，ready不承诺尾词必齐。
+015／016交付原生封装、冻结加载器、同源PCM与独立X2；017已将回调迁移为批次暂存，SharedContext一次提交正文／状态／真实进度，成功后才释放下一批，nonidle不再走前端停止旁路。原生SenseVoice、服务和reset保持，正文不进控制KV。本地conda全量144项通过，无跳过；真实权重／实时性尚未验证。下一步顺序为020→018→019；仅complete交接尚待实现，ready不承诺尾词必齐。
 
-本次没有提交真实模型新作业，远端只读取得既有资产校验清单。远端沿用conda、单活动作业、1×4090、4CPU、32GiB、显存22GiB和在线800ms停止线；NTF-018最多2作业、NTF-019最多2作业，各≤1800秒／128MiB，合计计划上限2 GPU小时／512MiB。启动前冻结实际矩阵与输入；不自动使用已归档调研的作业额度，不训练、不接LLM／CoT／TTS、不切换现役Agent。
+本次没有连接远端或提交真实模型新作业；资产校验清单沿用015／016交付。远端沿用conda、单活动作业、1×4090、4CPU、32GiB、显存22GiB和在线800ms停止线；NTF-018最多2作业、NTF-019最多2作业，各≤1800秒／128MiB，合计计划上限2 GPU小时／512MiB。启动前冻结实际矩阵与输入；不自动使用已归档调研的作业额度，不训练、不接LLM／CoT／TTS、不切换现役Agent。
 
 ## 本次归档与恢复
 
@@ -23,9 +22,10 @@
 | NTF-023—025 | 归档当前active计划 | 未实施归档，不记为已完成 |
 | NTF-026 | 保留已完成的历史归档 | 调研入口监控修复随分支撤回，不恢复为活动实现 |
 | NTF-027 | 本次Git与工作单维护 | 已完成并归档，范围见恢复记录 |
-| NTF-029 | 160ms双路完成后联合写入合同修订 | 已完成并归档；只改任务单与设计，017实现仍待执行，见[修订记录](../reports/soulx/20261102-joint-publication-contract/README.md) |
+| NTF-029 | 160ms双路完成后联合写入合同修订 | 已完成并归档；当时只改任务单与设计，017实现现已交付，见[修订记录](../reports/soulx/20261102-joint-publication-contract/README.md) |
 | NTF-015／016 | 本地实现与契约验收完成后归档 | 原生控制、同源PCM／屏障、独立X2适配已交付；真实模型验证留给018／019 |
-| NTF-017—020 | 继续active | Context、交接与真实模型验证待实施 |
+| NTF-017 | 本地实现与契约验收完成并归档 | 联合事务、短锁生命周期、失败保护与架构图同步，见[交付](../reports/soulx/20261102-ntf017-joint-publication/README.md) |
+| NTF-020／018／019 | 继续active | complete交接与真实模型验证待实施 |
 
 本地`docs/issue/archive/`继续不纳入Git；归档前原计划可由main基线0376ba7追溯，恢复的015—020原文可追溯e15554b。[前次归档记录](../reports/soulx/20261102-frontend-plan-archive/README.md)保留当时决策，本次明确恢复取代其活动状态，不把未实施计划写成完成成果。
 
@@ -44,11 +44,11 @@ NTF-010 已收口：词级规范分词保留，`r6` 固定30条 30/30完整、�
 
 NTF-001—009 均已完成并归档；NTF-009 固定30条同卡对照 30/30完整、退出0、主块P95 219.2ms、无800ms触发，状态指标混合改善。
 
-NTF-009 已完成并归档至本地 `archive/`：固定FDB30同卡、源码`4568ecf`、run `ntf009-teacher-fdb30-20261101-r1`。预热按合同执行；30/30完整、退出0，最大主块积压663.8ms，主块发布P50/P95 205.9/219.2ms，完整观察P95 120.2ms；`buffer_overflow=0`，30条EOF部分块逐例记录，complete无重识别。同25条中接话提前complete 6/9→5/9、>160ms提前6/9→4/9，打断结束后complete 2/9→4/9；停顿区间内complete 2/7→0/7，其中ID127在区间起点前40ms。详见[报告](../reports/soulx/20261101-ntf009-teacher-fdb30/README.md)。
+NTF-009 已完成并归档至本地 `archive/`：固定FDB30同卡、源码`4568ecf`、run `ntf009-teacher-fdb30-20261101-r1`。预热按合同执行；30/30完整、退出0，最大主块积压663.8ms，主块发布P50/P95 205.9/219.2ms，完整观察P95 120.2ms；`buffer_overflow=0`，30条EOF部分块逐例记录，complete无重识别。同25条中接话提前complete 6/9→5/9、>160ms提前6/9→4/9，打断结束后complete 2/9→4/9；停顿区间内complete 2/7→0/7，其中ID127在区间起点前40ms。详见[报告](../../reports/soulx/20261101-ntf009-teacher-fdb30/README.md)。
 
-NTF-008 已完成并归档至本地 `archive/`：音频embedding有界缓冲、首块不特判、配对器删除、complete不重识别，三轴预检3/3、退出0；首轮`r1`批量步骤失败已保留并在`4c81904`修复。详见[报告](../reports/soulx/20261101-ntf008-teacher-buffer/README.md)。
+NTF-008 已完成并归档至本地 `archive/`：音频embedding有界缓冲、首块不特判、配对器删除、complete不重识别，三轴预检3/3、退出0；首轮`r1`批量步骤失败已保留并在`4c81904`修复。详见[报告](../../reports/soulx/20261101-ntf008-teacher-buffer/README.md)。
 
-NTF-007 已完成并归档至本地 `archive/`：删除教师文本门控、`_revise()`、KV检查点、输入账本和三项缓存上限，改为增量追加与尾部重编码审计。远端 `ntf007-teacher-smoke-20261101-r1` 三轴预检3/3、退出0，逐帧确认控制文字前缀追加、token累计一致、原始增量与Nemotron正文一致，最大积压555.0ms；EOF保留尾词诊断。详见[报告](../reports/soulx/20261101-ntf007-teacher-append-only/README.md)。
+NTF-007 已完成并归档至本地 `archive/`：删除教师文本门控、`_revise()`、KV检查点、输入账本和三项缓存上限，改为增量追加与尾部重编码审计。远端 `ntf007-teacher-smoke-20261101-r1` 三轴预检3/3、退出0，逐帧确认控制文字前缀追加、token累计一致、原始增量与Nemotron正文一致，最大积压555.0ms；EOF保留尾词诊断。详见[报告](../../reports/soulx/20261101-ntf007-teacher-append-only/README.md)。
 
 NTF-006 已完成并归档至本地 `archive/`：`service_state`、`service_completion_source`、`speech_detected`、`service_text`与`no_speech`门控在NTF-008教师帧中发布并验证；`wait_fallback`属于已归档的SenseVoice外层，现役路径不产生。
 
@@ -76,7 +76,7 @@ NTF-001／002 已完成并归档至本地 `archive/`：教师文字前端与屏�
 
 | 路线 | 归档状态 | 入口 |
 | --- | --- | --- |
-| SoulX-Duplug | 当前活动：015／016本地验收完成并归档；017／020／018／019待实施 | [路线文档](../dev/SoulX-Duplug/README.md) |
+| SoulX-Duplug | 当前活动：015／016／017本地验收完成并归档；020／018／019待实施 | [路线文档](../dev/SoulX-Duplug/README.md) |
 | TextTurn | 已归档；共 11 项，7 项完成、TT-009 终止，TT-004／010／011 未完成 | [路线归档](../archive/dev/TextTurn/README.md) |
 | VoxTurn | 已归档；仅完成现成权重与接入可行性调研，未部署 | [调研归档](../archive/dev/VoxTurn/research_assessment.md) |
 | XTurnix | 已归档；XTX-001—005 与 XTX-007 完成，XTX-006 取消，XTX-009 仅完成来源审核 | [路线归档](../archive/dev/XTurnix/README.md) |
