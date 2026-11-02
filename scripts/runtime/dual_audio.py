@@ -1,0 +1,281 @@
+"""Bound continuous PCM and advance native control/X2 behind a 160 ms barrier."""
+from __future__ import annotations
+
+from copy import deepcopy
+from collections import deque
+import threading
+import time
+
+import numpy as np
+
+try:
+    from .native_soulx import pcm_digest
+except ImportError:
+    from native_soulx import pcm_digest
+
+
+class PCMLedger:
+    """Keep one immutable, contiguous source copy with explicit padding spans."""
+
+    def __init__(self, clock=time.monotonic):
+        self.start = self.end = 0
+        self.eof = False
+        self.clock, self.eof_at, self._arrivals = clock, None, deque()
+        self._audio = np.empty(0, dtype=np.float32)
+        self._lock = threading.RLock()
+
+    @staticmethod
+    def digest(audio):
+        return pcm_digest(audio)
+
+    def append(self, audio):
+        values = np.asarray(audio)
+        if values.dtype != np.float32 or values.ndim != 1 or not np.isfinite(values).all():
+            raise ValueError('PCM must be finite mono float32 at 16 kHz')
+        if values.size and np.max(np.abs(values)) > 1:
+            raise ValueError('PCM amplitude exceeds the frozen unit-gain contract')
+        with self._lock:
+            if self.eof:
+                raise RuntimeError('PCM after EOF')
+            begin = self.end
+            self._audio = np.concatenate([self._audio, values])
+            self.end += len(values)
+            arrived_at = self.clock()
+            if len(values):
+                self._arrivals.append((self.end, arrived_at))
+            return {'start': begin, 'end': self.end, 'sha256': self.digest(values), 'arrived_at': arrived_at}
+
+    def finish(self):
+        with self._lock:
+            self.eof = True
+            self.eof_at = self.clock()
+
+    def ready_at(self, required_end):
+        with self._lock:
+            if required_end > self.end:
+                if not self.eof:
+                    raise BufferError('Input is not yet ready')
+                return self.eof_at
+            for end, at in self._arrivals:
+                if end >= required_end:
+                    return at
+            raise ValueError('Input readiness has no retained arrival record')
+
+    def window(self, begin, end):
+        with self._lock:
+            if end <= begin or max(begin, 0) < self.start:
+                raise ValueError('PCM window is invalid or was already released')
+            if end > self.end and not self.eof:
+                raise BufferError('Real lookahead has not arrived')
+            parts, spans = [], []
+            if begin < 0:
+                count = min(end, 0) - begin
+                parts.append(np.zeros(count, np.float32))
+                spans.append({'kind': 'synthetic', 'reason': 'x2_left_padding', 'samples': count})
+            left, right = max(begin, 0), min(end, self.end)
+            if left < right:
+                parts.append(self._audio[left - self.start:right - self.start].copy())
+                spans.append({'kind': 'real', 'start': left, 'end': right, 'samples': right - left})
+            if end > self.end:
+                count = end - max(begin, self.end)
+                parts.append(np.zeros(count, np.float32))
+                spans.append({'kind': 'synthetic', 'reason': 'eof_right_padding', 'samples': count})
+            return np.concatenate(parts), spans
+
+    def discard_before(self, sample):
+        with self._lock:
+            if not self.start <= sample <= self.end:
+                raise ValueError('Invalid PCM release cursor')
+            self._audio = self._audio[sample - self.start:].copy()
+            self.start = sample
+            while self._arrivals and self._arrivals[0][0] <= sample:
+                self._arrivals.popleft()
+
+    @property
+    def nbytes(self):
+        with self._lock:
+            return self._audio.nbytes
+
+
+class StepBarrier:
+    """Reject stale/missing acknowledgements and retain both lane timings."""
+
+    def __init__(self, clock=time.monotonic):
+        self.clock, self.step_id, self.epoch = clock, 0, 0
+        self.current, self.cancelled = None, False
+
+    def begin(self, source_start, source_end, input_ready_at=None):
+        if self.cancelled or self.current is not None:
+            raise RuntimeError('Previous step has not released or barrier is cancelled')
+        self.current = {'epoch': self.epoch, 'step_id': self.step_id,
+                        'source_start': source_start, 'source_end': source_end,
+                        'input_ready_at': self.clock() if input_ready_at is None else input_ready_at,
+                        'started_at': self.clock(), 'receipts': {}}
+        return self.epoch, self.step_id
+
+    def acknowledge(self, ticket, receipt):
+        if self.cancelled or self.current is None or ticket != (self.epoch, self.step_id):
+            raise RuntimeError('Stale barrier receipt')
+        lane = receipt['lane']
+        if lane not in ('asr', 'controller') or lane in self.current['receipts'] or receipt['step_id'] != self.step_id:
+            raise ValueError('Invalid or duplicate barrier receipt')
+        if receipt['completed_at'] < self.current['input_ready_at']:
+            raise ValueError('Receipt predates the current step')
+        self.current['receipts'][lane] = deepcopy(receipt)
+
+    def release(self):
+        if self.cancelled or self.current is None or set(self.current['receipts']) != {'asr', 'controller'}:
+            raise RuntimeError('Both lanes must actually complete before release')
+        result = self.current
+        result['released_at'] = self.clock()
+        result['wait_seconds'] = {lane: result['released_at'] - row['completed_at']
+                                  for lane, row in result['receipts'].items()}
+        self.current = None
+        self.step_id += 1
+        return result
+
+    def cancel(self):
+        self.cancelled = True
+        self.epoch += 1
+
+
+class DualAudioFrontend:
+    """Accept PCM independently of model execution; one worker advances both lanes."""
+
+    def __init__(self, controller, asr, *, clock=time.monotonic, on_step=None,
+                 order=('controller', 'asr')):
+        if tuple(order) not in (('controller', 'asr'), ('asr', 'controller')):
+            raise ValueError('Each lane must run exactly once per cycle')
+        self.controller, self.asr, self.clock, self.on_step = controller, asr, clock, on_step
+        if (controller.session_id, controller.turn_id) != (asr.session_id, asr.turn_id):
+            raise ValueError('Controller and ASR must belong to the same logical turn')
+        self.order, self.ledger, self.barrier = order, PCMLedger(clock), StepBarrier(clock)
+        self.closed, self.failure, self.started_at = False, None, None
+        self._state_lock, self._worker = threading.RLock(), threading.Lock()
+        self.last_step = None
+        self._asr_completed_until = self._controller_completed_until = 0
+        controller_live, asr_live = controller.is_live, asr.is_live
+        controller.is_live = lambda: not self.closed and controller_live()
+        asr.is_live = lambda: not self.closed and asr_live()
+        controller.reserve_pcm = self._reserve_pcm
+
+    def _reserve_pcm(self, additional_bytes):
+        with self._state_lock:
+            if self.closed:
+                raise RuntimeError('Frontend was cancelled before PCM allocation')
+            if self.ledger.nbytes + self.controller.pcm_bytes() + additional_bytes > 4 * 2**20:
+                raise MemoryError('Model PCM allocation would exceed 4 MiB')
+
+    def _check_bounds(self):
+        for lane, until in (('controller', self._controller_completed_until), ('asr', self._asr_completed_until)):
+            if self.ledger.end - until > 12800:
+                raise BufferError(f'{lane}: unread PCM exceeded 800 ms')
+        if self.ledger.nbytes + self.controller.pcm_bytes() > 4 * 2**20:
+            raise MemoryError('Total PCM exceeded 4 MiB')
+        if self.started_at is not None:
+            for lane, until in (('controller', self._controller_completed_until), ('asr', self._asr_completed_until)):
+                if self.clock() - self.started_at - until / 16000 > .8:
+                    raise TimeoutError(f'{lane}: online progress exceeded 800 ms')
+
+    def append_pcm(self, audio):
+        try:
+            with self._state_lock:
+                if self.closed:
+                    raise RuntimeError('Frontend is closed')
+                # Check allocation before copying an oversized transport packet.
+                if self.ledger.nbytes + np.asarray(audio).nbytes + self.controller.pcm_bytes() > 4 * 2**20:
+                    raise MemoryError('Transport packet exceeds total PCM bound')
+                size = np.asarray(audio).size
+                for lane, until in (('controller', self._controller_completed_until), ('asr', self._asr_completed_until)):
+                    if self.ledger.end + size - until > 12800:
+                        raise BufferError(f'{lane}: transport packet exceeds 800 ms unread PCM')
+                packet = self.ledger.append(audio)
+                if self.started_at is None:
+                    self.started_at = self.clock() - self.ledger.end / 16000
+                self._check_bounds()
+                return packet
+        except Exception as exc:
+            self.cancel(str(exc))
+            raise
+
+    def finish_input(self):
+        with self._state_lock:
+            if self.closed:
+                raise RuntimeError('Frontend is closed')
+            self.ledger.finish()
+
+    def advance(self):
+        if not self._worker.acquire(blocking=False):
+            raise RuntimeError('Only one scheduling worker is allowed')
+        try:
+            with self._state_lock:
+                if self.closed:
+                    raise RuntimeError('Frontend is closed')
+                self._check_bounds()
+                source_start = self.barrier.step_id * 2560
+                if self.ledger.eof and source_start >= self.ledger.end:
+                    return None
+                required = max(source_start + 2760, self.controller.submitted_until + 2560)
+                if not self.ledger.eof and self.ledger.end < required:
+                    return None
+                ticket = self.barrier.begin(source_start, min(source_start + 2560, self.ledger.end),
+                                            self.ledger.ready_at(required))
+            for lane in self.order:
+                if self.closed:
+                    raise RuntimeError('Step cancelled before lane execution')
+                if lane == 'controller':
+                    receipt = self.controller.step(self.ledger, ticket[1])
+                else:
+                    frames = []
+                    for _ in range(2):
+                        if self.ledger.eof and self.asr.frame_index * 1280 >= self.ledger.end:
+                            break
+                        self._reserve_pcm(1680 * 4)
+                        frames.append(self.asr.step(self.ledger, ticket[1]))
+                        with self._state_lock:
+                            self._asr_completed_until = self.asr.processed_until
+                    if not frames:
+                        raise RuntimeError('EOF without an ASR completion cannot release a step')
+                    receipt = {'lane': 'asr', 'step_id': ticket[1], 'frames': frames,
+                               'terminal': self.ledger.eof and self.asr.processed_until == self.ledger.end,
+                               'processed_until': self.asr.processed_until, 'completed_at': self.clock()}
+                with self._state_lock:
+                    if lane == 'controller':
+                        self._controller_completed_until = receipt['processed_until']
+                    self.barrier.acknowledge(ticket, receipt)
+                    self._check_bounds()
+            with self._state_lock:
+                result = self.barrier.release()
+                self.last_step = deepcopy(result)
+                retain = min(self.controller.processed_until, max(0, self.asr.frame_index * 1280 - 200))
+                self.ledger.discard_before(retain)
+            if self.on_step and not self.closed:
+                self.on_step(deepcopy(result))
+            return result
+        except Exception as exc:
+            self.cancel(str(exc))
+            raise
+        finally:
+            self._worker.release()
+
+    def cancel(self, reason='runtime_cancel'):
+        with self._state_lock:
+            if not self.closed:
+                self.closed, self.failure = True, reason
+                self.barrier.cancel()
+        self.controller.cancel()
+        self.asr.cancel()
+
+    def close(self):
+        self.cancel('runtime_close')
+
+    def diagnostics(self):
+        with self._state_lock:
+            return {'closed': self.closed, 'reason': self.failure, 'input_end': self.ledger.end,
+                    'input_eof': self.ledger.eof, 'pcm_bytes': self.ledger.nbytes + self.controller.pcm_bytes(),
+                    'controller_processed_until': self.controller.processed_until,
+                    'controller_state': deepcopy(self.controller._frame),
+                    'controller_events': deepcopy(self.controller._events),
+                    'controller_failure': self.controller.failure,
+                    'asr': self.asr.diagnostics(), 'last_step': deepcopy(self.last_step),
+                    'pending_step': deepcopy(self.barrier.current)}

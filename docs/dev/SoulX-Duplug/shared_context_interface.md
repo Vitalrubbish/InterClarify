@@ -1,6 +1,6 @@
 # 用户话轮的 SharedContext 当前值接口
 
-2026-11-02，状态：当前接口设计，尚未实施。用户恢复[NTF-015—020](../../issue/README.md)为active；正文／状态独立更新由NTF-017实施，仅complete交接由NTF-020实施，实际链路由NTF-018／019验证，见[恢复记录](../../reports/soulx/20261102-external-asr-plan-restore/README.md)与[独立前端](independent_streaming_frontend.md)。本次仅恢复设计入口。
+2026-11-02，状态：当前接口设计，尚未实施。NTF-015／016已提供独立状态、闭合正文及80ms进度回调，见[交付记录](../../reports/soulx/20261102-native-independent-frontend/README.md)；本接口的原子独立更新仍由NTF-017实施，仅complete交接由NTF-020实施，实际链路由NTF-018／019验证。完整合同见[独立前端](independent_streaming_frontend.md)，当前工作见[索引](../../issue/README.md)。
 
 ## 1. 独立更新与原子读取
 

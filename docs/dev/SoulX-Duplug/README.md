@@ -2,7 +2,7 @@
 
 更新：2026-11-02。用户要求清除comparison端历史实验并重新clone官方仓库。当前以本地 [third_party/soulx-duplug](../../../third_party/soulx-duplug) 子模块为可审查源码入口，远端改用ParaThink独立根下新克隆的`upstream/soulx-duplug`，版本与说明见[依赖文档](../../third_party/soulx-duplug.md)。旧comparison加载器和实验worktree退役，不作为新实验入口。
 
-用户最新指令恢复[NTF-015—020](../../issue/README.md)为active，均待实施，采用**原生SenseVoice控制＋独立X2正文＋仅complete交接同步**。NTF-021／022调研完成后相关实现分支已撤回，NTF-023—025未实施归档，范围与证据保留见[恢复记录](../../reports/soulx/20261102-external-asr-plan-restore/README.md)。本次只调整工作单和文档。
+当前采用**原生SenseVoice控制＋独立X2正文＋仅complete交接同步**。NTF-015／016已交付原生封装、冻结加载器、同源PCM／160ms屏障和独立X2适配，本地契约验收后归档，见[交付记录](../../reports/soulx/20261102-native-independent-frontend/README.md)。[NTF-017／020／018／019](../../issue/README.md)继续待实施。NTF-021／022相关实现分支已撤回，NTF-023—025未实施归档，历史范围见[恢复记录](../../reports/soulx/20261102-external-asr-plan-restore/README.md)。
 
 ## 当前实施顺序
 

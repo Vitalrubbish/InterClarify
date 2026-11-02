@@ -1,6 +1,6 @@
 # 工程实施计划
 
-更新：2026-11-02。按用户最新指令恢复**原生SoulX＋SenseVoice控制、独立X2完整词正文、仅complete交接同步**。NTF-015—020重新列为待实施，教师调研单归档；Git从0376ba7基线继续，仅更新文档和工作单。本次不实现代码或提交远端作业，处理范围见[恢复记录](reports/soulx/20261102-external-asr-plan-restore/README.md)。
+更新：2026-11-02。当前路线为**原生SoulX＋SenseVoice控制、独立X2完整词正文、仅complete交接同步**。NTF-015／016已完成本地实现与契约验收并归档，见[交付记录](reports/soulx/20261102-native-independent-frontend/README.md)；NTF-017／020／018／019仍待实施。本次没有提交远端模型作业，路线恢复历史见[恢复记录](reports/soulx/20261102-external-asr-plan-restore/README.md)。
 
 ## 1. 当前目标与运行底座
 
@@ -14,14 +14,14 @@ SoulX保留内部SenseVoice教师、门控、滑窗差分／KV修订、状态规
 
 | 顺序 | 工作单 | 交付与进入下一步的条件 |
 | --- | --- | --- |
-| 1 | [NTF-015](issue/NTF-015.md) | 保留原生协议的控制封装、状态来源和reset输入账本审计 |
-| 2 | [NTF-016](issue/NTF-016.md) | 同源PCM分发、X2原生80ms解码、每160ms双路推进屏障、EOS正文及真实进度 |
+| 1 | [NTF-015](reports/soulx/20261102-native-independent-frontend/README.md) | 已完成：原生协议控制封装、冻结加载器、状态来源与reset审计 |
+| 2 | [NTF-016](reports/soulx/20261102-native-independent-frontend/README.md) | 已完成：同源PCM、X2原生80ms适配、160ms屏障、EOS正文／真实进度回调 |
 | 3 | [NTF-017](issue/NTF-017.md) | 正文／状态／进度异步合并、短锁当前值和生命周期；同步图源设计 |
 | 4 | [NTF-020](issue/NTF-020.md) | 仅complete的进度追齐、取消、去重和有界超时 |
 | 5 | [NTF-018](issue/NTF-018.md) | 同一拓扑完整预热、有限预热对照和单路参考；预检3/3完整、退出0且无800ms过载 |
 | 6 | [NTF-019](issue/NTF-019.md) | 原固定FDB30单／双路验收，分别评价原始状态、正文、实际交接与尾部 |
 
-六单均未实施。015—017／020先做实现和必要契约检查；018通过后才启动019。正文与状态发布不逐块配齐，模型计算推进执行160ms屏障；内部reset不清正文，交接pending不阻止已完成本步的屏障释放，收音及当前结果发布持续进行。
+015／016本地验收已完成，尚未进行真实权重等价性／实时性验收。下一步为017原子Context及020交接，018通过后才启动019。正文与状态发布不逐块配齐，模型计算推进执行160ms屏障；内部reset不清正文，交接pending不阻止已完成本步的屏障释放，收音及当前结果发布持续进行。
 
 ## 3. 资源与执行边界
 
@@ -39,4 +39,4 @@ NTF-021／022已完成调研，相关实现从main撤回，原始结果与离线
 
 历史[X2教师30条](reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)、[归因](reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)与[双ASR实验](../reports/soulx/20261031-dual-asr-publication/README.md)保留原分母和限制。TextTurn、VoxTurn、XTurnix继续归档，不恢复旧训练或已取消benchmark。
 
-160ms推进合同见[设计第2.1节](dev/SoulX-Duplug/independent_streaming_frontend.md#21-每160ms音频步的推进屏障)。本次只同步文档；六个实施工作单仍待实施，原作业矩阵与资源预算不扩大。
+160ms推进合同见[设计第2.1节](dev/SoulX-Duplug/independent_streaming_frontend.md#21-每160ms音频步的推进屏障)，015／016已实现；原作业矩阵与资源预算不扩大。

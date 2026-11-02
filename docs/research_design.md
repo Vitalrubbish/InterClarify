@@ -1,6 +1,6 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
-2026-11-02，用户决定恢复**原生SoulX＋SenseVoice控制、独立X2完整词正文**路线，并将[NTF-015—020](issue/README.md)恢复为active，均待实施。NTF-021／022已完成的调研事实保留，相关实现分支删除、main回到0376ba7基线；NTF-023—025未实施归档，见[恢复记录](reports/soulx/20261102-external-asr-plan-restore/README.md)。当前合同为[独立前端设计](dev/SoulX-Duplug/independent_streaming_frontend.md)与[Context接口](dev/SoulX-Duplug/shared_context_interface.md)。本次仅调整工作单和文档，没有实现链路或提交新作业。
+2026-11-02，当前采用**原生SoulX＋SenseVoice控制、独立X2完整词正文**路线。NTF-015／016已完成原生封装、同源PCM／160ms推进屏障及独立X2适配的本地实现与契约验收，见[交付记录](reports/soulx/20261102-native-independent-frontend/README.md)；[NTF-017／020／018／019](issue/README.md)仍待实施，尚未接通原子Context或开展真实模型新实验。NTF-021／022的调研事实及NTF-023—025未实施归档范围见[恢复记录](reports/soulx/20261102-external-asr-plan-restore/README.md)。当前合同为[独立前端设计](dev/SoulX-Duplug/independent_streaming_frontend.md)与[Context接口](dev/SoulX-Duplug/shared_context_interface.md)。
 
 此前comparison旧实验已清除，官方源码已重新克隆并纳入子模块，见[源码说明](third_party/soulx-duplug.md)与[清理报告](reports/soulx/20261102-source-reset/README.md)。Nemotron／X2教师替换和双ASR配对发布保留为历史实验，不恢复旧入口。X2同卡30/30、实时及分词规范性通过，但状态未整体改善，见[报告](reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)与[归因](reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)。此前双ASR18/30完整、12条800ms触限，存在非静音、多长度预热不足的配置差异，见[历史审计](../reports/soulx/20261031-dual-asr-publication/README.md)。预热不足是优先验证假设，尚不能认定是全部积压的原因。模型权重固定，不训练，尚未切换现役下游Agent。
 
