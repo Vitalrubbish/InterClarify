@@ -2,14 +2,14 @@
 
 更新：2026-11-02。用户要求清除comparison端历史实验并重新clone官方仓库。当前以本地 [third_party/soulx-duplug](../../../third_party/soulx-duplug) 子模块为可审查源码入口，远端改用ParaThink独立根下新克隆的`upstream/soulx-duplug`，版本与说明见[依赖文档](../../third_party/soulx-duplug.md)。旧comparison加载器和实验worktree退役，不作为新实验入口。
 
-用户随后确认采用[原生SoulX控制＋独立X2Streaming-ASR整词正文](independent_streaming_frontend.md)，本轮按指令建立[NTF-015—019](../../issue/README.md)，尚未实现或启动作业。
+用户随后确认采用[原生SoulX控制＋独立X2整词正文](independent_streaming_frontend.md)，并补充仅complete回答交接等待独立解码。当前[NTF-015—020](../../issue/README.md)均待实施；本轮只补设计和工作单，未启动作业。
 
 ## 当前设计与实施顺序
 
 - SoulX保留内部SenseVoice教师、门控、窗口修订、状态反馈和原生reset；外部流式正文不注入状态KV，内部窗口文字不作为权威正文。
 - 同一持续PCM分别驱动控制与X2正文，按用户指定，正文只在EOS闭合组后以完整词追加，不暴露子词草稿；一组可含多个词。两路各自就绪更新Context，不等待逐块配齐，锁内合并所属字段并原子读取，分别记录音频上界及可用／发布时间。
-- 控制器reset不清空正文或结束ASR；complete不保证尾词已齐。有效nonidle仍走直接停止，Layer 1普通回答仍以实际读到当前turn有效complete为边界。
-- 工作顺序为原生控制封装、独立ASR、异步Context、完整预热与远端积压归因、固定FDB30验收。预热优先覆盖真实语音和多种窗口长度；不足预热是待验证假设，不先认定全部积压来源。
+- 控制器reset不清空正文、交接记录或结束ASR。原始complete即时记诊断，只有X2真实追齐对应音频且闭合正文已提交才交接ready；Layer 1读到ready的complete后在当前turn回答，同ID不重复。其他四类状态立即交付，有效nonidle仍直接停止；nonidle／incomplete取消旧交接，超时不强行放行。ready不保证尾词必齐。
+- 工作顺序为原生控制封装、独立ASR、异步Context、[仅complete同步](../../issue/NTF-020.md)、完整预热与远端积压归因、固定FDB30验收。预热优先覆盖真实语音和多种窗口长度；不足预热是待验证假设，不先认定全部积压来源。
 - 本轮只交付设计与建单；下游LLM／CoT／TTS和训练不在本轮，不切换现役Agent。详细字段见[Context合同](shared_context_interface.md)，资源与门槛见[方案](independent_streaming_frontend.md#6-工作单资源与验收)。
 
 ## 历史合同与验证记录

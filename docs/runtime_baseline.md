@@ -25,7 +25,7 @@
 ## 行为边界
 
 - 保持单一仲裁器与单一 TTS 播放所有权；已播放内容不可撤销。
-- 现役双工控制仍由 DuplexCascade 路径执行。目标方案中 SoulX 五类用户状态送入 Layer 1，仅有效用户打断额外直接停止活动输出；普通正式回答在 Layer 1 读取对应 `user_complete` 后生成。Layer 2 的 CoT 与 Layer 0 系统附和均属后续接入。
+- 现役双工控制仍由DuplexCascade执行。目标方案中四类非complete状态立即供Layer 1读取；原始complete记录后等待X2对应解码和闭合正文提交，Layer 1实际读到ready的complete才在当前turn回答，同ID去重。有效用户打断直接停止，不等解码；Layer 2 CoT与Layer 0系统附和仍为后续接入。
 - 控制信号与思考 token 不直接进入 TTS。
 - 系统 backchannel 当前未实现，后续由 Layer 0 专项训练并接入，未从总计划移除；Layer 2 尚未接入运行链路。
 

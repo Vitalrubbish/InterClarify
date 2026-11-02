@@ -2,7 +2,7 @@
 
 更新：2026-10-29。[研究方案](../research_design.md) · [架构设计](architecture.md) · [边说边想](speaking.md)。
 
-当前设计采用SoulX原生控制＋独立X2Streaming-ASR整词正文，内部SenseVoice教师继续服务状态预测；两路各自就绪更新共享上下文，不等待逐块配齐或完成状态。方案见[独立流式前端](../dev/SoulX-Duplug/independent_streaming_frontend.md)，本轮只设计建单，尚未实现。前端位于Layer 0–Layer 2输入侧，可与表达、思考并发执行。五类状态、普通回答生成及直接打断遵循[架构第2.2节](architecture.md#22-前端状态与系统附和)。后续CoT条件化控制与主动澄清的独立生成边界尚未实现，见[第2.5节](architecture.md#25-soulx-的-cot-条件化控制)。
+当前设计采用SoulX原生控制＋独立X2Streaming-ASR整词正文，内部SenseVoice教师继续服务状态预测；整词正文与四类非complete状态各自就绪更新；仅complete回答交接等待X2对应解码和闭合正文，交接ready后供正式回答使用，续说可取消。方案见[独立流式前端](../dev/SoulX-Duplug/independent_streaming_frontend.md)，本轮只设计建单，尚未实现。前端位于Layer 0–Layer 2输入侧，可与表达、思考并发执行。五类状态、普通回答生成及直接打断遵循[架构第2.2节](architecture.md#22-前端状态与系统附和)。后续CoT条件化控制与主动澄清的独立生成边界尚未实现，见[第2.5节](architecture.md#25-soulx-的-cot-条件化控制)。
 
 本文检验倾听期间的 thinking 流能否带来更合理、及时的主动澄清，并设计相应的大规模训练数据。运行合同与训练对象采用架构文档，Layer 3 定位待统一；Layer 2 只向共享上下文发布 CoT，不提供话轮建议或候选问句；后续经适配和训练的 SoulX 提供介入相关判断，Layer 1 读取控制器输出与分析结果决定自身行为并组织实际表达，经统一仲裁和单一播放路径发声。普通回答的 `user_complete` 边界不等于未来主动澄清的全部生成规则，后者需单独设计。
 

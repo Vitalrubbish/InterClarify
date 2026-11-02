@@ -1,12 +1,12 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
-2026-11-02 用户确认采用 **SoulX-Duplug原生控制＋独立X2Streaming-ASR整词转写**，并要求拆分工作单。控制器保留SenseVoice内部教师、文字门控、窗口修订、状态反馈和原生reset；独立X2仅提供共享正文，不向SoulX注入教师文本。按用户进一步指定，正文在X2发射组EOS闭合后以完整词追加，子词草稿不进入Context；一组可含多个词，不要求一词一快照。该决定替代原先拟用Nemotron的正文选型，旨在保持原生控制输入协议的同时提供整词流式正文。方案见[独立流式前端](dev/SoulX-Duplug/independent_streaming_frontend.md)，实施单见[NTF-015—019](issue/README.md)。本轮只修订设计与工作单，尚未实现或启动远端作业。
+2026-11-02 用户确认采用 **SoulX-Duplug原生控制＋独立X2Streaming-ASR整词转写**，并要求拆分工作单。控制器保留SenseVoice内部教师、文字门控、窗口修订、状态反馈和原生reset；独立X2仅提供共享正文，不向SoulX注入教师文本。按用户进一步指定，正文在X2发射组EOS闭合后以完整词追加，子词草稿不进入Context；一组可含多个词，不要求一词一快照。该决定替代原先拟用Nemotron的正文选型，旨在保持原生控制输入协议的同时提供整词流式正文。方案见[独立流式前端](dev/SoulX-Duplug/independent_streaming_frontend.md)，实施单见[NTF-015—020](issue/README.md)。本轮只修订设计与工作单，尚未实现或启动远端作业。
 
 此前comparison旧实验已清除，官方源码已重新克隆并纳入子模块，见[源码说明](third_party/soulx-duplug.md)与[清理报告](reports/soulx/20261102-source-reset/README.md)。Nemotron／X2教师替换和双ASR配对发布保留为历史实验，不恢复旧入口。X2同卡30/30、实时及分词规范性通过，但状态未整体改善，见[报告](reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)与[归因](reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)。此前双ASR18/30完整、12条800ms触限，存在非静音、多长度预热不足的配置差异，见[历史审计](../reports/soulx/20261031-dual-asr-publication/README.md)。预热不足是优先验证假设，尚不能认定是全部积压的原因。模型权重固定，不训练，尚未切换现役下游Agent。
 
-前端两路接收同一持续音频，各自就绪即更新SharedContext，不等待逐块配齐。Context仍只保存当前全文和当前状态，在锁内合并本路字段并原子读取；分别记录正文／状态的真实音频观察上界、可用时间和发布时间，不把不同进度伪装为同步。控制器reset不清空正文或结束流式ASR，complete不代表尾词已齐。此设计替代历史逐块联合发布，原因是让正文和状态独立及时可见；仍不保存历史正文版本或增加固定发布周期，见[接口合同](dev/SoulX-Duplug/shared_context_interface.md)。Layer 0系统附和、Layer 1表达和Layer 2思考位于Context下游；后续CoT反馈至前端的条件化扩展尚未实现。
+前端两路接收同一持续音频，正文与四类非complete状态各自就绪发布，不等待逐块配齐。用户进一步确认：只有complete用于正式回答的交接需要等待X2完成对应真实音频解码和闭合组提交，新增[NTF-020](issue/NTF-020.md)。原始complete立即记录，交接ready后才向Layer 1提供可回答的complete；等待期间持续收音、解码、更新正文及其他状态。有效nonidle／incomplete撤销旧交接，超时不强行放行，沿用800ms总延迟保护。Context保留当前全文／原始状态、独立ASR进度及至多一条当前交接记录，锁内原子合并；不保存历史正文或恢复逐块配对。reset不结束ASR或清空正文，解码追齐和ready不保证尾词必齐，见[接口合同](dev/SoulX-Duplug/shared_context_interface.md)。Layer 0系统附和、Layer 1表达和Layer 2思考位于Context下游；后续CoT条件化扩展尚未实现。
 
-用户进一步确认：保留 CoT 条件下的主动澄清与话轮决策目标，后续让 SoulX-Duplug 联合读取音频 token、转写文本 token 和 Layer 2 已发布的 CoT token；当前不实现这项扩展。当前保留原生五类用户状态 token，全部送入 Layer 1，由 LLM 决定自身行为；普通正式回答在当前 turn 看到对应的 `user_complete` 后开始生成，看到之前不生成正文。后续 CoT 阶段是否扩展控制器输出另行设计，见[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
+保留CoT条件下的主动澄清与话轮决策目标，后续让SoulX联合读取音频、转写和Layer 2已发布CoT，当前不实现。保留原生五类状态，四类非complete直接供Layer 1读取，complete在交接ready后携当前正文进入模型输入，pending原始complete仅作诊断。普通正式回答在当前turn实际读到这一有效complete后生成，之前不生成正文。后续CoT是否扩展输出另行设计，见[架构第2.5节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
 
 研究任务与单一仲裁执行点、单一 TTS 播放所有权及已听内容不可撤销的边界保持。仅有效用户打断额外进入输出运行时：活动输出期间 `user_nonidle` 立即触发停止，涵盖准备与播放。其他状态不进入输出运行时，不映射成 start 或 keep；`user_complete` 不额外发起 LLM 回答调用，`user_backchannel` 由 LLM 读取并决定表达行为。具体路径见[架构第 2.2 节](research_design/architecture.md#22-前端状态与系统附和)。状态输入编码待后续讨论。TextTurn 专属协议不自动成为 SoulX 合同，旧作业不因本次选型恢复。
 

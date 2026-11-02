@@ -1,6 +1,6 @@
 # SoulX 原生控制与独立流式转写
 
-日期：2026-11-02。用户已确认采用本方案，并进一步指定X2Streaming-ASR，使Context正文以完整词追加。本轮修订设计和[NTF-015—019](../../issue/README.md)，尚未实现新链路或启动远端作业；原先拟用Nemotron的正文选型被本次决定替代。
+日期：2026-11-02。用户确认SoulX原生控制＋X2完整词正文，并进一步确认只有complete的回答交接需要等待独立解码；其他状态和正文持续发布。本轮修订[工作单](../../issue/README.md)，增加[NTF-020](../../issue/NTF-020.md)，尚未实现新链路或启动远端作业。原先拟用Nemotron的正文选型已被替代。
 
 ## 1. 目标与设计原因
 
@@ -18,9 +18,15 @@ flowchart LR
     A --> C[X2Streaming-ASR 原生流式 ASR]
     B --> D[五状态与各自时间边界]
     C --> E[EOS闭合后提交完整词与时间边界]
-    D --> F[SharedContext 当前快照]
+    D --> F[SharedContext 原始状态与正文]
     E --> F
-    F --> G[Layer 1 / Layer 2]
+    D --> I[仅 complete 回答交接同步]
+    E --> I
+    C --> J[每步实际解码进度含 WAIT]
+    J --> I
+    I --> K[交接 ready 与当前正文原子可见]
+    F --> G[Layer 1 / Layer 2 持续读取]
+    K --> G
     D --> H[有效 nonidle 直接停止路径]
 ```
 
@@ -36,19 +42,21 @@ X2按原生80ms音频步执行LISTEN／DECODE，复用音频与文本缓存；WA
 
 ## 3. 异步发布与当前值
 
-ASR完成一个EOS闭合发射组就立即按完整词追加正文，SoulX有状态就立即更新状态；两路都不等待另一条处理到同一音频块，不恢复 `PairedPublisher`、逐块屏障或固定正文发布周期。独立计算不等于GPU计算必然并发，实际排队需测量。
+ASR完成一个EOS闭合发射组就立即按完整词追加正文，SoulX原始五状态立即记录，idle、nonidle、backchannel、incomplete立即供下游读取。只有complete用于开始正式回答时经过第4.1节同步，不恢复 `PairedPublisher`、逐块屏障或固定正文发布周期。独立计算不等于GPU计算必然并发，实际排队需测量。
 
 生成中的BPE／子词token只留在ASR有界临时缓冲，遇到EOS后按官方 `join_emit_texts` 规则一次提交。Context只保存已提交正文，不暴露半词草稿；正文前缀不可回改。一个闭合组可能包含多个完整词，允许同一快照一起可见，不伪造组内各词的独立可用时间，也不要求“一词一个快照”。“按词提交”不改变下游LLM自己的tokenizer分词。
 
 例如一组内部先生成 `inter`、再生成后续子词并最终闭合成 `international`，Context只在闭合后看到完整词。WORD、空ASR步、任意空格或停顿计数均不能代替EOS。EOS和逐组追加保证提交协议，不能保证识别必然正确；验收需记录未闭合尾部及跨组尾词续写／改写异常。
 
-SharedContext仍只保存每个逻辑话轮一份当前全文与当前状态，不增加历史正文、版本查询、patch或complete锁存。每次提交只修改所属字段，在短锁中与另一组最新值合并，读取返回完整快照副本；不能用工作线程先前读取的整份旧快照回写覆盖另一路的新结果。模型推理、网络等待和磁盘写入均不持有Context锁。
+SharedContext仍只保存每个逻辑话轮一份当前全文与当前原始状态，不增加历史正文、版本查询或patch。本次为complete同步新增至多一个当前交接记录，明确替代此前完全不保留complete的约束；记录用于等待、取消和去重，不建立历史事件队列。每次提交只修改所属字段，在短锁中与其他最新值合并，读取返回完整快照副本；不能用工作线程先前读取的整份旧快照回写覆盖另一路的新结果。模型推理、网络等待和磁盘写入均不持有Context锁。
 
 | 字段组 | 内容与约束 |
 | --- | --- |
 | 身份与生命周期 | 稳定的 `session_id`、`turn_id`、`status`；同一话轮正文来源固定为X2Streaming-ASR |
 | 正文 | 当前EOS闭合组累计 `text`、来源 `x2_streaming_asr`、`text_observed_until`、`text_available_at`、`text_published_at`；不含开放组子词，不经SoulX窗口拼合器 |
 | 状态 | `state_token`、`state_accepted`、`controller_generation`、`state_processed_until`、`state_observed_until`、`state_available_at`、`state_published_at` |
+| 解码进度 | `asr_processed_until`、`asr_observed_until`、`asr_progress_available_at`、开放组状态；每个80ms步处理结束均推进，WAIT无新字也上报，不刷新正文时间 |
+| complete交接 | 当前 `completion_id`、`completion_status`（none／pending／ready／cancelled／timed_out）、原始来源与固定音频目标、deadline、ready时间、对应正文提交组数及取消／超时原因 |
 | 完整性 | 分别标记传输／整理缺口和后端明确提供的尾部状态；缺乏可靠尾词信号时记录unknown，不自行宣告final |
 
 `*_until`均为真实采样位置，合成padding另记；`*_at`使用同一可比较的单调时钟，跨进程时明确时钟来源。旧 `processed_until` 若保留，只兼容表示SoulX主块截止，不能兼任正文进度或阻止仅正文更新。仅文字变化不更新状态时间，仅状态变化不更新正文时间；空文字结果不清空已有正文。
@@ -61,11 +69,31 @@ SharedContext仍只保存每个逻辑话轮一份当前全文与当前状态，�
 
 SoulX内部reset不结束X2Streaming-ASR，不清空共享正文，也不创建新逻辑话轮。外部输入账本保留已到达未处理PCM，内部回看、padding和语义KV按原生reset管理；不能复用旧适配器将整个旧 `model.buffer` 写回的行为。主块、回看、前瞻分别计账，验证连续输入与原生reset兼容；如需改变原生行为，先修订设计并说明原因。
 
-`user_complete`仅是控制器的语义判断，不作为ASR结束指令或转写final标志。普通正式回答仍由Layer 1在当前turn实际读到有效complete后生成；本轮不增加尾词等待门、状态锁存或新的语义否决层。尾词尚未到达的状态必须可诊断，后续下游接入据此验证行为，不声称完整正文已就绪。
+`user_complete`仅是控制器的语义判断，不作为ASR结束指令或转写final标志。原始complete立即记录，但只有完成下述交接同步的complete才可作为Layer 1普通正式回答的生成边界。此处检查计算与提交就绪，不增加语义判断模型，不改变SoulX内部反馈或reset。
 
 活动输出期间有效nonidle直接提交既有唯一停止执行点，不等待ASR、Context消费者或日志。完成来源、停止请求与物理停播分别记录，本轮只验证回调探针，不接真实播放。
 
 只有运行时显式关闭才结束逻辑话轮；关闭后拒绝迟到回调。EOF不补造complete或EOS，不强制提交未闭合尾词，不把排空文字回填成在线已见结果；在线已闭合全文、开放组token、未处理真实采样及显式drain诊断分别保存。两路任一失败均显式终止该验证样本并保留证据，不静默丢弃慢路或降级成另一来源。
+
+### 4.1 仅 complete 的回答交接同步
+
+| 输入 | 交付规则 |
+| --- | --- |
+| idle／nonidle／backchannel／incomplete | 立即记录和交付；有效nonidle直接停止不等X2 |
+| 原始complete | 立即记录预测与可用时间，建立pending交接；不能直接许可正式回答 |
+| X2闭合正文与解码进度 | 各自立即更新；待交接complete不阻止后续音频、解码或正文发布 |
+| ready的complete | 和当时最新已闭合正文原子可见，Layer 1实际读取后才可在当前turn开始正式回答 |
+
+1. 接受一次原生complete后，固定其session／turn、原始控制代次、采样目标 `C = state_observed_until` 和原始可用时间，创建唯一completion_id。目标取实际观察截止，不只取160ms主块截止；后续已到达音频不把C变成移动目标。同一pending期间重复complete只审计，不重置目标或延长截止时间。
+2. X2每步音频编码、LISTEN及可能的DECODE结束后发布真实进度，只有整步完成才能推进asr_processed_until；不能用已收包或特征预取位置冒充。推进覆盖C的X2步所需真实前瞻按原生协议到达并处理，开放DECODE须等模型实际EOS闭合；不按两路步号相等判断，也不因为WAIT没有新字而永远不推进。
+3. 放行条件为：X2实际处理范围覆盖C、当前没有仍在进行的DECODE／开放组、截至这次进度的所有闭合组已写入Context，且候选未被取消、关闭或超时。若X2已经领先且满足条件，可立即ready，不要求complete之后必须新增文字或再出现一个EOS。
+4. 在同一短锁内复核候选、最新进度与已提交正文，置completion_status=ready并记录ready_at和对应已提交组数。正文仍只有当前值，不复制历史正文。Layer 1输入编码仅将ready的complete携正文作为可回答状态交付，pending原始complete留在诊断字段，不能仅凭state_token或state_accepted开始回答。即使最新原始状态已变为idle，尚有效的ready记录仍可读取；同一completion_id最多开始一次正式回答，不新增独立LLM回答调用。
+5. 等待／尚未使用ready期间，后到有效nonidle立即取消旧候选并照常执行打断；有效incomplete同样撤销旧交接，避免模型已判断继续等待却放行旧complete。idle和backchannel只更新原始状态，不自动否定语义完成。控制器内部reset不取消候选，显式话轮关闭和解码错误终结候选。ready作为单个当前交接标记保留到被撤销、新合法交接替代或话轮关闭；不增加历史队列和消费ack。取消与ready检查须串行化，迟到ASR回调不能复活旧候选。
+6. 等待为非阻塞、单调时钟计时，首轮 `completion_wait_timeout_ms=800`，沿用既有过载保护，不作为质量目标。deadline取“原始complete可用时刻＋800ms”和“原始complete主块截止对应实时到达时刻＋既有800ms总延迟停止线”的较早者；额外等待不重新获得一份独立800ms预算。到期未就绪则timed_out，不强制ready、不提交半词；验证样本明确失败并留证，按原合同清理。
+
+X2追齐C且处于LISTEN仍不能证明此前所有词已经发射；发射组EOS也不是整轮final。因此首轮使用上述明确的计算／提交同步条件，不添加“几个空步”“再等固定160／320ms”或“必须等下一个EOS”的尾词启发式。已开始DECODE的尾部必须真实闭合；尚未发射的尾词保留unknown，记录ready之后才到达的文字并在NTF-019评估。如果需要更强的转写完整性保证，先验证后端明确支持的尾部完成信号，再修订协议，不能将ready命名或解释为全文必齐。
+
+EOF时如果目标所需的真实前瞻不足、步骤未完成或开放组未闭合，则交接保持未完成并记录原因，不用合成尾部满足在线ready。原始预测时刻、交接等待、ready交付和Layer 1读取时刻分别记录，以区分状态质量、同步延迟及尾词覆盖。
 
 ## 5. 完整预热与积压归因
 
@@ -86,8 +114,9 @@ SoulX内部reset不结束X2Streaming-ASR，不清空共享正文，也不创建�
 | 1 | [NTF-015](../../issue/NTF-015.md) | 原生控制封装、reset和状态来源审计 |
 | 2 | [NTF-016](../../issue/NTF-016.md) | 同源音频分发与独立原生流式正文 |
 | 3 | [NTF-017](../../issue/NTF-017.md) | 无配对等待的Context更新与生命周期 |
-| 4 | [NTF-018](../../issue/NTF-018.md) | 全链路预热、远端积压对照与实时门槛 |
-| 5 | [NTF-019](../../issue/NTF-019.md) | 固定FDB30的状态、正文和发布验收 |
+| 4 | [NTF-020](../../issue/NTF-020.md) | 仅complete的交接同步、取消、去重与超时 |
+| 5 | [NTF-018](../../issue/NTF-018.md) | 全链路预热、远端积压对照与实时门槛 |
+| 6 | [NTF-019](../../issue/NTF-019.md) | 固定FDB30的状态、正文与交接验收 |
 
 远端使用conda，单并发作业、1×4090、4CPU、32GiB RAM、batch=1；显存停止线22GiB，每路模型worker各1、CPU线程各至多2，不新增无界worker池。每路未读真实PCM≤800ms，送音调度迟到及各路在线发布延迟超过800ms即停止样本并记录失败，物理PCM总量≤4MiB；800ms是过载保护，不是交互质量目标。各路发布延迟以其真实主块／解码覆盖及完整观察边界分别计算，不能只统计结果就绪后的短等待。
 

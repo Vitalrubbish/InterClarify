@@ -6,7 +6,7 @@
 
 历史Nemotron／X2教师替换与[双ASR配对发布](../archive/dev/SoulX-Duplug/dual_asr_publication.md)不作为当前协议。新方案完整预热优先覆盖真实语音、多长度和完成分支，以固定对照验证预热不足假设；不预先归因全部积压。下游尚未切换，有效nonidle的直接停止合同保持。
 
-当前五类用户状态均作为 token 送入 Layer 1，普通正式回答在当前 turn 读取对应 `user_complete` 后生成；仅活动输出期间的有效 `user_nonidle` 额外直接停止输出。其他状态不映射成运行时 start/keep。后续音频、转写与 CoT 联合控制的目标已确认，当前不实现；输出是否扩展仍待讨论。
+保留原生五类状态：四类非complete立即供Layer 1读取；complete原始预测立即记录，只有独立X2进度与闭合正文同步、交接ready后才作为可回答的complete进入Layer 1输入。普通正式回答在当前turn实际读取后生成；有效nonidle仍立即直接停止，其他状态不映射start／keep。交接规则见[第4.1节](../dev/SoulX-Duplug/independent_streaming_frontend.md#41-仅-complete-的回答交接同步)，CoT扩展尚未实现。
 
 [架构图 PDF](../../figures/parathink_method_preview.pdf) · [图示说明](../figures/parathink_method.md)。旧预览尚未更新双路前端细节，当前前端流程以[新方案图](../dev/SoulX-Duplug/independent_streaming_frontend.md#2-音频与两路职责)为准，图源同步纳入NTF-017，不表示已完成接入或验证。TextTurn／XTurnix专属协议与历史状态见[工作单](../issue/README.md)。
 
@@ -30,14 +30,14 @@ thinking 流指与表达流分工的内部任务分析过程，在当前信息�
 | 语音前端：Online ASR 与文本整理 | 独立X2Streaming-ASR原生80ms流式解码，EOS闭合后按完整词追加正文，不受SoulX文字门控或reset影响 | 已闭合组累计正文及其观察上界、实际闭合可用与发布时间；不含子词草稿 |
 | 语音前端：SoulX-Duplug 状态模型 | 保留内部SenseVoice教师及原生门控、修订、状态反馈和reset，独立预测；后续CoT扩展尚未实现 | 原生五类状态及其音频范围、可用与发布时间；CoT阶段输出另行设计 |
 | Layer 0 | 小型预测器，仅判断当前是否适合发出系统 backchannel；通过专项训练获得时机预测能力 | 发出系统附和或继续等待的决策 |
-| Layer 1 | 持续读取用户转写与 SoulX 状态，请求思考并利用结果组织表达；当前普通正式回答在看到 `user_complete` 后于当前 turn 开始生成 | 待表达文本与思考请求 special token |
+| Layer 1 | 持续读取整词正文与用户状态；四类非complete不等待，普通回答在实际读到交接ready的complete后于当前turn生成，按交接ID去重 | 待表达文本与思考请求special token |
 | Layer 2 | 倾听期间分析事实、缺口、条件依赖及影响；表达期间继续求解、检查约束和更新结论 | 仅发布 CoT 正文，附带运行时追溯元数据，不包含话轮建议 |
 | 共享 Context | 保存当前可用转写、真实生成历史、分析结果、控制决策及运行状态，供各模块在输入边界读取 | 最新用户全文与状态，以及真实生成、思考和输出上下文 |
 | Text FIFO | 按运行时提交规则接收 Layer 0 路径的系统附和与 Layer 1 表达，保持有效片段的提交顺序 | 带 output_id、chunk_id 和用途的待播文本块 |
 | 输出运行时（唯一仲裁执行点） | 接收实际表达输出，统一管理入队、合成与播放资格，并直接执行有效用户打断；不消费其他 SoulX 状态 token | 输出生命周期、停止与取消执行及真实播放状态 |
 | TTS 与播放 | 流式合成并播放已提交内容，回传实际播放状态 | 用户可听音频 |
 
-SoulX 当前保留 `user_idle`、`user_nonidle`、`user_backchannel`、`user_complete`、`user_incomplete` 五类预测，均作为状态 token 随实际可见的转写与上下文送入 Layer 1；LLM 据此决定自身行为，包括当前 turn 内普通正式回答的生成边界。有效用户打断额外走直接停止路径，其余状态 token 不送给输出运行时，也不转换成 start 或 keep 指令。上游服务的 idle/nonidle/speak 返回分支与原生五类预测分别记录。Layer 1 不重复预测用户状态，Layer 0 仍仅负责系统附和时机。Layer 2 的结果进入上下文后，由 Layer 1 在上述生成边界内正常自回归表达，不增加独立的任务语义复核或否决层。
+SoulX保留原生五类预测及内部反馈。四类非complete立即向Layer 1交付，complete先作为原始诊断记录，待交接ready后携当前正文作为可回答的状态token输入Layer 1；不能仅凭raw complete或state_accepted绕过同步。有效用户打断仍额外直接停止，其余状态不进入输出运行时，不映射start／keep；服务idle/nonidle/speak与原生状态分别记录。Layer 1不重复预测用户状态，Layer 0仍只负责系统附和时机。交接同步只检查数据就绪与原生状态取消，不增加任务语义复核或否决模型。
 
 表达和 thinking 请求保留 DuplexCascade 协议。SoulX 状态预测写入 Context，在 Layer 1 正常输入边界可见；只有有效用户打断另行提交给唯一输出执行点。状态对模型的具体封装与 token 编码待实现时冻结。新控制模式不同时执行旧 DuplexCascade 控制 token，历史 token 保留为真实生成记录。Layer 0 系统附和编码在实现时冻结，不复用用户附和 token 表达相反方向。
 
@@ -49,7 +49,7 @@ Layer 0/1 的发声路径直接连接 Text FIFO，Context 不向队列提交文�
 
 Context 保存当前实际可用的用户全文和当前 SoulX 状态，不保留历史正文版本；另保存 Layer 1 真实生成历史和输出、Layer 2 已发布结果、Layer 0 时机建议，以及实际输出阶段和打断事件。该存储不意味着输出运行时订阅全部状态；用户状态输入与打断执行记录分开。生成、提交、取消与实际播放分别记录，不能把已生成内容直接视为用户已听内容；同一份生成文本不重复注入模型输入。
 
-2026-11-02用户确认：按稳定turn_id保留当前值，但正文与状态分别就绪即更新。短锁内只合并本路字段并提供原子快照，不能用旧整帧覆盖另一路新结果；两路观察上界及可用／发布时间分别记录。SoulX内部窗口文字不作为正文，X2的EOS闭合组累计正文按完整词追加，不等待配齐、complete或固定定时器。reset不结束ASR或重开逻辑话轮，complete不代表尾词已齐。Layer 1／2在输入边界读取，慢消费者仍可能跳过中间状态，不增加历史队列或complete锁存；有效打断走直接停止。新接口待NTF-017实现，不能用此前六视图或教师实验验收替代，见[接口设计](../dev/SoulX-Duplug/shared_context_interface.md)。
+2026-11-02用户确认：正文、原始状态及无新字步骤的ASR进度分别就绪更新，短锁合并并原子读取；X2的EOS闭合组完整词正文不等待complete。仅complete回答交接固定原始实际观察截止，等待X2覆盖、开放组闭合及正文提交后ready；每话轮至多一条当前交接记录，替代此前完全不保留complete的约束，不建立历史队列。有效nonidle／incomplete取消，idle／backchannel与内部reset不清除；ready同ID最多用于一次生成。超时按既有800ms总延迟线失败，尾词未知不冒充final。有效打断即时执行，等待不阻塞两路。新接口及同步待NTF-017／020实现，见[接口设计](../dev/SoulX-Duplug/shared_context_interface.md)。
 
 SoulX 持续读取到达的音频，不能沿用旧文本控制器“只有 ASR 文字变化才判断”的调度，也不能因无新增文字而跳过真实音频或静音观察。ASR 正文在下游输入边界采用最新值，识别修订不自动改变在途模型输入，后续 CoT 在合法输入边界注入；CoT 更新是否独立触发控制请求仍待设计。Layer 1 和 Layer 2 只在各自明确的输入边界消费新增观察，已经构造的输入不因结果到达而自动重算。
 
@@ -57,16 +57,16 @@ SoulX 持续读取到达的音频，不能沿用旧文本控制器“只有 ASR 
 
 ### 2.2 前端状态与系统附和
 
-语音前端在系统准备和播放期间仍持续接收用户输入。ASR 负责转写，SoulX 负责用户状态，两类输出分别记录；五类状态 token 全部送入 Layer 1，由 LLM 决定自身行为；只有有效用户打断额外送入唯一输出执行点。Listen/Speak 描述实际输出生命周期：Layer 1 开始正式回答并登记活动输出后进入 Speak，播放阶段先记 preparing；真实开播事件到达再记 playing。`user_complete` 到达、模型读取状态、开始生成、建立输出、提交和实际开播分别记录，状态到达本身不等于已生成回答或进入 Speak。准备期间也能取消输出；停止请求先阻断旧输出，关闭确认后再回传 Listen。生成、实际播放及其游标独立记录，不由 ASR 停顿或模型推测冒充。
+语音前端在系统准备和播放期间仍持续接收用户输入。ASR负责转写，SoulX负责原生用户状态，原始complete与交接ready分别记录；四类非complete即时交付，complete仅在ready后编码进入Layer 1，供LLM在既定边界内表达。只有有效用户打断额外送唯一输出执行点。Listen/Speak描述实际输出生命周期：Layer 1开始正式回答并登记输出后进入Speak，先记preparing，真实开播再记playing。原始complete、ready、模型读取、生成、提交及实际播放分别记录；准备期间也可取消，停止关闭确认后回传Listen。
 
 普通轮后回答的生成规则由用户确认如下：
 
 | Layer 1 在当前 turn 的可见状态 | 正式回答行为 |
 | --- | --- |
-| 尚未看到对应用户话轮的 `user_complete` | 持续读取转写和状态，不生成正式回答正文；也不预生成正文再仅延迟送入 TTS |
-| 在正常输入边界看到有效 `user_complete` | 在当前 turn、现有会话与生成流程内开始正式回答，运行时接收其输出并管理播放 |
+| 尚无当前话轮交接ready的complete，或候选仍pending／已取消／超时 | 持续读取正文与非complete状态，不生成正式回答正文，也不预生成正文再仅延迟送TTS；raw complete只作诊断 |
+| 在正常输入边界读到当前仍有效、ready且未使用的complete及正文 | 按completion_id最多开始一次正式回答，在当前turn、现有会话与生成流程内表达，运行时接收并管理播放 |
 
-此处“当前 turn”指 Layer 1 当前的推理与生成上下文，不因完成状态新建 LLM 会话、清空历史或创建一次独立回答调用，也不把每个音频块、状态预测或 micro-turn 当作新的逻辑用户话轮。状态已到达 Context 但尚未被本次模型输入读取时，仍不算 LLM 已看到；不要求向已经构造的在途推理输入中途插入 token。
+此处当前turn仍指Layer 1的推理与生成上下文，不因complete新建LLM会话、清空历史或另建回答调用。原始预测、交接ready、模型实际读取分别记录；仅raw complete到达Context不算模型已看到可回答的complete。输入编码须排除pending诊断token，在正常输入边界检查当前ID仍ready；不要求向已构造的在途输入插token，已读取后发生续说则走既有取消／停止路径。
 
 该限制是 Layer 1 当前普通正式回答的生成合同，不通过运行时拦截预生成正文实现；Layer 1 仍可在倾听期间处理输入、发出内部思考请求，内部控制和 CoT 不直接播放。Layer 0 系统附和保持原有职责。后续 CoT 主动澄清的独立生成边界仍需设计，不能用伪造 `user_complete` 绕过。当前其余四类用户状态及长静音本身不替代 `user_complete`；官方服务的 `speak`／`wait_fallback` 可保留诊断，但不作为输出运行时的接话指令。
 
@@ -74,7 +74,11 @@ SoulX 持续读取到达的音频，不能沿用旧文本控制器“只有 ASR 
 
 ```mermaid
 flowchart LR
-    S[SoulX 五类状态 token] --> L[Layer 1 当前 turn]
+    S[SoulX 原生状态] --> N[四类非complete立即交付]
+    N --> L[Layer 1 当前 turn]
+    S --> C[仅complete等待X2进度与正文提交]
+    C --> E[交接ready的complete与正文]
+    E --> L
     L --> F[实际表达文本]
     F --> R[唯一输出运行时]
     R --> T[TTS 与播放器]
@@ -102,7 +106,7 @@ Layer 0 仍只预测用户持有话轮时是否适合简短附和。输入可结
 
 每次连续输出使用唯一 `output_id`，其下文本块、TTS 请求和音频块携带该标识及 `chunk_id`，同时记录普通回答、主动澄清或系统附和等用途。输出标识描述一次可取消的输出生命周期，与 ASR 转写版本、Layer 2 任务和结果版本分别管理。
 
-运行时在登记实际活动输出时建立有效输出标识。普通回答由 Layer 1 读取 `user_complete` 后在当前 turn 内开始生成，运行时为这次实际输出登记新标识，而非先由控制状态创建 start 调用来启动 LLM；系统附和仍按其既有动作边界由同一运行时执行，不另建播放器。FIFO 只接收当前有效标识的文本，TTS 返回与实际播放前再次检查资格。输出关闭后，来自旧标识的迟到文本或音频记录为取消，不重新标成新输出，也不因队列变空自动恢复。
+运行时登记实际活动输出时建立有效标识。普通回答由Layer 1读取交接ready的complete后在当前turn生成，按completion_id去重，再为实际输出登记新标识；不能由raw complete提前创建start调用或启动LLM。系统附和仍经同一运行时，不另建播放器。FIFO只接收当前有效标识，TTS返回及播放前复核资格；关闭后旧标识迟到内容记录取消，不重标为新输出，也不因队列变空自动恢复。
 
 控制事件保留请求关联标识、输入转写版本、运行状态版本及关联的输出标识。若动作返回时所属状态或输出生命周期已经改变，该动作不能直接执行；若所依据的观察已被新输入修订，保留原依据并由后续更新事件触发基于最新 Context 的决策。同一会话保持有界缓冲和单个在途控制请求，不通过无限并发提高控制频率。运行时对同一输出的停止保持幂等，同一批执行中停止先于普通文本消费。
 

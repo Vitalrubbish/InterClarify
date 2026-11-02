@@ -1,16 +1,16 @@
 # 用户话轮的 SharedContext 当前值接口
 
-2026-11-02，用户确认原生SoulX控制＋独立X2Streaming-ASR流式正文，替代逐块联合发布。新合同待[NTF-017](../../issue/NTF-017.md)实现；本轮只设计与建单，不能用旧接口通过记录替代新合同验收。完整方案见[独立流式前端](independent_streaming_frontend.md)。
+2026-11-02，用户确认原生SoulX控制＋独立X2完整词正文，并补充只有complete回答交接等待独立解码。异步字段更新待[NTF-017](../../issue/NTF-017.md)实现，交接同步见[NTF-020](../../issue/NTF-020.md)；本轮只修订设计和建单，不能用旧接口通过记录替代新验收。完整方案见[独立流式前端](independent_streaming_frontend.md)。
 
 ## 1. 独立更新与原子读取
 
-同一逻辑用户话轮以稳定的session_id／turn_id定位一份当前记录。按用户指定，X2在EOS闭合发射组后以完整词追加正文，SoulX状态就绪即更新状态；无逐块配对、跨路屏障、固定发布周期或complete等待。
+同一逻辑用户话轮以稳定session_id／turn_id定位一份当前记录。X2在EOS闭合组后追加完整词，SoulX原始状态立即记录；四类非complete状态立即供下游读取，只有complete用于开始回答时经过交接同步。无逐块配对、跨路计算屏障或固定发布周期；等待交接不阻塞两路音频、状态及正文更新。
 
 Context不接收生成中的BPE／子词草稿。一个闭合组可有多个完整词，按官方组拼接规则一次发布；不要求一词一快照，不为组内各词伪造独立时标，也不改变下游tokenizer。已有正文不可回改，WAIT、WORD、空格或空ASR步都不能替代EOS。
 
 每个写入在短锁内与记录最新值合并，只改变本路字段，再提供完整快照的原子读取。不能将线程此前读到的旧整帧写回，覆盖另一条路的新结果。推理、网络等待和落盘均不持锁；来源内的迟到或重复提交需拒绝，跨路进度允许不同。
 
-仍只提供当前值，不增加历史正文、正文版本、替换patch、历史查询、事件游标或complete锁存。实现时分别提供正文／状态更新入口；旧publish_user_frame的整帧覆盖及单一进度约束须迁移，不假定现实现已支持并发合并。
+仍只提供当前值，不增加历史正文、正文版本、替换patch、历史查询或事件游标。本次允许每话轮最多一条当前complete交接记录，用于有界等待与取消，替代此前完全不保留complete的约束；不建立历史事件队列或消费ack。实现时分别提供正文、原始状态、解码进度和交接更新入口；旧publish_user_frame的整帧覆盖及单一进度约束须迁移，不假定现实现已支持。
 
 ## 2. 当前记录与时间边界
 
@@ -24,9 +24,14 @@ Context不接收生成中的BPE／子词草稿。一个闭合组可有多个完�
 | controller_generation | 原生reset后的控制代次，不是新逻辑话轮 |
 | state_processed_until／state_observed_until | 状态主块与完整音频观察的真实采样上界，padding另记 |
 | state_available_at／state_published_at | 状态实际可用与发布的可比较单调时间 |
+| asr_processed_until／asr_observed_until／asr_progress_available_at | X2完成整步解码的主块、真实观察边界和可用时间；WAIT无新字也推进，不等于正文观察范围 |
+| completion_id／completion_status | 单个当前交接身份与none／pending／ready／cancelled／timed_out；原始complete不等于ready |
+| completion_target_sample／deadline／ready_at | 创建时固定的原始complete实际观察截止、交接截止及实际ready时间；包含原始来源与对应正文已提交组数 |
 | 完整性字段 | 区分传输／整理缺口和ASR尾部状态；没有可靠尾词信号则为unknown |
 
 旧processed_until若保留，只兼容表示SoulX主块截止；正文更新不要求它增长。各组时序只由所属路推进，状态变化不刷新正文时间，正文变化不刷新状态时间。原子快照不表示音文同块对齐，也不保证尾词完整。ASR暂时无新增token不等于静音或句子结束。
+
+解码进度独立于正文：X2收包、特征预取不能推进已完成进度，必须完成该80ms步及其DECODE；WAIT完成而正文不变时，仅推进进度字段，不改text_available_at。否则complete会因“没有新字就没有进度”而无限等待。
 
 ## 3. 生命周期与正文来源
 
@@ -40,12 +45,20 @@ X2已闭合组按官方规则形成只追加累计正文，不经SenseVoice拼�
 
 Layer 1／2在各自输入边界读取最新快照；一次更新不创建新用户消息，不自动改变已建立的模型输入／KV、已生成或已听内容。正文、状态与元数据分开编码，ASR标签没有控制权限。
 
-当前状态会被覆盖，慢消费者仍可能跳过短暂complete；本轮不增加历史投递或锁存。普通正式回答仍由Layer 1在当前turn实际读到有效complete后生成；本轮不额外增加尾词等待门或语义否决层，尾词尚未到达的风险需在后续接入中验证。
+四类非complete原始状态直接供Layer 1读取。原始complete只作诊断与pending来源，不作为已可回答的complete token直接编码到Layer 1输入。必须在交接ready后，将对应complete与当前已闭合正文在同一输入边界交付；仅state_accepted=true不足以开始正式回答。普通回答仍在当前turn现有生成流程内开始，不新建独立回答调用。
+
+交接固定原始complete的state_observed_until为目标C，等待X2完成覆盖C及原生真实前瞻的步骤、当前DECODE真实EOS闭合、相应闭合组全部提交；领先时可立即ready，不要求新词或下一个EOS。所有检查及ready标记与最新正文在同一锁内提交；正文不复制为历史版本，保留对应已提交组数供审计。
+
+pending和尚未使用的ready遇后到有效nonidle／incomplete即取消；nonidle直接停止仍即时执行。idle／backchannel和内部reset不取消，ready记录不随下一帧idle消失。Layer 1按completion_id最多使用一次，不增加消费ack；关闭或新合法交接替换后，迟到结果不能复活旧候选。取消与放行在同一执行域串行判断，已构造的模型输入不会被Context自动回改。
+
+交接采用非阻塞定时器。首轮completion_wait_timeout_ms=800，deadline与原始complete主块到交接的既有800ms总延迟停止线取较早者，不能叠加预算；重复complete不续期。超时则timed_out、验证样本失败并保留证据，不强制ready或提交半词。EOF真实前瞻不足不得用drain补成在线就绪。
+
+ready只表示上述计算／提交同步通过，不保证此前所有词已发射；尾词未知保留unknown并统计ready后追加的文字。初版不增加空步计数、固定160／320ms延后或必须等待下一个EOS的规则，具体边界见[设计第4.1节](independent_streaming_frontend.md#41-仅-complete-的回答交接同步)。
 
 活动输出期间有效nonidle直接调用唯一停止执行点，不等待ASR、Context消费者或日志；其他状态不映射为start／keep。停止请求与物理停播分别记录。
 
 ## 5. 验收与历史
 
-NTF-017检查交错更新无丢失、各路时间不串写、reset连续、关闭拒绝迟到和直接停止去重；真实模型的完整预热、时序与质量由NTF-018／019验证。每个实现文件同步更新docs同路径说明，既有容量限额保留。
+NTF-017检查交错更新无丢失、各路时间不串写、reset连续、关闭拒绝迟到和直接停止去重；NTF-020检查complete同步、取消、超时及生成边界探针。真实模型完整预热、时序及原始状态／ready交接质量由NTF-018／019验证，分别报告，不能用延后ready伪装SoulX原始状态改善。实现文件同步维护docs同路径说明，既有容量限额保留。
 
 历史[160ms联合发布](streaming_transcript_publication.md)、[双ASR配对发布](../../archive/dev/SoulX-Duplug/dual_asr_publication.md)与教师同步均已被本合同替代。旧[六视图接口检查](../../../reports/soulx/20261030-current-context-test/README.md)和[双ASR18/30报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)保留原解释，不作为新接口通过证据。
