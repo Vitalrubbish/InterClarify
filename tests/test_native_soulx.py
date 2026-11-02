@@ -112,7 +112,7 @@ class NativeTests(unittest.TestCase):
         initial_rng = np.random.get_state()
         np.random.seed(42)
         wrapped = official_model(predictions, ['hello', 'world', 'whole turn'])
-        wrapper = self.attach(wrapped)
+        wrapper = self.attach(wrapped, profile=True)
         ledger = self.ledger()
         results, expected, cursors = [], [], [0, 2560, 5120, 7040]
         # Compare the same PCM/config/seed; reset's pending lookahead comes from the source ledger.
@@ -137,6 +137,8 @@ class NativeTests(unittest.TestCase):
         self.assertEqual(results[2]['events'][-1]['resume_from'], 7040)
         self.assertEqual(results[3]['windows']['main']['spans'][-1]['start'], 7040)
         self.assertEqual(wrapper.generation, 1)
+        self.assertTrue(any(event['kind'] == 'stage' and event['name'] == '_audio_to_tokens'
+                            for event in results[0]['events']))
         self.assertEqual(results[0]['windows']['main']['spans'][0]['samples'], 640)
         self.assertEqual(results[0]['state']['state_observed_until'], 2560)
 

@@ -80,6 +80,8 @@ class _Capture(ast.NodeTransformer):
         if isinstance(node.value, ast.Name) and node.value.id == 'state':
             self.counts[3] += 1
             return ast.parse('self._native.capture_state(state, delta_text)\nreturn state').body
+        if isinstance(node.value, ast.Name) and node.value.id == 'delta_text':
+            return ast.parse('self._native.capture_revision(need_correction, corrected_prev_delta)\nreturn delta_text').body
         return node
 
 
@@ -106,7 +108,7 @@ class NativeSoulX:
 
     def __init__(self, model, *, synchronize, source_path=None, on_state=None,
                  session_id='session', turn_id='turn',
-                 is_live=lambda: True, clock=time.monotonic):
+                 is_live=lambda: True, clock=time.monotonic, profile=False):
         cfg = model.config.infer_config
         inp = cfg.input
         if (inp.sample_rate, inp.chunk_size, inp.audio_back_size, inp.audio_ahead_size) != (16000, 2560, 15360, 640):
@@ -124,6 +126,8 @@ class NativeSoulX:
         self._feeding = threading.Lock()
         self._publishing = threading.RLock()
         self._original = {name: getattr(model, name) for name in (*methods, 'reset', 'get_chunk')}
+        if profile:
+            self._original.update({name: getattr(model, name) for name in ('_audio_to_tokens', '_tokens_to_embeds')})
         self._recognize = model.cascade_asr.recognize
         self._events, self._frame, self._windows = [], None, None
         self.failure = None
@@ -132,8 +136,26 @@ class NativeSoulX:
         model._native = self
         for name, method in methods.items():
             setattr(model, name, method)
+        if profile:
+            for name in ('_audio_to_tokens', '_tokens_to_embeds', '_asr', '_state_predict'):
+                setattr(model, name, self._profile(name, getattr(model, name)))
         model.reset, model.get_chunk = self._reset, self._get_chunk
         model.cascade_asr.recognize = self._observe_recognize
+
+    def _profile(self, name, method):
+        def measured(*args, **kwargs):
+            started = self.clock()
+            result = method(*args, **kwargs)
+            self.synchronize()
+            row = {'kind': 'stage', 'name': name, 'started_at': started, 'completed_at': self.clock()}
+            if name == '_audio_to_tokens':
+                row['audio_token_ids'] = list(result)
+            self._events.append(row)
+            return result
+        return measured
+
+    def capture_revision(self, needed, corrected):
+        self._events.append({'kind': 'text_revision', 'needed': bool(needed), 'corrected_previous': corrected})
 
     def _record(self, audio, spans):
         key = id(audio)

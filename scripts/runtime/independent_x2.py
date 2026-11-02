@@ -129,6 +129,7 @@ class IndependentX2:
             self.frame_index += 1
             return dict(progress, lane='asr', started_at=started_at, completed_at=self.clock(), input_spans=spans,
                         input_sha256=ledger.digest(audio), text=self.groups.text,
+                        decode=deepcopy(result),
                         text_observed_until=self.text_observed_until, text_available_at=self.text_available_at)
         except Exception as exc:
             self.closed, self.failure = True, str(exc)

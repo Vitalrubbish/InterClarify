@@ -1,0 +1,164 @@
+"""Check real-clock gates, bounded IPC provenance and warmup isolation."""
+import base64
+from copy import deepcopy
+import json
+from pathlib import Path
+import socket
+import sys
+import tempfile
+from types import SimpleNamespace
+import unittest
+from unittest.mock import patch
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts/runtime'))
+sys.path.insert(0, str(ROOT / 'scripts/remote'))
+from dual_audio import DualAudioFrontend, PCMLedger
+from independent_x2 import IndependentX2
+from native_soulx import NativeSoulX, pcm_digest
+from native_frontend_worker import MAX_MESSAGE, RemoteX2, WindowLedger, receive, send
+from native_frontend_probe import compare_native, full_warmup, replay
+from shared_context import SharedContext
+from test_independent_frontend import Clock, FakeEngine
+from test_native_soulx import SOURCE, official_model
+
+
+class ProbeTests(unittest.TestCase):
+    def frontend(self, clock=None, realtime=False):
+        import time
+        clock = clock or time.monotonic
+        model = official_model([99, 6] * 100)
+        control = NativeSoulX(model, synchronize=lambda: None, source_path=SOURCE,
+                              clock=clock, profile=True, session_id='case', turn_id='input')
+        self.addCleanup(lambda: control.detach() if hasattr(model, '_native') else None)
+        asr = IndependentX2(FakeEngine([[12, 2]] + [None] * 100), clock=clock,
+                            session_id='case', turn_id='input')
+        context = SharedContext(clock=clock)
+        context.open_user_turn('case', 'input', 'x2_streaming_asr')
+        return DualAudioFrontend(control, asr, context=context, clock=clock, realtime=realtime), context
+
+    def test_only_warmup_can_ignore_wall_clock_and_keeps_pcm_limits(self):
+        clock = Clock()
+        warm, _ = self.frontend(clock, False)
+        warm.started_at = 0
+        warm.append_pcm(np.zeros(3000, np.float32))
+        self.assertIsNotNone(warm.advance())
+        with self.assertRaises(BufferError):
+            warm.append_pcm(np.zeros(12801, np.float32))
+        online, _ = self.frontend(clock, True)
+        online.started_at = 0
+        with self.assertRaises(TimeoutError):
+            online.append_pcm(np.zeros(3000, np.float32))
+
+    def test_warmup_results_stay_in_private_context_and_reset_is_clean(self):
+        frontend, context = self.frontend()
+        production = SharedContext()
+        before = production.open_user_turn('production', 'input', 'x2_streaming_asr')
+        with tempfile.TemporaryDirectory() as directory, patch('native_frontend_probe.fresh', return_value=(frontend, context)), \
+                patch('torch.cuda.synchronize'):
+            record = replay(frontend.controller.model, None, np.full(3000, .1, np.float32),
+                            'case', Path(directory), False)
+        self.assertTrue(record['passed'], record.get('error'))
+        self.assertEqual(record['frames'], 2)
+        self.assertEqual(record['online_text'], 'hello world')
+        self.assertTrue(record['cleanup']['native_kv_cleared'])
+        self.assertTrue(record['cleanup']['callbacks_detached'])
+        self.assertEqual(before, production.get_user_turn('production', 'input'))
+        self.assertEqual(record['diagnostics']['asr']['open_group_tokens'], [])
+
+    def test_real_clock_replay_preserves_eof_partial_batch(self):
+        frontend, context = self.frontend(realtime=True)
+        with tempfile.TemporaryDirectory() as directory, patch('native_frontend_probe.fresh', return_value=(frontend, context)), \
+                patch('torch.cuda.synchronize'):
+            record = replay(frontend.controller.model, None, np.full(3000, .1, np.float32),
+                            'case', Path(directory), True)
+        self.assertTrue(record['passed'], record.get('error'))
+        self.assertGreaterEqual(record['elapsed_seconds'], 3000 / 16000)
+        final = record['diagnostics']['last_step']
+        self.assertTrue(final['receipts']['asr']['terminal'])
+        self.assertEqual(final['receipts']['asr']['processed_until'], 3000)
+        self.assertEqual(len(final['receipts']['asr']['frames']), 1)
+
+    def test_uncovered_warmup_branch_blocks_acceptance(self):
+        empty = {'passed': True, 'coverage': {'sensevoice_text': True}, 'cleanup': {}}
+        model = SimpleNamespace(cascade_asr=SimpleNamespace(recognize=lambda *_: 'real text'))
+        with tempfile.TemporaryDirectory() as directory, patch('native_frontend_probe.replay', return_value=deepcopy(empty)), \
+                patch('native_frontend_probe.compare_native', return_value={'passed': True}), patch('torch.cuda.synchronize'):
+            result = full_warmup(model, None, np.full(150400, .1, np.float32), Path(directory))
+        self.assertFalse(result['passed'])
+        self.assertIn('text_revision', result['missing_by_round'][0])
+
+    def test_real_official_methods_match_after_added_observers(self):
+        model = official_model([99, 6] * 100)
+        original = model.model.llm
+
+        class LLM:
+            forward = staticmethod(original)
+
+            def __call__(self, *args, **kwargs):
+                return self.forward(*args, **kwargs)
+
+        model.model.llm = LLM()
+        with patch('torch.cuda.synchronize'), patch('native_frontend_probe.NativeSoulX',
+                side_effect=lambda *args, **kwargs: NativeSoulX(*args, source_path=SOURCE, **kwargs)):
+            result = compare_native(model, np.full(7000, .1, np.float32))
+        self.assertTrue(result['passed'])
+        self.assertEqual(len(result['reference']['records']), 3)
+        self.assertFalse(hasattr(model, '_native'))
+
+
+class IPCTests(unittest.TestCase):
+    def test_message_limit_and_transport_errors_are_explicit(self):
+        parent, child = socket.socketpair()
+        self.addCleanup(parent.close)
+        self.addCleanup(child.close)
+        stream = child.makefile('rb')
+        self.addCleanup(stream.close)
+        send(parent, {'ok': True})
+        self.assertEqual(receive(stream), {'ok': True})
+        with self.assertRaises(ValueError):
+            send(parent, {'text': 'a' * MAX_MESSAGE})
+        send(parent, {'error': 'worker failed'})
+        with self.assertRaisesRegex(RuntimeError, 'worker failed'):
+            receive(stream)
+
+    def test_remote_adapter_preserves_exact_pcm_and_closed_group_receipt(self):
+        ledger = PCMLedger()
+        ledger.append(np.linspace(-.1, .1, 3000, dtype=np.float32))
+        engine = IndependentX2(FakeEngine([[12, 2], None]), session_id='session', turn_id='turn')
+
+        class Worker:
+            def request(self, operation, **request):
+                self.window = WindowLedger(request)
+                text, progress = [], []
+                engine.on_text, engine.on_progress = text.append, progress.append
+                receipt = engine.step(self.window, request['step_id'])
+                return json.loads(json.dumps({'receipt': receipt, 'text': text, 'progress': progress,
+                                              'diagnostics': engine.diagnostics()}))
+
+        worker, text = Worker(), []
+        remote = RemoteX2(worker, 'session', 'turn', {})
+        remote.on_text = text.append
+        first = remote.step(ledger, 0)
+        second = remote.step(ledger, 0)
+        self.assertEqual(first['input_sha256'], pcm_digest(ledger.window(-200, 1480)[0]))
+        self.assertEqual(text[0]['text'], 'hello world')
+        self.assertEqual(second['committed_groups'], 1)
+        self.assertEqual(second['decision'], 32)
+        self.assertEqual(remote.frame_index, 2)
+        with self.assertRaises(ValueError):
+            worker.window.window(0, 1680)
+
+    def test_audio_tamper_is_rejected_before_inference(self):
+        audio = np.zeros(1680, np.float32)
+        request = {'begin': -200, 'end': 1480, 'eof': False,
+                   'audio': base64.b64encode(audio.tobytes()).decode(), 'sha256': 'wrong',
+                   'spans': [{'kind': 'real', 'start': 0, 'end': 1680, 'samples': 1680}]}
+        with self.assertRaisesRegex(ValueError, 'integrity'):
+            WindowLedger(request)
+
+
+if __name__ == '__main__':
+    unittest.main()

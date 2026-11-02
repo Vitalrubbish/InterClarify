@@ -14,6 +14,8 @@
 
 `_observe_recognize()`只记录实际输入与原生返回文字；SenseVoice整轮服务文字不覆盖外部正文。回执将service_state、service_text和model_complete／wait_fallback分别记录，不把speak改写为原生complete。
 
+NTF-018增加`capture_revision()`，只读记录官方`need_correction`及上一步文字修订结果。可选`profile=True`为音频token编码、投影、ASR和状态计算增加设备同步计时，并保存实际音频token；`_asr`耗时包含门控、SenseVoice和修订，不能与内部SenseVoice耗时重复相加。默认关闭阶段计时；detach恢复被包裹方法。开启插桩的协议等价性继续由同源官方方法对照检查。
+
 `pcm_bytes()`按拥有内存的底层数组去重，reserve_pcm在分配前检查4MiB预算。cancel与短暂存回调串行，保留失败诊断；detach须等设备worker结束后恢复原方法。
 
 [原生对照检查](../../tests/test_native_soulx.md)使用真实官方方法与轻量CPU依赖验证协议；真实权重、性能和质量仍留给NTF-018／019。

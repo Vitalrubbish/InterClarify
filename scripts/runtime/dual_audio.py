@@ -152,10 +152,11 @@ class DualAudioFrontend:
     """Accept PCM independently of model execution; one worker advances both lanes."""
 
     def __init__(self, controller, asr, *, context, clock=time.monotonic,
-                 order=('controller', 'asr')):
+                 order=('controller', 'asr'), realtime=True):
         if tuple(order) not in (('controller', 'asr'), ('asr', 'controller')):
             raise ValueError('Each lane must run exactly once per cycle')
         self.controller, self.asr, self.clock, self.context = controller, asr, clock, context
+        self.realtime = realtime
         if (controller.session_id, controller.turn_id) != (asr.session_id, asr.turn_id):
             raise ValueError('Controller and ASR must belong to the same logical turn')
         initial = context.get_user_turn(controller.session_id, controller.turn_id)
@@ -209,7 +210,7 @@ class DualAudioFrontend:
                 raise BufferError(f'{lane}: unread PCM exceeded 800 ms')
         if self.ledger.nbytes + self.controller.pcm_bytes() > 4 * 2**20:
             raise MemoryError('Total PCM exceeded 4 MiB')
-        if self.started_at is not None:
+        if self.realtime and self.started_at is not None:
             for lane, until in (('controller', self._controller_completed_until), ('asr', self._asr_completed_until)):
                 if self.clock() - self.started_at - until / 16000 > .8:
                     raise TimeoutError(f'{lane}: online progress exceeded 800 ms')
