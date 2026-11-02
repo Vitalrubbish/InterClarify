@@ -50,7 +50,7 @@
      System backchannel\\Timing prediction};
   \node[box,fill=blue!8,minimum height=3.4cm] (l1) at (10.5,6.9)
     {\textbf{Layer 1}\\\textbf{Expression}\\[3pt]
-     Read the joint snapshot\\Reply only after complete is ready\\Request thinking};
+     Read the joint snapshot\\Reply after committed complete\\Request thinking};
   \node[box,fill=violet!9,minimum height=3.4cm] (l2) at (19,6.9)
     {\textbf{Layer 2}\\\textbf{Async Thinking}\\[3pt]
      Publish CoT only\\No turn-action advice\\Update one active task};
@@ -98,13 +98,13 @@
   \node[eventbox] (ack) at (14.2,-6.1)
     {\textbf{3. Closure acknowledged}\\Publish Listen + interruption\\Keep generated history};
   \node[eventbox] (restart) at (21.6,-6.1)
-    {\textbf{4. New Layer 1 reply}\\Read ready complete + latest text\\Fresh output\_id; new text};
+    {\textbf{4. New Layer 1 reply}\\Read committed complete + text\\Fresh output\_id; new text};
   \draw[control] (close.east) -- (cancel.west);
   \draw[control] (cancel.east) -- (ack.west);
   \draw[control] (ack.east) -- (restart.west);
 
   \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-8)
-    {Only committed snapshots reach consumers. Complete additionally waits for the data handoff (NTF-020).};
+    {Five states share one commit boundary. Committed valid complete can be used with the current text.};
   \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-8.7)
-    {NTF-017: local contract checks. Real-model validation, answer handoff and CoT integration remain pending.};
+    {NTF-020 retired: no extra handoff wait. Real-model validation, downstream and CoT integration remain pending.};
 \end{tikzpicture}

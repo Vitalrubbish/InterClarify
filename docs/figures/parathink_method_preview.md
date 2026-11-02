@@ -2,7 +2,7 @@
 
 更新：2026-11-03。对应[预览入口](../../figures/parathink_method_preview.tex)，文件用standalone加载TikZ和[图源](../../figures/parathink_method.tex)，没有运行时类或方法。结构见[图示说明](parathink_method.md)。
 
-[PDF](../../figures/parathink_method_preview.pdf)和[PNG](../../figures/parathink_method_preview.png)已同步原生SoulX内部SenseVoice、独立X2、160ms联合写Context及下游共同快照消费，删除前端停止旁路。回答交接和真实模型验证仍待后续工作单。
+[PDF](../../figures/parathink_method_preview.pdf)和[PNG](../../figures/parathink_method_preview.png)已同步原生SoulX内部SenseVoice、独立X2、160ms联合写Context及下游共同快照消费，删除前端停止旁路。NTF-020额外交接已取消；普通回答读取已提交有效complete和当前正文，真实模型验证及下游接入仍待后续工作单。
 
 ## 构建与检查
 

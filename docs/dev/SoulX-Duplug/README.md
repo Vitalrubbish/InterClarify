@@ -2,18 +2,18 @@
 
 更新：2026-11-02。用户要求清除comparison端历史实验并重新clone官方仓库。当前以本地 [third_party/soulx-duplug](../../../third_party/soulx-duplug) 子模块为可审查源码入口，远端改用ParaThink独立根下新克隆的`upstream/soulx-duplug`，版本与说明见[依赖文档](../../third_party/soulx-duplug.md)。旧comparison加载器和实验worktree退役，不作为新实验入口。
 
-当前采用**原生SenseVoice控制＋独立X2正文＋仅complete交接同步**。NTF-015／016／017已交付原生封装、冻结加载器、同源PCM／160ms屏障和独立X2适配，本地契约验收后归档，见[交付记录](../../reports/soulx/20261102-native-independent-frontend/README.md)。[NTF-017联合提交](../../reports/soulx/20261102-ntf017-joint-publication/README.md)已本地交付，[NTF-020／018／019](../../issue/README.md)继续待实施。NTF-021／022相关实现分支已撤回，NTF-023—025未实施归档，历史范围见[恢复记录](../../reports/soulx/20261102-external-asr-plan-restore/README.md)。
+当前采用**原生SenseVoice控制＋独立X2正文＋160ms双路联合提交**。NTF-015／016／017已交付原生封装、冻结加载器、同源PCM／160ms屏障和独立X2适配，本地契约验收后归档，见[交付记录](../../reports/soulx/20261102-native-independent-frontend/README.md)。[NTF-017联合提交](../../reports/soulx/20261102-ntf017-joint-publication/README.md)已本地交付，[NTF-020](../../reports/soulx/20261103-ntf020-handoff-retirement/README.md)未实施取消并归档，[NTF-018／019](../../issue/README.md)继续待实施。NTF-021／022相关实现分支已撤回，NTF-023—025未实施归档，历史范围见[恢复记录](../../reports/soulx/20261102-external-asr-plan-restore/README.md)。
 
 ## 当前实施顺序
 
-按015→016→017→020→018→019依次完成原生封装、同源音频／X2正文、160ms文本／状态联合Context、complete交接、完整预热和固定FDB30验收。预热预检通过才启动正式30条；旧教师实验不作为新封装等价性或双路实时性通过证据。
+015／016／017已完成原生封装、同源音频／X2正文和160ms联合Context；020取消，后续按018→019完成完整预热和固定FDB30验收。预热预检通过才启动正式30条；旧教师实验不作为新封装等价性或双路实时性通过证据。
 
 ## 当前前端设计
 
 - SoulX保留内部SenseVoice教师、门控、窗口修订、状态反馈和原生reset，外接正文不注入状态KV，内部文字只作控制与诊断。
 - 同一持续PCM分别驱动控制与X2；X2按原生80ms步推进，真实EOS闭合组后按完整词追加正文，不暴露子词草稿，多词组一次可见。
-- 两路每160ms完成X2两个80ms步及SoulX本步后，一次联合写入正文、状态token和进度，再推进下一周期。批次未完成时下游仍读上一快照；控制器reset不清正文或交接，不结束X2。
-- 不再设置前端专用停止钩子，五状态均随本批次正文一起提交；complete还需已提交真实进度追齐后才ready。后续nonidle／incomplete取消旧交接，超时不强行放行，ready不保证尾词必齐。
+- 两路每160ms完成X2两个80ms步及SoulX本步后，一次联合写入正文、状态token和进度，再推进下一周期。批次未完成时下游仍读上一快照；控制器reset不清正文或全局步号，不结束X2。
+- 不再设置前端专用停止钩子，五状态均随本批次正文一起提交；已提交的有效complete携当前正文直接供下游使用，无独立pending／ready等待；后续状态按共同快照和输出生命周期消费，同步不保证尾词必齐。
 - 完整合同见[独立前端](independent_streaming_frontend.md)及[Context接口](shared_context_interface.md)。下游尚未接入，现役Agent不因计划恢复而切换。
 
 ## 历史合同与验证记录
@@ -51,4 +51,4 @@
 
 2026-10-31按用户授权实施NTF-004：恢复官方控制文字格式与门控，保留Nemotron原始正文发布、音频覆盖配对、soft reset和原状态规则；独立审计待消费文字与缓存修订。本地30项、远端预检3/3通过；正式25/30完整、5条积压触限，状态未整体改善，EOF仍有待消费尾部。详见[对照报告](../../../reports/soulx/20261031-nemotron-teacher-gate/README.md)。工作单已归档，队列已清空。
 
-用户新增的计算推进屏障详见[设计第2.1节](independent_streaming_frontend.md#21-每160ms音频步的推进屏障)：当前组内token连续解至EOS，WAIT算步完成；两路完成后联合写Context再推进，屏障不等complete交接ready，生产者持续收音。
+用户新增的计算推进屏障详见[设计第2.1节](independent_streaming_frontend.md#21-每160ms音频步的推进屏障)：当前组内token连续解至EOS，WAIT算步完成；两路完成后联合写Context再推进，不增加complete专用等待，生产者持续收音。

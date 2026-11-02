@@ -19,10 +19,10 @@ asr = IndependentX2.load(..., session_id=session_id, turn_id=turn_id)
 frontend = DualAudioFrontend(controller, asr, context=context)
 ```
 
-独立生产者按真实时钟持续append_pcm；调度worker调用advance。每批次完成SoulX原生调用和X2两个80ms步，回调仅送_stage暂存；两路回执齐备后publish_joint_batch一次提交。Context失败或校验错误立即终止，屏障不释放。下一批不等待complete ready、日志或消费者，前端没有同步on_step消费者回调；下游自行读取完整快照，不需要ack。
+独立生产者按真实时钟持续append_pcm；调度worker调用advance。每批次完成SoulX原生调用和X2两个80ms步，回调仅送_stage暂存；两路回执齐备后publish_joint_batch一次提交。Context失败或校验错误立即终止，屏障不释放。下一批不等待日志或消费者，前端没有同步on_step消费者回调；下游自行读取完整快照，不需要ack。
 
 推理不持生产者锁或Context锁。finish_input仅标EOF；最后不足160ms的批次按实际存在帧数核对，全部源批次结束后advance返回None，不额外drain、补EOS或补complete。取消／close使屏障和话轮关闭，随后关闭两路；原有完整正文与状态不被部分结果覆盖。若极小容量连关闭元数据也无法写入，close_failure单独保存，模型仍停止，原观察保留。
 
 每路未读真实PCM和在线进度上限800ms，总PCM上限4MiB；传输包、拼接、切块、reset及X2窗口在分配前检查，不减速送音、不丢帧。diagnostics保留最后完整批次、失败暂存、两路实际进度、开放组及各路未处理真实采样。
 
-advance返回的lane_compute_seconds、wait_seconds、commit_seconds分别描述模型调用、先完成侧等另一侧和提交耗时；保留input_ready_at、started_at、完成／发布／释放时间。消费者通过Context可选读取计时独立测量。日志由调用方在锁外落盘；本模块不接LLM、TTS或真实播放，NTF-020交接逻辑待实施。
+advance返回的lane_compute_seconds、wait_seconds、commit_seconds分别描述模型调用、先完成侧等另一侧和提交耗时；保留input_ready_at、started_at、完成／发布／释放时间。消费者通过Context可选读取计时独立测量。日志由调用方在锁外落盘；本模块不接LLM、TTS或真实播放，NTF-020已取消额外等待并归档，已提交complete直接供下游使用。

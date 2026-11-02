@@ -1,6 +1,6 @@
 # 已采用的运行时配置
 
-更新：2026-11-02。本文记录已采用的运行底座与参数；具体任务配置见`configs/`，实验结论以对应报告为准。用户已恢复[NTF-015—020](issue/README.md)为active，计划采用[原生SenseVoice控制＋独立X2正文](dev/SoulX-Duplug/independent_streaming_frontend.md)，015／016／017已完成本地交付，020／018／019待实施；尚未替换下述现役控制路径，见[恢复记录](reports/soulx/20261102-external-asr-plan-restore/README.md)。已有远端资产见[部署说明](dev/SoulX-Duplug/deployment.md)，下游目标见[架构设计](research_design/architecture.md)。
+更新：2026-11-02。本文记录已采用的运行底座与参数；具体任务配置见`configs/`，实验结论以对应报告为准。用户已恢复[NTF-015—020](issue/README.md)为active，计划采用[原生SenseVoice控制＋独立X2正文](dev/SoulX-Duplug/independent_streaming_frontend.md)，015／016／017已完成本地交付，020未实施取消归档，018／019待实施；尚未替换下述现役控制路径，见[恢复记录](reports/soulx/20261102-external-asr-plan-restore/README.md)。已有远端资产见[部署说明](dev/SoulX-Duplug/deployment.md)，下游目标见[架构设计](research_design/architecture.md)。
 
 ## 组件
 
@@ -25,7 +25,7 @@
 ## 行为边界
 
 - 保持单一仲裁器与单一 TTS 播放所有权；已播放内容不可撤销。
-- 现役双工控制仍由DuplexCascade执行。目标方案中四类非complete状态立即供Layer 1读取；原始complete记录后等待X2对应解码和闭合正文提交，Layer 1实际读到ready的complete才在当前turn回答，同ID去重。有效用户打断直接停止，不等解码；Layer 2 CoT与Layer 0系统附和仍为后续接入。
+- 现役双工控制仍由DuplexCascade执行。目标方案中五状态及正文在每160ms双路完成后联合提交；Layer 1在正常输入边界读到有效complete及当前正文后可在当前turn回答，无额外交接等待。下游从共同快照读取有效nonidle后，由唯一输出运行时处理停止；消费去重留待下游接入。Layer 2 CoT与Layer 0系统附和仍为后续接入。
 - 控制信号与思考 token 不直接进入 TTS。
 - 系统 backchannel 当前未实现，后续由 Layer 0 专项训练并接入，未从总计划移除；Layer 2 尚未接入运行链路。
 

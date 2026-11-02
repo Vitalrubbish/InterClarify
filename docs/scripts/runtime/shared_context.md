@@ -12,7 +12,7 @@
 
 校验后在短锁中复核最新话轮、连续批次、代次、组数和正文，合并最新生命周期与交接元数据，检查容量后一次替换。工作线程不能回写此前读到的整份快照。`publish_user_frame()`只服务历史固定模式，仍校验服务来源、原生状态ID、语音门控和音频单调性，不能向联合话轮单独写状态或文字。
 
-`update_completion()`仅预留单条当前交接的元数据事务：比较预期step_id、completion_id及completion_status，拒绝过期工作线程覆盖新批次或撤销后的记录；不能修改正文／状态。NTF-020另行实现候选、ready、取消、去重和超时语义，本单不自动创建或放行交接。
+`update_completion()`仅预留单条当前交接的元数据事务：比较预期step_id、completion_id及completion_status，拒绝过期工作线程覆盖新批次或撤销后的记录；不能修改正文／状态。2026-11-03用户取消并归档NTF-020；该预留接口当前未接入，不作为回答资格或数据等待条件。本次归档不修改Python代码，不宣称已实现消费去重或complete锁存。
 
 `get_user_turn()`返回原子深副本；可选with_timing=True返回snapshot、read_started_at、read_completed_at和read_seconds，读取计时不写回当前值。`close_user_turn()`保留最后观察并关闭，已有pending／ready交接标记取消；迟到批次及交接写入均被拒绝。`release_closed_turn()`显式释放关闭记录。
 

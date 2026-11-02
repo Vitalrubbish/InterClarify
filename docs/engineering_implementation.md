@@ -1,12 +1,12 @@
 # 工程实施计划
 
-更新：2026-11-03。当前路线为**原生SoulX＋SenseVoice控制、独立X2完整词正文、仅complete交接同步**。NTF-015／016／017已完成本地实现与契约验收并归档，见[交付记录](reports/soulx/20261102-native-independent-frontend/README.md)；NTF-020／018／019仍待实施。本次没有提交远端模型作业，路线恢复历史见[恢复记录](reports/soulx/20261102-external-asr-plan-restore/README.md)。
+更新：2026-11-03。当前路线为**原生SoulX＋SenseVoice控制、独立X2完整词正文、160ms双路联合提交**。NTF-015／016／017已完成本地实现与契约验收并归档，见[交付记录](reports/soulx/20261102-native-independent-frontend/README.md)；NTF-020未实施取消并归档，NTF-018／019仍待实施。本次没有提交远端模型作业，路线恢复历史见[恢复记录](reports/soulx/20261102-external-asr-plan-restore/README.md)。
 
 ## 1. 当前目标与运行底座
 
 SoulX保留内部SenseVoice教师、门控、滑窗差分／KV修订、状态规则、反馈和原生reset；X2只为共享上下文提供独立正文，不将外接转写注入状态KV。两路读取同一持续PCM。每160ms批次等X2完成两个80ms原生步及其组内解码、SoulX完成本步原生调用后，将EOS闭合正文和状态token一次写入SharedContext；提交成功后才允许下一步。先完成结果只在内部暂存，不写原始PCM。
 
-五状态统一经过本批次联合提交，不设置前端nonidle专用停止钩子。complete原始预测先在内部记录，只有X2真实解码进度覆盖固定目标、开放组真实闭合且正文已提交，才交接ready供Layer 1当前turn使用；ready不保证尾词必齐。详细合同见[独立前端](dev/SoulX-Duplug/independent_streaming_frontend.md)及[Context接口](dev/SoulX-Duplug/shared_context_interface.md)。
+五状态统一经过本批次联合提交，不设置前端nonidle专用停止钩子。当前冻结采样映射下，X2本批次实际处理覆盖SoulX状态观察截止，DECODE闭合和正文提交由联合事务完成。已提交的有效complete携当前正文直接供Layer 1在当前turn使用，无需额外交接等待；同步不保证尾词必齐。详细合同见[独立前端](dev/SoulX-Duplug/independent_streaming_frontend.md)及[Context接口](dev/SoulX-Duplug/shared_context_interface.md)。
 
 现役底座仍见[运行配置](runtime_baseline.md)，本次不切换Agent。官方源码使用[固定子模块及远端checkout](third_party/soulx-duplug.md)，不恢复已退役comparison加载器。历史教师替换和双ASR实验只作证据，不代替新封装的输入／reset等价性验证。
 
@@ -17,11 +17,10 @@ SoulX保留内部SenseVoice教师、门控、滑窗差分／KV修订、状态规
 | 1 | [NTF-015](reports/soulx/20261102-native-independent-frontend/README.md) | 已完成：原生协议控制封装、冻结加载器、状态来源与reset审计 |
 | 2 | [NTF-016](reports/soulx/20261102-native-independent-frontend/README.md) | 已完成：同源PCM、X2原生80ms适配、160ms屏障、EOS正文／真实进度回调 |
 | 3 | [NTF-017](reports/soulx/20261102-ntf017-joint-publication/README.md) | 已完成联合提交、停止旁路撤回、短锁生命周期和图源同步，本地144项检查通过 |
-| 4 | [NTF-020](issue/NTF-020.md) | 仅complete的进度追齐、取消、去重和有界超时 |
-| 5 | [NTF-018](issue/NTF-018.md) | 同一拓扑完整预热、有限预热对照和单路参考；预检3/3完整、退出0且无800ms过载 |
-| 6 | [NTF-019](issue/NTF-019.md) | 原固定FDB30单／双路验收，分别评价原始状态、正文、实际交接与尾部 |
+| 4 | [NTF-018](issue/NTF-018.md) | 同一拓扑完整预热、有限预热对照和单路参考；预检3/3完整、退出0且无800ms过载 |
+| 5 | [NTF-019](issue/NTF-019.md) | 原固定FDB30单／双路验收，分别评价原始状态、正文、联合发布与尾部 |
 
-015／016／017本地验收已完成，尚未进行真实权重等价性／实时性验收。下一步为020交接，018通过后才启动019。既有回调已迁移到当前批次暂存，成功联合写入Context后才推进，前端专用停止接入已删除；144项全量检查通过。内部reset不清正文，交接pending不阻止联合提交成功后的下一批推进，生产者持续收音。
+015／016／017本地验收已完成，尚未进行真实权重等价性／实时性验收。020已按[归档决定](reports/soulx/20261103-ntf020-handoff-retirement/README.md)取消，下一步为018，018通过后才启动019。既有回调已迁移到当前批次暂存，成功联合写入Context后才推进，前端专用停止接入已删除；144项全量检查通过。内部reset不清正文，联合提交成功后不等待消费者即可推进下一批，生产者持续收音。
 
 ## 3. 资源与执行边界
 

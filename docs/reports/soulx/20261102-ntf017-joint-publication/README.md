@@ -40,3 +40,5 @@ PDF／PNG已重新生成并查看，LaTeX无溢出或缺字警告。修改Python
 ## 归档与下一步
 
 本地工作单移至docs/issue/archive/NTF-017.md，沿用该目录不纳入Git的约定；任务原文可追溯合同提交74ccc13。当前活动顺序为NTF-020→018→019，不自动启动后续工作单或远端作业。
+
+2026-11-03后续决定：用户取消并归档NTF-020，160ms联合提交后的有效complete不再等待独立pending／ready或专用超时；原文保留当时计划，当前合同见[归档记录](../20261103-ntf020-handoff-retirement/README.md)。

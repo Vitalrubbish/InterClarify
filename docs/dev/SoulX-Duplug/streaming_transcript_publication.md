@@ -1,6 +1,6 @@
 # SoulX＋SenseVoice：160ms 文本与状态联合更新（历史）
 
-2026-11-02：本页只保留旧联合发布实现及验收解释。当前[NTF-015—020](../../issue/README.md)已恢复为active，采用[原生控制＋独立X2正文](independent_streaming_frontend.md)和[联合Context／complete交接](shared_context_interface.md)，015／016／017已本地交付，交接与真实模型验证仍待实施。以下旧reset封装、逐块联合写入和历史检查不作为新方案已交付证据。
+2026-11-03：本页只保留旧联合发布实现及验收解释。当前活动工作为[NTF-018／019](../../issue/README.md)，采用[原生控制＋独立X2正文](independent_streaming_frontend.md)和[联合Context与统一状态消费](shared_context_interface.md)，015／016／017已本地交付，020已取消归档，真实模型验证仍待实施。以下旧reset封装、逐块联合写入和历史检查不作为新方案已交付证据。
 
 2026-10-30，用户确认取消此前 320ms 正文周期方案：每处理完一个 160ms 音频块，将最新话轮全文和本块状态一起写入 SharedContext；后续识别修订直接覆盖旧正文，不保留历史正文版本。原因是让正文与状态按同一个处理步骤交付，简化下游读取。
 

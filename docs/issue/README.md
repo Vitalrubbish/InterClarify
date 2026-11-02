@@ -1,16 +1,15 @@
 # 工作单管理
 
-更新：2026-11-03。当前为**SoulX原生SenseVoice控制＋独立X2完整词正文**路线。NTF-015／016已完成本地实现与契约验收并归档，见[交付记录](../reports/soulx/20261102-native-independent-frontend/README.md)；[NTF-017](../reports/soulx/20261102-ntf017-joint-publication/README.md)已完成160ms联合提交、停止旁路撤回及本地144项全量验收并归档；NTF-020／018／019继续待实施。路线恢复范围见[恢复记录](../reports/soulx/20261102-external-asr-plan-restore/README.md)，合同见[独立前端设计](../dev/SoulX-Duplug/independent_streaming_frontend.md)、[Context接口](../dev/SoulX-Duplug/shared_context_interface.md)及[工程计划](../engineering_implementation.md)。
+更新：2026-11-03。当前为**SoulX原生SenseVoice控制＋独立X2完整词正文**路线。NTF-015／016已完成本地实现与契约验收并归档，见[交付记录](../reports/soulx/20261102-native-independent-frontend/README.md)；[NTF-017](../reports/soulx/20261102-ntf017-joint-publication/README.md)已完成160ms联合提交、停止旁路撤回及本地144项全量验收并归档；NTF-020按用户指令未实施取消并归档，NTF-018／019继续待实施。路线恢复范围见[恢复记录](../reports/soulx/20261102-external-asr-plan-restore/README.md)，合同见[独立前端设计](../dev/SoulX-Duplug/independent_streaming_frontend.md)、[Context接口](../dev/SoulX-Duplug/shared_context_interface.md)及[工程计划](../engineering_implementation.md)。
 
 ## 当前工作单
 
 | 工作单 | 工作单元 | 依赖 | 状态 |
 | --- | --- | --- | --- |
-| [NTF-020](NTF-020.md) | 仅complete的回答交接同步 | NTF-015—017 | 待实施 |
-| [NTF-018](NTF-018.md) | 全链路预热与远端积压归因 | NTF-015—017／020 | 待实施 |
+| [NTF-018](NTF-018.md) | 全链路预热与远端积压归因 | NTF-015—017 | 待实施 |
 | [NTF-019](NTF-019.md) | 独立前端单／双路固定FDB30验收 | NTF-018完整预热与实时门槛通过 | 待实施 |
 
-015／016交付原生封装、冻结加载器、同源PCM与独立X2；017已将回调迁移为批次暂存，SharedContext一次提交正文／状态／真实进度，成功后才释放下一批，nonidle不再走前端停止旁路。原生SenseVoice、服务和reset保持，正文不进控制KV。本地conda全量144项通过，无跳过；真实权重／实时性尚未验证。下一步顺序为020→018→019；仅complete交接尚待实现，ready不承诺尾词必齐。
+015／016交付原生封装、冻结加载器、同源PCM与独立X2；017已将回调迁移为批次暂存，SharedContext一次提交正文／状态／真实进度，成功后才释放下一批，nonidle不再走前端停止旁路。原生SenseVoice、服务和reset保持，正文不进控制KV。本地conda全量144项通过，无跳过；真实权重／实时性尚未验证。下一步顺序为018→019。已提交的有效complete携当前正文直接供下游使用，不再增加独立交接等待；同步不承诺尾词必齐。
 
 本次没有连接远端或提交真实模型新作业；资产校验清单沿用015／016交付。远端沿用conda、单活动作业、1×4090、4CPU、32GiB、显存22GiB和在线800ms停止线；NTF-018最多2作业、NTF-019最多2作业，各≤1800秒／128MiB，合计计划上限2 GPU小时／512MiB。启动前冻结实际矩阵与输入；不自动使用已归档调研的作业额度，不训练、不接LLM／CoT／TTS、不切换现役Agent。
 
@@ -25,7 +24,8 @@
 | NTF-029 | 160ms双路完成后联合写入合同修订 | 已完成并归档；当时只改任务单与设计，017实现现已交付，见[修订记录](../reports/soulx/20261102-joint-publication-contract/README.md) |
 | NTF-015／016 | 本地实现与契约验收完成后归档 | 原生控制、同源PCM／屏障、独立X2适配已交付；真实模型验证留给018／019 |
 | NTF-017 | 本地实现与契约验收完成并归档 | 联合事务、短锁生命周期、失败保护与架构图同步，见[交付](../reports/soulx/20261102-ntf017-joint-publication/README.md) |
-| NTF-020／018／019 | 继续active | complete交接与真实模型验证待实施 |
+| NTF-020 | 未实施取消并归档 | 双路联合同步已覆盖原数据等待，撤销pending／ready和专用超时，见[归档记录](../reports/soulx/20261103-ntf020-handoff-retirement/README.md) |
+| NTF-018／019 | 继续active | 完整预热与真实模型验证待实施 |
 
 本地`docs/issue/archive/`继续不纳入Git；归档前原计划可由main基线0376ba7追溯，恢复的015—020原文可追溯e15554b。[前次归档记录](../reports/soulx/20261102-frontend-plan-archive/README.md)保留当时决策，本次明确恢复取代其活动状态，不把未实施计划写成完成成果。
 
@@ -76,7 +76,7 @@ NTF-001／002 已完成并归档至本地 `archive/`：教师文字前端与屏�
 
 | 路线 | 归档状态 | 入口 |
 | --- | --- | --- |
-| SoulX-Duplug | 当前活动：015／016／017本地验收完成并归档；020／018／019待实施 | [路线文档](../dev/SoulX-Duplug/README.md) |
+| SoulX-Duplug | 当前活动：015／016／017本地验收完成并归档；020取消归档；018／019待实施 | [路线文档](../dev/SoulX-Duplug/README.md) |
 | TextTurn | 已归档；共 11 项，7 项完成、TT-009 终止，TT-004／010／011 未完成 | [路线归档](../archive/dev/TextTurn/README.md) |
 | VoxTurn | 已归档；仅完成现成权重与接入可行性调研，未部署 | [调研归档](../archive/dev/VoxTurn/research_assessment.md) |
 | XTurnix | 已归档；XTX-001—005 与 XTX-007 完成，XTX-006 取消，XTX-009 仅完成来源审核 | [路线归档](../archive/dev/XTurnix/README.md) |
