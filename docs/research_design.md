@@ -4,7 +4,7 @@
 
 此前comparison旧实验已清除，官方源码已重新克隆并纳入子模块，见[源码说明](third_party/soulx-duplug.md)与[清理报告](reports/soulx/20261102-source-reset/README.md)。Nemotron／X2教师替换和双ASR配对发布保留为历史实验，不恢复旧入口。X2同卡30/30、实时及分词规范性通过，但状态未整体改善，见[报告](reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)与[归因](reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)。此前双ASR18/30完整、12条800ms触限，存在非静音、多长度预热不足的配置差异，见[历史审计](../reports/soulx/20261031-dual-asr-publication/README.md)。预热不足是优先验证假设，尚不能认定是全部积压的原因。模型权重固定，不训练，尚未切换现役下游Agent。
 
-当前前端保持两路职责：SoulX通过原生SenseVoice教师和音频预测五状态，X2独立以真实EOS闭合组提供完整词正文，不进入状态KV。两路同源PCM、各自发布，内部reset不清空外接正文；四类非complete即时交付，只有complete按真实进度与正文提交进行有界交接。原始状态、交接等待和正文覆盖分别评价，不用延后ready宣称原生状态改善。实现和有限验证依NTF-015→016→017→020→018→019推进。
+当前前端保持两路职责：SoulX通过原生SenseVoice教师和音频预测五状态，X2独立以真实EOS闭合组提供完整词正文，不进入状态KV。两路同源PCM、各自发布；模型推进以160ms为屏障，X2两个80ms步及SoulX本步均结束后进入下一周期，实际采样／前瞻范围另记。内部reset不清空外接正文；四类非complete即时交付，只有complete按真实进度与正文提交进行有界交接。原始状态、交接等待和正文覆盖分别评价，不用延后ready宣称原生状态改善。实现和有限验证依NTF-015→016→017→020→018→019推进。
 
 此前已确认的下游分工与普通回答生成边界保留：独立正文方案中，四类非complete立即交付，complete须经数据交接ready后才供Layer 1在当前turn生成普通回答；pending仅作诊断，ready不保证尾词必齐。具体[接口合同](dev/SoulX-Duplug/shared_context_interface.md)由NTF-017／020负责，当前尚未实现，不以交接延迟改善原始状态指标。保留CoT条件下的主动澄清与话轮决策目标，后续让SoulX联合读取音频、转写和Layer 2已发布CoT；后续扩展见[架构第2.5节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
 

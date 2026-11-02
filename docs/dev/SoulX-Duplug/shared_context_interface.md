@@ -4,7 +4,7 @@
 
 ## 1. 独立更新与原子读取
 
-同一逻辑用户话轮以稳定session_id／turn_id定位一份当前记录。X2在EOS闭合组后追加完整词，SoulX原始状态立即记录；四类非complete状态立即供下游读取，只有complete用于开始回答时经过交接同步。无逐块配对、跨路计算屏障或固定发布周期；等待交接不阻塞两路音频、状态及正文更新。
+同一逻辑用户话轮以稳定session_id／turn_id定位一份当前记录。X2在EOS闭合组后追加完整词，SoulX原始状态立即记录；四类非complete状态立即供下游读取，只有complete用于开始回答时经过交接同步。结果发布无逐块配对或固定周期；模型推进按[设计第2.1节](independent_streaming_frontend.md#21-每160ms音频步的推进屏障)执行每160ms屏障，X2两个80ms步与SoulX本步均完成后才进入下一周期。交接pending不增加新的推进阻塞。
 
 Context不接收生成中的BPE／子词草稿。一个闭合组可有多个完整词，按官方组拼接规则一次发布；不要求一词一快照，不为组内各词伪造独立时标，也不改变下游tokenizer。已有正文不可回改，WAIT、WORD、空格或空ASR步都不能替代EOS。
 
@@ -31,7 +31,7 @@ Context不接收生成中的BPE／子词草稿。一个闭合组可有多个完�
 
 旧processed_until若保留，只兼容表示SoulX主块截止；正文更新不要求它增长。各组时序只由所属路推进，状态变化不刷新正文时间，正文变化不刷新状态时间。原子快照不表示音文同块对齐，也不保证尾词完整。ASR暂时无新增token不等于静音或句子结束。
 
-解码进度独立于正文：X2收包、特征预取不能推进已完成进度，必须完成该80ms步及其DECODE；WAIT完成而正文不变时，仅推进进度字段，不改text_available_at。否则complete会因“没有新字就没有进度”而无限等待。
+解码进度独立于正文：X2收包、特征预取不能推进已完成进度，必须完成该80ms步及其DECODE；WAIT完成而正文不变时，仅推进进度字段，不改text_available_at。否则complete会因“没有新字就没有进度”而无限等待。调度器另持有本160ms步的两侧完成标记与释放时间；它不要求当前文字变更，也不以completion_status=ready为释放条件。
 
 ## 3. 生命周期与正文来源
 
@@ -62,3 +62,9 @@ ready只表示上述计算／提交同步通过，不保证此前所有词已发
 NTF-017／020已恢复为active，负责交错更新、生命周期及complete同步；NTF-018／019负责完整预热和原始状态／ready交接验收。以上仍为待实施合同，不能因工作单恢复就当作已交付。原始状态与交接质量仍须分别报告，不能用延后ready伪装SoulX原始状态改善。
 
 历史[160ms联合发布](streaming_transcript_publication.md)、[双ASR配对发布](../../archive/dev/SoulX-Duplug/dual_asr_publication.md)与教师同步均已被本合同替代。旧[六视图接口检查](../../../reports/soulx/20261030-current-context-test/README.md)和[双ASR18/30报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)保留原解释，不作为新接口通过证据。
+
+## 6. 160ms推进与Context更新
+
+屏障只限制下一音频步的模型调用。当前X2第一个80ms闭合组、两次WAIT进度和SoulX状态均各自就绪更新，Context锁、日志及消费者不阻塞整步完成回执。step_id不表示文字版本或同一声学词尾，实际主块／观察范围继续分别保存；单个原子快照可处于本周期两侧先后完成的中间状态。
+
+当complete目标所需的真实观察范围只能在后续周期覆盖时，先按两侧完成条件释放当前推进屏障，交接保持pending并独立计时。禁止以ready等待屏障、再以屏障等待ready；EOF未完成周期不能借drain补成在线交接。

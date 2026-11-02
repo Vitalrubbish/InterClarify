@@ -4,7 +4,7 @@
 
 ## 1. 当前目标与运行底座
 
-SoulX保留内部SenseVoice教师、门控、滑窗差分／KV修订、状态规则、反馈和原生reset；X2只为共享上下文提供独立正文，不将外接转写注入状态KV。两路读取同一持续PCM，分别就绪发布，正文只在真实EOS闭合组后按完整词追加。
+SoulX保留内部SenseVoice教师、门控、滑窗差分／KV修订、状态规则、反馈和原生reset；X2只为共享上下文提供独立正文，不将外接转写注入状态KV。两路读取同一持续PCM，当前结果分别就绪发布，正文只在真实EOS闭合组后按完整词追加。每160ms模型推进设屏障：X2完成两个80ms原生步及各自组内解码、SoulX完成本步原生状态调用后，才允许两路进入下一步。
 
 四类非complete状态即时交付，有效nonidle直接停止。complete原始预测先记录，只有X2真实解码进度覆盖固定目标、开放组真实闭合且正文已提交，才交接ready供Layer 1当前turn使用；ready不保证尾词必齐。详细合同见[独立前端](dev/SoulX-Duplug/independent_streaming_frontend.md)及[Context接口](dev/SoulX-Duplug/shared_context_interface.md)。
 
@@ -15,13 +15,13 @@ SoulX保留内部SenseVoice教师、门控、滑窗差分／KV修订、状态规
 | 顺序 | 工作单 | 交付与进入下一步的条件 |
 | --- | --- | --- |
 | 1 | [NTF-015](issue/NTF-015.md) | 保留原生协议的控制封装、状态来源和reset输入账本审计 |
-| 2 | [NTF-016](issue/NTF-016.md) | 同源PCM分发、独立X2原生80ms解码、EOS完整词正文及真实进度 |
+| 2 | [NTF-016](issue/NTF-016.md) | 同源PCM分发、X2原生80ms解码、每160ms双路推进屏障、EOS正文及真实进度 |
 | 3 | [NTF-017](issue/NTF-017.md) | 正文／状态／进度异步合并、短锁当前值和生命周期；同步图源设计 |
 | 4 | [NTF-020](issue/NTF-020.md) | 仅complete的进度追齐、取消、去重和有界超时 |
 | 5 | [NTF-018](issue/NTF-018.md) | 同一拓扑完整预热、有限预热对照和单路参考；预检3/3完整、退出0且无800ms过载 |
 | 6 | [NTF-019](issue/NTF-019.md) | 原固定FDB30单／双路验收，分别评价原始状态、正文、实际交接与尾部 |
 
-六单均未实施。015—017／020先做实现和必要契约检查；018通过后才启动019。正文与状态不逐块配齐，内部reset不清正文；交接等待不阻塞收音、解码、其他状态及正文发布。
+六单均未实施。015—017／020先做实现和必要契约检查；018通过后才启动019。正文与状态发布不逐块配齐，模型计算推进执行160ms屏障；内部reset不清正文，交接pending不阻止已完成本步的屏障释放，收音及当前结果发布持续进行。
 
 ## 3. 资源与执行边界
 
@@ -38,3 +38,5 @@ NTF-021／022已完成调研，相关实现从main撤回，原始结果与离线
 普通回答生成边界、有效nonidle直接停止、单一输出执行点及TTS播放所有权保持。后续CoT条件化控制目标仍见[架构第2.5节](research_design/architecture.md#25-soulx-的-cot-条件化控制)，本次不构造训练数据或注入CoT。图源改造由恢复后的NTF-017执行，本次不修改图文件。
 
 历史[X2教师30条](reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)、[归因](reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)与[双ASR实验](../reports/soulx/20261031-dual-asr-publication/README.md)保留原分母和限制。TextTurn、VoxTurn、XTurnix继续归档，不恢复旧训练或已取消benchmark。
+
+160ms推进合同见[设计第2.1节](dev/SoulX-Duplug/independent_streaming_frontend.md#21-每160ms音频步的推进屏障)。本次只同步文档；六个实施工作单仍待实施，原作业矩阵与资源预算不扩大。

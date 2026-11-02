@@ -12,7 +12,7 @@
 
 - SoulX保留内部SenseVoice教师、门控、窗口修订、状态反馈和原生reset，外接正文不注入状态KV，内部文字只作控制与诊断。
 - 同一持续PCM分别驱动控制与X2；X2按原生80ms步推进，真实EOS闭合组后按完整词追加正文，不暴露子词草稿，多词组一次可见。
-- 两路各自更新所属Context字段，短锁合并并原子读取，无逐块配对；控制器reset不清正文或交接，不结束X2。
+- 两路每160ms完成X2两个80ms步及SoulX本步后才推进下一周期；结果各自就绪更新所属Context字段，短锁合并并原子读取，无配对发布等待；控制器reset不清正文或交接，不结束X2。
 - 四类非complete立即交付，有效nonidle直接停止；complete只有真实进度追齐且正文已提交后才ready。后续nonidle／incomplete取消旧交接，超时不强行放行，ready不保证尾词必齐。
 - 完整合同见[独立前端](independent_streaming_frontend.md)及[Context接口](shared_context_interface.md)。下游尚未接入，现役Agent不因计划恢复而切换。
 
@@ -50,3 +50,5 @@
 实施顺序及资源见[工程计划](../../engineering_implementation.md)，本轮输入与执行范围见[检查任务说明](frontend_audio_check.md)。实现及少量契约测试均有同路径中文说明；工作单仅按明确建单指令建立，本次教师文字接入与实验已按用户指令建单，仍不训练。
 
 2026-10-31按用户授权实施NTF-004：恢复官方控制文字格式与门控，保留Nemotron原始正文发布、音频覆盖配对、soft reset和原状态规则；独立审计待消费文字与缓存修订。本地30项、远端预检3/3通过；正式25/30完整、5条积压触限，状态未整体改善，EOF仍有待消费尾部。详见[对照报告](../../../reports/soulx/20261031-nemotron-teacher-gate/README.md)。工作单已归档，队列已清空。
+
+用户新增的计算推进屏障详见[设计第2.1节](independent_streaming_frontend.md#21-每160ms音频步的推进屏障)：当前组内token连续解至EOS，WAIT算步完成；屏障不等complete交接ready，不阻塞实时收音或当前有效nonidle停止。
