@@ -1,6 +1,8 @@
 # SoulX-Duplug 路线
 
-更新：2026-11-01。路线为 **Nemotron 作为唯一教师文本、取消 SenseVoice 滑窗与双路配对发布**。NTF-007/008/009 已交付并归档：纯追加文本路径、最多4块音频embedding缓冲、首个覆盖主块截止的流式ASR配对、complete不重识别；固定30条同卡对照30/30完整、退出0，主块P95 219.2ms，无800ms触发，状态指标混合改善。见[NTF-007报告](../../../reports/soulx/20261101-ntf007-teacher-append-only/README.md)、[NTF-008报告](../../../reports/soulx/20261101-ntf008-teacher-buffer/README.md)与[NTF-009报告](../../../reports/soulx/20261101-ntf009-teacher-fdb30/README.md)。此前 SoulX＋SenseVoice控制、独立Nemotron正文与配对发布保留为历史对照，不再运行。
+更新：2026-11-02。用户要求清除comparison端历史实验并重新clone官方仓库。当前以本地 [third_party/soulx-duplug](../../../third_party/soulx-duplug) 子模块为可审查源码入口，远端改用ParaThink独立根下新克隆的`upstream/soulx-duplug`，版本与说明见[依赖文档](../../third_party/soulx-duplug.md)。旧comparison加载器和实验worktree退役，不作为新实验入口。
+
+NTF-007—012的教师前端与实验保留为历史证据；X2同卡30/30、延迟及规范性通过，状态未整体改善，见[最终报告](../../reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)与[归因](../../reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)。以下合同为历史改造记录，不表示正在执行或已验证与官方协议等价。当前不启动推理、训练或下游切换。
 
 ## 已确认合同
 

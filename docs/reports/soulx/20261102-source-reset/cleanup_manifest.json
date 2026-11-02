@@ -1,0 +1,392 @@
+{
+  "created_at": "2026-11-02T02:19:02.247452+00:00",
+  "root": "/hpc_stor03/sjtu_home/xuan.zhang/turncontrol-comparison",
+  "execute": true,
+  "preserved": [
+    "cache",
+    "environment",
+    "envs",
+    "models",
+    "scoring-models",
+    "upstream",
+    "wheelhouse"
+  ],
+  "planned": [
+    "alignment-6c62f7f.bundle",
+    "campaigns",
+    "checkpoint-audit-666de53.bundle",
+    "components-b55578d.bundle",
+    "conda-recovery-f3649d2.bundle",
+    "cpu-9d388ff.bundle",
+    "duplex-d922e2f.bundle",
+    "full-b70cecb.bundle",
+    "gate-230850d.bundle",
+    "inspection",
+    "launch-ef4328c.bundle",
+    "lifecycle-a5b8880.bundle",
+    "managers",
+    "next-91f539e.bundle",
+    "no-monitor-73d2b93.bundle",
+    "offline-asr-7248fd7.bundle",
+    "pip-bootstrap-bcd9fb5.bundle",
+    "probe-0e15d1d.bundle",
+    "ratio-0ef21b5.bundle",
+    "recovery-2ba6c65.bundle",
+    "replay-5470d4f.bundle",
+    "repository",
+    "result-tracker-269cdb4.bundle",
+    "runs",
+    "runtime-092a15f.bundle",
+    "runtime-6b58eb9.bundle",
+    "scoring-model-21fc0d1.bundle",
+    "scripts",
+    "shared-asr-ccd8a0d.bundle",
+    "signal-edf46c2.bundle",
+    "source",
+    "source-r10.bundle",
+    "source-r2.bundle",
+    "source-r3.bundle",
+    "source-r4.bundle",
+    "source-r5.bundle",
+    "source-r6.bundle",
+    "source-r7.bundle",
+    "source-r8.bundle",
+    "source-r9.bundle",
+    "source.bundle",
+    "streaming-probe-9c79e38.bundle",
+    "submit_logs",
+    "tmp",
+    "tts-dependency-0952305.bundle",
+    "turncontrol-20-40.bundle",
+    "turncontrol-2d28dbc.bundle",
+    "turncontrol-crop.bundle",
+    "turncontrol-history-fix.bundle",
+    "turncontrol-metrics-audit.bundle",
+    "turncontrol-metrics-final.bundle",
+    "turncontrol-metrics.bundle",
+    "turncontrol-partial-score.bundle",
+    "turncontrol-pseudostream.bundle",
+    "turncontrol-score-resume.bundle",
+    "turncontrol-synthetic-fix.bundle",
+    "turncontrol-tts.bundle",
+    "turncontrol-xfix-r2.bundle",
+    "turncontrol-xfix.bundle",
+    "upstream-20261028.tar"
+  ],
+  "removed": [
+    {
+      "name": "alignment-6c62f7f.bundle",
+      "files": 1,
+      "bytes": 9326
+    },
+    {
+      "name": "campaigns",
+      "files": 174,
+      "bytes": 7612751
+    },
+    {
+      "name": "checkpoint-audit-666de53.bundle",
+      "files": 1,
+      "bytes": 4424
+    },
+    {
+      "name": "components-b55578d.bundle",
+      "files": 1,
+      "bytes": 75794
+    },
+    {
+      "name": "conda-recovery-f3649d2.bundle",
+      "files": 1,
+      "bytes": 1162
+    },
+    {
+      "name": "cpu-9d388ff.bundle",
+      "files": 1,
+      "bytes": 4788
+    },
+    {
+      "name": "duplex-d922e2f.bundle",
+      "files": 1,
+      "bytes": 24296
+    },
+    {
+      "name": "full-b70cecb.bundle",
+      "files": 1,
+      "bytes": 12882
+    },
+    {
+      "name": "gate-230850d.bundle",
+      "files": 1,
+      "bytes": 1397
+    },
+    {
+      "name": "inspection",
+      "files": 98,
+      "bytes": 68742807
+    },
+    {
+      "name": "launch-ef4328c.bundle",
+      "files": 1,
+      "bytes": 5549
+    },
+    {
+      "name": "lifecycle-a5b8880.bundle",
+      "files": 1,
+      "bytes": 11661
+    },
+    {
+      "name": "managers",
+      "files": 3,
+      "bytes": 30552
+    },
+    {
+      "name": "next-91f539e.bundle",
+      "files": 1,
+      "bytes": 1389
+    },
+    {
+      "name": "no-monitor-73d2b93.bundle",
+      "files": 1,
+      "bytes": 9403
+    },
+    {
+      "name": "offline-asr-7248fd7.bundle",
+      "files": 1,
+      "bytes": 1872
+    },
+    {
+      "name": "pip-bootstrap-bcd9fb5.bundle",
+      "files": 1,
+      "bytes": 6204
+    },
+    {
+      "name": "probe-0e15d1d.bundle",
+      "files": 1,
+      "bytes": 7210
+    },
+    {
+      "name": "ratio-0ef21b5.bundle",
+      "files": 1,
+      "bytes": 1163
+    },
+    {
+      "name": "recovery-2ba6c65.bundle",
+      "files": 1,
+      "bytes": 6799
+    },
+    {
+      "name": "replay-5470d4f.bundle",
+      "files": 1,
+      "bytes": 5058
+    },
+    {
+      "name": "repository",
+      "files": 429,
+      "bytes": 6004530
+    },
+    {
+      "name": "result-tracker-269cdb4.bundle",
+      "files": 1,
+      "bytes": 4573
+    },
+    {
+      "name": "runs",
+      "files": 39700,
+      "bytes": 6996725709
+    },
+    {
+      "name": "runtime-092a15f.bundle",
+      "files": 1,
+      "bytes": 5375
+    },
+    {
+      "name": "runtime-6b58eb9.bundle",
+      "files": 1,
+      "bytes": 5549
+    },
+    {
+      "name": "scoring-model-21fc0d1.bundle",
+      "files": 1,
+      "bytes": 1416
+    },
+    {
+      "name": "scripts",
+      "files": 5,
+      "bytes": 28502
+    },
+    {
+      "name": "shared-asr-ccd8a0d.bundle",
+      "files": 1,
+      "bytes": 2422
+    },
+    {
+      "name": "signal-edf46c2.bundle",
+      "files": 1,
+      "bytes": 1795
+    },
+    {
+      "name": "source",
+      "files": 2047,
+      "bytes": 13078966
+    },
+    {
+      "name": "source-r10.bundle",
+      "files": 1,
+      "bytes": 58201
+    },
+    {
+      "name": "source-r2.bundle",
+      "files": 1,
+      "bytes": 37136
+    },
+    {
+      "name": "source-r3.bundle",
+      "files": 1,
+      "bytes": 39720
+    },
+    {
+      "name": "source-r4.bundle",
+      "files": 1,
+      "bytes": 41388
+    },
+    {
+      "name": "source-r5.bundle",
+      "files": 1,
+      "bytes": 46977
+    },
+    {
+      "name": "source-r6.bundle",
+      "files": 1,
+      "bytes": 50001
+    },
+    {
+      "name": "source-r7.bundle",
+      "files": 1,
+      "bytes": 50771
+    },
+    {
+      "name": "source-r8.bundle",
+      "files": 1,
+      "bytes": 52564
+    },
+    {
+      "name": "source-r9.bundle",
+      "files": 1,
+      "bytes": 56738
+    },
+    {
+      "name": "source.bundle",
+      "files": 1,
+      "bytes": 34057
+    },
+    {
+      "name": "streaming-probe-9c79e38.bundle",
+      "files": 1,
+      "bytes": 5316
+    },
+    {
+      "name": "submit_logs",
+      "files": 226,
+      "bytes": 712709
+    },
+    {
+      "name": "tmp",
+      "files": 4,
+      "bytes": 13276
+    },
+    {
+      "name": "tts-dependency-0952305.bundle",
+      "files": 1,
+      "bytes": 2750
+    },
+    {
+      "name": "turncontrol-20-40.bundle",
+      "files": 1,
+      "bytes": 301730
+    },
+    {
+      "name": "turncontrol-2d28dbc.bundle",
+      "files": 1,
+      "bytes": 248906
+    },
+    {
+      "name": "turncontrol-crop.bundle",
+      "files": 1,
+      "bytes": 292567
+    },
+    {
+      "name": "turncontrol-history-fix.bundle",
+      "files": 1,
+      "bytes": 308707
+    },
+    {
+      "name": "turncontrol-metrics-audit.bundle",
+      "files": 1,
+      "bytes": 246444
+    },
+    {
+      "name": "turncontrol-metrics-final.bundle",
+      "files": 1,
+      "bytes": 247456
+    },
+    {
+      "name": "turncontrol-metrics.bundle",
+      "files": 1,
+      "bytes": 243013
+    },
+    {
+      "name": "turncontrol-partial-score.bundle",
+      "files": 1,
+      "bytes": 305802
+    },
+    {
+      "name": "turncontrol-pseudostream.bundle",
+      "files": 1,
+      "bytes": 299673
+    },
+    {
+      "name": "turncontrol-score-resume.bundle",
+      "files": 1,
+      "bytes": 325051
+    },
+    {
+      "name": "turncontrol-synthetic-fix.bundle",
+      "files": 1,
+      "bytes": 336003
+    },
+    {
+      "name": "turncontrol-tts.bundle",
+      "files": 1,
+      "bytes": 282500
+    },
+    {
+      "name": "turncontrol-xfix-r2.bundle",
+      "files": 1,
+      "bytes": 365081
+    },
+    {
+      "name": "turncontrol-xfix.bundle",
+      "files": 1,
+      "bytes": 363380
+    },
+    {
+      "name": "upstream-20261028.tar",
+      "files": 1,
+      "bytes": 41420800
+    }
+  ],
+  "bytes_in_removed_files": 7139224041,
+  "free_bytes_before": 891889385472,
+  "remaining": [
+    "cache",
+    "environment",
+    "envs",
+    "models",
+    "scoring-models",
+    "upstream",
+    "wheelhouse"
+  ],
+  "free_bytes_after": 899028090880,
+  "elapsed_seconds": 194.83015493303537,
+  "passed": true
+}

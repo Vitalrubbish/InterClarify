@@ -1,6 +1,6 @@
 # 远端工作目录约定
 
-更新：2026-11-01。本文维护目录与环境位置，历史作业进度统一链接报告；本次已登录贵州 HPC，复用Nemotron与SoulX模型及两组conda，完成教师文本纯追加与单块缓冲三轴预检。SenseVoice旧双ASR路径已归档。其他路径和历史作业不由此推断当前状态。
+更新：2026-11-02。用户要求清除`turncontrol-comparison`的全部旧实验，并重新克隆官方SoulX-Duplug。旧comparison结果、源码worktree和`source/6de0d70`加载器退役；模型／评分模型、conda与公共依赖继续保留。新源码入口为`~/parathink-soulx-duplug/upstream/soulx-duplug`的独立官方Git checkout，本地对应`third_party/soulx-duplug`子模块，详见[源码说明](third_party/soulx-duplug.md)。本次不运行推理／训练，历史证据在既有报告和ParaThink runs中保留。
 
 项目现名为 ParaThink。下表中的 `InterClarify`、`interclarify-*` 是已有服务器目录或环境的真实名称，继续保留以兼容现役资产；GitHub 地址与历史报告链接同样保留，未执行远端仓库或目录迁移。新建通用开发环境默认使用 `parathink-dev`。
 
@@ -26,7 +26,8 @@
 | `parathink-soulx-duplug` | ParaThink 前端独立部署与检查根目录，复用下面的资产；状态见[部署记录](dev/SoulX-Duplug/deployment.md) |
 | `turncontrol-comparison/models/soulx-duplug` | 复用 SoulX tokenizer、基座和状态权重，不复制或修改 |
 | `turncontrol-comparison/models/sensevoice-small` | 首版英文 ASR 权重，只读复用 |
-| `turncontrol-comparison/upstream/frozen-20261028/soulx-duplug` | 已核查 `a0b9063` 官方源码，只读复用 |
+| `parathink-soulx-duplug/upstream/soulx-duplug` | 新克隆官方仓库`a0b9063`，独立Git checkout，替代旧comparison源码软链 |
+| `turncontrol-comparison/upstream/frozen-20261028/soulx-duplug` | 保留只读上游参考，不作为新实验依赖 |
 
 ## 固定 conda 环境
 
@@ -41,6 +42,8 @@
 `paratalker-dev` 与 `sidecar` 属于其他项目，不纳入 ParaThink 清理。
 
 ## 实验与维护记录
+
+以下源码worktree和作业状态均为历史记录；comparison旧实验已按NTF-014清理，不能直接复用已移除的`source/6de0d70`加载器恢复旧教师入口。后续以新的官方checkout为起点，配置与实验需另立工作单。
 
 | 记录 | 证据与状态 |
 | --- | --- |

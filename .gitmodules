@@ -1,0 +1,3 @@
+[submodule "third_party/soulx-duplug"]
+	path = third_party/soulx-duplug
+	url = https://github.com/Soul-AILab/SoulX-Duplug.git

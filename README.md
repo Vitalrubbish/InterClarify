@@ -1,10 +1,12 @@
 # ParaThink
 
-原名 InterClarify。现有服务器资产路径、历史记录和 GitHub 地址保留原名，详见[远端约定](docs/remote_workspace.md)。
+现有服务器资产路径、历史记录和 GitHub 地址保留原名，详见[远端约定](docs/remote_workspace.md)。
 
 ParaThink 研究独立 thinking 流在语音 Agent 倾听与表达期间持续工作带来的优势，工作包括 Agent 框架、边听边想与边说边想两组 benchmark，以及大规模对话数据与训练。研究背景、目标、参考文章和三篇子文档见 [docs/research_design.md](docs/research_design.md)，工程安排见 [docs/engineering_implementation.md](docs/engineering_implementation.md)。
 
-当前研究前端为 **SoulX＋SenseVoice控制、独立Nemotron正文与状态配对发布**，见[方案](docs/dev/SoulX-Duplug/dual_asr_publication.md)。NTF-005实现和固定实验已交付：预检3/3通过，正式18/30完整、12条触及800ms停止线，实时验收未通过；打断检出局部改善，接话与停顿未整体改善，见[报告](reports/soulx/20261031-dual-asr-publication/README.md)。教师路径与报告保留为历史对照。五类用户状态送入 Layer 1，仅有效用户打断额外直接停止活动输出；具体合同见[架构设计](docs/research_design/architecture.md)。新链路尚未接入，已采用的运行底座仍为 DuplexCascade、Nemotron、Kokoro 与 [X-Talk fork](https://github.com/Vitalrubbish/xtalk) `ca9b23c`。
+当前重新以官方 **SoulX-Duplug** 源码为起点。本地源码在 [third_party/soulx-duplug](third_party/soulx-duplug)，作为Git子模块固定官方提交；clone父仓库时使用`--recurse-submodules`，已有仓库执行`git submodule update --init third_party/soulx-duplug`。源码与依赖说明见[子模块说明](docs/third_party/soulx-duplug.md)。
+
+此前Nemotron／X2教师前端及固定实验保留为历史改造证据：NTF-011／012实时性和规范分词通过、状态质量未整体改善，见[同卡报告](docs/reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)。这些适配器不等同于官方原生推理。comparison历史实验按NTF-014清理，公共模型与conda继续保留；本次不启动新模型测试、训练或下游切换。
 
 | 内容 | 位置 |
 | --- | --- |
