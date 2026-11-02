@@ -1,14 +1,14 @@
 # Agent 架构设计
 
-更新：2026-10-29。[研究背景与参考文章](../research_design.md) · [边听边想](listening.md) · [边说边想](speaking.md)。
+更新：2026-11-02。[研究背景与参考文章](../research_design.md) · [边听边想](listening.md) · [边说边想](speaking.md)。
 
-语音前端采用 **SoulX-Duplug＋SenseVoiceSmall**，整体位于 Layer 0–Layer 2 的输入侧。按用户确认，为先打通链路，首版沿用官方 ASR 配套路径，撤下 Nemotron＋SoulX 独立适配；原因与适配缺口见[选型说明](../dev/SoulX-Duplug/asr_adapter_assessment.md)。新链路尚未接入，现役底座和实施顺序见[工程计划](../engineering_implementation.md)。本次调整模块归属与实施顺序，研究目标保持不变。
+语音前端采用 **SoulX原生控制＋独立Nemotron流式正文**，整体位于Layer 0–Layer 2输入侧。SoulX内部保留SenseVoice教师、窗口修订及原生状态协议，独立正文不注入SoulX。两路各自就绪更新Context，无逐块配对屏障。用户已确认设计并要求建单，尚未实现，见[方案](../dev/SoulX-Duplug/independent_streaming_frontend.md)与[工程计划](../engineering_implementation.md)。
 
-2026-11-01 路线改为 **Nemotron 唯一教师文本**：NTF-007/008/009 已交付并归档，固定30条同卡对照30/30完整、主块P95 219.2ms、无800ms，状态指标混合改善；complete后整轮重识别已删除。此前[双ASR缓存发布](../archive/dev/SoulX-Duplug/dual_asr_publication.md)保留为历史，正式18/30完整、12条800ms触限。有效nonidle的直接停止合同保持。
+历史Nemotron／X2教师替换与[双ASR配对发布](../archive/dev/SoulX-Duplug/dual_asr_publication.md)不作为当前协议。新方案完整预热优先覆盖真实语音、多长度和完成分支，以固定对照验证预热不足假设；不预先归因全部积压。下游尚未切换，有效nonidle的直接停止合同保持。
 
 当前五类用户状态均作为 token 送入 Layer 1，普通正式回答在当前 turn 读取对应 `user_complete` 后生成；仅活动输出期间的有效 `user_nonidle` 额外直接停止输出。其他状态不映射成运行时 start/keep。后续音频、转写与 CoT 联合控制的目标已确认，当前不实现；输出是否扩展仍待讨论。
 
-[架构图 PDF](../../figures/parathink_method_preview.pdf) · [图示说明](../figures/parathink_method.md)。图展示目标合同，不表示已完成接入或验证。TextTurn／XTurnix 专属协议与历史状态见[工作单](../issue/README.md)。
+[架构图 PDF](../../figures/parathink_method_preview.pdf) · [图示说明](../figures/parathink_method.md)。旧预览尚未更新双路前端细节，当前前端流程以[新方案图](../dev/SoulX-Duplug/independent_streaming_frontend.md#2-音频与两路职责)为准，图源同步纳入NTF-017，不表示已完成接入或验证。TextTurn／XTurnix专属协议与历史状态见[工作单](../issue/README.md)。
 
 ![ParaThink 共享上下文、并行思考与表达及打断执行流程](../../figures/parathink_method_preview.png)
 
@@ -23,12 +23,12 @@ thinking 流指与表达流分工的内部任务分析过程，在当前信息�
 
 ## 2. 模块与动作边界
 
-前端包含 ASR 调用与文本整理、SoulX 音频编码和用户状态预测。图中将这些功能收进同一语音前端，每处理一个 160ms 音频块，向 Shared Context 联合写入最新话轮全文与本块状态，后续直接覆盖，下游仅并列展示 Layer 0、Layer 1 和 Layer 2。本项目只定义这三层，不设 Layer 3。前端与下游可以并发执行，职责上的前后关系不要求等待整轮识别或完成判断；ASR、状态和 CoT 也不要求同步更新。后续 CoT 经 Context 反馈至前端，在合法输入边界参与状态判断，条件化适配与训练尚未实现。
+前端包含SoulX原生控制链路与独立流式ASR：前者产生五状态，后者产生下游正文，分别向SharedContext更新自己的字段。SoulX保持160ms主块，Context不要求两路按块配齐或同频发布。下游仅并列Layer 0、Layer 1和Layer 2，本项目不设Layer 3。前端与下游并发，不等待整轮识别或完成判断。后续CoT经Context反馈至前端，在合法输入边界参与状态判断，条件化适配与训练尚未实现。
 
 | 模块 | 职责 | 输出 |
 | --- | --- | --- |
-| 语音前端：Online ASR 与文本整理 | 首版使用 SenseVoiceSmall，复用窗口识别与差分路径，整理当前话轮最新全文并直接覆盖旧正文；Nemotron组合已撤下 | 在线文本快照、增量／修订与实际到达时间 |
-| 语音前端：SoulX-Duplug 状态模型 | 编码持续音频，结合对应转写预测用户状态；后续加入 CoT token，联合判断等待与介入，当前不实现扩展 | 当前保留原生五类用户状态；CoT 阶段的输出编码另行设计 |
+| 语音前端：Online ASR 与文本整理 | 独立Nemotron原生流式解码，直接提供当前话轮正文，不受SoulX文字门控或reset影响 | 最新原始转写及其观察上界、可用与发布时间 |
+| 语音前端：SoulX-Duplug 状态模型 | 保留内部SenseVoice教师及原生门控、修订、状态反馈和reset，独立预测；后续CoT扩展尚未实现 | 原生五类状态及其音频范围、可用与发布时间；CoT阶段输出另行设计 |
 | Layer 0 | 小型预测器，仅判断当前是否适合发出系统 backchannel；通过专项训练获得时机预测能力 | 发出系统附和或继续等待的决策 |
 | Layer 1 | 持续读取用户转写与 SoulX 状态，请求思考并利用结果组织表达；当前普通正式回答在看到 `user_complete` 后于当前 turn 开始生成 | 待表达文本与思考请求 special token |
 | Layer 2 | 倾听期间分析事实、缺口、条件依赖及影响；表达期间继续求解、检查约束和更新结论 | 仅发布 CoT 正文，附带运行时追溯元数据，不包含话轮建议 |
@@ -49,7 +49,7 @@ Layer 0/1 的发声路径直接连接 Text FIFO，Context 不向队列提交文�
 
 Context 保存当前实际可用的用户全文和当前 SoulX 状态，不保留历史正文版本；另保存 Layer 1 真实生成历史和输出、Layer 2 已发布结果、Layer 0 时机建议，以及实际输出阶段和打断事件。该存储不意味着输出运行时订阅全部状态；用户状态输入与打断执行记录分开。生成、提交、取消与实际播放分别记录，不能把已生成内容直接视为用户已听内容；同一份生成文本不重复注入模型输入。
 
-2026-10-30 用户确认：前端每处理完一个 160ms 音频块，按稳定的用户 `turn_id` 将最新话轮全文和本块状态原子覆盖写入 Shared Context；无新文字时保留正文并更新状态，修订直接替换旧全文，不保留历史正文版本，也不增加 320ms 定时器。原因是简化读取并使两类输入按同一步骤交付。SenseVoice 窗口需先整理为完整话轮，不能直接拼接或把最近窗口当全文。Layer 1／2 在输入边界读取当前值，不把音频块或 micro-turn 当新用户消息；慢消费者可能跳过中间状态，本合同不额外保留状态历史或锁存 complete。有效打断仍走直接停止路径。关闭与语义完成、EOF 排空分别处理，详见[接口设计](../dev/SoulX-Duplug/shared_context_interface.md)。当前值前端写入已实现并通过本地与远端六视图写入检查，识别／状态质量边界见[报告](../../reports/soulx/20261030-current-context-test/README.md)，Layer1／2尚未接入。
+2026-11-02用户确认：按稳定turn_id保留当前值，但正文与状态分别就绪即更新。短锁内只合并本路字段并提供原子快照，不能用旧整帧覆盖另一路新结果；两路观察上界及可用／发布时间分别记录。SoulX内部窗口文字不作为正文，Nemotron原始累计正文直接写入，不等待配齐、complete或固定定时器。reset不结束ASR或重开逻辑话轮，complete不代表尾词已齐。Layer 1／2在输入边界读取，慢消费者仍可能跳过中间状态，不增加历史队列或complete锁存；有效打断走直接停止。新接口待NTF-017实现，不能用此前六视图或教师实验验收替代，见[接口设计](../dev/SoulX-Duplug/shared_context_interface.md)。
 
 SoulX 持续读取到达的音频，不能沿用旧文本控制器“只有 ASR 文字变化才判断”的调度，也不能因无新增文字而跳过真实音频或静音观察。ASR 正文在下游输入边界采用最新值，识别修订不自动改变在途模型输入，后续 CoT 在合法输入边界注入；CoT 更新是否独立触发控制请求仍待设计。Layer 1 和 Layer 2 只在各自明确的输入边界消费新增观察，已经构造的输入不因结果到达而自动重算。
 

@@ -1,10 +1,26 @@
 # 工作单管理
 
-更新：2026-11-02。X2Streaming-ASR的单进程门槛与EOS闭合组教师同卡FDB30对照均已完成（NTF-011／012），实时性与文本规范性通过、状态指标混合；只测同卡、不训练。此前 **SoulX＋SenseVoice控制、Nemotron正文与缓存状态配对发布**已完成功能与固定实验，实时及整体质量未通过，见[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。TextTurn、VoxTurn、XTurnix 三条历史路线已按用户指令归档：路线文档移至[归档区](../archive/dev/README.md)，对应实现移至 [archive/](../../archive/README.md)，历史工作单保留在本地 `docs/issue/archive/`（不进入 Git）。
+更新：2026-11-02。用户已确认 **SoulX原生控制＋独立原生流式转写**，并要求建立相关工作单。新方案保留SenseVoice内部教师链路，Nemotron仅供共享正文，两路各自就绪即发布，不等待逐块配齐。设计见[独立流式前端](../dev/SoulX-Duplug/independent_streaming_frontend.md)、[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。
 
-当前用户已授权 Nemotron Teacher Forcing 接入与 FDB 三轴固定小样本实验。下游 Agent 尚未切换到 SoulX，旧 Nemotron 公开英文集方案和旧文本控制器合同只作为历史设计，不恢复作业。
+## 当前工作单
 
-NTF-011和NTF-012均已完成并归档，NTF-014也已完成并归档：comparison旧实验已清除，官方源码已重新克隆并显式纳入子模块，见[清理与克隆报告](../reports/soulx/20261102-source-reset/README.md)。当前没有待执行工作单。NTF-013离线归因也已完成并归档，见[退化分析](../reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)。[NTF-011](../reports/soulx/20261101-ntf011-x2-probe/README.md)单进程门槛通过；[NTF-012](../reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)同卡FDB30完成30/30、退出0，主块发布P95 152.8ms、显存14046MiB、3185帧规范分词全通过、尾词退化追加0。20条在线WER为10.06%（r6为10.90%）。停顿和打断检出改善，但提前complete增加，状态未整体改善；不追加ASR调参或筛选重跑，下游Agent尚未切换。
+| 工作单 | 工作单元 | 依赖 | 状态 |
+| --- | --- | --- | --- |
+| [NTF-015](NTF-015.md) | 保留原生协议的SoulX控制封装及reset审计 | 无 | 待实施 |
+| [NTF-016](NTF-016.md) | 同源音频分发与独立Nemotron流式正文 | NTF-015输入合同 | 待实施 |
+| [NTF-017](NTF-017.md) | 正文／状态独立更新、原子快照与生命周期 | NTF-015／016 | 待实施 |
+| [NTF-018](NTF-018.md) | 完整预热、远端积压归因及实时门槛 | NTF-015—017 | 待实施 |
+| [NTF-019](NTF-019.md) | 固定FDB30单路／双路验收 | NTF-018通过 | 待实施 |
+
+本轮只设计与建单，尚未实施或提交远端作业。预热不足作为优先验证假设，分别对照既有有限预热与完整预热，区分首遇路径长尾和持续吞吐问题；不预先归因全部积压。远端单并发、1×4090、4CPU、32GiB、显存22GiB停止线，保留800ms过载保护，具体预算见各工作单。下游Agent尚未切换，不训练、不接LLM／CoT／TTS，也不恢复旧comparison入口。
+
+## 已归档实验
+
+NTF-011／012已完成，NTF-013离线归因和NTF-014源码重置也已完成并归档。comparison旧实验已清除，官方源码已重新克隆并显式纳入子模块，见[清理报告](../reports/soulx/20261102-source-reset/README.md)。旧教师替换、配对发布仅保留历史证据。
+
+[NTF-011](../reports/soulx/20261101-ntf011-x2-probe/README.md)单进程门槛通过；[NTF-012](../reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)同卡FDB30完成30/30、退出0，主块发布P95 152.8ms、显存14046MiB、3185帧规范分词全通过、尾词退化追加0。20条在线WER为10.06%（r6为10.90%），但状态未整体改善，见[归因](../reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)。
+
+TextTurn、VoxTurn、XTurnix按用户指令归档，文档见[归档区](../archive/dev/README.md)，实现见[archive](../../archive/README.md)，历史工作单保留在本地`docs/issue/archive/`，不进入Git。
 
 NTF-010 已收口：词级规范分词保留，`r6` 固定30条 30/30完整、退出0、主块P50/P95 208.5/219.6ms、最大405.3ms、无800ms触发、`buffer_overflow=0`，但“一个空ASR增量即提交尾词”产生`post_pause_extension=17`（13条用例），两次停顿版本为4次。该判据被证伪；X2 官方EOS闭合发射组取代它（执行前源码核查修订），不再使用空步启发式。
 

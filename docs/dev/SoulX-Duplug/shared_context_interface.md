@@ -1,53 +1,49 @@
 # 用户话轮的 SharedContext 当前值接口
 
-2026-10-30，按用户明确决定修订：语音前端每处理一个 160ms 音频块，将最新话轮全文和本块状态作为一组原子覆盖到 SharedContext。取消 320ms 正文发布周期；不维护历史正文版本或修订事件流。
+2026-11-02，用户确认原生SoulX控制＋独立Nemotron流式正文，替代逐块联合发布。新合同待[NTF-017](../../issue/NTF-017.md)实现；本轮只设计与建单，不能用旧接口通过记录替代新合同验收。完整方案见[独立流式前端](independent_streaming_frontend.md)。
 
-2026-10-31历史：NTF-005曾恢复SenseVoice作为0.6B控制文字，Nemotron提供共享正文；SoulX状态先按音频块暂存，待对应Nemotron解码完成再联合发布。两路计算独立推进，只约束发布；完整配对及EOF规则见[双ASR发布方案（已归档）](../../archive/dev/SoulX-Duplug/dual_asr_publication.md)。独立入口已完成固定实验：2134条正式发布帧配对结构通过，但18/30完整、12条触及800ms停止线，实时及整体质量未通过，见[报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)。2026-11-01起该路线由 Nemotron 唯一教师文本取代，相关代码已移除。以下历史接口验收不能替代当前教师链路验收。
+## 1. 独立更新与原子读取
 
-这是当前实施合同。已按用户授权重构 [SharedContext 实现](../../scripts/runtime/shared_context.md)，撤下 Nemotron＋SoulX 专用入口，以每个处理步骤的当前值替代旧事件协议；本地检查和远端六视图写入／读取检查均已通过，识别及状态语义边界另列，见[远端报告](../../../reports/soulx/20261030-current-context-test/README.md)。旧运行证据见[报告](../../../reports/soulx/20261029-shared-context/README.md)，不代表新合同已验收。
+同一逻辑用户话轮以稳定的session_id／turn_id定位一份当前记录。Nemotron正文就绪即更新正文，SoulX状态就绪即更新状态；无逐块配对、跨路屏障、固定发布周期或complete等待。
 
-## 1. 写入与读取
+每个写入在短锁内与记录最新值合并，只改变本路字段，再提供完整快照的原子读取。不能将线程此前读到的旧整帧写回，覆盖另一条路的新结果。推理、网络等待和落盘均不持锁；来源内的迟到或重复提交需拒绝，跨路进度允许不同。
 
-2026-10-30 最新用户授权增加 Nemotron 教师文字来源：开轮时固定来源为 Nemotron，逐步ASR完成、门控及按需教师消费、状态完成后才联合覆盖。NTF-004允许共享原始正文领先控制器已消费文字，不能以共享全文代替本步实际输入。当前值合同不变，同一话轮拒绝来源切换；历史 SenseVoice 路径仍可单独使用。详见[同步方案](nemotron_teacher_forcing.md)。
+仍只提供当前值，不增加历史正文、正文版本、替换patch、历史查询、事件游标或complete锁存。实现时分别提供正文／状态更新入口；旧publish_user_frame的整帧覆盖及单一进度约束须迁移，不假定现实现已支持并发合并。
 
-同一逻辑用户话轮用稳定的 `session_id`、`turn_id` 定位一条当前记录。每个160ms音频块在状态和对应ASR解码都完成后，由单写者整理配对步骤的正文和本块缓存状态，以短锁整体替换；消费者取得同组快照副本，不分别读取两者。
+## 2. 当前记录与时间边界
 
-更新按音频处理步骤发生，墙钟返回可能受计算和排队影响。无新转写时保留当前正文但仍更新状态；没有可处理音频时不靠定时器制造状态。不要求 ASR 每块调用，不等 complete 才提供文字。
-
-本合同只提供当前值的写入和读取；不要求正文 `version`、`asr_version`、替换 patch、历史查询或事件游标。并发通过串行写入和原子读取解决，不以保存旧正文为前提。`open_user_turn()`开轮，`publish_user_frame()`覆盖，`get_user_turn()`读取，`close_user_turn()`关闭；回放调用方已迁移。
-
-## 2. 当前记录
-
-| 字段 | 作用 |
+| 字段组 | 含义 |
 | --- | --- |
-| `session_id`、`turn_id` | 定位同一会话中的逻辑用户话轮 |
-| `text` | 当前可重建的话轮全文，后续修订直接替换 |
-| `state_token` | 本块 SoulX 原生五类用户状态之一，和正文分开编码 |
-| `state_accepted` | 本次状态是否有效，拒绝状态不能作为有效控制输入 |
-| `processed_until` | 本块已处理真实音频的采样截止点，不是正文版本 |
-| `coverage_complete` | 当前全文是否有拼合缺口，不承诺识别正确 |
-| `status` | 话轮记录处于 open 或 closed，不等于用户语义完整 |
+| session_id／turn_id／status | 稳定身份、open或closed；关闭不等于语义完成 |
+| text／source | Nemotron原始累计全文；话轮内来源固定，内部SenseVoice文字只作控制与诊断 |
+| text_observed_until | 产生该正文时ASR实际已观察的真实采样上界，不证明此前所有词已发射 |
+| text_available_at／text_published_at | 正文实际可用与写入的可比较单调时间 |
+| state_token／state_accepted | 最新原生五状态及有效性；外层service_state、完成来源分别保留 |
+| controller_generation | 原生reset后的控制代次，不是新逻辑话轮 |
+| state_processed_until／state_observed_until | 状态主块与完整音频观察的真实采样上界，padding另记 |
+| state_available_at／state_published_at | 状态实际可用与发布的可比较单调时间 |
+| 完整性字段 | 区分传输／整理缺口和ASR尾部状态；没有可靠尾词信号则为unknown |
 
-保留当前来源、音频观察上界、发布时间及必要过滤原因作为运行元数据即可，不要求全量注入 LLM。ASR 标签与用户正文不具有控制权限，Layer 1 的 tokenizer 也不能直接复用 SoulX 的状态 token 数字 ID。
+旧processed_until若保留，只兼容表示SoulX主块截止；正文更新不要求它增长。各组时序只由所属路推进，状态变化不刷新正文时间，正文变化不刷新状态时间。原子快照不表示音文同块对齐，也不保证尾词完整。ASR暂时无新增token不等于静音或句子结束。
 
-## 3. 正文覆盖与生命周期
+## 3. 生命周期与正文来源
 
-SenseVoice 窗口返回先整理为话轮全文，保留原文可用数字、标点、空格和附和；SoulX 控制用的归一化文字不覆盖用户正文。相邻窗口不能直接拼接，也不能把最新短窗口冒充完整话轮。
+控制器reset不清空正文，不结束Nemotron，不创建新turn_id；外部PCM账本与内部控制缓存分开管理。user_complete不触发ASR结束、正文重识别或final标记。内部SenseVoice完整话轮识别仍可按原生服务执行，结果不覆盖共享正文。
 
-成功修订可增加、删除或替换旧词，SharedContext 直接覆盖旧值。识别异常、暂未调用和普通空返回不清空已有文字；无法可靠拼合时保留最后可重建正文并标记缺口。
+原始Nemotron累计正文不经SenseVoice拼合或SoulX控制归一化。空返回和识别异常不清空已有正文；不允许缺少结果时换成内部窗口文字。任一路失败显式终止验证样本并保留记录。
 
-controller reset 不清空正文、不改变逻辑 `turn_id`。开轮时固定 SenseVoice 或 Nemotron 来源，不在中途切换另一套识别器。Nemotron 逐步返回的原始累计文字直接作为正文，不经过 SenseVoice 拼合器。运行时确认逻辑结束后保留最后在线全文并关闭；关闭不制造 complete。EOF 后才产生的识别结果另作排空诊断，不倒填在线记录。
+只有运行时显式关闭才终结逻辑话轮；关闭后拒绝两路迟到回调。EOF不补造complete，在线最后正文、未处理真实采样和显式drain诊断分别保留，排空结果不回填在线记录。
 
-## 4. 下游消费
+## 4. 下游消费与直接停止
 
-Layer 1／2 在各自输入边界读取最新值；同一话轮全文被更正，不创建新用户消息，不要求保存旧正文。已经建立的 LLM 输入或 KV 不会随 Context 自动更改，其修订衔接属于模型接入工作；已生成、提交或已听内容也不随之回滚。
+Layer 1／2在各自输入边界读取最新快照；一次更新不创建新用户消息，不自动改变已建立的模型输入／KV、已生成或已听内容。正文、状态与元数据分开编码，ASR标签没有控制权限。
 
-当前状态同样随新块覆盖。慢消费者可能跳过中间状态，本合同不保证逐帧投递，也不增加历史队列或 complete 锁存。普通正式回答仍以 Layer 1 在当前 turn 实际读到有效 complete 为边界；后续接入须验证短暂 complete 被覆盖时的行为。
+当前状态会被覆盖，慢消费者仍可能跳过短暂complete；本轮不增加历史投递或锁存。普通正式回答仍由Layer 1在当前turn实际读到有效complete后生成；本轮不额外增加尾词等待门或语义否决层，尾词尚未到达的风险需在后续接入中验证。
 
-有效 nonidle 在活动输出期间保留即时直接停止路径，不等待消费者读取，也不依赖历史正文。其他状态不进入输出运行时，不映射成 start／keep。
+活动输出期间有效nonidle直接调用唯一停止执行点，不等待ASR、Context消费者或日志；其他状态不映射为start／keep。停止请求与物理停播分别记录。
 
-## 5. 验证与历史边界
+## 5. 验收与历史
 
-验证重点是修订替换、文本与状态原子一致、无新文本时状态仍更新、reset 连续、关闭与排空分离、直接停止不重复执行，以及实际计算与排队间隔。固定 160ms 更新不表示识别正确、覆盖完整或 Layer 1 已经读到每帧。
+NTF-017检查交错更新无丢失、各路时间不串写、reset连续、关闭拒绝迟到和直接停止去重；真实模型的完整预热、时序与质量由NTF-018／019验证。每个实现文件同步更新docs同路径说明，既有容量限额保留。
 
-原有的事件、版本、patch、游标及历史水位接口已移除；旧报告保留原解释，Nemotron组合专用代码和入口已撤下。详细决策见[160ms 联合更新说明](streaming_transcript_publication.md)。
+历史[160ms联合发布](streaming_transcript_publication.md)、[双ASR配对发布](../../archive/dev/SoulX-Duplug/dual_asr_publication.md)与教师同步均已被本合同替代。旧[六视图接口检查](../../../reports/soulx/20261030-current-context-test/README.md)和[双ASR18/30报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)保留原解释，不作为新接口通过证据。

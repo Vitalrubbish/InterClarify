@@ -2,9 +2,19 @@
 
 更新：2026-11-02。用户要求清除comparison端历史实验并重新clone官方仓库。当前以本地 [third_party/soulx-duplug](../../../third_party/soulx-duplug) 子模块为可审查源码入口，远端改用ParaThink独立根下新克隆的`upstream/soulx-duplug`，版本与说明见[依赖文档](../../third_party/soulx-duplug.md)。旧comparison加载器和实验worktree退役，不作为新实验入口。
 
-NTF-007—012的教师前端与实验保留为历史证据；X2同卡30/30、延迟及规范性通过，状态未整体改善，见[最终报告](../../reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)与[归因](../../reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)。以下合同为历史改造记录，不表示正在执行或已验证与官方协议等价。当前不启动推理、训练或下游切换。
+用户随后确认采用[原生SoulX控制＋独立Nemotron流式正文](independent_streaming_frontend.md)，本轮按指令建立[NTF-015—019](../../issue/README.md)，尚未实现或启动作业。
 
-## 已确认合同
+## 当前设计与实施顺序
+
+- SoulX保留内部SenseVoice教师、门控、窗口修订、状态反馈和原生reset；外部流式正文不注入状态KV，内部窗口文字不作为权威正文。
+- 同一持续PCM分别驱动控制与正文，两路各自就绪更新Context，不等待逐块配齐；当前值仍为一份，锁内合并所属字段并原子读取，分别记录音频上界及可用／发布时间。
+- 控制器reset不清空正文或结束ASR；complete不保证尾词已齐。有效nonidle仍走直接停止，Layer 1普通回答仍以实际读到当前turn有效complete为边界。
+- 工作顺序为原生控制封装、独立ASR、异步Context、完整预热与远端积压归因、固定FDB30验收。预热优先覆盖真实语音和多种窗口长度；不足预热是待验证假设，不先认定全部积压来源。
+- 本轮只交付设计与建单；下游LLM／CoT／TTS和训练不在本轮，不切换现役Agent。详细字段见[Context合同](shared_context_interface.md)，资源与门槛见[方案](independent_streaming_frontend.md#6-工作单资源与验收)。
+
+## 历史合同与验证记录
+
+以下为历史改造记录，不作为当前执行合同。NTF-007—012教师实验保留证据；X2同卡30/30、延迟及规范性通过，状态未整体改善，见[最终报告](../../reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)与[归因](../../reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)。历史已授权或现役等措辞只描述当时状态，不恢复作业。
 
 - 前端包含Nemotron教师文本、SoulX音频编码及状态预测；同一活动话轮的SharedContext正文只用Nemotron一个权威来源，不再使用SenseVoice控制文字或双路配对队列。NTF-007/008 已交付逐帧即时发布、音频embedding有界缓冲和 `A_n→T_n→EOS` 对齐，`PairedPublisher`及complete后整轮重识别已删除。读取与关闭规则见[接口设计](shared_context_interface.md)，最新结果见[NTF-008报告](../../../reports/soulx/20261101-ntf008-teacher-buffer/README.md)。
 - 2026-10-31历史：曾采用[双ASR缓存发布](../../archive/dev/SoulX-Duplug/dual_asr_publication.md)，SenseVoice提供控制文字、Nemotron独立提供正文，状态配对后发布。NTF-005正式18/30完整、12条触及800ms停止线，实时与状态质量未通过，见[报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)。该路线已由 Nemotron 唯一教师文本取代，代码与文档已归档。
