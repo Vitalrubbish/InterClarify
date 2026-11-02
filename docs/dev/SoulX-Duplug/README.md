@@ -2,21 +2,19 @@
 
 更新：2026-11-02。用户要求清除comparison端历史实验并重新clone官方仓库。当前以本地 [third_party/soulx-duplug](../../../third_party/soulx-duplug) 子模块为可审查源码入口，远端改用ParaThink独立根下新克隆的`upstream/soulx-duplug`，版本与说明见[依赖文档](../../third_party/soulx-duplug.md)。旧comparison加载器和实验worktree退役，不作为新实验入口。
 
-用户现要求先归档活跃工作单，再调研SenseVoice／X2教师接入与状态退化。NTF-015—020均为未实施归档，见[归档记录](../../reports/soulx/20261102-frontend-plan-archive/README.md)。当前[NTF-021—025](../../issue/README.md)依次核查原生协议、比较同音频词级时序、进行最小教师替换、单因素归因及固定FDB30复核，详见[调研方案](asr_teacher_diagnosis.md)。本轮仅归档与建单，未实现或启动作业。
+用户最新指令恢复[NTF-015—020](../../issue/README.md)为active，均待实施，采用**原生SenseVoice控制＋独立X2正文＋仅complete交接同步**。NTF-021／022调研完成后相关实现分支已撤回，NTF-023—025未实施归档，范围与证据保留见[恢复记录](../../reports/soulx/20261102-external-asr-plan-restore/README.md)。本次只调整工作单和文档。
 
-## 当前调研顺序
+## 当前实施顺序
 
-先核查公开训练时标与原生门控／修订／reset合同，再分别测ASR交付与控制器实际消费文字的时间轴；原生SenseVoice与最小X2接入采用同一PCM和固定6条小样本。正确性与实时预检通过后，完整重放规则和提交时序消融，最后在原FDB30复核。状态真值依标注与事件核查，原生基线和r6均不作为绝对正确轨迹。
+按015→016→017→020→018→019依次完成原生封装、同源音频／X2正文、异步Context、complete交接、完整预热和固定FDB30验收。预热预检通过才启动正式30条；旧教师实验不作为新封装等价性或双路实时性通过证据。
 
-## 已归档的独立正文候选设计
+## 当前前端设计
 
-以下设计及已确认的下游约束保留，原实施工作单已归档，当前不推进接口、架构图或交接实现。
-
-- SoulX保留内部SenseVoice教师、门控、窗口修订、状态反馈和原生reset；外部流式正文不注入状态KV，内部窗口文字不作为权威正文。
-- 同一持续PCM分别驱动控制与X2正文，按用户指定，正文只在EOS闭合组后以完整词追加，不暴露子词草稿；一组可含多个词。两路各自就绪更新Context，不等待逐块配齐，锁内合并所属字段并原子读取，分别记录音频上界及可用／发布时间。
-- 控制器reset不清空正文、交接记录或结束ASR。原始complete即时记诊断，只有X2真实追齐对应音频且闭合正文已提交才交接ready；Layer 1读到ready的complete后在当前turn回答，同ID不重复。其他四类状态立即交付，有效nonidle仍直接停止；nonidle／incomplete取消旧交接，超时不强行放行。ready不保证尾词必齐。
-- 原计划包含原生控制封装、独立ASR、异步Context、仅complete同步、完整预热与固定FDB30验收，现已未实施归档。新调研仍记录完整预热和资源争用，不先认定全部积压来源。
-- 原方案只交付了设计与建单；下游尚未接入，现役Agent未切换。候选字段见[Context合同](shared_context_interface.md)，原资源与门槛见[归档方案](independent_streaming_frontend.md#6-已归档工作单与原验收设计)。
+- SoulX保留内部SenseVoice教师、门控、窗口修订、状态反馈和原生reset，外接正文不注入状态KV，内部文字只作控制与诊断。
+- 同一持续PCM分别驱动控制与X2；X2按原生80ms步推进，真实EOS闭合组后按完整词追加正文，不暴露子词草稿，多词组一次可见。
+- 两路各自更新所属Context字段，短锁合并并原子读取，无逐块配对；控制器reset不清正文或交接，不结束X2。
+- 四类非complete立即交付，有效nonidle直接停止；complete只有真实进度追齐且正文已提交后才ready。后续nonidle／incomplete取消旧交接，超时不强行放行，ready不保证尾词必齐。
+- 完整合同见[独立前端](independent_streaming_frontend.md)及[Context接口](shared_context_interface.md)。下游尚未接入，现役Agent不因计划恢复而切换。
 
 ## 历史合同与验证记录
 

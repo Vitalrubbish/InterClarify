@@ -1,36 +1,38 @@
 # 工作单管理
 
-更新：2026-11-02。用户要求先归档目前活跃issue，再建立SenseVoice／X2教师接入与状态退化调研工作单。原NTF-015—020均为**未实施归档**；独立X2正文和complete交接方案保留，不继续作为活动实施计划。归档原因及范围见[归档记录](../reports/soulx/20261102-frontend-plan-archive/README.md)，新范围见[调研方案](../dev/SoulX-Duplug/asr_teacher_diagnosis.md)、[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。
+更新：2026-11-02。按用户最新指令恢复**SoulX原生SenseVoice控制＋独立X2完整词正文**路线。NTF-015—020重新列为active，状态均为待实施；教师接入调研单已归档。分支、基线、归档与恢复范围见[恢复记录](../reports/soulx/20261102-external-asr-plan-restore/README.md)，实施合同见[独立前端设计](../dev/SoulX-Duplug/independent_streaming_frontend.md)、[Context接口](../dev/SoulX-Duplug/shared_context_interface.md)及[工程计划](../engineering_implementation.md)。
 
 ## 当前工作单
 
 | 工作单 | 工作单元 | 依赖 | 状态 |
 | --- | --- | --- | --- |
-| [NTF-021](NTF-021.md) | 原生教师协议、训练时标与对照合同核查 | 无 | 待调研 |
-| [NTF-022](NTF-022.md) | 同音频SenseVoice／X2词级时间轴对照 | NTF-021 | 待调研 |
-| [NTF-023](NTF-023.md) | 原生基线与最小X2教师替换的小样本对照 | NTF-021／022 | 待调研 |
-| [NTF-024](NTF-024.md) | 空步规则与教师提交时序的单因素归因 | NTF-022／023有效轨迹与预检 | 待调研 |
-| [NTF-025](NTF-025.md) | 固定FDB30复核与教师路线决策 | NTF-023预检通过、NTF-024归因完成 | 待调研 |
+| [NTF-015](NTF-015.md) | 原生控制封装、状态来源与reset审计 | 无 | 待实施 |
+| [NTF-016](NTF-016.md) | 同源PCM分发与独立X2完整词正文 | NTF-015输入合同 | 待实施 |
+| [NTF-017](NTF-017.md) | 异步SharedContext更新与生命周期 | NTF-015／016 | 待实施 |
+| [NTF-020](NTF-020.md) | 仅complete的回答交接同步 | NTF-015—017 | 待实施 |
+| [NTF-018](NTF-018.md) | 全链路预热与远端积压归因 | NTF-015—017／020 | 待实施 |
+| [NTF-019](NTF-019.md) | 独立前端单／双路固定FDB30验收 | NTF-018完整预热与实时门槛通过 | 待实施 |
 
-先核查原生协议与公开训练时标，再比较相同音频的ASR交付和教师实际消费。最小教师替换保留原生门控、差分／KV修订、规则、反馈与reset；必要差异先写明合同。规则开／关在两种ASR内分别完整重放，文字时序用固定因果序列单独消融，最后复核原FDB30，不把r6或SenseVoice当作绝对状态真值。
+执行顺序为015→016→017→020→018→019。SoulX保留原生SenseVoice教师、门控、修订、反馈及reset；X2只提供独立正文，两路同源音频、分别发布。四类非complete状态即时交付，有效nonidle直接停止；complete按真实X2进度与闭合正文进行有界交接，ready不承诺尾词必齐。
 
-本轮仅归档和建单，五份工作单均待调研，未实现或启动新远端作业。真实模型后续在远端conda受限作业运行，沿用单并发、1×4090、4CPU、32GiB、显存22GiB和在线800ms停止线；每阶段先冻结实验矩阵、作业数和总预算。旧工作单作业额度不自动转用，不训练、不接LLM／CoT／TTS、不切换现役Agent。
+本次只恢复分支基线、工作单和文档，没有实现或提交新作业。远端沿用conda、单活动作业、1×4090、4CPU、32GiB、显存22GiB和在线800ms停止线；NTF-018最多2作业、NTF-019最多2作业，各≤1800秒／128MiB，合计计划上限2 GPU小时／512MiB。启动前冻结实际矩阵与输入；不自动使用已归档调研的作业额度，不训练、不接LLM／CoT／TTS、不切换现役Agent。
 
-## 本次归档
+## 本次归档与恢复
 
-| 工作单 | 原范围 | 归档状态 |
+| 工作单 | 处理 | 状态说明 |
 | --- | --- | --- |
-| NTF-015 | 原生控制封装与reset审计 | 未实施归档，协议核查与采集转入新调研 |
-| NTF-016 | 同源音频与独立X2完整词正文 | 未实施归档，正文服务暂不实施 |
-| NTF-017 | 异步SharedContext与生命周期 | 未实施归档，接口／图源改造暂不实施 |
-| NTF-020 | 仅complete交接同步 | 未实施归档，原设计及下游约束保留 |
-| NTF-018 | 完整预热与积压归因 | 未实施归档，方法可供新对照复用 |
-| NTF-019 | 独立前端单／双路FDB30验收 | 未实施归档，新NTF-025改测教师替换 |
-| NTF-010 | 词级分词与尾词判据复测 | 已收口，补移归档目录，结论保持 |
+| NTF-021／022 | 保持已完成归档，撤回main中的实现提交 | 协议／同音频调研已执行；证据保留于本地artifacts和远端run，不再作为活动路线 |
+| NTF-023—025 | 归档当前active计划 | 未实施归档，不记为已完成 |
+| NTF-026 | 保留已完成的历史归档 | 调研入口监控修复随分支撤回，不恢复为活动实现 |
+| NTF-027 | 本次Git与工作单维护 | 已完成并归档，范围见恢复记录 |
+| NTF-015—020 | 从archive恢复至本目录 | 待实施，原生控制＋外接正文与complete交接合同恢复 |
 
-原工作单保存在本地`docs/issue/archive/`，遵循既有忽略约定；完整原文可由Git提交`e15554b`追溯，[归档记录](../reports/soulx/20261102-frontend-plan-archive/README.md)进入Git。原生控制＋独立正文仍是候选设计，是否采用在新调研结束后决定，旧工作单不自动恢复。
+本地`docs/issue/archive/`继续不纳入Git；归档前原计划可由main基线0376ba7追溯，恢复的015—020原文可追溯e15554b。[前次归档记录](../reports/soulx/20261102-frontend-plan-archive/README.md)保留当时决策，本次明确恢复取代其活动状态，不把未实施计划写成完成成果。
 
 ## 已归档实验
+
+NTF-021／022已完成调研，现撤回实现分支；NTF-023—025未实施归档，详见[本次记录](../reports/soulx/20261102-external-asr-plan-restore/README.md)。相关结果不证明X2无法适配SoulX，本次选择保留原生控制、外接正文以减少教师协议改动。
+
 
 NTF-011／012已完成，NTF-013离线归因和NTF-014源码重置也已完成并归档。comparison旧实验已清除，官方源码已重新克隆并显式纳入子模块，见[清理报告](../reports/soulx/20261102-source-reset/README.md)。旧教师替换、配对发布仅保留历史证据。
 
@@ -74,7 +76,7 @@ NTF-001／002 已完成并归档至本地 `archive/`：教师文字前端与屏�
 
 | 路线 | 归档状态 | 入口 |
 | --- | --- | --- |
-| SoulX-Duplug | 当前活动：SenseVoice／X2教师协议、时序与状态退化调研；新前端和下游尚未接入 | [路线文档](../dev/SoulX-Duplug/README.md) |
+| SoulX-Duplug | 当前活动：原生SenseVoice控制＋独立X2正文、仅complete交接；NTF-015—020待实施 | [路线文档](../dev/SoulX-Duplug/README.md) |
 | TextTurn | 已归档；共 11 项，7 项完成、TT-009 终止，TT-004／010／011 未完成 | [路线归档](../archive/dev/TextTurn/README.md) |
 | VoxTurn | 已归档；仅完成现成权重与接入可行性调研，未部署 | [调研归档](../archive/dev/VoxTurn/research_assessment.md) |
 | XTurnix | 已归档；XTX-001—005 与 XTX-007 完成，XTX-006 取消，XTX-009 仅完成来源审核 | [路线归档](../archive/dev/XTurnix/README.md) |

@@ -1,6 +1,6 @@
 # ASR 前端：160ms 全文与状态联合覆盖（历史）
 
-2026-11-02：本页保留旧实现结构说明；独立流式正文候选方案及NTF-015—020已未实施归档，当前先开展[教师接入调研](asr_teacher_diagnosis.md)，见[工作单索引](../../issue/README.md)。以下联合覆盖、旧reset封装及历史通过记录不作为新方案已实现的证据。
+2026-11-02：本页只保留旧联合发布实现及验收解释。当前[NTF-015—020](../../issue/README.md)已恢复为active，采用[原生控制＋独立X2正文](independent_streaming_frontend.md)和[异步Context／complete交接](shared_context_interface.md)，尚未实现。以下旧reset封装、逐块联合写入和历史检查不作为新方案已交付证据。
 
 2026-10-30，按用户指令撤下Nemotron＋SoulX专用适配和探针，采用官方SoulX＋SenseVoice。每处理一个160ms音频块，前端将最新话轮全文与本块状态原子覆盖到SharedContext，后续识别修订直接替换旧正文。不保存历史正文版本、patch或事件游标，不增加320ms定时器。
 

@@ -1,6 +1,6 @@
 # 用户话轮的 SharedContext 当前值接口
 
-2026-11-02，状态：已归档候选接口，未实施。用户要求归档NTF-015—020，当前转为[教师接入与状态退化调研](asr_teacher_diagnosis.md)，见[归档记录](../../reports/soulx/20261102-frontend-plan-archive/README.md)。以下保留此前确认的异步字段更新与仅complete交接设计，不表示已实现，也不是当前实施任务。完整原方案见[独立流式前端](independent_streaming_frontend.md)。
+2026-11-02，状态：当前接口设计，尚未实施。用户恢复[NTF-015—020](../../issue/README.md)为active；正文／状态独立更新由NTF-017实施，仅complete交接由NTF-020实施，实际链路由NTF-018／019验证，见[恢复记录](../../reports/soulx/20261102-external-asr-plan-restore/README.md)与[独立前端](independent_streaming_frontend.md)。本次仅恢复设计入口。
 
 ## 1. 独立更新与原子读取
 
@@ -59,6 +59,6 @@ ready只表示上述计算／提交同步通过，不保证此前所有词已发
 
 ## 5. 验收与历史
 
-原NTF-017／020拟检查交错更新、生命周期及complete同步，NTF-018／019拟验证完整预热和原始状态／ready交接质量，均已未实施归档。上述是候选接口的验收要求，不由当前调研自动实施；后续如恢复需另行建单。原始状态与交接质量仍须分别报告，不能用延后ready伪装SoulX原始状态改善。
+NTF-017／020已恢复为active，负责交错更新、生命周期及complete同步；NTF-018／019负责完整预热和原始状态／ready交接验收。以上仍为待实施合同，不能因工作单恢复就当作已交付。原始状态与交接质量仍须分别报告，不能用延后ready伪装SoulX原始状态改善。
 
 历史[160ms联合发布](streaming_transcript_publication.md)、[双ASR配对发布](../../archive/dev/SoulX-Duplug/dual_asr_publication.md)与教师同步均已被本合同替代。旧[六视图接口检查](../../../reports/soulx/20261030-current-context-test/README.md)和[双ASR18/30报告](../../../reports/soulx/20261031-dual-asr-publication/README.md)保留原解释，不作为新接口通过证据。
