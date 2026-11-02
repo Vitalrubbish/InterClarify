@@ -2,13 +2,11 @@
 
 更新：2026-11-02。[研究背景与参考文章](../research_design.md) · [边听边想](listening.md) · [边说边想](speaking.md)。
 
-语音前端采用 **SoulX原生控制＋独立X2Streaming-ASR整词正文**，整体位于Layer 0–Layer 2输入侧。SoulX内部保留SenseVoice教师、窗口修订及原生状态协议，独立正文不注入SoulX。两路各自就绪更新Context，无逐块配对屏障。用户已确认设计并要求建单，尚未实现，见[方案](../dev/SoulX-Duplug/independent_streaming_frontend.md)与[工程计划](../engineering_implementation.md)。
+用户要求先归档活跃工作单，再开展[SenseVoice／X2教师接入与状态退化调研](../dev/SoulX-Duplug/asr_teacher_diagnosis.md)。原NTF-015—020均为未实施归档，当前[NTF-021—025](../issue/README.md)先核查原生协议与同音频时序，再做最小替换、归因和固定样本复核。本轮仅归档与建单，尚未实现或提交新作业。
 
-历史Nemotron／X2教师替换与[双ASR配对发布](../archive/dev/SoulX-Duplug/dual_asr_publication.md)不作为当前协议。新方案完整预热优先覆盖真实语音、多长度和完成分支，以固定对照验证预热不足假设；不预先归因全部积压。下游尚未切换，有效nonidle的直接停止合同保持。
+下文保留此前确认的**原生SoulX控制＋独立X2整词正文**候选架构和下游合同，见[归档记录](../reports/soulx/20261102-frontend-plan-archive/README.md)。内部SenseVoice、异步Context和仅complete交接均属原候选设计，当前不推进接口实现；后续是否保留或替换教师由调研证据决定，不自动恢复旧工作单。有效nonidle直接停止、普通回答生成边界与CoT研究目标保留。
 
-保留原生五类状态：四类非complete立即供Layer 1读取；complete原始预测立即记录，只有独立X2进度与闭合正文同步、交接ready后才作为可回答的complete进入Layer 1输入。普通正式回答在当前turn实际读取后生成；有效nonidle仍立即直接停止，其他状态不映射start／keep。交接规则见[第4.1节](../dev/SoulX-Duplug/independent_streaming_frontend.md#41-仅-complete-的回答交接同步)，CoT扩展尚未实现。
-
-[架构图 PDF](../../figures/parathink_method_preview.pdf) · [图示说明](../figures/parathink_method.md)。旧预览尚未更新双路前端细节，当前前端流程以[新方案图](../dev/SoulX-Duplug/independent_streaming_frontend.md#2-音频与两路职责)为准，图源同步纳入NTF-017，不表示已完成接入或验证。TextTurn／XTurnix专属协议与历史状态见[工作单](../issue/README.md)。
+[架构图 PDF](../../figures/parathink_method_preview.pdf) · [图示说明](../figures/parathink_method.md)。预览未更新双路细节，原候选流程见[方案图](../dev/SoulX-Duplug/independent_streaming_frontend.md#2-音频与两路职责)；图源改造随NTF-017未实施归档，不表示已接入或验证。本轮不改图，不恢复TextTurn／XTurnix专属协议。
 
 ![ParaThink 共享上下文、并行思考与表达及打断执行流程](../../figures/parathink_method_preview.png)
 
@@ -23,7 +21,7 @@ thinking 流指与表达流分工的内部任务分析过程，在当前信息�
 
 ## 2. 模块与动作边界
 
-前端包含SoulX原生控制链路与独立流式ASR：前者产生五状态，后者产生下游正文，分别向SharedContext更新自己的字段。SoulX保持160ms主块，Context不要求两路按块配齐或同频发布。下游仅并列Layer 0、Layer 1和Layer 2，本项目不设Layer 3。前端与下游并发，不等待整轮识别或完成判断。后续CoT经Context反馈至前端，在合法输入边界参与状态判断，条件化适配与训练尚未实现。
+以下前端分工保留为已归档的独立正文候选设计，具体选型等待教师调研结论。该设计中前端包含SoulX原生控制链路与独立流式ASR：前者产生五状态，后者产生下游正文，分别向SharedContext更新自己的字段。SoulX保持160ms主块，Context不要求两路按块配齐或同频发布。下游仅并列Layer 0、Layer 1和Layer 2，本项目不设Layer 3。前端与下游并发，不等待整轮识别或完成判断。后续CoT经Context反馈至前端，在合法输入边界参与状态判断，条件化适配与训练尚未实现。
 
 | 模块 | 职责 | 输出 |
 | --- | --- | --- |
@@ -49,7 +47,7 @@ Layer 0/1 的发声路径直接连接 Text FIFO，Context 不向队列提交文�
 
 Context 保存当前实际可用的用户全文和当前 SoulX 状态，不保留历史正文版本；另保存 Layer 1 真实生成历史和输出、Layer 2 已发布结果、Layer 0 时机建议，以及实际输出阶段和打断事件。该存储不意味着输出运行时订阅全部状态；用户状态输入与打断执行记录分开。生成、提交、取消与实际播放分别记录，不能把已生成内容直接视为用户已听内容；同一份生成文本不重复注入模型输入。
 
-2026-11-02用户确认：正文、原始状态及无新字步骤的ASR进度分别就绪更新，短锁合并并原子读取；X2的EOS闭合组完整词正文不等待complete。仅complete回答交接固定原始实际观察截止，等待X2覆盖、开放组闭合及正文提交后ready；每话轮至多一条当前交接记录，替代此前完全不保留complete的约束，不建立历史队列。有效nonidle／incomplete取消，idle／backchannel与内部reset不清除；ready同ID最多用于一次生成。超时按既有800ms总延迟线失败，尾词未知不冒充final。有效打断即时执行，等待不阻塞两路。新接口及同步待NTF-017／020实现，见[接口设计](../dev/SoulX-Duplug/shared_context_interface.md)。
+2026-11-02用户确认：正文、原始状态及无新字步骤的ASR进度分别就绪更新，短锁合并并原子读取；X2的EOS闭合组完整词正文不等待complete。仅complete回答交接固定原始实际观察截止，等待X2覆盖、开放组闭合及正文提交后ready；每话轮至多一条当前交接记录，替代此前完全不保留complete的约束，不建立历史队列。有效nonidle／incomplete取消，idle／backchannel与内部reset不清除；ready同ID最多用于一次生成。超时按既有800ms总延迟线失败，尾词未知不冒充final。有效打断即时执行，等待不阻塞两路。新接口及同步随NTF-017／020未实施归档，当前不推进，见[接口设计](../dev/SoulX-Duplug/shared_context_interface.md)。
 
 SoulX 持续读取到达的音频，不能沿用旧文本控制器“只有 ASR 文字变化才判断”的调度，也不能因无新增文字而跳过真实音频或静音观察。ASR 正文在下游输入边界采用最新值，识别修订不自动改变在途模型输入，后续 CoT 在合法输入边界注入；CoT 更新是否独立触发控制请求仍待设计。Layer 1 和 Layer 2 只在各自明确的输入边界消费新增观察，已经构造的输入不因结果到达而自动重算。
 

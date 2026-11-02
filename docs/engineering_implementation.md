@@ -1,56 +1,43 @@
 # 工程实施计划
 
-更新：2026-11-02。用户确认[原生SoulX控制＋独立X2整词正文](dev/SoulX-Duplug/independent_streaming_frontend.md)，并补充只有complete交接等待独立解码。当前工作单为NTF-015—020，执行顺序见下表；本轮仅设计与建单，尚未实现或启动远端作业。范围见[研究方案](research_design.md)，下游边界见[架构](research_design/architecture.md)。
+更新：2026-11-02。用户要求归档当前活跃issue，先调研SenseVoice／X2教师接入与状态退化。原NTF-015—020均为未实施归档，见[归档记录](reports/soulx/20261102-frontend-plan-archive/README.md)。当前为[NTF-021—025](issue/README.md)，本轮仅归档与建单，没有实现或提交远端作业。研究范围见[研究方案](research_design.md)，详细合同见[调研方案](dev/SoulX-Duplug/asr_teacher_diagnosis.md)。
 
 ## 1. 当前目标与运行底座
 
-目标前端位于Layer 0–Layer 2输入侧。SoulX内部保留SenseVoice教师、文字门控、窗口修订、状态反馈及原生reset；按用户指定，X2Streaming-ASR独立持续解码，只在EOS闭合组后以完整词追加共享正文，不暴露组内子词，不向SoulX注入外部教师文字。两路接收同一PCM，各自就绪即更新Context，不等待逐块配齐。
+先核查官方教师协议与训练分块时标，再对同一音频测量两种ASR的出词、修订／闭合、教师消费及墙钟时间。从原生SenseVoice建立干净基线，尽量保持门控、差分／KV修订、状态规则、反馈和reset接入X2；明确不可避免的协议差异，再通过单因素消融定位退化原因。
 
-现役底座仍为X-Talk ca9b23c、DuplexCascade、Nemotron EN160与Kokoro，见[运行配置](runtime_baseline.md)。本轮不切换现役Agent；官方源码使用[本地子模块和远端独立checkout](third_party/soulx-duplug.md)，不恢复已退役comparison加载器。
+现役底座仍为X-Talk ca9b23c、DuplexCascade、Nemotron EN160与Kokoro，见[运行配置](runtime_baseline.md)。本轮不切换Agent；官方源码使用[子模块和远端独立checkout](third_party/soulx-duplug.md)，不恢复已退役comparison加载器。既有实现和历史通过记录不替代新对照。
 
-| 模块 | 当前设计职责 |
-| --- | --- |
-| SoulX原生控制 | 保留内部教师协议和五状态，提供实际输入／状态来源及时间边界 |
-| 独立X2Streaming-ASR | 复用锁定4B模型、BF16与原生80ms自适应缓存，EOS闭合后按完整词追加正文 |
-| SharedContext | 正文／原始状态／实际解码进度分别更新，短锁原子合并，保存至多一条当前complete交接记录 |
-| complete交接同步 | 原始complete固定目标，X2真实追齐并提交闭合组后ready；支持续说取消、去重与有界超时，不阻塞两路 |
-| Layer 1 | 读取即时正文及四类非complete状态，实际读到交接ready的complete后于当前turn开始普通回答，同ID去重 |
-| 输出运行时 | 有效nonidle直接提交唯一停止执行点；其他状态不映射start／keep |
-| Layer 2／Layer 0 | CoT思考与系统附和属于后续接入，本轮不实现 |
-
-控制器reset不结束ASR、不清空正文、交接记录或重开逻辑话轮。原始complete立即记录，仅用于回答的complete等待对应解码与已闭合正文；ready不保证所有尾词已发射。原有无complete保留约束改为至多一条当前交接记录，不建历史队列或新语义判断模型。生成、停止、实际播放与已听内容的既有边界保持。
-
-## 2. 实施顺序与门槛
+## 2. 调研顺序与交付
 
 | 顺序 | 工作单 | 交付与进入下一步的条件 |
 | --- | --- | --- |
-| 1 | [NTF-015](issue/NTF-015.md) | 原生控制封装与reset／采样账本审计；不套用旧教师和buffer写回补丁 |
-| 2 | [NTF-016](issue/NTF-016.md) | 同源PCM分发、X2原生80ms解码与EOS完整词提交，无跨路屏障或旧教师两帧聚合 |
-| 3 | [NTF-017](issue/NTF-017.md) | 异步字段合并、原子快照、关闭与迟到处理，必要契约检查通过 |
-| 4 | [NTF-020](issue/NTF-020.md) | 仅complete的交接同步、取消、去重与超时，必要契约检查通过 |
-| 5 | [NTF-018](issue/NTF-018.md) | 完整预热及有限预热对照，含交接路径；双路三轴3/3完整、无过载才进入正式验收 |
-| 6 | [NTF-019](issue/NTF-019.md) | 固定FDB30单路／双路对照，原始状态与ready交接分开报告；30/30、退出0、无过载为实时门槛 |
+| 1 | [NTF-021](issue/NTF-021.md) | 协议／训练时标核查、公开资料缺口、冻结输入与采集／预热合同，以及前两项实验预算 |
+| 2 | [NTF-022](issue/NTF-022.md) | 固定6条的独立ASR词级时间轴，区分首次出现、修订、EOS闭合和计算时间 |
+| 3 | [NTF-023](issue/NTF-023.md) | 原生采集等价性、最小X2适配diff及6条完整状态轨迹；正确性与实时预检通过 |
+| 4 | [NTF-024](issue/NTF-024.md) | 两ASR内规则开／关完整重放，固定因果文字的提交延迟消融，明确有效归因与限制 |
+| 5 | [NTF-025](issue/NTF-025.md) | 原固定FDB30复核原生／最小替换臂，必要时加一条预先冻结消融臂，形成路线建议 |
 
-预热不足作为优先排查假设：历史双ASR缺少完整非静音、多长度预热。新预热须覆盖真实语音触发的内部ASR、多个窗口／整轮长度、修订、完成分支及独立流式解码；预热会话与正式输入隔离，全部就绪后才启动到达时钟。分别报告首遇路径与稳定阶段的排队、计算和发布，不预先把全部积压归因于预热，也不为通过而放慢送音或去掉首帧。
+小样本包括接话ID102／3、停顿ID127、打断ID136／20／9，均来自原FDB30。每次对照使用完全相同PCM，不因结果换样本。状态按标注及事件核查评价，r6与SenseVoice都不是绝对状态真值。正式30条不做显著性承诺，失败、识别覆盖、原始与规则改写状态全部报告。
 
-新链路当前只完成设计。历史接口、教师实验和六视图检查不能替代以上验收；真实模型只在远端conda受限调度作业执行，本地仅做必要轻量契约检查。每个实现文件同步维护docs同路径中文说明，包含功能、类设计与核心方法。
+ASR独立时间测量与控制器门控后的实际消费分开。延后同一个complete的发布不是状态预测改善；强制对齐和完整后续音频仅作离线评分，不能让在线教师提前看到未来词。门控、修订或reset无法等价时先补设计，不能将多项改造解释为单纯换ASR。
 
-## 3. 资源与执行边界
+## 3. 资源与实施边界
 
-远端根目录为~/parathink-soulx-duplug/，只读复用既有权重、conda和数据，见[目录约定](remote_workspace.md)。单并发作业、1×4090、4CPU、32GiB RAM、batch=1，显存停止线22GiB；每路模型worker各1、CPU线程各≤2，不启动无界worker池。
+本地使用既有conda完成必要轻量检查，真实模型只在远端conda调度作业运行。复用已有权重、环境和数据，每个实现文件同步维护docs同路径中文说明，包含整体功能、类设计和核心方法。
 
-每路未读真实PCM≤800ms，送音迟到及各路在线发布延迟执行800ms过载停止线，PCM总量≤4MiB。各路发布延迟分别按真实主块／解码范围和完整观察边界报告；800ms是保护上限，不是交互质量目标。Context容量沿用既有限额，不以无界队列隐藏慢路。
+远端单活动作业、1×4090、4CPU、32GiB RAM、batch=1、显存22GiB停止线；每模型worker至多1、CPU线程各≤2。每作业≤1800秒、输出≤128MiB、启动空闲磁盘≥10GiB。每路未读PCM≤800ms、总PCM≤4MiB，在线送音迟到和发布延迟沿用800ms停止线，不靠慢速送音或丢帧达标。
 
-complete首轮等待上限为800ms，deadline还受原始complete主块截止到ready的既有800ms总延迟线约束，取更早者，不追加预算。等待非阻塞，重复complete不续期，有效nonidle续说与incomplete撤销旧交接；超时验证失败，不以旧正文或半词强行放行。
+预热覆盖真实语音、多种窗口长度、修订与完成分支，以及X2首块／增量、WAIT／DECODE／EOS；就绪后清理会话、重置种子再启动正式时钟。离线因果重放单独标记，不能用其加速吞吐充当在线延迟。
 
-NTF-018最多2个串行作业，NTF-019最多2个串行作业；每作业≤1800秒、结果≤128MiB，累计GPU预算≤2小时、结果≤512MiB，启动空闲磁盘≥10GiB。不复制权重，不自动重复实验、换卡、扩容或提高停止线。预检未过则不启动正式30条，失败与未通过结论照实保留。
+NTF-021冻结NTF-022／023有限矩阵与总预算；NTF-024和NTF-025各自在实施前冻结实验臂、作业数、累计GPU时长及结果预算。原NTF-018／019额度随归档失效，不自动转用。前置预检未过不启动正式30条，不自动扩容、换卡、调阈值或筛选重跑。本轮不启动推理／训练、不接LLM／CoT／TTS。
 
-用户本轮要求设计与建单，以上是后续实施合同，当前不提交GPU任务、不训练，也不接下游LLM／CoT／TTS。
+## 4. 已归档方案与后续研究
 
-## 4. 后续研究与历史证据
+[原生控制＋独立X2正文](dev/SoulX-Duplug/independent_streaming_frontend.md)及[SharedContext接口](dev/SoulX-Duplug/shared_context_interface.md)保留为候选设计。正文／状态独立更新、仅complete交接、续说取消、去重和超时均未实现；是否采用等待新调研结论，原工作单不自动恢复。
 
-SoulX联合音频、转写与已发布CoT的条件化控制仍是后续研究目标；其序列、缓存、触发与训练另行设计，见[架构第2.5节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。Layer 1表达与思考调用、Layer 2分析和Layer 0附和专项按既有研究范围推进，不因本轮前端建单自动实施。
+已确认的下游分工、普通回答生成边界、有效nonidle直接停止、单一输出执行点与TTS播放所有权保留。CoT条件化控制仍是后续研究目标，见[架构第2.5节](research_design/architecture.md#25-soulx-的-cot-条件化控制)；本次不构造训练数据或更新参数。图源改造随旧接口工作归档，当前不改图。
 
-历史Nemotron／X2教师前端与双ASR配对发布保留报告：[双ASR18/30及预热差异](../reports/soulx/20261031-dual-asr-publication/README.md)、[Nemotron教师30/30](../reports/soulx/20261101-ntf009-teacher-fdb30/README.md)、[X2教师30/30](reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)、[协议差异归因](reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)。这些实验未证明新方案已通过，也不作为绝对状态真值。
+历史证据包括[X2教师30/30](reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)、[协议差异归因](reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)、[Nemotron教师](../reports/soulx/20261101-ntf009-teacher-fdb30/README.md)及[双ASR配对](../reports/soulx/20261031-dual-asr-publication/README.md)。原始证据保持，不作为当前方案已经验证的依据。
 
-TextTurn、VoxTurn、XTurnix已归档，入口见[归档区](archive/dev/README.md)、[实现归档](../archive/README.md)和[报告](../reports/README.md)。历史工作单保留在本地docs/issue/archive/，不进入Git；旧训练、全量benchmark和comparison实验不自动恢复。
+TextTurn、VoxTurn、XTurnix已归档，见[归档区](archive/dev/README.md)、[实现归档](../archive/README.md)和[报告](../reports/README.md)。历史issue保存在本地docs/issue/archive/，不新增跟踪；旧训练与全量benchmark不恢复。

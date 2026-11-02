@@ -1,21 +1,34 @@
 # 工作单管理
 
-更新：2026-11-02。用户已确认 **SoulX原生控制＋独立X2Streaming-ASR整词转写**，并要求建立相关工作单。按进一步指定，正文来源改为X2，以EOS闭合组中的完整词追加Context，不暴露子词草稿；原先拟用Nemotron的选型被替代。SoulX保留SenseVoice内部教师，两路各自就绪发布，不等待逐块配齐。设计见[独立流式前端](../dev/SoulX-Duplug/independent_streaming_frontend.md)、[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。
+更新：2026-11-02。用户要求先归档目前活跃issue，再建立SenseVoice／X2教师接入与状态退化调研工作单。原NTF-015—020均为**未实施归档**；独立X2正文和complete交接方案保留，不继续作为活动实施计划。归档原因及范围见[归档记录](../reports/soulx/20261102-frontend-plan-archive/README.md)，新范围见[调研方案](../dev/SoulX-Duplug/asr_teacher_diagnosis.md)、[研究方案](../research_design.md)与[工程计划](../engineering_implementation.md)。
 
 ## 当前工作单
 
 | 工作单 | 工作单元 | 依赖 | 状态 |
 | --- | --- | --- | --- |
-| [NTF-015](NTF-015.md) | 保留原生协议的SoulX控制封装及reset审计 | 无 | 待实施 |
-| [NTF-016](NTF-016.md) | 同源音频分发与X2的EOS完整词正文 | NTF-015输入合同 | 待实施 |
-| [NTF-017](NTF-017.md) | 正文／状态独立更新、原子快照与生命周期 | NTF-015／016 | 待实施 |
-| [NTF-020](NTF-020.md) | 仅complete的交接同步、续说取消、去重与超时 | NTF-015—017 | 待实施 |
-| [NTF-018](NTF-018.md) | 完整预热、远端积压归因及实时门槛 | NTF-015—017／020 | 待实施 |
-| [NTF-019](NTF-019.md) | 固定FDB30单路／双路验收 | NTF-018通过 | 待实施 |
+| [NTF-021](NTF-021.md) | 原生教师协议、训练时标与对照合同核查 | 无 | 待调研 |
+| [NTF-022](NTF-022.md) | 同音频SenseVoice／X2词级时间轴对照 | NTF-021 | 待调研 |
+| [NTF-023](NTF-023.md) | 原生基线与最小X2教师替换的小样本对照 | NTF-021／022 | 待调研 |
+| [NTF-024](NTF-024.md) | 空步规则与教师提交时序的单因素归因 | NTF-022／023有效轨迹与预检 | 待调研 |
+| [NTF-025](NTF-025.md) | 固定FDB30复核与教师路线决策 | NTF-023预检通过、NTF-024归因完成 | 待调研 |
 
-用户进一步确认仅complete回答交接等待独立X2解码，新增NTF-020，在NTF-018前执行：原始complete即时记录，ready后才携正文供正式回答；其他状态与正文无跨路等待。续说nonidle／incomplete取消旧候选，超时不强行放行，不增加逐块配对队列；计算追齐不等于尾词必齐，须独立验收覆盖。
+先核查原生协议与公开训练时标，再比较相同音频的ASR交付和教师实际消费。最小教师替换保留原生门控、差分／KV修订、规则、反馈与reset；必要差异先写明合同。规则开／关在两种ASR内分别完整重放，文字时序用固定因果序列单独消融，最后复核原FDB30，不把r6或SenseVoice当作绝对状态真值。
 
-本轮只设计与建单，六份工作单均待实施，不提交远端作业。预热不足仍为优先验证假设，区分首遇长尾与持续积压。远端单并发、1×4090、4CPU、32GiB、显存22GiB停止线；交接等待与既有800ms总延迟线取更早者，不叠加预算，详见工作单。下游尚未切换，不训练、不接LLM／CoT／TTS，也不恢复旧comparison入口。
+本轮仅归档和建单，五份工作单均待调研，未实现或启动新远端作业。真实模型后续在远端conda受限作业运行，沿用单并发、1×4090、4CPU、32GiB、显存22GiB和在线800ms停止线；每阶段先冻结实验矩阵、作业数和总预算。旧工作单作业额度不自动转用，不训练、不接LLM／CoT／TTS、不切换现役Agent。
+
+## 本次归档
+
+| 工作单 | 原范围 | 归档状态 |
+| --- | --- | --- |
+| NTF-015 | 原生控制封装与reset审计 | 未实施归档，协议核查与采集转入新调研 |
+| NTF-016 | 同源音频与独立X2完整词正文 | 未实施归档，正文服务暂不实施 |
+| NTF-017 | 异步SharedContext与生命周期 | 未实施归档，接口／图源改造暂不实施 |
+| NTF-020 | 仅complete交接同步 | 未实施归档，原设计及下游约束保留 |
+| NTF-018 | 完整预热与积压归因 | 未实施归档，方法可供新对照复用 |
+| NTF-019 | 独立前端单／双路FDB30验收 | 未实施归档，新NTF-025改测教师替换 |
+| NTF-010 | 词级分词与尾词判据复测 | 已收口，补移归档目录，结论保持 |
+
+原工作单保存在本地`docs/issue/archive/`，遵循既有忽略约定；完整原文可由Git提交`e15554b`追溯，[归档记录](../reports/soulx/20261102-frontend-plan-archive/README.md)进入Git。原生控制＋独立正文仍是候选设计，是否采用在新调研结束后决定，旧工作单不自动恢复。
 
 ## 已归档实验
 
@@ -61,7 +74,7 @@ NTF-001／002 已完成并归档至本地 `archive/`：教师文字前端与屏�
 
 | 路线 | 归档状态 | 入口 |
 | --- | --- | --- |
-| SoulX-Duplug | 当前活动：语音前端与 Shared Context 已实现，下游 LLM、思考与真实输出未接入 | [路线文档](../dev/SoulX-Duplug/README.md) |
+| SoulX-Duplug | 当前活动：SenseVoice／X2教师协议、时序与状态退化调研；新前端和下游尚未接入 | [路线文档](../dev/SoulX-Duplug/README.md) |
 | TextTurn | 已归档；共 11 项，7 项完成、TT-009 终止，TT-004／010／011 未完成 | [路线归档](../archive/dev/TextTurn/README.md) |
 | VoxTurn | 已归档；仅完成现成权重与接入可行性调研，未部署 | [调研归档](../archive/dev/VoxTurn/research_assessment.md) |
 | XTurnix | 已归档；XTX-001—005 与 XTX-007 完成，XTX-006 取消，XTX-009 仅完成来源审核 | [路线归档](../archive/dev/XTurnix/README.md) |

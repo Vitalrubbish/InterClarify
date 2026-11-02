@@ -6,6 +6,8 @@ ParaThink 研究独立 thinking 流在语音 Agent 倾听与表达期间持续�
 
 当前重新以官方 **SoulX-Duplug** 源码为起点。本地源码在 [third_party/soulx-duplug](third_party/soulx-duplug)，作为Git子模块固定官方提交；clone父仓库时使用`--recurse-submodules`，已有仓库执行`git submodule update --init third_party/soulx-duplug`。源码与依赖说明见[子模块说明](docs/third_party/soulx-duplug.md)。
 
+当前工作为[SenseVoice／X2教师接入调研](docs/dev/SoulX-Duplug/asr_teacher_diagnosis.md)，新工作单见[NTF-021—025](docs/issue/README.md)。原NTF-015—020均未实施归档；先核查协议、同音频词级时序与状态退化原因，再决定教师替换或独立正文路线。本轮仅归档与建单。
+
 此前Nemotron／X2教师前端及固定实验保留为历史改造证据：NTF-011／012实时性和规范分词通过、状态质量未整体改善，见[同卡报告](docs/reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)。这些适配器不等同于官方原生推理。comparison历史实验按NTF-014清理，公共模型与conda继续保留；本次不启动新模型测试、训练或下游切换。
 
 | 内容 | 位置 |

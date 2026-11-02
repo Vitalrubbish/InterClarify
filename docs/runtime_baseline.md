@@ -1,6 +1,6 @@
 # 已采用的运行时配置
 
-更新：2026-11-02。本文记录已采用的运行底座与参数；具体任务配置见 `configs/`，实验结论以对应报告为准。当前目标为[原生SoulX控制＋独立X2Streaming-ASR整词正文](dev/SoulX-Duplug/independent_streaming_frontend.md)，内部SenseVoice教师保留，已建NTF-015—019，尚未实现或替换下述现役控制路径。已有远端资产见[部署说明](dev/SoulX-Duplug/deployment.md)，目标职责见[架构设计](research_design/architecture.md)。
+更新：2026-11-02。本文记录已采用的运行底座与参数；具体任务配置见`configs/`，实验结论以对应报告为准。原NTF-015—020已未实施归档，独立X2正文方案保留为候选；当前先开展[SenseVoice／X2教师调研](dev/SoulX-Duplug/asr_teacher_diagnosis.md)，工作单见[NTF-021—025](issue/README.md)，尚未替换下述现役控制路径。已有远端资产见[部署说明](dev/SoulX-Duplug/deployment.md)，下游目标见[架构设计](research_design/architecture.md)。
 
 ## 组件
 

@@ -1,6 +1,6 @@
 # SoulX-Duplug 的 ASR 低延迟适配调研
 
-2026-11-02当前决定：采用[原生SoulX控制＋独立X2Streaming-ASR整词正文](independent_streaming_frontend.md)，保留内部SenseVoice教师，不将外部正文注入状态KV；正文与状态分别就绪发布。已按用户要求建立NTF-015—019，本轮尚未实现或运行实验。以下是历史选型、教师替换及组合适配记录，不作为当前执行合同。
+2026-11-02当前工作：用户要求归档NTF-015—020，先开展[SenseVoice／X2教师接入调研](asr_teacher_diagnosis.md)，见[新工作单](../../issue/README.md)与[归档记录](../../reports/soulx/20261102-frontend-plan-archive/README.md)。原生控制＋独立X2正文保留为未实施候选，先核查同音频时序、原生协议和状态退化原因，再决定路线。本轮仅归档与建单；以下为历史选型与实验记录。
 
 2026-10-30 撤回说明：用户已指令停止 Nemotron＋SoulX 路线，转向官方 SoulX＋SenseVoice 的160ms当前值写入。以下为历史调研／实验记录，不再作为执行计划；专用适配器和入口已移除，源码由 Git 提交 `9fb5319` 追溯。现役独立 Nemotron ASR 服务不属于本次组合回退范围。
 
