@@ -174,7 +174,6 @@ class DualAudioFrontend:
         self.close_failure = None
         self._state_lock, self._worker = threading.RLock(), threading.Lock()
         self.last_step = None
-        self._asr_completed_until = self._controller_completed_until = 0
         controller_live, asr_live = controller.is_live, asr.is_live
         controller.is_live = lambda: not self.closed and controller_live()
         asr.is_live = lambda: not self.closed and asr_live()
@@ -207,15 +206,8 @@ class DualAudioFrontend:
                 raise MemoryError('Model PCM allocation would exceed 4 MiB')
 
     def _check_bounds(self):
-        for lane, until in (('controller', self._controller_completed_until), ('asr', self._asr_completed_until)):
-            if self.ledger.end - until > 12800:
-                raise BufferError(f'{lane}: unread PCM exceeded 800 ms')
         if self.ledger.nbytes + self.controller.pcm_bytes() > 4 * 2**20:
             raise MemoryError('Total PCM exceeded 4 MiB')
-        if self.realtime and self.started_at is not None:
-            for lane, until in (('controller', self._controller_completed_until), ('asr', self._asr_completed_until)):
-                if self.clock() - self.started_at - until / 16000 > .8:
-                    raise TimeoutError(f'{lane}: online progress exceeded 800 ms')
 
     def append_pcm(self, audio):
         try:
@@ -225,10 +217,6 @@ class DualAudioFrontend:
                 # Check allocation before copying an oversized transport packet.
                 if self.ledger.nbytes + np.asarray(audio).nbytes + self.controller.pcm_bytes() > 4 * 2**20:
                     raise MemoryError('Transport packet exceeds total PCM bound')
-                size = np.asarray(audio).size
-                for lane, until in (('controller', self._controller_completed_until), ('asr', self._asr_completed_until)):
-                    if self.ledger.end + size - until > 12800:
-                        raise BufferError(f'{lane}: transport packet exceeds 800 ms unread PCM')
                 packet = self.ledger.append(audio)
                 if self.started_at is None:
                     self.started_at = self.clock() - self.ledger.end / 16000
@@ -257,8 +245,6 @@ class DualAudioFrontend:
                         break
                     self._reserve_pcm(1680 * 4)
                     frames.append(self.asr.step(self.ledger, ticket[1]))
-                    with self._state_lock:
-                        self._asr_completed_until = self.asr.processed_until
                 if not frames:
                     raise RuntimeError('EOF without an ASR completion cannot release a step')
                 receipt = {'lane': 'asr', 'session_id': self.asr.session_id,
@@ -266,8 +252,6 @@ class DualAudioFrontend:
                            'terminal': self.ledger.eof and self.asr.processed_until == self.ledger.end,
                            'processed_until': self.asr.processed_until, 'completed_at': self.clock()}
             with self._state_lock:
-                if lane == 'controller':
-                    self._controller_completed_until = receipt['processed_until']
                 self.barrier.acknowledge(ticket, receipt)
                 self._check_bounds()
         except Exception as exc:

@@ -1,6 +1,6 @@
 # 已采用的运行时配置
 
-更新：2026-11-02。本文记录已采用的运行底座与参数；具体任务配置见`configs/`，实验结论以对应报告为准。用户已恢复[NTF-015—020](issue/README.md)为active，计划采用[原生SenseVoice控制＋独立X2正文](dev/SoulX-Duplug/independent_streaming_frontend.md)，015／016／017已完成本地交付，020未实施取消归档，018／019待实施；尚未替换下述现役控制路径，见[恢复记录](reports/soulx/20261102-external-asr-plan-restore/README.md)。已有远端资产见[部署说明](dev/SoulX-Duplug/deployment.md)，下游目标见[架构设计](research_design/architecture.md)。
+更新：2026-11-03。本文记录已采用的运行底座与参数；具体任务配置见`configs/`，实验结论以对应报告为准。[原生SenseVoice控制＋独立X2正文](dev/SoulX-Duplug/independent_streaming_frontend.md)的015／016／017本地交付、018真实权重预检均已归档，019已由用户审核通过并归档；030取消前端800ms时长停止条件，保留容量与资源上限。后续LLM接入暂缓，尚未替换下述现役控制路径。已有远端资产见[部署说明](dev/SoulX-Duplug/deployment.md)，下游目标见[架构设计](research_design/architecture.md)。
 
 ## 组件
 

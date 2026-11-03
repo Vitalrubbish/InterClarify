@@ -1,10 +1,10 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
-2026-11-03，当前采用原生SoulX＋SenseVoice控制、独立X2完整词正文及160ms联合提交。015／016／017本地实现已归档；[NTF-018](reports/soulx/20261103-ntf018-warmup/README.md)已通过完整预热、真实权重对照及并发三轴3/3，019已启动固定FDB30双／单路验收。020已取消额外交接等待，已提交complete携当前正文直接供下游读取；当前未接LLM／CoT／TTS或切换现役Agent。合同见[独立前端](dev/SoulX-Duplug/independent_streaming_frontend.md)与[Context接口](dev/SoulX-Duplug/shared_context_interface.md)。
+2026-11-03，当前采用原生SoulX＋SenseVoice控制、独立X2完整词正文及160ms联合提交。015／016／017本地实现已归档；[NTF-018](reports/soulx/20261103-ntf018-warmup/README.md)已通过完整预热、真实权重对照及并发三轴3/3，[NTF-019](reports/soulx/20261103-ntf019-fdb30/README.md)已由用户审核通过并归档，原29/30、退出1和单路缺失保留。[NTF-030](reports/soulx/20261103-latency-limit-removal/README.md)按用户指令取消800ms时长停止条件，保留容量与作业资源保护。后续LLM接入暂缓，031—035草案未实施归档，当前未接LLM／CoT／TTS或切换现役Agent。合同见[独立前端](dev/SoulX-Duplug/independent_streaming_frontend.md)与[Context接口](dev/SoulX-Duplug/shared_context_interface.md)。
 
 此前comparison旧实验已清除，官方源码已重新克隆并纳入子模块，见[源码说明](third_party/soulx-duplug.md)与[清理报告](reports/soulx/20261102-source-reset/README.md)。Nemotron／X2教师替换和双ASR配对发布保留为历史实验，不恢复旧入口。X2同卡30/30、实时及分词规范性通过，但状态未整体改善，见[报告](reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)与[归因](reports/soulx/20261101-ntf012-x2-teacher-fdb30/regression_analysis.md)。此前双ASR18/30完整、12条800ms触限，存在非静音、多长度预热不足的配置差异，见[历史审计](../reports/soulx/20261031-dual-asr-publication/README.md)。预热不足是优先验证假设，尚不能认定是全部积压的原因。模型权重固定，不训练，尚未切换现役下游Agent。
 
-当前前端保持两路职责：SoulX通过原生SenseVoice教师和音频预测五状态，X2独立以真实EOS闭合组提供完整词正文，不进入状态KV。两路同源PCM；每160ms等X2两个80ms步及SoulX本步均结束后，将文本和状态token一次原子写入SharedContext，成功后推进下一周期，实际采样／前瞻范围另记。先完成结果只在内部暂存，不写PCM、不设前端停止旁路。内部reset不清空外接正文；已提交的有效complete携当前正文直接供下游使用，不再增加独立交接等待。原始状态、联合发布延迟和正文覆盖分别评价，不用延后发布宣称原生状态改善。015／016／017已本地交付，后续顺序为018→019。
+当前前端保持两路职责：SoulX通过原生SenseVoice教师和音频预测五状态，X2独立以真实EOS闭合组提供完整词正文，不进入状态KV。两路同源PCM；每160ms等X2两个80ms步及SoulX本步均结束后，将文本和状态token一次原子写入SharedContext，成功后推进下一周期，实际采样／前瞻范围另记。先完成结果只在内部暂存，不写PCM、不设前端停止旁路。内部reset不清空外接正文；已提交的有效complete携当前正文直接供下游使用，不再增加独立交接等待。原始状态、联合发布延迟和正文覆盖分别评价，不用延后发布宣称原生状态改善。前端工作已收口，本次仅完成归档与800ms停止条件取消。用户片段按首段实际播放分组的合同保留，下游暂不实施。
 
 此前已确认的下游分工与普通回答生成边界保留：独立正文方案中，五状态在所属160ms批次联合提交后供下游消费，Layer 1在正常输入边界读到已提交的有效complete及当前正文后可在当前turn生成普通回答；同步不保证尾词必齐。具体[接口合同](dev/SoulX-Duplug/shared_context_interface.md)的联合提交已由NTF-017交付，NTF-020已按[归档决定](reports/soulx/20261103-ntf020-handoff-retirement/README.md)取消，不以联合发布延迟改善原始状态指标。保留CoT条件下的主动澄清与话轮决策目标，后续让SoulX联合读取音频、转写和Layer 2已发布CoT；后续扩展见[架构第2.5节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
 

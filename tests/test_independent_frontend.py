@@ -376,10 +376,29 @@ class AudioTests(unittest.TestCase):
         self.assertIsNone(frontend.advance())
         self.assertEqual(frontend.asr.groups.text, 'hello world')
 
-    def test_bounds_errors_cancel_both_lanes_and_preserve_progress(self):
+    def test_long_backlog_and_late_processing_keep_continuous_pcm(self):
         frontend = self.make()
-        with self.assertRaises(BufferError):
-            frontend.append_pcm(np.zeros(12801, np.float32))
+        audio = np.linspace(-.1, .1, 16001, dtype=np.float32)
+        frontend.started_at = self.clock.now
+        frontend.append_pcm(audio)
+        np.testing.assert_array_equal(frontend.ledger.window(0, len(audio))[0], audio)
+        self.clock.now += 2
+        frontend.finish_input()
+        rows = []
+        while True:
+            row = frontend.advance()
+            if row is None:
+                break
+            rows.append(row)
+        self.assertFalse(frontend.closed)
+        self.assertEqual(len(rows), 7)
+        self.assertEqual(frontend.asr.processed_until, len(audio))
+        self.assertEqual(self.view(frontend)['step_id'], 6)
+
+    def test_capacity_errors_cancel_both_lanes_before_pcm_allocation(self):
+        frontend = self.make()
+        with self.assertRaises(MemoryError):
+            frontend.append_pcm(np.zeros(2**20, np.float32))
         self.assertTrue(frontend.closed)
         self.assertTrue(frontend.controller.closed)
         self.assertTrue(frontend.asr.closed)
@@ -387,15 +406,6 @@ class AudioTests(unittest.TestCase):
         self.assertEqual(frontend.ledger.end, 0)
         with self.assertRaises(RuntimeError):
             frontend.advance()
-        other = self.make()
-        other.append_pcm(np.zeros(2760, np.float32))
-        self.clock.now += 1
-        with self.assertRaises(TimeoutError):
-            other.advance()
-        self.assertTrue(other.closed)
-        large = self.make()
-        with self.assertRaises(MemoryError):
-            large.append_pcm(np.zeros(2**20, np.float32))
 
     def test_failure_after_one_lane_completes_never_releases_barrier(self):
         frontend = self.make(emissions=[[10, 11]])
@@ -429,8 +439,8 @@ class AudioTests(unittest.TestCase):
                 if reason == 'close':
                     frontend.close()
                 else:
-                    with self.assertRaises(BufferError):
-                        frontend.append_pcm(np.zeros(11000, np.float32))
+                    with self.assertRaises(MemoryError):
+                        frontend.append_pcm(np.zeros(2**20, np.float32))
                 return step(audio, on_token)
 
             frontend.asr.engine.step = abort

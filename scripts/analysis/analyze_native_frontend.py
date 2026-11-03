@@ -40,9 +40,7 @@ def audit_case(rows, result, dual):
             failures.append(f'{index}:controller_sequence')
         if control['completed_at'] > row['released_at']:
             failures.append(f'{index}:release_before_controller')
-        if row['controller_main_lag_ms'] > 800:
-            failures.append(f'{index}:controller_overload')
-        if row.get('pcm_bytes', 0) > 4 * 2**20 or any(v > 12800 for v in row.get('unread_samples', {}).values()):
+        if row.get('pcm_bytes', 0) > 4 * 2**20:
             failures.append(f'{index}:pcm_overload')
         if dual:
             snapshot, receipt = row['snapshot'], row['receipts']['asr']
@@ -76,8 +74,6 @@ def audit_case(rows, result, dual):
                     or snapshot['asr_processed_until'] < snapshot['state_observed_until']
                     or snapshot['open_group_tokens'] or snapshot['decoding']):
                 failures.append(f'{index}:invalid_joint_snapshot')
-            if row['asr_main_lag_ms'] > 800:
-                failures.append(f'{index}:asr_overload')
         previous_release = row['released_at']
     return {'passed': not failures, 'failures': failures, 'frames': len(rows), 'expected_frames': expected,
             'closed_groups': groups if dual else None, 'online_text': text if dual else None,
@@ -174,8 +170,7 @@ def write_backlog_plot(run, output):
         steps = [row['step_id'] for row in rows]
         axis.plot(steps, [row['controller_main_lag_ms'] for row in rows], 'o-', label='Controller main to joint release')
         axis.plot(steps, [row['asr_main_lag_ms'] for row in rows], 's-', label='X2 main to joint publication')
-        axis.axhline(800, color='red', linestyle='--', linewidth=1, label='800 ms stop line')
-        axis.set(title=case + ' (incomplete)', ylabel='Latency (ms)', ylim=(0, 880), xticks=steps)
+        axis.set(title=case + ' (incomplete)', ylabel='Latency (ms)', xticks=steps)
         axis.grid(alpha=.2)
     axes[0].legend(fontsize=8, loc='lower right')
     axes[-1].set_xlabel('Published 160 ms batch index; failed/unpublished batches are omitted')

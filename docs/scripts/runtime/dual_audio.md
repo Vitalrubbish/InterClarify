@@ -25,8 +25,8 @@ frontend = DualAudioFrontend(controller, asr, context=context)
 
 推理不持生产者锁或Context锁。finish_input仅标EOF；最后不足160ms的批次按实际存在帧数核对，全部源批次结束后advance返回None，不额外drain、补EOS或补complete。取消／close使屏障和话轮关闭，随后关闭两路；原有完整正文与状态不被部分结果覆盖。若极小容量连关闭元数据也无法写入，close_failure单独保存，模型仍停止，原观察保留。
 
-每路未读真实PCM和在线进度上限800ms，总PCM上限4MiB；传输包、拼接、切块、reset及X2窗口在分配前检查，不减速送音、不丢帧。diagnostics保留最后完整批次、失败暂存、两路实际进度、开放组及各路未处理真实采样。
+按NTF-030取消每路未读真实PCM时长及墙钟进度800ms停止条件，`_check_bounds()`只执行总PCM上限4MiB；传输包、拼接、切块、reset及X2窗口继续在分配前检查，不减速送音、不丢帧。diagnostics保留最后完整批次、失败暂存、两路实际进度、开放组及各路未处理真实采样。
 
-NTF-018新增`realtime=True`构造参数；正式路径默认保持墙钟800ms保护。固定预热单独传`False`，只关闭墙钟积压判断，未读PCM800ms、4MiB、联合提交和生命周期校验仍有效。预热必须逐步供音并使用私有Context，不能将该参数用于正式回放。
+`realtime`构造参数继续兼容既有调用；NTF-030后两种模式都不执行800ms判断。正式回放仍由调用方按真实时钟持续供音；预热逐步供音、私有Context及完整清理保持，4MiB、联合提交和生命周期校验在两种模式均有效。
 
 advance返回的lane_compute_seconds、wait_seconds、commit_seconds分别描述模型调用、先完成侧等另一侧和提交耗时；保留input_ready_at、started_at、完成／发布／释放时间。消费者通过Context可选读取计时独立测量。日志由调用方在锁外落盘；本模块不接LLM、TTS或真实播放，NTF-020已取消额外等待并归档，已提交complete直接供下游使用。

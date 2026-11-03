@@ -92,20 +92,13 @@ class SingleLane:
             raise MemoryError('Single-lane PCM would exceed 4 MiB')
 
     def check(self):
-        if self.ledger.end - self.completed_until > 12800:
-            raise BufferError('Single-lane unread PCM exceeded 800 ms')
         self.reserve(0)
-        if self.realtime and self.started_at is not None:
-            if time.monotonic() - self.started_at - self.completed_until / 16000 > .8:
-                raise TimeoutError('Single-lane online progress exceeded 800 ms')
 
     def append_pcm(self, audio):
         with self.lock:
             if self.closed:
                 raise RuntimeError('Single-lane reference is closed')
             self.reserve(audio.nbytes)
-            if self.ledger.end + len(audio) - self.completed_until > 12800:
-                raise BufferError('Single-lane transport would exceed 800 ms')
             packet = self.ledger.append(audio)
             if self.started_at is None:
                 self.started_at = time.monotonic() - self.ledger.end / 16000
@@ -199,8 +192,6 @@ def replay(model, worker, audio, identity, output, realtime, order=('controller'
                 if stopped.wait(max(0, due - time.monotonic())):
                     return
                 at = time.monotonic()
-                if at - due > .8:
-                    raise TimeoutError('Input delivery exceeded 800 ms lateness')
                 packet = frontend.append_pcm(audio[begin:end])
                 arrivals.append(dict(packet, due_at=due, late_ms=(at - due) * 1000))
             frontend.finish_input()
@@ -258,8 +249,6 @@ def replay(model, worker, audio, identity, output, realtime, order=('controller'
                         raise ValueError('X2 did not cover the controller observation')
                     row['asr_main_lag_ms'] = (row['batch_published_at'] - started - frames[-1]['asr_processed_until'] / 16000) * 1000
                     row['unread_samples']['asr'] = frontend.ledger.end - frontend.asr.processed_until
-                    if realtime and max(row['controller_main_lag_ms'], row['asr_main_lag_ms']) > 800:
-                        raise TimeoutError('Joint publication exceeded 800 ms')
                 previous_release = row['released_at']
                 rows.append(row)
                 stream.write(json.dumps(row, ensure_ascii=False, allow_nan=False) + '\n')
@@ -532,7 +521,8 @@ def run(args):
     args.output.mkdir(exist_ok=False)
     result = {'passed': False, 'condition': args.condition, 'cases': [], 'manifest_sha256': digest(args.manifest),
               'fixed_cases': [sample['case_id'] for sample in samples], 'seed': 42, 'warmup_audio_sha256': WARMUP_SHA256,
-              'suite': args.suite, 'acceptance_gate_sha256': args.acceptance_gate_sha256}
+              'suite': args.suite, 'acceptance_gate_sha256': args.acceptance_gate_sha256,
+              'limits': {'latency_stop_ms': None, 'unread_pcm_stop_ms': None, 'pcm_bytes': 4 * 2**20}}
     write_json(args.output / 'input_manifest.json', dict(manifest, samples=samples))
     worker = controller = None
     began = time.monotonic()

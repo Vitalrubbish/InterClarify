@@ -21,7 +21,7 @@ from dual_audio import DualAudioFrontend, PCMLedger
 from independent_x2 import IndependentX2
 from native_soulx import NativeSoulX, pcm_digest
 from native_frontend_worker import MAX_MESSAGE, RemoteX2, WindowLedger, receive, send
-from native_frontend_probe import PREFLIGHT, compare_native, full_warmup, prepare_warmup, quantize, replay, select_samples
+from native_frontend_probe import PREFLIGHT, SingleLane, compare_native, full_warmup, prepare_warmup, quantize, replay, select_samples
 from shared_context import SharedContext
 from analyze_native_frontend import audit_case, analyze, load_rows
 from test_independent_frontend import Clock, FakeEngine
@@ -105,7 +105,13 @@ class ProbeTests(unittest.TestCase):
         for row in rows:
             for frame in row['receipts']['asr']['frames']:
                 frame['decode']['token_ids'] = [33, 12, 2] if frame['decision'] == 33 else [32]
+            row.update(controller_main_lag_ms=2000, asr_main_lag_ms=1900,
+                       unread_samples={'controller': 16001, 'asr': 15000})
         self.assertTrue(audit_case(rows, result, True)['passed'])
+        pcm_bytes = rows[0]['pcm_bytes']
+        rows[0]['pcm_bytes'] = 4 * 2**20 + 1
+        self.assertFalse(audit_case(rows, result, True)['passed'])
+        rows[0]['pcm_bytes'] = pcm_bytes
         rows[0]['receipts']['asr']['frames'][0]['decode']['token_ids'][-1] = 32
         self.assertFalse(audit_case(rows, result, True)['passed'])
 
@@ -128,18 +134,30 @@ class ProbeTests(unittest.TestCase):
         context.open_user_turn('case', 'input', 'x2_streaming_asr')
         return DualAudioFrontend(control, asr, context=context, clock=clock, realtime=realtime), context
 
-    def test_only_warmup_can_ignore_wall_clock_and_keeps_pcm_limits(self):
-        clock = Clock()
-        warm, _ = self.frontend(clock, False)
-        warm.started_at = 0
-        warm.append_pcm(np.zeros(3000, np.float32))
-        self.assertIsNotNone(warm.advance())
-        with self.assertRaises(BufferError):
-            warm.append_pcm(np.zeros(12801, np.float32))
-        online, _ = self.frontend(clock, True)
-        online.started_at = 0
-        with self.assertRaises(TimeoutError):
-            online.append_pcm(np.zeros(3000, np.float32))
+    def test_online_and_warmup_allow_long_backlog_but_keep_pcm_capacity(self):
+        for realtime in (True, False):
+            with self.subTest(realtime=realtime):
+                frontend, _ = self.frontend(Clock(), realtime)
+                frontend.started_at = 0
+                frontend.append_pcm(np.zeros(16001, np.float32))
+                self.assertIsNotNone(frontend.advance())
+                self.assertFalse(frontend.closed)
+                with self.assertRaises(MemoryError):
+                    frontend.append_pcm(np.zeros(2**20, np.float32))
+
+    def test_single_lane_allows_long_backlog_but_keeps_pcm_capacity(self):
+        for realtime in (True, False):
+            with self.subTest(realtime=realtime):
+                control = NativeSoulX(official_model([99, 6] * 100), synchronize=lambda: None,
+                                      source_path=SOURCE, clock=Clock(), profile=True)
+                self.addCleanup(control.detach)
+                frontend = SingleLane(control, realtime)
+                frontend.started_at = 0
+                frontend.append_pcm(np.zeros(16001, np.float32))
+                self.assertIsNotNone(frontend.advance())
+                self.assertFalse(frontend.closed)
+                with self.assertRaises(MemoryError):
+                    frontend.append_pcm(np.zeros(2**20, np.float32))
 
     def test_warmup_results_stay_in_private_context_and_reset_is_clean(self):
         frontend, context = self.frontend()
@@ -169,6 +187,30 @@ class ProbeTests(unittest.TestCase):
         self.assertTrue(final['receipts']['asr']['terminal'])
         self.assertEqual(final['receipts']['asr']['processed_until'], 3000)
         self.assertEqual(len(final['receipts']['asr']['frames']), 1)
+
+    def test_late_delivery_and_publication_are_recorded_without_stopping(self):
+        import time
+        frontend, context = self.frontend(realtime=True)
+        append = frontend.append_pcm
+        delayed = False
+
+        def slow_first_packet(audio):
+            nonlocal delayed
+            if not delayed:
+                delayed = True
+                time.sleep(1.)
+            return append(audio)
+
+        frontend.append_pcm = slow_first_packet
+        with tempfile.TemporaryDirectory() as directory, patch('native_frontend_probe.fresh', return_value=(frontend, context)), \
+                patch('torch.cuda.synchronize'):
+            record = replay(frontend.controller.model, None, np.full(3000, .1, np.float32),
+                            'case', Path(directory), True)
+        self.assertTrue(record['passed'], record.get('error'))
+        self.assertEqual(record['frames'], 2)
+        self.assertGreater(record['arrival_late_ms']['max'], 800)
+        self.assertGreater(record['timing']['controller_main_lag_ms']['max'], 800)
+        self.assertEqual(record['diagnostics']['asr']['processed_until'], 3000)
 
     def test_uncovered_warmup_branch_blocks_acceptance(self):
         empty = {'passed': True, 'coverage': {'sensevoice_text': True}, 'cleanup': {}}

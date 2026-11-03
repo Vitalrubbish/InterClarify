@@ -2,11 +2,11 @@
 
 更新：2026-11-02。用户要求清除comparison端历史实验并重新clone官方仓库。当前以本地 [third_party/soulx-duplug](../../../third_party/soulx-duplug) 子模块为可审查源码入口，远端改用ParaThink独立根下新克隆的`upstream/soulx-duplug`，版本与说明见[依赖文档](../../third_party/soulx-duplug.md)。旧comparison加载器和实验worktree退役，不作为新实验入口。
 
-当前采用**原生SenseVoice控制＋独立X2正文＋160ms双路联合提交**。NTF-015／016／017已交付原生封装、冻结加载器、同源PCM／160ms屏障和独立X2适配，本地契约验收后归档，见[交付记录](../../reports/soulx/20261102-native-independent-frontend/README.md)。[NTF-017联合提交](../../reports/soulx/20261102-ntf017-joint-publication/README.md)已本地交付，[NTF-020](../../reports/soulx/20261103-ntf020-handoff-retirement/README.md)未实施取消并归档，[NTF-018](../../reports/soulx/20261103-ntf018-warmup/README.md)已通过完整预热、真实权重对照和并发三轴3/3并归档，019已启动固定FDB30正式验收。NTF-021／022相关实现分支已撤回，NTF-023—025未实施归档，历史范围见[恢复记录](../../reports/soulx/20261102-external-asr-plan-restore/README.md)。
+当前采用**原生SenseVoice控制＋独立X2正文＋160ms双路联合提交**。NTF-015／016／017本地交付归档，见[记录](../../reports/soulx/20261102-native-independent-frontend/README.md)与[联合提交](../../reports/soulx/20261102-ntf017-joint-publication/README.md)；020取消，[018](../../reports/soulx/20261103-ntf018-warmup/README.md)完整预热与真实权重预检通过。[019](../../reports/soulx/20261103-ntf019-fdb30/README.md)已由用户审核通过并归档，原29/30、退出1及单路缺失保留；[030](../../reports/soulx/20261103-latency-limit-removal/README.md)取消800ms停止条件，容量与资源保护保持。NTF-021／022相关实现分支已撤回，NTF-023—025未实施归档，历史范围见[恢复记录](../../reports/soulx/20261102-external-asr-plan-restore/README.md)。
 
 ## 当前实施顺序
 
-015／016／017已完成原生封装、同源音频／X2正文和160ms联合Context；020取消，后续按018→019完成完整预热和固定FDB30验收。预热预检通过才启动正式30条；旧教师实验不作为新封装等价性或双路实时性通过证据。
+前端工作已收口，用户明确暂不推进后续LLM接入，031—035草案未实施归档；当前无活动工作单。旧教师实验及旧comparison生成播放结果不作为新链路已接入或实时达标的证据。
 
 ## 当前前端设计
 

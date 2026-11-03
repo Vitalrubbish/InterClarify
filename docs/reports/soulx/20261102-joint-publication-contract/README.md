@@ -18,7 +18,7 @@ complete仍需NTF-020按已提交进度检查真实观察目标和闭合正文�
 
 - [NTF-017](../20261102-ntf017-joint-publication/README.md)：改为联合入口、有界暂存、移除停止接入及两路完成后写入的契约检查；负责迁移SharedContext与现有三份适配模块。
 - [前端设计](../../../dev/SoulX-Duplug/independent_streaming_frontend.md)、[Context接口](../../../dev/SoulX-Duplug/shared_context_interface.md)、[架构](../../../research_design/architecture.md)和入口文档：统一共同快照与下游消费边界，文内流程图同步。
-- [NTF-020](../20261103-ntf020-handoff-retirement/README.md)：仅消费已提交批次进行交接／取消；[NTF-018](../20261103-ntf018-warmup/README.md)／[019](../../../issue/NTF-019.md)：拆分原始可用、屏障等待、联合提交与消费者读取时间，撤下独立停止回调验收。
+- [NTF-020](../20261103-ntf020-handoff-retirement/README.md)：仅消费已提交批次进行交接／取消；[NTF-018](../20261103-ntf018-warmup/README.md)／[019](../20261103-ntf019-fdb30/README.md)：拆分原始可用、屏障等待、联合提交与消费者读取时间，撤下独立停止回调验收；链接随后续归档更新，原合同修订范围保持。
 - 三份现有模块说明增加待迁移提示，继续如实描述当前代码。图源与预览仍由NTF-017实施时调整；本次不改动用户现有绘图文件修改。
 
 文档链接、合同关键项和差异空白检查通过；运行代码、配置和测试文件均未修改，因此不重复运行旧测试，也不启动本地／远端模型作业。NTF-029完成后按约定归档至本地`docs/issue/archive/`。

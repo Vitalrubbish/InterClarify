@@ -233,7 +233,6 @@ def write_plot(dual_run, single_run, output):
                 rows = load_rows(run / condition, sample['case_id'])
                 axis.plot([row['receipts']['controller']['state']['state_processed_until'] / 16000 for row in rows],
                           [row['controller_main_lag_ms'] for row in rows], linewidth=.8, alpha=.65)
-            axis.axhline(800, color='red', linestyle='--', linewidth=1)
             axis.set(title=title + '\n' + task, xlabel='Actual controller main end (seconds)', ylabel='Main latency (ms)')
             axis.grid(alpha=.2)
     figure.suptitle('NTF-019 fixed FDB30: published native-control latency; each line is one case')
