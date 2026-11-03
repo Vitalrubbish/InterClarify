@@ -261,7 +261,8 @@ def replay(model, worker, audio, identity, output, realtime, order=('controller'
                 rows.append(row)
                 stream.write(json.dumps(row, ensure_ascii=False, allow_nan=False) + '\n')
                 stream.flush()
-        result['passed'] = len(rows) == (len(audio) + 2559) // 2560
+        expected = (len(audio) + 2559) // 2560
+        result['passed'] = len(rows) == expected if context is not None else len(rows) >= expected
     except Exception:
         result['error'] = traceback.format_exc()
     finally:

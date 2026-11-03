@@ -18,7 +18,8 @@ MANIFEST_SHA256 = '403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cde4f3
 def audit_case(rows, result, dual):
     failures, previous_release, text, groups = [], 0., '', 0
     expected = (result['real_samples'] + 2559) // 2560
-    if not result.get('passed') or len(rows) != expected or result.get('frames') != expected:
+    count_valid = len(rows) == expected if dual else len(rows) >= expected
+    if not result.get('passed') or not count_valid or result.get('frames') != len(rows):
         failures.append('fixed_case_incomplete')
     for index, row in enumerate(rows):
         control = row['receipts']['controller']

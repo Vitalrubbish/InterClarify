@@ -28,6 +28,17 @@ from test_native_soulx import SOURCE, official_model
 
 
 class ProbeTests(unittest.TestCase):
+    def test_single_lane_reset_can_produce_more_calls_than_source_batches(self):
+        model = official_model([99, 7] * 100)
+        with tempfile.TemporaryDirectory() as directory, patch('torch.cuda.synchronize'), \
+                patch('native_frontend_probe.NativeSoulX', side_effect=lambda *args, **kwargs:
+                      NativeSoulX(*args, source_path=SOURCE, **kwargs)):
+            result = replay(model, None, np.full(30000, .1, np.float32), 'single', Path(directory), True)
+        self.assertTrue(result['passed'], result.get('error'))
+        self.assertGreater(result['frames'], (30000 + 2559) // 2560)
+        self.assertTrue(result['diagnostics']['input_eof'])
+        self.assertGreaterEqual(result['diagnostics']['unprocessed_real_samples'], 0)
+
     def test_quiet_warmup_is_normalized_before_quantization_and_silent_input_is_rejected(self):
         audio = (.0005 * np.sin(np.arange(124800) * .1)).astype(np.float32)
         first, evidence = prepare_warmup(audio)

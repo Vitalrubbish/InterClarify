@@ -8,4 +8,6 @@
 
 输入准备修正检查覆盖低幅度真实形状语音的确定性增益、PCM16量化、峰值限制、既定静音尾部，以及全静音拒绝；它只验证输入处理，不预言真实模型一定产生complete或文字修订。
 
+单路完成计数修正用真实时钟及重复原生reset验证：允许因重新供给PCM产生更多调用，EOF尾部仍保留，800ms和容量检查不变；双路批次数精确要求继续由原有检查约束。
+
 运行：`conda run -n interclarify-dev python -m unittest discover -s tests -p test_native_frontend_probe.py -v`。完整回归仍由`python -m unittest discover -s tests -q`执行。真实预热覆盖、GPU延迟与资源门槛必须在远端验收。
