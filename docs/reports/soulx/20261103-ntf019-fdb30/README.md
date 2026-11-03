@@ -89,6 +89,28 @@
 
 以上是旧项目实际实现的机制复核，没有运行新模型或复活已清理的远端旧实验。ParaThink当前设计同样区分preparing取消与playing停止，但普通回答通过Layer 1读取联合快照决定，不能把旧项目`speak -> start`外部调度原样视为当前已接入。NTF-019尚未接入该输出运行时，现有轨迹无法计算首音前取消率、实际抢话率、实际停播延迟或FDB系统TOR；9/10提前complete及3/11停顿complete继续仅作为前端时序诊断。
 
+### 旧项目正式批次的取消频次
+
+按用户后续确认，判断边界为首段音频是否已开始实际播放，以同一请求的实际已播采样是否大于0为准，不要求首段整段播完；本次已将该约定同步到[当前架构](../../../research_design/architecture.md#22-前端状态与系统附和)，未实施下游运行时。
+
+本地保留的`TurnControlComparison/artifacts/remote/tts20-r2-inference-audit-20261029.json`包含接话、Candor停顿、打断三个完整正式轴的事件总数；Synthetic使用`synthetic-recovery-audit-20261030.json`内完整修复复测的137条，不混入旧未完成轴。以下只统计SoulX＋半双工LLM，共672条，与旧最终报告的SoulX来源一致，不是NTF-019或修正后XTurnix的数据。
+
+| 场景 | 样本数 | 回复启动次数 | 取消次数 | 取消／启动 |
+| --- | ---: | ---: | ---: | ---: |
+| Candor接话 | 119 | 313 | 195 | 62.3% |
+| Candor停顿 | 216 | 804 | 592 | 73.6% |
+| Synthetic停顿 | 137 | 402 | 265 | 65.9% |
+| Synthetic打断 | 200 | 517 | 316 | 61.1% |
+| 合计 | 672 | 2036 | 1368 | **67.2%** |
+
+同一样本可多次启动及取消；表中是次数比例，不是发生取消的样本比例。取消总数同时包含控制器nonidle、新回复替换及样本收尾，现存汇总没有原因分项，也没有每次取消的`played_samples`，不能把1368次全部视为首音前取消或complete误判。1266条`late_audio_discarded`仅说明迟到TTS结果被丢弃，不能据此推定对应回复此前从未播放。
+
+汇总另有450次`assistant_history_pending`。按`ReplySession.cancel()`仅在实际已播尾段采样非空时产生该事件的实现，可推得至少450次取消已发生播放，首音前取消至多918次。此为保留下来的下界／上界，不能将余下918次全部判为首音前；整段已播后在段间取消、样本收尾等也可能不产生该尾段事件。
+
+保留的两条旧r4逐事件样本可以精确分类：Candor停顿ID113有4次`soulx_nonidle`取消，全部`played_samples=0`；打断ID110有1次同原因取消且`played_samples=0`，另1次为已播160291采样后的`sample_cleanup`。这些是挑选保存的诊断案例，不能将5次首音前取消外推为完整正式批次的阶段占比。原远端实验及元数据已在NTF-014按指令清理，目前无法重算672条的精确首音前／开播后分布。
+
+结构化计数、来源摘要和逐请求案例见[turncontrol_cancellation_review.json](turncontrol_cancellation_review.json)；原始输入副本保存在本地`artifacts/soulx/20261103-turncontrol-cancellation-review/`。本次使用本地conda离线读取保留证据，没有启动新模型、恢复旧远端实验或改动TurnControlComparison实现。
+
 ## 正文与尾部
 
 | 有参考任务 | 样本 | 参考词数 | 错词数 | 在线WER |
