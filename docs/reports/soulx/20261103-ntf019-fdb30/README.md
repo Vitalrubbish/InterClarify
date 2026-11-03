@@ -58,9 +58,11 @@
 
 已发布批次采样时最大未读PCM为7680采样，即480ms；PCM合计最大2147840字节，约2.05MiB。失败期间未读量及墙钟停止事件另外保留，不能从成功批次采样反推全程未触线。逐批积压数据保存在本地`artifacts/soulx/20261103-ntf019/analysis/dual-full.backlog.csv`。
 
-## 原生状态质量
+## 原生状态时序诊断
 
 固定分母保留全部30条，失败样本也计入接话10条。主块、实际观察、原始可用、联合发布和读取五坐标均保存在review.json。下表的事件数按“出现过该事件的样本／区间”计数，同一条可能同时出现提前及边界后complete。
+
+“提前complete”只表示该状态早于FDB标注的整段交接边界，不直接等于系统误接话、模型已经发声或官方TOR失败。中途自然句末及后续nonidle取消均可能改变系统实际行为；必须结合后续控制、生成、TTS和真实播放轨迹评价，不能将9/10解释为90%的实际抢话率。
 
 | 指标 | 主块 | 实际观察 | 原始可用墙钟 | 联合发布墙钟 | 读取墙钟 |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -74,6 +76,18 @@
 打断nonidle的主块延迟P50/P95/max为533.3/1454.0/1760.0ms，联合发布墙钟为825.7/1779.7/2139.7ms。这是相对标注打断起点的检测延迟，与800ms计算积压停止线的计时起点不同。
 
 原始模型token有32次complete，原生规则后有48次complete；共89帧发生规则调整。两者分别保留，不能把服务规则后的48次当作模型直接输出。发布墙钟中边界后complete增多是坐标变化，不能据此宣称原生状态改善；缺少正式单路对照，也不能和不同协议历史run直接作改善结论。
+
+### 半双工LLM运行时的取消机制复核
+
+按用户指令只读检查本地`TurnControlComparison`仓库，HEAD为`a7ce834`。`scripts/remote/duplex_controllers.py`中的`SoulXController.process()`读取原生服务结果：有非空正文的`speak`启动`ReplySession.start()`；若已经有活动回复，先取消旧回复。`nonidle`在`replies.busy()`时直接调用`cancel('soulx_nonidle')`。它依据服务状态驱动普通Qwen请求，没有把五状态token直接拼入半双工LLM输入；原生服务的`speak`也包含其等待兜底路径，不能和原始complete一一等同。
+
+`scripts/remote/duplex_replies.py`的`busy()`从生成准备开始即成立，涵盖尚未出声的LLM／TTS阶段。`start()`建立唯一请求ID并排队生成，播放器`begin()`仅登记该ID；取得LLM文本片段、完成TTS并入队后才实际播放。`cancel()`先使旧请求失效、删除待执行生成和TTS任务，再取消本地播放；远端取消RPC及已播放尾段ASR在后台处理。旧TTS无法即时中止时继续排空计算，迟到音频按失效请求丢弃，不会恢复播放。Qwen在生成停止条件中检查取消标记。历史仅保留已实际播放内容。
+
+因此，若后续nonidle在首音前被执行，该次提前complete可以完全没有可听输出；若首音已经播放，则停止后续声音，已播部分仍保留并参与系统评价。`scripts/remote/duplex_playback.py`以20ms帧推进软件播放并保存实际播出采样，不能用取消请求时间冒充零延迟物理停播。
+
+本地历史实录`TurnControlComparison/artifacts/remote/candor-pause-113-r4-events.jsonl`提供实际例子：请求`da2e41096a57a2dd-r2`在3.658秒启动回复，4.150秒请求TTS，4.619秒因`soulx_nonidle`取消，播放器确认`played_samples=0`；5.949秒TTS返回后记录`late_audio_discarded`。该例证明“启动生成但没有出声”确实发生过，不能将其当成NTF-019当前配置的结果或取消率。
+
+以上是旧项目实际实现的机制复核，没有运行新模型或复活已清理的远端旧实验。ParaThink当前设计同样区分preparing取消与playing停止，但普通回答通过Layer 1读取联合快照决定，不能把旧项目`speak -> start`外部调度原样视为当前已接入。NTF-019尚未接入该输出运行时，现有轨迹无法计算首音前取消率、实际抢话率、实际停播延迟或FDB系统TOR；9/10提前complete及3/11停顿complete继续仅作为前端时序诊断。
 
 ## 正文与尾部
 
