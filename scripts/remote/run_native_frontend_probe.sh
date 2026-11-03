@@ -75,7 +75,18 @@ for condition in "${CONDITIONS[@]}"; do
   PID=$!
   while kill -0 "$PID" 2>/dev/null; do
     usage=$(nvidia-smi -i "${CUDA_VISIBLE_DEVICES%%,*}" --query-gpu=memory.used --format=csv,noheader,nounits)
-    size=$(du -sk "$RUN" | awk '{print $1}')
+    if ! disk_row=$(LC_ALL=C du -sk "$RUN" 2> "$RUN/disk_probe.stderr"); then
+      if [[ ! -d "$RUN" ]] || ! awk '/^du: cannot access .*: No such file or directory$/ {next} {bad=1} END {exit bad}' "$RUN/disk_probe.stderr"; then
+        cp "$RUN/disk_probe.stderr" "$RUN/resource_stop.txt"
+        exit 2
+      fi
+      cat "$RUN/disk_probe.stderr" >> "$RUN/disk_probe_races.txt"
+    fi
+    size="${disk_row%%[[:space:]]*}"
+    if [[ ! "$size" =~ ^[0-9]+$ ]]; then
+      printf 'invalid_disk_probe\n' > "$RUN/resource_stop.txt"
+      exit 2
+    fi
     rss=$(ps -e -o pgid=,rss= | awk -v group="$PID" '$1==group {sum+=$2} END {print sum+0}')
     printf '%s %s %s %s %s\n' "$SECONDS" "$condition" "$usage" "$rss" "$size" >> "$RUN/resources.txt"
     if (( usage > 22528 || size > 131072 || rss > 33554432 || SECONDS - STARTED > 1750 )); then
