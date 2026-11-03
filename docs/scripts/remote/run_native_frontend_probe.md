@@ -2,7 +2,7 @@
 
 对应`scripts/remote/run_native_frontend_probe.sh`。只能在分配了GPU的调度作业中运行；`NTF_SCHEDULED_RUN=1`由提交命令设置，不在登录节点手工运行。避免在环境变量名中使用调度器会替换的`JOB`占位符。脚本使用既有SoulX／ASR conda，要求干净冻结源码、原FDB30摘要、空闲盘至少10GiB和独占前端锁，输出目录存在则拒绝覆盖。
 
-`NTF018_GROUP=dual`依次启动两个全新进程执行有限／完整双路；`single`只执行单路完整参考。两组各提交一次，合计最多2作业，不自动重跑。有限臂失败保留退出码，并继续测一次完整臂；外层作业退出码可能因有限臂失败非零，018的实时门槛取`dual-full`自身退出0、完整覆盖、3/3和资源记录，不能只看外层退出码。
+`NTF018_GROUP=dual`依次启动两个全新进程执行有限／完整双路；`single`只执行单路完整参考。每轮各条件运行一次；用户已撤销提交次数限制，修复后可建立新run复测，仍不替换固定样本。有限臂失败保留退出码，并继续测一次完整臂；外层作业退出码可能因有限臂失败非零，018的实时门槛取`dual-full`自身退出0、完整覆盖、3/3和资源记录，不能只看外层退出码。
 
 首次调度因变量名占位替换在模型脚本启动前失败，已占用第1作业。剩余作业改用`NTF018_GROUP=matrix`，按双路有限／双路完整／单路完整顺序各执行一次，保持独立新进程；总时长和输出仍按单作业限制，不追加第3作业。该变更在任何条件开始前冻结，不能用于结果出来后的筛选重跑。
 
@@ -18,4 +18,4 @@ vc submit --image docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:
   --cmd 'export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}; NTF_SCHEDULED_RUN=1 NTF018_GROUP=matrix SOULX_SOURCE=FROZEN_SOURCE SOULX_RUN_ID=ntf018-matrix-20261103-r2 SOULX_FDB_MANIFEST=FROZEN_MANIFEST timeout --kill-after=10 1800 bash FROZEN_SOURCE/scripts/remote/run_native_frontend_probe.sh'
 ```
 
-本轮r1矩阵作业已结束且未通过，原2次提交额度已用完。上方r2命令仅供获批后的新增复测，不覆盖r1；当前没有可自动提交的剩余额度。模型与数据复用，不复制权重；本脚本不负责提交作业、换卡或放行019。
+本轮r1矩阵作业已结束且未通过，原2次提交额度已用完。上方r2命令用于修正后的复测，不覆盖r1；用户已撤销提交次数限制，现按新指令直接继续复测。模型与数据复用，不复制权重；本脚本不负责提交作业、换卡或放行019。
