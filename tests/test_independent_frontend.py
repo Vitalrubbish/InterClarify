@@ -123,6 +123,96 @@ class X2Tests(unittest.TestCase):
 
 
 class AudioTests(unittest.TestCase):
+    def test_concurrent_lanes_start_together_but_publish_only_after_both_finish(self):
+        for first in ('controller', 'asr'):
+            with self.subTest(first=first):
+                frontend = self.make(concurrent=True)
+                entered = {lane: threading.Event() for lane in ('controller', 'asr')}
+                allowed = {lane: threading.Event() for lane in ('controller', 'asr')}
+                finished = {lane: threading.Event() for lane in ('controller', 'asr')}
+                for lane in ('controller', 'asr'):
+                    component = getattr(frontend, lane)
+                    original = component.step
+
+                    def blocked(*args, _lane=lane, _original=original):
+                        entered[_lane].set()
+                        if not allowed[_lane].wait(5):
+                            raise TimeoutError('Test lane was not released')
+                        result = _original(*args)
+                        finished[_lane].set()
+                        return result
+                    component.step = blocked
+                frontend.append_pcm(np.full(2760, .1, np.float32))
+                results, errors = [], []
+
+                def drive():
+                    try:
+                        results.append(frontend.advance())
+                    except Exception as exc:
+                        errors.append(exc)
+                worker = threading.Thread(target=drive)
+                worker.start()
+                try:
+                    self.assertTrue(entered['controller'].wait(3))
+                    self.assertTrue(entered['asr'].wait(3))
+                    allowed[first].set()
+                    self.assertTrue(finished[first].wait(3))
+                    self.assertEqual(self.view(frontend)['step_id'], -1)
+                    with self.assertRaises(RuntimeError):
+                        frontend.advance()
+                finally:
+                    for event in allowed.values():
+                        event.set()
+                    worker.join(5)
+                self.assertFalse(worker.is_alive())
+                self.assertEqual(errors, [])
+                self.assertEqual(len(results), 1)
+                self.assertEqual(self.view(frontend)['step_id'], 0)
+
+    def test_concurrent_failure_waits_for_other_lane_before_returning(self):
+        frontend = self.make(concurrent=True)
+        entered, failed, release, finished = [threading.Event() for _ in range(4)]
+        original = frontend.asr.step
+
+        def blocked_asr(*args):
+            entered.set()
+            if not release.wait(5):
+                raise TimeoutError('Test ASR was not released')
+            try:
+                return original(*args)
+            finally:
+                finished.set()
+
+        def fail_control(*args):
+            if not entered.wait(3):
+                raise TimeoutError('Concurrent ASR never entered')
+            failed.set()
+            raise ValueError('Injected control failure')
+
+        frontend.asr.step, frontend.controller.step = blocked_asr, fail_control
+        frontend.append_pcm(np.full(2760, .1, np.float32))
+        errors = []
+
+        def drive():
+            try:
+                frontend.advance()
+            except Exception as exc:
+                errors.append(exc)
+        worker = threading.Thread(target=drive)
+        worker.start()
+        try:
+            self.assertTrue(failed.wait(3))
+            self.assertTrue(worker.is_alive())
+            self.assertFalse(finished.is_set())
+            self.assertEqual(self.view(frontend)['step_id'], -1)
+        finally:
+            release.set()
+            worker.join(5)
+        self.assertFalse(worker.is_alive())
+        self.assertTrue(finished.is_set())
+        self.assertTrue(errors)
+        self.assertEqual(self.view(frontend)['status'], 'closed')
+
     def make(self, order=('controller', 'asr'), predictions=None, emissions=None, **kwargs):
         self.clock = Clock()
         controller = NativeSoulX(official_model(predictions or [99, 6] * 10),

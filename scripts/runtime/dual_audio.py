@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from collections import deque
+from concurrent.futures import ThreadPoolExecutor
 import threading
 import time
 
@@ -152,11 +153,12 @@ class DualAudioFrontend:
     """Accept PCM independently of model execution; one worker advances both lanes."""
 
     def __init__(self, controller, asr, *, context, clock=time.monotonic,
-                 order=('controller', 'asr'), realtime=True):
+                 order=('controller', 'asr'), realtime=True, concurrent=False):
         if tuple(order) not in (('controller', 'asr'), ('asr', 'controller')):
             raise ValueError('Each lane must run exactly once per cycle')
         self.controller, self.asr, self.clock, self.context = controller, asr, clock, context
         self.realtime = realtime
+        self.concurrent = concurrent
         if (controller.session_id, controller.turn_id) != (asr.session_id, asr.turn_id):
             raise ValueError('Controller and ASR must belong to the same logical turn')
         initial = context.get_user_turn(controller.session_id, controller.turn_id)
@@ -242,6 +244,36 @@ class DualAudioFrontend:
                 raise RuntimeError('Frontend is closed')
             self.ledger.finish()
 
+    def _advance_lane(self, lane, ticket):
+        try:
+            if self.closed:
+                raise RuntimeError('Step cancelled before lane execution')
+            if lane == 'controller':
+                receipt = self.controller.step(self.ledger, ticket[1])
+            else:
+                frames = []
+                for _ in range(2):
+                    if self.ledger.eof and self.asr.frame_index * 1280 >= self.ledger.end:
+                        break
+                    self._reserve_pcm(1680 * 4)
+                    frames.append(self.asr.step(self.ledger, ticket[1]))
+                    with self._state_lock:
+                        self._asr_completed_until = self.asr.processed_until
+                if not frames:
+                    raise RuntimeError('EOF without an ASR completion cannot release a step')
+                receipt = {'lane': 'asr', 'session_id': self.asr.session_id,
+                           'turn_id': self.asr.turn_id, 'step_id': ticket[1], 'frames': frames,
+                           'terminal': self.ledger.eof and self.asr.processed_until == self.ledger.end,
+                           'processed_until': self.asr.processed_until, 'completed_at': self.clock()}
+            with self._state_lock:
+                if lane == 'controller':
+                    self._controller_completed_until = receipt['processed_until']
+                self.barrier.acknowledge(ticket, receipt)
+                self._check_bounds()
+        except Exception as exc:
+            self.cancel(str(exc))
+            raise
+
     def advance(self):
         if not self._worker.acquire(blocking=False):
             raise RuntimeError('Only one scheduling worker is allowed')
@@ -260,31 +292,15 @@ class DualAudioFrontend:
                     return None
                 ticket = self.barrier.begin(source_start, min(source_start + 2560, self.ledger.end),
                                             self.ledger.ready_at(required))
-            for lane in self.order:
-                if self.closed:
-                    raise RuntimeError('Step cancelled before lane execution')
-                if lane == 'controller':
-                    receipt = self.controller.step(self.ledger, ticket[1])
-                else:
-                    frames = []
-                    for _ in range(2):
-                        if self.ledger.eof and self.asr.frame_index * 1280 >= self.ledger.end:
-                            break
-                        self._reserve_pcm(1680 * 4)
-                        frames.append(self.asr.step(self.ledger, ticket[1]))
-                        with self._state_lock:
-                            self._asr_completed_until = self.asr.processed_until
-                    if not frames:
-                        raise RuntimeError('EOF without an ASR completion cannot release a step')
-                    receipt = {'lane': 'asr', 'session_id': self.asr.session_id,
-                               'turn_id': self.asr.turn_id, 'step_id': ticket[1], 'frames': frames,
-                               'terminal': self.ledger.eof and self.asr.processed_until == self.ledger.end,
-                               'processed_until': self.asr.processed_until, 'completed_at': self.clock()}
-                with self._state_lock:
-                    if lane == 'controller':
-                        self._controller_completed_until = receipt['processed_until']
-                    self.barrier.acknowledge(ticket, receipt)
-                    self._check_bounds()
+            if self.concurrent:
+                # Joining the bounded helper also fences cancellation before detach.
+                with ThreadPoolExecutor(max_workers=1, thread_name_prefix='frontend-lane') as executor:
+                    pending = executor.submit(self._advance_lane, self.order[0], ticket)
+                    self._advance_lane(self.order[1], ticket)
+                    pending.result()
+            else:
+                for lane in self.order:
+                    self._advance_lane(lane, ticket)
             with self._state_lock:
                 if self.closed:
                     raise RuntimeError('Frontend closed before joint publication')

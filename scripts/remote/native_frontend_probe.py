@@ -159,7 +159,7 @@ def fresh(model, worker, identity, realtime, order):
     asr = worker.session(identity, 'input')
     context = SharedContext()
     context.open_user_turn(identity, 'input', 'x2_streaming_asr')
-    frontend = DualAudioFrontend(controller, asr, context=context, realtime=realtime, order=order)
+    frontend = DualAudioFrontend(controller, asr, context=context, realtime=realtime, order=order, concurrent=True)
     return frontend, context
 
 
@@ -210,7 +210,8 @@ def replay(model, worker, audio, identity, output, realtime, order=('controller'
 
     reader = threading.Thread(target=feed, name='pcm-arrival', daemon=True) if realtime else None
     result = {'case_id': identity, 'passed': False, 'timing_mode': 'realtime' if realtime else 'warmup',
-              'audio_sha256': pcm_digest(audio), 'real_samples': len(audio), 'lane_order': list(order) if worker else ['controller']}
+              'audio_sha256': pcm_digest(audio), 'real_samples': len(audio), 'lane_order': list(order) if worker else ['controller'],
+              'lane_execution': 'concurrent' if worker else 'single'}
     cursor = 0
     previous_release = 0.
     try:
