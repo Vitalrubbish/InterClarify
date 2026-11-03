@@ -15,17 +15,41 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts/runtime'))
 sys.path.insert(0, str(ROOT / 'scripts/remote'))
+sys.path.insert(0, str(ROOT / 'scripts/analysis'))
 from dual_audio import DualAudioFrontend, PCMLedger
 from independent_x2 import IndependentX2
 from native_soulx import NativeSoulX, pcm_digest
 from native_frontend_worker import MAX_MESSAGE, RemoteX2, WindowLedger, receive, send
 from native_frontend_probe import compare_native, full_warmup, replay
 from shared_context import SharedContext
+from analyze_native_frontend import audit_case, analyze
 from test_independent_frontend import Clock, FakeEngine
 from test_native_soulx import SOURCE, official_model
 
 
 class ProbeTests(unittest.TestCase):
+    def test_offline_audit_accepts_actual_receipts_and_rejects_forged_eos(self):
+        frontend, context = self.frontend()
+        with tempfile.TemporaryDirectory() as directory, patch('native_frontend_probe.fresh', return_value=(frontend, context)), \
+                patch('torch.cuda.synchronize'):
+            output = Path(directory)
+            result = replay(frontend.controller.model, None, np.full(3000, .1, np.float32),
+                            'case', output, False)
+            rows = [json.loads(line) for line in (output / 'case.frames.jsonl').read_text().splitlines()]
+        # The lightweight engine supplies only its decision; add the real scripted token trace for the audit.
+        for row in rows:
+            for frame in row['receipts']['asr']['frames']:
+                frame['decode']['token_ids'] = [33, 12, 2] if frame['decision'] == 33 else [32]
+        self.assertTrue(audit_case(rows, result, True)['passed'])
+        rows[0]['receipts']['asr']['frames'][0]['decode']['token_ids'][-1] = 32
+        self.assertFalse(audit_case(rows, result, True)['passed'])
+
+    def test_missing_matrix_cannot_authorize_ntf019(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = analyze(Path(directory))
+        self.assertFalse(result['ntf019_candidate_gate'])
+        self.assertFalse(result['matrix_all_passed'])
+
     def frontend(self, clock=None, realtime=False):
         import time
         clock = clock or time.monotonic

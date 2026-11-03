@@ -12,9 +12,9 @@
 
 ```bash
 vc submit --image docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4 \
-  --partition pdgpu-4090 --job ntf018-dual-20261103-r1 \
+  --partition pdgpu-4090 --job ntf018-matrix-20261103-r1 \
   --num-task 1 --cpu-per-task 4 --mem-per-task 32G --gpu-per-task 1 \
-  JOB=1:1 "$HOME/parathink-soulx-duplug/submit_logs/ntf018-dual-20261103-r1.log" \
+  JOB=1:1 "$HOME/parathink-soulx-duplug/submit_logs/ntf018-matrix-20261103-r1.log" \
   --cmd 'NTF_SCHEDULED_RUN=1 NTF018_GROUP=matrix SOULX_SOURCE=FROZEN_SOURCE SOULX_RUN_ID=ntf018-matrix-20261103-r1 SOULX_FDB_MANIFEST=FROZEN_MANIFEST timeout --kill-after=10 1800 bash FROZEN_SOURCE/scripts/remote/run_native_frontend_probe.sh'
 ```
 
