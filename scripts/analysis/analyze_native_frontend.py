@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 from collections import Counter
 import json
+import gzip
 from pathlib import Path
 import sys
 
@@ -13,6 +14,18 @@ from x2_streaming_probe import distribution, write_json
 CASES = ['candor_turn_taking-102', 'candor_pause_handling-127', 'synthetic_user_interruption-104']
 CONDITIONS = ['dual-limited', 'dual-full', 'single-full']
 MANIFEST_SHA256 = '403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cde4f3c07'
+
+
+def load_rows(root, case_id):
+    path = root / f'{case_id}.frames.jsonl'
+    if path.exists():
+        stream = path.open()
+    elif Path(str(path) + '.gz').exists():
+        stream = gzip.open(str(path) + '.gz', 'rt', encoding='utf-8')
+    else:
+        return []
+    with stream:
+        return [json.loads(line) for line in stream if line.strip()]
 
 
 def audit_case(rows, result, dual):
@@ -101,7 +114,7 @@ def warmup_details(root, warmup):
     return details
 
 
-def audit_condition(run, condition):
+def audit_condition(run, condition, expected_cases=None):
     root, failures, cases = run / condition, [], []
     try:
         result = json.loads((root / 'result.json').read_text())
@@ -110,7 +123,7 @@ def audit_condition(run, condition):
         exit_code = int((run / f'{condition}.exit_code.txt').read_text())
         if exit_code or not result.get('passed'):
             failures.append('condition_failed')
-        if [case['case_id'] for case in result['cases']] != CASES:
+        if [case['case_id'] for case in result['cases']] != (CASES if expected_cases is None else expected_cases):
             failures.append('fixed_cases_missing_or_changed')
         warmup = result.get('warmup', {})
         if not warmup.get('passed'):
@@ -120,8 +133,7 @@ def audit_condition(run, condition):
                     or not warmup.get('reset_rng_equal') or not warmup.get('equivalence', {}).get('passed')):
                 failures.append('full_warmup_or_equivalence_missing')
         for case in result['cases']:
-            path = root / f"{case['case_id']}.frames.jsonl"
-            rows = [json.loads(line) for line in path.read_text().splitlines() if line]
+            rows = load_rows(root, case['case_id'])
             audited = audit_case(rows, case, condition != 'single-full')
             cases.append(dict(case_id=case['case_id'], **audited))
             if not audited['passed']:

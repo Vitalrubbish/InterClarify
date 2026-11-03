@@ -1,0 +1,859 @@
+{
+  "conditions": {
+    "dual-limited": {
+      "passed": false,
+      "failures": [
+        "condition_failed",
+        "candor_turn_taking-102:audit_failed",
+        "candor_pause_handling-127:audit_failed"
+      ],
+      "exit_code": 1,
+      "cases": [
+        {
+          "case_id": "candor_turn_taking-102",
+          "passed": false,
+          "failures": [
+            "fixed_case_incomplete"
+          ],
+          "frames": 1,
+          "expected_frames": 74,
+          "closed_groups": 0,
+          "online_text": "",
+          "controller_main_ms": {
+            "count": 1,
+            "p50": 269.7468000650406,
+            "p95": 269.7468000650406,
+            "max": 269.7468000650406
+          },
+          "controller_observed_ms": {
+            "count": 1,
+            "p50": 229.7468000650406,
+            "p95": 229.7468000650406,
+            "max": 229.7468000650406
+          },
+          "asr_main_ms": {
+            "count": 1,
+            "p50": 229.4919492304325,
+            "p95": 229.4919492304325,
+            "max": 229.4919492304325
+          },
+          "first_frame_main_ms": 269.7468000650406,
+          "stable_main_ms": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null
+          },
+          "failed_step_sensevoice": [
+            {
+              "samples": 53760,
+              "dtype": "float64",
+              "milliseconds": 7589.004028588533
+            }
+          ]
+        },
+        {
+          "case_id": "candor_pause_handling-127",
+          "passed": false,
+          "failures": [
+            "fixed_case_incomplete"
+          ],
+          "frames": 34,
+          "expected_frames": 62,
+          "closed_groups": 19,
+          "online_text": "yeah do you have is there someone like a social worker that could kind of help you with them because i",
+          "controller_main_ms": {
+            "count": 34,
+            "p50": 258.80322143435495,
+            "p95": 290.49625352025026,
+            "max": 338.08496147394163
+          },
+          "controller_observed_ms": {
+            "count": 34,
+            "p50": 218.80322143435495,
+            "p95": 250.4962535202502,
+            "max": 298.0849614739416
+          },
+          "asr_main_ms": {
+            "count": 34,
+            "p50": 180.67850567400478,
+            "p95": 198.00878879427913,
+            "max": 257.7460569143293
+          },
+          "first_frame_main_ms": 234.6787053346634,
+          "stable_main_ms": {
+            "count": 33,
+            "p50": 258.85618969798105,
+            "p95": 291.97442486882204,
+            "max": 338.08496147394163
+          },
+          "failed_step_sensevoice": [
+            {
+              "samples": 53760,
+              "dtype": "float64",
+              "milliseconds": 3947.1358694136143
+            }
+          ]
+        },
+        {
+          "case_id": "synthetic_user_interruption-104",
+          "passed": true,
+          "failures": [],
+          "frames": 176,
+          "expected_frames": 176,
+          "closed_groups": 16,
+          "online_text": "told they start investing in stocks yeah but can we shift gears a bit how do i start a",
+          "controller_main_ms": {
+            "count": 176,
+            "p50": 346.4887060225017,
+            "p95": 356.78936496376946,
+            "max": 374.98114705085686
+          },
+          "controller_observed_ms": {
+            "count": 176,
+            "p50": 306.48870602250076,
+            "p95": 316.7893649637703,
+            "max": 334.98114705085766
+          },
+          "asr_main_ms": {
+            "count": 176,
+            "p50": 151.4547264575956,
+            "p95": 180.38344368338596,
+            "max": 220.27619272470477
+          },
+          "first_frame_main_ms": 190.7973411679268,
+          "stable_main_ms": {
+            "count": 175,
+            "p50": 346.86948359012604,
+            "p95": 356.81364771723696,
+            "max": 374.98114705085686
+          },
+          "failed_step_sensevoice": []
+        }
+      ],
+      "load_seconds": 96.69564519450068,
+      "warmup_seconds": 13.339052513241768,
+      "warmup_passed": true,
+      "missing_paths": null,
+      "run_error": null,
+      "native_equivalence_passed": null,
+      "warmup_details": []
+    },
+    "dual-full": {
+      "passed": true,
+      "failures": [],
+      "exit_code": 0,
+      "cases": [
+        {
+          "case_id": "candor_turn_taking-102",
+          "passed": true,
+          "failures": [],
+          "frames": 74,
+          "expected_frames": 74,
+          "closed_groups": 21,
+          "online_text": "like the the majority of people who are going to vote for trump don't care that he said that you know",
+          "controller_main_ms": {
+            "count": 74,
+            "p50": 365.91610312461876,
+            "p95": 433.5451450049877,
+            "max": 454.2455707490447
+          },
+          "controller_observed_ms": {
+            "count": 74,
+            "p50": 325.91610312461876,
+            "p95": 393.54514500498766,
+            "max": 414.2455707490438
+          },
+          "asr_main_ms": {
+            "count": 74,
+            "p50": 155.87908647954495,
+            "p95": 205.74296472221607,
+            "max": 225.33043146133426
+          },
+          "first_frame_main_ms": 191.47008761763573,
+          "stable_main_ms": {
+            "count": 73,
+            "p50": 366.55303686857235,
+            "p95": 433.62073341012,
+            "max": 454.2455707490447
+          },
+          "failed_step_sensevoice": []
+        },
+        {
+          "case_id": "candor_pause_handling-127",
+          "passed": true,
+          "failures": [],
+          "frames": 62,
+          "expected_frames": 62,
+          "closed_groups": 31,
+          "online_text": "yeah do you have is there someone like a social worker that could kind of help you with them because i mean that agency is just terrible to deal with for anybody um",
+          "controller_main_ms": {
+            "count": 62,
+            "p50": 290.1065693795682,
+            "p95": 371.7457826137538,
+            "max": 397.2747451066976
+          },
+          "controller_observed_ms": {
+            "count": 62,
+            "p50": 250.10656937956833,
+            "p95": 331.7457826137546,
+            "max": 357.2747451066966
+          },
+          "asr_main_ms": {
+            "count": 62,
+            "p50": 185.07550917565794,
+            "p95": 215.22890993207722,
+            "max": 234.29291069507573
+          },
+          "first_frame_main_ms": 188.7138682603836,
+          "stable_main_ms": {
+            "count": 61,
+            "p50": 295.6438609957699,
+            "p95": 371.7495822906489,
+            "max": 397.2747451066976
+          },
+          "failed_step_sensevoice": []
+        },
+        {
+          "case_id": "synthetic_user_interruption-104",
+          "passed": true,
+          "failures": [],
+          "frames": 176,
+          "expected_frames": 176,
+          "closed_groups": 16,
+          "online_text": "told they start investing in stocks yeah but can we shift gears a bit how do i start a",
+          "controller_main_ms": {
+            "count": 176,
+            "p50": 345.26496037840815,
+            "p95": 359.3360415846112,
+            "max": 563.6051063239585
+          },
+          "controller_observed_ms": {
+            "count": 176,
+            "p50": 305.264960378409,
+            "p95": 319.33604158461117,
+            "max": 523.6051063239557
+          },
+          "asr_main_ms": {
+            "count": 176,
+            "p50": 149.09585960209392,
+            "p95": 198.50110653787834,
+            "max": 363.2118684053438
+          },
+          "first_frame_main_ms": 184.80478331446648,
+          "stable_main_ms": {
+            "count": 175,
+            "p50": 345.3114308416829,
+            "p95": 359.69463217258476,
+            "max": 563.6051063239585
+          },
+          "failed_step_sensevoice": []
+        }
+      ],
+      "load_seconds": 94.14517244324088,
+      "warmup_seconds": 46.82688117027283,
+      "warmup_passed": true,
+      "missing_paths": [
+        {},
+        {}
+      ],
+      "run_error": null,
+      "native_equivalence_passed": true,
+      "warmup_details": [
+        {
+          "frames": 59,
+          "passed": true,
+          "coverage": {
+            "sensevoice_text": true,
+            "text_revision": true,
+            "native_complete": true,
+            "reset": true,
+            "wait": true,
+            "multi_token_eos": true,
+            "joint_complete": true,
+            "joint_wait": true
+          },
+          "raw_states": {
+            "<|user_idle|>": 16,
+            "<|user_nonidle|>": 43
+          },
+          "effective_states": {
+            "<|user_idle|>": 16,
+            "<|user_nonidle|>": 41,
+            "<|user_complete|>": 1,
+            "<|user_incomplete|>": 1
+          },
+          "rejections": {
+            "accepted": 59
+          },
+          "controller_compute_ms": {
+            "count": 59,
+            "p50": 89.3394872546196,
+            "p95": 296.87603600322956,
+            "max": 14552.045855671167
+          },
+          "x2_compute_ms": {
+            "count": 118,
+            "p50": 34.50572490692139,
+            "p95": 74.4011828675866,
+            "max": 194.58937272429466
+          },
+          "sensevoice_ms": {
+            "count": 35,
+            "p50": 37.62824460864067,
+            "p95": 1361.9521420448903,
+            "max": 14483.237486332655
+          },
+          "sensevoice_dtypes": [
+            "float64"
+          ],
+          "sensevoice_samples": [
+            53760,
+            76800,
+            97280
+          ],
+          "sensevoice_calls": 35,
+          "direct_sensevoice": [
+            {
+              "samples": 25600,
+              "sha256": "7feeffca48eb5129ac2452903b7a86b174b0cb3da4009df4fda66f2d390cb0af",
+              "dtype": "float64",
+              "seconds": 6.049745541065931,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 51200,
+              "sha256": "4520b8082fde4d40df6110280d696df6a01e1b50890c6980f04876925a69fc2f",
+              "dtype": "float64",
+              "seconds": 0.8484353236854076,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 53760,
+              "sha256": "854cfa307ae3c2d9c89d639f0a94a679270d6f27f295925670adbfa32fcc6e33",
+              "dtype": "float64",
+              "seconds": 0.03377513960003853,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 107520,
+              "sha256": "32a77b05366fd9c1407ffaf37a5fd106159eb73aac11c96cf99e69282fcd6f46",
+              "dtype": "float64",
+              "seconds": 0.038008883595466614,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 161280,
+              "sha256": "27f81ed58620b1bbe6800028b10f0be4180eceab384bf60cc2458bc9b86e37e0",
+              "dtype": "float64",
+              "seconds": 0.04198408126831055,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            }
+          ],
+          "cleanup": {
+            "native_kv_cleared": true,
+            "native_history_cleared": true,
+            "native_speech_cleared": true,
+            "callbacks_detached": true,
+            "native_buffer_samples": [
+              16000,
+              25600,
+              51200
+            ],
+            "reset_buffer_sha256": "c98475bcbe4da87c2a2ccd882a2ee4dcd873a6676df7d9b30208c5b2919e9adc",
+            "x2": {
+              "kv_cleared": true,
+              "text_cleared": true,
+              "callbacks_cleared": true,
+              "counters_cleared": true,
+              "completed_at": 17106034.400723003
+            }
+          },
+          "unprocessed_real_samples": {
+            "controller": 1280,
+            "asr": 0
+          }
+        },
+        {
+          "frames": 59,
+          "passed": true,
+          "coverage": {
+            "sensevoice_text": true,
+            "text_revision": true,
+            "native_complete": true,
+            "reset": true,
+            "wait": true,
+            "multi_token_eos": true,
+            "joint_complete": true,
+            "joint_wait": true
+          },
+          "raw_states": {
+            "<|user_idle|>": 16,
+            "<|user_nonidle|>": 43
+          },
+          "effective_states": {
+            "<|user_idle|>": 16,
+            "<|user_nonidle|>": 41,
+            "<|user_complete|>": 1,
+            "<|user_incomplete|>": 1
+          },
+          "rejections": {
+            "accepted": 59
+          },
+          "controller_compute_ms": {
+            "count": 59,
+            "p50": 88.80762755870819,
+            "p95": 108.80885161459445,
+            "max": 126.98885798454285
+          },
+          "x2_compute_ms": {
+            "count": 118,
+            "p50": 34.10579450428486,
+            "p95": 67.90623981505631,
+            "max": 87.38251402974129
+          },
+          "sensevoice_ms": {
+            "count": 35,
+            "p50": 38.61195966601372,
+            "p95": 45.902424678206444,
+            "max": 48.15271869301796
+          },
+          "sensevoice_dtypes": [
+            "float64"
+          ],
+          "sensevoice_samples": [
+            53760,
+            76800,
+            97280
+          ],
+          "sensevoice_calls": 35,
+          "direct_sensevoice": [
+            {
+              "samples": 25600,
+              "sha256": "7feeffca48eb5129ac2452903b7a86b174b0cb3da4009df4fda66f2d390cb0af",
+              "dtype": "float64",
+              "seconds": 0.03263527899980545,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 51200,
+              "sha256": "4520b8082fde4d40df6110280d696df6a01e1b50890c6980f04876925a69fc2f",
+              "dtype": "float64",
+              "seconds": 0.034163858741521835,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 53760,
+              "sha256": "854cfa307ae3c2d9c89d639f0a94a679270d6f27f295925670adbfa32fcc6e33",
+              "dtype": "float64",
+              "seconds": 0.036030616611242294,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 107520,
+              "sha256": "32a77b05366fd9c1407ffaf37a5fd106159eb73aac11c96cf99e69282fcd6f46",
+              "dtype": "float64",
+              "seconds": 0.038195859640836716,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 161280,
+              "sha256": "27f81ed58620b1bbe6800028b10f0be4180eceab384bf60cc2458bc9b86e37e0",
+              "dtype": "float64",
+              "seconds": 0.04346444830298424,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            }
+          ],
+          "cleanup": {
+            "native_kv_cleared": true,
+            "native_history_cleared": true,
+            "native_speech_cleared": true,
+            "callbacks_detached": true,
+            "native_buffer_samples": [
+              16000,
+              25600,
+              51200
+            ],
+            "reset_buffer_sha256": "c98475bcbe4da87c2a2ccd882a2ee4dcd873a6676df7d9b30208c5b2919e9adc",
+            "x2": {
+              "kv_cleared": true,
+              "text_cleared": true,
+              "callbacks_cleared": true,
+              "counters_cleared": true,
+              "completed_at": 17106040.14844666
+            }
+          },
+          "unprocessed_real_samples": {
+            "controller": 1280,
+            "asr": 0
+          }
+        }
+      ]
+    },
+    "single-full": {
+      "passed": false,
+      "failures": [
+        "condition_failed",
+        "candor_turn_taking-102:audit_failed"
+      ],
+      "exit_code": 1,
+      "cases": [
+        {
+          "case_id": "candor_turn_taking-102",
+          "passed": false,
+          "failures": [
+            "fixed_case_incomplete"
+          ],
+          "frames": 75,
+          "expected_frames": 74,
+          "closed_groups": null,
+          "online_text": null,
+          "controller_main_ms": {
+            "count": 75,
+            "p50": 129.3636688590052,
+            "p95": 187.0718109756709,
+            "max": 216.144072264433
+          },
+          "controller_observed_ms": {
+            "count": 75,
+            "p50": 89.36366885900514,
+            "p95": 147.07181097567087,
+            "max": 176.14407226443296
+          },
+          "asr_main_ms": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null
+          },
+          "first_frame_main_ms": 89.40523967146873,
+          "stable_main_ms": {
+            "count": 74,
+            "p50": 130.5335954576732,
+            "p95": 187.3359380587936,
+            "max": 216.144072264433
+          },
+          "failed_step_sensevoice": []
+        },
+        {
+          "case_id": "candor_pause_handling-127",
+          "passed": true,
+          "failures": [],
+          "frames": 62,
+          "expected_frames": 62,
+          "closed_groups": null,
+          "online_text": null,
+          "controller_main_ms": {
+            "count": 62,
+            "p50": 134.52742449939237,
+            "p95": 207.0520812571049,
+            "max": 293.21592926979065
+          },
+          "controller_observed_ms": {
+            "count": 62,
+            "p50": 94.52742449939232,
+            "p95": 167.05208125710485,
+            "max": 253.21592926979065
+          },
+          "asr_main_ms": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null
+          },
+          "first_frame_main_ms": 90.31907200813293,
+          "stable_main_ms": {
+            "count": 61,
+            "p50": 136.16755813360191,
+            "p95": 207.47433155775076,
+            "max": 293.21592926979065
+          },
+          "failed_step_sensevoice": []
+        },
+        {
+          "case_id": "synthetic_user_interruption-104",
+          "passed": true,
+          "failures": [],
+          "frames": 176,
+          "expected_frames": 176,
+          "closed_groups": null,
+          "online_text": null,
+          "controller_main_ms": {
+            "count": 176,
+            "p50": 107.19990849494998,
+            "p95": 174.55853592604421,
+            "max": 480.3628945350642
+          },
+          "controller_observed_ms": {
+            "count": 176,
+            "p50": 67.19990849494906,
+            "p95": 134.55853592604373,
+            "max": 440.36289453506504
+          },
+          "asr_main_ms": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null
+          },
+          "first_frame_main_ms": 88.30093324184418,
+          "stable_main_ms": {
+            "count": 175,
+            "p50": 107.74234160781049,
+            "p95": 174.85670097172263,
+            "max": 480.3628945350642
+          },
+          "failed_step_sensevoice": []
+        }
+      ],
+      "load_seconds": 54.9221906401217,
+      "warmup_seconds": 19.139371261000633,
+      "warmup_passed": true,
+      "missing_paths": [
+        {},
+        {}
+      ],
+      "run_error": null,
+      "native_equivalence_passed": true,
+      "warmup_details": [
+        {
+          "frames": 59,
+          "passed": true,
+          "coverage": {
+            "sensevoice_text": true,
+            "text_revision": true,
+            "native_complete": true,
+            "reset": true,
+            "wait": false,
+            "multi_token_eos": false,
+            "joint_complete": false,
+            "joint_wait": false
+          },
+          "raw_states": {
+            "<|user_idle|>": 16,
+            "<|user_nonidle|>": 43
+          },
+          "effective_states": {
+            "<|user_idle|>": 16,
+            "<|user_nonidle|>": 41,
+            "<|user_complete|>": 1,
+            "<|user_incomplete|>": 1
+          },
+          "rejections": {
+            "accepted": 59
+          },
+          "controller_compute_ms": {
+            "count": 59,
+            "p50": 76.98628678917885,
+            "p95": 103.92054803669436,
+            "max": 459.01861414313316
+          },
+          "x2_compute_ms": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null
+          },
+          "sensevoice_ms": {
+            "count": 35,
+            "p50": 33.98158773779869,
+            "p95": 37.19577603042126,
+            "max": 289.24672305583954
+          },
+          "sensevoice_dtypes": [
+            "float64"
+          ],
+          "sensevoice_samples": [
+            53760,
+            76800,
+            97280
+          ],
+          "sensevoice_calls": 35,
+          "direct_sensevoice": [
+            {
+              "samples": 25600,
+              "sha256": "7feeffca48eb5129ac2452903b7a86b174b0cb3da4009df4fda66f2d390cb0af",
+              "dtype": "float64",
+              "seconds": 1.3573384210467339,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 51200,
+              "sha256": "4520b8082fde4d40df6110280d696df6a01e1b50890c6980f04876925a69fc2f",
+              "dtype": "float64",
+              "seconds": 0.2720787674188614,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 53760,
+              "sha256": "854cfa307ae3c2d9c89d639f0a94a679270d6f27f295925670adbfa32fcc6e33",
+              "dtype": "float64",
+              "seconds": 0.032912421971559525,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 107520,
+              "sha256": "32a77b05366fd9c1407ffaf37a5fd106159eb73aac11c96cf99e69282fcd6f46",
+              "dtype": "float64",
+              "seconds": 0.037316445261240005,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 161280,
+              "sha256": "27f81ed58620b1bbe6800028b10f0be4180eceab384bf60cc2458bc9b86e37e0",
+              "dtype": "float64",
+              "seconds": 0.04408417269587517,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            }
+          ],
+          "cleanup": {
+            "native_kv_cleared": true,
+            "native_history_cleared": true,
+            "native_speech_cleared": true,
+            "callbacks_detached": true,
+            "native_buffer_samples": [
+              16000,
+              25600,
+              51200
+            ],
+            "reset_buffer_sha256": "c98475bcbe4da87c2a2ccd882a2ee4dcd873a6676df7d9b30208c5b2919e9adc"
+          },
+          "unprocessed_real_samples": 1280
+        },
+        {
+          "frames": 59,
+          "passed": true,
+          "coverage": {
+            "sensevoice_text": true,
+            "text_revision": true,
+            "native_complete": true,
+            "reset": true,
+            "wait": false,
+            "multi_token_eos": false,
+            "joint_complete": false,
+            "joint_wait": false
+          },
+          "raw_states": {
+            "<|user_idle|>": 16,
+            "<|user_nonidle|>": 43
+          },
+          "effective_states": {
+            "<|user_idle|>": 16,
+            "<|user_nonidle|>": 41,
+            "<|user_complete|>": 1,
+            "<|user_incomplete|>": 1
+          },
+          "rejections": {
+            "accepted": 59
+          },
+          "controller_compute_ms": {
+            "count": 59,
+            "p50": 76.56744867563248,
+            "p95": 96.53869718313216,
+            "max": 114.91312831640244
+          },
+          "x2_compute_ms": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null
+          },
+          "sensevoice_ms": {
+            "count": 35,
+            "p50": 33.89355540275574,
+            "p95": 35.92337444424629,
+            "max": 37.82081604003906
+          },
+          "sensevoice_dtypes": [
+            "float64"
+          ],
+          "sensevoice_samples": [
+            53760,
+            76800,
+            97280
+          ],
+          "sensevoice_calls": 35,
+          "direct_sensevoice": [
+            {
+              "samples": 25600,
+              "sha256": "7feeffca48eb5129ac2452903b7a86b174b0cb3da4009df4fda66f2d390cb0af",
+              "dtype": "float64",
+              "seconds": 0.03241286054253578,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 51200,
+              "sha256": "4520b8082fde4d40df6110280d696df6a01e1b50890c6980f04876925a69fc2f",
+              "dtype": "float64",
+              "seconds": 0.033799365162849426,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 53760,
+              "sha256": "854cfa307ae3c2d9c89d639f0a94a679270d6f27f295925670adbfa32fcc6e33",
+              "dtype": "float64",
+              "seconds": 0.03409187123179436,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 107520,
+              "sha256": "32a77b05366fd9c1407ffaf37a5fd106159eb73aac11c96cf99e69282fcd6f46",
+              "dtype": "float64",
+              "seconds": 0.038834940642118454,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 161280,
+              "sha256": "27f81ed58620b1bbe6800028b10f0be4180eceab384bf60cc2458bc9b86e37e0",
+              "dtype": "float64",
+              "seconds": 0.04541979730129242,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            }
+          ],
+          "cleanup": {
+            "native_kv_cleared": true,
+            "native_history_cleared": true,
+            "native_speech_cleared": true,
+            "callbacks_detached": true,
+            "native_buffer_samples": [
+              16000,
+              25600,
+              51200
+            ],
+            "reset_buffer_sha256": "c98475bcbe4da87c2a2ccd882a2ee4dcd873a6676df7d9b30208c5b2919e9adc"
+          },
+          "unprocessed_real_samples": 1280
+        }
+      ]
+    }
+  },
+  "resource_stop": false,
+  "resource_peaks": {
+    "gpu_mib": 14752,
+    "rss_kib": 10161588,
+    "output_kib": 14120
+  },
+  "resource_checks_passed": true,
+  "ntf019_candidate_gate": true,
+  "matrix_all_passed": false
+}

@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 from copy import deepcopy
 import hashlib
+import gzip
 import json
 from pathlib import Path
 import random
@@ -183,7 +184,7 @@ def cleanup(frontend, worker):
     return record
 
 
-def replay(model, worker, audio, identity, output, realtime, order=('controller', 'asr')):
+def replay(model, worker, audio, identity, output, realtime, order=('controller', 'asr'), compress=False):
     frontend, context = fresh(model, worker, identity, realtime, order)
     stopped = threading.Event()
     ingress_errors, arrivals, rows = [], [], []
@@ -211,13 +212,15 @@ def replay(model, worker, audio, identity, output, realtime, order=('controller'
     reader = threading.Thread(target=feed, name='pcm-arrival', daemon=True) if realtime else None
     result = {'case_id': identity, 'passed': False, 'timing_mode': 'realtime' if realtime else 'warmup',
               'audio_sha256': pcm_digest(audio), 'real_samples': len(audio), 'lane_order': list(order) if worker else ['controller'],
-              'lane_execution': 'concurrent' if worker else 'single'}
+              'lane_execution': 'concurrent' if worker else 'single', 'started_at': started}
     cursor = 0
     previous_release = 0.
     try:
         if reader:
             reader.start()
-        with (output / f'{identity}.frames.jsonl').open('x') as stream:
+        path = output / f'{identity}.frames.jsonl'
+        stream = gzip.open(str(path) + '.gz', 'xt', encoding='utf-8', compresslevel=1) if compress else path.open('x')
+        with stream:
             while True:
                 if ingress_errors:
                     raise RuntimeError(ingress_errors[0])
@@ -525,10 +528,12 @@ def run(args):
     manifest = json.loads(args.manifest.read_text())
     if len(manifest['samples']) != 30:
         raise ValueError('Expected fixed denominator 30')
-    samples = [next(sample for sample in manifest['samples'] if sample['case_id'] == name) for name in PREFLIGHT]
+    samples = select_samples(manifest, args.suite, args.condition, args.acceptance_gate, args.acceptance_gate_sha256)
     args.output.mkdir(exist_ok=False)
     result = {'passed': False, 'condition': args.condition, 'cases': [], 'manifest_sha256': digest(args.manifest),
-              'fixed_cases': PREFLIGHT, 'seed': 42, 'warmup_audio_sha256': WARMUP_SHA256}
+              'fixed_cases': [sample['case_id'] for sample in samples], 'seed': 42, 'warmup_audio_sha256': WARMUP_SHA256,
+              'suite': args.suite, 'acceptance_gate_sha256': args.acceptance_gate_sha256}
+    write_json(args.output / 'input_manifest.json', dict(manifest, samples=samples))
     worker = controller = None
     began = time.monotonic()
     try:
@@ -553,11 +558,11 @@ def run(args):
         result['ready_at'] = time.monotonic()
         for sample in samples:
             values, gain = load_audio(sample)
-            record = replay(model, worker, quantize(values), sample['case_id'], args.output, True)
+            record = replay(model, worker, quantize(values), sample['case_id'], args.output, True, compress=args.suite == 'fdb30')
             record['gain'] = gain
             result['cases'].append(record)
             write_json(args.output / 'progress.json', result)
-        result['passed'] = len(result['cases']) == 3 and all(record['passed'] for record in result['cases'])
+        result['passed'] = len(result['cases']) == len(samples) and all(record['passed'] for record in result['cases'])
     except Exception:
         result['error'] = traceback.format_exc()
         traceback.print_exc()
@@ -570,9 +575,31 @@ def run(args):
     return 0 if result['passed'] else 1
 
 
+def select_samples(manifest, suite, condition, gate=None, gate_sha256=None):
+    if suite == 'preflight':
+        return [next(sample for sample in manifest['samples'] if sample['case_id'] == name) for name in PREFLIGHT]
+    if suite != 'fdb30' or condition not in ('dual-full', 'single-full'):
+        raise ValueError('Formal FDB30 requires a full warmup condition')
+    if gate is None or not gate_sha256 or digest(gate) != gate_sha256:
+        raise ValueError('The accepted NTF-018 evidence digest is required')
+    accepted = json.loads(Path(gate).read_text())
+    dual = accepted.get('conditions', {}).get('dual-full', {})
+    if (accepted.get('ntf019_candidate_gate') is not True or accepted.get('resource_checks_passed') is not True
+            or dual.get('passed') is not True or [row['case_id'] for row in dual.get('cases', [])] != PREFLIGHT
+            or not all(row.get('passed') is True for row in dual['cases'])):
+        raise ValueError('NTF-018 did not pass its fixed three-axis gate')
+    samples = manifest['samples']
+    if len(samples) != 30 or len({row['case_id'] for row in samples}) != 30:
+        raise ValueError('Expected thirty distinct frozen cases')
+    return samples
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--condition', required=True, choices=('dual-limited', 'dual-full', 'single-full'))
+    parser.add_argument('--suite', choices=('preflight', 'fdb30'), default='preflight')
+    parser.add_argument('--acceptance-gate', type=Path)
+    parser.add_argument('--acceptance-gate-sha256')
     for name in ('manifest', 'assets', 'upstream', 'warmup-audio', 'asr-python', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     return run(parser.parse_args())

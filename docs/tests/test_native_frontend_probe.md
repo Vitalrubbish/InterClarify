@@ -10,4 +10,6 @@
 
 单路完成计数修正用真实时钟及重复原生reset验证：允许因重新供给PCM产生更多调用，EOF尾部仍保留，800ms和容量检查不变；双路批次数精确要求继续由原有检查约束。
 
+019入口增加未通过／摘要错误的验收证据不得启动正式套件检查；有效门槛才能选择全部30条，有限预热条件不得运行正式套件。gzip证据与普通证据读取后必须完全一致。
+
 运行：`conda run -n interclarify-dev python -m unittest discover -s tests -p test_native_frontend_probe.py -v`。完整回归仍由`python -m unittest discover -s tests -q`执行。真实预热覆盖、GPU延迟与资源门槛必须在远端验收。

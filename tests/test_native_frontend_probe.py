@@ -1,5 +1,6 @@
 """Check real-clock gates, bounded IPC provenance and warmup isolation."""
 import base64
+import hashlib
 from copy import deepcopy
 import json
 from pathlib import Path
@@ -20,14 +21,47 @@ from dual_audio import DualAudioFrontend, PCMLedger
 from independent_x2 import IndependentX2
 from native_soulx import NativeSoulX, pcm_digest
 from native_frontend_worker import MAX_MESSAGE, RemoteX2, WindowLedger, receive, send
-from native_frontend_probe import compare_native, full_warmup, prepare_warmup, quantize, replay
+from native_frontend_probe import PREFLIGHT, compare_native, full_warmup, prepare_warmup, quantize, replay, select_samples
 from shared_context import SharedContext
-from analyze_native_frontend import audit_case, analyze
+from analyze_native_frontend import audit_case, analyze, load_rows
 from test_independent_frontend import Clock, FakeEngine
 from test_native_soulx import SOURCE, official_model
 
 
 class ProbeTests(unittest.TestCase):
+    def test_formal_suite_requires_verified_gate_and_keeps_all_thirty_cases(self):
+        samples = [{'case_id': name} for name in PREFLIGHT + [f'case_{i}' for i in range(27)]]
+        manifest = {'samples': samples}
+        gate = {'ntf019_candidate_gate': True, 'resource_checks_passed': True,
+                'conditions': {'dual-full': {'passed': True, 'cases': [{'case_id': name, 'passed': True} for name in PREFLIGHT]}}}
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'gate.json'
+            path.write_text(json.dumps(gate))
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            self.assertEqual(select_samples(manifest, 'fdb30', 'dual-full', path, digest), samples)
+            with self.assertRaises(ValueError):
+                select_samples(manifest, 'fdb30', 'dual-full', path, 'wrong')
+            with self.assertRaises(ValueError):
+                select_samples(manifest, 'fdb30', 'dual-limited', path, digest)
+            gate['ntf019_candidate_gate'] = False
+            path.write_text(json.dumps(gate))
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            with self.assertRaises(ValueError):
+                select_samples(manifest, 'fdb30', 'single-full', path, digest)
+
+    def test_compressed_evidence_retains_every_receipt(self):
+        frontend, context = self.frontend()
+        with tempfile.TemporaryDirectory() as directory, patch('native_frontend_probe.fresh', return_value=(frontend, context)), \
+                patch('torch.cuda.synchronize'):
+            root = Path(directory)
+            result = replay(frontend.controller.model, None, np.full(3000, .1, np.float32), 'case', root, False, compress=True)
+            self.assertTrue(result['passed'], result.get('error'))
+            self.assertFalse((root / 'case.frames.jsonl').exists())
+            rows = load_rows(root, 'case')
+            self.assertEqual(len(rows), 2)
+            self.assertEqual(rows[-1]['snapshot']['text'], 'hello world')
+            self.assertEqual(rows[-1]['receipts']['asr']['processed_until'], 3000)
+
     def test_single_lane_reset_can_produce_more_calls_than_source_batches(self):
         model = official_model([99, 7] * 100)
         with tempfile.TemporaryDirectory() as directory, patch('torch.cuda.synchronize'), \

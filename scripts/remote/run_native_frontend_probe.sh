@@ -4,10 +4,10 @@ set -euo pipefail
 ROOT="${SOULX_ROOT:-$HOME/parathink-soulx-duplug}"
 SOURCE="${SOULX_SOURCE:?set frozen clean source worktree}"
 RUN_ID="${SOULX_RUN_ID:?set unique run ID}"
-GROUP="${NTF018_GROUP:?set dual, single or matrix}"
+GROUP="${NTF_FRONTEND_GROUP:-${NTF018_GROUP:?set a frontend condition group}}"
 MANIFEST="${SOULX_FDB_MANIFEST:?set original frozen FDB30 manifest}"
 [[ "$RUN_ID" =~ ^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$ ]] || exit 2
-[[ "$GROUP" == dual || "$GROUP" == single || "$GROUP" == matrix ]] || exit 2
+[[ "$GROUP" == dual || "$GROUP" == single || "$GROUP" == matrix || "$GROUP" == fdb-dual || "$GROUP" == fdb-single ]] || exit 2
 [[ "${NTF_SCHEDULED_RUN:-0}" == 1 && -n "${CUDA_VISIBLE_DEVICES:-}" ]] || exit 2
 ASSETS="$HOME/turncontrol-comparison"
 SOULX="$ASSETS/envs/soulx/bin/python"
@@ -31,7 +31,8 @@ mkdir -p "$TMPDIR" "$HF_HOME"
 cp "$MANIFEST" "$RUN/frozen_manifest.json"
 git -C "$SOURCE" rev-parse HEAD > "$RUN/source_commit.txt"
 git -C "$SOURCE" ls-files scripts/runtime scripts/remote/native_frontend_probe.py \
-  scripts/remote/native_frontend_worker.py scripts/remote/x2_streaming_probe.py scripts/remote/run_native_frontend_probe.sh configs/native_soulx.json \
+  scripts/remote/native_frontend_worker.py scripts/remote/x2_streaming_probe.py scripts/remote/run_native_frontend_probe.sh \
+  scripts/remote/run_native_frontend_fdb.sh configs/native_soulx.json \
   configs/x2_streaming_probe.json | while IFS= read -r file; do sha256sum "$SOURCE/$file"; done > "$RUN/source.sha256"
 printf '%s\n' "$GROUP" > "$RUN/group.txt"
 PID=''
@@ -53,12 +54,20 @@ STARTED=$SECONDS
 CONDITIONS=(single-full)
 [[ "$GROUP" != dual ]] || CONDITIONS=(dual-limited dual-full)
 [[ "$GROUP" != matrix ]] || CONDITIONS=(dual-limited dual-full single-full)
+SUITE_ARGS=()
+if [[ "$GROUP" == fdb-dual || "$GROUP" == fdb-single ]]; then
+  [[ "$GROUP" != fdb-dual ]] || CONDITIONS=(dual-full)
+  cp "${NTF_ACCEPTANCE_GATE:?set accepted NTF-018 evidence}" "$RUN/ntf018_acceptance.json"
+  sha256sum "$RUN/ntf018_acceptance.json" >> "$RUN/source.sha256"
+  SUITE_ARGS=(--suite fdb30 --acceptance-gate "$RUN/ntf018_acceptance.json"
+    --acceptance-gate-sha256 "${NTF_ACCEPTANCE_GATE_SHA256:?set frozen acceptance evidence digest}")
+fi
 FINAL_CODE=0
 for condition in "${CONDITIONS[@]}"; do
   remaining=$((1750 - SECONDS + STARTED))
   (( remaining > 0 )) || exit 124
   setsid timeout --signal=TERM --kill-after=5 "$remaining" "$SOULX" -B \
-    "$SOURCE/scripts/remote/native_frontend_probe.py" --condition "$condition" \
+    "$SOURCE/scripts/remote/native_frontend_probe.py" --condition "$condition" "${SUITE_ARGS[@]}" \
     --manifest "$RUN/frozen_manifest.json" --assets "$ASSETS" \
     --upstream "$ROOT/upstream/soulx-duplug" --asr-python "$ASR" \
     --warmup-audio "$HOME/interclarify-xturnix-fleurs/dataset/fleurs_en_us/audio/dev/786465049904960526.wav" \

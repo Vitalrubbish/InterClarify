@@ -1,6 +1,6 @@
 # NTF-018完整预热与三轴预检
 
-对应`scripts/remote/native_frontend_probe.py`。入口只支持NTF-018的`dual-limited`、`dual-full`、`single-full`，每次独立进程。固定manifest、三轴顺序、预热语音与长度见[工作单](../../issue/NTF-018.md)。本模块不执行NTF-019正式30条。
+对应`scripts/remote/native_frontend_probe.py`。入口只支持NTF-018的`dual-limited`、`dual-full`、`single-full`，每次独立进程。固定manifest、三轴顺序、预热语音与长度见[工作单](../../reports/soulx/20261103-ntf018-warmup/README.md)。本模块不执行NTF-019正式30条。
 
 `SingleLane`只作原生控制参考，保持同一连续PCM账本、真实到达时钟、800ms未读／进度停止线和4MiB限制；不伪造ASR回执或联合正文。它以完整调用结束后的游标计算积压，不能把中途得到音频token当作完成。
 
@@ -25,3 +25,7 @@
 直接SenseVoice长度探针改用与原生缓冲一致的float64，并保存dtype。r1的float32直接探针没有覆盖首遇原生float64调用，不能以相同长度认定相同路径已热。r2已通过完整覆盖和真实权重对照，但串行在线三轴2/3；用户已撤销次数限制，继续复测。
 
 r2后双路预热和在线两条件统一使用`concurrent=True`，同一160ms内并发推进两个单worker模型，联合提交后才开始下一批。单路不变，模型和输入不变；与r2比较时必须明示调度已变。实际完成顺序据回执报告，不人为延迟结果。
+
+NTF-018已通过并归档后，本入口增加`--suite fdb30`供019复用：只接受dual-full／single-full，运行原manifest的全部30条；必须给出018验收JSON及SHA256，摘要、双路通过标记、资源通过和三轴3/3任一不符均在模型加载前拒绝。默认preflight仍只运行018固定三条。`select_samples()`集中执行该门槛；结果记录实际套件、固定顺序及验收证据摘要。
+
+正式套件逐帧文件使用gzip无损压缩，`replay(compress=True)`保留所有原字段并记录回放起点供墙钟评分；默认本地／预检文件不压缩。压缩及写盘在Context锁外且计入后续在线排队；生产者按真实时钟持续运行。每臂仍只有两轮起始完整预热，30条间只清理会话，不逐例重载或给失败样本补热。
