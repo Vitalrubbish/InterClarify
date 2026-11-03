@@ -2,6 +2,8 @@
 
 更新：2026-11-03。对应[图源](../../figures/parathink_method.tex)，合同见[架构第2节](../research_design/architecture.md#2-模块与动作边界)。NTF-017已同步原生控制、独立X2与160ms联合提交；图中下游接入、真实模型验证和CoT反馈仍是后续目标，不表示已接入。
 
+后续用户已确认将 Layer 0 系统附和能力并入 Layer 1。本页其余内容解释合并前的图源与预览，图中独立 Layer 0 不再表示当前目标部署；当前文字合同见[架构设计](../research_design/architecture.md)，训练方案见[专项研究](../research_design/layer1_training.md)。本次研究未重绘图源或预览。
+
 ## 结构与绘图元素
 
 TikZ源码没有运行时类或方法。frontend表示语音前端，box表示组件，wide表示Context和唯一输出路径，eventbox表示下游输出生命周期。flow表示读取与顺序消费，write表示提交，control表示读取已提交nonidle后的输出执行，thinking表示思考请求／CoT发布，future表示尚未实现的CoT反馈，feedback表示实际输出状态回传。

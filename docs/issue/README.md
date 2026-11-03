@@ -4,7 +4,7 @@
 
 ## 当前工作单
 
-当前无活动工作单。NTF-036 已完成并归档，清理结果见本地 `docs/issue/archive/NTF-036.md`。
+当前无活动工作单。NTF-037 已完成训练数据与成本研究并归档，见[方案](../research_design/layer1_training.md)及本地 `docs/issue/archive/NTF-037.md`；未启动接入或训练。NTF-036 清理结果见本地 `docs/issue/archive/NTF-036.md`。
 
 ## 当前路线交付
 
@@ -20,6 +20,7 @@
 | [NTF-028](archive/NTF-028.md) | 已完成并归档 | 160ms 音频步推进屏障合同 |
 | [NTF-029](archive/NTF-029.md) | 已完成并归档 | 160ms 双路完成后的联合发布合同 |
 | [NTF-030](../reports/soulx/20261103-latency-limit-removal/README.md) | 已完成并归档 | 取消 800ms 时长停止条件，保留容量与资源保护 |
+| [NTF-037](../research_design/layer1_training.md) | 研究已完成并归档 | Layer 0 并入 Layer 1 的职责同步、含噪控制与取消恢复数据、规模预算及控制方案比较；尚未实施训练 |
 
 ## 后续计划
 

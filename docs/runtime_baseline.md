@@ -25,8 +25,8 @@
 ## 行为边界
 
 - 保持单一仲裁器与单一 TTS 播放所有权；已播放内容不可撤销。
-- 现役双工控制仍由DuplexCascade执行。目标方案中五状态及正文在每160ms双路完成后联合提交；Layer 1在正常输入边界读到有效complete及当前正文后可在当前turn回答，无额外交接等待。下游从共同快照读取有效nonidle后，由唯一输出运行时处理停止；消费去重留待下游接入。Layer 2 CoT与Layer 0系统附和仍为后续接入。
+- 现役双工控制仍由DuplexCascade执行。目标方案中五状态及正文在每160ms双路完成后联合提交；Layer 1在正常输入边界读到有效complete及当前正文后可在当前turn回答，无额外交接等待。下游从共同快照读取有效nonidle后，由唯一输出运行时处理停止；消费去重留待下游接入。Layer 2 CoT与并入Layer 1的系统附和仍为后续接入。
 - 控制信号与思考 token 不直接进入 TTS。
-- 系统 backchannel 当前未实现，后续由 Layer 0 专项训练并接入，未从总计划移除；Layer 2 尚未接入运行链路。
+- 系统 backchannel 当前未实现，用户已确认并入 Layer 1，后续统一训练附和时机与措辞；数据与成本见[训练研究](research_design/layer1_training.md)。Layer 2 尚未接入运行链路。
 
 参数变更须同步更新 `configs/xtalk_duplex_english_runtime.json`、`docs/configs/` 对应说明与本文。

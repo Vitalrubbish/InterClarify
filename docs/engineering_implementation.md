@@ -31,6 +31,8 @@ SoulX 保留内部 SenseVoice 教师、门控、滑窗差分／KV 修订、状�
 
 ## 4. 后续边界
 
+用户已确认将 Layer 0 系统附和能力并入 Layer 1；当前开展[训练数据与成本研究](research_design/layer1_training.md)，不单独部署附和预测器。研究包含真实控制噪声、首音前取消和开播后恢复；协议、数据规模和训练资源仍为方案建议，未启动语料生成、训练或 LLM／TTS 接入。
+
 普通回答生成边界、单一输出执行点及 TTS 播放所有权保持；状态统一经联合快照交付，撤回前端专用停止旁路。后续 CoT 条件化控制目标仍见[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)，本次不构造训练数据或注入 CoT。图源及 PDF／PNG 已由 NTF-017 同步；不表示回答或播放链路已实现。
 
 160ms 推进合同见[设计第 2.1 节](dev/SoulX-Duplug/independent_streaming_frontend.md#21-每160ms音频步的推进屏障)，NTF-015／016 已实现计算基础，NTF-017 已完成联合发布迁移。后续工作待用户另行明确指令。
