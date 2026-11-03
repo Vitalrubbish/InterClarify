@@ -18,7 +18,7 @@ COMPLETION_FIELDS = {'completion_id', 'completion_status', 'completion_target_sa
                      'completion_reason', 'completion_available_at', 'completion_generation'}
 SERVICE_FIELDS = {'service_state': None, 'service_completion_source': None,
                   'speech_detected': False, 'service_text': ''}
-TRANSCRIPT_SOURCES = ('sensevoice_small', 'nemotron', 'x2_streaming_asr')
+TRANSCRIPT_SOURCES = ('x2_streaming_asr',)
 
 
 class SharedContext:
@@ -52,14 +52,11 @@ class SharedContext:
         self.changed.notify_all()
         return deepcopy(value)
 
-    def open_user_turn(self, session_id, turn_id, source='sensevoice_small', *, publication_mode=None):
-        """Fix one ASR source for the entire logical turn."""
+    def open_user_turn(self, session_id, turn_id, source='x2_streaming_asr'):
+        """Fix the independent X2 source for the entire logical turn."""
         key = self._key(session_id, turn_id)
         if source not in TRANSCRIPT_SOURCES:
             raise ValueError('Unsupported transcript source')
-        mode = publication_mode or ('joint' if source == 'x2_streaming_asr' else 'legacy_frame')
-        if mode not in ('joint', 'legacy_frame') or (mode == 'joint' and source != 'x2_streaming_asr'):
-            raise ValueError('Unsupported publication mode')
         with self.changed:
             if key in self.latest:
                 raise ValueError('User turn already exists')
@@ -71,75 +68,14 @@ class SharedContext:
                      'processed_until': 0, 'audio_observed_until': 0,
                      'assembly_status': 'empty', 'coverage_complete': False,
                      'status': 'open', 'published_at': self.clock(),
-                     **SERVICE_FIELDS}
-            value['publication_mode'] = mode
-            if mode == 'joint':
-                value.update(step_id=-1, committed_groups=0, batch_published_at=None,
-                             text_available_at=None, text_published_at=None, text_observed_until=0,
-                             state_available_at=None, state_published_at=None,
-                             state_processed_until=0, state_observed_until=0,
-                             asr_processed_until=0, asr_observed_until=0,
-                             asr_progress_available_at=None, completion_id=None,
-                             completion_status='none', tail_status='unknown')
-            return self._store(key, value)
-
-    def publish_user_frame(self, frame):
-        """Publish a complete processed-audio observation, including text corrections."""
-        value = deepcopy(frame)
-        required = {'session_id', 'turn_id', 'source', 'text', 'state_token', 'state_token_id',
-                    'state_accepted', 'processed_until', 'audio_observed_until',
-                    'coverage_complete', 'assembly_status', 'status'}
-        if not required <= value.keys():
-            raise ValueError('Incomplete user frame')
-        for name, default in SERVICE_FIELDS.items():
-            value.setdefault(name, default)
-        if {'version', 'asr_version', 'replace_from', 'replacement', 'event_seq'} & value.keys():
-            raise ValueError('User frames contain current values, not transcript revisions')
-        key = self._key(value['session_id'], value['turn_id'])
-        if value['source'] not in TRANSCRIPT_SOURCES or value['status'] != 'open':
-            raise ValueError('Unsupported user frame source or lifecycle')
-        if not isinstance(value['text'], str):
-            raise ValueError('Transcript must be a string')
-        if type(value['state_accepted']) is not bool or type(value['coverage_complete']) is not bool:
-            raise ValueError('Invalid user frame flags')
-        if value['state_accepted'] and (value['state_token'] not in STATE_IDS
-                or type(value['state_token_id']) is not int
-                or STATE_IDS[value['state_token']] != value['state_token_id']):
-            raise ValueError('Invalid accepted SoulX state')
-        if value['service_state'] not in SERVICE_STATES:
-            raise ValueError('Invalid official service state')
-        if value['service_completion_source'] not in COMPLETION_SOURCES:
-            raise ValueError('Invalid official completion source')
-        if type(value['speech_detected']) is not bool:
-            raise ValueError('Invalid speech detection flag')
-        if not isinstance(value['service_text'], str) or len(value['service_text']) > self.max_chars:
-            raise ValueError('Invalid official service text')
-        source = value['service_completion_source']
-        if source is not None and value['service_state'] != 'speak':
-            raise ValueError('Completion signal requires the official speak state')
-        if source == 'model_complete' and (value['state_token'] != '<|user_complete|>'
-                or not value['state_accepted'] or not value['speech_detected']):
-            raise ValueError('Model completion must be an accepted native complete with speech')
-        if source == 'wait_fallback' and value['state_token'] == '<|user_complete|>':
-            raise ValueError('Wait fallback cannot rewrite a native complete')
-        if value.get('rejection_reason') == 'no_speech' and (value['state_token'] != '<|user_complete|>'
-                or value['speech_detected']):
-            raise ValueError('No-speech rejection only applies to an unconfirmed native complete')
-        end, observed = value['processed_until'], value['audio_observed_until']
-        if type(end) is not int or type(observed) is not int or not 0 <= end <= observed:
-            raise ValueError('Invalid audio observation range')
-        with self.changed:
-            old = self.latest[key]
-            if old['publication_mode'] != 'legacy_frame':
-                raise ValueError('Independent X2 turns require a joint batch')
-            if value['source'] != old['source']:
-                raise ValueError('Transcript source cannot change within a turn')
-            if key in self._closed_keys or old['status'] != 'open':
-                raise ValueError('Cannot update a closed user turn')
-            if end <= old['processed_until']:
-                raise ValueError('Audio frame is duplicated or out of order')
-            value['published_at'] = self.clock()
-            value['publication_mode'] = old['publication_mode']
+                     'publication_mode': 'joint', **SERVICE_FIELDS}
+            value.update(step_id=-1, committed_groups=0, batch_published_at=None,
+                         text_available_at=None, text_published_at=None, text_observed_until=0,
+                         state_available_at=None, state_published_at=None,
+                         state_processed_until=0, state_observed_until=0,
+                         asr_processed_until=0, asr_observed_until=0,
+                         asr_progress_available_at=None, completion_id=None,
+                         completion_status='none', tail_status='unknown')
             return self._store(key, value)
 
     @staticmethod

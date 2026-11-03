@@ -6,15 +6,40 @@ from collections import Counter
 import csv
 import json
 from pathlib import Path
+import re
 import sys
 
 sys.path.insert(0, str(Path(__file__).parents[1] / 'remote'))
-from nemotron_teacher_fdb import word_errors
 from x2_streaming_probe import digest, distribution, write_json
 from analyze_native_frontend import MANIFEST_SHA256, audit_condition, load_rows
 
 COORDINATES = ('main', 'observed', 'available', 'published', 'read')
 TASKS = ('smooth_turn_taking', 'pause_handling', 'user_interruption')
+
+
+def word_errors(reference, hypothesis):
+    """Return reproducible word-error counts against one reference transcript."""
+    def words(text):
+        return re.findall(r"[a-z0-9]+(?:'[a-z0-9]+)*", text.lower().replace('’', "'"))
+    ref, hyp = words(reference), words(hypothesis)
+    previous = [(j, 0, 0, j) for j in range(len(hyp) + 1)]
+    for i, a in enumerate(ref, 1):
+        current = [(i, 0, i, 0)]
+        for j, b in enumerate(hyp, 1):
+            if a == b:
+                current.append(previous[j - 1])
+            else:
+                candidates = []
+                for old, column in ((previous[j - 1], 1), (previous[j], 2), (current[-1], 3)):
+                    v = list(old)
+                    v[0] += 1
+                    v[column] += 1
+                    candidates.append(tuple(v))
+                current.append(min(candidates, key=lambda v: v[0]))
+        previous = current
+    errors, subs, deletes, inserts = previous[-1]
+    return {'reference_words': len(ref), 'errors': errors, 'substitutions': subs,
+            'deletions': deletes, 'insertions': inserts, 'wer': errors / len(ref) if ref else None}
 
 
 def score_times(sample, events, coordinate):

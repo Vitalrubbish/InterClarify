@@ -1,6 +1,6 @@
 # NTF-018远端受限作业
 
-对应`scripts/remote/run_native_frontend_probe.sh`。只能在分配了GPU的调度作业中运行；`NTF_SCHEDULED_RUN=1`由提交命令设置，不在登录节点手工运行。避免在环境变量名中使用调度器会替换的`JOB`占位符。脚本使用既有SoulX／ASR conda，要求干净冻结源码、原FDB30摘要、空闲盘至少10GiB和独占前端锁，输出目录存在则拒绝覆盖。
+对应`scripts/remote/run_native_frontend_probe.sh`。只能在分配了GPU的调度作业中运行；`NTF_SCHEDULED_RUN=1`由提交命令设置，不在登录节点手工运行。避免在环境变量名中使用调度器会替换的`JOB`占位符。脚本使用既有SoulX／ASR conda，要求干净冻结源码、原FDB30摘要、空闲盘至少10GiB和独占前端锁，输出目录存在则拒绝覆盖。`SOULX_WARMUP_AUDIO`必须指向本地7.8秒英文语音文件，用于完整预热。
 
 NTF-030按用户指令取消被调执行器的800ms时长停止条件；本包装保留的显存、RSS、磁盘、文件和作业总时长上限保持。018／019已归档，本说明的旧提交命令只作历史入口示例，不表示本次已启动新作业。
 

@@ -16,7 +16,6 @@
 | [dual_audio](../../../scripts/runtime/dual_audio.md) | 唯一当前批次暂存、两路完成后提交、成功后释放、失败诊断及分段计时 |
 | [native_soulx](../../../scripts/runtime/native_soulx.md) | 状态回调只暂存，完整原生调用结束才出完成回执，删除前端停止旁路 |
 | [independent_x2](../../../scripts/runtime/independent_x2.md) | 80ms真实EOS组及进度暂存、完整回执、内部解码与Context已提交数分开 |
-| [x2_teacher_frontend](../../../scripts/runtime/x2_teacher_frontend.md) | 历史教师显式legacy_frame模式，独立X2默认joint，话轮内不可互换 |
 | [架构图](../../../figures/parathink_method.md) | 保留内部SenseVoice和独立X2，单一联合写入路径；nonidle由下游读Context后进入唯一输出运行时 |
 
 对当前话轮只保留一份快照及至多一条交接元数据，不增加历史正文、patch、版本查询、消费ack或待发布队列。update_completion只预留比较更新事务，尚未实现候选目标、ready、去重、取消或超时的NTF-020自动判定；原始complete不能据此宣称允许正式回答。
@@ -31,7 +30,7 @@ reset保持原生数值与源采样连续，不清正文、不重置全局step_i
 conda run --no-capture-output -n interclarify-dev python -m unittest discover -s tests -v
 ```
 
-2026-11-03续做时重新执行，全量144项通过，退出0，无跳过；其中双路契约27项、原生协议5项、SharedContext7项。相对015／016的134项基线增加10项，并迁移了旧提前发布／独立停止断言。首轮全量出现4项历史X2教师兼容失败，修复固定发布模式后通过，未跳过旧用例。
+2026-11-03续做时重新执行，全量144项通过，退出0，无跳过；其中双路契约27项、原生协议5项、SharedContext7项。相对015／016的134项基线增加10项，并迁移了旧提前发布／独立停止断言。
 
 验收覆盖两种先后顺序、首帧／nonidle／设备完成前不可见、统一发布与原始可用时间、连续WAIT、提交返回前禁止下一批、并发副本、交接元数据与新批次合并、关闭／迟到结果、回执及开始／可用／完成时序篡改、正文与字节容量、注入写入失败、reset连续性、EOF一／两帧、开放组失败、800ms／4MiB、推理期间生产者持续入账。原生对照仍使用官方实际方法和微型CPU依赖，未修改第三方源码。
 

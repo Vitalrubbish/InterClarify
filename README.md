@@ -4,22 +4,19 @@
 
 ParaThink 研究独立 thinking 流在语音 Agent 倾听与表达期间持续工作带来的优势，工作包括 Agent 框架、边听边想与边说边想两组 benchmark，以及大规模对话数据与训练。研究背景、目标、参考文章和三篇子文档见 [docs/research_design.md](docs/research_design.md)，工程安排见 [docs/engineering_implementation.md](docs/engineering_implementation.md)。
 
-当前重新以官方 **SoulX-Duplug** 源码为起点。本地源码在 [third_party/soulx-duplug](third_party/soulx-duplug)，作为Git子模块固定官方提交；clone父仓库时使用`--recurse-submodules`，已有仓库执行`git submodule update --init third_party/soulx-duplug`。源码与依赖说明见[子模块说明](docs/third_party/soulx-duplug.md)。
+当前以官方 **SoulX-Duplug** 源码为起点。本地源码在 [third_party/soulx-duplug](third_party/soulx-duplug)，作为 Git 子模块固定官方提交；clone 父仓库时使用 `--recurse-submodules`，已有仓库执行 `git submodule update --init third_party/soulx-duplug`。源码与依赖说明见[子模块说明](docs/third_party/soulx-duplug.md)。
 
-当前采用[原生SenseVoice控制＋独立X2正文](docs/dev/SoulX-Duplug/independent_streaming_frontend.md)。NTF-015／016的原生封装、同源PCM／160ms推进屏障和独立X2适配已完成本地实现及契约验收，见[交付记录](docs/reports/soulx/20261102-native-independent-frontend/README.md)；[NTF-017联合Context](docs/reports/soulx/20261102-ntf017-joint-publication/README.md)已完成联合提交并移除前端停止钩子；[NTF-020](docs/reports/soulx/20261103-ntf020-handoff-retirement/README.md)取消额外交接等待并归档，[NTF-018](docs/reports/soulx/20261103-ntf018-warmup/README.md)已通过完整预热、真实权重对照及并发三轴3/3；[NTF-019](docs/reports/soulx/20261103-ntf019-fdb30/README.md)已由用户审核通过并归档，原29/30、退出1及单路缺失保留。[NTF-030](docs/reports/soulx/20261103-latency-limit-removal/README.md)按用户指令取消800ms停止条件，容量与资源保护保持；后续LLM接入已按用户指令暂缓。
-
-此前Nemotron／X2教师前端及固定实验保留为历史改造证据：NTF-011／012实时性和规范分词通过、状态质量未整体改善，见[同卡报告](docs/reports/soulx/20261101-ntf012-x2-teacher-fdb30/README.md)。这些适配器不等同于官方原生推理。comparison历史实验按NTF-014清理，公共模型与conda继续保留；018／019已收口，本次未启动新远端作业、训练或切换下游。
+第一阶段 ASR-Frontend 采用 **SoulX-Duplug 官方配置＋并行 X2Streaming-ASR**：SoulX 保留内部 SenseVoice 控制与原生五状态，独立 X2 只向 SharedContext 提供 EOS 闭合的完整词正文，两路每 160ms 完成后联合提交。合同见[独立流式前端](docs/dev/SoulX-Duplug/independent_streaming_frontend.md)，交付与验收见[NFT-015/016](docs/reports/soulx/20261102-native-independent-frontend/README.md)、[NTF-017](docs/reports/soulx/20261102-ntf017-joint-publication/README.md)、[NTF-018](docs/reports/soulx/20261103-ntf018-warmup/README.md)、[NTF-019](docs/reports/soulx/20261103-ntf019-fdb30/README.md)和[NTF-030](docs/reports/soulx/20261103-latency-limit-removal/README.md)。当前前端工作已收口，后续 LLM 接入暂缓。
 
 | 内容 | 位置 |
 | --- | --- |
 | 研究方案与评测范围 | [docs/research_design.md](docs/research_design.md) |
 | 工程实施计划 | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
-| SoulX 前端路线与对照实验 | [docs/dev/SoulX-Duplug](docs/dev/SoulX-Duplug/README.md) |
-| 已归档的 TextTurn／VoxTurn／XTurnix 路线 | [docs/archive/dev](docs/archive/dev/README.md) |
+| SoulX 前端路线 | [docs/dev/SoulX-Duplug](docs/dev/SoulX-Duplug/README.md) |
 | 本地 conda 环境 | [docs/local_environment.md](docs/local_environment.md)（`parathink-dev`） |
-| 工作单与历史实验 | [docs/issue/README.md](docs/issue/README.md) |
+| 工作单 | [docs/issue/README.md](docs/issue/README.md) |
 | 已采用的运行时配置 | [docs/runtime_baseline.md](docs/runtime_baseline.md) |
-| FDB 评测结果 | [reports/fdb](reports/README.md) |
+| FDB 固定 30 条验收 | [docs/reports/soulx/20261103-ntf019-fdb30](docs/reports/soulx/20261103-ntf019-fdb30/README.md) |
 | X-Talk 源码版本 | [configs/xtalk_runtime_source.json](configs/xtalk_runtime_source.json) |
 | 英文运行配置 | [docs/configs/xtalk_duplex_english_runtime.md](docs/configs/xtalk_duplex_english_runtime.md) |
 

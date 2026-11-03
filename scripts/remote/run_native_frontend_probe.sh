@@ -12,6 +12,8 @@ MANIFEST="${SOULX_FDB_MANIFEST:?set original frozen FDB30 manifest}"
 ASSETS="$HOME/turncontrol-comparison"
 SOULX="$ASSETS/envs/soulx/bin/python"
 ASR="$HOME/interclarify-english-integration-20261018-v1/envs/asr/bin/python"
+WARMUP_AUDIO="${SOULX_WARMUP_AUDIO:?set a local 7.8 second English speech file}"
+[[ -f "$WARMUP_AUDIO" ]] || exit 2
 for python in "$SOULX" "$ASR"; do [[ -f "${python%/bin/python}/conda-meta/history" ]] || exit 2; done
 [[ -z "$(git -C "$SOURCE" status --porcelain)" ]] || exit 2
 [[ "$(sha256sum "$MANIFEST" | cut -d' ' -f1)" == 403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cde4f3c07 ]] || exit 2
@@ -70,7 +72,7 @@ for condition in "${CONDITIONS[@]}"; do
     "$SOURCE/scripts/remote/native_frontend_probe.py" --condition "$condition" "${SUITE_ARGS[@]}" \
     --manifest "$RUN/frozen_manifest.json" --assets "$ASSETS" \
     --upstream "$ROOT/upstream/soulx-duplug" --asr-python "$ASR" \
-    --warmup-audio "$HOME/interclarify-xturnix-fleurs/dataset/fleurs_en_us/audio/dev/786465049904960526.wav" \
+    --warmup-audio "$WARMUP_AUDIO" \
     --output "$RUN/$condition" > "$RUN/$condition.log" 2>&1 &
   PID=$!
   while kill -0 "$PID" 2>/dev/null; do

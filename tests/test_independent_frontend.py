@@ -610,8 +610,7 @@ class AudioTests(unittest.TestCase):
         previous = self.view(frontend)
         with self.assertRaises(ValueError):
             frontend.context.publish_joint_batch(batch)
-        with self.assertRaises(ValueError):
-            frontend.context.publish_user_frame(previous)
+        self.assertFalse(hasattr(frontend.context, 'publish_user_frame'))
         self.assertEqual(self.view(frontend), previous)
 
     def test_handoff_updates_merge_with_new_batch_and_reject_stale_writers(self):

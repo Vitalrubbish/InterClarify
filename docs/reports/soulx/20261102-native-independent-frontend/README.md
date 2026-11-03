@@ -7,7 +7,7 @@
 | 工作单 | 交付 | 说明 |
 | --- | --- | --- |
 | NTF-015 | [原生封装](../../../scripts/runtime/native_soulx.md) | 保留官方门控、窗口识别、归一化、KV修订、规则、反馈、整轮识别及reset；原始状态与外层服务分开；有效nonidle先停止后交付并按output_id去重 |
-| NTF-015 | [离线加载器](../../../scripts/runtime/native_soulx_loader.md)、[冻结配置](../../../configs/native_soulx.md) | 独立调用官方TurnModel，核对源码、英文配置、SoulX及SenseVoice资产，不依赖旧comparison加载器 |
+| NTF-015 | [离线加载器](../../../scripts/runtime/native_soulx_loader.md)、[冻结配置](../../../configs/native_soulx.md) | 独立调用官方TurnModel，核对源码、英文配置、SoulX及SenseVoice资产 |
 | NTF-016 | [PCM与屏障](../../../scripts/runtime/dual_audio.md) | 连续16kHz单声道float32、单位增益、真实采样／padding分别记录，两路实际完成后才推进；生产者不等推理 |
 | NTF-016 | [独立X2](../../../scripts/runtime/independent_x2.md) | 每80ms执行原生LISTEN／DECODE；EOS闭合后即时交正文，WAIT仍交进度，开放组最多64 token；不接受控制文字或complete/reset指令 |
 
@@ -15,7 +15,7 @@
 
 资产摘要来自已有下载验收JSON，只读复制后SHA256为`61415c9e35b65e71697ebc0c250996618edc2528e00e0929fd52cd9a829937f4`；不是本次重新扫描远端大权重所得。实际加载前逐文件重新计算，变化即失败。远端只读检查使用已有`envs/soulx` conda，不运行推理、创建模型副本或提交作业。
 
-X2沿用既有`configs/x2_streaming_probe.json`：revision`4c8df16`，官方源码`0aca80597bb1399c0be4002de5bc62c0a779c542`，BF16、英文language-tag、80ms协议，权重SHA256`fadba62dde440bb7e31c011f2b85b3d3bc5d6b1a1c265ebc4f968c28b5bfe5c1`。只复用因果引擎，不复用旧教师worker的两帧发布／注入行为。
+X2沿用既有`configs/x2_streaming_probe.json`：revision`4c8df16`，官方源码`0aca80597bb1399c0be4002de5bc62c0a779c542`，BF16、英文language-tag、80ms协议，权重SHA256`fadba62dde440bb7e31c011f2b85b3d3bc5d6b1a1c265ebc4f968c28b5bfe5c1`。只复用X2因果引擎和官方组拼接规则，文字发布由联合批次统一完成。
 
 ## 关键采样与生命周期决定
 

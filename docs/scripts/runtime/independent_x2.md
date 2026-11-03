@@ -6,7 +6,7 @@
 
 `ClosedText`只接受真实EOS=2结尾、内部不含控制token的组，使用官方解码与join规则拼接；候选必须以前文为前缀，否则失败且保留原正文。一个组可以包含多个词。
 
-`IndependentX2`持有因果引擎、当前累计闭合正文及至多64个开放文字token。load核对冻结配置、官方源码和模型摘要，使用既有BF16英文原生80ms引擎；不复用旧教师worker。
+`IndependentX2`持有因果引擎、当前累计闭合正文及至多64个开放文字token。load核对冻结配置、官方源码和模型摘要，使用既有BF16英文原生80ms引擎。
 
 `step()`对第i帧使用[i×1280−200,(i+1)×1280＋200)的1680采样；左padding与EOF右padding分别记账。WORD触发组内连续DECODE至真实EOS，设备实际同步后记录正文及进度；WAIT无新字也完成本步。回执携带身份、帧号、真实处理／观察截止、当前闭合全文／组数、采样span及实际开始／完成时间。正文变化时更新text_available_at和text_observed_until，无新字时保留原值。
 

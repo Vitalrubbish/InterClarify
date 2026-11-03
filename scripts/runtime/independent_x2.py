@@ -49,7 +49,7 @@ class IndependentX2:
 
     @classmethod
     def load(cls, model_path, upstream, config_path, **kwargs):
-        # Import only the engine, never the historical teacher worker.
+        # Import only the engine; text publication stays in the joint batch.
         path = Path(__file__).parents[1] / 'remote/x2_streaming_probe.py'
         spec = importlib.util.spec_from_file_location('independent_x2_engine', path)
         module = importlib.util.module_from_spec(spec)

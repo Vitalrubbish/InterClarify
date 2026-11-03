@@ -1,4 +1,4 @@
-"""Observe the frozen native SoulX protocol without replacing its teacher."""
+"""Observe the frozen native SoulX protocol without replacing its internal ASR."""
 from __future__ import annotations
 
 import ast

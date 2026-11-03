@@ -1,6 +1,6 @@
 # 原生模型离线加载
 
-对应实现：`scripts/runtime/native_soulx_loader.py`。本文件没有新增模型类，直接构造官方`service.model.TurnModel`，再交给`NativeSoulX`。不导入comparison加载器，不下载或复制权重。
+对应实现：`scripts/runtime/native_soulx_loader.py`。本文件没有新增模型类，直接构造官方`service.model.TurnModel`，再交给`NativeSoulX`。不导入外部加载器，不下载或复制权重。
 
 `verify_source()`核对官方Git提交、干净工作区和21份Python文件摘要。`verify_files()`逐文件流式计算摘要，错误或缺失立即失败。冻结内容见[配置说明](../../configs/native_soulx.md)。
 
