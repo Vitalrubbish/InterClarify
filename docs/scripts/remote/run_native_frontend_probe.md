@@ -8,7 +8,7 @@
 
 每作业单卡4090、4CPU、32GiB RAM，唯一模型worker／路、CPU线程各≤2；脚本每秒检查显存22528MiB、进程组RSS32GiB、输出128MiB和1750秒收尾线。调度器另限制1800秒与32GiB；文件大小也有限制。触限终止整个进程组，保存resource_stop及exit_code，不进入下一条件。RAM按RSS／调度内存限制，不使用会破坏CUDA虚拟地址映射的地址空间上限。
 
-必须先只读检查`vc list`、账户配额和磁盘。待复测参考命令（仅取得追加作业授权后，替换实际冻结源码执行）：
+必须先只读检查`vc list`、账户配额和磁盘。待复测参考命令（按用户新指令直接复测，替换实际冻结源码执行）：
 
 ```bash
 vc submit --image docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4 \
