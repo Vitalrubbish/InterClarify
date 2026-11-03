@@ -40,6 +40,26 @@ def quantize(audio):
     return (np.clip(audio, -1, 1) * 32767).astype('<i2').astype(np.float32) / 32768
 
 
+def prepare_warmup(audio):
+    values = np.asarray(audio, dtype=np.float32)
+    if values.shape != (124800,) or not np.isfinite(values).all():
+        raise ValueError('Expected finite 7.8 second mono warmup speech')
+    rms = float(np.sqrt(np.mean(values.astype(np.float64) ** 2)))
+    peak = float(np.max(np.abs(values)))
+    if not rms or not peak:
+        raise ValueError('Warmup speech cannot be silent')
+    gain = min(.05 / rms, .9 / peak)
+    speech = quantize((values * gain).astype(np.float32))
+    if np.max(np.abs(speech)) < .02:
+        raise ValueError('Warmup speech never reaches the frozen far-field threshold')
+    output = np.concatenate((speech, np.zeros(25600, np.float32)))
+    evidence = {'policy': 'rms_005_peak_09_pcm16_v2', 'original_rms': rms,
+                'original_peak': peak, 'gain': gain, 'prepared_peak': float(np.max(np.abs(speech))),
+                'prepared_rms': float(np.sqrt(np.mean(speech.astype(np.float64) ** 2))),
+                'speech_sha256': pcm_digest(speech)}
+    return output, evidence
+
+
 def warmup_audio(path):
     import soundfile as sf
     import soxr
@@ -52,7 +72,7 @@ def warmup_audio(path):
         audio = soxr.resample(audio, rate, 16000)
     if len(audio) != 124800:
         raise ValueError('Expected 7.8 seconds of fixed speech')
-    return np.concatenate((quantize(audio), np.zeros(25600, np.float32)))
+    return prepare_warmup(audio)
 
 
 class SingleLane:
@@ -351,11 +371,11 @@ def full_warmup(model, worker, audio, output):
         # Direct recognition warms shapes that a short natural utterance may never request.
         direct = []
         for count in LENGTHS:
-            values = np.resize(speech, count)
+            values = np.resize(speech, count).astype(np.float64)
             began = time.monotonic()
             text = model.cascade_asr.recognize(values, 16000)
             torch.cuda.synchronize()
-            direct.append({'samples': count, 'sha256': pcm_digest(values), 'text': text,
+            direct.append({'samples': count, 'sha256': pcm_digest(values), 'dtype': str(values.dtype), 'text': text,
                            'seconds': time.monotonic() - began, 'source': 'cyclic_fixed_speech'})
         order = ('controller', 'asr') if index == 0 else ('asr', 'controller')
         record = replay(model, worker, audio, f'warmup_{index}', output, False, order)
@@ -517,9 +537,10 @@ def run(args):
         model = controller.model
         controller.detach()
         result['load_seconds'] = time.monotonic() - began
-        audio = warmup_audio(args.warmup_audio)
+        audio, normalization = warmup_audio(args.warmup_audio)
         result['warmup_input'] = {'samples': len(audio), 'sha256': pcm_digest(audio),
-                                  'synthetic_tail_samples': 25600, 'sensevoice_lengths': LENGTHS}
+                                  'synthetic_tail_samples': 25600, 'sensevoice_lengths': LENGTHS,
+                                  'normalization': normalization, 'direct_sensevoice_dtype': 'float64'}
         began = time.monotonic()
         result['warmup'] = (limited_warmup if args.condition == 'dual-limited' else full_warmup)(
             model, worker, audio, args.output)

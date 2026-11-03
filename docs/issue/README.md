@@ -1,17 +1,17 @@
 # 工作单管理
 
-更新：2026-11-03。当前为**SoulX原生SenseVoice控制＋独立X2完整词正文**路线。NTF-015／016已完成本地实现与契约验收并归档，见[交付记录](../reports/soulx/20261102-native-independent-frontend/README.md)；[NTF-017](../reports/soulx/20261102-ntf017-joint-publication/README.md)已完成160ms联合提交、停止旁路撤回及本地144项全量验收并归档；NTF-020按用户指令未实施取消并归档，NTF-018已启动并完成本地预热／受限脚本，远端SSH超时，真实验收待执行；019等待018通过，见[启动记录](../reports/soulx/20261103-ntf018-warmup/README.md)。路线恢复范围见[恢复记录](../reports/soulx/20261102-external-asr-plan-restore/README.md)，合同见[独立前端设计](../dev/SoulX-Duplug/independent_streaming_frontend.md)、[Context接口](../dev/SoulX-Duplug/shared_context_interface.md)及[工程计划](../engineering_implementation.md)。
+更新：2026-11-03。当前为**SoulX原生SenseVoice控制＋独立X2完整词正文**路线。NTF-015／016已完成本地实现与契约验收并归档，见[交付记录](../reports/soulx/20261102-native-independent-frontend/README.md)；[NTF-017](../reports/soulx/20261102-ntf017-joint-publication/README.md)已完成160ms联合提交、停止旁路撤回及本地144项全量验收并归档；NTF-020按用户指令未实施取消并归档，NTF-018本轮远端未通过：有限预热三轴0/3、完整预热缺少修订／有效complete覆盖；输入准备已修正，本地156项通过，待新增额度复测；019等待018通过，见[本轮报告](../reports/soulx/20261103-ntf018-warmup/README.md)。路线恢复范围见[恢复记录](../reports/soulx/20261102-external-asr-plan-restore/README.md)，合同见[独立前端设计](../dev/SoulX-Duplug/independent_streaming_frontend.md)、[Context接口](../dev/SoulX-Duplug/shared_context_interface.md)及[工程计划](../engineering_implementation.md)。
 
 ## 当前工作单
 
 | 工作单 | 工作单元 | 依赖 | 状态 |
 | --- | --- | --- | --- |
-| [NTF-018](NTF-018.md) | 全链路预热与远端积压归因 | NTF-015—017 | 实施中；本地152项通过，远端连接超时 |
+| [NTF-018](NTF-018.md) | 全链路预热与远端积压归因 | NTF-015—017 | 本轮未通过；修正156项通过，复测待新增额度 |
 | [NTF-019](NTF-019.md) | 独立前端单／双路固定FDB30验收 | NTF-018完整预热与实时门槛通过 | 待实施 |
 
-015／016交付原生封装、冻结加载器、同源PCM与独立X2；017已将回调迁移为批次暂存，SharedContext一次提交正文／状态／真实进度，成功后才释放下一批，nonidle不再走前端停止旁路。原生SenseVoice、服务和reset保持，正文不进控制KV。本地conda全量152项通过，无跳过（含018新增8项）；真实权重／实时性尚未验证。下一步顺序为018→019。已提交的有效complete携当前正文直接供下游使用，不再增加独立交接等待；同步不承诺尾词必齐。
+015／016交付原生封装、冻结加载器、同源PCM与独立X2；017已将回调迁移为批次暂存，SharedContext一次提交正文／状态／真实进度，成功后才释放下一批，nonidle不再走前端停止旁路。原生SenseVoice、服务和reset保持，正文不进控制KV。本地conda全量156项通过，无跳过；018已验证实际走到路径的同权重等价性，缺失修订／complete覆盖，完整预热在线实时性未验证。下一步顺序为018→019。已提交的有效complete携当前正文直接供下游使用，不再增加独立交接等待；同步不承诺尾词必齐。
 
-本次连接远端在TCP阶段超时，尚未提交真实模型新作业；资产校验清单沿用015／016交付。远端沿用conda、单活动作业、1×4090、4CPU、32GiB、显存22GiB和在线800ms停止线；NTF-018最多2作业、NTF-019最多2作业，各≤1800秒／128MiB，合计计划上限2 GPU小时／512MiB。启动前冻结实际矩阵与输入；不自动使用已归档调研的作业额度，不训练、不接LLM／CoT／TTS、不切换现役Agent。
+本轮018两作业已结束，结束时队列为空；源码及原生模型资产摘要逐臂复核一致。原2次提交额度已用完，不自动追加第三作业，详见[本轮报告](../reports/soulx/20261103-ntf018-warmup/README.md)。远端沿用conda、单活动作业、1×4090、4CPU、32GiB、显存22GiB和在线800ms停止线；NTF-018最多2作业、NTF-019最多2作业，各≤1800秒／128MiB，合计计划上限2 GPU小时／512MiB。启动前冻结实际矩阵与输入；不自动使用已归档调研的作业额度，不训练、不接LLM／CoT／TTS、不切换现役Agent。
 
 ## 本次归档与恢复
 
@@ -25,7 +25,7 @@
 | NTF-015／016 | 本地实现与契约验收完成后归档 | 原生控制、同源PCM／屏障、独立X2适配已交付；真实模型验证留给018／019 |
 | NTF-017 | 本地实现与契约验收完成并归档 | 联合事务、短锁生命周期、失败保护与架构图同步，见[交付](../reports/soulx/20261102-ntf017-joint-publication/README.md) |
 | NTF-020 | 未实施取消并归档 | 双路联合同步已覆盖原数据等待，撤销pending／ready和专用超时，见[归档记录](../reports/soulx/20261103-ntf020-handoff-retirement/README.md) |
-| NTF-018／019 | 继续active | 018本地实现及152项检查通过，远端待执行；019尚未放行 |
+| NTF-018／019 | 继续active | 018本轮远端未通过，输入准备修正及156项检查通过，复测待新增额度；019未启动 |
 
 本地`docs/issue/archive/`继续不纳入Git；归档前原计划可由main基线0376ba7追溯，恢复的015—020原文可追溯e15554b。[前次归档记录](../reports/soulx/20261102-frontend-plan-archive/README.md)保留当时决策，本次明确恢复取代其活动状态，不把未实施计划写成完成成果。
 
@@ -76,7 +76,7 @@ NTF-001／002 已完成并归档至本地 `archive/`：教师文字前端与屏�
 
 | 路线 | 归档状态 | 入口 |
 | --- | --- | --- |
-| SoulX-Duplug | 当前活动：015／016／017本地验收完成并归档；020取消归档；018实施中、019等待018通过 | [路线文档](../dev/SoulX-Duplug/README.md) |
+| SoulX-Duplug | 当前活动：015／016／017本地验收完成并归档；020取消归档；018本轮未通过、修正待授权复测；019等待018通过 | [路线文档](../dev/SoulX-Duplug/README.md) |
 | TextTurn | 已归档；共 11 项，7 项完成、TT-009 终止，TT-004／010／011 未完成 | [路线归档](../archive/dev/TextTurn/README.md) |
 | VoxTurn | 已归档；仅完成现成权重与接入可行性调研，未部署 | [调研归档](../archive/dev/VoxTurn/research_assessment.md) |
 | XTurnix | 已归档；XTX-001—005 与 XTX-007 完成，XTX-006 取消，XTX-009 仅完成来源审核 | [路线归档](../archive/dev/XTurnix/README.md) |

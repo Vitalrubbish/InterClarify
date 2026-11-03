@@ -1,0 +1,707 @@
+{
+  "conditions": {
+    "dual-limited": {
+      "passed": false,
+      "failures": [
+        "condition_failed",
+        "candor_turn_taking-102:audit_failed",
+        "candor_pause_handling-127:audit_failed",
+        "synthetic_user_interruption-104:audit_failed"
+      ],
+      "exit_code": 1,
+      "cases": [
+        {
+          "case_id": "candor_turn_taking-102",
+          "passed": false,
+          "failures": [
+            "fixed_case_incomplete"
+          ],
+          "frames": 1,
+          "expected_frames": 74,
+          "closed_groups": 0,
+          "online_text": "",
+          "controller_main_ms": {
+            "count": 1,
+            "p50": 353.18025678396225,
+            "p95": 353.18025678396225,
+            "max": 353.18025678396225
+          },
+          "controller_observed_ms": {
+            "count": 1,
+            "p50": 313.1802567839622,
+            "p95": 313.1802567839622,
+            "max": 313.1802567839622
+          },
+          "asr_main_ms": {
+            "count": 1,
+            "p50": 312.89779968559736,
+            "p95": 312.89779968559736,
+            "max": 312.89779968559736
+          },
+          "first_frame_main_ms": 353.18025678396225,
+          "stable_main_ms": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null
+          },
+          "failed_step_sensevoice": [
+            {
+              "samples": 53760,
+              "dtype": "float64",
+              "milliseconds": 1922.726258635521
+            }
+          ]
+        },
+        {
+          "case_id": "candor_pause_handling-127",
+          "passed": false,
+          "failures": [
+            "fixed_case_incomplete"
+          ],
+          "frames": 4,
+          "expected_frames": 62,
+          "closed_groups": 1,
+          "online_text": "yeah",
+          "controller_main_ms": {
+            "count": 4,
+            "p50": 546.9879813864827,
+            "p95": 718.9551943317056,
+            "max": 743.2208420336246
+          },
+          "controller_observed_ms": {
+            "count": 4,
+            "p50": 506.9879813864827,
+            "p95": 678.9551943317056,
+            "max": 703.2208420336246
+          },
+          "asr_main_ms": {
+            "count": 4,
+            "p50": 486.5995053201914,
+            "p95": 638.5599883422256,
+            "max": 662.8239104896784
+          },
+          "first_frame_main_ms": 398.7095459550619,
+          "stable_main_ms": {
+            "count": 3,
+            "p50": 581.4498573541641,
+            "p95": 727.0437435656786,
+            "max": 743.2208420336246
+          },
+          "failed_step_sensevoice": [
+            {
+              "samples": 53760,
+              "dtype": "float64",
+              "milliseconds": 64.27719071507454
+            }
+          ]
+        },
+        {
+          "case_id": "synthetic_user_interruption-104",
+          "passed": false,
+          "failures": [
+            "fixed_case_incomplete"
+          ],
+          "frames": 4,
+          "expected_frames": 176,
+          "closed_groups": 0,
+          "online_text": "",
+          "controller_main_ms": {
+            "count": 4,
+            "p50": 485.0497565791011,
+            "p95": 687.4110639803112,
+            "max": 707.3896579444408
+          },
+          "controller_observed_ms": {
+            "count": 4,
+            "p50": 445.0497565791011,
+            "p95": 647.4110639803112,
+            "max": 667.3896579444408
+          },
+          "asr_main_ms": {
+            "count": 4,
+            "p50": 444.5179220288992,
+            "p95": 647.0184511654079,
+            "max": 666.9994188845158
+          },
+          "first_frame_main_ms": 308.5151083022356,
+          "stable_main_ms": {
+            "count": 3,
+            "p50": 574.1990315169096,
+            "p95": 694.0705953016877,
+            "max": 707.3896579444408
+          },
+          "failed_step_sensevoice": [
+            {
+              "samples": 53760,
+              "dtype": "float64",
+              "milliseconds": 65.40127471089363
+            }
+          ]
+        }
+      ],
+      "load_seconds": 177.5985029116273,
+      "warmup_seconds": 20.75439826026559,
+      "warmup_passed": true,
+      "missing_paths": null,
+      "run_error": null,
+      "native_equivalence_passed": null,
+      "warmup_details": []
+    },
+    "dual-full": {
+      "passed": false,
+      "failures": [
+        "condition_failed",
+        "fixed_cases_missing_or_changed",
+        "warmup_failed",
+        "full_warmup_or_equivalence_missing"
+      ],
+      "exit_code": 1,
+      "cases": [],
+      "load_seconds": 107.56267354823649,
+      "warmup_seconds": 52.94432430714369,
+      "warmup_passed": false,
+      "missing_paths": [
+        {
+          "text_revision": false,
+          "native_complete": false,
+          "joint_complete": false
+        },
+        {
+          "text_revision": false,
+          "native_complete": false,
+          "joint_complete": false
+        }
+      ],
+      "run_error": "Traceback (most recent call last):\n  File \"/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf018-1167791/scripts/remote/native_frontend_probe.py\", line 529, in run\n    raise RuntimeError('Frozen warmup coverage is incomplete; online clock was not started')\nRuntimeError: Frozen warmup coverage is incomplete; online clock was not started\n",
+      "native_equivalence_passed": true,
+      "warmup_details": [
+        {
+          "frames": 59,
+          "passed": true,
+          "coverage": {
+            "sensevoice_text": true,
+            "text_revision": false,
+            "native_complete": false,
+            "reset": true,
+            "wait": true,
+            "multi_token_eos": true,
+            "joint_complete": false,
+            "joint_wait": true
+          },
+          "raw_states": {
+            "<|user_idle|>": 48,
+            "<|user_nonidle|>": 10,
+            "<|user_backchannel|>": 1
+          },
+          "effective_states": {
+            "<|user_idle|>": 48,
+            "<|user_nonidle|>": 10,
+            "<|user_backchannel|>": 1
+          },
+          "rejections": {
+            "accepted": 49,
+            "far_field": 10
+          },
+          "controller_compute_ms": {
+            "count": 59,
+            "p50": 88.97263556718826,
+            "p95": 184.33196991682019,
+            "max": 5571.196168661118
+          },
+          "x2_compute_ms": {
+            "count": 118,
+            "p50": 52.88568697869778,
+            "p95": 98.69043827056885,
+            "max": 176.01695284247398
+          },
+          "sensevoice_ms": {
+            "count": 19,
+            "p50": 66.85846112668514,
+            "p95": 679.7983553260451,
+            "max": 5479.417933151126
+          },
+          "sensevoice_dtypes": [
+            "float64"
+          ],
+          "sensevoice_samples": [
+            53760
+          ],
+          "sensevoice_calls": 19,
+          "direct_sensevoice": [
+            {
+              "samples": 25600,
+              "sha256": "837ee1afe616ffdeea34f7b76ca8627a689952e1ec5e68f119f45f9ee683f014",
+              "seconds": 0.509561175480485,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 51200,
+              "sha256": "f1e6a0f1a6e885b4f53707299969685c88664223f68a15d1092bbae795004bbf",
+              "seconds": 0.0666942186653614,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 53760,
+              "sha256": "be9ffd367db0da610a4fa9733c258553c4e0e1776376081f80acb5fb48ea83aa",
+              "seconds": 0.05771924927830696,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 107520,
+              "sha256": "316ec0f6559cf89b471dcd58241cedf5efb6adcb276e50359f2f115392ccde96",
+              "seconds": 0.061111534014344215,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 161280,
+              "sha256": "f75a0bc2140ae58814c68982fc2954aba5e8b610537aaeb722cd6f498fe72c22",
+              "seconds": 0.06257958151400089,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            }
+          ],
+          "cleanup": {
+            "native_kv_cleared": true,
+            "native_history_cleared": true,
+            "native_speech_cleared": true,
+            "callbacks_detached": true,
+            "native_buffer_samples": [
+              16000,
+              25600,
+              51200
+            ],
+            "reset_buffer_sha256": "c98475bcbe4da87c2a2ccd882a2ee4dcd873a6676df7d9b30208c5b2919e9adc",
+            "x2": {
+              "kv_cleared": true,
+              "text_cleared": true,
+              "callbacks_cleared": true,
+              "counters_cleared": true,
+              "completed_at": 11279232.771112503
+            }
+          },
+          "unprocessed_real_samples": {
+            "controller": 7040,
+            "asr": 0
+          }
+        },
+        {
+          "frames": 59,
+          "passed": true,
+          "coverage": {
+            "sensevoice_text": true,
+            "text_revision": false,
+            "native_complete": false,
+            "reset": true,
+            "wait": true,
+            "multi_token_eos": true,
+            "joint_complete": false,
+            "joint_wait": true
+          },
+          "raw_states": {
+            "<|user_idle|>": 48,
+            "<|user_nonidle|>": 10,
+            "<|user_backchannel|>": 1
+          },
+          "effective_states": {
+            "<|user_idle|>": 48,
+            "<|user_nonidle|>": 10,
+            "<|user_backchannel|>": 1
+          },
+          "rejections": {
+            "accepted": 49,
+            "far_field": 10
+          },
+          "controller_compute_ms": {
+            "count": 59,
+            "p50": 88.15468475222588,
+            "p95": 157.95487482100725,
+            "max": 159.52365100383759
+          },
+          "x2_compute_ms": {
+            "count": 118,
+            "p50": 51.79034732282162,
+            "p95": 95.97033429890871,
+            "max": 139.56794701516628
+          },
+          "sensevoice_ms": {
+            "count": 19,
+            "p50": 65.31381607055664,
+            "p95": 66.18847083300352,
+            "max": 66.44582375884056
+          },
+          "sensevoice_dtypes": [
+            "float64"
+          ],
+          "sensevoice_samples": [
+            53760
+          ],
+          "sensevoice_calls": 19,
+          "direct_sensevoice": [
+            {
+              "samples": 25600,
+              "sha256": "837ee1afe616ffdeea34f7b76ca8627a689952e1ec5e68f119f45f9ee683f014",
+              "seconds": 1.7854151204228401,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 51200,
+              "sha256": "f1e6a0f1a6e885b4f53707299969685c88664223f68a15d1092bbae795004bbf",
+              "seconds": 2.4651545714586973,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 53760,
+              "sha256": "be9ffd367db0da610a4fa9733c258553c4e0e1776376081f80acb5fb48ea83aa",
+              "seconds": 0.06022031232714653,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 107520,
+              "sha256": "316ec0f6559cf89b471dcd58241cedf5efb6adcb276e50359f2f115392ccde96",
+              "seconds": 0.06438122875988483,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 161280,
+              "sha256": "f75a0bc2140ae58814c68982fc2954aba5e8b610537aaeb722cd6f498fe72c22",
+              "seconds": 0.06557963602244854,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            }
+          ],
+          "cleanup": {
+            "native_kv_cleared": true,
+            "native_history_cleared": true,
+            "native_speech_cleared": true,
+            "callbacks_detached": true,
+            "native_buffer_samples": [
+              16000,
+              25600,
+              51200
+            ],
+            "reset_buffer_sha256": "c98475bcbe4da87c2a2ccd882a2ee4dcd873a6676df7d9b30208c5b2919e9adc",
+            "x2": {
+              "kv_cleared": true,
+              "text_cleared": true,
+              "callbacks_cleared": true,
+              "counters_cleared": true,
+              "completed_at": 11279251.043235527
+            }
+          },
+          "unprocessed_real_samples": {
+            "controller": 7040,
+            "asr": 0
+          }
+        }
+      ]
+    },
+    "single-full": {
+      "passed": false,
+      "failures": [
+        "condition_failed",
+        "fixed_cases_missing_or_changed",
+        "warmup_failed",
+        "full_warmup_or_equivalence_missing"
+      ],
+      "exit_code": 1,
+      "cases": [],
+      "load_seconds": 59.319387931376696,
+      "warmup_seconds": 41.262106630951166,
+      "warmup_passed": false,
+      "missing_paths": [
+        {
+          "text_revision": false,
+          "native_complete": false
+        },
+        {
+          "text_revision": false,
+          "native_complete": false
+        }
+      ],
+      "run_error": "Traceback (most recent call last):\n  File \"/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf018-1167791/scripts/remote/native_frontend_probe.py\", line 529, in run\n    raise RuntimeError('Frozen warmup coverage is incomplete; online clock was not started')\nRuntimeError: Frozen warmup coverage is incomplete; online clock was not started\n",
+      "native_equivalence_passed": true,
+      "warmup_details": [
+        {
+          "frames": 59,
+          "passed": true,
+          "coverage": {
+            "sensevoice_text": true,
+            "text_revision": false,
+            "native_complete": false,
+            "reset": true,
+            "wait": false,
+            "multi_token_eos": false,
+            "joint_complete": false,
+            "joint_wait": false
+          },
+          "raw_states": {
+            "<|user_idle|>": 48,
+            "<|user_nonidle|>": 10,
+            "<|user_backchannel|>": 1
+          },
+          "effective_states": {
+            "<|user_idle|>": 48,
+            "<|user_nonidle|>": 10,
+            "<|user_backchannel|>": 1
+          },
+          "rejections": {
+            "accepted": 49,
+            "far_field": 10
+          },
+          "controller_compute_ms": {
+            "count": 59,
+            "p50": 86.5214578807354,
+            "p95": 226.27518791705344,
+            "max": 6071.15925848484
+          },
+          "x2_compute_ms": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null
+          },
+          "sensevoice_ms": {
+            "count": 19,
+            "p50": 67.34495237469673,
+            "p95": 660.8492735773199,
+            "max": 5983.1381514668465
+          },
+          "sensevoice_dtypes": [
+            "float64"
+          ],
+          "sensevoice_samples": [
+            53760
+          ],
+          "sensevoice_calls": 19,
+          "direct_sensevoice": [
+            {
+              "samples": 25600,
+              "sha256": "837ee1afe616ffdeea34f7b76ca8627a689952e1ec5e68f119f45f9ee683f014",
+              "seconds": 1.4599328078329563,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 51200,
+              "sha256": "f1e6a0f1a6e885b4f53707299969685c88664223f68a15d1092bbae795004bbf",
+              "seconds": 5.581546511501074,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 53760,
+              "sha256": "be9ffd367db0da610a4fa9733c258553c4e0e1776376081f80acb5fb48ea83aa",
+              "seconds": 0.06087923236191273,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 107520,
+              "sha256": "316ec0f6559cf89b471dcd58241cedf5efb6adcb276e50359f2f115392ccde96",
+              "seconds": 0.061717210337519646,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 161280,
+              "sha256": "f75a0bc2140ae58814c68982fc2954aba5e8b610537aaeb722cd6f498fe72c22",
+              "seconds": 0.06192936562001705,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            }
+          ],
+          "cleanup": {
+            "native_kv_cleared": true,
+            "native_history_cleared": true,
+            "native_speech_cleared": true,
+            "callbacks_detached": true,
+            "native_buffer_samples": [
+              16000,
+              25600,
+              51200
+            ],
+            "reset_buffer_sha256": "c98475bcbe4da87c2a2ccd882a2ee4dcd873a6676df7d9b30208c5b2919e9adc"
+          },
+          "unprocessed_real_samples": 7040
+        },
+        {
+          "frames": 59,
+          "passed": true,
+          "coverage": {
+            "sensevoice_text": true,
+            "text_revision": false,
+            "native_complete": false,
+            "reset": true,
+            "wait": false,
+            "multi_token_eos": false,
+            "joint_complete": false,
+            "joint_wait": false
+          },
+          "raw_states": {
+            "<|user_idle|>": 48,
+            "<|user_nonidle|>": 10,
+            "<|user_backchannel|>": 1
+          },
+          "effective_states": {
+            "<|user_idle|>": 48,
+            "<|user_nonidle|>": 10,
+            "<|user_backchannel|>": 1
+          },
+          "rejections": {
+            "accepted": 49,
+            "far_field": 10
+          },
+          "controller_compute_ms": {
+            "count": 59,
+            "p50": 85.46358719468117,
+            "p95": 156.4307626336813,
+            "max": 183.1627693027258
+          },
+          "x2_compute_ms": {
+            "count": 0,
+            "p50": null,
+            "p95": null,
+            "max": null
+          },
+          "sensevoice_ms": {
+            "count": 19,
+            "p50": 64.37307596206665,
+            "p95": 66.05616211891174,
+            "max": 66.10662117600441
+          },
+          "sensevoice_dtypes": [
+            "float64"
+          ],
+          "sensevoice_samples": [
+            53760
+          ],
+          "sensevoice_calls": 19,
+          "direct_sensevoice": [
+            {
+              "samples": 25600,
+              "sha256": "837ee1afe616ffdeea34f7b76ca8627a689952e1ec5e68f119f45f9ee683f014",
+              "seconds": 0.06231281720101833,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 51200,
+              "sha256": "f1e6a0f1a6e885b4f53707299969685c88664223f68a15d1092bbae795004bbf",
+              "seconds": 0.9642396047711372,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 53760,
+              "sha256": "be9ffd367db0da610a4fa9733c258553c4e0e1776376081f80acb5fb48ea83aa",
+              "seconds": 0.05964362435042858,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 107520,
+              "sha256": "316ec0f6559cf89b471dcd58241cedf5efb6adcb276e50359f2f115392ccde96",
+              "seconds": 0.062442317605018616,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            },
+            {
+              "samples": 161280,
+              "sha256": "f75a0bc2140ae58814c68982fc2954aba5e8b610537aaeb722cd6f498fe72c22",
+              "seconds": 0.06581646762788296,
+              "source": "cyclic_fixed_speech",
+              "text_nonempty": true
+            }
+          ],
+          "cleanup": {
+            "native_kv_cleared": true,
+            "native_history_cleared": true,
+            "native_speech_cleared": true,
+            "callbacks_detached": true,
+            "native_buffer_samples": [
+              16000,
+              25600,
+              51200
+            ],
+            "reset_buffer_sha256": "c98475bcbe4da87c2a2ccd882a2ee4dcd873a6676df7d9b30208c5b2919e9adc"
+          },
+          "unprocessed_real_samples": 7040
+        }
+      ]
+    }
+  },
+  "resource_stop": false,
+  "resource_peaks": {
+    "gpu_mib": 14612,
+    "rss_kib": 10304052,
+    "output_kib": 3842
+  },
+  "resource_checks_passed": true,
+  "ntf019_candidate_gate": false,
+  "matrix_all_passed": false,
+  "provenance": {
+    "source_commit": "1167791990b61518c3c20c323e0501f278c509f0",
+    "archive_sha256": "ce3ba90a50659ecd873c861107941f1245c4dbb5e7b168ee82c917b411c8e540",
+    "asset_digest_checks": {
+      "dual-limited": {
+        "source": true,
+        "soulx": true,
+        "sensevoice": true
+      },
+      "dual-full": {
+        "source": true,
+        "soulx": true,
+        "sensevoice": true
+      },
+      "single-full": {
+        "source": true,
+        "soulx": true,
+        "sensevoice": true
+      }
+    },
+    "source_digest_checks": true,
+    "manifest_sha256": "403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cde4f3c07",
+    "warmup_original_rms": 0.0004977665624957115,
+    "warmup_original_peak": 0.003160715103149414,
+    "jobs": [
+      {
+        "run_id": "ntf018-dual-20261103-r1",
+        "job_id": "job-179366944517283504744-xuan-zhang",
+        "start": "2026-11-03T09:30:51+08:00",
+        "end": "2026-11-03T09:30:54+08:00",
+        "model_started": false
+      },
+      {
+        "run_id": "ntf018-matrix-20261103-r1",
+        "job_id": "job-179366959357546756322-xuan-zhang",
+        "start": "2026-11-03T09:40:29+08:00",
+        "end": "2026-11-03T09:48:42+08:00",
+        "exit_code": 1
+      }
+    ],
+    "status": "ntf018_gate_failed_no_ntf019",
+    "queue_after_run": [],
+    "run_directory_kib": 4404,
+    "proposed_warmup_v2": {
+      "policy": "rms_005_peak_09_pcm16_v2",
+      "original_rms": 0.0004977665624957115,
+      "original_peak": 0.003160715103149414,
+      "gain": 100.44869175082601,
+      "prepared_peak": 0.317474365234375,
+      "prepared_rms": 0.04998846147404681,
+      "speech_sha256": "f6118839bfc8b8bd4ba3f5544993a5538a5e03693abb78619ae77bce440bd0e6",
+      "samples": 150400,
+      "sha256": "e4f1fbb00e547eadba7f9d14e1644ba089f97522dc2a20ce56a15ebb378bb145",
+      "original_file_sha256": "d733a878fbb3393dac0349cfa1293e4fad9a8bd5ec1f58ce6adc019de4b94f32"
+    }
+  }
+}

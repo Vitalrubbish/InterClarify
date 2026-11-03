@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import json
 from pathlib import Path
 import sys
@@ -70,7 +71,33 @@ def audit_case(rows, result, dual):
             'controller_observed_ms': distribution([row['controller_observed_lag_ms'] for row in rows]),
             'asr_main_ms': distribution([row['asr_main_lag_ms'] for row in rows if dual]),
             'first_frame_main_ms': rows[0]['controller_main_lag_ms'] if rows else None,
-            'stable_main_ms': distribution([row['controller_main_lag_ms'] for row in rows[1:]])}
+            'stable_main_ms': distribution([row['controller_main_lag_ms'] for row in rows[1:]]),
+            'failed_step_sensevoice': [{'samples': sum(span['samples'] for span in event['spans']),
+                'dtype': event['dtype'], 'milliseconds': (event['completed_at'] - event['started_at']) * 1000}
+                for event in result.get('diagnostics', {}).get('controller_events', [])
+                if not result.get('passed') and event['kind'] == 'sensevoice']}
+
+
+def warmup_details(root, warmup):
+    details = []
+    for index, record in enumerate(warmup.get('rounds', [])):
+        rows = [json.loads(line) for line in (root / f'warmup_{index}.frames.jsonl').read_text().splitlines()]
+        controls = [row['receipts']['controller'] for row in rows]
+        events = [event for row in controls for event in row['events']]
+        senses = [event for event in events if event['kind'] == 'sensevoice']
+        details.append({'frames': record['frames'], 'passed': record['passed'], 'coverage': record['coverage'],
+            'raw_states': dict(Counter(row['state']['raw_token'] for row in controls)),
+            'effective_states': dict(Counter(row['state']['state_token'] for row in controls)),
+            'rejections': dict(Counter(row['state']['rejection_reason'] or 'accepted' for row in controls)),
+            'controller_compute_ms': record['timing']['controller_compute_ms'],
+            'x2_compute_ms': record['timing']['asr_compute_ms'],
+            'sensevoice_ms': distribution([(event['completed_at'] - event['started_at']) * 1000 for event in senses]),
+            'sensevoice_dtypes': sorted({event['dtype'] for event in senses}),
+            'sensevoice_samples': sorted({sum(span['samples'] for span in event['spans']) for event in senses}),
+            'sensevoice_calls': len(senses), 'direct_sensevoice': record['direct_sensevoice'],
+            'cleanup': record['cleanup'],
+            'unprocessed_real_samples': record['diagnostics']['unprocessed_real_samples']})
+    return details
 
 
 def audit_condition(run, condition):
@@ -102,7 +129,8 @@ def audit_condition(run, condition):
                 'cases': cases, 'load_seconds': result.get('load_seconds'),
                 'warmup_seconds': result.get('warmup_seconds'), 'warmup_passed': warmup.get('passed', False),
                 'missing_paths': warmup.get('missing_by_round'), 'run_error': result.get('error'),
-                'native_equivalence_passed': warmup.get('equivalence', {}).get('passed')}
+                'native_equivalence_passed': warmup.get('equivalence', {}).get('passed'),
+                'warmup_details': warmup_details(root, warmup)}
     except Exception as exc:
         return {'passed': False, 'failures': failures + ['missing_or_invalid_evidence'],
                 'error': str(exc), 'cases': cases}
@@ -122,9 +150,34 @@ def analyze(run):
             'matrix_all_passed': all(value['passed'] for value in conditions.values()) and resource_ok}
 
 
+def write_backlog_plot(run, output):
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    figure, axes = plt.subplots(3, 1, figsize=(8, 7), sharey=True)
+    for axis, case in zip(axes, CASES):
+        path = run / 'dual-limited' / f'{case}.frames.jsonl'
+        rows = [json.loads(line) for line in path.read_text().splitlines()] if path.exists() else []
+        steps = [row['step_id'] for row in rows]
+        axis.plot(steps, [row['controller_main_lag_ms'] for row in rows], 'o-', label='Controller main to joint release')
+        axis.plot(steps, [row['asr_main_lag_ms'] for row in rows], 's-', label='X2 main to joint publication')
+        axis.axhline(800, color='red', linestyle='--', linewidth=1, label='800 ms stop line')
+        axis.set(title=case + ' (incomplete)', ylabel='Latency (ms)', ylim=(0, 880), xticks=steps)
+        axis.grid(alpha=.2)
+    axes[0].legend(fontsize=8, loc='lower right')
+    axes[-1].set_xlabel('Published 160 ms batch index; failed/unpublished batches are omitted')
+    figure.suptitle('NTF-018 limited warmup: fixed three-axis partial traces')
+    figure.tight_layout()
+    figure.savefig(output, dpi=160)
+    plt.close(figure)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--plot', type=Path)
     args = parser.parse_args()
     write_json(args.output, analyze(args.run))
+    if args.plot:
+        write_backlog_plot(args.run, args.plot)

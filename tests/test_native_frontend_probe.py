@@ -20,7 +20,7 @@ from dual_audio import DualAudioFrontend, PCMLedger
 from independent_x2 import IndependentX2
 from native_soulx import NativeSoulX, pcm_digest
 from native_frontend_worker import MAX_MESSAGE, RemoteX2, WindowLedger, receive, send
-from native_frontend_probe import compare_native, full_warmup, replay
+from native_frontend_probe import compare_native, full_warmup, prepare_warmup, quantize, replay
 from shared_context import SharedContext
 from analyze_native_frontend import audit_case, analyze
 from test_independent_frontend import Clock, FakeEngine
@@ -28,6 +28,26 @@ from test_native_soulx import SOURCE, official_model
 
 
 class ProbeTests(unittest.TestCase):
+    def test_quiet_warmup_is_normalized_before_quantization_and_silent_input_is_rejected(self):
+        audio = (.0005 * np.sin(np.arange(124800) * .1)).astype(np.float32)
+        first, evidence = prepare_warmup(audio)
+        second, repeated = prepare_warmup(audio)
+        np.testing.assert_array_equal(first, second)
+        self.assertEqual(evidence, repeated)
+        self.assertAlmostEqual(evidence['prepared_rms'], .05, places=4)
+        self.assertGreater(evidence['prepared_peak'], .02)
+        np.testing.assert_array_equal(first[:124800], quantize(audio * evidence['gain']))
+        np.testing.assert_array_equal(first[124800:], np.zeros(25600, np.float32))
+        with self.assertRaisesRegex(ValueError, 'silent'):
+            prepare_warmup(np.zeros(124800, np.float32))
+
+    def test_warmup_peak_limit_preserves_transient_headroom(self):
+        audio = np.zeros(124800, np.float32)
+        audio[0] = 1.
+        prepared, evidence = prepare_warmup(audio)
+        self.assertAlmostEqual(evidence['gain'], .9)
+        self.assertLessEqual(float(np.max(np.abs(prepared))), .9)
+
     def test_offline_audit_accepts_actual_receipts_and_rejects_forged_eos(self):
         frontend, context = self.frontend()
         with tempfile.TemporaryDirectory() as directory, patch('native_frontend_probe.fresh', return_value=(frontend, context)), \

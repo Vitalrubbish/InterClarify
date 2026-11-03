@@ -8,14 +8,14 @@
 
 每作业单卡4090、4CPU、32GiB RAM，唯一模型worker／路、CPU线程各≤2；脚本每秒检查显存22528MiB、进程组RSS32GiB、输出128MiB和1750秒收尾线。调度器另限制1800秒与32GiB；文件大小也有限制。触限终止整个进程组，保存resource_stop及exit_code，不进入下一条件。RAM按RSS／调度内存限制，不使用会破坏CUDA虚拟地址映射的地址空间上限。
 
-必须先只读检查`vc list`、账户配额和磁盘。参考调度命令（替换实际冻结源码和run_id后执行）：
+必须先只读检查`vc list`、账户配额和磁盘。待复测参考命令（仅取得追加作业授权后，替换实际冻结源码执行）：
 
 ```bash
 vc submit --image docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4 \
-  --partition pdgpu-4090 --job ntf018-matrix-20261103-r1 \
+  --partition pdgpu-4090 --job ntf018-matrix-20261103-r2 \
   --num-task 1 --cpu-per-task 4 --mem-per-task 32G --gpu-per-task 1 \
-  JOB=1:1 "$HOME/parathink-soulx-duplug/submit_logs/ntf018-matrix-20261103-r1.log" \
-  --cmd 'NTF_SCHEDULED_RUN=1 NTF018_GROUP=matrix SOULX_SOURCE=FROZEN_SOURCE SOULX_RUN_ID=ntf018-matrix-20261103-r1 SOULX_FDB_MANIFEST=FROZEN_MANIFEST timeout --kill-after=10 1800 bash FROZEN_SOURCE/scripts/remote/run_native_frontend_probe.sh'
+  JOB=1:1 "$HOME/parathink-soulx-duplug/submit_logs/ntf018-matrix-20261103-r2.log" \
+  --cmd 'export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-0}; NTF_SCHEDULED_RUN=1 NTF018_GROUP=matrix SOULX_SOURCE=FROZEN_SOURCE SOULX_RUN_ID=ntf018-matrix-20261103-r2 SOULX_FDB_MANIFEST=FROZEN_MANIFEST timeout --kill-after=10 1800 bash FROZEN_SOURCE/scripts/remote/run_native_frontend_probe.sh'
 ```
 
-当前仅剩matrix作业可提交，调度job与日志名使用`ntf018-matrix-20261103-r1`。模型与数据只读复用，不复制权重；本脚本不负责提交作业、换卡或放行019。资源及输入未实测前不能将参考命令记作已提交。
+本轮r1矩阵作业已结束且未通过，原2次提交额度已用完。上方r2命令仅供获批后的新增复测，不覆盖r1；当前没有可自动提交的剩余额度。模型与数据复用，不复制权重；本脚本不负责提交作业、换卡或放行019。
