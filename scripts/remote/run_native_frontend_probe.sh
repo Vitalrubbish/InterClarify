@@ -4,11 +4,11 @@ set -euo pipefail
 ROOT="${SOULX_ROOT:-$HOME/parathink-soulx-duplug}"
 SOURCE="${SOULX_SOURCE:?set frozen clean source worktree}"
 RUN_ID="${SOULX_RUN_ID:?set unique run ID}"
-GROUP="${NTF018_GROUP:?set dual or single}"
+GROUP="${NTF018_GROUP:?set dual, single or matrix}"
 MANIFEST="${SOULX_FDB_MANIFEST:?set original frozen FDB30 manifest}"
 [[ "$RUN_ID" =~ ^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$ ]] || exit 2
-[[ "$GROUP" == dual || "$GROUP" == single ]] || exit 2
-[[ "${NTF_SCHEDULER_JOB:-0}" == 1 && -n "${CUDA_VISIBLE_DEVICES:-}" ]] || exit 2
+[[ "$GROUP" == dual || "$GROUP" == single || "$GROUP" == matrix ]] || exit 2
+[[ "${NTF_SCHEDULED_RUN:-0}" == 1 && -n "${CUDA_VISIBLE_DEVICES:-}" ]] || exit 2
 ASSETS="$HOME/turncontrol-comparison"
 SOULX="$ASSETS/envs/soulx/bin/python"
 ASR="$HOME/interclarify-english-integration-20261018-v1/envs/asr/bin/python"
@@ -52,6 +52,7 @@ trap 'exit 143' TERM INT
 STARTED=$SECONDS
 CONDITIONS=(single-full)
 [[ "$GROUP" != dual ]] || CONDITIONS=(dual-limited dual-full)
+[[ "$GROUP" != matrix ]] || CONDITIONS=(dual-limited dual-full single-full)
 FINAL_CODE=0
 for condition in "${CONDITIONS[@]}"; do
   remaining=$((1750 - SECONDS + STARTED))
