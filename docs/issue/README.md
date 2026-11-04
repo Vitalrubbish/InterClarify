@@ -4,7 +4,7 @@
 
 ## 当前工作单
 
-当前无活动工作单。NTF-040 已完成[提前 complete、官方运行时恢复与设计影响分析](../dev/SoulX-Duplug/completion_runtime_analysis.md)并归档，未启动下游接入或训练。NTF-039 已完成当前前端文档与接口收口，135 项本地检查通过；NTF-038 的 [SoulX 原生 complete 行为审计](../reports/soulx/20261104-completion-strategy-audit/README.md)和 NTF-037 的[训练数据与成本研究](../research_design/layer1_training.md)已归档。
+当前无活动工作单。NTF-044 已完成 [Layer 1 接入、窗口与训练方案](../research_design/layer1_training.md)重写并归档，仅交付设计。NTF-040 已完成[提前 complete、官方运行时恢复与设计影响分析](../dev/SoulX-Duplug/completion_runtime_analysis.md)并归档，未启动下游接入或训练。NTF-039 已完成当前前端文档与接口收口，135 项本地检查通过；NTF-038 的 [SoulX 原生 complete 行为审计](../reports/soulx/20261104-completion-strategy-audit/README.md)和 NTF-037 的[训练数据与成本研究](../research_design/layer1_training.md)已归档。
 
 ## 当前路线交付
 
@@ -26,6 +26,7 @@
 | [NTF-041](../dev/SoulX-Duplug/completion_runtime_analysis.md#2-提前-complete-的具体例子) | 复核已完成并归档 | 两组无新增文字状态序列、首音前取消与上下文合并实例；明确规则前字段缺失 |
 | NTF-042 | 已完成并归档 | 第二节采用 TurnControlComparison 实际日志案例，时间线与引用同步 |
 | NTF-043 | 已完成并归档 | 区分自写与官方运行时，澄清官方消息整理、请求重建和 KV 边界 |
+| [NTF-044](../research_design/layer1_training.md) | 文档已完成并归档 | 明确运行时基线与 7B 微调关系、窗口建议、取消恢复和 8×4090 预算；未实施接入或训练 |
 
 ## 后续计划
 
