@@ -4,7 +4,7 @@
 
 ## 当前工作单
 
-当前无活动工作单。NTF-046 已根据用户质疑修正 [Layer 1 接入、窗口与训练方案](../research_design/layer1_training.md)的无训练假设：A 仅为有兼容条件的未适配权重诊断，目标实现 B 先做协议适配训练，再逐步训练恢复与附和；不再要求 A 先跑通新协议。NTF-045 取消两条路线的范围保留。两单均仅交付文档，已归档。NTF-044 的方案重写、NTF-040 的[提前 complete、官方运行时恢复与设计影响分析](../dev/SoulX-Duplug/completion_runtime_analysis.md)均已归档，未启动下游接入或训练。NTF-039 已完成当前前端文档与接口收口，135 项本地检查通过；NTF-038 的 [SoulX 原生 complete 行为审计](../reports/soulx/20261104-completion-strategy-audit/README.md)和 NTF-037 的[训练数据与成本研究](../research_design/layer1_training.md)已归档。
+当前无活动工作单。NTF-047 已按用户要求删除路线 A，仅保留 [Layer 1 接入、窗口与训练方案](../research_design/layer1_training.md)中的路线 B：协议适配后的 7B Layer 1＋可取消运行时。推进顺序为协议与运行时验证、协议适配训练、取消恢复、基础主版与附和、thinking 适配，仅保留训练主线内部的阶段检查点比较与消融；本单仅交付文档，已归档。NTF-044—046 的方案整理与修正、NTF-040 的[提前 complete、官方运行时恢复与设计影响分析](../dev/SoulX-Duplug/completion_runtime_analysis.md)均已归档，未启动下游接入或训练。NTF-039 已完成当前前端文档与接口收口，135 项本地检查通过；NTF-038 的 [SoulX 原生 complete 行为审计](../reports/soulx/20261104-completion-strategy-audit/README.md)和 NTF-037 的[训练数据与成本研究](../research_design/layer1_training.md)已归档。
 
 ## 当前路线交付
 
@@ -28,7 +28,8 @@
 | NTF-043 | 已完成并归档 | 区分自写与官方运行时，澄清官方消息整理、请求重建和 KV 边界 |
 | [NTF-044](../research_design/layer1_training.md) | 文档已完成并归档 | 明确运行时基线与 7B 微调关系、窗口建议、取消恢复和 8×4090 预算；未实施接入或训练 |
 | [NTF-045](../research_design/layer1_training.md) | 文档已完成并归档 | 取消两条路线；其中未微调基线的能力假设已由 NTF-046 修正，未实施接入或训练 |
-| [NTF-046](../research_design/layer1_training.md#12-路线-a仅保留有条件的未适配权重诊断) | 文档已完成并归档 | 区分既有协议与新 token 适配，限定 A 的诊断条件；目标实现先训练协议，新增词表须覆盖相关参数训练 |
+| [NTF-046](../research_design/layer1_training.md) | 文档已完成并归档 | 修正既有协议与新 token 适配的能力假设；新增词表须覆盖相关参数训练，路线范围以后续 NTF-047 为准 |
+| [NTF-047](../research_design/layer1_training.md#12-路线-b分阶段训练协议表达与恢复) | 文档已完成并归档 | 删除路线 A，仅保留协议适配后的 7B Layer 1 训练主线及其内部检查点比较与消融 |
 
 ## 后续计划
 
