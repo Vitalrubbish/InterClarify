@@ -1,10 +1,10 @@
 # 工作单管理
 
-更新：2026-11-04。当前唯一路线为 **SoulX-Duplug 官方配置＋并行 X2Streaming-ASR**。第一阶段 ASR-Frontend 已收口，后续 LLM 接入暂缓。
+更新：2026-11-05。当前前端路线为 **SoulX-Duplug 官方配置＋并行 X2Streaming-ASR**。第一阶段 ASR-Frontend 已收口；Layer 1 仅保留协议适配训练路线 B，底座范围为官方 Qwen2.5-7B-Instruct 或选定 Qwen3，后续接入与训练尚未实施。
 
 ## 当前工作单
 
-当前无活动工作单。NTF-047 已按用户要求删除路线 A，仅保留 [Layer 1 接入、窗口与训练方案](../research_design/layer1_training.md)中的路线 B：协议适配后的 7B Layer 1＋可取消运行时。推进顺序为协议与运行时验证、协议适配训练、取消恢复、基础主版与附和、thinking 适配，仅保留训练主线内部的阶段检查点比较与消融；本单仅交付文档，已归档。NTF-044—046 的方案整理与修正、NTF-040 的[提前 complete、官方运行时恢复与设计影响分析](../dev/SoulX-Duplug/completion_runtime_analysis.md)均已归档，未启动下游接入或训练。NTF-039 已完成当前前端文档与接口收口，135 项本地检查通过；NTF-038 的 [SoulX 原生 complete 行为审计](../reports/soulx/20261104-completion-strategy-audit/README.md)和 NTF-037 的[训练数据与成本研究](../research_design/layer1_training.md)已归档。
+当前无活动工作单。NTF-048 已按用户要求更新 [Layer 1 接入、窗口与训练方案](../research_design/layer1_training.md)：以官方 Qwen2.5-7B-Instruct 或选定 Qwen3 后训练模型为起点，Qwen3-8B 非 thinking 模式为同量级候选；重新建立协议、LoRA 与加载验证，最终版本经预检冻结。NTF-047 删除路线 A、仅保留路线 B 的范围保持；推进顺序为协议与运行时验证、协议适配训练、取消恢复、基础主版与附和、thinking 适配。两单均仅交付文档，已归档。NTF-044—046 的方案整理与修正、NTF-040 的[提前 complete、官方运行时恢复与设计影响分析](../dev/SoulX-Duplug/completion_runtime_analysis.md)均已归档，未启动下游接入或训练。NTF-039 已完成当前前端文档与接口收口，135 项本地检查通过；NTF-038 的 [SoulX 原生 complete 行为审计](../reports/soulx/20261104-completion-strategy-audit/README.md)和 NTF-037 的[训练数据与成本研究](../research_design/layer1_training.md)已归档。
 
 ## 当前路线交付
 
@@ -30,6 +30,7 @@
 | [NTF-045](../research_design/layer1_training.md) | 文档已完成并归档 | 取消两条路线；其中未微调基线的能力假设已由 NTF-046 修正，未实施接入或训练 |
 | [NTF-046](../research_design/layer1_training.md) | 文档已完成并归档 | 修正既有协议与新 token 适配的能力假设；新增词表须覆盖相关参数训练，路线范围以后续 NTF-047 为准 |
 | [NTF-047](../research_design/layer1_training.md#12-路线-b分阶段训练协议表达与恢复) | 文档已完成并归档 | 删除路线 A，仅保留协议适配后的 7B Layer 1 训练主线及其内部检查点比较与消融 |
+| [NTF-048](../research_design/layer1_training.md#71-从官方-qwen-指令后训练权重建立训练起点) | 文档已完成并归档 | 将训练起点改为 Qwen2.5-7B-Instruct 或选定 Qwen3，取消旧 checkpoint／adapter 依赖，更新模式与资源预检要求 |
 
 ## 后续计划
 

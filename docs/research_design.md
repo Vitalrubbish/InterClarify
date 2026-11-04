@@ -2,9 +2,9 @@
 
 2026-11-03，当前采用 SoulX-Duplug 官方配置＋并行 X2Streaming-ASR：原生 SenseVoice 控制、独立 X2 完整词正文及 160ms 联合提交。前端实现、[NTF-018](reports/soulx/20261103-ntf018-warmup/README.md)真实权重预检和[NTF-019](reports/soulx/20261103-ntf019-fdb30/README.md)固定 FDB30 验收已归档；[NTF-030](reports/soulx/20261103-latency-limit-removal/README.md)已取消 800ms 时长停止条件，保留容量与作业资源保护。后续 LLM 接入暂缓，当前未接 LLM／CoT／TTS 或切换现役 Agent。合同见[独立前端](dev/SoulX-Duplug/independent_streaming_frontend.md)与[Context 接口](dev/SoulX-Duplug/shared_context_interface.md)。
 
-官方源码已纳入固定子模块，见[源码说明](third_party/soulx-duplug.md)。模型权重固定，不训练，尚未切换现役下游 Agent。
+SoulX 官方源码已纳入固定子模块，见[源码说明](third_party/soulx-duplug.md)。当前 SoulX 前端模型权重固定，不训练，尚未切换现役下游 Agent。
 
-2026-11-03 后续讨论已确认：将原 Layer 0 的系统附和时机判断并入 Layer 1，由 Layer 1 统一负责附和时机与措辞，后续不单独部署 Layer 0。SoulX 继续提供外部用户状态，Layer 1 学习等待、系统附和与正式回答，单一输出执行点和普通回答的 complete 边界保持。2026-11-04 按用户要求收敛[Layer 1 接入与训练方案](research_design/layer1_training.md)，仅保留路线 B：协议适配后的 7B Layer 1＋可取消运行时。先确定协议并用确定性执行器验证运行时，再做协议适配训练、取消恢复、基础主版、系统附和及 thinking 适配；比较训练主线内部的阶段检查点与消融。窗口建议为 640ms 普通更新、16 token 解码块、2K 训练序列，8×4090 分阶段使用；数值均待预检，关键事件不等待普通更新计时点。尚未生成语料、训练或接入流式 TTS。
+2026-11-03 后续讨论已确认：将原 Layer 0 的系统附和时机判断并入 Layer 1，由 Layer 1 统一负责附和时机与措辞，后续不单独部署 Layer 0。SoulX 继续提供外部用户状态，Layer 1 学习等待、系统附和与正式回答，单一输出执行点和普通回答的 complete 边界保持。2026-11-05 更新[Layer 1 接入与训练方案](research_design/layer1_training.md)，仅保留路线 B，训练起点采用官方 Qwen2.5-7B-Instruct 或选定的 Qwen3 后训练模型，不沿用旧 Qwen2／DuplexCascade checkpoint 与 adapter。Qwen3 同量级候选为 Qwen3-8B，Layer 1 先采用非 thinking 模式；最终型号与版本经预检冻结。先确定新协议并验证运行时，再做协议适配训练、取消恢复、基础主版、系统附和及 thinking 适配；比较同底座训练阶段与消融。窗口建议仍为 640ms 普通更新、16 token 解码块、2K 训练序列，8×4090 分阶段使用；显存、吞吐与延迟需按新模型预检。尚未生成语料、训练或接入流式 TTS。
 
 当前前端保持两路职责：SoulX 通过原生 SenseVoice 教师和音频预测五状态，X2 独立以真实 EOS 闭合组提供完整词正文，不进入状态 KV。两路同源 PCM；每 160ms 等 X2 两个 80ms 步及 SoulX 本步均结束后，将文本和状态 token 一次原子写入 SharedContext，成功后推进下一周期，实际采样／前瞻范围另记。先完成结果只在内部暂存，不写 PCM、不设前端停止旁路。内部 reset 不清空外接正文；已提交的有效 complete 携当前正文直接供下游使用，不再增加独立交接等待。原始状态、联合发布延迟和正文覆盖分别评价。前端工作已收口。用户片段按首段实际播放分组的合同保留，下游暂不实施。
 
