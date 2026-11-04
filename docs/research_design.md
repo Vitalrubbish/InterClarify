@@ -8,7 +8,7 @@
 
 当前前端保持两路职责：SoulX 通过原生 SenseVoice 教师和音频预测五状态，X2 独立以真实 EOS 闭合组提供完整词正文，不进入状态 KV。两路同源 PCM；每 160ms 等 X2 两个 80ms 步及 SoulX 本步均结束后，将文本和状态 token 一次原子写入 SharedContext，成功后推进下一周期，实际采样／前瞻范围另记。先完成结果只在内部暂存，不写 PCM、不设前端停止旁路。内部 reset 不清空外接正文；已提交的有效 complete 携当前正文直接供下游使用，不再增加独立交接等待。原始状态、联合发布延迟和正文覆盖分别评价。前端工作已收口。用户片段按首段实际播放分组的合同保留，下游暂不实施。
 
-已确认的下游分工与普通回答生成边界保留：五状态在所属 160ms 批次联合提交后供下游消费，Layer 1 在正常输入边界读到已提交的有效 complete 及当前正文后可在当前 turn 生成普通回答；同步不保证尾词必齐。具体[接口合同](dev/SoulX-Duplug/shared_context_interface.md)的联合提交已由 NTF-017 交付，NTF-020 已按[归档决定](reports/soulx/20261103-ntf020-handoff-retirement/README.md)取消。保留 CoT 条件下的主动澄清与话轮决策目标，后续让 SoulX 联合读取音频、转写和 Layer 2 已发布 CoT；后续扩展见[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
+已确认的下游分工与普通回答生成边界保留：五状态在所属 160ms 批次联合提交后供下游消费，Layer 1 在正常输入边界读到已提交的有效 complete 及当前正文后可在当前 turn 生成普通回答；同步不保证尾词必齐。具体[接口合同](dev/SoulX-Duplug/shared_context_interface.md)的联合提交已由 NTF-017 交付。保留 CoT 条件下的主动澄清与话轮决策目标，后续让 SoulX 联合读取音频、转写和 Layer 2 已发布 CoT；后续扩展见[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
 
 研究任务与单一仲裁执行点、单一 TTS 播放所有权及已听内容不可撤销的边界保持。用户状态统一随正文联合提交，前端不再为 `user_nonidle` 设置专用停止钩子；下游读取同一快照后，由既有唯一输出运行时按准备／播放生命周期处理有效打断。其他状态不进入输出运行时，不映射成 start 或 keep；`user_complete` 不额外发起 LLM 回答调用，`user_backchannel` 由 LLM 读取并决定表达行为。具体路径见[架构第 2.2 节](research_design/architecture.md#22-前端状态与系统附和)。状态输入编码待后续讨论。
 

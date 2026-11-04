@@ -4,7 +4,7 @@
 
 ## 当前工作单
 
-当前无活动工作单。NTF-038 已完成 [SoulX＋X2 使用策略与提前 complete 审计](../reports/soulx/20261104-completion-strategy-audit/README.md)并归档，未改变推理行为或启动集群作业。NTF-037 已完成训练数据与成本研究并归档，见[方案](../research_design/layer1_training.md)及本地 `docs/issue/archive/NTF-037.md`；未启动接入或训练。NTF-036 清理结果见本地 `docs/issue/archive/NTF-036.md`。
+当前无活动工作单。NTF-039 已完成当前前端文档与接口收口并归档；135 项本地检查通过，未启动下游接入或训练。NTF-038 的 [SoulX 原生 complete 行为审计](../reports/soulx/20261104-completion-strategy-audit/README.md)和 NTF-037 的[训练数据与成本研究](../research_design/layer1_training.md)已完成并归档。
 
 ## 当前路线交付
 
@@ -14,14 +14,14 @@
 | [NTF-017](../reports/soulx/20261102-ntf017-joint-publication/README.md) | 已完成并归档 | 文本／状态／进度联合提交，移除前端停止旁路 |
 | [NTF-018](../reports/soulx/20261103-ntf018-warmup/README.md) | 已完成并归档 | 完整预热、真实权重对照和并发三轴 3/3 |
 | [NTF-019](../reports/soulx/20261103-ntf019-fdb30/README.md) | 已完成并归档 | 固定 FDB30 验收，用户审核通过 |
-| [NTF-020](../reports/soulx/20261103-ntf020-handoff-retirement/README.md) | 未实施取消并归档 | 联合提交已覆盖数据等待，撤销 pending／ready |
 | [NTF-026](archive/NTF-026.md) | 已完成并归档 | 采集监控的进程退出竞态修复 |
 | [NTF-027](archive/NTF-027.md) | 已完成并归档 | 恢复原生控制与外接 X2 工作单 |
 | [NTF-028](archive/NTF-028.md) | 已完成并归档 | 160ms 音频步推进屏障合同 |
 | [NTF-029](archive/NTF-029.md) | 已完成并归档 | 160ms 双路完成后的联合发布合同 |
 | [NTF-030](../reports/soulx/20261103-latency-limit-removal/README.md) | 已完成并归档 | 取消 800ms 时长停止条件，保留容量与资源保护 |
 | [NTF-037](../research_design/layer1_training.md) | 研究已完成并归档 | Layer 0 并入 Layer 1 的职责同步、含噪控制与取消恢复数据、规模预算及控制方案比较；尚未实施训练 |
-| [NTF-038](../reports/soulx/20261104-completion-strategy-audit/README.md) | 审计已完成并归档 | 区分历史教师替换问题、当前原始预测与官方规则来源；复核 3180 批次，未改推理或追加 GPU 实验 |
+| [NTF-038](../reports/soulx/20261104-completion-strategy-audit/README.md) | 审计已完成并归档 | 区分当前原始预测与官方规则来源；复核 3180 批次，未改推理或追加 GPU 实验 |
+| NTF-039 | 已完成并归档 | 当前前端文档、快照接口与图稿一致；135 项本地检查通过 |
 
 ## 后续计划
 

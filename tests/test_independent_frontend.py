@@ -313,7 +313,6 @@ class AudioTests(unittest.TestCase):
         self.assertEqual(second['asr_processed_until'], 5120)
         self.assertGreater(second['batch_published_at'], first['batch_published_at'])
         self.assertGreater(second['asr_progress_available_at'], first['asr_progress_available_at'])
-        self.assertEqual(second['completion_status'], 'none')
 
     def test_native_reset_preserves_unread_pcm_and_x2_text_across_cycles(self):
         frontend = self.make(predictions=[99, 3, 99, 6], emissions=[[12, 2], None, [13, 2], None])
@@ -613,35 +612,6 @@ class AudioTests(unittest.TestCase):
         self.assertFalse(hasattr(frontend.context, 'publish_user_frame'))
         self.assertEqual(self.view(frontend), previous)
 
-    def test_handoff_updates_merge_with_new_batch_and_reject_stale_writers(self):
-        frontend = self.make(emissions=[[12, 2], None, [13, 2], None])
-        frontend.append_pcm(np.full(5320, .1, np.float32))
-        frontend.advance()
-        context = frontend.context
-        context.update_completion('session', 'turn', expected_step_id=0, expected_completion_id=None,
-                                  expected_completion_status='none',
-                                  fields={'completion_id': 'c1', 'completion_status': 'pending'})
-        frontend.advance()
-        current = self.view(frontend)
-        self.assertEqual(current['completion_id'], 'c1')
-        self.assertEqual(current['completion_status'], 'pending')
-        with self.assertRaises(ValueError):
-            context.update_completion('session', 'turn', expected_step_id=0, expected_completion_id='c1',
-                                      expected_completion_status='pending', fields={'completion_status': 'ready'})
-        context.update_completion('session', 'turn', expected_step_id=1, expected_completion_id='c1',
-                                  expected_completion_status='pending', fields={'completion_status': 'cancelled'})
-        with self.assertRaises(ValueError):
-            context.update_completion('session', 'turn', expected_step_id=1, expected_completion_id='c1',
-                                      expected_completion_status='pending', fields={'completion_status': 'ready'})
-        self.assertEqual(self.view(frontend)['text'], 'hello world again')
-        with self.assertRaises(ValueError):
-            context.update_completion('session', 'turn', expected_step_id=1, expected_completion_id='c1',
-                                      expected_completion_status='cancelled', fields={'text': 'stale'})
-        frontend.close()
-        with self.assertRaises(ValueError):
-            context.update_completion('session', 'turn', expected_step_id=1, expected_completion_id='c1',
-                                      expected_completion_status='cancelled', fields={'completion_status': 'ready'})
-
     def test_concurrent_readers_only_observe_complete_batches_and_receive_copies(self):
         frontend = self.make(emissions=[[13, 2], None] * 8)
         done, entered = threading.Event(), threading.Event()
@@ -696,7 +666,6 @@ class AudioTests(unittest.TestCase):
                 self.assertEqual(view['partial_batch'], length % 2560 != 0)
                 self.assertEqual(view['tail_status'], 'unknown')
                 self.assertFalse(view['coverage_complete'])
-                self.assertEqual(view['completion_status'], 'none')
                 self.assertEqual(frontend.diagnostics()['unprocessed_real_samples']['asr'], 0)
 
     def test_external_close_and_delayed_callbacks_cannot_revive_a_turn(self):

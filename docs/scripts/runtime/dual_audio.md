@@ -29,4 +29,4 @@ frontend = DualAudioFrontend(controller, asr, context=context)
 
 `realtime`构造参数继续兼容既有调用；NTF-030后两种模式都不执行800ms判断。正式回放仍由调用方按真实时钟持续供音；预热逐步供音、私有Context及完整清理保持，4MiB、联合提交和生命周期校验在两种模式均有效。
 
-advance返回的lane_compute_seconds、wait_seconds、commit_seconds分别描述模型调用、先完成侧等另一侧和提交耗时；保留input_ready_at、started_at、完成／发布／释放时间。消费者通过Context可选读取计时独立测量。日志由调用方在锁外落盘；本模块不接LLM、TTS或真实播放，NTF-020已取消额外等待并归档，已提交complete直接供下游使用。
+advance返回的lane_compute_seconds、wait_seconds、commit_seconds分别描述模型调用、先完成侧等另一侧和提交耗时；保留input_ready_at、started_at、完成／发布／释放时间。消费者通过Context可选读取计时独立测量。日志由调用方在锁外落盘；本模块不接LLM、TTS或真实播放，已提交的有效complete携当前正文直接供下游使用。

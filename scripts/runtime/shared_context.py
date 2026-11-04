@@ -13,9 +13,6 @@ STATE_IDS = {'<|user_idle|>': 151680, '<|user_nonidle|>': 151681,
              '<|user_incomplete|>': 151678}
 SERVICE_STATES = (None, 'idle', 'nonidle', 'speak', 'blank')
 COMPLETION_SOURCES = (None, 'model_complete', 'wait_fallback')
-COMPLETION_FIELDS = {'completion_id', 'completion_status', 'completion_target_sample',
-                     'completion_deadline', 'completion_ready_at', 'completion_committed_groups',
-                     'completion_reason', 'completion_available_at', 'completion_generation'}
 SERVICE_FIELDS = {'service_state': None, 'service_completion_source': None,
                   'speech_detected': False, 'service_text': ''}
 TRANSCRIPT_SOURCES = ('x2_streaming_asr',)
@@ -74,8 +71,7 @@ class SharedContext:
                          state_available_at=None, state_published_at=None,
                          state_processed_until=0, state_observed_until=0,
                          asr_processed_until=0, asr_observed_until=0,
-                         asr_progress_available_at=None, completion_id=None,
-                         completion_status='none', tail_status='unknown')
+                         asr_progress_available_at=None, tail_status='unknown')
             return self._store(key, value)
 
     @staticmethod
@@ -281,27 +277,6 @@ class SharedContext:
                              text_observed_until=last['text_observed_until'], text_published_at=published)
             return self._store(key, value)
 
-    def update_completion(self, session_id, turn_id, *, expected_step_id, expected_completion_id,
-                          expected_completion_status, fields):
-        """Reserve one current handoff record; callers must compare the current batch."""
-        key = self._key(session_id, turn_id)
-        fields = deepcopy(fields)
-        if not fields or fields.keys() - COMPLETION_FIELDS:
-            raise ValueError('Only current completion metadata may be updated')
-        with self.changed:
-            old = self.latest[key]
-            if (key in self._closed_keys or old['status'] != 'open' or old.get('step_id') != expected_step_id
-                    or old.get('completion_id') != expected_completion_id
-                    or old.get('completion_status') != expected_completion_status):
-                raise ValueError('Stale completion update')
-            value = dict(old, **fields)
-            if value['completion_status'] not in ('none', 'pending', 'ready', 'cancelled', 'timed_out'):
-                raise ValueError('Invalid completion lifecycle')
-            if (value['completion_status'] != 'none'
-                    and (not isinstance(value['completion_id'], str) or not value['completion_id'])):
-                raise ValueError('A handoff record requires a completion identifier')
-            return self._store(key, value)
-
     def get_user_turn(self, session_id, turn_id, *, with_timing=False):
         """Return one atomic copy; later writes never mutate an existing reader's copy."""
         key = self._key(session_id, turn_id)
@@ -326,8 +301,6 @@ class SharedContext:
             if value['status'] == 'closed':
                 return value
             value.update(status='closed', close_reason=reason, published_at=self.clock())
-            if value.get('completion_status') in ('pending', 'ready'):
-                value.update(completion_status='cancelled', completion_reason=reason)
             return self._store(key, value)
 
     def release_closed_turn(self, session_id, turn_id):

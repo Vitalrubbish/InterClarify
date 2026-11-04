@@ -14,7 +14,7 @@ class SharedContextTests(unittest.TestCase):
         opened = context.open_user_turn('s', 't')
         self.assertEqual((opened['source'], opened['publication_mode']), ('x2_streaming_asr', 'joint'))
         self.assertEqual((opened['text'], opened['step_id'], opened['committed_groups']), ('', -1, 0))
-        self.assertEqual((opened['completion_status'], opened['tail_status']), ('none', 'unknown'))
+        self.assertEqual(opened['tail_status'], 'unknown')
         with self.assertRaises(ValueError):
             context.open_user_turn('s', 't', 'sensevoice_small')
 

@@ -19,7 +19,6 @@
 | [NTF-017](../../reports/soulx/20261102-ntf017-joint-publication/README.md) | 文本／状态／进度联合提交，移除前端停止旁路 |
 | [NTF-018](../../reports/soulx/20261103-ntf018-warmup/README.md) | 完整预热、真实权重对照和并发三轴 3/3 |
 | [NTF-019](../../reports/soulx/20261103-ntf019-fdb30/README.md) | 固定 FDB30 验收，用户审核通过并归档 |
-| [NTF-020](../../reports/soulx/20261103-ntf020-handoff-retirement/README.md) | 取消 complete 额外交接等待并归档 |
 | [NTF-030](../../reports/soulx/20261103-latency-limit-removal/README.md) | 取消 800ms 时长停止条件，保留容量与资源保护 |
 
 当前无活动工作单。后续 LLM 接入暂缓，不在本次恢复训练、CoT 注入或现役 Agent 切换。

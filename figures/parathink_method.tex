@@ -37,7 +37,7 @@
   \node[wide,fill=teal!6,text width=26cm,minimum height=1.8cm] (context) at (10.5,10.7)
     {\textbf{Shared Context: Available Dialogue + Runtime State}\\[3pt]
      Current EOS-closed text + five states + real progress \enspace / \enspace One joint batch snapshot \enspace / \enspace Layer 2 CoT\\
-     Backchannel timing suggestions \enspace / \enspace Layer 1 output \enspace / \enspace Listen--Speak state\\
+     Layer 1 speech and backchannel output \enspace / \enspace Listen--Speak state\\
      Interruption events / generated, submitted, canceled and played records};
   \draw[write] (front.south) -- node[label,right] {One atomic 160 ms commit: text + states + progress} (context.north);
   \draw[future] ([xshift=11.8cm]context.north) -- (22.3,12.5) --
@@ -45,22 +45,17 @@
   \node[font=\sffamily\normalsize,rotate=90,text=violet!80!black] at (25.1,13.85)
     {Future CoT input};
 
-  \node[box,fill=cyan!9,minimum height=3.4cm] (l0) at (2,6.9)
-    {\textbf{Layer 0}\\\textbf{Backchannel Timing}\\[3pt]
-     System backchannel\\Timing prediction};
-  \node[box,fill=blue!8,minimum height=3.4cm] (l1) at (10.5,6.9)
+  \node[box,fill=blue!8,text width=7.8cm,minimum height=3.4cm] (l1) at (5.8,6.9)
     {\textbf{Layer 1}\\\textbf{Expression}\\[3pt]
-     Read the joint snapshot\\Reply after committed complete\\Request thinking};
-  \node[box,fill=violet!9,minimum height=3.4cm] (l2) at (19,6.9)
+     Read the joint snapshot\\Choose backchannel timing and words\\Reply after committed complete\\Request thinking};
+  \node[box,fill=violet!9,text width=6.4cm,minimum height=3.4cm] (l2) at (18.5,6.9)
     {\textbf{Layer 2}\\\textbf{Async Thinking}\\[3pt]
      Publish CoT only\\No turn-action advice\\Update one active task};
 
-  \foreach \name in {l0,l1,l2} {
+  \foreach \name in {l1,l2} {
     \draw[flow] ([xshift=-1.5cm]\name.north |- context.south) --
       node[label,left] {Read} ([xshift=-1.5cm]\name.north);
   }
-  \draw[write] ([xshift=1.5cm]l0.north) --
-    node[label,right] {Timing} ([xshift=1.5cm]l0.north |- context.south);
   \draw[write] ([xshift=1.5cm]l1.north) --
     node[label,right] {Output} ([xshift=1.5cm]l1.north |- context.south);
   \draw[thinking] ([xshift=1.5cm]l2.north) --
@@ -72,8 +67,7 @@
   \node[wide,fill=blue!5,text width=22cm] (fifo) at (10.5,2.4)
     {\textbf{Text FIFO}\\Submitted speech text / system backchannel, in order\\
      Chunks carry output\_id + chunk\_id; accept active output only};
-  \draw[write] (l0.south) -- node[label,left,pos=0.7] {System backchannel} (l0.south |- fifo.north);
-  \draw[write] (l1.south) -- node[label,right,pos=0.7] {Speech text} (l1.south |- fifo.north);
+  \draw[write] (l1.south) -- node[label,right,pos=0.7] {Speech / backchannel text} (l1.south |- fifo.north);
 
   \node[wide,fill=gray!8,text width=22cm,minimum height=2.5cm] (playback) at (10.5,-1)
     {\textbf{Output Runtime: Streaming TTS + Player}\\
@@ -106,5 +100,5 @@
   \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-8)
     {Five states share one commit boundary. Committed valid complete can be used with the current text.};
   \node[align=center,font=\sffamily\normalsize,text=black!70] at (10.5,-8.7)
-    {NTF-020 retired: no extra handoff wait. Real-model validation, downstream and CoT integration remain pending.};
+    {Native frontend validation is recorded. Downstream playback and CoT integration remain pending.};
 \end{tikzpicture}

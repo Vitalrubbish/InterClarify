@@ -8,7 +8,7 @@ HTTP `/v1/session` 分配、`/v1/recognize` 输入、`/v1/session/{id}/result` �
 
 TextTurn补充真实解码完成事件：原生generation在耗尽当前编码帧后拉取下一特征块，特征迭代器恢复时只登记待完成边界；配对的streamer.put交付最后token后才发布该步骤，包括没有新增字的步骤。不能把特征读取或音频接收直接算完成。每条事件带step_seq、名义160ms范围、真实消费样本、转写前缀版本、完成及发布时刻、EOF标志；EOF排空仍单独记账，不回填较早在线结果。
 
-NemotronSession保存最多4096个步骤，`read_steps(after)`及HTTP `/v1/session/{id}/steps?after=N`按游标返回；过期游标、未来游标、改写、错误显式失败。该接口供TT-003聚合三个真实完成步骤，不改变现役160ms解码或播放器所有权。
+NemotronSession保存最多4096个步骤，`read_steps(after)`及HTTP `/v1/session/{id}/steps?after=N`按游标返回；过期游标、未来游标、改写、错误显式失败。该接口按游标提供真实完成步骤，不改变现役160ms解码或播放器所有权。
 
 `read_events`及HTTP `/events?after=N`另提供最多4096条有序文本／完成事件。每次转写变化立即入队，不等160ms步骤结束，避免仅轮询最新快照丢掉中间版本。共享游标使消费者可以先提交某版本，再消费引用该版本的步骤；重复轮询幂等，过期游标显式失败。
 

@@ -4,7 +4,7 @@
 
 headless X-Talk 会话基础驱动：从运行配置启动 X-Talk 服务（其 ASR/LLM/TTS 指向外部模型服务），再以“前端”身份用 WebSocket 驱动一次会话——发送 `vad_speech_start`、按 16 kHz 单声道 PCM16 实时分帧送入一段 WAV、发送 `vad_speech_end`，接收并模拟播放 TTS 音频，记录事件时间线。
 
-本脚本同时是当前 FDB 重放驱动 [duplex_a4_replay.py](duplex_a4_replay.md) 的基类：`LinkClient`、`_load_pcm16`、`_pick_free_port`、`_serve`、`_wait_for_server` 由后者直接复用，`layer1_fdb.py` 的全链路重测间接依赖本文件。为保持“相同驱动对比旧/新候选”的可比性，实现不随旧路线清理改动。其独立 CLI 场景（顺序多轮、插话）保留为连接诊断用途。
+本脚本同时是当前 FDB 重放驱动 [duplex_a4_replay.py](duplex_a4_replay.md) 的基类：`LinkClient`、`_load_pcm16`、`_pick_free_port`、`_serve`、`_wait_for_server` 由后者直接复用，`layer1_fdb.py` 的全链路重测间接依赖本文件。复用同一驱动可保持基线与候选结果的可比性。其独立 CLI 场景（顺序多轮、插话）保留为连接诊断用途。
 
 两个场景：**顺序**（默认，`--rounds` 轮次依次进行）与 **插话**（`--barge-in`，先起一段长回复、播放中再送入第二段话，要求当前回复停止并让第二次发言完成）。
 

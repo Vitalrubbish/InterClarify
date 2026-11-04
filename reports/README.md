@@ -11,6 +11,7 @@
 | [完整预热与三轴预检](../docs/reports/soulx/20261103-ntf018-warmup/README.md) | NTF-018 完整预热、真实权重对照、并发三轴 3/3 |
 | [固定 FDB30 验收](../docs/reports/soulx/20261103-ntf019-fdb30/README.md) | NTF-019 独立正文与原生状态验收，用户审核通过 |
 | [取消 800ms 停止条件](../docs/reports/soulx/20261103-latency-limit-removal/README.md) | NTF-030 延迟照实记录，容量与资源保护保持 |
+| [原生 complete 行为审计](../docs/reports/soulx/20261104-completion-strategy-audit/README.md) | 原始预测、官方规则与提前事件分别计数 |
 
 ## 原始产物规则
 

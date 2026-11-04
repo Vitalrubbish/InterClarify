@@ -1,12 +1,12 @@
 # SoulX 原生控制与独立流式转写
 
-更新：2026-11-03。状态：NTF-015／016原生封装、同源PCM／160ms屏障及独立X2适配已完成本地实现与契约验收，见[交付记录](../../reports/soulx/20261102-native-independent-frontend/README.md)。[NTF-017联合提交](../../reports/soulx/20261102-ntf017-joint-publication/README.md)已交付，020取消；[018](../../reports/soulx/20261103-ntf018-warmup/README.md)真实权重预检通过，[019](../../reports/soulx/20261103-ntf019-fdb30/README.md)已由用户审核归档。[NTF-030](../../reports/soulx/20261103-latency-limit-removal/README.md)已取消800ms停止条件，后续LLM接入暂缓。
+更新：2026-11-03。状态：NTF-015／016原生封装、同源PCM／160ms屏障及独立X2适配已完成本地实现与契约验收，见[交付记录](../../reports/soulx/20261102-native-independent-frontend/README.md)。[NTF-017联合提交](../../reports/soulx/20261102-ntf017-joint-publication/README.md)已交付；[018](../../reports/soulx/20261103-ntf018-warmup/README.md)真实权重预检通过，[019](../../reports/soulx/20261103-ntf019-fdb30/README.md)已由用户审核归档。[NTF-030](../../reports/soulx/20261103-latency-limit-removal/README.md)已取消800ms停止条件，后续LLM接入暂缓。
 
 ## 1. 目标与设计原因
 
 保留 SoulX-Duplug 的原生状态预测链路，另由独立原生流式 ASR 提供下游正文。控制器内部的窗口文字继续参与状态预测，不作为 SharedContext 的权威转写；外部流式正文不注入 SoulX 的 KV。
 
-本方案不替换内部教师文字，保留原生控制输入协议，并把第2.1节160ms屏障同时作为Context提交边界：两路完成当前批次后，正文和状态token一次写入；不保留结果提前发布或nonidle专用停止钩子。
+本方案保留原生控制输入协议，并把第2.1节160ms屏障同时作为Context提交边界：两路完成当前批次后，正文和状态token一次写入，下游统一消费共同快照。
 
 预热不足是当前优先验证假设；目前不能认定它解释了全部积压，也不能预先保证单卡通过。
 
@@ -68,7 +68,7 @@ sequenceDiagram
 
 完成回执只在本路当前步骤及设备计算实际结束、结果已可供发布后产生；收包、预取和任务入队不算完成。记录`step_id`、当前源采样批次、两路实际输入范围／完成时间、各路屏障等待及释放时间。控制器reset不重置全局step_id，关闭／异常取消屏障并拒绝旧回执，不能误释放下一步。
 
-屏障同时约束计算推进和Context提交：X2第一帧闭合组与SoulX状态先暂存，本批次两路完成后一次写入文本、状态token及进度。前端不再单独执行nonidle停止钩子，下游统一消费已提交快照。提交成功后即可推进，不等待日志或消费者；complete不再增加独立的ready等待。
+屏障同时约束计算推进和Context提交：X2第一帧闭合组与SoulX状态先暂存，本批次两路完成后一次写入文本、状态token及进度。前端不再单独执行nonidle停止钩子，下游统一消费已提交快照。提交成功后即可推进，不等待日志或消费者。
 
 真实音频按固定时钟持续进入有界缓冲，不因屏障变慢而减速送音。屏障等待计入两路排队与未读PCM；2026-11-03用户明确取消800ms时长停止条件，未读PCM、墙钟积压、送音迟到和发布延迟均只记录，不再据此中止。4MiB PCM及作业资源上限继续有效，触限保留失败。该机制保证调度进度受共同屏障约束，不保证本步一定有文字，也不消除X2等到后续音频才发射一个词的算法延迟。
 
@@ -90,7 +90,7 @@ X2启动仅用合成2600采样预填充；第i个80ms真实步使用`[i×1280−
 
 例如一组内部先生成 `inter`、再生成后续子词并最终闭合成 `international`，Context只在闭合后看到完整词。WORD、空ASR步、任意空格或停顿计数均不能代替EOS。EOS和逐组追加保证提交协议，不能保证识别必然正确；验收需记录未闭合尾部及跨组尾词续写／改写异常。
 
-SharedContext仍只保存每个逻辑话轮一份当前全文与当前原始状态，不增加历史正文、版本查询或patch。017曾预留至多一条当前交接元数据；020取消后该接口保持未接入，不要求等待、取消或ready状态机，也不建立历史事件队列。每个批次通过唯一入口，在短锁中一次替换文本／状态／进度，并合并最新生命周期与既有保留元数据；读取返回完整快照副本，不暴露单侧计算中间态，也不能回写旧整帧覆盖较新记录。模型推理、网络等待和磁盘写入均不持有Context锁。
+SharedContext仍只保存每个逻辑话轮一份当前全文与当前原始状态，不增加历史正文、版本查询或patch。话轮生命周期只记录open／closed。每个批次通过唯一入口，在短锁中一次替换文本／状态／进度，并保留当前话轮开闭状态；读取返回完整快照副本，不暴露单侧计算中间态，也不能回写旧整帧覆盖较新记录。模型推理、网络等待和磁盘写入均不持有Context锁。
 
 | 字段组 | 内容与约束 |
 | --- | --- |
@@ -98,10 +98,9 @@ SharedContext仍只保存每个逻辑话轮一份当前全文与当前原始状�
 | 正文 | 当前EOS闭合组累计 `text`、来源 `x2_streaming_asr`、`text_observed_until`、`text_available_at`、`text_published_at`；不含开放组子词，不经SoulX窗口拼合器 |
 | 状态 | `state_token`、`state_accepted`、`controller_generation`、`state_processed_until`、`state_observed_until`、`state_available_at`、`state_published_at` |
 | 解码进度 | `asr_processed_until`、`asr_observed_until`、`asr_progress_available_at`、开放组状态；每个80ms步内部记录，批次结束提交最后实际进度；WAIT无新字也推进，不刷新正文时间 |
-| 兼容保留 | 017的completion_*占位和比较更新接口当前未接入，不作为complete回答条件；本次不修改运行代码 |
 | 完整性 | 分别标记传输／整理缺口和后端明确提供的尾部状态；缺乏可靠尾词信号时记录unknown，不自行宣告final |
 
-`*_until`均为真实采样位置，合成padding另记；`*_at`使用同一可比较的单调时钟，跨进程时明确时钟来源。旧 `processed_until` 若保留，只兼容表示SoulX主块截止，不能兼任正文进度。每批次状态与进度随联合提交更新；正文无变化时保留此前文字时间和观察范围，空文字结果不清空已有正文。有新正文时text_published_at与本批次state_published_at同取batch_published_at，原始available_at分别保留。
+`*_until`均为真实采样位置，合成padding另记；`*_at`使用同一可比较的单调时钟，跨进程时明确时钟来源。`processed_until` 表示SoulX主块截止，不能兼任正文进度。每批次状态与进度随联合提交更新；正文无变化时保留此前文字时间和观察范围，空文字结果不清空已有正文。有新正文时text_published_at与本批次state_published_at同取batch_published_at，原始available_at分别保留。
 
 原子快照表示一次一致读取，不表示两路观察到同一时刻，更不表示文字与主块逐词对齐。ASR观察到某一采样位置不保证之前的所有词已经发射；无新增token不等于静音、词结束或句子完成。
 
@@ -109,7 +108,7 @@ SharedContext仍只保存每个逻辑话轮一份当前全文与当前原始状�
 
 ## 4. reset、关闭与下游边界
 
-SoulX内部reset不结束X2Streaming-ASR，不清空共享正文，也不创建新逻辑话轮。外部输入账本保留已到达未处理PCM，内部回看、padding和语义KV按原生reset管理；不能复用旧适配器将整个旧 `model.buffer` 写回的行为。主块、回看、前瞻分别计账，验证连续输入与原生reset兼容；如需改变原生行为，先修订设计并说明原因。
+SoulX内部reset不结束X2Streaming-ASR，不清空共享正文，也不创建新逻辑话轮。外部输入账本保留已到达未处理PCM，内部回看、padding和语义KV按原生reset管理。主块、回看、前瞻分别计账，验证连续输入与原生reset兼容；如需改变原生行为，先修订设计并说明原因。
 
 `user_complete`仅是控制器的语义判断，不作为ASR结束指令或转写final标志。原始complete在内部记录实际可用时间，与本批次正文／进度联合写入；已联合提交的有效complete携该快照正文可作为Layer 1当前turn的普通回答输入边界；不再增加交接等待，不改变SoulX内部反馈或reset。
 
@@ -121,13 +120,13 @@ SoulX内部reset不结束X2Streaming-ASR，不清空共享正文，也不创建�
 
 ### 4.1 complete统一消费边界
 
-2026-11-03用户确认归档NTF-020。NTF-017已保证本批次两路实际完成、已开始的X2 DECODE至真实EOS及正文／状态原子提交，因此撤销原先额外的pending→ready、固定交接目标追齐和专用超时，详见[归档记录](../../reports/soulx/20261103-ntf020-handoff-retirement/README.md)。
+NTF-017保证本批次两路实际完成、已开始的X2 DECODE至真实EOS及正文／状态原子提交。Context保存当前联合快照和话轮开闭状态，已提交的有效complete携当前正文直接供下游使用。
 
 当前冻结采样映射下，SoulX观察截止不晚于X2本批次实际处理截止；startup／reset的合成padding使控制主块可能滞后，真实范围须分别记账，018／019继续逐批核对。联合提交前的原始状态或开放组不能供下游提前使用；提交后的有效complete携当前闭合正文直接供Layer 1在正常输入边界消费。
 
-消费去重、慢消费者可能漏读短暂complete和实际输出生命周期仍需后续下游接入设计，本次不宣称已经解决，也不新增历史队列或ack。017预留的completion_*和update_completion保持未接入，不是回答条件。
+消费去重、慢消费者可能漏读短暂complete和实际输出生命周期仍需后续下游接入设计，本次不宣称已经解决，也不新增历史队列或ack。
 
-X2已处理某段音频仍不保证此前所有词均已发射；EOS只闭合发射组。complete联合发布后新增文字、开放尾组及EOF未处理真实PCM继续记录，不增加固定等待或强制EOS，不能用合成padding宣称全文齐备。额外交接等待层已取消；用户随后取消800ms停止条件，4MiB容量保护继续有效，详见NTF-030。
+X2已处理某段音频仍不保证此前所有词均已发射；EOS只闭合发射组。complete联合发布后新增文字、开放尾组及EOF未处理真实PCM继续记录，不增加固定等待或强制EOS，不能用合成padding宣称全文齐备。当前时延与积压照实记录，4MiB容量保护继续有效，详见NTF-030。
 
 ## 5. 完整预热与积压归因
 
@@ -147,8 +146,8 @@ X2已处理某段音频仍不保证此前所有词均已发射；EOS只闭合发
 
 | 顺序 | 工作单 | 交付 |
 | --- | --- | --- |
-| 1 | [NTF-015](../../reports/soulx/20261102-native-independent-frontend/README.md) | 已完成原生控制封装；旧停止接入由017迁移 |
-| 2 | [NTF-016](../../reports/soulx/20261102-native-independent-frontend/README.md) | 已完成同源账本及X2适配；旧提前发布由017迁移 |
+| 1 | [NTF-015](../../reports/soulx/20261102-native-independent-frontend/README.md) | 已完成原生控制封装，状态在当前批次联合发布 |
+| 2 | [NTF-016](../../reports/soulx/20261102-native-independent-frontend/README.md) | 已完成同源账本及X2适配，正文在当前批次联合发布 |
 | 3 | [NTF-017](../../reports/soulx/20261102-ntf017-joint-publication/README.md) | 已完成本地联合提交、生命周期与图源同步 |
 | 4 | [NTF-018](../../reports/soulx/20261103-ntf018-warmup/README.md) | 全链路预热、远端积压对照与实时门槛 |
 | 5 | [NTF-019](../../reports/soulx/20261103-ntf019-fdb30/README.md) | 用户审核通过并归档；原始29/30及缺失对照保留 |
@@ -160,4 +159,4 @@ X2已处理某段音频仍不保证此前所有词均已发射；EOS只闭合发
 
 验收分别回答协议是否保持、文本是否持续可读、联合提交是否完整且无半帧、完整预热后的长尾和持续吞吐，以及三轴状态和在线转写质量。完成比例、退出码和资源保护照实记录，长延迟本身不再触发停止或失败，也不把运行完成宣称为实时达标。NTF-019原800ms合同和29/30结果保留，已由用户审核归档。
 
-015／016／017已本地交付，018完整预热、真实权重对照及并发三轴3/3已通过归档，020取消；019已由用户审核通过并归档，NTF-030取消800ms条件。状态与正文联合发布，后续LLM接入暂缓；当前不训练或切换现役Agent。
+015／016／017已本地交付，018完整预热、真实权重对照及并发三轴3/3已通过归档；019已由用户审核通过并归档，NTF-030取消800ms条件。状态与正文联合发布，后续LLM接入暂缓；当前不训练或切换现役Agent。
