@@ -20,7 +20,7 @@
 
 ## 2. 提前 complete 的具体例子
 
-本节使用 TurnControlComparison 的 Candor 停顿样本 113、r4 运行日志。时间为该次运行的墙钟秒数，表中行号对应原始 JSONL 文件。`artifacts/remote/candor-pause-113-r4-events.jsonl` 是故障回归保存的运行轨迹，后段发生框架资源槽位故障，不能作为该用例完整成功或最终 FDB 评分的证据；以下只引用前段已记录事件。不复制或恢复该项目实现。
+本节是 TurnControlComparison 自写运行时的实际日志，用于展示状态与续说现象。它调用官方 SoulX 控制器，但回复调度、播放、历史管理并非官方 dialogue-system，不能据此认定官方会生成相同的下一次 context。日志的 controller_raw 记录规则后返回值，未保存原始 argmax，不能确证第三步是否由规则改写。第三、四节仅按官方固定提交 `66a9f74ca39d30984eb87fc4c029fadc797b6e34` 解释。
 
 ### 2.1 无新字之后分别出现 complete 和 incomplete
 
@@ -35,53 +35,24 @@
 | 2.212s | 87 | nonidle | 空 |
 | 2.318s | 92 | incomplete | 空 |
 
-该序列符合“三步 nonidle 且无新增文字时二选一”的外观，但**不足以确证第三步是规则改写**。实际埋点在 `scripts/remote/duplex_controllers.py` 第 118—123 行调用完整 `original(delta)` 后才记录 `controller_raw`，所以这个名称记录的是 `_state_predict()` 的规则后返回值。探针的 `native_state` 同样如此，不能因名字含 raw 就当作模型原始 argmax。
 
-旧日志没有保存规则前 argmax、mistake_len 或 complete／incomplete logits。第三步可能原始就预测 complete／incomplete，也可能被规则强制改写；它也无法确证另一条“前一步 nonidle、本步原始 idle”的分支。因此不能用这些旧日志给两条规则单独计数。当前 NTF-019 的 raw_token／state_token／rule_applied 证据仍可单独复核，不能拿它代替 TurnControlComparison 日志的缺失字段。
+### 2.2 首音前取消和 context 合并
 
-### 2.2 首音前取消和 context 合并是直接证据
+| 墙钟 | 直接记录 |
+| --- | --- |
+| 1.7396s | 生成回答，用户文本 `I see that a lot.` |
+| 1.9544s | 取消回答，原因 `soulx_nonidle`（即用户又在说话） |
+| 1.9545s | `playback_cancelled`（取消播放） |
+| 1.9718s | LLM 返回 `It sounds like you're`，`cancelled=true` |
+| 3.6583s | 下次 `llm_request` 只有合并用户消息 `I see that a lot. And.`，没有插入这次未播助手回答 |
 
-同一文件中，以下事件使用相同请求 `da2e41096a57a2dd-r1`：
-
-| 墙钟 | 行号 | 直接记录 |
-| --- | ---: | --- |
-| 1.7396s | 65 | `reply_started`，用户文本 `I see that a lot.` |
-| 1.9544s | 75 | `cancel_requested`，原因 `soulx_nonidle` |
-| 1.9545s | 76 | `playback_cancelled`，`played_samples=0` |
-| 1.9718s | 79 | LLM 返回 `It sounds like you're`，`cancelled=true`，可见性标为 `generation_only_until_played` |
-| 3.6583s | 137 | 下次 `llm_request` 只有合并用户消息 `I see that a lot. And.`，没有插入这次未播助手回答 |
-
-从回复启动到取消请求约 214.8ms。它直接证明该框架的一次真实首音前取消和后续用户上下文合并，不能推导该次 complete 由规则造成，也不能代表官方 dialogue-system 本身运行过这段轨迹。
-
-此外，第 132 行五状态记录仍是 idle，第 135 行服务却返回 speak；此前第 92 行为 incomplete，之后连续八个 idle。这个顺序与原生等待兜底相符，说明不能将每次服务 speak 或回复启动都算成一次 complete。
-
-日志位置为 `/home/vitalrubbish/TurnControlComparison/artifacts/remote/candor-pause-113-r4-events.jsonl`，字段语义依据同项目的 `scripts/remote/duplex_controllers.py`。该项目的控制器适配、可取消回复与当前 ParaThink 前端不是同一运行时；此处只读引用证据。
+从回复启动到取消请求约 214.8ms。
 
 ## 3. 官方怎样抵消一部分可听后果
 
-### 3.1 收到交接就生成，下一次 nonidle 取消
+官方下游消费服务层 speak：规则后 complete 在此前已检测到有效语音时，可触发整段识别并交接；另一条兜底必须先出现 incomplete、开启等待监控，之后连续 idle 达到 max_wait_num（默认 8），且已检测到语音，才能返回 speak。任意八拍 idle 本身不触发回答。FDB 离线入口还过滤空文本与附和文本，再启动 LLM／TTS。
 
-官方 `OfflineDuplexSimulator._handle_vad_result()` 收到非空、未被附和过滤的服务文本就调用 `_start_generation()`：先整理前一助手历史，撤销先前活动响应，建立新的 `threading.Event`，追加用户文本，启动后台 LLM／TTS 工作线程。输入循环继续逐块调用控制器。
-
-收到后续 `[None]`，它记录当前打断采样点，调用 `_request_interruption()` 设置活动停止事件，并按同一时间线处理已有助手音频：打断前播放完的片段保留，未来片段删除，跨越打断点的片段只保留前半段。后续新交接重新生成，不自动恢复已取消响应。参见[交接与取消](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/offline_infer.py#L268-L336)。
-
-输出音频起点取“该响应的时间锚点＋实际生成／合成等待”和上一片段结束位置的较晚者；因此自然的 LLM／TTS 等待给续说取消提供了窗口。它没有增加固定静音确认。若在首音之前取得并执行取消，旧回复可以完全不进入可听轨迹；若首音已经发生，只能停止后续声音，之前的抢话仍存在。
-
-### 3.2 用第二节的真实取消过程解释恢复窗口
-
-第二节中，回复于 1.7396s 启动，约 214.8ms 后，即 1.9544s，因续说请求取消；播放器随后记录 `played_samples=0`。1.9718s 返回的 LLM 片段已经带有取消标记，后续请求也没有把这段未播内容写成助手已说历史。这是 TurnControlComparison 运行时对一次首音前取消的实际记录，与官方代码的取消思路对应，但不是官方 dialogue-system 的重放结果。
-
-如果同样的控制事件下首音早于取消生效，已经播放的部分便无法撤销，只能停止后续声音。这是从时序关系得出的条件判断，不是该日志中发生了已播后取消；不能把这一次零播放结果推广为所有提前 complete 都能被抵消。
-
-一般应分别记录 `t_complete_read`、`t_nonidle_consumed`、`t_cancel_effective`、`t_first_played` 和 `t_last_played`。本日志直接提供回复启动、取消请求及零播放结果，没有 Layer 1 读取联合快照的字段；约 214.8ms 是回复启动至取消请求的间隔，不能改称完整停播时延。首音前能否抵消取决于取消生效是否早于首音，以及迟到结果是否仍被接纳。
-
-### 3.3 在线演示怎样停播放器
-
-`ChatSession.interrupt()` 设置停止事件并通过 WebSocket 发 `stop_audio`。浏览器 `script.js` 将其变为 AudioWorklet 的 `abort`；`processor.js` 把读指针推进到写指针、清空已缓存音频并暂时输出静音。这比单纯停止读取 LLM token 多了一步真实播放控制。
-
-LLM 客户端在收到下一个流块后检查停止事件并关闭 HTTP 响应；服务端 `/chat` 用 `StoppingCriteria` 对断连作协作式停止，组合 LLM＋TTS 路径在流式迭代边界检测断连。当前正在执行的模型前向或 TTS 调用不因此保证立即结束。参见[在线取消](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/app.py#L81-L94)、[播放器](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/frontend/processor.js#L31-L65)和[LLM 服务](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/modules/qwen_llm/llm_server.py#L69-L212)。
-
-离线 FDB 保存的是按生成耗时排定、再按打断采样点裁切的 `output.wav`；它不是浏览器声卡的实际回执。两者共享取消思路，但不能将离线裁切直接当成在线停播时延已验证。
+下一次 nonidle 就直接取消当前的播放链路；如果取消之前 TTS 还没有播放音频，那么从听感上就没有抢话；
 
 ## 4. 取消后怎样处理 context
 
@@ -89,13 +60,11 @@ LLM 客户端在收到下一个流块后检查停止事件并关闭 HTTP 响应�
 
 以“帮我订周五的车票，……不对，是周六”为说明性输入。第一次交接后助手还未发声，随后续说取消了响应：
 
-| 项目 | 官方 FDB 离线路径的理想顺序 | ParaThink 当前合同要求 |
-| --- | --- | --- |
-| 用户内容 | 先保留周五片段，之后收到周六片段；若其间没有非空助手历史，两段 user 消息自动合并 | 同一用户片段继续更新，不能把完整累计正文重复拼接 |
-| 助手未播回答 | 播放前取消的已排定音频删除；在历史截断得到空文本时，不追加助手消息 | 保留真实生成及未播取消记录，不能作为助手已说内容 |
-| 恢复 | 后续交接以合并后的输入重新生成 | Layer 1 在后续合法输入边界读到有效 complete，按新条件恢复 |
-
-这里没有保证旧回答所有内部 token 都会从模型历史清除。官方每次 HTTP 请求从消息列表重新构造输入；我们未来可能复用 Layer 1 KV，必须同时尊重真实生成历史与“未播”的事实标记，不能照搬删除角色消息的操作来假装内部从未生成。
+| 项目 | 官方 FDB 离线路径的理想顺序 |
+| --- | --- |
+| 用户内容 | 先保留周五片段，之后收到周六片段；若其间没有非空助手历史，两段 user 消息自动合并 |
+| 助手未播回答 | 播放前取消的已排定音频删除；在历史截断得到空文本时，不追加助手消息 |
+| 恢复 | 后续交接以合并后的输入重新生成 |
 
 ### 4.2 已播后取消：保留可听前缀与续说
 
@@ -103,62 +72,27 @@ LLM 客户端在收到下一个流块后检查停止事件并关闭 HTTP 响应�
 
 `保留字符数 = floor(助手文本长度 × min(已播放时长 / 已生成音频总时长, 1))`
 
-CPU 探针以八字符 `abcdefgh` 对应两秒音频，开始播放 0.5 秒后取消，保留 500 个测试采样，并把历史截为 `ab`。这证明按比例保留前缀的机制，不证明两个字符正好对齐到真实语音词边界。文字、音素与语速并非匀速映射。
+在这个正常顺序下，下一轮是 user（先前片段）→assistant（估计已说前缀）→user（后续改口），用户片段因此不再直接合并。我们的设计也以首段实际播放作为分组边界，但要求按真实输出账本保存已播事实，不能将按字符估计的文本当成精确可听转写。
 
-在这个正常顺序下，下一轮是 user（先前片段）→assistant（估计已说前缀）→user（后续改口），用户片段因此不再直接合并。我们的设计也以首段实际播放作为分组边界，但要求按真实输出账本保存已播事实，不能将按字符估计的文本当成精确可听转写。参见[官方历史提交](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/offline_infer.py#L574-L605)。
+### 4.3 下一次交接怎样重新喂给 LLM
 
-### 4.3 官方源码的局限：不能照搬成正确性保证
+官方 FDB 离线入口 `_start_generation()` 按顺序执行：先 `_flush_assistant_history()` 整理前一次助手暂存消息，再追加本次用户文本，最后调用 `generate_with_history()`。后者把 system 提示词与当前角色消息列表组成请求。客户端把相邻同角色内容用换行合并，仅保留最后五个合并消息条目。
 
-| 情况 | 已核对行为 | 对 context／播放的影响 |
-| --- | --- | --- |
-| 助手工作线程已收尾，之后在播放中被打断 | `_flush_assistant_history()` 可按保留的打断时间裁切历史 | 能体现已播与未播区别，但只是时长比例估计 |
-| 打断发生在工作线程尚未收尾时 | 音频先被截断，工作线程随后仍写入 `pending_message` 并把 `interruption_sample` 清为 None | CPU 探针中只保留 0.5 秒音频，却把八字符全文写入后续助手历史 |
-| 停止检查刚通过、尚未进入 `_enqueue_segment()` 时发生取消 | 入队函数锁内没有复核本次响应是否仍有效 | 强制交错探针中，取消后仍进入一整段音频；证明存在可能路径，不估计发生频率 |
-| 在线演示首音前取消 | 部分分支无条件 `add_message(..., 'assistant', '')` | 空助手消息会隔开两段 user；因此“自动合并”不是所有在线路径保证 |
-| 音频发送后又迟到 | 浏览器数据是裸 PCM，没有逐响应身份校验；清空缓冲后仍可接收新数据 | 单次 abort 不是对所有旧响应的持久隔离，不能据此保证迟到音频永不复活 |
+以“帮我订周五的车票……不对，是周六”为例，下列为官方正常历史整理顺序的说明性输入，不是第二节日志的官方重放结果：
 
-这些行为由固定官方源码和本地可控替身复核，不是对官方原论文指标的重测。探针原样提取官方类／方法，只替换音频解码、时钟和模型流；合成调度用于暴露执行路径，不能据此给线上错误分配比例。[线程收尾与入队](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/offline_infer.py#L367-L513)、[在线历史分支](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/app.py#L213-L333)可直接复查。
+| 取消阶段 | 下一次 LLM 请求中的角色消息 |
+| --- | --- |
+| 首音前，整理后助手文本为空 | system；user：帮我订周五的车票\n不对，是周六。FDB 离线入口不追加空助手消息，前后 user 因而合并 |
+| 首音后，整理后助手文本非空 | system；user：帮我订周五的车票；assistant：按时长比例截出的已说前缀；user：不对，是周六 |
 
-## 5. 对我们设计的影响
+官方没有将所有已生成但未播的文本作为隐藏草稿再次输入，也没有对已播尾部做 ASR 回填。FDB 默认的 IndexTTS 组合客户端先缓冲文字，得到关联音频组后再交给运行时；被运行时接纳的正文暂存为 pending_message，之后按打断时间与音频时长裁切成助手历史。生成过的 token、暂存正文与下一次 messages 并非同一份内容。
 
-### 5.1 保持原生控制，把输出当作可取消过程
+LLM 服务对每次请求重新 apply_chat_template、分词，组合生成函数把 past_key_values 初始化为 None，然后在本次生成内部使用 KV 缓存。下一次交接会从整理后的 messages 重新计算，不沿着被取消回答的 KV 续写。因此不能把它描述成“未播 token 保留在旧 KV，再输入续说继续生成”。
 
-SoulX complete 仍作为当前普通回答的必要输入边界；它是当前观察下允许回答的信号，不是对未来不续说的保证。当前合同允许 Layer 1 在合法输入边界读取有效 complete 后生成，后续有效 nonidle 由唯一输出执行点取消。无需因本分析擅自加固定静音时长、前端停止旁路或第二个语义否决器。
+源码见[历史整理与交接](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/offline_infer.py#L320-L336)、[角色消息与请求](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/clients/llm_client.py#L125-L143)和[每次请求的 KV 初始化](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/modules/qwen_llm/llm_server.py#L112-L165)。
 
-区别在于官方另开响应线程和 HTTP 请求，我们的 Layer 1 使用现有会话与生成流程，complete 不额外新建回答调用。借鉴的是可取消的生命周期，不是原样复制调用拓扑。官方等待兜底 speak 也不能顺势变成我们的新回答门槛；当前五状态合同仅将它保留为诊断。
+### 4.4 设计意图与实际代码的边界
 
-### 5.2 当前最重要的实现要求是恢复闭环
+上述首音前合并、首音后保留前缀，是打断时间等元数据有效时的 FDB 离线处理路径，不是所有执行顺序的保证。工作线程尚未收尾时被取消，随后可能把 interruption_sample 清空，使助手暂存全文进入下一次历史；这在固定官方原方法的 CPU 探针中已复现。因此官方实际行为不能简化为“永远只保留已播文字”。
 
-| 项目 | 当前已确认或待实现要求 | 具体原因 |
-| --- | --- | --- |
-| 前端发布 | 保持 160ms 文本／状态／进度联合提交；X2 独立正文持续 | 一次 complete 不结束 ASR，reset 不清正文，后续新字仍须进入 Context |
-| 下游消费 | 冻结短暂状态的消费、去重、过期判断及身份；目前尚未实现 | 当前只存最新快照，慢读可能错过一个批次的 complete 或 nonidle；训练不能补回没收到的事件 |
-| 输出有效性 | preparing 起即登记 output_id；取消、入队、TTS 返回与播放前检查属于同一执行域 | 只在循环顶部检查停止事件，会留下取消与入队之间的竞态 |
-| 停止执行 | 消费已提交有效 nonidle 后关闭旧输出资格，优先停止，重复取消幂等 | 不等待当前 LLM／TTS 计算结束；所有迟到结果按已失效身份丢弃 |
-| 上下文 | 区分已生成、已提交、待播、已播和取消；按首个实际播放事件分组用户内容 | 不能把未播回答写成助手已经说过，也不能把旧片段改口误当独立请求 |
-| Layer 2 | 根据实际可见用户片段与条件更新任务／结果适用性 | complete 不等于思考结果已最终适用；“周五→周六”后按前缀条件发布的分析不能无标记沿用 |
-
-这些是当前[架构设计](../../research_design/architecture.md#22-前端状态与系统附和)与[Context 合同](shared_context_interface.md)的具体实现约束，不代表本轮已交付输出运行时。任务级分析与 CoT 到达不自动取消播放，不新增话轮动作建议；信息变化只在各模块后续合法输入边界消费。
-
-### 5.3 性能更快可能暴露更多可听错误
-
-官方较慢的分句或合成在某些轨迹上为取消留下时间；它是成本与时序现象，不能当作端点准确性的证明。我们若让 Layer 1 生成更快、TTS 更早首音，可能把同样的 complete→nonidle 轨迹从“静默取消”变成“已播后截断”。因此不能只优化首音延迟，也不能故意拖慢 TTS 来冒充状态改善。
-
-反过来，160ms 联合提交及下游消费也会推迟取消。必须把状态原始可用→联合发布→运行时消费→停止请求→实际停播分别计时。模型的 nonidle 漏检或晚检会直接限制运行时能补救的程度；仅给每批处理加速，不能消除语义判断延迟。
-
-### 5.4 训练与评测必须包含取消和恢复
-
-Layer 1 需要学习在含噪状态下等待、附和、回答和取消后恢复；被取消的回答不天然是错误训练目标。若当时只有“周五”，不能用未来“改成周六”反向要求模型预知；在改口已可见后，应按新条件恢复，避免继续旧回答或学成永远等待。
-
-数据同时覆盖首音前与首音后取消、连续多次 complete／续说、正文延迟、原生 reset 和慢消费者。保持同前缀不同未来的因果标注，真实生成与已播事件分开。FDB 只作评测和诊断，不进入训练、阈值选择或教师示范改写。系统附和允许用户继续说话，其有效取消条件还需另行冻结，不能把每帧 nonidle 都机械当作附和后的新打断；既有训练研究已明确该边界。参见[训练方案](../../research_design/layer1_training.md#4-提前-complete-的监督原则)。
-
-后续完整系统至少分别报告：提前状态、首音前取消、已播后取消及重叠时长、停止耗时、恢复正确性、上下文重复／丢失、迟到播放和额外计算开销。官方 FDB 系统 TOR／RL 等指标与这些诊断并列；不能将 9／10 提前状态当 90% 抢话，也不能将所有取消都算作完全抵消。
-
-## 6. 本轮证据与限制
-
-- 第二节案例来自 TurnControlComparison 的 Candor 停顿 113 r4 原始 JSONL，埋点语义依据该项目实际代码；日志 SHA256 为 `bc60f4146591af2b1a72dc6c119423654b405a9aa2d665a7ee4a8a5c0ed2923e`，未改写原始 run。ParaThink 前端总体来源计数另见 [NTF-038 复核](../../reports/soulx/20261104-completion-strategy-audit/audit.json)，不能补足这份日志缺失的规则前字段。
-- 官方运行时固定在 `66a9f74ca39d30984eb87fc4c029fadc797b6e34`；当前项目 SoulX 前端固定源码仍为 `a0b9063`，二者用途不同，不切换子模块。
-- 本地 `interclarify-dev` conda 复核七组 CPU 情景：音频返回前取消、已排定未播取消、工作线程结束后播放中取消、工作线程内取消、检查与入队交错、附和过滤、空助手消息的角色分组。结果位于 `artifacts/soulx/20261104-official-runtime-analysis/behavior_probe.json`，包含源码摘要，不纳入 Git。
-- 合成例子采用 1000Hz 便于核对采样算术；实际前端保持 16kHz。未加载真实 LLM／TTS，未测浏览器声卡，未复现官方 FDB 数值，也未证明当前样本在完整系统中能抵消多少。
-
-后续若要量化收益，应固定同一前端轨迹，比较首音、取消和恢复闭环，再以真实模型及流式播放复核。当前目标是把行为、机制和设计约束说清楚，不把尚未实现的闭环写成已完成成果。
+官方在线 app.py 还与 FDB 离线入口不同：中断分支即使未发出音频，也会追加空 assistant 消息，这会隔开前后 user 消息；首音时间记录的是服务端第一次发送音频，并非浏览器实际开播确认。不能把 FDB 离线的角色合并效果当作在线演示的统一保证。见[在线历史处理](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/app.py#L303-L333)与[离线历史处理](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/offline_infer.py#L574-L605)。
