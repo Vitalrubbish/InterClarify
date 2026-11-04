@@ -1,36 +1,26 @@
-# 提前 complete、官方运行时恢复与 ParaThink 设计影响
+# SoulX-Duplug 提前 complete、官方运行时恢复
 
-2026-11-04，NTF-040。本文基于当前原生前端的 FDB30 轨迹、官方 `dialogue-system` 固定提交 `66a9f74ca39d30984eb87fc4c029fadc797b6e34` 和本地 CPU 行为探针。模型配置与来源计数见[原生行为审计](../../reports/soulx/20261104-completion-strategy-audit/README.md)。
+**SoulX 会在局部语义似乎结束时给出 complete，官方规则也能把持续 nonidle 改成 complete。官方系统随后启动回答，持续听音，并在用户续说时取消生成和未播音频，从而抵消部分可听后果**
 
-**SoulX 会在局部语义似乎结束时给出 complete，官方规则也能把持续 nonidle 改成 complete。官方系统随后启动回答，持续听音，并在用户续说时取消生成和未播音频，从而抵消部分可听后果。这个机制不会修复已经作出的状态判断，也不能撤销用户已经听到的内容。**
+## 1. 需要区别的概念
 
-本文不修改已确认的前端、普通回答边界或训练范围，不启动接入或远端模型评测。以下先写实测状态，再解释源码行为，最后讨论当前设计。例子中的假设首音时刻只用于说明，不能当作官方 FDB 实测结果。
+### 1.1 两种状态
 
-## 1. 三种信号与两份上下文
+1. Qwen3-0.6B 生成的**原始预测状态**；
+2. 原始预测状态经过官方规则处理后生成的**规则后状态**；
 
-### 1.1 complete 不等于 speak，也不等于实际开口
+每周期**原始预测状态**到**规则后状态**的处理规则：
+1. 如果上一周期的规则后状态是 nonidle，本步的原始预测是idle，则会直接在 complete 和 incomplete 之间二选一；
+2. 如果连续 3 拍的原始预测都是 nonidle，但是这 3 拍都没有产生出增量的文本，则会直接在 complete 和 incomplete 之间二选一；
 
-| 层次 | 实际含义 |
-| --- | --- |
-| 原始状态 token | 状态模型的 argmax，例如 complete 或 nonidle |
-| 规则后状态 token | 原生规则处理后的五状态，可能覆盖原始 argmax |
-| 服务层 speak | 原生服务要求交接；可以来自有效 complete，也可以来自 incomplete 后的等待兜底 |
-| 响应开始 | 运行时收到非空交接文本后启动 LLM／TTS，与真实播放是两个时刻 |
-| 首个可听采样 | 播放器实际输出，或离线回放时间线上排定的首采样 |
+### 1.2 两种上下文
 
-当前 FDB30 已发布 3180 批次，有 32 次原始 complete、16 次规则生成 complete，共 48 次有效 complete；另有 23 次等待兜底 speak。接话 10 条中，7 条出现原始提前 complete，规则另增加 2 条，合计 9 条。它们不是官方完整系统的抢话率，也不是关闭规则后的消融结果。
-
-官方 `TurnModel.state_predict()` 在有效 complete 时用内部 `buffer_for_asr` 重识别当前用户段，取得服务返回的 `text`，然后 reset；等待兜底也走服务 speak。`TurnTaking.process()` 将服务 nonidle 映射为 `[None]`，将 speak 映射为服务文本。官方下游消费的是这份服务结果，没有直接读取全部五状态的原始 token。参见[原生服务](https://github.com/Soul-AILab/SoulX-Duplug/blob/a0b9063843df69619b087b95b74597b2176910b8/service/model.py#L237-L371)和[官方客户端](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/clients/vad_client.py#L79-L118)。
-
-### 1.2 原生模型缓存与 LLM 对话历史相互独立
-
-SoulX complete 后 reset 的是控制器内部 KV、音频窗口、识别缓冲和计数；它不等于清空表达 LLM 的对话。官方 LLM 客户端另按 `client_id` 保存角色消息，相邻同角色消息用换行合并，最后保留至多五个合并后的消息条目，不是五轮完整对话。
-
-官方运行时还单独暂存助手已生成文本、累计音频时长和预期首音时刻；这份 `pending_message` 是助手历史的延迟提交记录。它不负责再次确认用户是否结束，也不是 ASR 追齐门槛。参见[LLM 历史管理](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/clients/llm_client.py#L103-L167)。
+1. Qwen3-0.6B 的 context
+2. 交给半双工 LLM 的 context
 
 ## 2. 提前 complete 的具体例子
 
-下表均来自本项目当前原生 SoulX＋独立 X2 的 NTF-019 远端轨迹，原生控制没有换教师。**这些事件用于解释官方机制，不表示官方完整运行时已对这些样本产生相同播放结果。** 时间从样本开始计；观察截止是模型实际听到的音频坐标，联合发布是项目墙钟坐标。控制正文、服务整段重识别文本和 X2 正文分别记录。
+下表均来自本项目当前原生 SoulX＋独立 X2 **这些事件用于解释官方机制，不表示官方完整运行时已对这些样本产生相同播放结果。** 时间从样本开始计；观察截止是模型实际听到的音频坐标，联合发布是项目墙钟坐标。控制正文、服务整段重识别文本和 X2 正文分别记录。
 
 | 样本 | 原始→规则后状态 | 观察／联合发布 | 整段交接标注起点 | 当时可见的文字与后续情况 |
 | --- | --- | --- | --- | --- |
@@ -147,7 +137,46 @@ Layer 1 需要学习在含噪状态下等待、附和、回答和取消后恢复
 
 后续完整系统至少分别报告：提前状态、首音前取消、已播后取消及重叠时长、停止耗时、恢复正确性、上下文重复／丢失、迟到播放和额外计算开销。官方 FDB 系统 TOR／RL 等指标与这些诊断并列；不能将 9／10 提前状态当 90% 抢话，也不能将所有取消都算作完全抵消。
 
-## 6. 本轮证据与限制
+## 6. TurnControlComparison 中的实际日志实例
+
+2026-11-04，NTF-041 只读复核相邻项目现存日志。`artifacts/remote/candor-pause-113-r4-events.jsonl` 是故障回归保存的运行轨迹，后段发生框架资源槽位故障，不能作为该用例完整成功或最终 FDB 评分的证据；以下只引用前段已记录事件。不复制或恢复该项目实现。
+
+### 6.1 无新字之后分别出现 complete 和 incomplete
+
+| 日志墙钟 | 行号 | 记录状态 | delta_text |
+| --- | ---: | --- | --- |
+| 1.255s | 44 | nonidle | `a lot` |
+| 1.356s | 49 | nonidle | 空 |
+| 1.574s | 56 | nonidle | 空 |
+| 1.678s | 61 | complete | 空 |
+| 1.953s | 73 | nonidle | `I` |
+| 2.135s | 83 | nonidle | 空 |
+| 2.212s | 87 | nonidle | 空 |
+| 2.318s | 92 | incomplete | 空 |
+
+该序列符合“三步 nonidle 且无新增文字时二选一”的外观，但**不足以确证第三步是规则改写**。实际埋点在 `scripts/remote/duplex_controllers.py` 第 118—123 行调用完整 `original(delta)` 后才记录 `controller_raw`，所以这个名称记录的是 `_state_predict()` 的规则后返回值。探针的 `native_state` 同样如此，不能因名字含 raw 就当作模型原始 argmax。
+
+旧日志没有保存规则前 argmax、mistake_len 或 complete／incomplete logits。第三步可能原始就预测 complete／incomplete，也可能被规则强制改写；它也无法确证另一条“前一步 nonidle、本步原始 idle”的分支。因此不能用这些旧日志给两条规则单独计数。当前 NTF-019 的 raw_token／state_token／rule_applied 证据仍可单独复核，不能拿它代替 TurnControlComparison 日志的缺失字段。
+
+### 6.2 首音前取消和 context 合并是直接证据
+
+同一文件中，以下事件使用相同请求 `da2e41096a57a2dd-r1`：
+
+| 墙钟 | 行号 | 直接记录 |
+| --- | ---: | --- |
+| 1.7396s | 65 | `reply_started`，用户文本 `I see that a lot.` |
+| 1.9544s | 75 | `cancel_requested`，原因 `soulx_nonidle` |
+| 1.9545s | 76 | `playback_cancelled`，`played_samples=0` |
+| 1.9718s | 79 | LLM 返回 `It sounds like you're`，`cancelled=true`，可见性标为 `generation_only_until_played` |
+| 3.6583s | 137 | 下次 `llm_request` 只有合并用户消息 `I see that a lot. And.`，没有插入这次未播助手回答 |
+
+从回复启动到取消请求约 214.8ms。它直接证明该框架的一次真实首音前取消和后续用户上下文合并，不能推导该次 complete 由规则造成，也不能代表官方 dialogue-system 本身运行过这段轨迹。
+
+此外，第 132 行五状态记录仍是 idle，第 135 行服务却返回 speak；此前第 92 行为 incomplete，之后连续八个 idle。这个顺序与原生等待兜底相符，说明不能将每次服务 speak 或回复启动都算成一次 complete。
+
+日志位置为 `/home/vitalrubbish/TurnControlComparison/artifacts/remote/candor-pause-113-r4-events.jsonl`，字段语义依据同项目的 `scripts/remote/duplex_controllers.py`。该项目的控制器适配、可取消回复与当前 ParaThink 前端不是同一运行时；此处只读引用证据。
+
+## 7. 本轮证据与限制
 
 - 当前案例来自 NTF-019 原始压缩帧和 [NTF-038 复核](../../reports/soulx/20261104-completion-strategy-audit/audit.json)，未改写原始 run。
 - 官方运行时固定在 `66a9f74ca39d30984eb87fc4c029fadc797b6e34`；当前项目 SoulX 前端固定源码仍为 `a0b9063`，二者用途不同，不切换子模块。
