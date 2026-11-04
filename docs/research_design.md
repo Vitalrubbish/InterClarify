@@ -4,7 +4,7 @@
 
 SoulX 官方源码已纳入固定子模块，见[源码说明](third_party/soulx-duplug.md)。当前 SoulX 前端模型权重固定，不训练，尚未切换现役下游 Agent。
 
-2026-11-03 后续讨论已确认：将原 Layer 0 的系统附和时机判断并入 Layer 1，由 Layer 1 统一负责附和时机与措辞，后续不单独部署 Layer 0。SoulX 继续提供外部用户状态，Layer 1 学习等待、系统附和与正式回答，单一输出执行点和普通回答的 complete 边界保持。2026-11-05 更新[Layer 1 接入与训练方案](research_design/layer1_training.md)，仅保留路线 B，训练起点采用官方 Qwen2.5-7B-Instruct 或选定的 Qwen3 后训练模型，不沿用旧 Qwen2／DuplexCascade checkpoint 与 adapter。Qwen3 同量级候选为 Qwen3-8B，Layer 1 先采用非 thinking 模式；最终型号与版本经预检冻结。先确定新协议并验证运行时，再做协议适配训练、取消恢复、基础主版、系统附和及 thinking 适配；比较同底座训练阶段与消融。窗口建议仍为 640ms 普通更新、16 token 解码块、2K 训练序列，8×4090 分阶段使用；显存、吞吐与延迟需按新模型预检。尚未生成语料、训练或接入流式 TTS。
+2026-11-03 后续讨论已确认：将原 Layer 0 的系统附和时机判断并入 Layer 1，由 Layer 1 统一负责附和时机与措辞。2026-11-05 将 [Layer 1 训练设计](research_design/layer1_training.md)精简为目标、基座、因果数据、监督与评估思路：首轮以 Qwen2.5-7B-Instruct 开始协议适配，再训练含噪状态与取消恢复、系统附和和 thinking 利用，Qwen3 保留为后续底座候选。SoulX 继续提供外部用户状态，普通回答的 complete 边界与单一输出执行点保持。训练收益通过同底座的阶段检查点和消融验证；尚未生成语料、训练或接入流式 TTS。
 
 当前前端保持两路职责：SoulX 通过原生 SenseVoice 教师和音频预测五状态，X2 独立以真实 EOS 闭合组提供完整词正文，不进入状态 KV。两路同源 PCM；每 160ms 等 X2 两个 80ms 步及 SoulX 本步均结束后，将文本和状态 token 一次原子写入 SharedContext，成功后推进下一周期，实际采样／前瞻范围另记。先完成结果只在内部暂存，不写 PCM、不设前端停止旁路。内部 reset 不清空外接正文；已提交的有效 complete 携当前正文直接供下游使用，不再增加独立交接等待。原始状态、联合发布延迟和正文覆盖分别评价。前端工作已收口。用户片段按首段实际播放分组的合同保留，下游暂不实施。
 
@@ -64,7 +64,7 @@ docs/
 | 文档 | 职责 |
 | --- | --- |
 | [架构设计](research_design/architecture.md) | thinking/表达分工、异步时序、结果合同、动作边界、共同实验和训练约定 |
-| [Layer 1 接入与训练方案](research_design/layer1_training.md) | 运行时与微调职责、窗口建议、因果取消恢复数据、系统附和、8×4090 预算与验收 |
+| [Layer 1 训练设计](research_design/layer1_training.md) | 训练目标、基座选择、因果数据与监督原则、分阶段训练及评估思路 |
 | [边听边想：主动介入 benchmark 与训练数据](research_design/listening.md) | 介入依据、分支案例、事件标注、行为指标、倾听训练轨迹与实验 |
 | [边说边想：benchmark 与训练数据](research_design/speaking.md) | 回答递进、自我修正、实际可听评分、表达训练轨迹与实验 |
 
