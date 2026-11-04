@@ -20,18 +20,42 @@
 
 ## 2. 提前 complete 的具体例子
 
-下表均来自本项目当前原生 SoulX＋独立 X2 **这些事件用于解释官方机制，不表示官方完整运行时已对这些样本产生相同播放结果。** 时间从样本开始计；观察截止是模型实际听到的音频坐标，联合发布是项目墙钟坐标。控制正文、服务整段重识别文本和 X2 正文分别记录。
+本节使用 TurnControlComparison 的 Candor 停顿样本 113、r4 运行日志。时间为该次运行的墙钟秒数，表中行号对应原始 JSONL 文件。`artifacts/remote/candor-pause-113-r4-events.jsonl` 是故障回归保存的运行轨迹，后段发生框架资源槽位故障，不能作为该用例完整成功或最终 FDB 评分的证据；以下只引用前段已记录事件。不复制或恢复该项目实现。
 
-| 样本 | 原始→规则后状态 | 观察／联合发布 | 整段交接标注起点 | 当时可见的文字与后续情况 |
-| --- | --- | --- | --- | --- |
-| `candor_turn_taking-17` | complete→complete | 0.800／1.029s | 5.320s | 控制文字 `Oh okay`；服务文本 `Oh, okay.`；X2 为 `oh okay`。随后继续追加问句，下一有效 nonidle 于 1.457s 联合发布 |
-| `candor_turn_taking-51` | nonidle→complete | 3.040／3.247s | 7.820s | 控制文字仅到 `yeah I didnt know California`，服务重识别同样停在 California 附近；之后仍追加内容，下一 nonidle 于 4.180s 联合发布 |
-| `candor_turn_taking-54` | complete→complete | 1.440／1.659s | 6.210s | 控制文字 `Im Baer`，服务文本 `I'm Baerie.`，X2 尚为空；随后 X2 才追加毕业、搬家内容，下一 nonidle 于 1.929s 联合发布 |
-| `candor_turn_taking-56` | complete→complete | 2.560／2.774s | 4.020s | 服务文本在 `at this point` 收尾，但后面仍有 `think i'm too far gone`；下一 nonidle 于 2.898s 联合发布 |
+### 2.1 无新字之后分别出现 complete 和 incomplete
 
-例 17 和 56 显示“局部像一句话结束”和“整段用户让轮”可能不同。例 51 的原始模型仍是 nonidle：连续三步没有 SenseVoice 新增文字后，官方规则强制在 complete／incomplete 两个 logits 中择一，没有额外要求声学静音。例 54 则显示服务文本与独立 ASR 的可见正文可能明显不同；不能拿后来较完整的 X2 文本倒推当时控制器已拥有同样信息。
+| 日志墙钟 | 行号 | 记录状态 | delta_text |
+| --- | ---: | --- | --- |
+| 1.255s | 44 | nonidle | `a lot` |
+| 1.356s | 49 | nonidle | 空 |
+| 1.574s | 56 | nonidle | 空 |
+| 1.678s | 61 | complete | 空 |
+| 1.953s | 73 | nonidle | `I` |
+| 2.135s | 83 | nonidle | 空 |
+| 2.212s | 87 | nonidle | 空 |
+| 2.318s | 92 | incomplete | 空 |
 
-附和过滤也有边界。官方 FDB 运行时会过滤空文本或 `check_backchannel()` 命中的文本；对固定函数做 CPU 核对，`okay` 被过滤，而 `Oh, okay.` 不命中：去标点后它不在词表中，长度也超过短片段规则。因此不能仅凭语义上像附和就断言例 17 必然不会启动回答。是否触发仍以实际服务文本为准。参见[过滤函数](https://github.com/Soul-AILab/SoulX-Duplug/blob/66a9f74ca39d30984eb87fc4c029fadc797b6e34/dialogue_system/modules/utils/backchannel_utils.py#L2-L90)。
+该序列符合“三步 nonidle 且无新增文字时二选一”的外观，但**不足以确证第三步是规则改写**。实际埋点在 `scripts/remote/duplex_controllers.py` 第 118—123 行调用完整 `original(delta)` 后才记录 `controller_raw`，所以这个名称记录的是 `_state_predict()` 的规则后返回值。探针的 `native_state` 同样如此，不能因名字含 raw 就当作模型原始 argmax。
+
+旧日志没有保存规则前 argmax、mistake_len 或 complete／incomplete logits。第三步可能原始就预测 complete／incomplete，也可能被规则强制改写；它也无法确证另一条“前一步 nonidle、本步原始 idle”的分支。因此不能用这些旧日志给两条规则单独计数。当前 NTF-019 的 raw_token／state_token／rule_applied 证据仍可单独复核，不能拿它代替 TurnControlComparison 日志的缺失字段。
+
+### 2.2 首音前取消和 context 合并是直接证据
+
+同一文件中，以下事件使用相同请求 `da2e41096a57a2dd-r1`：
+
+| 墙钟 | 行号 | 直接记录 |
+| --- | ---: | --- |
+| 1.7396s | 65 | `reply_started`，用户文本 `I see that a lot.` |
+| 1.9544s | 75 | `cancel_requested`，原因 `soulx_nonidle` |
+| 1.9545s | 76 | `playback_cancelled`，`played_samples=0` |
+| 1.9718s | 79 | LLM 返回 `It sounds like you're`，`cancelled=true`，可见性标为 `generation_only_until_played` |
+| 3.6583s | 137 | 下次 `llm_request` 只有合并用户消息 `I see that a lot. And.`，没有插入这次未播助手回答 |
+
+从回复启动到取消请求约 214.8ms。它直接证明该框架的一次真实首音前取消和后续用户上下文合并，不能推导该次 complete 由规则造成，也不能代表官方 dialogue-system 本身运行过这段轨迹。
+
+此外，第 132 行五状态记录仍是 idle，第 135 行服务却返回 speak；此前第 92 行为 incomplete，之后连续八个 idle。这个顺序与原生等待兜底相符，说明不能将每次服务 speak 或回复启动都算成一次 complete。
+
+日志位置为 `/home/vitalrubbish/TurnControlComparison/artifacts/remote/candor-pause-113-r4-events.jsonl`，字段语义依据同项目的 `scripts/remote/duplex_controllers.py`。该项目的控制器适配、可取消回复与当前 ParaThink 前端不是同一运行时；此处只读引用证据。
 
 ## 3. 官方怎样抵消一部分可听后果
 
@@ -43,20 +67,13 @@
 
 输出音频起点取“该响应的时间锚点＋实际生成／合成等待”和上一片段结束位置的较晚者；因此自然的 LLM／TTS 等待给续说取消提供了窗口。它没有增加固定静音确认。若在首音之前取得并执行取消，旧回复可以完全不进入可听轨迹；若首音已经发生，只能停止后续声音，之前的抢话仍存在。
 
-### 3.2 用例 17 的事件间隔解释两种分支
+### 3.2 用第二节的真实取消过程解释恢复窗口
 
-例 17 的项目联合发布轨迹中，complete 为 1.029s，下次有效 nonidle 为 1.457s，间隔约 428.6ms。以下把这两个时刻作为说明性运行时事件输入；官方自身的原始服务回执时刻会不同，不据此计算其真实抵消率。
+第二节中，回复于 1.7396s 启动，约 214.8ms 后，即 1.9544s，因续说请求取消；播放器随后记录 `played_samples=0`。1.9718s 返回的 LLM 片段已经带有取消标记，后续请求也没有把这段未播内容写成助手已说历史。这是 TurnControlComparison 运行时对一次首音前取消的实际记录，与官方代码的取消思路对应，但不是官方 dialogue-system 的重放结果。
 
-| 时刻 | 分支 A：假设首音要到 1.700s | 分支 B：假设首音在 1.250s |
-| --- | --- | --- |
-| 1.029s | 读到交接文本，开始 LLM／TTS | 同左 |
-| 1.250s | 仍未播放 | 已经开始播放旧回答 |
-| 1.457s | nonidle 取消，丢弃未播结果；用户听不到旧回答 | nonidle 取消，停止余下音频，但已播放约 207ms 不能撤销 |
-| 后续真正交接 | 根据继续到达的用户内容重新响应 | 根据续说和已播事实重新响应 |
+如果同样的控制事件下首音早于取消生效，已经播放的部分便无法撤销，只能停止后续声音。这是从时序关系得出的条件判断，不是该日志中发生了已播后取消；不能把这一次零播放结果推广为所有提前 complete 都能被抵消。
 
-分支 A 仍产生了状态误判与浪费计算，只是可听错误被拦住。分支 B 已有真实抢话，不能因为后续取消成功就记为零错误。例 56 的相应联合发布间隔仅约 123.2ms，运行时恢复窗口也不同；若 nonidle 漏检或消费过晚，机制可能完全来不及。
-
-一般应分别记录 `t_complete_read`、`t_nonidle_consumed`、`t_cancel_effective`、`t_first_played` 和 `t_last_played`。首音前能否抵消取决于取消生效是否早于首音，以及迟到结果是否仍被接纳；不能只比较原始状态与标注边界。
+一般应分别记录 `t_complete_read`、`t_nonidle_consumed`、`t_cancel_effective`、`t_first_played` 和 `t_last_played`。本日志直接提供回复启动、取消请求及零播放结果，没有 Layer 1 读取联合快照的字段；约 214.8ms 是回复启动至取消请求的间隔，不能改称完整停播时延。首音前能否抵消取决于取消生效是否早于首音，以及迟到结果是否仍被接纳。
 
 ### 3.3 在线演示怎样停播放器
 
@@ -137,48 +154,9 @@ Layer 1 需要学习在含噪状态下等待、附和、回答和取消后恢复
 
 后续完整系统至少分别报告：提前状态、首音前取消、已播后取消及重叠时长、停止耗时、恢复正确性、上下文重复／丢失、迟到播放和额外计算开销。官方 FDB 系统 TOR／RL 等指标与这些诊断并列；不能将 9／10 提前状态当 90% 抢话，也不能将所有取消都算作完全抵消。
 
-## 6. TurnControlComparison 中的实际日志实例
+## 6. 本轮证据与限制
 
-2026-11-04，NTF-041 只读复核相邻项目现存日志。`artifacts/remote/candor-pause-113-r4-events.jsonl` 是故障回归保存的运行轨迹，后段发生框架资源槽位故障，不能作为该用例完整成功或最终 FDB 评分的证据；以下只引用前段已记录事件。不复制或恢复该项目实现。
-
-### 6.1 无新字之后分别出现 complete 和 incomplete
-
-| 日志墙钟 | 行号 | 记录状态 | delta_text |
-| --- | ---: | --- | --- |
-| 1.255s | 44 | nonidle | `a lot` |
-| 1.356s | 49 | nonidle | 空 |
-| 1.574s | 56 | nonidle | 空 |
-| 1.678s | 61 | complete | 空 |
-| 1.953s | 73 | nonidle | `I` |
-| 2.135s | 83 | nonidle | 空 |
-| 2.212s | 87 | nonidle | 空 |
-| 2.318s | 92 | incomplete | 空 |
-
-该序列符合“三步 nonidle 且无新增文字时二选一”的外观，但**不足以确证第三步是规则改写**。实际埋点在 `scripts/remote/duplex_controllers.py` 第 118—123 行调用完整 `original(delta)` 后才记录 `controller_raw`，所以这个名称记录的是 `_state_predict()` 的规则后返回值。探针的 `native_state` 同样如此，不能因名字含 raw 就当作模型原始 argmax。
-
-旧日志没有保存规则前 argmax、mistake_len 或 complete／incomplete logits。第三步可能原始就预测 complete／incomplete，也可能被规则强制改写；它也无法确证另一条“前一步 nonidle、本步原始 idle”的分支。因此不能用这些旧日志给两条规则单独计数。当前 NTF-019 的 raw_token／state_token／rule_applied 证据仍可单独复核，不能拿它代替 TurnControlComparison 日志的缺失字段。
-
-### 6.2 首音前取消和 context 合并是直接证据
-
-同一文件中，以下事件使用相同请求 `da2e41096a57a2dd-r1`：
-
-| 墙钟 | 行号 | 直接记录 |
-| --- | ---: | --- |
-| 1.7396s | 65 | `reply_started`，用户文本 `I see that a lot.` |
-| 1.9544s | 75 | `cancel_requested`，原因 `soulx_nonidle` |
-| 1.9545s | 76 | `playback_cancelled`，`played_samples=0` |
-| 1.9718s | 79 | LLM 返回 `It sounds like you're`，`cancelled=true`，可见性标为 `generation_only_until_played` |
-| 3.6583s | 137 | 下次 `llm_request` 只有合并用户消息 `I see that a lot. And.`，没有插入这次未播助手回答 |
-
-从回复启动到取消请求约 214.8ms。它直接证明该框架的一次真实首音前取消和后续用户上下文合并，不能推导该次 complete 由规则造成，也不能代表官方 dialogue-system 本身运行过这段轨迹。
-
-此外，第 132 行五状态记录仍是 idle，第 135 行服务却返回 speak；此前第 92 行为 incomplete，之后连续八个 idle。这个顺序与原生等待兜底相符，说明不能将每次服务 speak 或回复启动都算成一次 complete。
-
-日志位置为 `/home/vitalrubbish/TurnControlComparison/artifacts/remote/candor-pause-113-r4-events.jsonl`，字段语义依据同项目的 `scripts/remote/duplex_controllers.py`。该项目的控制器适配、可取消回复与当前 ParaThink 前端不是同一运行时；此处只读引用证据。
-
-## 7. 本轮证据与限制
-
-- 当前案例来自 NTF-019 原始压缩帧和 [NTF-038 复核](../../reports/soulx/20261104-completion-strategy-audit/audit.json)，未改写原始 run。
+- 第二节案例来自 TurnControlComparison 的 Candor 停顿 113 r4 原始 JSONL，埋点语义依据该项目实际代码；日志 SHA256 为 `bc60f4146591af2b1a72dc6c119423654b405a9aa2d665a7ee4a8a5c0ed2923e`，未改写原始 run。ParaThink 前端总体来源计数另见 [NTF-038 复核](../../reports/soulx/20261104-completion-strategy-audit/audit.json)，不能补足这份日志缺失的规则前字段。
 - 官方运行时固定在 `66a9f74ca39d30984eb87fc4c029fadc797b6e34`；当前项目 SoulX 前端固定源码仍为 `a0b9063`，二者用途不同，不切换子模块。
 - 本地 `interclarify-dev` conda 复核七组 CPU 情景：音频返回前取消、已排定未播取消、工作线程结束后播放中取消、工作线程内取消、检查与入队交错、附和过滤、空助手消息的角色分组。结果位于 `artifacts/soulx/20261104-official-runtime-analysis/behavior_probe.json`，包含源码摘要，不纳入 Git。
 - 合成例子采用 1000Hz 便于核对采样算术；实际前端保持 16kHz。未加载真实 LLM／TTS，未测浏览器声卡，未复现官方 FDB 数值，也未证明当前样本在完整系统中能抵消多少。
