@@ -54,17 +54,21 @@ thinking 流是与表达分工的内部任务分析过程。“独立”表示�
 ```text
 docs/
 ├── research_design.md
-└── research_design/
-    ├── architecture.md
-    ├── layer1_training.md
-    ├── listening.md
-    └── speaking.md
+├── research_design/
+│   ├── architecture.md
+│   ├── layer1_training.md
+│   ├── listening.md
+│   └── speaking.md
+└── dev/
+    └── layer1_training/
+        └── README.md
 ```
 
 | 文档 | 职责 |
 | --- | --- |
 | [架构设计](research_design/architecture.md) | thinking/表达分工、异步时序、结果合同、动作边界、共同实验和训练约定 |
 | [Layer 1 训练设计](research_design/layer1_training.md) | 训练目标、基座选择、因果数据与监督原则、分阶段训练及评估思路 |
+| [Layer 1 数据构造与训练预算](dev/layer1_training/README.md) | 试标与扩量流程、七类数据及阶段配比、8×4090 假设下的时长与资源预算 |
 | [边听边想：主动介入 benchmark 与训练数据](research_design/listening.md) | 介入依据、分支案例、事件标注、行为指标、倾听训练轨迹与实验 |
 | [边说边想：benchmark 与训练数据](research_design/speaking.md) | 回答递进、自我修正、实际可听评分、表达训练轨迹与实验 |
 
