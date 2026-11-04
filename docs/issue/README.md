@@ -4,7 +4,7 @@
 
 ## 当前工作单
 
-当前无活动工作单。NTF-039 已完成当前前端文档与接口收口并归档；135 项本地检查通过，未启动下游接入或训练。NTF-038 的 [SoulX 原生 complete 行为审计](../reports/soulx/20261104-completion-strategy-audit/README.md)和 NTF-037 的[训练数据与成本研究](../research_design/layer1_training.md)已完成并归档。
+当前无活动工作单。NTF-040 已完成[提前 complete、官方运行时恢复与设计影响分析](../dev/SoulX-Duplug/completion_runtime_analysis.md)并归档，未启动下游接入或训练。NTF-039 已完成当前前端文档与接口收口，135 项本地检查通过；NTF-038 的 [SoulX 原生 complete 行为审计](../reports/soulx/20261104-completion-strategy-audit/README.md)和 NTF-037 的[训练数据与成本研究](../research_design/layer1_training.md)已归档。
 
 ## 当前路线交付
 
@@ -22,6 +22,7 @@
 | [NTF-037](../research_design/layer1_training.md) | 研究已完成并归档 | Layer 0 并入 Layer 1 的职责同步、含噪控制与取消恢复数据、规模预算及控制方案比较；尚未实施训练 |
 | [NTF-038](../reports/soulx/20261104-completion-strategy-audit/README.md) | 审计已完成并归档 | 区分当前原始预测与官方规则来源；复核 3180 批次，未改推理或追加 GPU 实验 |
 | NTF-039 | 已完成并归档 | 当前前端文档、快照接口与图稿一致；135 项本地检查通过 |
+| [NTF-040](../dev/SoulX-Duplug/completion_runtime_analysis.md) | 分析已完成并归档 | 真实案例、官方取消与上下文整理、七组 CPU 行为核查及当前设计影响；未接入运行时 |
 
 ## 后续计划
 

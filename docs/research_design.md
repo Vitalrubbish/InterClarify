@@ -10,6 +10,8 @@
 
 已确认的下游分工与普通回答生成边界保留：五状态在所属 160ms 批次联合提交后供下游消费，Layer 1 在正常输入边界读到已提交的有效 complete 及当前正文后可在当前 turn 生成普通回答；同步不保证尾词必齐。具体[接口合同](dev/SoulX-Duplug/shared_context_interface.md)的联合提交已由 NTF-017 交付。保留 CoT 条件下的主动澄清与话轮决策目标，后续让 SoulX 联合读取音频、转写和 Layer 2 已发布 CoT；后续扩展见[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
 
+2026-11-04 已整理[提前 complete 与官方运行时恢复分析](dev/SoulX-Duplug/completion_runtime_analysis.md)：区分原生状态、服务交接和实际播放，用固定案例解释首音前取消、已播后停止及上下文恢复。分析支持按可取消输出设计闭环，保留当前普通回答边界；没有接入官方运行时或启动新评测。
+
 研究任务与单一仲裁执行点、单一 TTS 播放所有权及已听内容不可撤销的边界保持。用户状态统一随正文联合提交，前端不再为 `user_nonidle` 设置专用停止钩子；下游读取同一快照后，由既有唯一输出运行时按准备／播放生命周期处理有效打断。其他状态不进入输出运行时，不映射成 start 或 keep；`user_complete` 不额外发起 LLM 回答调用，`user_backchannel` 由 LLM 读取并决定表达行为。具体路径见[架构第 2.2 节](research_design/architecture.md#22-前端状态与系统附和)。状态输入编码待后续讨论。
 
 ## 1. 研究背景

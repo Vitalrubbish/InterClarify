@@ -11,6 +11,8 @@
 
 完整合同见[独立流式前端](independent_streaming_frontend.md)，Context 字段见[联合快照接口](shared_context_interface.md)，运行资产见[部署说明](deployment.md)。
 
+提前 complete 的实测案例、官方运行时取消与历史整理，以及对 Layer 1／2 和播放闭环的影响，见[行为与运行时分析](completion_runtime_analysis.md)。该分析不表示下游运行时已接入。
+
 ## 2. 当前状态
 
 | 工作单 | 交付 |
