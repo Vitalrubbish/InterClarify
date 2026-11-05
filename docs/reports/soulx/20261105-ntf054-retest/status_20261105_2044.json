@@ -1,0 +1,79 @@
+{
+  "checked_at_utc": "2026-11-05 12:44:32 UTC",
+  "smoke_job": "job-179387030286102615198-xuan-zhang",
+  "smoke_exit_code": 1,
+  "cases_started": 0,
+  "warmup_rounds": [
+    {
+      "case_id": "warmup_0",
+      "passed": true,
+      "coverage": {
+        "sensevoice_text": true,
+        "text_revision": true,
+        "native_complete": true,
+        "reset": true,
+        "wait": true,
+        "multi_token_eos": true,
+        "joint_complete": true,
+        "joint_wait": true
+      },
+      "controller_compute_ms": {
+        "count": 59,
+        "p50": 90.03562002908438,
+        "p95": 108.5296746052336,
+        "max": 1107.8038350096904
+      }
+    },
+    {
+      "case_id": "warmup_1",
+      "passed": true,
+      "coverage": {
+        "sensevoice_text": true,
+        "text_revision": true,
+        "native_complete": true,
+        "reset": true,
+        "wait": true,
+        "multi_token_eos": true,
+        "joint_complete": true,
+        "joint_wait": true
+      },
+      "controller_compute_ms": {
+        "count": 59,
+        "p50": 88.58971099834889,
+        "p95": 106.58279093331657,
+        "max": 108.33305300911888
+      }
+    }
+  ],
+  "control_comparison_passed": false,
+  "authorized_omissions": 1,
+  "first_trace_difference": {
+    "index": 192,
+    "reference": {
+      "asr_pcm": "ca6f6defe35f63d40be16629829af8500a9805eb31b6083578c30769c4d7cc6d",
+      "asr_text": "And moving into higher education back."
+    },
+    "observed": {
+      "asr_pcm": "ca6f6defe35f63d40be16629829af8500a9805eb31b6083578c30769c4d7cc6d",
+      "asr_text": "I moving into higher education back."
+    }
+  },
+  "campaign": {
+    "source_commit": "65d15e60730a3e01c580ee68a73d75c4439741db",
+    "source": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-65d15e6",
+    "script_sha256": "c389f3ccb0fe18bfe27ba3ea921b3ac1e28b6a5b7c5fb693e6461a893f49cc31",
+    "smoke_job": "job-179387030286102615198-xuan-zhang",
+    "status": "failed",
+    "updated_at": "2026-11-05 09:49:33 UTC",
+    "error": "CalledProcessError: Command '['vc', 'list']' returned non-zero exit status 1."
+  },
+  "formal_output_exists": false,
+  "score_output_exists": false,
+  "evidence_sha256": {
+    "runs/ntf054-half-smoke-20261105-r2/frontend/result.json": "4edb2a1e011dec99998d29468a350303093f04539515fd1d9d06217ee08849a0",
+    "runs/ntf054-half-smoke-20261105-r2/frontend/warmup.json": "12d3f5689055fbba42007d53a6b005c5a0ba348cd5f2fdf30c9be81d46a980e8",
+    "runs/ntf054-half-smoke-20261105-r2/exit_code.txt": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "analysis/ntf054-half-campaign-20261105-r2/state.json": "acffcaf76cfeef2823acc03c072392001f799c1a05d52f5df2407d01e2a0376f",
+    "analysis/ntf054-half-campaign-20261105-r2/campaign.log": "4333f31a0ff36fe281a0495e3870289a9d09349ad8065005ca7154be5c15a735"
+  }
+}

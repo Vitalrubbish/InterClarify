@@ -4,9 +4,9 @@
 
 ## 当前工作单
 
-NTF-055已完成用户要求的r2重提与自动跟踪切换并归档；[NTF-054](NTF-054.md)继续跟踪实际复测。新smoke为job-179387030286102615198-xuan-zhang，当前Pending，保持单作业并发及原冻结条件。
+NTF-055已完成此前r2重提与跟踪切换并归档；[NTF-054](NTF-054.md)复测尚未完成。20:44复核smoke作业job-179387030286102615198-xuan-zhang已因控制对照失败退出1，样本0/3；衔接进程另因调度查询连接失败退出，当前队列为空，正式30条和评分未提交。
 
-[NTF-054](NTF-054.md)正在启动[修复后FDB30复测](../reports/soulx/20261105-ntf054-retest/README.md)：源码固定65d15e6，先三条smoke，再固定30条及TOR／延迟评分，远端单作业并发。
+[NTF-054](NTF-054.md)继续跟踪[修复后FDB30复测及失败定位](../reports/soulx/20261105-ntf054-retest/README.md)：源码固定65d15e6，两轮预热覆盖通过，但后续同PCM短窗转写出现未授权差异，需定位后恢复；原定三条smoke、固定30条和TOR／延迟评分范围保持。
 
 NTF-052／053已完成[固定执行线程、CPU资源配置及跳过complete重识别](../dev/SoulX-Duplug/runtime_execution_update.md)并归档，完整本地146项回归通过。160ms联合提交、短窗状态识别和reset保持；尚未远端复测性能／TOR。
 

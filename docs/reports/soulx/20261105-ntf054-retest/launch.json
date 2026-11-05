@@ -17,27 +17,32 @@
   "smoke": {
     "run_id": "ntf054-half-smoke-20261105-r2",
     "job_id": "job-179387030286102615198-xuan-zhang",
-    "state": "pending"
+    "state": "failed_control_comparison",
+    "exit_code": 1,
+    "cases_started": 0
   },
   "formal": {
     "run_id": "ntf054-half-20261105-r2-formal",
-    "state": "awaiting_smoke_audit"
+    "state": "not_submitted_smoke_failed"
   },
   "score": {
     "run_id": "ntf054-half-20261105-r2-score",
-    "state": "awaiting_formal",
+    "state": "not_submitted",
     "judge": "excluded_by_user"
   },
   "followup": {
     "script": "submit_logs/ntf054-followup.py",
     "script_sha256": "c389f3ccb0fe18bfe27ba3ea921b3ac1e28b6a5b7c5fb693e6461a893f49cc31",
-    "state": "waiting_smoke",
+    "state": "failed",
     "remote_state": "analysis/ntf054-half-campaign-20261105-r2/state.json",
     "ram_limit_gib": 2,
     "cpu_affinity_count": 1,
     "deadline_hours": 12,
     "pid": 2769918,
-    "rss_kib_at_start": 21976
+    "rss_kib_at_start": 21976,
+    "failed_at": "2026-11-05 09:49:33 UTC",
+    "error": "CalledProcessError: Command '['vc', 'list']' returned non-zero exit status 1.",
+    "process_alive_at_check": false
   },
   "attempt_history": [
     {
@@ -76,5 +81,11 @@
     "previous_manager_exited": true,
     "queue_empty_before_submit": true,
     "model_or_resource_changes": false
+  },
+  "latest_status": {
+    "checked_at_utc": "2026-11-05 12:44:32 UTC",
+    "queue_empty": true,
+    "evidence": "status_20261105_2044.json",
+    "gpu_jobs_submitted_during_status_check": 0
   }
 }
