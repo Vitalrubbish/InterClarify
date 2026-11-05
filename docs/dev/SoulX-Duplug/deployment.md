@@ -1,6 +1,6 @@
 # 远端前端部署与资产复用
 
-更新：2026-11-03。当前前端为 SoulX-Duplug 原生控制＋独立 X2Streaming-ASR。本文只记录只读复用的模型、conda 与源码资产，具体实验结论以对应报告为准。
+更新：2026-11-05。当前前端为 SoulX-Duplug 原生控制＋独立 X2Streaming-ASR。本文只记录只读复用的模型、conda 与源码资产，具体实验结论以对应报告为准。
 
 ## 1. 共用资产
 
@@ -36,4 +36,4 @@ ParaThink 使用独立根目录 `~/parathink-soulx-duplug/`，源码、提交日
 
 - 复用官方模型加载、原生推理与 X2 因果解码；动作消费与发布屏障按当前前端合同执行。
 - 五类用户状态写入 SharedContext，由下游在当前 turn 读取有效 `user_complete`；有效用户打断单独停止输出。
-- 部署和离线探针通过不等于常驻服务、下游 LLM、TTS、CoT 注入或真实播放已接入。
+- 普通 LLM／TTS 与播放实录已用于[独立半双工评测](fdb30_half_duplex.md)；前端探针通过不等于 X-Talk 常驻集成、Layer 1 训练或 CoT 注入已完成。

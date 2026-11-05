@@ -35,7 +35,7 @@ smoke-r2 作业 `job-179387030286102615198-xuan-zhang` 已完成模型加载及�
 
 ## 3. 远端因果验证
 
-诊断作业 `job-179388371390743074870-xuan-zhang` 于21:01:54提交，在 `d6-hpc-gpu-059` 串行运行两组真实权重对照。复用同一冻结源码、资产、预热语音、主线程与2线程／interop1预算，保留现有对照的全部条件。详见[诊断脚本说明](../../../scripts/remote/diagnose_native_asr_rng.md)、[提交记录](diagnostic_launch.json)及[诊断摘要](diagnostic_summary.json)。
+诊断作业 `job-179388371390743074870-xuan-zhang` 于21:01:54提交，在 `d6-hpc-gpu-059` 串行运行两组真实权重对照。复用同一冻结源码、资产、预热语音、主线程与2线程／interop1预算，保留现有对照的全部条件。详见诊断脚本说明（已随单次实验入口清理，可从 Git 提交 `174e7f7` 的 `docs/scripts/remote/diagnose_native_asr_rng.md` 追溯）、[提交记录](diagnostic_launch.json)及[诊断摘要](diagnostic_summary.json)。
 
 | 检查项 | 原始跳过路径 | 仅补齐被省略调用的 CPU 特征提取 |
 | --- | --- | --- |

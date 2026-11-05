@@ -1,6 +1,6 @@
 # 远端工作目录约定
 
-更新：2026-11-03。项目现名为 ParaThink。下表中的 `InterClarify`、`interclarify-*` 是已有服务器目录或环境的真实名称，继续保留以兼容现役资产；本仓库不执行远端仓库或目录重命名。
+更新：2026-11-05。项目现名为 ParaThink。下表中的 `InterClarify`、`interclarify-*` 是已有服务器目录或环境的真实名称，继续保留以兼容现役资产；本仓库不执行远端仓库或目录重命名。
 
 根目录为 `/hpc_stor03/sjtu_home/xuan.zhang/`。远端只保留当前源码、模型、数据、现役 conda 环境与评测入口；运行输出使用独立目录，不覆盖既有结果。
 
@@ -10,14 +10,6 @@
 | --- | --- |
 | `InterClarify` | 当前项目仓库 |
 | `xtalk` | X-Talk fork 源码 |
-| `DuplexCascade` | 官方 DuplexCascade 参考仓库 |
-| `interclarify-p0-models` | Qwen2-7B、DuplexCascade 权重与 HF 辅助资产 |
-| `interclarify-asr-selection/models` | Nemotron 与 alignment 资产 |
-| `interclarify-tts-selection-20261018/models` | Kokoro 模型 |
-| `interclarify-english-integration-20261018-v1/envs` | 现役 ASR/TTS conda 环境 |
-| `interclarify-english-integration-20261018-v6` | 组件入口；`envs` 软链到 v1 |
-| `interclarify-runtime-20261021-adopted` | 当前运行时源码快照 |
-| `interclarify-runtime-current` | 指向当前运行时快照的稳定入口 |
 | `InterClarify/benchmark/fdb_v1_0` | FDB v1.0 评测数据 |
 | `Full-Duplex-Bench` | 官方 FDB 评分仓库 |
 | `parathink-soulx-duplug` | 前端独立部署与检查根目录，复用下列资产；见[部署说明](dev/SoulX-Duplug/deployment.md) |
@@ -33,11 +25,11 @@
 | --- | --- |
 | 通用与模型服务 | `~/miniconda3/envs/interclarify-dev` |
 | FDB 官方评分 | `~/miniconda3/envs/full-duplex-bench` |
-| ASR 组件 | `~/interclarify-english-integration-20261018-v1/envs/asr` |
-| TTS 组件 | `~/interclarify-english-integration-20261018-v1/envs/tts` |
 | SoulX 与 SenseVoiceSmall | `~/turncontrol-comparison/envs/soulx`，只读复用，不修改共享依赖 |
 
 `paratalker-dev` 与 `sidecar` 属于其他项目，不纳入 ParaThink 清理。
+
+旧 DuplexCascade／Nemotron／Kokoro 的服务器目录、模型和环境属于历史资产，已退出父仓库当前入口；本次只清理仓库，不删除远端内容或改变运行中的冻结作业。当前下游模型、TTS 与 conda 路径以[半双工方案](dev/SoulX-Duplug/fdb30_half_duplex.md)和 [NTF-054](issue/NTF-054.md) 为准。
 
 ## 3. 当前前端结果
 

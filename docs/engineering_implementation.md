@@ -8,7 +8,7 @@ SoulX 保留内部 SenseVoice 教师、门控、滑窗差分／KV 修订、状�
 
 五状态统一经过本批次联合提交，不设置前端 nonidle 专用停止钩子。已提交的有效 complete 携当前正文直接供 Layer 1 在当前 turn 使用，无需额外交接等待；同步不保证尾词必齐。详细合同见[独立前端](dev/SoulX-Duplug/independent_streaming_frontend.md)及[Context 接口](dev/SoulX-Duplug/shared_context_interface.md)。
 
-现役 Agent 底座见[运行配置](runtime_baseline.md)，本次不切换。官方源码使用[固定子模块及远端 checkout](third_party/soulx-duplug.md)。
+X-Talk 保留为工程框架；当前独立半双工评测基线见[运行配置](runtime_baseline.md)，DuplexCascade 旧模型链路已按用户要求清理，尚未实施框架常驻集成。官方源码使用[固定子模块及远端 checkout](third_party/soulx-duplug.md)。
 
 ## 2. 工作顺序与交付
 
@@ -31,7 +31,7 @@ SoulX 保留内部 SenseVoice 教师、门控、滑窗差分／KV 修订、状�
 
 ## 4. 后续边界
 
-用户已确认将 Layer 0 系统附和能力并入 Layer 1；训练目标、因果数据与分阶段学习思路见[训练设计](research_design/layer1_training.md)，不单独部署附和预测器。研究包含真实控制噪声、首音前取消和开播后恢复；具体协议、训练参数与资源安排在实施阶段确定，未启动语料生成、训练或 Layer 1／thinking 接入；普通半双工 LLM／TTS 已用于独立评测。旧 DuplexCascade 候选加载及固定 25 条重放入口已退出当前训练路线并清理，现役官方权重基线保留。
+用户已确认将 Layer 0 系统附和能力并入 Layer 1；训练目标、因果数据与分阶段学习思路见[训练设计](research_design/layer1_training.md)，不单独部署附和预测器。研究包含真实控制噪声、首音前取消和开播后恢复；具体协议、训练参数与资源安排在实施阶段确定，未启动语料生成、训练或 Layer 1／thinking 接入；普通半双工 LLM／TTS 已用于独立评测。旧 DuplexCascade 候选加载及固定 25 条重放入口已退出当前训练路线并清理，本轮进一步删除 DuplexCascade 官方权重服务及其旧组件链路，X-Talk 框架保留。
 
 普通回答生成边界、单一输出执行点及 TTS 播放所有权保持；状态统一经联合快照交付，撤回前端专用停止旁路。后续 CoT 条件化控制目标仍见[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)，本次不构造训练数据或注入 CoT。图源及 PDF／PNG 已由 NTF-017 同步；不表示回答或播放链路已实现。
 

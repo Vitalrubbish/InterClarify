@@ -40,7 +40,7 @@ conda run --no-capture-output -n parathink-dev python -m unittest discover -s te
 
 ## X-Talk 测试
 
-`xtalk/` 是独立仓库，现役基线仍依赖它；当前 SoulX 前端与半双工评测不因此切换现役 Agent。其测试清单以该仓库当前文件为准，不再保留已经失效的逐模块命令。ParaThink 自有测试使用上面的 discover 命令；独立仓库测试应在其目录及对应 conda 环境中运行。
+`xtalk/` 是独立仓库，按用户要求保留为工程框架；当前 SoulX 半双工评测尚未完成框架常驻集成。其测试清单以该仓库当前文件为准，不再保留已经失效的逐模块命令。ParaThink 自有测试使用上面的 discover 命令；独立仓库测试应在其目录及对应 conda 环境中运行。
 
 ## 测试依赖
 

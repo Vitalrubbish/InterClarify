@@ -1,5 +1,7 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
+2026-11-05 用户确认清理范围：保留 X-Talk 工程框架，删除父仓库中的 DuplexCascade 模型与旧 Nemotron／Kokoro 组合链路。当前运行基线为 SoulX＋独立 X2＋Qwen2.5-7B-Instruct＋IndexTTS 半双工评测链路；Layer 1 训练与框架常驻集成仍未实施。历史报告及 NTF-054 冻结作业保留。
+
 2026-11-05 用户追加授权NTF-057：取消NTF-054完整系统FDB30复测中的原生控制一致性检查，停止修复短窗转写变化；检查状态明确记为未执行，不声明原生等价。保留完整预热、执行与资源预算、160ms联合提交、complete-only回答及样本／录音审计，随后按原流程重提复测。该修订不改变模型、dtype、缓存或既有历史前端验收结论。
 
 2026-11-05 用户追加授权修复[前端执行线程、资源与complete交接](dev/SoulX-Duplug/runtime_execution_update.md)：SoulX固定在回放线程，X2使用常驻辅助线程，各模型进程计算线程预算统一为2；取消有效complete后的整段SenseVoice重识别，保留状态预测所需的短窗识别、reset及X2正文。此次不改回答触发条件或160ms联合提交，不扩展Layer 1训练范围；实现与本地验证见NTF-052／053，真实性能需远端另验。

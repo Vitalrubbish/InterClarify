@@ -1,7 +1,0 @@
-# 英文运行配置
-
-当前唯一默认组合为NemotronStreamingClient与KokoroSegmented。TTS首段max_wait_ms=300、后续continuation_wait_ms=1200，分段长度12/160字符，保留完整词边界、句界/finish提前提交和首尾冗余静音裁剪。300ms是文本聚合期限，残词可能继续等待，不代表首音频必须300ms到达。
-
-duplex_kv_cache_enabled=true，跨micro-turn按会话复用匹配KV，改写/取消/淘汰时安全重建。LLM采用duplex_greedy_v1显式贪心规则与repetition_penalty=1.0。600ms micro-turn、80ms音频传输与160ms ASR模型分块分别定义，声学VAD关闭，单一播放路径及层边界保持。
-
-2026-10-21 用户复听认为 300ms 自然度略逊 600ms 但差异不大，决定采用 300ms 与缓存。后续运行与组件验证只执行该路线；无缓存入口仅供显式正确性诊断。本配置无类和方法，不自行启动服务。

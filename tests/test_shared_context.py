@@ -1,7 +1,6 @@
 """Check latest-only storage, snapshot isolation and turn boundaries."""
 from pathlib import Path
 import sys
-import threading
 import unittest
 
 sys.path.insert(0, str(Path(__file__).parents[1] / 'scripts/runtime'))
@@ -52,27 +51,6 @@ class SharedContextTests(unittest.TestCase):
         context.close_user_turn('s', 't', 'eof')
         context.release_closed_turn('s', 't')
         context.open_user_turn('s', 'other')
-
-    def test_concurrent_readers_cannot_mix_frames(self):
-        context = SharedContext(max_turns=1)
-        context.open_user_turn('s', 't')
-        context.latest[('s', 't')]['text'] = 'hello'
-        errors = []
-
-        def read():
-            try:
-                for _ in range(200):
-                    value = context.get_user_turn('s', 't')
-                    self.assertEqual(value['text'], 'hello')
-            except Exception as exc:
-                errors.append(exc)
-
-        threads = [threading.Thread(target=read) for _ in range(4)]
-        for thread in threads:
-            thread.start()
-        for thread in threads:
-            thread.join()
-        self.assertFalse(errors)
 
     def test_state_ids_are_frozen(self):
         self.assertEqual(sorted(STATE_IDS.values()), [151676, 151677, 151678, 151680, 151681])

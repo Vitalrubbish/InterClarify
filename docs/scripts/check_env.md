@@ -22,3 +22,5 @@
 ## 依赖
 
 只依赖标准库与目标环境本身，避免“检查脚本自己装不上”的问题。X-Talk 运行时依赖（LangChain/Chroma）已写入 `requirements.txt`，但 `check_env.py` 仍只检查通用核心；X-Talk 自身测试使用 `PYTHONPATH=src` 单独运行。
+
+2026-11-05：DuplexCascade 服务与专用测试已退出当前基线。`requirements.txt` 保留已验证的本地开发依赖版本，旧模型服务专用说明已移除；本次不升级依赖或重建 conda。当前真实模型仍使用各自隔离的远端 conda，通用导入检查不能证明模型链路已验收。
