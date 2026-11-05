@@ -1,0 +1,41 @@
+{
+  "source_commit": "65d15e60730a3e01c580ee68a73d75c4439741db",
+  "source_archive_sha256": "0b09c31e3054957869d59d7ce1f5f550f4971d97933f144e113252b4c8793e77",
+  "native_config_sha256": "128978377266770c1cdee4c244c81eefb3b3c85d7536b4707eff528e36412ba9",
+  "input_manifest_sha256": "403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cde4f3c07",
+  "remote_source": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-65d15e6",
+  "single_concurrent_job": true,
+  "inference_resources": {
+    "gpus": 3,
+    "cpus": 12,
+    "ram_gib": 64,
+    "timeout_seconds": 7200,
+    "gpu_stop_mib": 22528,
+    "output_limit_mib": 2048,
+    "pcm_limit_mib": 16
+  },
+  "smoke": {
+    "run_id": "ntf054-half-smoke-20261105-r1",
+    "job_id": "job-179386787087491282885-xuan-zhang",
+    "state": "submitted"
+  },
+  "formal": {
+    "run_id": "ntf054-half-20261105-r1-formal",
+    "state": "awaiting_smoke_audit"
+  },
+  "score": {
+    "run_id": "ntf054-half-20261105-r1-score",
+    "state": "awaiting_formal",
+    "judge": "excluded_by_user"
+  },
+  "followup": {
+    "script": "submit_logs/ntf054-followup.py",
+    "script_sha256": "c389f3ccb0fe18bfe27ba3ea921b3ac1e28b6a5b7c5fb693e6461a893f49cc31",
+    "state": "started",
+    "remote_state": "analysis/ntf054-half-campaign-20261105-r1/state.json",
+    "ram_limit_gib": 2,
+    "cpu_affinity_count": 1,
+    "deadline_hours": 12,
+    "pid": 2603757
+  }
+}
