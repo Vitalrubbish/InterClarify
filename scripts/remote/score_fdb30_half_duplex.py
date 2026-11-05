@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -11,17 +10,12 @@ import sys
 
 from score_duplex import (SCORING_COMMIT, align, behavior, compare_official, digest,
                           scoring_view, validate_recording)
-from run_fdb_llm_judge import prepare_work_repo, read_api_key, parse_scores
-from full_fdb_two_axes import official_step
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ('run','output','assets','fdb-repo'):
         parser.add_argument('--'+name,type=Path,required=True)
-    parser.add_argument('--key-file',type=Path,default=Path.home()/'InterClarify/openai_api.txt')
-    parser.add_argument('--judge-model',default='gpt-4-turbo')
-    parser.add_argument('--base-url',default='https://api-2.xi-ai.cn/v1')
     args=parser.parse_args()
     if not (Path(sys.prefix)/'conda-meta/history').is_file():
         raise RuntimeError('Use remote conda scoring environment')
@@ -91,29 +85,12 @@ def main():
         aggregates.append(group)
     summary={'scope':'fixed_fdb30_not_full_benchmark','scoring_commit':commit,
              'parakeet_sha256':entry['sha256'],'rows':results,'aggregates':aggregates,
-             'scoring_window':'zero_to_original_input_end','judge_status':'pending',
+             'scoring_window':'zero_to_original_input_end','judge_status':'excluded_by_user',
              'backchannel':'not_in_fdb30','inference_manifest_sha256':digest(args.run/'input_manifest.json')}
     path=args.output/'summary.json'
     path.write_text(json.dumps(summary,indent=2)+'\n')
-    try:
-        work=prepare_work_repo(args.fdb_repo,args.output/'judge',args.judge_model)
-        environment=dict(os.environ)
-        environment['OPENAI_API_KEY']=read_api_key(args.key_file,os.environ)
-        environment['OPENAI_BASE_URL']=args.base_url
-        log=args.output/'judge.log'
-        code=official_step([sys.executable,str(work/'evaluation/evaluate.py'),'--task','user_interruption',
-            '--root_dir',str(args.output/'alignments/synthetic_user_interruption')],log,environment,
-            str(args.output),seconds=1800)
-        summary['judge']={'returncode':code,'model':args.judge_model,
-            'ratings':len(list((args.output/'alignments/synthetic_user_interruption').glob('*/rating.json'))),
-            'scores':parse_scores(log)}
-        summary['judge_status']='complete' if code==0 and summary['judge']['ratings']==10 else 'failed'
-    except (Exception,SystemExit) as exc:
-        summary['judge_status']='failed'
-        summary['judge_error']=str(exc)
-    path.write_text(json.dumps(summary,indent=2)+'\n')
     print(json.dumps({'aggregates':aggregates,'judge_status':summary['judge_status']}),flush=True)
-    return 0 if summary['judge_status']=='complete' else 1
+    return 0
 
 
 if __name__=='__main__':
