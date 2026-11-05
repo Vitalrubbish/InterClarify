@@ -69,7 +69,10 @@ def main():
             transcript=align(model,target/'output.wav',offset)
         (target/'output.json').write_text(json.dumps(transcript,indent=2)+'\n')
         results.append({'case_id':sample['case_id'],'subset':subset,'id':identifier,
-                        **behavior(transcript['chunks'],origin),'transcript':transcript['text']})
+                        **behavior(transcript['chunks'],origin),'transcript':transcript['text'],
+                        'first_word_seconds':transcript['chunks'][0]['timestamp'][0] if transcript['chunks'] else None,
+                        'raw_first_word_latency':transcript['chunks'][0]['timestamp'][0]-origin
+                            if transcript['chunks'] and origin is not None else None})
         (args.output/'progress.json').write_text(json.dumps(results,indent=2)+'\n')
     del model
     torch.cuda.empty_cache()
