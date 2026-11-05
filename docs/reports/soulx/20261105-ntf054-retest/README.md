@@ -1,16 +1,18 @@
 # NTF-054：执行线程与 complete 交接修复后的复测
 
+2026-11-05 21:22最新状态：按用户明确指令取消完整系统的原生控制一致性检查，停止修复短窗变化；新源码固定82ff9ba，r3 smoke作业job-179388489846387768877-xuan-zhang已提交，当前Pending。顺序衔接PID3997827已启动，状态waiting_smoke；smoke通过后才提交正式30条及TOR／延迟评分。完整预热、线程预算、跳过事件、录音和资源审计保留，未执行的对照明确记为disabled_by_user／passed=null。提交证据见[launch_r3.json](launch_r3.json)。
+
 21:04后原因调查已完成，见[失败分析](failure_analysis.md)：真实权重基线完整复现原3处差异；仅补齐被省去的 CPU 特征提取后，随机状态与275条对照轨迹全部一致。根因为 complete 整段识别省略后 dither 的 CPU RNG 消耗发生偏移。诊断不代表正式复测已通过；推理修复、三条smoke、固定30条和评分仍待恢复。
 
 2026-11-05 20:44复核：r2已在预热后的控制对照阶段失败，退出1，三条smoke样本尚未开始；正式30条及评分未提交。当前队列为空。自动衔接进程另于17:49:33因调度查询连接失败退出，不能继续将本轮状态表述为排队或自动推进。
 
 ## 固定条件
 
-模型实现提交为 `65d15e6`，已推送GitHub。输入manifest SHA256为 `403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cde4f3c07`。比较对象是[修复前正式r2](../20261105-fdb30-half-duplex/README.md)。新版本固定SoulX回放线程、常驻X2辅助线程，各模型进程CPU计算线程为2，并跳过complete后的整段SenseVoice识别；短窗识别、reset、160ms联合发布及complete-only回答合同保持。
+当前r3实现提交为 `82ff9ba`，历史r2为 `65d15e6`，均已推送GitHub。输入manifest SHA256为 `403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cde4f3c07`。比较对象是[修复前正式r2](../20261105-fdb30-half-duplex/README.md)。新版本固定SoulX回放线程、常驻X2辅助线程，各模型进程CPU计算线程为2，并跳过complete后的整段SenseVoice识别；短窗识别、reset、160ms联合发布及complete-only回答合同保持。r3按用户指令取消原生控制对照。
 
 ## 资源与步骤
 
-远端队列检查为空；账户存储约186.90GB／1TB，可用约838GB，GPU配额8张。仅串行提交作业：smoke三条通过后正式30条，推理释放后单卡评分。推理3×4090、12CPU／64GiB、7200秒、每卡22GiB、输出2GiB、PCM16MiB；评分1×4090、4CPU／32GiB、3600秒。仅TOR与延迟，保留失败记录。
+r3提交前队列为空；账户存储约186.67GB／1TB，GPU配额8张。仅串行提交作业：smoke三条通过后正式30条，推理释放后单卡评分。推理3×4090、12CPU／64GiB、7200秒、每卡22GiB、输出2GiB、PCM16MiB；评分1×4090、4CPU／32GiB、3600秒。仅TOR与延迟，保留失败记录。
 
 | 阶段 | run ID | job ID | 状态 |
 | --- | --- | --- | --- |
@@ -18,12 +20,17 @@
 | smoke-r2 | `ntf054-half-smoke-20261105-r2` | `job-179387030286102615198-xuan-zhang` | 约19:00退出1；控制对照失败，正式样本0/3 |
 | formal-r2 | `ntf054-half-20261105-r2-formal` | 未提交 | smoke未通过 |
 | score-r2 | `ntf054-half-20261105-r2-score` | 未提交 | 无正式推理结果 |
+| smoke-r3 | `ntf054-half-smoke-20261105-r3` | `job-179388489846387768877-xuan-zhang` | 21:22为Pending，已取消原生控制对照 |
+| formal-r3 | `ntf054-half-20261105-r3-formal` | 待smoke通过后提交 | 顺序衔接已启动 |
+| score-r3 | `ntf054-half-20261105-r3-score` | 待正式推理通过后提交 | 仅TOR／延迟 |
 
-验收需核对新execution／ready预算、预热与正式SoulX线程ID、complete识别跳过事件、限定差异的控制对照、播放实录及完整固定分母。完成作业和低延迟分别报告，不能由本地146项检查推定GPU性能。
+验收需核对新execution／ready预算、预热与正式SoulX线程ID、complete识别跳过事件、播放实录及完整固定分母。r3只核对一致性检查的明确取消记录，不执行原生对照；r2限定差异对照结果保留作历史证据。完成作业和低延迟分别报告，不能由本地回归推定GPU性能。
 
 远端冻结目录为 `~/parathink-soulx-duplug/source/ntf054-65d15e6`，独立detached worktree，工作区干净。源码归档 `submit_logs/ntf054-65d15e6-source.tar.gz` 的SHA256为 `0b09c31e3054957869d59d7ce1f5f550f4971d97933f144e113252b4c8793e77`，与本地从同提交生成的scripts／configs归档一致；native_soulx.json的SHA256为 `128978377266770c1cdee4c244c81eefb3b3c85d7536b4707eff528e36412ba9`。四套推理conda均已核对存在，仅复用原资产。
 
 ## 顺序衔接
+
+r3使用新源码内的衔接脚本，SHA256为7e876b2e2fdf58133d0dec0d64cf8b09b2367c986883e9a8c287f0e7d472c9db；PID3997827，绑定单CPU、2GiB地址空间、最长12小时。只读队列查询最多4次尝试，5／15／30秒退避，失败不按空队列处理；提交不自动重试。r3状态、日志及提交回执位于analysis/ntf054-half-campaign-20261105-r3/。r3源码目录为source/ntf054-82ff9ba，独立干净detached worktree；scripts／configs归档SHA256为e593ef2bc3b92c2800053ff4ff4b0f9d8e36b1577158dd32034e55e538f8bf05，与本地一致；配置及输入摘要与r2相同。本地153项完整回归及编译、空白检查通过。
 
 [衔接脚本](../../../scripts/remote/fdb30_retest_followup.md)的r2 PID2769918已退出，state为failed。其17:49:33调用`vc list`时调度接口10.24.18.34:6443拒绝连接，vc随后报告内部NameError并退出1，衔接脚本未重试而停止。该故障与稍后的模型控制对照失败分别记录。启动采样RSS为21976KiB；部署在 `submit_logs/ntf054-followup.py`，SHA256为 `c389f3ccb0fe18bfe27ba3ea921b3ac1e28b6a5b7c5fb693e6461a893f49cc31`，没有改变模型提交。进程原限制为单CPU、2GiB地址空间和12小时。
 

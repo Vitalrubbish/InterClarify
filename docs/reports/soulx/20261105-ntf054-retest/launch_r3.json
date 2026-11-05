@@ -1,0 +1,98 @@
+{
+  "submitted_at_utc": "2026-11-05 13:21:38 UTC",
+  "source_commit": "82ff9babcd77cdf19d53735020bb47871b028ff1",
+  "source": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-82ff9ba",
+  "smoke_job": "job-179388489846387768877-xuan-zhang",
+  "smoke_run": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/runs/ntf054-half-smoke-20261105-r3",
+  "campaign_output": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/ntf054-half-campaign-20261105-r3",
+  "followup_pid": 3997827,
+  "followup_command": [
+    "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/bin/python",
+    "-B",
+    "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-82ff9ba/scripts/remote/fdb30_retest_followup.py",
+    "--source",
+    "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-82ff9ba",
+    "--source-commit",
+    "82ff9babcd77cdf19d53735020bb47871b028ff1",
+    "--root",
+    "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug",
+    "--output",
+    "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/ntf054-half-campaign-20261105-r3",
+    "--audit-python",
+    "/hpc_stor03/sjtu_home/xuan.zhang/turncontrol-comparison/envs/soulx/bin/python",
+    "--smoke-run",
+    "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/runs/ntf054-half-smoke-20261105-r3",
+    "--smoke-job",
+    "job-179388489846387768877-xuan-zhang",
+    "--prefix",
+    "ntf054-half-20261105-r3"
+  ],
+  "submit_command": [
+    "vc",
+    "submit",
+    "--image",
+    "docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4",
+    "--partition",
+    "pdgpu-4090",
+    "--job",
+    "ntf054-smoke-20261105-r3",
+    "--num-task",
+    "1",
+    "--cpu-per-task",
+    "12",
+    "--mem-per-task",
+    "64G",
+    "--gpu-per-task",
+    "3",
+    "JOB=1:1",
+    "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/submit_logs/ntf054-half-smoke-20261105-r3.log",
+    "--cmd",
+    "env SOULX_SOURCE=/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-82ff9ba SOULX_RUN_ID=ntf054-half-smoke-20261105-r3 SOULX_MODE=smoke timeout --signal=TERM --kill-after=10 7200 bash /hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-82ff9ba/scripts/remote/run_fdb30_half_duplex.sh"
+  ],
+  "native_equivalence": {
+    "executed": false,
+    "status": "disabled_by_user",
+    "passed": null,
+    "comparison_policy": "disabled_by_user"
+  },
+  "source_archive_sha256": "e593ef2bc3b92c2800053ff4ff4b0f9d8e36b1577158dd32034e55e538f8bf05",
+  "followup_sha256": "7e876b2e2fdf58133d0dec0d64cf8b09b2367c986883e9a8c287f0e7d472c9db",
+  "manifest_sha256": "403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cde4f3c07",
+  "inference_resources": {
+    "gpus": 3,
+    "cpus": 12,
+    "ram_gib": 64,
+    "timeout_seconds": 7200,
+    "gpu_limit_mib": 22528,
+    "output_limit_mib": 2048,
+    "pcm_limit_mib": 16
+  },
+  "scoring_resources": {
+    "gpus": 1,
+    "cpus": 4,
+    "ram_gib": 32,
+    "timeout_seconds": 3600,
+    "judge": "excluded_by_user"
+  },
+  "single_concurrent_job": true,
+  "native_config_sha256": "128978377266770c1cdee4c244c81eefb3b3c85d7536b4707eff528e36412ba9",
+  "last_verified": {
+    "checked_at_utc": "2026-11-05 13:22:11 UTC",
+    "smoke_status": "Pending",
+    "followup_status": "waiting_smoke",
+    "followup_alive": true,
+    "followup_rss_kib": 21844,
+    "scheduler_query_error": null
+  },
+  "followup_limits": {
+    "cpu_affinity_count": 1,
+    "address_space_gib": 2,
+    "deadline_hours": 12,
+    "queue_query_max_attempts": 4,
+    "queue_query_backoff_seconds": [
+      5,
+      15,
+      30
+    ]
+  }
+}
