@@ -205,7 +205,9 @@ def replay(model, worker, audio, identity, output, realtime, order=('controller'
     reader = threading.Thread(target=feed, name='pcm-arrival', daemon=True) if realtime else None
     result = {'case_id': identity, 'passed': False, 'timing_mode': 'realtime' if realtime else 'warmup',
               'audio_sha256': pcm_digest(audio), 'real_samples': len(audio), 'lane_order': list(order) if worker else ['controller'],
-              'lane_execution': 'concurrent' if worker else 'single', 'started_at': started}
+              'lane_execution': 'concurrent' if worker else 'single', 'started_at': started,
+              'controller_execution': 'replay_thread',
+              'skip_complete_recognition': frontend.controller.skip_complete_recognition}
     cursor = 0
     previous_release = 0.
     try:
@@ -375,12 +377,12 @@ def full_warmup(model, worker, audio, output):
         for count in LENGTHS:
             values = np.resize(speech, count).astype(np.float64)
             began = time.monotonic()
-            text = model.cascade_asr.recognize(values, 16000)
+            with torch.inference_mode():
+                text = model.cascade_asr.recognize(values, 16000)
             torch.cuda.synchronize()
             direct.append({'samples': count, 'sha256': pcm_digest(values), 'dtype': str(values.dtype), 'text': text,
                            'seconds': time.monotonic() - began, 'source': 'cyclic_fixed_speech'})
-        order = ('controller', 'asr') if index == 0 else ('asr', 'controller')
-        record = replay(model, worker, audio, f'warmup_{index}', output, False, order)
+        record = replay(model, worker, audio, f'warmup_{index}', output, False)
         record['direct_sensevoice'] = direct
         rounds.append(record)
     required = ['sensevoice_text', 'text_revision', 'native_complete', 'reset']
@@ -399,8 +401,8 @@ def full_warmup(model, worker, audio, output):
             'passed': bool(passed and equivalence['passed'] and reset_rng_equal)}
 
 
-def compare_native(model, audio):
-    """Compare real official and observed calls using the same resident weights."""
+def compare_native(model, audio, *, skip_complete_recognition=True):
+    """Compare native control, explicitly auditing the complete-only ASR omission."""
     import torch
 
     def tensor_hash(value):
@@ -409,7 +411,8 @@ def compare_native(model, audio):
     def execute(observed):
         seed_all()
         model.reset()
-        trace, records = [], []
+        trace, records, complete_recognitions = [], [], []
+        phase = {'state': None}
         originals = {name: getattr(model, name) for name in ('_audio_to_tokens', '_state_predict', 'reset')}
         recognize, forward = model.cascade_asr.recognize, model.model.llm.forward
         reset_count = [0]
@@ -419,18 +422,24 @@ def compare_native(model, audio):
             return originals['reset']()
 
         def tokens(*args, **kwargs):
+            phase['state'] = None
             result = originals['_audio_to_tokens'](*args, **kwargs)
             trace.append({'audio_pcm': [pcm_digest(value) for value in args], 'audio_tokens': list(result)})
             return result
 
         def state(*args, **kwargs):
             result = predict(*args, **kwargs)
+            phase['state'] = result
             trace.append({'effective_state': result})
             return result
 
         def asr(*args, **kwargs):
             result = recognize(*args, **kwargs)
-            trace.append({'asr_pcm': pcm_digest(args[0]), 'asr_text': result})
+            event = {'asr_pcm': pcm_digest(args[0]), 'asr_text': result}
+            if phase['state'] == '<|user_complete|>':
+                complete_recognitions.append(dict(event, step_id=step))
+            else:
+                trace.append(event)
             return result
 
         def llm(*args, **kwargs):
@@ -443,7 +452,8 @@ def compare_native(model, audio):
         wrapper = None
         try:
             if observed:
-                wrapper = NativeSoulX(model, synchronize=torch.cuda.synchronize)
+                wrapper = NativeSoulX(model, synchronize=torch.cuda.synchronize,
+                                      skip_complete_recognition=skip_complete_recognition)
             predict = model._state_predict
             model._state_predict = state
             ledger = PCMLedger()
@@ -458,11 +468,15 @@ def compare_native(model, audio):
                     receipt = wrapper.step(ledger, step)
                     returned = receipt['native_result']
                 else:
-                    returned = model.process(values)
+                    with torch.inference_mode():
+                        returned = model.process(values)
                 processed = min(len(audio), processed + (1920 if previous_reset else 2560))
                 previous_reset = reset_count[0] != before
                 submitted = processed if previous_reset else min(submitted + 2560, len(audio))
                 records.append({'result': returned, 'resets': reset_count[0],
+                    'complete_service': phase['state'] == '<|user_complete|>' and returned['state'] == 'speak',
+                    'complete_recognition_skipped': sum(e['kind'] == 'complete_recognition_skipped'
+                                                       for e in receipt['events']) if wrapper else 0,
                     'buffers': {name: pcm_digest(getattr(model, name)) for name in ('buffer', 'buffer_for_asr', 'cascade_buffer')},
                     'control_text': model.past_state['cascade_text'] if model.past_state else None})
             torch.cuda.synchronize()
@@ -475,10 +489,33 @@ def compare_native(model, audio):
             seed_all()
             model.reset()
             torch.cuda.synchronize()
-        return {'records': records, 'trace': trace}
+        return {'records': records, 'trace': trace, 'complete_recognitions': complete_recognitions}
 
     reference, observed = execute(False), execute(True)
-    return {'passed': reference == observed, 'audio_sha256': pcm_digest(audio),
+    def control_projection(run):
+        records = deepcopy(run['records'])
+        for record in records:
+            record.pop('complete_recognition_skipped')
+            if skip_complete_recognition and record['complete_service']:
+                record['result']['text'] = ''
+        return {'records': records, 'trace': run['trace']}
+
+    expected_steps = [i for i, row in enumerate(reference['records']) if row['complete_service']]
+    reference_steps = [event['step_id'] for event in reference['complete_recognitions']]
+    observed_steps = [i for i, row in enumerate(observed['records'])
+                      if row['complete_recognition_skipped'] == 1]
+    if skip_complete_recognition:
+        allowed = (reference_steps == expected_steps == observed_steps
+                   and not observed['complete_recognitions']
+                   and all(row['complete_recognition_skipped'] == int(row['complete_service'])
+                           and (not row['complete_service'] or row['result'].get('text') == '')
+                           for row in observed['records']))
+    else:
+        allowed = reference == observed
+    return {'passed': control_projection(reference) == control_projection(observed) and allowed,
+            'comparison_policy': 'control_equivalence_skip_complete_asr' if skip_complete_recognition else 'strict_native',
+            'authorized_omissions': len(expected_steps) if skip_complete_recognition else 0,
+            'audio_sha256': pcm_digest(audio),
             'reference': reference, 'observed': observed}
 
 
@@ -487,9 +524,10 @@ def limited_warmup(model, worker, audio, output):
     seed_all()
     model.reset()
     began = time.monotonic()
-    for _ in range(3):
-        model.process(np.zeros(2560, np.float32))
-    text = model.cascade_asr.recognize(np.zeros(53760, np.float32), 16000)
+    with torch.inference_mode():
+        for _ in range(3):
+            model.process(np.zeros(2560, np.float32))
+        text = model.cascade_asr.recognize(np.zeros(53760, np.float32), 16000)
     torch.cuda.synchronize()
     record = {'controller_steps': 3, 'silent_sensevoice_samples': 53760,
               'silent_sensevoice_text': text, 'seconds': time.monotonic() - began, 'x2_rounds': []}
@@ -540,6 +578,9 @@ def run(args):
         controller = load_native_controller(args.upstream, args.assets / 'models/soulx-duplug',
             args.assets / 'models/sensevoice-small', args.output / 'assets')
         model = controller.model
+        result['execution'] = controller.execution_manifest
+        if worker is not None:
+            result['x2_execution'] = worker.ready
         controller.detach()
         result['load_seconds'] = time.monotonic() - began
         audio, normalization = warmup_audio(args.warmup_audio)

@@ -42,13 +42,31 @@ def real_end(spans, default=0):
 
 
 class _Capture(ast.NodeTransformer):
-    """Add read-only observations and track existing PCM concatenations."""
+    """Track native calls and route the authorized complete-only ASR override."""
 
     def __init__(self):
-        self.counts = [0, 0, 0, 0]
+        self.counts = [0, 0, 0, 0, 0]
+        self._in_complete = False
+
+    def visit_If(self, node):
+        previous = self._in_complete
+        test = node.test
+        if (isinstance(test, ast.Compare) and isinstance(test.left, ast.Name)
+                and test.left.id == 'state' and len(test.ops) == 1
+                and isinstance(test.ops[0], ast.Eq) and len(test.comparators) == 1
+                and isinstance(test.comparators[0], ast.Constant)
+                and test.comparators[0].value == '<|user_complete|>'):
+            self._in_complete = True
+        self.generic_visit(node)
+        self._in_complete = previous
+        return node
 
     def visit_Call(self, node):
         self.generic_visit(node)
+        if (self._in_complete and isinstance(node.func, ast.Attribute)
+                and ast.unparse(node.func) == 'self.cascade_asr.recognize'):
+            self.counts[4] += 1
+            node.func = ast.parse('self._native.complete_text', mode='eval').body
         if isinstance(node.func, ast.Attribute) and isinstance(node.func.value, ast.Name):
             if (node.func.value.id, node.func.attr) == ('np', 'concatenate'):
                 self.counts[0] += 1
@@ -95,7 +113,7 @@ def capture_methods(model, source_path=None):
     methods = [n for n in cls.body if isinstance(n, ast.FunctionDef) and n.name in names]
     capture = _Capture()
     tree = capture.visit(ast.Module(body=methods, type_ignores=[]))
-    if {n.name for n in methods} != names or capture.counts != [5, 1, 1, 1]:
+    if {n.name for n in methods} != names or capture.counts != [5, 1, 1, 1, 1]:
         raise ValueError('Native SoulX observation sites differ')
     ast.fix_missing_locations(tree)
     namespace = dict(inspect.unwrap(model.infer.__func__).__globals__)
@@ -108,7 +126,8 @@ class NativeSoulX:
 
     def __init__(self, model, *, synchronize, source_path=None, on_state=None,
                  session_id='session', turn_id='turn',
-                 is_live=lambda: True, clock=time.monotonic, profile=False):
+                 is_live=lambda: True, clock=time.monotonic, profile=False,
+                 skip_complete_recognition=True):
         cfg = model.config.infer_config
         inp = cfg.input
         if (inp.sample_rate, inp.chunk_size, inp.audio_back_size, inp.audio_ahead_size) != (16000, 2560, 15360, 640):
@@ -117,8 +136,11 @@ class NativeSoulX:
             raise ValueError('Native English SenseVoice is required')
         if hasattr(model, '_native') or hasattr(model, '_pt'):
             raise ValueError('Controller already has an owner')
+        if type(skip_complete_recognition) is not bool:
+            raise ValueError('Complete recognition policy must be boolean')
         methods = capture_methods(model, source_path)
         self.model, self.synchronize, self.clock = model, synchronize, clock
+        self.skip_complete_recognition = skip_complete_recognition
         self.on_state, self.is_live = on_state, is_live
         self.session_id, self.turn_id = session_id, turn_id
         self.generation = self.processed_until = self.submitted_until = 0
@@ -223,6 +245,14 @@ class NativeSoulX:
         self._events.append(call)
         return result
 
+    def complete_text(self, audio, *args, **kwargs):
+        if not self.skip_complete_recognition:
+            return self._observe_recognize(audio, *args, **kwargs)
+        self._events.append({'kind': 'complete_recognition_skipped',
+                             'controller_generation': self.generation,
+                             'samples': len(audio), 'reason': 'independent_x2_text'})
+        return ''
+
     def capture_state(self, token, delta_text):
         self.synchronize()
         speech = bool(self.model.speech_detected)
@@ -247,6 +277,7 @@ class NativeSoulX:
         self._events.append(dict(frame, kind='state'))
 
     def step(self, ledger, step_id):
+        import torch
         if not self._feeding.acquire(blocking=False):
             raise RuntimeError('Native controller calls must be serial')
         try:
@@ -260,7 +291,8 @@ class NativeSoulX:
             self.submitted_until = real_end(spans, start)
             self._record(audio, spans)
             self._pending_buffer_spans = self._spans(self.model.buffer) + spans
-            result = self.model.process(audio)
+            with torch.inference_mode():
+                result = self.model.process(audio)
             self.synchronize()
             if self._frame is None:
                 raise RuntimeError('Native call produced no state observation')
@@ -277,6 +309,12 @@ class NativeSoulX:
                     'windows': self._windows, 'state': deepcopy(self._frame),
                     'service_state': service_state, 'service_completion_source': source,
                     'service_text': result.get('text') or '', 'native_result': result,
+                    'skip_complete_recognition': self.skip_complete_recognition,
+                    'execution_thread': {'ident': threading.get_ident(),
+                                         'native_id': threading.get_native_id(),
+                                         'name': threading.current_thread().name,
+                                         'cpu_threads': torch.get_num_threads(),
+                                         'interop_threads': torch.get_num_interop_threads()},
                     'generation_after': self.generation, 'events': deepcopy(self._events)}
         except Exception as exc:
             self.closed, self.failure = True, str(exc)

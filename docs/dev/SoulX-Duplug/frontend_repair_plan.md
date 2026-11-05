@@ -1,6 +1,6 @@
 # SoulX＋X2 长尾与 TOR 修复方案
 
-2026-11-05，NTF-051。状态：分析与方案已完成，尚未实施修复或启动新 GPU 实验。依据[逐例归因](../../reports/soulx/20261105-fdb30-half-duplex/control_backlog_analysis.md)、历史 CPU 剖析和 FunASR 1.2.6 发布包源码；新增证据见 [long_tail_source_audit.json](../../reports/soulx/20261105-fdb30-half-duplex/long_tail_source_audit.json)。
+2026-11-05，NTF-051原始方案。依据[逐例归因](../../reports/soulx/20261105-fdb30-half-duplex/control_backlog_analysis.md)、历史CPU剖析和FunASR 1.2.6发布包源码；新增证据见[源码摘要](../../reports/soulx/20261105-fdb30-half-duplex/long_tail_source_audit.json)。后续用户授权的NTF-052／053已完成[执行线程、资源与complete重识别修订](runtime_execution_update.md)的本地实现与146项回归，尚未远端复测。本文其他候选方案仍未实施，包括服务层交接许可恢复、缓存释放／dtype调整和历史识别分离。
 
 建议先修运行时的执行线程和资源设置，再恢复本轮半双工评测适配器的原生服务交接。160ms 联合发布暂时保留。当前证据足以确定 TOR 漏答的若干行为原因，但没有当前 30 秒调用内部的完整 profile，不能把某个底层机制写成已确认根因。
 

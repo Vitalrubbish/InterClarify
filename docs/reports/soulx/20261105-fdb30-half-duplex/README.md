@@ -25,6 +25,8 @@
 
 本次未评价打断回答相关性，TOR不保证回答了新问题；没有backchannel样本，不包含ICC／JSD。固定FDB30不是完整FDB总体，也不能与TurnControlComparison的672条全量系统成绩直接比较。
 
+后续代码修复NTF-052／053已完成[固定执行线程、CPU预算与取消complete重识别](../../../dev/SoulX-Duplug/runtime_execution_update.md)，本地146项回归通过。尚未进行修复后GPU复测，本页指标保持正式r2原值。
+
 ## 系统与评分口径
 
 - SoulX原生控制与独立X2每160ms联合发布。有效complete且有新正文时启动普通LLM；有效nonidle取消生成及播放。X2正文跨SoulX reset保留，每次只追加尚未提交给LLM的新正文。其他状态不启动回答，官方服务等待兜底不额外映射成回答许可。

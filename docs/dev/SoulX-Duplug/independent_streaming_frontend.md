@@ -1,5 +1,7 @@
 # SoulX 原生控制与独立流式转写
 
+2026-11-05后续授权修订见[执行线程与complete交接](runtime_execution_update.md)：SoulX固定在回放线程，X2使用常驻辅助线程，SenseVoice及各模型进程计算线程统一为2；跳过complete后的整段SenseVoice重识别。原状态预测、短窗识别、reset、X2正文及160ms联合发布保持。旧018／019报告只描述当时版本，不能代替修复后的真实权重复测。
+
 更新：2026-11-03。状态：NTF-015／016原生封装、同源PCM／160ms屏障及独立X2适配已完成本地实现与契约验收，见[交付记录](../../reports/soulx/20261102-native-independent-frontend/README.md)。[NTF-017联合提交](../../reports/soulx/20261102-ntf017-joint-publication/README.md)已交付；[018](../../reports/soulx/20261103-ntf018-warmup/README.md)真实权重预检通过，[019](../../reports/soulx/20261103-ntf019-fdb30/README.md)已由用户审核归档。[NTF-030](../../reports/soulx/20261103-latency-limit-removal/README.md)已取消800ms停止条件，后续LLM接入暂缓。
 
 ## 1. 目标与设计原因

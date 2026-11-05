@@ -85,7 +85,7 @@ class Backend:
         self.lock = threading.Lock()
         self.events_lock = threading.Lock()
         self.cancelled = set()
-        torch.set_num_threads(4)
+        torch.set_num_threads(2)
         torch.set_num_interop_threads(1)
         if not torch.cuda.is_available() or torch.cuda.device_count() != 1:
             raise RuntimeError("One scheduler-assigned GPU is required per backend")
@@ -110,6 +110,8 @@ class Backend:
             self.model = IndexTTS(cfg_path=str(path / "config.yaml"), model_dir=str(path),
                                   device="cuda:0", is_fp16=True, use_cuda_kernel=False)
             self.generate({"id": "warmup", "text": "Hello, I am ready.", "seed": 42})
+        if torch.get_num_threads() != 2 or torch.get_num_interop_threads() != 1:
+            raise RuntimeError("Backend initialization changed the CPU thread budget")
 
     def is_cancelled(self, identifier):
         with self.events_lock:
@@ -236,6 +238,8 @@ def main():
     with Server(str(args.socket), Handler) as server:
         args.socket.chmod(0o600)
         ready = {"backend": args.backend, "socket": str(args.socket), "python": sys.prefix,
+                 "cpu_threads": backend.torch.get_num_threads(),
+                 "interop_threads": backend.torch.get_num_interop_threads(),
                  "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                  "ready_at": time.monotonic(), "voice": str(args.voice),
                  "tts_inference_method": args.tts_inference_method, "tts_num_beams": args.tts_num_beams}

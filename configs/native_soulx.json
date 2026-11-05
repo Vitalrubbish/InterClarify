@@ -1,4 +1,9 @@
 {
+  "execution_config": {
+    "cpu_threads": 2,
+    "interop_threads": 1,
+    "skip_complete_recognition": true
+  },
   "source_commit": "a0b9063843df69619b087b95b74597b2176910b8",
   "soulx_revision": "61701c4ab8193cc1ee2220d3848872ac6c720142",
   "sensevoice_revision": "3847d57b6bdf2dd8875cb1508d2af43d80a16bf7",

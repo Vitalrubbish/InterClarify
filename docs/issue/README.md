@@ -4,6 +4,8 @@
 
 ## 当前工作单
 
+NTF-052／053已完成[固定执行线程、CPU资源配置及跳过complete重识别](../dev/SoulX-Duplug/runtime_execution_update.md)并归档，完整本地146项回归通过。160ms联合提交、短窗状态识别和reset保持；尚未远端复测性能／TOR。
+
 NTF-051 已完成[长尾机制复核与具体修复方案](../dev/SoulX-Duplug/frontend_repair_plan.md)并归档：历史 CPU fbank 剖析、执行线程差异、FunASR 线程覆盖与缓存清理，以及服务交接／正文晚到的修复和验证计划；未修改推理或启动新模型作业。
 
 NTF-050 已完成[最新 FDB30 控制积压与 TOR 归因](../reports/soulx/20261105-fdb30-half-duplex/control_backlog_analysis.md)并归档：逐批定位控制路长尾、服务层等待兜底消费差异，并按相同 ID 复核历史纯 SoulX 成绩；未修改推理或启动 GPU 作业。
@@ -14,7 +16,8 @@ NTF-050 已完成[最新 FDB30 控制积压与 TOR 归因](../reports/soulx/2026
 
 | 工作单 | 状态 | 交付 |
 | --- | --- | --- |
-| [NTF-051](../dev/SoulX-Duplug/frontend_repair_plan.md) | 分析与方案已完成并归档 | 按证据强度拆分长尾候选，明确文件／方法、修复优先级与远端验证矩阵；修复尚未实施 |
+| [NTF-052／053](../dev/SoulX-Duplug/runtime_execution_update.md) | 实现及本地验证已完成并归档 | 固定SoulX／X2线程、各进程2线程预算、跳过complete整段识别及限定差异的控制对照；146项本地回归通过，GPU复测待后续 |
+| [NTF-051](../dev/SoulX-Duplug/frontend_repair_plan.md) | 分析与方案已完成并归档 | 按证据强度拆分长尾候选，明确文件／方法和验证矩阵；后续052／053已实施本轮授权子项，其余候选待实施 |
 | [NTF-050](../reports/soulx/20261105-fdb30-half-duplex/control_backlog_analysis.md) | 分析已完成并归档 | 4720 批计时、相同 ID 历史对照及 5 条接话失败归因；底层长尾机制待进一步计时 |
 | [NTF-015／016](../reports/soulx/20261102-native-independent-frontend/README.md) | 已完成并归档 | 原生控制封装、冻结加载器、同源 PCM、160ms 屏障和独立 X2 适配 |
 | [NTF-017](../reports/soulx/20261102-ntf017-joint-publication/README.md) | 已完成并归档 | 文本／状态／进度联合提交，移除前端停止旁路 |

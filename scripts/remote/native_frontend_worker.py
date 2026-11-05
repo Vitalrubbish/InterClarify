@@ -181,7 +181,11 @@ def serve(args):
         Path(__file__).parents[2] / 'configs/x2_streaming_probe.json')
     engine = asr.engine
     profile_engine(engine)
-    send(connection, {'loaded_at': time.monotonic(), 'startup': asr.startup})
+    if torch.get_num_threads() != 2 or torch.get_num_interop_threads() != 1:
+        raise RuntimeError('X2 initialization changed the CPU thread budget')
+    send(connection, {'loaded_at': time.monotonic(), 'startup': asr.startup,
+                      'cpu_threads': torch.get_num_threads(),
+                      'interop_threads': torch.get_num_interop_threads()})
     asr = None
     while True:
         try:

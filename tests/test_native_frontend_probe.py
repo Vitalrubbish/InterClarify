@@ -239,6 +239,49 @@ class ProbeTests(unittest.TestCase):
         self.assertEqual(len(result['reference']['records']), 3)
         self.assertFalse(hasattr(model, '_native'))
 
+    def test_control_comparison_allows_only_complete_service_asr_omission(self):
+        model = official_model([99, 5, 99, 3] * 2, ['whole turn'])
+        original = model.model.llm
+
+        class LLM:
+            forward = staticmethod(original)
+
+            def __call__(self, *args, **kwargs):
+                return self.forward(*args, **kwargs)
+
+        model.model.llm = LLM()
+        with patch('torch.cuda.synchronize'), patch('native_frontend_probe.NativeSoulX',
+                side_effect=lambda *args, **kwargs: NativeSoulX(*args, source_path=SOURCE, **kwargs)):
+            result = compare_native(model, np.full(5000, .1, np.float32))
+        self.assertTrue(result['passed'])
+        self.assertEqual(result['comparison_policy'], 'control_equivalence_skip_complete_asr')
+        self.assertEqual(result['authorized_omissions'], 1)
+        self.assertEqual(result['reference']['records'][1]['result']['text'], 'whole turn')
+        self.assertEqual(result['observed']['records'][1]['result']['text'], '')
+        self.assertEqual(len(result['reference']['complete_recognitions']), 1)
+        self.assertEqual(result['observed']['complete_recognitions'], [])
+
+    def test_control_comparison_rejects_unexpected_model_input_change(self):
+        model = official_model([99, 6] * 100)
+        original = model.model.llm
+
+        class LLM:
+            forward = staticmethod(original)
+
+            def __call__(self, *args, **kwargs):
+                return self.forward(*args, **kwargs)
+
+        model.model.llm = LLM()
+
+        def changed(*args, **kwargs):
+            wrapper = NativeSoulX(*args, source_path=SOURCE, **kwargs)
+            model.text_embeds = model.text_embeds + 1
+            return wrapper
+
+        with patch('torch.cuda.synchronize'), patch('native_frontend_probe.NativeSoulX', side_effect=changed):
+            result = compare_native(model, np.full(5000, .1, np.float32))
+        self.assertFalse(result['passed'])
+
 
 class IPCTests(unittest.TestCase):
     def test_message_limit_and_transport_errors_are_explicit(self):

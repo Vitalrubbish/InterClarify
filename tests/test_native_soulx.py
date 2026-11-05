@@ -112,7 +112,7 @@ class NativeTests(unittest.TestCase):
         initial_rng = np.random.get_state()
         np.random.seed(42)
         wrapped = official_model(predictions, ['hello', 'world', 'whole turn'])
-        wrapper = self.attach(wrapped, profile=True)
+        wrapper = self.attach(wrapped, profile=True, skip_complete_recognition=False)
         ledger = self.ledger()
         results, expected, cursors = [], [], [0, 2560, 5120, 7040]
         # Compare the same PCM/config/seed; reset's pending lookahead comes from the source ledger.
@@ -141,6 +141,38 @@ class NativeTests(unittest.TestCase):
                             for event in results[0]['events']))
         self.assertEqual(results[0]['windows']['main']['spans'][0]['samples'], 640)
         self.assertEqual(results[0]['state']['state_observed_until'], 2560)
+
+    def test_complete_skips_only_service_recognition_and_keeps_state_asr_and_reset(self):
+        model = official_model([0, 5, 99, 3, 99, 6], ['hello'])
+        wrapper = self.attach(model, profile=True)
+        ledger = self.ledger()
+        first = wrapper.step(ledger, 0)
+        completed = wrapper.step(ledger, 1)
+        following = wrapper.step(ledger, 2)
+        self.assertEqual(first['state']['control_text'], 'hello')
+        self.assertEqual(completed['service_state'], 'speak')
+        self.assertEqual(completed['service_completion_source'], 'model_complete')
+        self.assertEqual(completed['service_text'], '')
+        self.assertTrue(completed['skip_complete_recognition'])
+        self.assertEqual(sum(e['kind'] == 'complete_recognition_skipped' for e in completed['events']), 1)
+        self.assertFalse(any(e['kind'] == 'sensevoice' for e in completed['events']))
+        self.assertEqual(sum(e[0] == 'recognize' for e in model.trace), 1)
+        self.assertEqual(completed['generation_after'], 1)
+        self.assertEqual(following['windows']['main']['spans'][-1]['start'],
+                         completed['state']['state_processed_until'])
+
+    def test_native_process_runs_inside_inference_mode(self):
+        model = official_model([99, 6])
+        original = model.process
+        contexts = []
+
+        def process(audio):
+            contexts.append(torch.is_inference_mode_enabled())
+            return original(audio)
+
+        model.process = process
+        self.attach(model).step(self.ledger(), 0)
+        self.assertEqual(contexts, [True])
 
     def test_nonidle_is_only_staged_and_has_no_output_hook(self):
         model = official_model([0, 5, 99, 5, 99, 5], ['hello'])

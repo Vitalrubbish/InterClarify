@@ -123,6 +123,48 @@ class X2Tests(unittest.TestCase):
 
 
 class AudioTests(unittest.TestCase):
+    def test_controller_stays_on_replay_thread_and_asr_reuses_one_helper(self):
+        for order in (('controller', 'asr'), ('asr', 'controller')):
+            frontend = self.make(order=order, concurrent=True)
+            calls = {'controller': [], 'asr': []}
+            for lane in calls:
+                original = getattr(frontend, lane).step
+
+                def record(*args, _lane=lane, _original=original):
+                    calls[_lane].append(threading.current_thread())
+                    return _original(*args)
+
+                getattr(frontend, lane).step = record
+            frontend.append_pcm(np.full(5320, .1, np.float32))
+            frontend.advance()
+            frontend.advance()
+            self.assertEqual(calls['controller'], [threading.current_thread()] * 2)
+            self.assertEqual(len(calls['asr']), 4)
+            self.assertTrue(all(t is calls['asr'][0] for t in calls['asr']))
+            self.assertIsNot(calls['asr'][0], threading.current_thread())
+            frontend.close()
+            self.assertFalse(calls['asr'][0].is_alive())
+
+    def test_moving_replay_thread_is_rejected_before_next_batch(self):
+        frontend = self.make(concurrent=True)
+        frontend.append_pcm(np.full(5320, .1, np.float32))
+        frontend.advance()
+        errors = []
+
+        def move():
+            try:
+                frontend.advance()
+            except Exception as exc:
+                errors.append(exc)
+
+        thread = threading.Thread(target=move)
+        thread.start()
+        thread.join(3)
+        self.assertFalse(thread.is_alive())
+        self.assertRegex(str(errors[0]), 'another replay thread')
+        self.assertEqual(frontend.barrier.step_id, 1)
+        self.assertTrue(frontend.closed)
+
     def test_concurrent_lanes_start_together_but_publish_only_after_both_finish(self):
         for first in ('controller', 'asr'):
             with self.subTest(first=first):
@@ -222,7 +264,9 @@ class AudioTests(unittest.TestCase):
         asr = IndependentX2(FakeEngine(emissions or [None] * 20), clock=self.clock)
         context = kwargs.pop('context', SharedContext(clock=self.clock))
         context.open_user_turn('session', 'turn', 'x2_streaming_asr')
-        return DualAudioFrontend(controller, asr, context=context, clock=self.clock, order=order, **kwargs)
+        frontend = DualAudioFrontend(controller, asr, context=context, clock=self.clock, order=order, **kwargs)
+        self.addCleanup(frontend.close)
+        return frontend
 
     def test_both_orders_require_both_receipts_and_do_not_wait_for_text(self):
         for order in (('asr', 'controller'), ('controller', 'asr')):
@@ -442,8 +486,9 @@ class AudioTests(unittest.TestCase):
         self.assertEqual(frontend.barrier.step_id, 0)
 
     def test_close_or_overflow_during_inference_rejects_late_results(self):
-        for reason in ('close', 'overflow'):
-            frontend = self.make(('asr', 'controller'), emissions=[[12, 2], None])
+        for concurrent, reason in ((False, 'close'), (False, 'overflow'),
+                                   (True, 'close'), (True, 'overflow')):
+            frontend = self.make(('asr', 'controller'), emissions=[[12, 2], None], concurrent=concurrent)
             frontend.append_pcm(np.zeros(2760, np.float32))
             step = frontend.asr.engine.step
 
@@ -466,8 +511,7 @@ class AudioTests(unittest.TestCase):
     def test_close_during_second_decode_preserves_previous_complete_snapshot(self):
         frontend = self.make(('asr', 'controller'), emissions=[[12, 2], None, [13, 2], None])
         frontend.append_pcm(np.full(5320, .1, np.float32))
-        frontend.advance()
-        first = self.view(frontend)
+        first = []
         original = frontend.asr.engine.step
         entered, proceed = threading.Event(), threading.Event()
         errors = []
@@ -478,10 +522,11 @@ class AudioTests(unittest.TestCase):
                 raise TimeoutError('Decode was not released')
             return original(audio, callback)
 
-        frontend.asr.engine.step = delayed
-
         def advance():
             try:
+                frontend.advance()
+                first.append(self.view(frontend))
+                frontend.asr.engine.step = delayed
                 frontend.advance()
             except RuntimeError as exc:
                 errors.append(str(exc))
@@ -497,8 +542,8 @@ class AudioTests(unittest.TestCase):
             worker.join(5)
         self.assertFalse(worker.is_alive())
         self.assertEqual(len(errors), 1)
-        self.assertEqual(self.view(frontend)['text'], first['text'])
-        self.assertEqual(self.view(frontend)['step_id'], first['step_id'])
+        self.assertEqual(self.view(frontend)['text'], first[0]['text'])
+        self.assertEqual(self.view(frontend)['step_id'], first[0]['step_id'])
         self.assertEqual(frontend.barrier.step_id, 1)
 
     def test_commit_failure_never_releases_or_changes_previous_observation(self):
@@ -542,6 +587,7 @@ class AudioTests(unittest.TestCase):
         def advance():
             try:
                 frontend.advance()
+                frontend.advance()
             except Exception as exc:
                 errors.append(exc)
 
@@ -559,7 +605,6 @@ class AudioTests(unittest.TestCase):
             worker.join(5)
         self.assertFalse(errors)
         self.assertFalse(worker.is_alive())
-        frontend.advance()
         self.assertEqual(self.view(frontend)['step_id'], 1)
 
     def test_barrier_rejects_missing_duplicate_stale_and_cancelled_receipts(self):

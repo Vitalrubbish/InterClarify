@@ -49,16 +49,21 @@ def verify_source(upstream, frozen):
 
 
 def load_native_controller(upstream, soulx_assets, sensevoice_assets, run_dir, **callbacks):
-    """Resolve asset paths only; preserve native initialization and inference."""
+    """Verify pinned assets and load the documented frontend execution policy."""
     import yaml
     frozen = json.loads(CONFIG.read_text())
+    execution = frozen['execution_config']
+    if execution != {'cpu_threads': 2, 'interop_threads': 1, 'skip_complete_recognition': True}:
+        raise ValueError('Unsupported frontend execution policy')
+    if callbacks.get('skip_complete_recognition', True) is not True:
+        raise ValueError('The loaded frontend must skip complete recognition')
     upstream, soulx_assets, sensevoice_assets = [Path(p).resolve() for p in (upstream, soulx_assets, sensevoice_assets)]
     run_dir = Path(run_dir)
     evidence = {'frozen_config_sha256': digest(CONFIG), 'source': verify_source(upstream, frozen),
                 'soulx': verify_files(soulx_assets, frozen['soulx_files']),
                 'sensevoice': verify_files(sensevoice_assets, frozen['sensevoice_files']),
                 'source_commit': frozen['source_commit'], 'soulx_revision': frozen['soulx_revision'],
-                'sensevoice_revision': frozen['sensevoice_revision']}
+                'sensevoice_revision': frozen['sensevoice_revision'], 'execution_config': execution}
     config = deepcopy(frozen['runtime_config'])
     for key in ('glm_tokenizer_path', 'model_name', 'init_ckpt_path_lora'):
         config['model_config'][key] = str(soulx_assets / Path(config['model_config'][key]).relative_to('pretrained_models'))
@@ -80,12 +85,15 @@ def load_native_controller(upstream, soulx_assets, sensevoice_assets, run_dir, *
         sys.path.insert(0, str(upstream))
         import torch
         import funasr
+        torch.set_num_threads(execution['cpu_threads'])
+        if torch.get_num_interop_threads() != execution['interop_threads']:
+            torch.set_num_interop_threads(execution['interop_threads'])
         auto_model = funasr.AutoModel
 
         def local_sensevoice(*args, **kwargs):
             if args or kwargs.get('model') != 'iic/SenseVoiceSmall':
                 raise ValueError('Unexpected native ASR asset request')
-            return auto_model(**dict(kwargs, model=str(sensevoice_assets)))
+            return auto_model(**dict(kwargs, model=str(sensevoice_assets), ncpu=execution['cpu_threads']))
 
         offline = {'HF_HUB_OFFLINE': '1', 'TRANSFORMERS_OFFLINE': '1', 'MODELSCOPE_OFFLINE': '1'}
         with patch.dict(os.environ, offline), patch.object(funasr, 'AutoModel', local_sensevoice):
@@ -99,6 +107,20 @@ def load_native_controller(upstream, soulx_assets, sensevoice_assets, run_dir, *
                     or tokenizer.decode([token_id], skip_special_tokens=False) != token):
                 raise ValueError(f'Frozen SoulX state vocabulary differs: {token}')
         torch.cuda.synchronize()
+        actual = {'cpu_threads': torch.get_num_threads(),
+                  'interop_threads': torch.get_num_interop_threads(),
+                  'sensevoice_ncpu': model.cascade_asr.sensevoice_model.kwargs['ncpu'],
+                  'thread_ident': threading.get_ident(), 'thread_native_id': threading.get_native_id(),
+                  'skip_complete_recognition': execution['skip_complete_recognition']}
+        if (actual['cpu_threads'] != execution['cpu_threads']
+                or actual['interop_threads'] != execution['interop_threads']
+                or actual['sensevoice_ncpu'] != execution['cpu_threads']):
+            raise RuntimeError('Model initialization changed the CPU thread budget')
+        with (run_dir / 'execution.json').open('x') as stream:
+            json.dump(actual, stream, indent=2)
+            stream.write('\n')
+    callbacks.setdefault('skip_complete_recognition', execution['skip_complete_recognition'])
     result = NativeSoulX(model, synchronize=torch.cuda.synchronize, **callbacks)
     result.asset_manifest = evidence
+    result.execution_manifest = actual
     return result

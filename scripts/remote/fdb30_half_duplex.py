@@ -166,6 +166,8 @@ def main():
         native = load_native_controller(args.upstream, args.assets/'models/soulx-duplug',
             args.assets/'models/sensevoice-small', args.output/'assets')
         model = native.model
+        report['execution'] = native.execution_manifest
+        report['x2_execution'] = worker.ready
         native.detach()
         # Serialize the shared SenseVoice teacher and audible-tail history recognition.
         sensevoice = model.cascade_asr.sensevoice_model

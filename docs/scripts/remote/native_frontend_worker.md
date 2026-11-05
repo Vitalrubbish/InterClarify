@@ -9,3 +9,5 @@
 `WindowLedger`核对窗口长度、有限值、来源span长度与PCM摘要，只允许解码器读取已经发送的窗口。`serve()`每次create统一种子42并重置会话；clear清除音频／文字KV、PCM引用、正文、回调、计数及阶段记录，并等待设备完成，常驻权重保留。
 
 `profile_engine()`为真实encode和LM调用增加设备同步计时；DECODE token与EOS来自原引擎，不人工补齐或改写。X2采样／EOS／开放组合同仍由IndependentX2负责。本地检查使用轻量引擎，真实跨conda加载和显存待远端验收。
+
+NTF-052：子进程固定intra-op=2、interop=1，加载引擎后检查实际值并写入ready回执；依赖改变预算则加载失败。父进程X2的IPC调用由每个前端会话的常驻辅助线程承担，实际解码仍在同一子进程顺序执行，未改变80ms协议或模型并发数。

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from collections import deque
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, wait
 import threading
 import time
 
@@ -176,6 +176,9 @@ class DualAudioFrontend:
         self.closed, self.failure, self.started_at = False, None, None
         self.close_failure = None
         self._state_lock, self._worker = threading.RLock(), threading.Lock()
+        self._controller_thread = self._asr_thread = None
+        self._executor = (ThreadPoolExecutor(max_workers=1, thread_name_prefix='frontend-asr')
+                          if concurrent else None)
         self.last_step = None
         controller_live, asr_live = controller.is_live, asr.is_live
         controller.is_live = lambda: not self.closed and controller_live()
@@ -242,6 +245,7 @@ class DualAudioFrontend:
             if lane == 'controller':
                 receipt = self.controller.step(self.ledger, ticket[1])
             else:
+                self._asr_thread = threading.current_thread()
                 frames = []
                 for _ in range(2):
                     if self.ledger.eof and self.asr.frame_index * 1280 >= self.ledger.end:
@@ -277,14 +281,22 @@ class DualAudioFrontend:
                 required = max(source_start + 2760, self.controller.submitted_until + 2560)
                 if not self.ledger.eof and self.ledger.end < required:
                     return None
+                current_thread = threading.current_thread()
+                if self._controller_thread is None:
+                    self._controller_thread = current_thread
+                elif self._controller_thread is not current_thread:
+                    raise RuntimeError('Controller execution cannot move to another replay thread')
                 ticket = self.barrier.begin(source_start, min(source_start + 2560, self.ledger.end),
                                             self.ledger.ready_at(required))
             if self.concurrent:
-                # Joining the bounded helper also fences cancellation before detach.
-                with ThreadPoolExecutor(max_workers=1, thread_name_prefix='frontend-lane') as executor:
-                    pending = executor.submit(self._advance_lane, self.order[0], ticket)
-                    self._advance_lane(self.order[1], ticket)
-                    pending.result()
+                # Keep native inference on the warmed replay thread for every batch.
+                pending = self._executor.submit(self._advance_lane, 'asr', ticket)
+                try:
+                    self._advance_lane('controller', ticket)
+                finally:
+                    # A failed native call must still fence the other lane before detach.
+                    wait((pending,))
+                pending.result()
             else:
                 for lane in self.order:
                     self._advance_lane(lane, ticket)
@@ -324,9 +336,14 @@ class DualAudioFrontend:
                     self.close_failure = str(exc)
         self.controller.cancel()
         self.asr.cancel()
+        if self._executor is not None:
+            self._executor.shutdown(wait=False, cancel_futures=True)
 
     def close(self):
         self.cancel('runtime_close')
+        if self._executor is not None:
+            self._executor.shutdown(wait=threading.current_thread() is not self._asr_thread,
+                                    cancel_futures=True)
 
     def diagnostics(self):
         with self._state_lock:

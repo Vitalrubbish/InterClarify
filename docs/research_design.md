@@ -1,5 +1,7 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
+2026-11-05 用户追加授权修复[前端执行线程、资源与complete交接](dev/SoulX-Duplug/runtime_execution_update.md)：SoulX固定在回放线程，X2使用常驻辅助线程，各模型进程计算线程预算统一为2；取消有效complete后的整段SenseVoice重识别，保留状态预测所需的短窗识别、reset及X2正文。此次不改回答触发条件或160ms联合提交，不扩展Layer 1训练范围；实现与本地验证见NTF-052／053，真实性能需远端另验。
+
 2026-11-05 新增用户授权的 FDB30 完整系统评测：将当前 SoulX＋独立 X2 前端接入普通半双工 LLM 与可取消 TTS，按 FDB v1.0 统计实际播放指标。此次解除的只是该独立评测的下游接入限制；不实施 Layer 1 训练、thinking 或现役 Agent 切换。使用既有固定 30 条，先验证生成、取消和播放实录，再正式回放与评分。30/30已完成，按用户最新指令仅测TOR／延迟，实测与实时积压限制见[报告](reports/soulx/20261105-fdb30-half-duplex/README.md)。具体范围与资源见[评测方案](dev/SoulX-Duplug/fdb30_half_duplex.md)。按用户要求不新建 issue。
 
 2026-11-03，当前采用 SoulX-Duplug 官方配置＋并行 X2Streaming-ASR：原生 SenseVoice 控制、独立 X2 完整词正文及 160ms 联合提交。前端实现、[NTF-018](reports/soulx/20261103-ntf018-warmup/README.md)真实权重预检和[NTF-019](reports/soulx/20261103-ntf019-fdb30/README.md)固定 FDB30 验收已归档；[NTF-030](reports/soulx/20261103-latency-limit-removal/README.md)已取消 800ms 时长停止条件，保留容量与作业资源保护。后续 LLM 接入暂缓，当前未接 LLM／CoT／TTS 或切换现役 Agent。合同见[独立前端](dev/SoulX-Duplug/independent_streaming_frontend.md)与[Context 接口](dev/SoulX-Duplug/shared_context_interface.md)。
