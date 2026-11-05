@@ -24,6 +24,8 @@ wait_fallback分支和取消后已播尾音的历史识别不属于本次删除�
 
 ## 实测验证
 
+后续NTF-054的真实对照失败已由NTF-056[定位](../../reports/soulx/20261105-ntf054-retest/failure_analysis.md)：删除complete整段调用还改变了dither的CPU随机数消耗，产生3处后续短窗转写差异。本地轻量替身未覆盖这一副作用；单卡干预实验补齐该次特征提取后对照通过。运行时兼容修复和正式FDB30复测仍待执行，不能将诊断工具视作已修复。
+
 本地`interclarify-dev` conda完整回归146项通过，退出0；针对性控制／加载检查12项、双路32项和预热／IPC检查19项分别通过。完整回归使用OMP、MKL、OpenBLAS各2线程；没有加载GPU模型或启动集群作业。编译检查、配置JSON解析、变更文件的同路径说明和Git空白检查一并核对。
 
 后续远端复核可沿用已有三条smoke和固定FDB30入口。须保存新源码及配置摘要、加载execution.json、后端ready预算、原生对照的comparison_policy／authorized_omissions，并逐帧核对SoulX执行线程是否与预热／加载一致。仅完成本地代码交付，不能将修复前30条的TOR和延迟作为本版本成绩。

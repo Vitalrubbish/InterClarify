@@ -1,0 +1,197 @@
+{
+  "source_commit": "65d15e60730a3e01c580ee68a73d75c4439741db",
+  "script_sha256": "d63743a803998f63ca082d937db76da63218893606b565538b1cfccc7fa32701",
+  "versions": {
+    "torch": "2.6.0+cu126",
+    "torchaudio": "2.6.0+cu126",
+    "funasr": "1.2.6"
+  },
+  "audio_sha256": "e4f1fbb00e547eadba7f9d14e1644ba089f97522dc2a20ce56a15ebb378bb145",
+  "preparation": {
+    "policy": "rms_005_peak_09_pcm16_v2",
+    "original_rms": 0.0004977665624957115,
+    "original_peak": 0.003160715103149414,
+    "gain": 100.44869175082601,
+    "prepared_peak": 0.317474365234375,
+    "prepared_rms": 0.04998846147404681,
+    "speech_sha256": "f6118839bfc8b8bd4ba3f5544993a5538a5e03693abb78619ae77bce440bd0e6"
+  },
+  "comparisons": {
+    "baseline": {
+      "passed": false,
+      "align_complete_rng": false,
+      "dither": 1.0,
+      "trace_lengths": [
+        275,
+        275
+      ],
+      "trace_differences": [
+        {
+          "index": 192,
+          "reference": {
+            "asr_pcm": "ca6f6defe35f63d40be16629829af8500a9805eb31b6083578c30769c4d7cc6d",
+            "asr_text": "And moving into higher education back."
+          },
+          "observed": {
+            "asr_pcm": "ca6f6defe35f63d40be16629829af8500a9805eb31b6083578c30769c4d7cc6d",
+            "asr_text": "I moving into higher education back."
+          }
+        },
+        {
+          "index": 208,
+          "reference": {
+            "asr_pcm": "2e100674cdae0daa119877d5f7c9eed58d67fd9e43af55b1afb33f0650fdd837",
+            "asr_text": "If moving into higher education back in your home."
+          },
+          "observed": {
+            "asr_pcm": "2e100674cdae0daa119877d5f7c9eed58d67fd9e43af55b1afb33f0650fdd837",
+            "asr_text": "Of moving into higher education back in your home."
+          }
+        },
+        {
+          "index": 213,
+          "reference": {
+            "asr_pcm": "6a5a354753bb772cd07baa8238d9eef8e0d949ee5cb996a06782ace0cceb4ef0",
+            "asr_text": "If moving is a higher education back in your home country."
+          },
+          "observed": {
+            "asr_pcm": "6a5a354753bb772cd07baa8238d9eef8e0d949ee5cb996a06782ace0cceb4ef0",
+            "asr_text": "A moving is a higher education back in your home country."
+          }
+        }
+      ],
+      "supplements": [],
+      "recognitions": 69,
+      "feature_calls": 69
+    },
+    "aligned": {
+      "passed": true,
+      "align_complete_rng": true,
+      "dither": 1.0,
+      "trace_lengths": [
+        275,
+        275
+      ],
+      "trace_differences": [],
+      "supplements": [
+        {
+          "step_id": 27,
+          "samples": 97280,
+          "pcm_sha256": "83435b25c8a7278059e7dfd875417849a512257fef0e961835e85a3032aedca2",
+          "rng_before": "548df565cdd10b9aa5cce65f7d4b99416d3b9c9b4e65ccccd313cc4b75e06982",
+          "rng_after": "0ad1696bcab5ce652c39c7a8598645aaed3a09d696783702e334999bdc785225"
+        }
+      ],
+      "recognitions": 69,
+      "feature_calls": 70
+    }
+  },
+  "execution": {
+    "cpu_threads": 2,
+    "interop_threads": 1,
+    "sensevoice_ncpu": 2,
+    "thread_ident": 140581862156096,
+    "thread_native_id": 20,
+    "skip_complete_recognition": true
+  },
+  "seconds": 149.65135227143764,
+  "peak_rss_kib": 8990364,
+  "peak_gpu_allocated_mib": 4774.61083984375,
+  "peak_gpu_reserved_mib": 4910.0,
+  "output_bytes_before_summary": 498979,
+  "job_id": "job-179388371390743074870-xuan-zhang",
+  "baseline_exactly_matches_original_failure": true,
+  "paired_short_call_audit": {
+    "baseline": {
+      "short_call_count": 34,
+      "same_pcm_count": 34,
+      "rng_before_difference_count": 13,
+      "feature_difference_count": 13,
+      "text_difference_count": 3,
+      "complete_recognition": {
+        "index": 21,
+        "pcm_sha256": "83435b25c8a7278059e7dfd875417849a512257fef0e961835e85a3032aedca2",
+        "samples": 97280,
+        "dtype": "float64",
+        "rng_before": "548df565cdd10b9aa5cce65f7d4b99416d3b9c9b4e65ccccd313cc4b75e06982",
+        "text": "In many cases, enrolling on a gap year course abroad can actually improve your chances.",
+        "rng_after": "0ad1696bcab5ce652c39c7a8598645aaed3a09d696783702e334999bdc785225"
+      },
+      "first_short_after_complete": {
+        "reference": {
+          "index": 22,
+          "pcm_sha256": "1ddfce4d3ec88f6ca4800f295dcbcedb16fca94b6819dbefcf9ae3b08c58f859",
+          "samples": 53760,
+          "dtype": "float64",
+          "rng_before": "0ad1696bcab5ce652c39c7a8598645aaed3a09d696783702e334999bdc785225",
+          "text": "",
+          "rng_after": "dd17dfd92bac54c14a62b6c324d83c92b39c19bc6d5f9125b0e1e9cc414158be"
+        },
+        "observed": {
+          "index": 56,
+          "pcm_sha256": "1ddfce4d3ec88f6ca4800f295dcbcedb16fca94b6819dbefcf9ae3b08c58f859",
+          "samples": 53760,
+          "dtype": "float64",
+          "rng_before": "548df565cdd10b9aa5cce65f7d4b99416d3b9c9b4e65ccccd313cc4b75e06982",
+          "text": "",
+          "rng_after": "4e664193121ff11d3ae8a07e4d9d598bf7ca186eec195af733ca78e74d97ae02"
+        }
+      }
+    },
+    "aligned": {
+      "short_call_count": 34,
+      "same_pcm_count": 34,
+      "rng_before_difference_count": 0,
+      "feature_difference_count": 0,
+      "text_difference_count": 0,
+      "complete_recognition": {
+        "index": 21,
+        "pcm_sha256": "83435b25c8a7278059e7dfd875417849a512257fef0e961835e85a3032aedca2",
+        "samples": 97280,
+        "dtype": "float64",
+        "rng_before": "548df565cdd10b9aa5cce65f7d4b99416d3b9c9b4e65ccccd313cc4b75e06982",
+        "text": "In many cases, enrolling on a gap year course abroad can actually improve your chances.",
+        "rng_after": "0ad1696bcab5ce652c39c7a8598645aaed3a09d696783702e334999bdc785225"
+      },
+      "first_short_after_complete": {
+        "reference": {
+          "index": 22,
+          "pcm_sha256": "1ddfce4d3ec88f6ca4800f295dcbcedb16fca94b6819dbefcf9ae3b08c58f859",
+          "samples": 53760,
+          "dtype": "float64",
+          "rng_before": "0ad1696bcab5ce652c39c7a8598645aaed3a09d696783702e334999bdc785225",
+          "text": "",
+          "rng_after": "dd17dfd92bac54c14a62b6c324d83c92b39c19bc6d5f9125b0e1e9cc414158be"
+        },
+        "observed": {
+          "index": 56,
+          "pcm_sha256": "1ddfce4d3ec88f6ca4800f295dcbcedb16fca94b6819dbefcf9ae3b08c58f859",
+          "samples": 53760,
+          "dtype": "float64",
+          "rng_before": "0ad1696bcab5ce652c39c7a8598645aaed3a09d696783702e334999bdc785225",
+          "text": "",
+          "rng_after": "dd17dfd92bac54c14a62b6c324d83c92b39c19bc6d5f9125b0e1e9cc414158be"
+        }
+      },
+      "complete_feature_and_supplement_equal": true
+    }
+  },
+  "evidence_sha256": {
+    "analysis/ntf056-native-asr-rng-20261105-r1/aligned/comparison.json": "3f08284869693d79b02579923d9ed2ee6e801dd3dc9e332f5437956bf120ec69",
+    "analysis/ntf056-native-asr-rng-20261105-r1/aligned/features.json": "18609b5f8bd77b93b243675f68564abddbe4f71f591b454a280e377728372f7a",
+    "analysis/ntf056-native-asr-rng-20261105-r1/aligned/recognitions.json": "5e010e5336e592a37184afdb0bd152346a896d2be27b960f86b6fcd3d189160f",
+    "analysis/ntf056-native-asr-rng-20261105-r1/aligned/summary.json": "e3b2974185952388a85c748465e30e0e6a6870bf20eff65ceb2cb00c1299f335",
+    "analysis/ntf056-native-asr-rng-20261105-r1/assets/execution.json": "ea26429cdbc4f0be2638a2e756067b1c8bc960df19132a9787f4953fe27cae41",
+    "analysis/ntf056-native-asr-rng-20261105-r1/assets/native_assets.json": "4c95b810d5d4501877b5f1b3c4df4617bd9d8f42b8e2e544f12237a44593d4b9",
+    "analysis/ntf056-native-asr-rng-20261105-r1/assets/native_soulx.yaml": "5acbe520df41c6ec2b67c043bd5e0de819e03d5ab8cc0460a05785f698dec7f3",
+    "analysis/ntf056-native-asr-rng-20261105-r1/baseline/comparison.json": "49badb4c0a39b8456ff750ad6d8a255b79b41f66a91008d420a21ad90e901ff6",
+    "analysis/ntf056-native-asr-rng-20261105-r1/baseline/features.json": "9c414f384fbc6350df54d6e837afcd3ff4cd0a79fea8a69fd5b584d1746d8853",
+    "analysis/ntf056-native-asr-rng-20261105-r1/baseline/recognitions.json": "2ba8dca2af5a55856a32c06083c06d4cdd739c1ba0a280e3344338769b82778c",
+    "analysis/ntf056-native-asr-rng-20261105-r1/baseline/summary.json": "d9f2e86f5f160a572befdf82808b81424284678108b0d3c0db048540ccf9bd4f",
+    "analysis/ntf056-native-asr-rng-20261105-r1/summary.json": "f086d5d5820eb5f0eafb61183666e4f1f23ff17324f44f9d3f265cdc3ee4f353",
+    "submit_logs/ntf054-half-smoke-20261105-r2.log": "2c7acbab39301581fd95aac1954c031d7ec2769aec99b9f445e21e3eaac1114b",
+    "submit_logs/ntf056-diagnose-native-asr-rng.py": "d63743a803998f63ca082d937db76da63218893606b565538b1cfccc7fa32701",
+    "submit_logs/ntf056-native-asr-rng-20261105-r1.log": "d371f50ca1e86e87ac10ae8e3c30abd7ab055640f75d8838dbcc45d93dd4b399"
+  },
+  "output_bytes_total": 502332
+}

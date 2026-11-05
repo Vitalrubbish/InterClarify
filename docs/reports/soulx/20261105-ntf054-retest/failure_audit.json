@@ -1,0 +1,100 @@
+{
+  "scope": "existing_failure_evidence_and_installed_source_audit",
+  "source_commit": "65d15e60730a3e01c580ee68a73d75c4439741db",
+  "original_comparison_passed": false,
+  "audio_sha256": "e4f1fbb00e547eadba7f9d14e1644ba089f97522dc2a20ce56a15ebb378bb145",
+  "record_lengths": [
+    59,
+    59
+  ],
+  "trace_lengths": [
+    275,
+    275
+  ],
+  "trace_counts": {
+    "audio_pcm": 59,
+    "llm_input": 123,
+    "effective_state": 59,
+    "asr_pcm": 34
+  },
+  "trace_differences": [
+    {
+      "trace_index": 192,
+      "step_id": 40,
+      "reference": {
+        "asr_pcm": "ca6f6defe35f63d40be16629829af8500a9805eb31b6083578c30769c4d7cc6d",
+        "asr_text": "And moving into higher education back."
+      },
+      "observed": {
+        "asr_pcm": "ca6f6defe35f63d40be16629829af8500a9805eb31b6083578c30769c4d7cc6d",
+        "asr_text": "I moving into higher education back."
+      }
+    },
+    {
+      "trace_index": 208,
+      "step_id": 43,
+      "reference": {
+        "asr_pcm": "2e100674cdae0daa119877d5f7c9eed58d67fd9e43af55b1afb33f0650fdd837",
+        "asr_text": "If moving into higher education back in your home."
+      },
+      "observed": {
+        "asr_pcm": "2e100674cdae0daa119877d5f7c9eed58d67fd9e43af55b1afb33f0650fdd837",
+        "asr_text": "Of moving into higher education back in your home."
+      }
+    },
+    {
+      "trace_index": 213,
+      "step_id": 44,
+      "reference": {
+        "asr_pcm": "6a5a354753bb772cd07baa8238d9eef8e0d949ee5cb996a06782ace0cceb4ef0",
+        "asr_text": "If moving is a higher education back in your home country."
+      },
+      "observed": {
+        "asr_pcm": "6a5a354753bb772cd07baa8238d9eef8e0d949ee5cb996a06782ace0cceb4ef0",
+        "asr_text": "A moving is a higher education back in your home country."
+      }
+    }
+  ],
+  "unauthorized_record_difference_steps": [],
+  "complete_reference": [
+    {
+      "asr_pcm": "83435b25c8a7278059e7dfd875417849a512257fef0e961835e85a3032aedca2",
+      "asr_text": "In many cases, enrolling on a gap year course abroad can actually improve your chances.",
+      "step_id": 27
+    }
+  ],
+  "complete_observed": [],
+  "short_asr_difference_count": 3,
+  "state_and_llm_and_audio_token_trace_equal": true,
+  "reset_and_retained_service_records_equal": true,
+  "evidence_sha256": {
+    "analysis/ntf054-half-campaign-20261105-r2/campaign.log": "4333f31a0ff36fe281a0495e3870289a9d09349ad8065005ca7154be5c15a735",
+    "analysis/ntf054-half-campaign-20261105-r2/state.json": "acffcaf76cfeef2823acc03c072392001f799c1a05d52f5df2407d01e2a0376f",
+    "envs/soulx/lib/python3.11/site-packages/funasr/auto/auto_model.py": "f04e9b984e0d12f109212e7a711e03eb276f20673e418165f88c9ac40417b520",
+    "envs/soulx/lib/python3.11/site-packages/funasr/frontends/wav_frontend.py": "4771916cbbdc02ad095493ada7f2d9502a3f3c58befab0867d7e43769363d26f",
+    "envs/soulx/lib/python3.11/site-packages/funasr/models/sense_voice/model.py": "0aa5864d4f40facae5f2bc849877f1c979461d00d07f154e82bd69a320e82d52",
+    "envs/soulx/lib/python3.11/site-packages/funasr/utils/load_utils.py": "73b55f1104ea5ee2304f0493a9b442a3b1ff90968183737b7cb24418cb673e23",
+    "envs/soulx/lib/python3.11/site-packages/torchaudio/compliance/kaldi.py": "5cbea1a584ddea748f6f68a621d794e13334e88d9faa1d40986f7af32f196d29",
+    "models/sensevoice-small/config.yaml": "f71e239ba36705564b5bf2d2ffd07eece07b8e3f2bbf6d2c99d8df856339ac19",
+    "runs/ntf054-half-smoke-20261105-r2/exit_code.txt": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+    "runs/ntf054-half-smoke-20261105-r2/frontend/assets/execution.json": "d035da566fbce4935eac4af7c1390549d173d9a82da6e4e0978cbd28770da6f8",
+    "runs/ntf054-half-smoke-20261105-r2/frontend/native_equivalence.json": "49badb4c0a39b8456ff750ad6d8a255b79b41f66a91008d420a21ad90e901ff6",
+    "runs/ntf054-half-smoke-20261105-r2/frontend/warmup.json": "12d3f5689055fbba42007d53a6b005c5a0ba348cd5f2fdf30c9be81d46a980e8",
+    "submit_logs/ntf054-half-smoke-20261105-r2.log": "2c7acbab39301581fd95aac1954c031d7ec2769aec99b9f445e21e3eaac1114b"
+  },
+  "source_findings": {
+    "funasr_frontend_default_dither": 1.0,
+    "model_config_explicit_dither": false,
+    "kaldi_dither_rng": "torch.randn(strided_input.shape, device=device, dtype=dtype)",
+    "seed_all_scope": "start_of_each_reference_or_observed_replay",
+    "skip_complete_rng_compensation": false
+  },
+  "scheduler_failure": {
+    "time_utc": "2026-11-05 09:49:33 UTC",
+    "operation": "vc list",
+    "underlying_error": "ConnectionRefusedError to 10.24.18.34:6443",
+    "secondary_error": "vc internal NameError: ps is not defined",
+    "campaign_error": "CalledProcessError; no retry",
+    "independent_of_smoke_control_comparison": true
+  }
+}

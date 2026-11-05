@@ -4,9 +4,9 @@
 
 ## 当前工作单
 
-NTF-055已完成此前r2重提与跟踪切换并归档；[NTF-054](NTF-054.md)复测尚未完成。20:44复核smoke作业job-179387030286102615198-xuan-zhang已因控制对照失败退出1，样本0/3；衔接进程另因调度查询连接失败退出，当前队列为空，正式30条和评分未提交。
+NTF-056已完成[NTF-054失败原因调查](../reports/soulx/20261105-ntf054-retest/failure_analysis.md)并归档：complete整段识别省略后，dither的CPU随机数消耗偏移；单卡基线完整复现3处差异，仅补齐特征提取后275条轨迹对照通过。调度衔接另因API连接失败且查询无重试退出。诊断完成后队列为空，推理实现未修复。
 
-[NTF-054](NTF-054.md)继续跟踪[修复后FDB30复测及失败定位](../reports/soulx/20261105-ntf054-retest/README.md)：源码固定65d15e6，两轮预热覆盖通过，但后续同PCM短窗转写出现未授权差异，需定位后恢复；原定三条smoke、固定30条和TOR／延迟评分范围保持。
+NTF-055已完成此前r2重提与跟踪切换并归档；[NTF-054](NTF-054.md)继续跟踪修复及恢复。原smoke样本0/3，正式30条和评分未提交；源码固定65d15e6，原定三条smoke、固定30条和TOR／延迟评分范围及验收条件保持，不能将诊断通过记为正式复测完成。
 
 NTF-052／053已完成[固定执行线程、CPU资源配置及跳过complete重识别](../dev/SoulX-Duplug/runtime_execution_update.md)并归档，完整本地146项回归通过。160ms联合提交、短窗状态识别和reset保持；尚未远端复测性能／TOR。
 
@@ -20,6 +20,7 @@ NTF-049 已完成[训练数据构造、配比与分阶段时长方案](../dev/la
 
 | 工作单 | 状态 | 交付 |
 | --- | --- | --- |
+| [NTF-056](../reports/soulx/20261105-ntf054-retest/failure_analysis.md) | 调查已完成并归档 | 真实权重完整复现及CPU特征提取干预，确认dither随机状态偏移；区分调度衔接故障，生产修复及正式复测待NTF-054 |
 | [NTF-052／053](../dev/SoulX-Duplug/runtime_execution_update.md) | 实现及本地验证已完成并归档 | 固定SoulX／X2线程、各进程2线程预算、跳过complete整段识别及限定差异的控制对照；146项本地回归通过，GPU复测待后续 |
 | [NTF-051](../dev/SoulX-Duplug/frontend_repair_plan.md) | 分析与方案已完成并归档 | 按证据强度拆分长尾候选，明确文件／方法和验证矩阵；后续052／053已实施本轮授权子项，其余候选待实施 |
 | [NTF-050](../reports/soulx/20261105-fdb30-half-duplex/control_backlog_analysis.md) | 分析已完成并归档 | 4720 批计时、相同 ID 历史对照及 5 条接话失败归因；底层长尾机制待进一步计时 |

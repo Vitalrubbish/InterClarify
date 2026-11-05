@@ -1,0 +1,19 @@
+{
+  "source_commit": "65d15e60730a3e01c580ee68a73d75c4439741db",
+  "script_sha256": "d63743a803998f63ca082d937db76da63218893606b565538b1cfccc7fa32701",
+  "output": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/ntf056-native-asr-rng-20261105-r1",
+  "resources": {
+    "gpus": 1,
+    "cpus": 4,
+    "ram_gib": 32,
+    "timeout_seconds": 1200,
+    "gpu_alloc_limit_gib": 22,
+    "output_limit_mib": 128
+  },
+  "command": "'timeout' '--signal=TERM' '--kill-after=10' '1200' 'env' 'PYTHONNOUSERSITE=1' 'PYTHONDONTWRITEBYTECODE=1' 'HF_HUB_OFFLINE=1' 'TRANSFORMERS_OFFLINE=1' 'MODELSCOPE_OFFLINE=1' 'PIP_NO_INDEX=1' 'TOKENIZERS_PARALLELISM=false' 'OMP_NUM_THREADS=2' 'MKL_NUM_THREADS=2' 'OPENBLAS_NUM_THREADS=2' 'NUMEXPR_NUM_THREADS=2' '/hpc_stor03/sjtu_home/xuan.zhang/turncontrol-comparison/envs/soulx/bin/python' '-B' '/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/submit_logs/ntf056-diagnose-native-asr-rng.py' '--source' '/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-65d15e6' '--root' '/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug' '--assets' '/hpc_stor03/sjtu_home/xuan.zhang/turncontrol-comparison' '--warmup-audio' '/hpc_stor03/sjtu_home/xuan.zhang/interclarify-xturnix-fleurs/dataset/fleurs_en_us/audio/dev/786465049904960526.wav' '--output' '/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/ntf056-native-asr-rng-20261105-r1'",
+  "job_id": "job-179388371390743074870-xuan-zhang",
+  "submitted_at_beijing": "2026-11-05 21:01:54",
+  "finished_at_beijing": "2026-11-05 21:04 (summary file timestamp)",
+  "state": "completed_diagnostic_baseline_reproduced_aligned_passed",
+  "queue_empty_after_diagnostic": true
+}
