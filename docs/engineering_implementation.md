@@ -1,6 +1,6 @@
 # 工程实施计划
 
-更新：2026-11-03。第一阶段 ASR-Frontend 已完成，当前路线为 **SoulX-Duplug 官方配置＋并行 X2Streaming-ASR**。前端工作收口，后续 LLM 接入按用户指令暂缓。
+更新：2026-11-05。第一阶段 ASR-Frontend 已完成，当前路线为 **SoulX-Duplug 官方配置＋并行 X2Streaming-ASR**。独立半双工 LLM／TTS 评测已完成首轮，[NTF-054](issue/NTF-054.md) 正在跟踪修复后复测；Layer 1 训练与现役 Agent 切换尚未实施。
 
 ## 1. 当前目标与运行底座
 
@@ -21,7 +21,7 @@ SoulX 保留内部 SenseVoice 教师、门控、滑窗差分／KV 修订、状�
 | 5 | [NTF-019](reports/soulx/20261103-ntf019-fdb30/README.md) | 已由用户审核通过并归档，原始运行与限制保留 |
 | 6 | [NTF-030](reports/soulx/20261103-latency-limit-removal/README.md) | 已取消 800ms 时长停止条件，169 项本地检查通过 |
 
-前端工作已收口，无活动接入任务。两路每批联合写 Context 后推进，不等待消费者；原生 reset 不清正文，生产者持续到达，所有时标与 EOF 尾部独立报告。
+前端验收已收口，独立半双工评测与执行线程修复见[评测报告](reports/soulx/20261105-fdb30-half-duplex/README.md)和[执行修订](dev/SoulX-Duplug/runtime_execution_update.md)。NTF-054 完整复测尚未完成。两路每批联合写 Context 后推进，不等待消费者；原生 reset 不清正文，生产者持续到达，所有时标与 EOF 尾部独立报告。
 
 ## 3. 资源与执行边界
 
@@ -31,7 +31,7 @@ SoulX 保留内部 SenseVoice 教师、门控、滑窗差分／KV 修订、状�
 
 ## 4. 后续边界
 
-用户已确认将 Layer 0 系统附和能力并入 Layer 1；训练目标、因果数据与分阶段学习思路见[训练设计](research_design/layer1_training.md)，不单独部署附和预测器。研究包含真实控制噪声、首音前取消和开播后恢复；具体协议、训练参数与资源安排在实施阶段确定，未启动语料生成、训练或 LLM／TTS 接入。
+用户已确认将 Layer 0 系统附和能力并入 Layer 1；训练目标、因果数据与分阶段学习思路见[训练设计](research_design/layer1_training.md)，不单独部署附和预测器。研究包含真实控制噪声、首音前取消和开播后恢复；具体协议、训练参数与资源安排在实施阶段确定，未启动语料生成、训练或 Layer 1／thinking 接入；普通半双工 LLM／TTS 已用于独立评测。旧 DuplexCascade 候选加载及固定 25 条重放入口已退出当前训练路线并清理，现役官方权重基线保留。
 
 普通回答生成边界、单一输出执行点及 TTS 播放所有权保持；状态统一经联合快照交付，撤回前端专用停止旁路。后续 CoT 条件化控制目标仍见[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)，本次不构造训练数据或注入 CoT。图源及 PDF／PNG 已由 NTF-017 同步；不表示回答或播放链路已实现。
 

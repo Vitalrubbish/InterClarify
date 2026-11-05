@@ -40,16 +40,7 @@ conda run --no-capture-output -n parathink-dev python -m unittest discover -s te
 
 ## X-Talk 测试
 
-`xtalk/` 是独立仓库，运行时依赖已纳入 `requirements.txt`。在 `xtalk/` 目录下运行：
-
-```bash
-PYTHONPATH=src conda run --no-capture-output -n parathink-dev python -m unittest \
-  tests.test_continuous_streaming_client tests.test_nemotron_streaming_client \
-  tests.test_duplex_protocol tests.test_duplex_observability tests.test_duplex_runtime \
-  tests.test_kokoro_segmented tests.test_qwen3_asr_reconnect -v
-```
-
-完整 X-Talk 测试还包含可选模型依赖；缺少对应后端时相关用例应跳过，不以跳过冒充通过。
+`xtalk/` 是独立仓库，现役基线仍依赖它；当前 SoulX 前端与半双工评测不因此切换现役 Agent。其测试清单以该仓库当前文件为准，不再保留已经失效的逐模块命令。ParaThink 自有测试使用上面的 discover 命令；独立仓库测试应在其目录及对应 conda 环境中运行。
 
 ## 测试依赖
 

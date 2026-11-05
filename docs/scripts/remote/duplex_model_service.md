@@ -6,7 +6,7 @@
 
 ## 类设计与核心方法
 
-`OfficialDuplexModel` 按 `train_cfg.json` 加载本地 Qwen2-7B-Instruct，resize token embedding，创建 q/v LoRA 与 embedding/head 保存层，再通过 `scripts/runtime/layer1_model.py` 严格恢复官方 state。tokenizer 使用 fast 实现，BF16 推理，所有参数冻结并 `eval()`。可选 `--adaptation` 在官方权重恢复后调用 `scripts/runtime/layer1_candidate.py` 加载已登记候选；不提供时为 B0。
+`OfficialDuplexModel` 按 `train_cfg.json` 加载本地 Qwen2-7B-Instruct，resize token embedding，创建 q/v LoRA 与 embedding/head 保存层，再通过 `scripts/runtime/layer1_model.py` 严格恢复官方 state。tokenizer 使用 fast 实现，BF16 推理，所有参数冻结并 `eval()`。仅加载官方权重，健康信息保留 B0 标记。旧 delayed-start／punctuation 候选路线已由从官方 Qwen2.5-7B-Instruct 开始的训练方案取代，删除对应候选加载入口。
 
 `PrefixCachePool` 按显式 `session_id` 保存有界 `DynamicCache`，管理前缀匹配、会话淘汰、字节/token/会话数上限与 TTL。缓存取出后独占使用，成功结束且长度核对通过才归还；历史改写、取消或错误会丢弃在用缓存。完整历史与原始生成 ID 始终是事实来源。
 
@@ -16,7 +16,7 @@
 
 HTTP 接口：
 
-- `GET /health`：登记模型目录、token ID、加载状态、候选信息与生成策略。
+- `GET /health`：登记模型目录、token ID、加载状态、B0 信息与生成策略。
 - `POST /generate`：接收微回合历史与 `max_new_tokens`，以 NDJSON 流返回 `text`、`token_ids`、`prompt_tokens`、`finish_reason` 或 `error`。
 - 可选的 `audit_prompt` 与生成 ID 诊断端点用于离线核对，不改变产品调用契约。
 
@@ -31,4 +31,4 @@ conda run --no-capture-output -n parathink-dev python scripts/remote/duplex_mode
   --port 8006
 ```
 
-需要加载微调候选时增加 `--adaptation /path/to/checkpoint.pt`。运行不下载模型、不启动训练；源码、权重资产与环境版本须在任务清单中冻结。
+运行不下载模型、不启动训练；源码、权重资产与环境版本须在任务清单中冻结。

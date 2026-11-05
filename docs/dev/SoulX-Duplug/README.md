@@ -1,6 +1,6 @@
 # SoulX-Duplug 路线
 
-更新：2026-11-03。第一阶段 ASR-Frontend 已收口，当前唯一路线为 **SoulX-Duplug 官方配置＋并行 X2Streaming-ASR**。
+更新：2026-11-05。第一阶段 ASR-Frontend 已收口，当前唯一路线为 **SoulX-Duplug 官方配置＋并行 X2Streaming-ASR**。
 
 ## 1. 路线定义
 
@@ -23,7 +23,7 @@
 | [NTF-019](../../reports/soulx/20261103-ntf019-fdb30/README.md) | 固定 FDB30 验收，用户审核通过并归档 |
 | [NTF-030](../../reports/soulx/20261103-latency-limit-removal/README.md) | 取消 800ms 时长停止条件，保留容量与资源保护 |
 
-当前无活动工作单。后续 LLM 接入暂缓，不在本次恢复训练、CoT 注入或现役 Agent 切换。
+独立半双工 LLM／TTS [首轮评测](../../reports/soulx/20261105-fdb30-half-duplex/README.md)已完成；执行线程及 complete 重识别修复后的完整复测由 [NTF-054](../../issue/NTF-054.md) 跟踪。Layer 1 训练、CoT 注入及现役 Agent 切换尚未实施。
 
 ## 3. 实现入口
 
@@ -44,4 +44,4 @@
 - 已提交正文只追加、不回改；子词草稿不进入 Context，EOS 只闭合发射组，不代表用户话轮结束。
 - 已提交的有效 `user_complete` 携当前正文直接供下游使用；同步完成不保证尾词必齐。
 - 延迟、未读 PCM、墙钟积压和发布延迟照实记录；4MiB PCM、显存、RSS、磁盘和作业时长上限继续有效。
-- 下游状态消费、去重和真实播放尚未接入，本次不宣称已解决。
+- 独立半双工评测已实现 complete／nonidle 消费、去重、取消及播放实录；其结果不能代表 Layer 1／thinking 或现役 Agent 已接入。
