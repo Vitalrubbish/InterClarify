@@ -1,8 +1,10 @@
 # 工作单管理
 
-更新：2026-11-05。当前前端路线为 **SoulX-Duplug 官方配置＋并行 X2Streaming-ASR**。第一阶段 ASR-Frontend 已收口；Layer 1 首轮从官方 Qwen2.5-7B-Instruct 开始协议适配，Qwen3 为后续候选，接入与训练尚未实施。
+更新：2026-11-06。当前前端路线为 **SoulX-Duplug 官方配置＋并行 X2Streaming-ASR**。第一阶段 ASR-Frontend 已收口；Layer 1 首轮从官方 Qwen2.5-7B-Instruct 开始协议适配，Qwen3 为后续候选，接入与训练尚未实施。
 
 ## 当前工作单
+
+NTF-063 已完成并归档：按用户要求删除架构图模块标题下方及图旁的叙述说明，保留模块和连接关系，收紧布局并重新生成 [PDF／PNG](../figures/parathink_method_preview.md)。本地编译、导出文字及图片布局检查通过；架构行为保持现有设计。
 
 NTF-061／062 已按用户最终确认完成并归档：保留 X-Talk 工程框架与当前 SoulX＋X2＋Qwen2.5＋IndexTTS 基线，删除 DuplexCascade 及旧组件／评测链路和七个专用测试文件；删除静态并发读取冗余用例，保留当前评分边界。本地 95 项回归通过（原 149 项），导入及本地链接检查通过。详见[清理与测试取舍](../runtime_baseline.md#清理与单元测试)。NTF-054 活动复测保持。
 
@@ -26,6 +28,7 @@ NTF-049 已完成[训练数据构造、配比与分阶段时长方案](../dev/la
 
 | 工作单 | 状态 | 交付 |
 | --- | --- | --- |
+| NTF-063 | 图示精简已完成并归档 | 删除各框标题下方及图旁说明，收紧布局，同步 PDF／PNG 与文档；本地编译和预览检查通过 |
 | [NTF-057](../reports/soulx/20261105-ntf054-retest/launch_r3.json) | 取消对照及重提已完成并归档 | 完整系统显式不运行原生一致性对照，153项回归通过；r3已提交，有限重试衔接进程已启动，完整复测仍由NTF-054跟踪 |
 | [NTF-056](../reports/soulx/20261105-ntf054-retest/failure_analysis.md) | 调查已完成并归档 | 真实权重完整复现及CPU特征提取干预，确认dither随机状态偏移；区分调度衔接故障，生产修复及正式复测待NTF-054 |
 | [NTF-052／053](../dev/SoulX-Duplug/runtime_execution_update.md) | 实现及本地验证已完成并归档 | 固定SoulX／X2线程、各进程2线程预算、跳过complete整段识别及限定差异的控制对照；146项本地回归通过，GPU复测待后续 |
