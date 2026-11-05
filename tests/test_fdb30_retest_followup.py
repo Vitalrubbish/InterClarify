@@ -3,6 +3,7 @@ from copy import deepcopy
 import gzip
 import json
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 from types import SimpleNamespace
@@ -20,8 +21,8 @@ class FollowupTests(unittest.TestCase):
                      'skip_complete_recognition': True, 'thread_ident': 100, 'thread_native_id': 101}
         report = {'passed': True, 'manifest_sha256': MANIFEST_SHA256, 'scope': 'smoke',
                   'execution': execution, 'x2_execution': execution,
-                  'warmup': {'passed': True, 'equivalence': {'passed': True,
-                      'comparison_policy': 'control_equivalence_skip_complete_asr', 'authorized_omissions': 1}},
+                  'warmup': {'passed': True, 'equivalence': {'passed': None, 'executed': False,
+                      'status': 'disabled_by_user', 'comparison_policy': 'disabled_by_user'}},
                   'cases': [{'passed': True, 'case_id': f'case-{i}', 'subset': 'sample', 'id': str(i),
                              'recording': {}, 'frames': 1} for i in range(1, 4)]}
         frame = {'step_id': 0, 'controller_main_lag_ms': 250., 'receipts': {'controller': {
@@ -65,7 +66,8 @@ class FollowupTests(unittest.TestCase):
     def test_submission_refuses_active_jobs_and_reuses_saved_job(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            args = SimpleNamespace(output=root, source=ROOT, smoke_job='job-1-test', prefix='test', root=root)
+            args = SimpleNamespace(output=root, source=ROOT, source_commit='1' * 40,
+                                   smoke_job='job-1-test', prefix='test', root=root)
             campaign = Campaign(args)
             with patch.object(campaign, 'active', return_value={'job-2-other'}), \
                     patch('fdb30_retest_followup.subprocess.run') as submit:
@@ -81,7 +83,7 @@ class FollowupTests(unittest.TestCase):
     def test_failed_or_missing_exit_marker_blocks_followup(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            args = SimpleNamespace(output=root, source=ROOT, smoke_job='job-1-test')
+            args = SimpleNamespace(output=root, source=ROOT, source_commit='1' * 40, smoke_job='job-1-test')
             campaign = Campaign(args)
             marker = root/'exit.txt'
             with patch.object(campaign, 'active', return_value=set()):
@@ -92,6 +94,43 @@ class FollowupTests(unittest.TestCase):
                     campaign.wait('job-1-test', marker)
                 marker.write_text('0\n')
                 campaign.wait('job-1-test', marker)
+
+    def test_scheduler_query_retries_then_recovers(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            args = SimpleNamespace(output=Path(temporary), source=ROOT, source_commit='1' * 40,
+                                   smoke_job='job-1-test')
+            campaign = Campaign(args)
+            failure = subprocess.CalledProcessError(1, ['vc', 'list'], output='Connection refused')
+            with patch('fdb30_retest_followup.subprocess.check_output',
+                       side_effect=[failure, 'job-2-other']) as query, \
+                    patch('fdb30_retest_followup.time.sleep') as sleep:
+                self.assertEqual(campaign.active(), {'job-2-other'})
+                self.assertEqual(query.call_count, 2)
+                sleep.assert_called_once_with(5)
+            self.assertIsNone(campaign.state['scheduler_query_error'])
+
+    def test_scheduler_query_exhaustion_stops_and_preserves_error(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            args = SimpleNamespace(output=Path(temporary), source=ROOT, source_commit='1' * 40,
+                                   smoke_job='job-1-test')
+            campaign = Campaign(args)
+            failure = subprocess.TimeoutExpired(['vc', 'list'], 45, output=b'API unavailable')
+            with patch('fdb30_retest_followup.subprocess.check_output', side_effect=failure) as query, \
+                    patch('fdb30_retest_followup.time.sleep') as sleep:
+                with self.assertRaisesRegex(RuntimeError, 'unavailable'):
+                    campaign.active()
+                self.assertEqual(query.call_count, 4)
+                self.assertEqual([call.args[0] for call in sleep.call_args_list], [5, 15, 30])
+            self.assertEqual(campaign.state['scheduler_query_output'], 'API unavailable')
+
+    def test_restore_rejects_different_source_commit(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            args = SimpleNamespace(output=Path(temporary), source=ROOT, source_commit='1' * 40,
+                                   smoke_job='job-1-test')
+            Campaign(args).save()
+            args.source_commit = '2' * 40
+            with self.assertRaisesRegex(ValueError, 'identity'):
+                Campaign(args)
 
 
 if __name__ == '__main__':

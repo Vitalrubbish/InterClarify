@@ -178,7 +178,8 @@ def main():
                 return original_generate(*args, **kwargs)
         sensevoice.generate = locked_generate
         audio, report['warmup_normalization'] = warmup_audio(args.warmup_audio)
-        report['warmup'] = full_warmup(model, worker, audio, args.output)
+        report['warmup'] = full_warmup(model, worker, audio, args.output,
+                                       check_native_equivalence=False)
         write_json(args.output/'warmup.json', report['warmup'])
         if not report['warmup']['passed']:
             raise RuntimeError('Frontend warmup coverage failed')

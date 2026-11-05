@@ -367,7 +367,7 @@ def coverage(rows):
             'joint_wait': any('snapshot' in row and all(frame['decision'] == 32 for frame in row['receipts']['asr']['frames']) for row in rows)}
 
 
-def full_warmup(model, worker, audio, output):
+def full_warmup(model, worker, audio, output, *, check_native_equivalence=True):
     import torch
     rounds = []
     speech = audio[:124800]
@@ -392,13 +392,16 @@ def full_warmup(model, worker, audio, output):
                for record in rounds]
     passed = all(record['passed'] and not gaps and all(row['text'].strip() for row in record['direct_sensevoice'])
                  and (worker is None or record.get('online_text', '').strip()) for record, gaps in zip(rounds, missing))
-    equivalence = compare_native(model, audio)
+    equivalence = (compare_native(model, audio) if check_native_equivalence else
+                   {'executed': False, 'status': 'disabled_by_user',
+                    'comparison_policy': 'disabled_by_user', 'passed': None})
     write_json(output / 'native_equivalence.json', equivalence)
     first_reset_hash = rounds[0]['cleanup'].get('reset_buffer_sha256')
     reset_rng_equal = bool(first_reset_hash and first_reset_hash == rounds[1]['cleanup'].get('reset_buffer_sha256'))
     return {'rounds': rounds, 'required_paths': required, 'missing_by_round': missing,
             'equivalence': equivalence, 'reset_rng_equal': reset_rng_equal,
-            'passed': bool(passed and equivalence['passed'] and reset_rng_equal)}
+            'passed': bool(passed and reset_rng_equal
+                           and (not check_native_equivalence or equivalence['passed']))}
 
 
 def compare_native(model, audio, *, skip_complete_recognition=True):

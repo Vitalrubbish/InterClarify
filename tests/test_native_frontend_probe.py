@@ -221,6 +221,26 @@ class ProbeTests(unittest.TestCase):
         self.assertFalse(result['passed'])
         self.assertIn('text_revision', result['missing_by_round'][0])
 
+    def test_cancelled_comparison_is_not_run_and_coverage_still_blocks(self):
+        record = {'passed': True,
+                  'coverage': dict.fromkeys(('sensevoice_text', 'text_revision', 'native_complete', 'reset'), True),
+                  'cleanup': {'reset_buffer_sha256': 'same-reset'}}
+        model = SimpleNamespace(cascade_asr=SimpleNamespace(recognize=lambda *_: 'real text'))
+        with tempfile.TemporaryDirectory() as directory, \
+                patch('native_frontend_probe.replay', return_value=record), \
+                patch('native_frontend_probe.compare_native', side_effect=AssertionError('Comparison ran')) as compare, \
+                patch('torch.cuda.synchronize'):
+            result = full_warmup(model, None, np.full(150400, .1, np.float32), Path(directory),
+                                 check_native_equivalence=False)
+            self.assertTrue(result['passed'])
+            self.assertEqual(result['equivalence'], {'executed': False, 'status': 'disabled_by_user',
+                             'comparison_policy': 'disabled_by_user', 'passed': None})
+            record['coverage']['text_revision'] = False
+            rejected = full_warmup(model, None, np.full(150400, .1, np.float32), Path(directory),
+                                   check_native_equivalence=False)
+            self.assertFalse(rejected['passed'])
+            compare.assert_not_called()
+
     def test_real_official_methods_match_after_added_observers(self):
         model = official_model([99, 6] * 100)
         original = model.model.llm

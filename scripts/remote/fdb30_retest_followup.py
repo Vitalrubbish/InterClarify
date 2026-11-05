@@ -16,7 +16,6 @@ import sys
 import time
 
 
-SOURCE_COMMIT = '65d15e60730a3e01c580ee68a73d75c4439741db'
 MANIFEST_SHA256 = '403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cde4f3c07'
 IMAGE = 'docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4'
 JOB = re.compile(r'job-\d+-[A-Za-z0-9_-]+')
@@ -40,10 +39,10 @@ def audit_run(run, expected, source):
     if report['scope'] != ('smoke' if expected == 3 else 'fixed_fdb30'):
         raise ValueError('Inference scope differs')
     equivalence = report['warmup']['equivalence']
-    if (not report['warmup']['passed'] or not equivalence['passed']
-            or equivalence['comparison_policy'] != 'control_equivalence_skip_complete_asr'
-            or equivalence['authorized_omissions'] < 1):
-        raise ValueError('Warmup or authorized control comparison failed')
+    if (not report['warmup']['passed'] or equivalence != {
+            'executed': False, 'status': 'disabled_by_user',
+            'comparison_policy': 'disabled_by_user', 'passed': None}):
+        raise ValueError('Warmup failed or comparison cancellation was not recorded')
     execution = report['execution']
     if (execution['cpu_threads'], execution['interop_threads'], execution['sensevoice_ncpu'],
             execution['skip_complete_recognition']) != (2, 1, 2, True):
@@ -96,10 +95,11 @@ class Campaign:
         self.args = args
         self.path = args.output / 'state.json'
         self.state = json.loads(self.path.read_text()) if self.path.exists() else {
-            'source_commit': SOURCE_COMMIT, 'source': str(args.source),
+            'source_commit': args.source_commit, 'source': str(args.source),
             'script_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
             'smoke_job': args.smoke_job, 'status': 'waiting_smoke'}
-        if self.state['source'] != str(args.source) or self.state['smoke_job'] != args.smoke_job:
+        if (self.state['source'] != str(args.source) or self.state['smoke_job'] != args.smoke_job
+                or self.state['source_commit'] != args.source_commit):
             raise ValueError('Campaign identity differs from saved state')
         self.deadline = time.monotonic() + 12 * 3600
 
@@ -108,8 +108,25 @@ class Campaign:
         write_json(self.path, self.state)
 
     def active(self):
-        output = subprocess.check_output(['vc', 'list'], text=True, timeout=45)
-        return set(JOB.findall(output))
+        for attempt, delay in enumerate((0, 5, 15, 30), start=1):
+            if delay:
+                time.sleep(delay)
+            try:
+                output = subprocess.check_output(['vc', 'list'], text=True, timeout=45,
+                                                 stderr=subprocess.STDOUT)
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+                detail = exc.output or ''
+                if isinstance(detail, bytes):
+                    detail = detail.decode(errors='replace')
+                self.save(scheduler_query_attempt=attempt,
+                          scheduler_query_error=type(exc).__name__ + ': ' + str(exc),
+                          scheduler_query_output=detail[-4096:])
+                if attempt == 4:
+                    raise RuntimeError('Scheduler state unavailable after four attempts') from exc
+            else:
+                self.save(scheduler_query_attempt=attempt, scheduler_query_error=None,
+                          scheduler_query_output=None)
+                return set(JOB.findall(output))
 
     def wait(self, job, marker):
         while True:
@@ -192,6 +209,7 @@ class Campaign:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', type=Path, required=True)
+    parser.add_argument('--source-commit')
     parser.add_argument('--audit-run', type=Path)
     parser.add_argument('--expected-cases', type=int, choices=(3, 30))
     parser.add_argument('--audit-output', type=Path)
@@ -213,7 +231,9 @@ def main():
         parser.error('Campaign arguments are incomplete')
     if not JOB.fullmatch(args.smoke_job) or not re.fullmatch(r'[a-z0-9_-]{1,55}', args.prefix):
         parser.error('Invalid campaign identity')
-    if subprocess.check_output(['git', '-C', str(args.source), 'rev-parse', 'HEAD'], text=True).strip() != SOURCE_COMMIT:
+    if not args.source_commit or not re.fullmatch(r'[0-9a-f]{40}', args.source_commit):
+        parser.error('Campaign requires the frozen source commit')
+    if subprocess.check_output(['git', '-C', str(args.source), 'rev-parse', 'HEAD'], text=True).strip() != args.source_commit:
         parser.error('Model source commit differs')
     if subprocess.check_output(['git', '-C', str(args.source), 'status', '--porcelain'], text=True).strip():
         parser.error('Model source worktree is dirty')

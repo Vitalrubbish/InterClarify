@@ -15,3 +15,5 @@
 NTF-053新增控制等价性检查：在官方实际方法触发有效complete，确认参考执行整段识别、默认适配跳过并保留空服务文字，且两路控制对照通过、授权缺失计数为1；另外故意改变状态模型输入，确认对照失败，不会因为允许省略服务识别而忽略其他差异。
 
 运行：`conda run -n interclarify-dev python -m unittest discover -s tests -p test_native_frontend_probe.py -v`。完整回归仍由`python -m unittest discover -s tests -q`执行。真实预热覆盖、GPU延迟与资源门槛必须在远端验收。
+
+NTF-057增加取消一致性检查的回归：确认不调用对照函数、结果明确记录未执行，完整预热覆盖缺失时仍失败；原有默认对照检查保留。

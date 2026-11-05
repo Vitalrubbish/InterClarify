@@ -14,6 +14,8 @@
 
 `limited_warmup()`复现有限控制覆盖（三次静音状态调用、一次3.36秒静音SenseVoice），X2仍执行两轮固定真实语音。`full_warmup()`每轮先用固定真实语音覆盖1.6／3.2／3.36／6.72／10.08秒识别形状，再运行完整原生拓扑；共两轮。直接长度探针的循环语音明确标记，不冒充自然话轮。自然文字修订、有效complete、reset、WAIT及多token EOS缺失均列入missing；覆盖不足直接停止，不启动在线时钟或019。
 
+NTF-057新增`check_native_equivalence`关键字参数，默认true以保留历史独立前端入口。完整系统FDB30显式传false，不运行`compare_native()`；native_equivalence.json及warmup.equivalence只记录executed=false、status／comparison_policy=disabled_by_user、passed=null。两轮覆盖、直接长度预热及reset清理检查仍执行，未运行的对照不会被记为通过。
+
 `compare_native()`在完整预热后用同一常驻真实权重，分别运行未插桩官方process和封装，输入为固定9.4秒预热流，种子与reset一致。NTF-053默认使用control_equivalence_skip_complete_asr：原始记录全部保留，仅将complete服务整段识别单独保存到complete_recognitions，并允许对应服务text从识别结果变为空字符串。逐批核对这类调用与跳过事件一一对应；其余音频token、LLM输入／logits、短窗ASR、有效状态、服务字段及reset缓冲不等都拒绝放行。显式skip_complete_recognition=False可运行strict_native完整对照。官方参考会执行原始重识别，正常预热回放和正式路径不会；不再将默认路径称为完整服务输出严格等价。
 
 直接长度预热、有限预热和原生对照的实际模型调用均在本线程inference_mode内执行。run记录execution及X2 ready资源回执，replay记录controller_execution和complete识别策略；原生逐帧回执包含实际执行线程和CPU预算，供远端复核预热／正式是否同线程。
