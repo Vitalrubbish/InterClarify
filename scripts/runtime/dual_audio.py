@@ -153,10 +153,13 @@ class DualAudioFrontend:
     """Accept PCM independently of model execution; one worker advances both lanes."""
 
     def __init__(self, controller, asr, *, context, clock=time.monotonic,
-                 order=('controller', 'asr'), realtime=True, concurrent=False):
+                 order=('controller', 'asr'), realtime=True, concurrent=False, pcm_limit_bytes=4 * 2**20):
         if tuple(order) not in (('controller', 'asr'), ('asr', 'controller')):
             raise ValueError('Each lane must run exactly once per cycle')
         self.controller, self.asr, self.clock, self.context = controller, asr, clock, context
+        if type(pcm_limit_bytes) is not int or not 4 * 2**20 <= pcm_limit_bytes <= 16 * 2**20:
+            raise ValueError('PCM capacity must be an integer between 4 and 16 MiB')
+        self.pcm_limit_bytes = pcm_limit_bytes
         self.realtime = realtime
         self.concurrent = concurrent
         if (controller.session_id, controller.turn_id) != (asr.session_id, asr.turn_id):
@@ -202,12 +205,12 @@ class DualAudioFrontend:
         with self._state_lock:
             if self.closed:
                 raise RuntimeError('Frontend was cancelled before PCM allocation')
-            if self.ledger.nbytes + self.controller.pcm_bytes() + additional_bytes > 4 * 2**20:
-                raise MemoryError('Model PCM allocation would exceed 4 MiB')
+            if self.ledger.nbytes + self.controller.pcm_bytes() + additional_bytes > self.pcm_limit_bytes:
+                raise MemoryError(f'Model PCM allocation would exceed {self.pcm_limit_bytes} bytes')
 
     def _check_bounds(self):
-        if self.ledger.nbytes + self.controller.pcm_bytes() > 4 * 2**20:
-            raise MemoryError('Total PCM exceeded 4 MiB')
+        if self.ledger.nbytes + self.controller.pcm_bytes() > self.pcm_limit_bytes:
+            raise MemoryError(f'Total PCM exceeded {self.pcm_limit_bytes} bytes')
 
     def append_pcm(self, audio):
         try:
@@ -215,7 +218,7 @@ class DualAudioFrontend:
                 if self.closed:
                     raise RuntimeError('Frontend is closed')
                 # Check allocation before copying an oversized transport packet.
-                if self.ledger.nbytes + np.asarray(audio).nbytes + self.controller.pcm_bytes() > 4 * 2**20:
+                if self.ledger.nbytes + np.asarray(audio).nbytes + self.controller.pcm_bytes() > self.pcm_limit_bytes:
                     raise MemoryError('Transport packet exceeds total PCM bound')
                 packet = self.ledger.append(audio)
                 if self.started_at is None:
@@ -330,7 +333,7 @@ class DualAudioFrontend:
             snapshot = self.context.get_user_turn(self.controller.session_id, self.controller.turn_id)
             return {'closed': self.closed, 'reason': self.failure, 'close_failure': self.close_failure,
                     'input_end': self.ledger.end,
-                    'input_eof': self.ledger.eof, 'pcm_bytes': self.ledger.nbytes + self.controller.pcm_bytes(),
+                    'input_eof': self.ledger.eof, 'pcm_limit_bytes': self.pcm_limit_bytes, 'pcm_bytes': self.ledger.nbytes + self.controller.pcm_bytes(),
                     'controller_processed_until': self.controller.processed_until,
                     'controller_state': deepcopy(self.controller._frame),
                     'controller_events': deepcopy(self.controller._events),

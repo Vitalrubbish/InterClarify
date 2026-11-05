@@ -2,6 +2,8 @@
 
 ## 整体功能
 
+完整评测通过 `--pcm-limit-mib` 显式选择16MiB（兼容选择4MiB），保存到总报告 limits。默认前端合同不变。提高上限用于修复 r1 因积压触及4MiB的工程停止；新批次重跑全部样本。
+
 `scripts/remote/fdb30_half_duplex.py` 把既有实时双路前端连接到普通 Qwen 与可取消 IndexTTS 回答会话。运行必须使用远端 conda 与调度显卡，输入为冻结 FDB30 manifest。每条原始输入末尾增加八秒诊断静音，正式评分截回原时长。
 
 ## 类与核心方法

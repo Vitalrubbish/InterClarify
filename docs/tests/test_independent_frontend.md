@@ -11,3 +11,5 @@ AudioTests验收两种完成顺序、第一帧及nonidle在双路实际完成前
 运行：`conda run -n interclarify-dev python -m unittest discover -s tests -p test_independent_frontend.py -v`。NTF-017采用联合提交合同；真实模型及实时性验收见NTF-018／019。
 
 NTF-018增加可选并发调度检查：两路能在同批同时开始；一侧结束时另一侧未结束不得提交，下一批仍不能启动；一侧异常时必须等另一侧设备worker收尾后才允许detach。默认串行用例继续保持原行为。
+
+完整系统评测扩容检查：显式16MiB允许超过旧4MiB的输入暂存，但模型临时分配和超大传输包仍在分配前拒绝；记录容量，超限取消且不推进输入。旧4MiB拒绝用例保留。

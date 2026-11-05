@@ -111,7 +111,8 @@ def run_case(model, worker, sample, args):
 
     try:
         record = replay(model, worker, audio, sample['case_id'], folder, True,
-                        compress=True, on_batch=on_batch, on_finish=on_finish)
+                        compress=True, on_batch=on_batch, on_finish=on_finish,
+                        pcm_limit_bytes=args.pcm_limit_mib * 2**20)
     except Exception:
         error = traceback.format_exc()
         close_error = None
@@ -139,6 +140,7 @@ def main():
     for name in ('manifest','assets','upstream','asr-python','warmup-audio','output','socket-root'):
         parser.add_argument('--'+name, type=Path, required=True)
     parser.add_argument('--smoke', action='store_true')
+    parser.add_argument('--pcm-limit-mib', type=int, choices=(4,16), default=16)
     args = parser.parse_args()
     import torch
     if digest(args.manifest) != MANIFEST_SHA256:
@@ -152,7 +154,8 @@ def main():
         ids = {'candor_turn_taking-17', 'candor_pause_handling-16', 'synthetic_user_interruption-104'}
         samples = [s for s in samples if s['case_id'] in ids]
     report = {'passed':False, 'manifest_sha256':MANIFEST_SHA256, 'samples':samples,
-              'scope':'smoke' if args.smoke else 'fixed_fdb30', 'cases':[]}
+              'scope':'smoke' if args.smoke else 'fixed_fdb30', 'cases':[],
+              'limits':{'pcm_bytes':args.pcm_limit_mib * 2**20}}
     write_json(args.output/'input_manifest.json', manifest)
     torch.set_num_threads(2)
     torch.set_num_interop_threads(1)

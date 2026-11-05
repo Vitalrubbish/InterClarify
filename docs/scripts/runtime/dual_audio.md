@@ -4,6 +4,8 @@
 
 ## 类设计
 
+2026-11-05：`DualAudioFrontend` 新增显式 `pcm_limit_bytes`，默认仍为4MiB；模型暂存、传输包和总量检查统一使用该上限，诊断记录实际值。完整半双工评测因控制积压与诊断尾窗，单独设置16MiB；旧前端入口和历史验收不改变。
+
 `PCMLedger`保存单份连续16kHz、单声道、单位增益float32 PCM。append拒绝隐式转换、非有限值和幅度越界；window返回副本及真实／合成span，真实前瞻不足时等待输入，仅显式EOF允许右padding。discard_before释放两路后续计算不再需要的采样；输入到达时间独立于调度开始。
 
 `StepBarrier`保存唯一当前批次、身份、全局step_id和取消代次。begin建立当前暂存区；acknowledge拒绝重复、缺失、过期或取消回执。release必须取得本批次已成功提交的快照，随后才递增step_id。reset不改变全局批次。

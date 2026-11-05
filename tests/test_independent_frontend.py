@@ -394,6 +394,19 @@ class AudioTests(unittest.TestCase):
         self.assertEqual(frontend.asr.processed_until, len(audio))
         self.assertEqual(self.view(frontend)['step_id'], 6)
 
+    def test_explicit_larger_pcm_budget_keeps_allocation_checks(self):
+        frontend = self.make(pcm_limit_bytes=16 * 2**20)
+        frontend.append_pcm(np.zeros(2**20, np.float32))
+        self.assertFalse(frontend.closed)
+        self.assertEqual(frontend.diagnostics()['pcm_limit_bytes'], 16 * 2**20)
+        with self.assertRaises(MemoryError):
+            frontend._reserve_pcm(12 * 2**20)
+        before = frontend.ledger.end
+        with self.assertRaises(MemoryError):
+            frontend.append_pcm(np.zeros(4 * 2**20, np.float32))
+        self.assertEqual(frontend.ledger.end, before)
+        self.assertTrue(frontend.closed)
+
     def test_capacity_errors_cancel_both_lanes_before_pcm_allocation(self):
         frontend = self.make()
         with self.assertRaises(MemoryError):

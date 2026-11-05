@@ -141,7 +141,7 @@ class SingleLane:
                 'pcm_bytes': self.ledger.nbytes + self.controller.pcm_bytes()}
 
 
-def fresh(model, worker, identity, realtime, order):
+def fresh(model, worker, identity, realtime, order, pcm_limit_bytes=4 * 2**20):
     import torch
     seed_all()
     model.reset()
@@ -153,7 +153,8 @@ def fresh(model, worker, identity, realtime, order):
     asr = worker.session(identity, 'input')
     context = SharedContext()
     context.open_user_turn(identity, 'input', 'x2_streaming_asr')
-    frontend = DualAudioFrontend(controller, asr, context=context, realtime=realtime, order=order, concurrent=True)
+    frontend = DualAudioFrontend(controller, asr, context=context, realtime=realtime, order=order, concurrent=True,
+                                 pcm_limit_bytes=pcm_limit_bytes)
     return frontend, context
 
 
@@ -178,8 +179,8 @@ def cleanup(frontend, worker):
 
 
 def replay(model, worker, audio, identity, output, realtime, order=('controller', 'asr'), compress=False,
-           on_batch=None, on_finish=None):
-    frontend, context = fresh(model, worker, identity, realtime, order)
+           on_batch=None, on_finish=None, pcm_limit_bytes=4 * 2**20):
+    frontend, context = fresh(model, worker, identity, realtime, order, pcm_limit_bytes)
     stopped = threading.Event()
     ingress_errors, arrivals, rows = [], [], []
     started = time.monotonic()
