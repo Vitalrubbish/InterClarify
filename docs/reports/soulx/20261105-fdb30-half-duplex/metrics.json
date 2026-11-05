@@ -1,0 +1,375 @@
+{
+  "scope": "fixed_fdb30_not_full_benchmark",
+  "scoring_commit": "3e799c45a045256f47d5f1c9cda90157e2d2ec9e",
+  "parakeet_sha256": "d99e39955c9d3d0350d8fb7c75e40c64a2b2eaeb003883d7c941fd2e8747b28c",
+  "rows": [
+    {
+      "case_id": "candor_turn_taking-102",
+      "subset": "candor_turn_taking",
+      "id": "102",
+      "tor": 1,
+      "latency": 0.8400000000000185,
+      "transcript": "Many voters supporting Trump prioritise his policy.",
+      "first_word_seconds": 7.36,
+      "raw_first_word_latency": 0.8400000000000185
+    },
+    {
+      "case_id": "candor_turn_taking-17",
+      "subset": "candor_turn_taking",
+      "id": "17",
+      "tor": 1,
+      "latency": 0,
+      "transcript": "Got it, let me know. Great.",
+      "first_word_seconds": 2.08,
+      "raw_first_word_latency": -3.2400000000000215
+    },
+    {
+      "case_id": "candor_turn_taking-3",
+      "subset": "candor_turn_taking",
+      "id": "3",
+      "tor": 1,
+      "latency": 0,
+      "transcript": "It sounds like you really enjoy the prolific service. Is there anything specific about it that you love?",
+      "first_word_seconds": 6.16,
+      "raw_first_word_latency": -2.9999999999999964
+    },
+    {
+      "case_id": "candor_turn_taking-39",
+      "subset": "candor_turn_taking",
+      "id": "39",
+      "tor": 1,
+      "latency": 1.179999999999911,
+      "transcript": "It sounds like your husband's family used to have a large",
+      "first_word_seconds": 26.080000000000002,
+      "raw_first_word_latency": 1.179999999999911
+    },
+    {
+      "case_id": "candor_turn_taking-51",
+      "subset": "candor_turn_taking",
+      "id": "51",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "candor_turn_taking-54",
+      "subset": "candor_turn_taking",
+      "id": "54",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "candor_turn_taking-56",
+      "subset": "candor_turn_taking",
+      "id": "56",
+      "tor": 1,
+      "latency": 0.06000000000001826,
+      "transcript": "It sounds like you are considering going back to make adjustments, but you are not.",
+      "first_word_seconds": 4.08,
+      "raw_first_word_latency": 0.06000000000001826
+    },
+    {
+      "case_id": "candor_turn_taking-76",
+      "subset": "candor_turn_taking",
+      "id": "76",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "candor_turn_taking-83",
+      "subset": "candor_turn_taking",
+      "id": "83",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "candor_turn_taking-91",
+      "subset": "candor_turn_taking",
+      "id": "91",
+      "tor": 0,
+      "latency": null,
+      "transcript": "It does indeed",
+      "first_word_seconds": 4.72,
+      "raw_first_word_latency": 0.38999999999984514
+    },
+    {
+      "case_id": "candor_pause_handling-127",
+      "subset": "candor_pause_handling",
+      "id": "127",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "candor_pause_handling-16",
+      "subset": "candor_pause_handling",
+      "id": "16",
+      "tor": 1,
+      "latency": null,
+      "transcript": "It sounds like your first call was with an executive jury. A time of significance.",
+      "first_word_seconds": 10.8,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "candor_pause_handling-161",
+      "subset": "candor_pause_handling",
+      "id": "161",
+      "tor": 0,
+      "latency": null,
+      "transcript": "It sounds like.",
+      "first_word_seconds": 7.04,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "candor_pause_handling-40",
+      "subset": "candor_pause_handling",
+      "id": "40",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "candor_pause_handling-50",
+      "subset": "candor_pause_handling",
+      "id": "50",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "synthetic_pause_handling-131",
+      "subset": "synthetic_pause_handling",
+      "id": "131",
+      "tor": 0,
+      "latency": null,
+      "transcript": "Sure.",
+      "first_word_seconds": 3.68,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "synthetic_pause_handling-132",
+      "subset": "synthetic_pause_handling",
+      "id": "132",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "synthetic_pause_handling-41",
+      "subset": "synthetic_pause_handling",
+      "id": "41",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "synthetic_pause_handling-53",
+      "subset": "synthetic_pause_handling",
+      "id": "53",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "synthetic_pause_handling-70",
+      "subset": "synthetic_pause_handling",
+      "id": "70",
+      "tor": 1,
+      "latency": null,
+      "transcript": "I understand your concern about climate change. It is important to stay informed and considerate.",
+      "first_word_seconds": 3.2,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "synthetic_user_interruption-104",
+      "subset": "synthetic_user_interruption",
+      "id": "104",
+      "tor": 1,
+      "latency": 0.16000000000000014,
+      "transcript": "Sure, if you are. Looking to shift gears, maybe we can discuss other investment options like bonds or real estate instead. What specifically are you interested in? Exploring.",
+      "first_word_seconds": 13.304,
+      "raw_first_word_latency": 0.16000000000000014
+    },
+    {
+      "case_id": "synthetic_user_interruption-118",
+      "subset": "synthetic_user_interruption",
+      "id": "118",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "synthetic_user_interruption-131",
+      "subset": "synthetic_user_interruption",
+      "id": "131",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "synthetic_user_interruption-136",
+      "subset": "synthetic_user_interruption",
+      "id": "136",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "synthetic_user_interruption-164",
+      "subset": "synthetic_user_interruption",
+      "id": "164",
+      "tor": 1,
+      "latency": 1.5199999999999996,
+      "transcript": "Recent advancements in space technology include more: efficient solar panels, advanced 3D, printing for on-demand parts, and improved life support systems.",
+      "first_word_seconds": 13.768,
+      "raw_first_word_latency": 1.5199999999999996
+    },
+    {
+      "case_id": "synthetic_user_interruption-18",
+      "subset": "synthetic_user_interruption",
+      "id": "18",
+      "tor": 1,
+      "latency": 1.1999999999999993,
+      "transcript": "Succulents typically need to be watered only every two to four weeks, depending on the climate and soil conditions. We haven't set up a dinner plan for tonight, but we can definitely do it.",
+      "first_word_seconds": 14.002666666666666,
+      "raw_first_word_latency": 1.1999999999999993
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "subset": "synthetic_user_interruption",
+      "id": "20",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    },
+    {
+      "case_id": "synthetic_user_interruption-43",
+      "subset": "synthetic_user_interruption",
+      "id": "43",
+      "tor": 1,
+      "latency": 0.3200000000000003,
+      "transcript": "Each week. To catch up on new information could help.",
+      "first_word_seconds": 12.525333333333332,
+      "raw_first_word_latency": 0.3200000000000003
+    },
+    {
+      "case_id": "synthetic_user_interruption-74",
+      "subset": "synthetic_user_interruption",
+      "id": "74",
+      "tor": 1,
+      "latency": 8.0,
+      "transcript": "The newest missions to space include NASA's Artemis program aiming to return humans to the space.",
+      "first_word_seconds": 21.869333333333334,
+      "raw_first_word_latency": 8.0
+    },
+    {
+      "case_id": "synthetic_user_interruption-9",
+      "subset": "synthetic_user_interruption",
+      "id": "9",
+      "tor": 0,
+      "latency": null,
+      "transcript": "",
+      "first_word_seconds": null,
+      "raw_first_word_latency": null
+    }
+  ],
+  "aggregates": [
+    {
+      "subset": "candor_turn_taking",
+      "n": 10,
+      "successes": 5,
+      "tor": 0.5,
+      "latency_n": 5,
+      "latency_mean": 0.41599999999998954,
+      "official_comparison": {
+        "source_sha256": "cb7d6b987cd415e1b71b6eea06e67ea8fdc77a1167107e5c0552105bac05b2df",
+        "stdout": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/fdb30-half-score-20261105-r1/alignments/candor_turn_taking/39/output.json\nthe TOR is 1\nthe latency is 1.179999999999911\n/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/fdb30-half-score-20261105-r1/alignments/candor_turn_taking/51/output.json\nthe TOR is 0\nthe latency is None\n/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/fdb30-half-score-20261105-r1/alignments/candor_turn_taking/54/output.json\nthe TOR is 0\nthe latency is None\n/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/fdb30-half-score-20261105-r1/alignments/candor_turn_taking/56/output.json\nthe TOR is 1\nthe latency is 0.06000000000001826\n/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/fdb30-half-score-20261105-r1/alignments/candor_turn_taking/91/output.json\nthe TOR is 0\nthe latency is None\n/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/fdb30-half-score-20261105-r1/alignments/candor_turn_taking/102/output.json\nthe TOR is 1\nthe latency is 0.8400000000000185\n/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/fdb30-half-score-20261105-r1/alignments/candor_turn_taking/17/output.json\nthe TOR is 1\nthe latency is -3.2400000000000215\n/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/fdb30-half-score-20261105-r1/alignments/candor_turn_taking/3/output.json\nthe TOR is 1\nthe latency is -2.9999999999999964\n/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/fdb30-half-score-20261105-r1/alignments/candor_turn_taking/76/output.json\nthe TOR is 0\nthe latency is None\n/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/fdb30-half-score-20261105-r1/alignments/candor_turn_taking/83/output.json\nthe TOR is 0\nthe latency is None\n---------------------------------------------------\n[Result]\nAverage take turn:  0.5\nAverage latency:  0.41599999999998954\n---------------------------------------------------\n",
+        "exception": null
+      }
+    },
+    {
+      "subset": "candor_pause_handling",
+      "n": 5,
+      "successes": 1,
+      "tor": 0.2,
+      "latency_n": 0,
+      "latency_mean": null,
+      "official_comparison": {
+        "source_sha256": "1e86519b4f4543f2f667ce60b9bea2f6148a3bc4255bb20c1ea111b45e0adbb5",
+        "stdout": "---------------------------------------------------\n[Result]\nAverage take turn:  0.2\n---------------------------------------------------\n",
+        "exception": null
+      }
+    },
+    {
+      "subset": "synthetic_pause_handling",
+      "n": 5,
+      "successes": 1,
+      "tor": 0.2,
+      "latency_n": 0,
+      "latency_mean": null,
+      "official_comparison": {
+        "source_sha256": "1e86519b4f4543f2f667ce60b9bea2f6148a3bc4255bb20c1ea111b45e0adbb5",
+        "stdout": "---------------------------------------------------\n[Result]\nAverage take turn:  0.2\n---------------------------------------------------\n",
+        "exception": null
+      }
+    },
+    {
+      "subset": "synthetic_user_interruption",
+      "n": 10,
+      "successes": 5,
+      "tor": 0.5,
+      "latency_n": 5,
+      "latency_mean": 2.2399999999999998,
+      "official_comparison": {
+        "source_sha256": "e701c14579c1477577b262265cfff75b28ac2e057beee5ba82572afa2a35963a",
+        "method": "frozen_official_tor_latency_block_without_judge",
+        "metric_lines": [
+          92,
+          114
+        ],
+        "metrics": {
+          "n": 10,
+          "tor": 0.5,
+          "latency_n": 5,
+          "latency_mean": 2.2399999999999998
+        },
+        "full_official_entrypoint_called": false
+      }
+    }
+  ],
+  "scoring_window": "zero_to_original_input_end",
+  "judge_status": "excluded_by_user",
+  "backchannel": "not_in_fdb30",
+  "inference_manifest_sha256": "403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cde4f3c07"
+}

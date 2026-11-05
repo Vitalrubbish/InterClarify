@@ -1,0 +1,65 @@
+{
+  "fixed_cases": 30,
+  "completed_cases": 30,
+  "inference_exit_code": 0,
+  "recording_audit_passed_cases": 30,
+  "local_word_timing_metric_recomputation_passed": true,
+  "source_commit": "b198227",
+  "manifest_sha256": "403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cde4f3c07",
+  "metrics_sha256": "f10ab4011f1d615e73f314416f9d496e5391359bb84ade99ae6a1f03a34be11f",
+  "evidence_sha256": {
+    "smoke": "742f500d8425a3e58ca9d2269a31b2fcea9c2fdccee3b411d1a33bb5bb845360",
+    "failed_formal_r1": "da081bdd361b69b3a5b56f84a63a1d560414f75050b680857e1d7fb7cb485139",
+    "formal_r2": "91e355326b367544b0e1ba7edb5e1b9f33b666f1a14121f5e5a60febde7a68a6",
+    "score_r1": "c3884867f952c0fb18d07fc1ad6cedac8ec7021cdbacab3d3870484c4e66e58f"
+  },
+  "event_counts": {
+    "reply_started": 54,
+    "cancel_requested": 34,
+    "playback_cancelled": 34,
+    "playback_complete": 25
+  },
+  "cancel_reasons": {
+    "soulx_nonidle": 34
+  },
+  "complete_events": {
+    "including_diagnostic_tail": 55,
+    "observation_within_original_input": 51
+  },
+  "peak_pcm_bytes_at_published_frames": 3068756,
+  "pcm_limit_bytes": 16777216,
+  "peak_gpu_mib": 15084,
+  "peak_output_kib": 68597,
+  "largest_controller_main_lags": [
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "lag_ms": 60727.9590241611,
+      "observed_seconds": 3.44,
+      "input_seconds": 28.2293125
+    },
+    {
+      "case_id": "synthetic_user_interruption-104",
+      "lag_ms": 52057.46099859476,
+      "observed_seconds": 13.48,
+      "input_seconds": 28.144
+    },
+    {
+      "case_id": "candor_turn_taking-51",
+      "lag_ms": 36332.78911098838,
+      "observed_seconds": 4.08,
+      "input_seconds": 13.1999375
+    },
+    {
+      "case_id": "synthetic_user_interruption-43",
+      "lag_ms": 26884.491955190897,
+      "observed_seconds": 11.32,
+      "input_seconds": 27.2053125
+    }
+  ],
+  "turn_taking_tor_positive_with_early_first_word": [
+    "candor_turn_taking-17",
+    "candor_turn_taking-3"
+  ],
+  "tor_is_not_relevance_or_no_overlap_rate": true,
+  "judge": "excluded_by_user"
+}

@@ -1,6 +1,6 @@
 # FDB30 半双工回答与可取消播放评测
 
-2026-11-05。用户已授权实现并在远端评测，按推荐默认采用 TurnControlComparison 的 Qwen2.5-7B-Instruct 与 IndexTTS-1.5，首段 20、后续 40 字符。
+2026-11-05。用户已确认采用 TurnControlComparison 的 Qwen2.5-7B-Instruct 与 IndexTTS-1.5，首段20、后续40字符。完整评测已完成，结果与限制见[正式报告](../../reports/soulx/20261105-fdb30-half-duplex/README.md)。
 
 ## 范围与行为
 
