@@ -7,8 +7,13 @@ RUN_ID="${SOULX_RUN_ID:?set unique run ID}"
 MODE="${SOULX_MODE:-smoke}"
 [[ "$MODE" == smoke || "$MODE" == formal ]] || exit 2
 [[ "$RUN_ID" =~ ^[A-Za-z0-9_-]{1,70}$ ]] || exit 2
-[[ -n "${CUDA_VISIBLE_DEVICES:-}" ]] || exit 2
-IFS=',' read -r -a DEVICES <<< "$CUDA_VISIBLE_DEVICES"
+[[ -n "${JobID:-}" || -n "${NVIDIA_VISIBLE_DEVICES:-}" ]] || exit 2
+if [[ -n "${CUDA_VISIBLE_DEVICES:-}" ]]; then
+  IFS=',' read -r -a DEVICES <<< "$CUDA_VISIBLE_DEVICES"
+else
+  mapfile -t DEVICES < <(nvidia-smi --query-gpu=index --format=csv,noheader,nounits)
+fi
+ASSIGNED_DEVICES=$(IFS=,; echo "${DEVICES[*]}")
 [[ "${#DEVICES[@]}" == 3 ]] || exit 2
 ASSETS="$HOME/turncontrol-comparison"
 FRONTEND="$ASSETS/envs/soulx/bin/python"
@@ -85,6 +90,12 @@ PIDS+=("$FRONTEND_PID")
 STARTED=$SECONDS
 while kill -0 "$FRONTEND_PID" 2>/dev/null; do
   size=$(du -sk "$RUN" | cut -f1)
+  gpu_peak=$(nvidia-smi --id="$ASSIGNED_DEVICES" --query-gpu=memory.used --format=csv,noheader,nounits | sort -nr | head -1)
+  printf '%s %s %s\n' "$SECONDS" "$size" "$gpu_peak" >> "$RUN/resources.txt"
+  if (( gpu_peak > 22528 )); then
+    printf 'gpu_peak_mib=%s\n' "$gpu_peak" > "$RUN/resource_stop.txt"
+    exit 1
+  fi
   if (( size > 2097152 || SECONDS-STARTED > 6600 )); then
     printf 'output_kib=%s seconds=%s\n' "$size" "$((SECONDS-STARTED))" > "$RUN/resource_stop.txt"
     exit 1

@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 from pathlib import Path
 import threading
@@ -115,9 +114,13 @@ def run_case(model, worker, sample, args):
                         compress=True, on_batch=on_batch, on_finish=on_finish)
     except Exception:
         error = traceback.format_exc()
+        close_error = None
         if session is not None:
-            session.close(minimum_seconds=original_seconds)
-        record = {'passed': False, 'error': error}
+            try:
+                session.close(minimum_seconds=original_seconds)
+            except Exception:
+                close_error = traceback.format_exc()
+        record = {'passed': False, 'error': error, 'close_error': close_error}
     finally:
         trace.stream.close()
     record.update(case_id=sample['case_id'], subset=sample['subset'], id=sample['id'],
