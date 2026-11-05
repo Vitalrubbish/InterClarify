@@ -15,27 +15,66 @@
     "pcm_limit_mib": 16
   },
   "smoke": {
-    "run_id": "ntf054-half-smoke-20261105-r1",
-    "job_id": "job-179386787087491282885-xuan-zhang",
-    "state": "submitted"
+    "run_id": "ntf054-half-smoke-20261105-r2",
+    "job_id": "job-179387030286102615198-xuan-zhang",
+    "state": "pending"
   },
   "formal": {
-    "run_id": "ntf054-half-20261105-r1-formal",
+    "run_id": "ntf054-half-20261105-r2-formal",
     "state": "awaiting_smoke_audit"
   },
   "score": {
-    "run_id": "ntf054-half-20261105-r1-score",
+    "run_id": "ntf054-half-20261105-r2-score",
     "state": "awaiting_formal",
     "judge": "excluded_by_user"
   },
   "followup": {
     "script": "submit_logs/ntf054-followup.py",
     "script_sha256": "c389f3ccb0fe18bfe27ba3ea921b3ac1e28b6a5b7c5fb693e6461a893f49cc31",
-    "state": "started",
-    "remote_state": "analysis/ntf054-half-campaign-20261105-r1/state.json",
+    "state": "waiting_smoke",
+    "remote_state": "analysis/ntf054-half-campaign-20261105-r2/state.json",
     "ram_limit_gib": 2,
     "cpu_affinity_count": 1,
     "deadline_hours": 12,
-    "pid": 2603757
+    "pid": 2769918,
+    "rss_kib_at_start": 21976
+  },
+  "attempt_history": [
+    {
+      "attempt": "r1",
+      "smoke": {
+        "run_id": "ntf054-half-smoke-20261105-r1",
+        "job_id": "job-179386787087491282885-xuan-zhang",
+        "state": "left_queue_without_exit_marker"
+      },
+      "formal": {
+        "run_id": "ntf054-half-20261105-r1-formal",
+        "state": "not_submitted"
+      },
+      "score": {
+        "run_id": "ntf054-half-20261105-r1-score",
+        "state": "not_submitted",
+        "judge": "excluded_by_user"
+      },
+      "followup": {
+        "script": "submit_logs/ntf054-followup.py",
+        "script_sha256": "c389f3ccb0fe18bfe27ba3ea921b3ac1e28b6a5b7c5fb693e6461a893f49cc31",
+        "state": "failed",
+        "remote_state": "analysis/ntf054-half-campaign-20261105-r1/state.json",
+        "ram_limit_gib": 2,
+        "cpu_affinity_count": 1,
+        "deadline_hours": 12,
+        "pid": 2603757,
+        "failed_at": "2026-11-05 09:07:40 UTC",
+        "error": "RuntimeError: Job ended without successful exit marker: job-179386787087491282885-xuan-zhang"
+      }
+    }
+  ],
+  "resubmission": {
+    "authorized_by_user": true,
+    "issue": "NTF-055",
+    "previous_manager_exited": true,
+    "queue_empty_before_submit": true,
+    "model_or_resource_changes": false
   }
 }

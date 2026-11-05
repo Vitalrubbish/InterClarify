@@ -1,6 +1,6 @@
 # NTF-054：执行线程与 complete 交接修复后的复测
 
-2026-11-05，用户已授权启动。三条smoke已提交，当前等待4090调度，模型尚未启动。受限顺序衔接进程已运行，尚无本轮新成绩。
+2026-11-05，按用户最新指令已以r2重新提交三条smoke，当前Pending，等待4090调度。r1已离队且无成功退出标记，旧衔接进程已退出；新衔接进程已启动，尚无本轮新成绩。
 
 ## 固定条件
 
@@ -12,9 +12,10 @@
 
 | 阶段 | run ID | job ID | 状态 |
 | --- | --- | --- | --- |
-| smoke | `ntf054-half-smoke-20261105-r1` | `job-179386787087491282885-xuan-zhang` | Pending，等待三卡调度 |
-| formal | `ntf054-half-20261105-r1-formal` | 待自动提交 | 等smoke离队及核验 |
-| score | `ntf054-half-20261105-r1-score` | 待自动提交 | 等正式推理离队及核验 |
+| smoke-r1 | `ntf054-half-smoke-20261105-r1` | `job-179386787087491282885-xuan-zhang` | 已离队，无退出码／最终结果；衔接停止 |
+| smoke-r2 | `ntf054-half-smoke-20261105-r2` | `job-179387030286102615198-xuan-zhang` | 17:18:23提交，Pending |
+| formal-r2 | `ntf054-half-20261105-r2-formal` | 待自动提交 | 等smoke-r2离队及核验 |
+| score-r2 | `ntf054-half-20261105-r2-score` | 待自动提交 | 等正式推理离队及核验 |
 
 验收需核对新execution／ready预算、预热与正式SoulX线程ID、complete识别跳过事件、限定差异的控制对照、播放实录及完整固定分母。完成作业和低延迟分别报告，不能由本地146项检查推定GPU性能。
 
@@ -22,6 +23,10 @@
 
 ## 顺序衔接
 
-[衔接脚本](../../../scripts/remote/fdb30_retest_followup.md)已在远端以base conda启动，PID为2603757，状态为waiting_smoke。脚本部署在 `submit_logs/ntf054-followup.py`，SHA256为 `c389f3ccb0fe18bfe27ba3ea921b3ac1e28b6a5b7c5fb693e6461a893f49cc31`，与本地源码一致；该脚本单独冻结，不改变模型提交。启动采样RSS为21700KiB，限定单CPU、2GiB地址空间和12小时。
+[衔接脚本](../../../scripts/remote/fdb30_retest_followup.md)已在远端以base conda重新启动，r2 PID为2769918，状态为waiting_smoke，跟踪新smoke job ID；启动采样RSS为21976KiB。脚本部署在 `submit_logs/ntf054-followup.py`，SHA256仍为 `c389f3ccb0fe18bfe27ba3ea921b3ac1e28b6a5b7c5fb693e6461a893f49cc31`，已重新核对与本地一致；该脚本单独冻结，不改变模型提交。限定单CPU、2GiB地址空间和12小时。
 
-状态、日志、各阶段提交回执和审计分别保存在 `analysis/ntf054-half-campaign-20261105-r1/` 的state.json、campaign.log、*.submit.txt及*.audit.json。每30秒检查一次队列；前一作业离队、退出0且审计通过后才提交下一阶段，任何失败均记录并停止，无自动重跑。状态和来源摘要见[launch.json](launch.json)。衔接的3项本地检查已通过，覆盖错误线程／预算／跳过行为拒绝、单作业防重及失败退出码阻断。
+当前状态、日志、各阶段提交回执和审计分别保存在 `analysis/ntf054-half-campaign-20261105-r2/` 的state.json、campaign.log、*.submit.txt及*.audit.json。每30秒检查一次队列；前一作业离队、退出0且审计通过后才提交下一阶段，任何失败均记录并停止，无自动重跑。状态和来源摘要见[launch.json](launch.json)，其中attempt_history保留r1记录。衔接的3项本地检查已通过，覆盖错误线程／预算／跳过行为拒绝、单作业防重及失败退出码阻断。
+
+## 重提记录
+
+旧r1衔接于17:07:40记录`Job ended without successful exit marker`并退出，旧PID2603757已不在运行。按用户要求重提前再次确认队列为空、r2输出及状态目录未使用，保留旧目录；现有记录不足以判定旧作业被删除还是调度失败。源码工作区仍干净，模型提交、配置摘要、输入与资源不变，没有并行保留旧任务。
