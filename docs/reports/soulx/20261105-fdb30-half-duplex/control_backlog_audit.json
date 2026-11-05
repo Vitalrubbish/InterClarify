@@ -1,0 +1,3864 @@
+{
+  "scope": "offline_existing_traces_no_inference",
+  "timing_units": "seconds",
+  "includes_eight_second_diagnostic_tail": true,
+  "source_commit": "b198227",
+  "distributions": {
+    "controller": {
+      "n": 4720,
+      "p50": 0.059936800971627235,
+      "p95": 0.1145196333527565,
+      "max": 35.09945619106293
+    },
+    "x2": {
+      "n": 4720,
+      "p50": 0.06180811673402786,
+      "p95": 0.1040527330711484,
+      "max": 1.5599776692688465
+    },
+    "x2_span": {
+      "n": 4720,
+      "p50": 0.06328075379133224,
+      "p95": 0.10701372697949414,
+      "max": 8.297400459647179
+    },
+    "batch": {
+      "n": 4720,
+      "p50": 0.06498515233397484,
+      "p95": 0.12250216994434596,
+      "max": 35.10098781436682
+    },
+    "inter_batch": {
+      "n": 4720,
+      "p50": 0.0014282464981079102,
+      "p95": 0.09695969615131617,
+      "max": 0.2411593422293663
+    },
+    "commit": {
+      "n": 4720,
+      "p50": 0.0005172062665224075,
+      "p95": 0.0006644630804657937,
+      "max": 0.004606679081916809
+    },
+    "state_to_publish": {
+      "n": 4720,
+      "p50": 0.0058508869260549545,
+      "p95": 0.03264968618750572,
+      "max": 16.992336679250002
+    },
+    "lag": {
+      "n": 4720,
+      "p50": 0.6300210919231175,
+      "p95": 46.125589213065815,
+      "max": 60.7279590241611
+    }
+  },
+  "sensevoice_distribution": {
+    "n": 952,
+    "p50": 0.037715280428528786,
+    "p95": 0.3205559676513068,
+    "max": 34.97753099352121
+  },
+  "sensevoice_over_one_second": {
+    "n": 40,
+    "before_first_reply": 9,
+    "seconds_sum": 359.9721368551254
+  },
+  "service_counts": {
+    "none": 4636,
+    "model_complete": 55,
+    "wait_fallback": 29
+  },
+  "matched_scores": [
+    {
+      "subset": "candor_pause_handling",
+      "n": 5,
+      "baseline_successes": 0,
+      "successes": 1
+    },
+    {
+      "subset": "candor_turn_taking",
+      "n": 10,
+      "baseline_successes": 10,
+      "successes": 5
+    },
+    {
+      "subset": "synthetic_pause_handling",
+      "n": 5,
+      "baseline_successes": 0,
+      "successes": 1
+    },
+    {
+      "subset": "synthetic_user_interruption",
+      "n": 10,
+      "baseline_successes": 10,
+      "successes": 5
+    }
+  ],
+  "slowest_batches": [
+    {
+      "case_id": "synthetic_user_interruption-104",
+      "step": 78,
+      "wall_start": 12.828295946121216,
+      "wall_end": 47.92928376048803,
+      "observed": 12.52,
+      "state": "<|user_nonidle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.062078602612018585
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.00022725015878677368
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 34.97753099352121
+        },
+        {
+          "name": "_asr",
+          "seconds": 35.002902023494244
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.032404012978076935
+        }
+      ],
+      "controller": 35.09945619106293,
+      "x2": 0.0621626116335392,
+      "x2_span": 0.06359438225626945,
+      "batch": 35.10098781436682,
+      "inter_batch": 0.000864226371049881,
+      "commit": 0.0006358623504638672,
+      "state_to_publish": 0.0010184049606323242,
+      "lag": 35.44928376048803
+    },
+    {
+      "case_id": "candor_turn_taking-51",
+      "step": 1,
+      "wall_start": 0.40127670019865036,
+      "wall_end": 33.24901628121734,
+      "observed": 0.32,
+      "state": "<|user_nonidle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.014629475772380829
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.0012480579316616058
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 32.78551597520709
+        },
+        {
+          "name": "_asr",
+          "seconds": 32.80690959468484
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.0218048058450222
+        }
+      ],
+      "controller": 32.84586277604103,
+      "x2": 0.058701734989881516,
+      "x2_span": 0.06014687940478325,
+      "batch": 32.847739581018686,
+      "inter_batch": 0.06994380429387093,
+      "commit": 0.0006534866988658905,
+      "state_to_publish": 0.0010925233364105225,
+      "lag": 32.969016281217336
+    },
+    {
+      "case_id": "synthetic_user_interruption-43",
+      "step": 70,
+      "wall_start": 11.44114476442337,
+      "wall_end": 38.1644919551909,
+      "observed": 11.32,
+      "state": "<|user_idle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.014066807925701141
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.0017841756343841553
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 26.664041705429554
+        },
+        {
+          "name": "_asr",
+          "seconds": 26.68412809446454
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.020187385380268097
+        }
+      ],
+      "controller": 26.721517834812403,
+      "x2": 0.08924498781561852,
+      "x2_span": 0.09109247848391533,
+      "batch": 26.723347190767527,
+      "inter_batch": 0.058591488748788834,
+      "commit": 0.0007501505315303802,
+      "state_to_publish": 0.0017592981457710266,
+      "lag": 26.884491955190896
+    },
+    {
+      "case_id": "synthetic_user_interruption-118",
+      "step": 4,
+      "wall_start": 0.8804715052247047,
+      "wall_end": 26.121884062886238,
+      "observed": 0.8,
+      "state": "<|user_nonidle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.013839710503816605
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.0005684085190296173
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 25.18153629079461
+        },
+        {
+          "name": "_asr",
+          "seconds": 25.203084759414196
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.02108578011393547
+        }
+      ],
+      "controller": 25.23984593525529,
+      "x2": 0.10585236921906471,
+      "x2_span": 0.10889143496751785,
+      "batch": 25.241412557661533,
+      "inter_batch": 0.09617035835981369,
+      "commit": 0.0006860941648483276,
+      "state_to_publish": 0.0011620186269283295,
+      "lag": 25.361884062886237
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "step": 18,
+      "wall_start": 36.96987846493721,
+      "wall_end": 60.1472574621439,
+      "observed": 2.96,
+      "state": "<|user_idle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.05028628930449486
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.004537124186754227
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 23.076411105692387
+        },
+        {
+          "name": "_asr",
+          "seconds": 23.097915701568127
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.021859358996152878
+        }
+      ],
+      "controller": 23.175910156220198,
+      "x2": 0.05667802318930626,
+      "x2_span": 0.05788945406675339,
+      "batch": 23.177378997206688,
+      "inter_batch": 0.001086365431547165,
+      "commit": 0.0006035827100276947,
+      "state_to_publish": 0.001047387719154358,
+      "lag": 57.227257462143896
+    },
+    {
+      "case_id": "synthetic_user_interruption-74",
+      "step": 4,
+      "wall_start": 0.8809039331972599,
+      "wall_end": 19.621602594852448,
+      "observed": 0.8,
+      "state": "<|user_nonidle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.014109015464782715
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.000764697790145874
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 18.677504554390907
+        },
+        {
+          "name": "_asr",
+          "seconds": 18.69929113611579
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.02350388467311859
+        }
+      ],
+      "controller": 18.73906645923853,
+      "x2": 0.06311290711164474,
+      "x2_span": 0.0662011057138443,
+      "batch": 18.740698661655188,
+      "inter_batch": 0.09645775333046913,
+      "commit": 0.0007116571068763733,
+      "state_to_publish": 0.0012306533753871918,
+      "lag": 18.861602594852446
+    },
+    {
+      "case_id": "candor_pause_handling-50",
+      "step": 1,
+      "wall_start": 0.40040888637304306,
+      "wall_end": 17.932613633573055,
+      "observed": 0.32,
+      "state": "<|user_backchannel|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.013540443032979965
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.0008669756352901459
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 17.468444243073463
+        },
+        {
+          "name": "_asr",
+          "seconds": 17.491048954427242
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.021899312734603882
+        }
+      ],
+      "controller": 17.53038615733385,
+      "x2": 0.07611070200800896,
+      "x2_span": 0.0802738256752491,
+      "batch": 17.532204747200012,
+      "inter_batch": 0.09562657028436661,
+      "commit": 0.0006891712546348572,
+      "state_to_publish": 0.00291617214679718,
+      "lag": 17.652613633573054
+    },
+    {
+      "case_id": "synthetic_user_interruption-104",
+      "step": 84,
+      "wall_start": 48.447356037795544,
+      "wall_end": 65.49746099859476,
+      "observed": 13.48,
+      "state": "<|user_complete|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.014493800699710846
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.0012451782822608948
+        },
+        {
+          "name": "_asr",
+          "seconds": 0.019331716001033783
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.021135184913873672
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 0.033206574618816376
+        }
+      ],
+      "controller": 17.048437256366014,
+      "x2": 0.06061018630862236,
+      "x2_span": 0.06187296286225319,
+      "batch": 17.050104960799217,
+      "inter_batch": 0.0010083876550197601,
+      "commit": 0.0007374957203865051,
+      "state_to_publish": 16.992336679250002,
+      "lag": 52.05746099859476
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "step": 14,
+      "wall_start": 7.102668061852455,
+      "wall_end": 23.4560660533607,
+      "observed": 2.36,
+      "state": "<|user_nonidle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.03354470804333687
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.0002777613699436188
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 16.197362300008535
+        },
+        {
+          "name": "_asr",
+          "seconds": 16.29148218035698
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.021958127617836
+        }
+      ],
+      "controller": 16.34868374839425,
+      "x2": 0.30194826796650887,
+      "x2_span": 0.32079261541366577,
+      "batch": 16.353397991508245,
+      "inter_batch": 0.006900109350681305,
+      "commit": 0.0025304481387138367,
+      "state_to_publish": 0.0043170265853405,
+      "lag": 21.1360660533607
+    },
+    {
+      "case_id": "candor_turn_taking-56",
+      "step": 20,
+      "wall_start": 3.442485027015209,
+      "wall_end": 16.78856236860156,
+      "observed": 3.28,
+      "state": "<|user_nonidle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.13526837155222893
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.003965221345424652
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 13.144127909094095
+        },
+        {
+          "name": "_asr",
+          "seconds": 13.181504469364882
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.02137916162610054
+        }
+      ],
+      "controller": 13.343342386186123,
+      "x2": 0.2647652104496956,
+      "x2_span": 0.27899369597435,
+      "batch": 13.346077341586351,
+      "inter_batch": 0.05878513678908348,
+      "commit": 0.0007148869335651398,
+      "state_to_publish": 0.002294328063726425,
+      "lag": 13.54856236860156
+    },
+    {
+      "case_id": "synthetic_pause_handling-70",
+      "step": 14,
+      "wall_start": 2.480775263160467,
+      "wall_end": 15.362244710326195,
+      "observed": 2.36,
+      "state": "<|user_nonidle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.010572101920843124
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.00032020360231399536
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 12.822345193475485
+        },
+        {
+          "name": "_asr",
+          "seconds": 12.845999885350466
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.02198479324579239
+        }
+      ],
+      "controller": 12.88002897799015,
+      "x2": 0.09555210173130035,
+      "x2_span": 0.09686855971813202,
+      "batch": 12.881469447165728,
+      "inter_batch": 0.011239107698202133,
+      "commit": 0.0006921738386154175,
+      "state_to_publish": 0.0012367255985736847,
+      "lag": 13.042244710326194
+    },
+    {
+      "case_id": "candor_pause_handling-161",
+      "step": 49,
+      "wall_start": 21.131220925599337,
+      "wall_end": 33.97264689207077,
+      "observed": 7.92,
+      "state": "<|user_backchannel|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.06797310337424278
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.0005321018397808075
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 12.720622058957815
+        },
+        {
+          "name": "_asr",
+          "seconds": 12.743306558579206
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.021452128887176514
+        }
+      ],
+      "controller": 12.839814815670252,
+      "x2": 0.12520236521959305,
+      "x2_span": 0.13138960674405098,
+      "batch": 12.841425966471434,
+      "inter_batch": 0.0008558705449104309,
+      "commit": 0.0007024593651294708,
+      "state_to_publish": 0.006517928093671799,
+      "lag": 26.09264689207077
+    },
+    {
+      "case_id": "candor_pause_handling-16",
+      "step": 65,
+      "wall_start": 10.640893690288067,
+      "wall_end": 23.281970661133528,
+      "observed": 10.36,
+      "state": "<|user_nonidle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.015178259462118149
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.000583987683057785
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 12.57247880846262
+        },
+        {
+          "name": "_asr",
+          "seconds": 12.594857558608055
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.0212937630712986
+        }
+      ],
+      "controller": 12.638022925704718,
+      "x2": 0.05920851230621338,
+      "x2_span": 0.06060933321714401,
+      "batch": 12.641076970845461,
+      "inter_batch": 0.09643848240375519,
+      "commit": 0.0020782500505447388,
+      "state_to_publish": 0.005940277129411697,
+      "lag": 12.961970661133527
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "step": 16,
+      "wall_start": 25.032256793230772,
+      "wall_end": 36.77096026018262,
+      "observed": 2.68,
+      "state": "<|user_complete|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.015595614910125732
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.0003094896674156189
+        },
+        {
+          "name": "_asr",
+          "seconds": 0.019208960235118866
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.021844882518053055
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 11.671715714037418
+        }
+      ],
+      "controller": 11.737032353878021,
+      "x2": 0.061407845467329025,
+      "x2_span": 0.0639939196407795,
+      "batch": 11.738703466951847,
+      "inter_batch": 0.0011194944381713867,
+      "commit": 0.0006916970014572144,
+      "state_to_publish": 11.67965393513441,
+      "lag": 34.13096026018262
+    },
+    {
+      "case_id": "candor_pause_handling-161",
+      "step": 38,
+      "wall_start": 6.847492400556803,
+      "wall_end": 17.194900151342154,
+      "observed": 6.2,
+      "state": "<|user_nonidle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.16001096367835999
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.0016757957637310028
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 10.117651030421257
+        },
+        {
+          "name": "_asr",
+          "seconds": 10.148705553263426
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.02216772735118866
+        }
+      ],
+      "controller": 10.3455994091928,
+      "x2": 0.3244822174310684,
+      "x2_span": 0.3402259759604931,
+      "batch": 10.34740775078535,
+      "inter_batch": 0.002577252686023712,
+      "commit": 0.000712171196937561,
+      "state_to_publish": 0.0011014118790626526,
+      "lag": 11.034900151342153
+    }
+  ],
+  "slowest_sensevoice": [
+    {
+      "case_id": "synthetic_user_interruption-104",
+      "step": 78,
+      "seconds": 34.97753099352121,
+      "wall_start": 12.917267188429832,
+      "before_first_reply": false,
+      "samples": 53760,
+      "dtype": "float64"
+    },
+    {
+      "case_id": "candor_turn_taking-51",
+      "step": 1,
+      "seconds": 32.78551597520709,
+      "wall_start": 0.4394822344183922,
+      "before_first_reply": true,
+      "samples": 53760,
+      "dtype": "float64"
+    },
+    {
+      "case_id": "synthetic_user_interruption-43",
+      "step": 70,
+      "seconds": 26.664041705429554,
+      "wall_start": 11.47777421027422,
+      "before_first_reply": false,
+      "samples": 53760,
+      "dtype": "float64"
+    },
+    {
+      "case_id": "synthetic_user_interruption-118",
+      "step": 4,
+      "seconds": 25.18153629079461,
+      "wall_start": 0.9171524159610271,
+      "before_first_reply": true,
+      "samples": 53760,
+      "dtype": "float64"
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "step": 18,
+      "seconds": 23.076411105692387,
+      "wall_start": 37.04739246889949,
+      "before_first_reply": false,
+      "samples": 53760,
+      "dtype": "float64"
+    },
+    {
+      "case_id": "synthetic_user_interruption-74",
+      "step": 4,
+      "seconds": 18.677504554390907,
+      "wall_start": 0.9178878255188465,
+      "before_first_reply": true,
+      "samples": 53760,
+      "dtype": "float64"
+    },
+    {
+      "case_id": "candor_pause_handling-50",
+      "step": 1,
+      "seconds": 17.468444243073463,
+      "wall_start": 0.4363977573812008,
+      "before_first_reply": true,
+      "samples": 53760,
+      "dtype": "float64"
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "step": 14,
+      "seconds": 16.197362300008535,
+      "wall_start": 7.20423686876893,
+      "before_first_reply": false,
+      "samples": 53760,
+      "dtype": "float64"
+    },
+    {
+      "case_id": "candor_turn_taking-56",
+      "step": 20,
+      "seconds": 13.144127909094095,
+      "wall_start": 3.616674244403839,
+      "before_first_reply": false,
+      "samples": 53760,
+      "dtype": "float64"
+    },
+    {
+      "case_id": "synthetic_pause_handling-70",
+      "step": 14,
+      "seconds": 12.822345193475485,
+      "wall_start": 2.5159761160612106,
+      "before_first_reply": false,
+      "samples": 53760,
+      "dtype": "float64"
+    },
+    {
+      "case_id": "candor_pause_handling-161",
+      "step": 49,
+      "seconds": 12.720622058957815,
+      "wall_start": 21.222866892814636,
+      "before_first_reply": false,
+      "samples": 53760,
+      "dtype": "float64"
+    },
+    {
+      "case_id": "candor_pause_handling-16",
+      "step": 65,
+      "seconds": 12.57247880846262,
+      "wall_start": 10.680025905370712,
+      "before_first_reply": false,
+      "samples": 53760,
+      "dtype": "float64"
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "step": 16,
+      "seconds": 11.671715714037418,
+      "wall_start": 25.09305877238512,
+      "before_first_reply": false,
+      "samples": 35840,
+      "dtype": "float64"
+    },
+    {
+      "case_id": "synthetic_pause_handling-41",
+      "step": 14,
+      "seconds": 10.203545346856117,
+      "wall_start": 2.5675801374018192,
+      "before_first_reply": false,
+      "samples": 53760,
+      "dtype": "float64"
+    },
+    {
+      "case_id": "candor_pause_handling-161",
+      "step": 38,
+      "seconds": 10.117651030421257,
+      "wall_start": 7.050601810216904,
+      "before_first_reply": false,
+      "samples": 53760,
+      "dtype": "float64"
+    }
+  ],
+  "interruption_20_slow_batches": [
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "step": 5,
+      "wall_start": 1.0404053963720798,
+      "wall_end": 4.223682161420584,
+      "observed": 0.96,
+      "state": "<|user_nonidle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.013483643531799316
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.0007434673607349396
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 3.124985221773386
+        },
+        {
+          "name": "_asr",
+          "seconds": 3.1454457603394985
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.02092568576335907
+        }
+      ],
+      "controller": 3.181587904691696,
+      "x2": 0.11441051959991455,
+      "x2_span": 0.11949644982814789,
+      "batch": 3.183276765048504,
+      "inter_batch": 0.09640057384967804,
+      "commit": 0.0007115006446838379,
+      "state_to_publish": 0.0011118128895759583,
+      "lag": 3.303682161420584
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "step": 13,
+      "wall_start": 4.8936983942985535,
+      "wall_end": 7.095767952501774,
+      "observed": 2.2,
+      "state": "<|user_nonidle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.011111646890640259
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.0005347467958927155
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 2.082354124635458
+        },
+        {
+          "name": "_asr",
+          "seconds": 2.1669425517320633
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.021138086915016174
+        }
+      ],
+      "controller": 2.2007250376045704,
+      "x2": 0.1696741208434105,
+      "x2_span": 0.17148902639746666,
+      "batch": 2.2020695582032204,
+      "inter_batch": 0.0014241784811019897,
+      "commit": 0.0006225444376468658,
+      "state_to_publish": 0.0009166710078716278,
+      "lag": 4.935767952501774
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "step": 14,
+      "wall_start": 7.102668061852455,
+      "wall_end": 23.4560660533607,
+      "observed": 2.36,
+      "state": "<|user_nonidle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.03354470804333687
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.0002777613699436188
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 16.197362300008535
+        },
+        {
+          "name": "_asr",
+          "seconds": 16.29148218035698
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.021958127617836
+        }
+      ],
+      "controller": 16.34868374839425,
+      "x2": 0.30194826796650887,
+      "x2_span": 0.32079261541366577,
+      "batch": 16.353397991508245,
+      "inter_batch": 0.006900109350681305,
+      "commit": 0.0025304481387138367,
+      "state_to_publish": 0.0043170265853405,
+      "lag": 21.1360660533607
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "step": 15,
+      "wall_start": 23.46029232442379,
+      "wall_end": 25.0311372987926,
+      "observed": 2.52,
+      "state": "<|user_nonidle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.08334777131676674
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.0002604760229587555
+        },
+        {
+          "name": "_asr",
+          "seconds": 0.02591913565993309
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.019180595874786377
+        }
+      ],
+      "controller": 1.5088003128767014,
+      "x2": 1.5599776692688465,
+      "x2_span": 1.5675313919782639,
+      "batch": 1.5708449743688107,
+      "inter_batch": 0.004226271063089371,
+      "commit": 0.0005788691341876984,
+      "state_to_publish": 0.06164461374282837,
+      "lag": 22.5511372987926
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "step": 16,
+      "wall_start": 25.032256793230772,
+      "wall_end": 36.77096026018262,
+      "observed": 2.68,
+      "state": "<|user_complete|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.015595614910125732
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.0003094896674156189
+        },
+        {
+          "name": "_asr",
+          "seconds": 0.019208960235118866
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.021844882518053055
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 11.671715714037418
+        }
+      ],
+      "controller": 11.737032353878021,
+      "x2": 0.061407845467329025,
+      "x2_span": 0.0639939196407795,
+      "batch": 11.738703466951847,
+      "inter_batch": 0.0011194944381713867,
+      "commit": 0.0006916970014572144,
+      "state_to_publish": 11.67965393513441,
+      "lag": 34.13096026018262
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "step": 18,
+      "wall_start": 36.96987846493721,
+      "wall_end": 60.1472574621439,
+      "observed": 2.96,
+      "state": "<|user_idle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.05028628930449486
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.004537124186754227
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 23.076411105692387
+        },
+        {
+          "name": "_asr",
+          "seconds": 23.097915701568127
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.021859358996152878
+        }
+      ],
+      "controller": 23.175910156220198,
+      "x2": 0.05667802318930626,
+      "x2_span": 0.05788945406675339,
+      "batch": 23.177378997206688,
+      "inter_batch": 0.001086365431547165,
+      "commit": 0.0006035827100276947,
+      "state_to_publish": 0.001047387719154358,
+      "lag": 57.227257462143896
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "step": 19,
+      "wall_start": 60.14836497977376,
+      "wall_end": 62.03588852286339,
+      "observed": 3.12,
+      "state": "<|user_idle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.02351812645792961
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.00019929558038711548
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 1.7913628816604614
+        },
+        {
+          "name": "_asr",
+          "seconds": 1.82490698620677
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.030172452330589294
+        }
+      ],
+      "controller": 1.8821052126586437,
+      "x2": 0.22559664770960808,
+      "x2_span": 0.2442384883761406,
+      "batch": 1.8875235430896282,
+      "inter_batch": 0.0011075176298618317,
+      "commit": 0.0006150379776954651,
+      "state_to_publish": 0.0024975091218948364,
+      "lag": 58.95588852286339
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "step": 21,
+      "wall_start": 62.1768791526556,
+      "wall_end": 64.1279590241611,
+      "observed": 3.44,
+      "state": "<|user_nonidle|>",
+      "stages": [
+        {
+          "name": "_audio_to_tokens",
+          "seconds": 0.06199246644973755
+        },
+        {
+          "name": "_tokens_to_embeds",
+          "seconds": 0.00021901726722717285
+        },
+        {
+          "name": "sensevoice",
+          "seconds": 1.8393392451107502
+        },
+        {
+          "name": "_asr",
+          "seconds": 1.860949158668518
+        },
+        {
+          "name": "_state_predict",
+          "seconds": 0.025275852531194687
+        }
+      ],
+      "controller": 1.949654795229435,
+      "x2": 0.17599095776677132,
+      "x2_span": 0.1831088922917843,
+      "batch": 1.9510798715054989,
+      "inter_batch": 0.0011530444025993347,
+      "commit": 0.0006537772715091705,
+      "state_to_publish": 0.0012158043682575226,
+      "lag": 60.7279590241611
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "candor_pause_handling-127",
+      "original_seconds": 9.92,
+      "subset": "candor_pause_handling",
+      "id": "127",
+      "baseline_tor": 0,
+      "tor": 0,
+      "max_lag": 0.40287402004003603,
+      "events": {
+        "reply_started": 2,
+        "cancel_requested": 2,
+        "assistant_history_pending": 1
+      },
+      "complete": [
+        {
+          "wall": 5.500940036028624,
+          "observed": 5.24,
+          "text": "yeah do you have is there someone like a social worker that could kind of help you with them because"
+        },
+        {
+          "wall": 7.888363089412451,
+          "observed": 7.6,
+          "text": "yeah do you have is there someone like a social worker that could kind of help you with them because i mean that agency is just terrible to deal with"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 63,
+          "wall": 10.41712985560298,
+          "text": "Anybody?",
+          "x2_text": "yeah do you have is there someone like a social worker that could kind of help you with them because i mean that agency is just terrible to deal with for anybody um"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 5.501057952642441,
+          "request_id": "candor_pause_handling-127-r1",
+          "user_text": "yeah do you have is there someone like a social worker that could kind of help you with them because"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 5.796308312565088,
+          "request_id": "candor_pause_handling-127-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 5.796337265521288,
+          "request_id": "candor_pause_handling-127-r1",
+          "played_samples": 0
+        },
+        {
+          "event": "reply_started",
+          "time": 7.888479266315699,
+          "request_id": "candor_pause_handling-127-r2",
+          "user_text": "i mean that agency is just terrible to deal with"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 8.575111545622349,
+          "request_id": "candor_pause_handling-127-r2"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 8.658678963780403,
+          "request_id": "candor_pause_handling-127-r2",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 8.66203187406063,
+          "request_id": "candor_pause_handling-127-r2",
+          "played_samples": 1134
+        }
+      ]
+    },
+    {
+      "case_id": "candor_pause_handling-16",
+      "original_seconds": 15.84,
+      "subset": "candor_pause_handling",
+      "id": "16",
+      "baseline_tor": 0,
+      "tor": 1,
+      "max_lag": 13.146096715331078,
+      "events": {
+        "reply_started": 3,
+        "cancel_requested": 2,
+        "assistant_history_pending": 0
+      },
+      "complete": [
+        {
+          "wall": 2.6058639474213123,
+          "observed": 2.32,
+          "text": "yeah i don't have anything"
+        },
+        {
+          "wall": 3.5716320797801018,
+          "observed": 3.24,
+          "text": "yeah i don't have anything particularly memorable"
+        },
+        {
+          "wall": 9.955382980406284,
+          "observed": 9.6,
+          "text": "yeah i don't have anything particularly memorable like that at most it was like my first call was with an excop and this was around the time of the whole like"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 91,
+          "wall": 25.896708264946938,
+          "text": "Police like protest and I was kind of like,ooh.",
+          "x2_text": "yeah i don't have anything particularly memorable like that at most it was like my first call was with an excop and this was around the time of the whole like police like protest and i was kind of like ooh i"
+        },
+        {
+          "step": 107,
+          "wall": 27.176828891038895,
+          "text": "I don't know what to say.",
+          "x2_text": "yeah i don't have anything particularly memorable like that at most it was like my first call was with an excop and this was around the time of the whole like police like protest and i was kind of like ooh i don't know what to say"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 2.605980932712555,
+          "request_id": "candor_pause_handling-16-r1",
+          "user_text": "yeah i don't have anything"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 2.733918610960245,
+          "request_id": "candor_pause_handling-16-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 2.7339457981288433,
+          "request_id": "candor_pause_handling-16-r1",
+          "played_samples": 0
+        },
+        {
+          "event": "reply_started",
+          "time": 3.571741610765457,
+          "request_id": "candor_pause_handling-16-r2",
+          "user_text": "particularly memorable"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 3.904450561851263,
+          "request_id": "candor_pause_handling-16-r2",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 3.90449645742774,
+          "request_id": "candor_pause_handling-16-r2",
+          "played_samples": 0
+        },
+        {
+          "event": "reply_started",
+          "time": 9.955504145473242,
+          "request_id": "candor_pause_handling-16-r3",
+          "user_text": "like that at most it was like my first call was with an excop and this was around the time of the whole like"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 10.819471254944801,
+          "request_id": "candor_pause_handling-16-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 12.223480984568596,
+          "request_id": "candor_pause_handling-16-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 14.848453491926193,
+          "request_id": "candor_pause_handling-16-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 17.426333151757717,
+          "request_id": "candor_pause_handling-16-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 19.71813092380762,
+          "request_id": "candor_pause_handling-16-r3"
+        }
+      ]
+    },
+    {
+      "case_id": "candor_pause_handling-161",
+      "original_seconds": 8.32,
+      "subset": "candor_pause_handling",
+      "id": "161",
+      "baseline_tor": 0,
+      "tor": 0,
+      "max_lag": 26.09264689207077,
+      "events": {
+        "reply_started": 2,
+        "cancel_requested": 1,
+        "assistant_history_pending": 1
+      },
+      "complete": [
+        {
+          "wall": 5.684802569448948,
+          "observed": 5.44,
+          "text": "well and exactly and even if it's doing basic work doing so a worksheet of multiplication i'm like"
+        },
+        {
+          "wall": 20.091146990656853,
+          "observed": 6.36,
+          "text": "well and exactly and even if it's doing basic work doing so a worksheet of multiplication i'm like how does that hurt you"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 60,
+          "wall": 34.79946432262659,
+          "text": "",
+          "x2_text": "well and exactly and even if it's doing basic work doing so a worksheet of multiplication i'm like how does that hurt you does"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 5.684935364872217,
+          "request_id": "candor_pause_handling-161-r1",
+          "user_text": "well and exactly and even if it's doing basic work doing so a worksheet of multiplication i'm like"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 6.93627142906189,
+          "request_id": "candor_pause_handling-161-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 8.218217264860868,
+          "request_id": "candor_pause_handling-161-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 10.781192030757666,
+          "request_id": "candor_pause_handling-161-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 14.696002062410116,
+          "request_id": "candor_pause_handling-161-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 16.724153224378824,
+          "request_id": "candor_pause_handling-161-r1"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 17.19549759104848,
+          "request_id": "candor_pause_handling-161-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 17.199662778526545,
+          "request_id": "candor_pause_handling-161-r1",
+          "played_samples": 141706
+        },
+        {
+          "event": "reply_started",
+          "time": 20.09130134060979,
+          "request_id": "candor_pause_handling-161-r2",
+          "user_text": "how does that hurt you"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 21.267293490469456,
+          "request_id": "candor_pause_handling-161-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 22.64941133186221,
+          "request_id": "candor_pause_handling-161-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 25.378567684441805,
+          "request_id": "candor_pause_handling-161-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 26.766974821686745,
+          "request_id": "candor_pause_handling-161-r2"
+        }
+      ]
+    },
+    {
+      "case_id": "candor_pause_handling-40",
+      "original_seconds": 9.76,
+      "subset": "candor_pause_handling",
+      "id": "40",
+      "baseline_tor": 0,
+      "tor": 0,
+      "max_lag": 13.398066512048244,
+      "events": {
+        "reply_started": 3,
+        "cancel_requested": 3,
+        "assistant_history_pending": 3
+      },
+      "complete": [
+        {
+          "wall": 3.091594524681568,
+          "observed": 2.88,
+          "text": "the most endearing little noises"
+        },
+        {
+          "wall": 15.240141712129116,
+          "observed": 6.52,
+          "text": "the most endearing little noises these little bags under our eyes like a waitress at waffle"
+        },
+        {
+          "wall": 19.968624480068684,
+          "observed": 8.52,
+          "text": "the most endearing little noises these little bags under our eyes like a waitress at waffle house is so cute"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 71,
+          "wall": 23.797302715480328,
+          "text": "",
+          "x2_text": "the most endearing little noises these little bags under our eyes like a waitress at waffle house is so cute"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 3.091717094182968,
+          "request_id": "candor_pause_handling-40-r1",
+          "user_text": "the most endearing little noises"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 11.732365027070045,
+          "request_id": "candor_pause_handling-40-r1"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 11.942602191120386,
+          "request_id": "candor_pause_handling-40-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 11.946294032037258,
+          "request_id": "candor_pause_handling-40-r1",
+          "played_samples": 2801
+        },
+        {
+          "event": "reply_started",
+          "time": 15.240264717489481,
+          "request_id": "candor_pause_handling-40-r2",
+          "user_text": "these little bags under our eyes like a waitress at waffle"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 16.00493074953556,
+          "request_id": "candor_pause_handling-40-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 17.539472173899412,
+          "request_id": "candor_pause_handling-40-r2"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 19.317372642457485,
+          "request_id": "candor_pause_handling-40-r2",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 19.321035347878933,
+          "request_id": "candor_pause_handling-40-r2",
+          "played_samples": 45707
+        },
+        {
+          "event": "reply_started",
+          "time": 19.968728378415108,
+          "request_id": "candor_pause_handling-40-r3",
+          "user_text": "house is so cute"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 20.908110447227955,
+          "request_id": "candor_pause_handling-40-r3"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 21.479879342019558,
+          "request_id": "candor_pause_handling-40-r3",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 21.483107697218657,
+          "request_id": "candor_pause_handling-40-r3",
+          "played_samples": 7919
+        }
+      ]
+    },
+    {
+      "case_id": "candor_pause_handling-50",
+      "original_seconds": 8.32,
+      "subset": "candor_pause_handling",
+      "id": "50",
+      "baseline_tor": 0,
+      "tor": 0,
+      "max_lag": 20.61195880740881,
+      "events": {
+        "reply_started": 2,
+        "cancel_requested": 1,
+        "assistant_history_pending": 0
+      },
+      "complete": [
+        {
+          "wall": 19.795611582696438,
+          "observed": 3.0,
+          "text": "yeah they had a link there that said if you need to get back to it"
+        },
+        {
+          "wall": 28.36739170178771,
+          "observed": 8.36,
+          "text": "yeah they had a link there that said if you need to get back to it so we need to get back to this thing i don't"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 44,
+          "wall": 27.69195880740881,
+          "text": "So I wonder't know if we need to get back to this thing.",
+          "x2_text": "yeah they had a link there that said if you need to get back to it so we need to get back to this thing"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 19.795729633420706,
+          "request_id": "candor_pause_handling-50-r1",
+          "user_text": "yeah they had a link there that said if you need to get back to it"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 20.144417505711317,
+          "request_id": "candor_pause_handling-50-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 20.144444588571787,
+          "request_id": "candor_pause_handling-50-r1",
+          "played_samples": 0
+        },
+        {
+          "event": "reply_started",
+          "time": 28.367498576641083,
+          "request_id": "candor_pause_handling-50-r2",
+          "user_text": "so we need to get back to this thing i don't"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 29.10542432963848,
+          "request_id": "candor_pause_handling-50-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 30.50608516857028,
+          "request_id": "candor_pause_handling-50-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 32.98090311512351,
+          "request_id": "candor_pause_handling-50-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 34.85548534616828,
+          "request_id": "candor_pause_handling-50-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 37.32469166815281,
+          "request_id": "candor_pause_handling-50-r2"
+        }
+      ]
+    },
+    {
+      "case_id": "candor_turn_taking-102",
+      "original_seconds": 11.7999375,
+      "subset": "candor_turn_taking",
+      "id": "102",
+      "baseline_tor": 1,
+      "tor": 1,
+      "max_lag": 10.818878561854362,
+      "events": {
+        "reply_started": 1,
+        "cancel_requested": 0,
+        "assistant_history_pending": 0
+      },
+      "complete": [
+        {
+          "wall": 6.4226535223424435,
+          "observed": 6.12,
+          "text": "like the the majority of people who are going to vote for trump don't care that he said that"
+        }
+      ],
+      "wait_fallback": [],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 6.422796942293644,
+          "request_id": "candor_turn_taking-102-r1",
+          "user_text": "like the the majority of people who are going to vote for trump don't care that he said that"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 7.377087160944939,
+          "request_id": "candor_turn_taking-102-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 8.814288765192032,
+          "request_id": "candor_turn_taking-102-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 11.981432523578405,
+          "request_id": "candor_turn_taking-102-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 14.827726274728775,
+          "request_id": "candor_turn_taking-102-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 17.5384436622262,
+          "request_id": "candor_turn_taking-102-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 19.236210487782955,
+          "request_id": "candor_turn_taking-102-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 22.26486248522997,
+          "request_id": "candor_turn_taking-102-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 25.124223362654448,
+          "request_id": "candor_turn_taking-102-r1"
+        }
+      ]
+    },
+    {
+      "case_id": "candor_turn_taking-17",
+      "original_seconds": 10.5999375,
+      "subset": "candor_turn_taking",
+      "id": "17",
+      "baseline_tor": 1,
+      "tor": 1,
+      "max_lag": 2.779153584986925,
+      "events": {
+        "reply_started": 2,
+        "cancel_requested": 2,
+        "assistant_history_pending": 2
+      },
+      "complete": [
+        {
+          "wall": 1.0510137639939785,
+          "observed": 0.8,
+          "text": "oh okay"
+        },
+        {
+          "wall": 4.406819466501474,
+          "observed": 1.72,
+          "text": "oh okay cool"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 41,
+          "wall": 6.9335286766290665,
+          "text": "So what part of Arizona are you in?",
+          "x2_text": "oh okay cool nice so what part of the arizona are you in"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 1.0511337891221046,
+          "request_id": "candor_turn_taking-17-r1",
+          "user_text": "oh okay"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 2.063603274524212,
+          "request_id": "candor_turn_taking-17-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 3.6668728962540627,
+          "request_id": "candor_turn_taking-17-r1"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 3.72052289173007,
+          "request_id": "candor_turn_taking-17-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 3.7235693112015724,
+          "request_id": "candor_turn_taking-17-r1",
+          "played_samples": 22605
+        },
+        {
+          "event": "reply_started",
+          "time": 4.4069391414523125,
+          "request_id": "candor_turn_taking-17-r2",
+          "user_text": "cool"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 4.910341959446669,
+          "request_id": "candor_turn_taking-17-r2"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 5.315954390913248,
+          "request_id": "candor_turn_taking-17-r2",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 5.319242391735315,
+          "request_id": "candor_turn_taking-17-r2",
+          "played_samples": 5625
+        }
+      ]
+    },
+    {
+      "case_id": "candor_turn_taking-3",
+      "original_seconds": 14.3499375,
+      "subset": "candor_turn_taking",
+      "id": "3",
+      "baseline_tor": 1,
+      "tor": 1,
+      "max_lag": 9.20077993839979,
+      "events": {
+        "reply_started": 4,
+        "cancel_requested": 3,
+        "assistant_history_pending": 2
+      },
+      "complete": [
+        {
+          "wall": 2.629405938088894,
+          "observed": 2.4,
+          "text": "i i love this"
+        },
+        {
+          "wall": 3.2696007639169693,
+          "observed": 3.0,
+          "text": "i i love this prolific service"
+        },
+        {
+          "wall": 5.221011348068714,
+          "observed": 3.92,
+          "text": "i i love this prolific service thing i"
+        },
+        {
+          "wall": 16.493583358824253,
+          "observed": 9.12,
+          "text": "i i love this prolific service thing i this year i started kind of looking for some downtime at work or minutes in between like whatever"
+        }
+      ],
+      "wait_fallback": [],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 2.629569698125124,
+          "request_id": "candor_turn_taking-3-r1",
+          "user_text": "i i love this"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 2.9162981882691383,
+          "request_id": "candor_turn_taking-3-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 2.9163298159837723,
+          "request_id": "candor_turn_taking-3-r1",
+          "played_samples": 0
+        },
+        {
+          "event": "reply_started",
+          "time": 3.2697187066078186,
+          "request_id": "candor_turn_taking-3-r2",
+          "user_text": "prolific service"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 4.1292809471488,
+          "request_id": "candor_turn_taking-3-r2"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 4.709154810756445,
+          "request_id": "candor_turn_taking-3-r2",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 4.7127488404512405,
+          "request_id": "candor_turn_taking-3-r2",
+          "played_samples": 8000
+        },
+        {
+          "event": "reply_started",
+          "time": 5.22113024443388,
+          "request_id": "candor_turn_taking-3-r3",
+          "user_text": "thing i"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 6.079562474042177,
+          "request_id": "candor_turn_taking-3-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 7.506618425250053,
+          "request_id": "candor_turn_taking-3-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 10.122608203440905,
+          "request_id": "candor_turn_taking-3-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 12.829597145318985,
+          "request_id": "candor_turn_taking-3-r3"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 13.769695341587067,
+          "request_id": "candor_turn_taking-3-r3",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 13.773096784949303,
+          "request_id": "candor_turn_taking-3-r3",
+          "played_samples": 106618
+        },
+        {
+          "event": "reply_started",
+          "time": 16.493709724396467,
+          "request_id": "candor_turn_taking-3-r4",
+          "user_text": "this year i started kind of looking for some downtime at work or minutes in between like whatever"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 17.37819839641452,
+          "request_id": "candor_turn_taking-3-r4"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 18.920376755297184,
+          "request_id": "candor_turn_taking-3-r4"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 19.771332386881113,
+          "request_id": "candor_turn_taking-3-r4"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 22.49992273002863,
+          "request_id": "candor_turn_taking-3-r4"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 25.063417088240385,
+          "request_id": "candor_turn_taking-3-r4"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 26.44224975630641,
+          "request_id": "candor_turn_taking-3-r4"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 29.301727198064327,
+          "request_id": "candor_turn_taking-3-r4"
+        }
+      ]
+    },
+    {
+      "case_id": "candor_turn_taking-39",
+      "original_seconds": 29.9899375,
+      "subset": "candor_turn_taking",
+      "id": "39",
+      "baseline_tor": 1,
+      "tor": 1,
+      "max_lag": 6.333912511616945,
+      "events": {
+        "reply_started": 3,
+        "cancel_requested": 2,
+        "assistant_history_pending": 0
+      },
+      "complete": [
+        {
+          "wall": 14.55779417604208,
+          "observed": 13.36,
+          "text": "yes like a big square you know out of block and like and even way back when when my my husband's family used to live down there often and they had some land and so they always garden they'd be like oh we just throw seven dust on it"
+        },
+        {
+          "wall": 24.867985770106316,
+          "observed": 24.44,
+          "text": "yes like a big square you know out of block and like and even way back when when my my husband's family used to live down there often and they had some land and so they always garden they'd be like oh we just throw seven dust on it like okay they throw seven dust on the tomatoes so by the time you grow the tomatoes and when you throw all they would just douse them in seven dust which you know it's chemical it's"
+        },
+        {
+          "wall": 25.296606946736574,
+          "observed": 24.88,
+          "text": "yes like a big square you know out of block and like and even way back when when my my husband's family used to live down there often and they had some land and so they always garden they'd be like oh we just throw seven dust on it like okay they throw seven dust on the tomatoes so by the time you grow the tomatoes and when you throw all they would just douse them in seven dust which you know it's chemical it's poison"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 22,
+          "wall": 8.526814971119165,
+          "text": "That's like a big square, you know, out of law.",
+          "x2_text": "yes like a big square you know out of block and"
+        },
+        {
+          "step": 145,
+          "wall": 23.56911338865757,
+          "text": "Like okay, they throw seven dust on the tomatoes, so by the time you grow the tomatoes and when you throw all, they would just douse them.",
+          "x2_text": "yes like a big square you know out of block and like and even way back when when my my husband's family used to live down there often and they had some land and so they always garden they'd be like oh we just throw seven dust on it like okay they throw seven dust on the tomatoes so by the time you grow the tomatoes and when you throw all they would just douse them in seven dust which you know"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 14.557929959148169,
+          "request_id": "candor_turn_taking-39-r1",
+          "user_text": "yes like a big square you know out of block and like and even way back when when my my husband's family used to live down there often and they had some land and so they always garden they'd be like oh we just throw seven dust on it"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 15.545068446546793,
+          "request_id": "candor_turn_taking-39-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 15.545109886676073,
+          "request_id": "candor_turn_taking-39-r1",
+          "played_samples": 0
+        },
+        {
+          "event": "reply_started",
+          "time": 24.86810041591525,
+          "request_id": "candor_turn_taking-39-r2",
+          "user_text": "like okay they throw seven dust on the tomatoes so by the time you grow the tomatoes and when you throw all they would just douse them in seven dust which you know it's chemical it's"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 24.984330639243126,
+          "request_id": "candor_turn_taking-39-r2",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 24.98436115682125,
+          "request_id": "candor_turn_taking-39-r2",
+          "played_samples": 0
+        },
+        {
+          "event": "reply_started",
+          "time": 25.29671972244978,
+          "request_id": "candor_turn_taking-39-r3",
+          "user_text": "poison"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 26.011973947286606,
+          "request_id": "candor_turn_taking-39-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 27.406676799058914,
+          "request_id": "candor_turn_taking-39-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 30.14023381099105,
+          "request_id": "candor_turn_taking-39-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 32.56640749052167,
+          "request_id": "candor_turn_taking-39-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 35.0416681393981,
+          "request_id": "candor_turn_taking-39-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 37.516571175307035,
+          "request_id": "candor_turn_taking-39-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 40.244694624096155,
+          "request_id": "candor_turn_taking-39-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 42.97666967660189,
+          "request_id": "candor_turn_taking-39-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 45.102348655462265,
+          "request_id": "candor_turn_taking-39-r3"
+        }
+      ]
+    },
+    {
+      "case_id": "candor_turn_taking-51",
+      "original_seconds": 13.1999375,
+      "subset": "candor_turn_taking",
+      "id": "51",
+      "baseline_tor": 1,
+      "tor": 0,
+      "max_lag": 36.33278911098838,
+      "events": {
+        "reply_started": 2,
+        "cancel_requested": 1,
+        "assistant_history_pending": 1
+      },
+      "complete": [
+        {
+          "wall": 34.83194721117616,
+          "observed": 3.04,
+          "text": "and mask yeah i didn't know california"
+        },
+        {
+          "wall": 42.489233665168285,
+          "observed": 7.92,
+          "text": "and mask yeah i didn't know california was um that about the mask too i thought they were pretty"
+        }
+      ],
+      "wait_fallback": [],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 34.83207456767559,
+          "request_id": "candor_turn_taking-51-r1",
+          "user_text": "and mask yeah i didn't know california"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 36.10672610625625,
+          "request_id": "candor_turn_taking-51-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 38.73812359198928,
+          "request_id": "candor_turn_taking-51-r1"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 38.866622403264046,
+          "request_id": "candor_turn_taking-51-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 38.87135135382414,
+          "request_id": "candor_turn_taking-51-r1",
+          "played_samples": 37936
+        },
+        {
+          "event": "reply_started",
+          "time": 42.48937572911382,
+          "request_id": "candor_turn_taking-51-r2",
+          "user_text": "was um that about the mask too i thought they were pretty"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 43.24757282435894,
+          "request_id": "candor_turn_taking-51-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 45.13693789020181,
+          "request_id": "candor_turn_taking-51-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 47.99605209752917,
+          "request_id": "candor_turn_taking-51-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 50.114315785467625,
+          "request_id": "candor_turn_taking-51-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 53.13170938566327,
+          "request_id": "candor_turn_taking-51-r2"
+        }
+      ]
+    },
+    {
+      "case_id": "candor_turn_taking-54",
+      "original_seconds": 11.5999375,
+      "subset": "candor_turn_taking",
+      "id": "54",
+      "baseline_tor": 1,
+      "tor": 0,
+      "max_lag": 3.122978807836771,
+      "events": {
+        "reply_started": 1,
+        "cancel_requested": 1,
+        "assistant_history_pending": 0
+      },
+      "complete": [
+        {
+          "wall": 4.201419085264206,
+          "observed": 1.44,
+          "text": ""
+        },
+        {
+          "wall": 6.597503077238798,
+          "observed": 5.56,
+          "text": "i am privately graduated from college and then after college i moved to chicago for a"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 47,
+          "wall": 7.855589389801025,
+          "text": "For while.",
+          "x2_text": "i am privately graduated from college and then after college i moved to chicago for a while"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 6.597615364938974,
+          "request_id": "candor_turn_taking-54-r1",
+          "user_text": "i am privately graduated from college and then after college i moved to chicago for a"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 6.787368007004261,
+          "request_id": "candor_turn_taking-54-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 6.787420708686113,
+          "request_id": "candor_turn_taking-54-r1",
+          "played_samples": 0
+        }
+      ]
+    },
+    {
+      "case_id": "candor_turn_taking-56",
+      "original_seconds": 9.3999375,
+      "subset": "candor_turn_taking",
+      "id": "56",
+      "baseline_tor": 1,
+      "tor": 1,
+      "max_lag": 16.521536449342968,
+      "events": {
+        "reply_started": 3,
+        "cancel_requested": 2,
+        "assistant_history_pending": 1
+      },
+      "complete": [
+        {
+          "wall": 2.7768049836158752,
+          "observed": 2.56,
+          "text": "i don't know i could have adjusted go back at this point i"
+        },
+        {
+          "wall": 3.2458200715482235,
+          "observed": 3.0,
+          "text": "i don't know i could have adjusted go back at this point i think"
+        },
+        {
+          "wall": 20.32459044456482,
+          "observed": 4.08,
+          "text": "i don't know i could have adjusted go back at this point i think i'm too far gone"
+        }
+      ],
+      "wait_fallback": [],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 2.776926752179861,
+          "request_id": "candor_turn_taking-56-r1",
+          "user_text": "i don't know i could have adjusted go back at this point i"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 2.90312048047781,
+          "request_id": "candor_turn_taking-56-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 2.9031480625271797,
+          "request_id": "candor_turn_taking-56-r1",
+          "played_samples": 0
+        },
+        {
+          "event": "reply_started",
+          "time": 3.2459338158369064,
+          "request_id": "candor_turn_taking-56-r2",
+          "user_text": "think"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 4.121709987521172,
+          "request_id": "candor_turn_taking-56-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 5.503791946917772,
+          "request_id": "candor_turn_taking-56-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 7.926201794296503,
+          "request_id": "candor_turn_taking-56-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 10.355472136288881,
+          "request_id": "candor_turn_taking-56-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 12.18260059133172,
+          "request_id": "candor_turn_taking-56-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 14.74876018986106,
+          "request_id": "candor_turn_taking-56-r2"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 16.78916261717677,
+          "request_id": "candor_turn_taking-56-r2",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 16.793120592832565,
+          "request_id": "candor_turn_taking-56-r2",
+          "played_samples": 174959
+        },
+        {
+          "event": "reply_started",
+          "time": 20.324717558920383,
+          "request_id": "candor_turn_taking-56-r3",
+          "user_text": "i'm too far gone"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 21.268593825399876,
+          "request_id": "candor_turn_taking-56-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 23.263863440603018,
+          "request_id": "candor_turn_taking-56-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 25.74926533922553,
+          "request_id": "candor_turn_taking-56-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 28.32201172783971,
+          "request_id": "candor_turn_taking-56-r3"
+        }
+      ]
+    },
+    {
+      "case_id": "candor_turn_taking-76",
+      "original_seconds": 10.45,
+      "subset": "candor_turn_taking",
+      "id": "76",
+      "baseline_tor": 1,
+      "tor": 0,
+      "max_lag": 0.3151848305761815,
+      "events": {
+        "reply_started": 0,
+        "cancel_requested": 0,
+        "assistant_history_pending": 0
+      },
+      "complete": [],
+      "wait_fallback": [
+        {
+          "step": 15,
+          "wall": 2.7383345253765583,
+          "text": "I.",
+          "x2_text": "yeah i um"
+        },
+        {
+          "step": 41,
+          "wall": 6.90854661911726,
+          "text": "Are you arere you from there originally or?",
+          "x2_text": "yeah i um are you from are you from there originally or"
+        }
+      ],
+      "actions": []
+    },
+    {
+      "case_id": "candor_turn_taking-83",
+      "original_seconds": 11.4099375,
+      "subset": "candor_turn_taking",
+      "id": "83",
+      "baseline_tor": 1,
+      "tor": 0,
+      "max_lag": 4.67525126054883,
+      "events": {
+        "reply_started": 1,
+        "cancel_requested": 1,
+        "assistant_history_pending": 1
+      },
+      "complete": [
+        {
+          "wall": 3.3763236701488495,
+          "observed": 3.16,
+          "text": "do did you like"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 13,
+          "wall": 2.4566703252494335,
+          "text": "Do you.",
+          "x2_text": "do did you"
+        },
+        {
+          "step": 48,
+          "wall": 10.543834742158651,
+          "text": "Or are you going at the sector?",
+          "x2_text": "do did you like just graduate or are you going into"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 3.376445297151804,
+          "request_id": "candor_turn_taking-83-r1",
+          "user_text": "do did you like"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 4.32854338735342,
+          "request_id": "candor_turn_taking-83-r1"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 4.350375946611166,
+          "request_id": "candor_turn_taking-83-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 4.35882805660367,
+          "request_id": "candor_turn_taking-83-r1",
+          "played_samples": 323
+        }
+      ]
+    },
+    {
+      "case_id": "candor_turn_taking-91",
+      "original_seconds": 9.4,
+      "subset": "candor_turn_taking",
+      "id": "91",
+      "baseline_tor": 1,
+      "tor": 0,
+      "max_lag": 2.017796791046858,
+      "events": {
+        "reply_started": 1,
+        "cancel_requested": 1,
+        "assistant_history_pending": 1
+      },
+      "complete": [
+        {
+          "wall": 3.858615417033434,
+          "observed": 3.64,
+          "text": "ah well i think the time is up"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 34,
+          "wall": 6.685603134334087,
+          "text": "Actually.",
+          "x2_text": "ah well i think the time is up actually"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 3.8587247133255005,
+          "request_id": "candor_turn_taking-91-r1",
+          "user_text": "ah well i think the time is up"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 4.638077899813652,
+          "request_id": "candor_turn_taking-91-r1"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 5.702496435493231,
+          "request_id": "candor_turn_taking-91-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 5.707415383309126,
+          "request_id": "candor_turn_taking-91-r1",
+          "played_samples": 14722
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_pause_handling-131",
+      "original_seconds": 8.7573125,
+      "subset": "synthetic_pause_handling",
+      "id": "131",
+      "baseline_tor": 0,
+      "tor": 0,
+      "max_lag": 1.124092278033495,
+      "events": {
+        "reply_started": 3,
+        "cancel_requested": 2,
+        "assistant_history_pending": 1
+      },
+      "complete": [
+        {
+          "wall": 2.7901268862187862,
+          "observed": 2.56,
+          "text": "let me tell you how to make my special"
+        },
+        {
+          "wall": 6.272771522402763,
+          "observed": 6.04,
+          "text": "let me tell you how to make my special lasagne you start with a layer of noodles then add the sauce and"
+        },
+        {
+          "wall": 9.299879681318998,
+          "observed": 9.0,
+          "text": "let me tell you how to make my special lasagne you start with a layer of noodles then add the sauce and finally the cheese on top"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 48,
+          "wall": 8.016728796064854,
+          "text": "And.",
+          "x2_text": "let me tell you how to make my special lasagne you start with a layer of noodles then add the sauce and"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 2.7902524434030056,
+          "request_id": "synthetic_pause_handling-131-r1",
+          "user_text": "let me tell you how to make my special"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 3.646044362336397,
+          "request_id": "synthetic_pause_handling-131-r1"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 4.0844963528215885,
+          "request_id": "synthetic_pause_handling-131-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 4.0877974554896355,
+          "request_id": "synthetic_pause_handling-131-r1",
+          "played_samples": 6072
+        },
+        {
+          "event": "reply_started",
+          "time": 6.272901602089405,
+          "request_id": "synthetic_pause_handling-131-r2",
+          "user_text": "lasagne you start with a layer of noodles then add the sauce and"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 6.612014602869749,
+          "request_id": "synthetic_pause_handling-131-r2",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 6.612052075564861,
+          "request_id": "synthetic_pause_handling-131-r2",
+          "played_samples": 0
+        },
+        {
+          "event": "reply_started",
+          "time": 9.299987897276878,
+          "request_id": "synthetic_pause_handling-131-r3",
+          "user_text": "finally the cheese on top"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 9.935446113348007,
+          "request_id": "synthetic_pause_handling-131-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 11.1693126372993,
+          "request_id": "synthetic_pause_handling-131-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 12.553867980837822,
+          "request_id": "synthetic_pause_handling-131-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 15.425643246620893,
+          "request_id": "synthetic_pause_handling-131-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 18.037439793348312,
+          "request_id": "synthetic_pause_handling-131-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 21.186460003256798,
+          "request_id": "synthetic_pause_handling-131-r3"
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_pause_handling-132",
+      "original_seconds": 8.544,
+      "subset": "synthetic_pause_handling",
+      "id": "132",
+      "baseline_tor": 0,
+      "tor": 0,
+      "max_lag": 9.439075310081243,
+      "events": {
+        "reply_started": 3,
+        "cancel_requested": 2,
+        "assistant_history_pending": 2
+      },
+      "complete": [
+        {
+          "wall": 1.7811831571161747,
+          "observed": 1.6,
+          "text": "i watched your presentation"
+        },
+        {
+          "wall": 12.318815469741821,
+          "observed": 4.92,
+          "text": "i watched your presentation i had some thoughts your opening was strong and the visuals were effective"
+        },
+        {
+          "wall": 16.526211742311716,
+          "observed": 8.68,
+          "text": "i watched your presentation i had some thoughts your opening was strong and the visuals were effective but ah the conclusion needs more impact"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 44,
+          "wall": 15.594424068927765,
+          "text": "If, but.",
+          "x2_text": "i watched your presentation i had some thoughts your opening was strong and the visuals were effective but"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 1.7812872380018234,
+          "request_id": "synthetic_pause_handling-132-r1",
+          "user_text": "i watched your presentation"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 2.4923329204320908,
+          "request_id": "synthetic_pause_handling-132-r1"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 2.6000862792134285,
+          "request_id": "synthetic_pause_handling-132-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 2.6033455282449722,
+          "request_id": "synthetic_pause_handling-132-r1",
+          "played_samples": 1495
+        },
+        {
+          "event": "reply_started",
+          "time": 12.318931970745325,
+          "request_id": "synthetic_pause_handling-132-r2",
+          "user_text": "i had some thoughts your opening was strong and the visuals were effective"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 13.459982629865408,
+          "request_id": "synthetic_pause_handling-132-r2"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 14.759581178426743,
+          "request_id": "synthetic_pause_handling-132-r2",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 14.763376861810684,
+          "request_id": "synthetic_pause_handling-132-r2",
+          "played_samples": 17920
+        },
+        {
+          "event": "reply_started",
+          "time": 16.526320427656174,
+          "request_id": "synthetic_pause_handling-132-r3",
+          "user_text": "but ah the conclusion needs more impact"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 17.295542631298304,
+          "request_id": "synthetic_pause_handling-132-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 18.84548119828105,
+          "request_id": "synthetic_pause_handling-132-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 20.08490425720811,
+          "request_id": "synthetic_pause_handling-132-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 22.706767816096544,
+          "request_id": "synthetic_pause_handling-132-r3"
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_pause_handling-41",
+      "original_seconds": 8.2453125,
+      "subset": "synthetic_pause_handling",
+      "id": "41",
+      "baseline_tor": 0,
+      "tor": 0,
+      "max_lag": 10.512070462554693,
+      "events": {
+        "reply_started": 1,
+        "cancel_requested": 1,
+        "assistant_history_pending": 0
+      },
+      "complete": [
+        {
+          "wall": 1.6479485556483269,
+          "observed": 1.44,
+          "text": "i have been in the"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 56,
+          "wall": 16.329862169921398,
+          "text": "For classics, I'm thinking something like, you know, Casab Blanca or gonewood.",
+          "x2_text": "i have been in the mood towards some old classics i'm thinking something like you know ah casablanca or gone with the"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 1.648062378168106,
+          "request_id": "synthetic_pause_handling-41-r1",
+          "user_text": "i have been in the"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 2.2357112616300583,
+          "request_id": "synthetic_pause_handling-41-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 2.235763981938362,
+          "request_id": "synthetic_pause_handling-41-r1",
+          "played_samples": 0
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_pause_handling-53",
+      "original_seconds": 10.72,
+      "subset": "synthetic_pause_handling",
+      "id": "53",
+      "baseline_tor": 0,
+      "tor": 0,
+      "max_lag": 0.2966127891838557,
+      "events": {
+        "reply_started": 1,
+        "cancel_requested": 0,
+        "assistant_history_pending": 0
+      },
+      "complete": [
+        {
+          "wall": 11.24986920133233,
+          "observed": 11.04,
+          "text": "i have been really thinking about what I want to do next in my career I'm leaning towards either continuing in marketing or kind of possibly going back to school for"
+        }
+      ],
+      "wait_fallback": [],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 11.250007506459951,
+          "request_id": "synthetic_pause_handling-53-r1",
+          "user_text": "i have been really thinking about what I want to do next in my career I'm leaning towards either continuing in marketing or kind of possibly going back to school for"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 11.953559670597315,
+          "request_id": "synthetic_pause_handling-53-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 13.241780709475279,
+          "request_id": "synthetic_pause_handling-53-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 16.156895890831947,
+          "request_id": "synthetic_pause_handling-53-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 18.140890527516603,
+          "request_id": "synthetic_pause_handling-53-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 20.919662233442068,
+          "request_id": "synthetic_pause_handling-53-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 23.18807265162468,
+          "request_id": "synthetic_pause_handling-53-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 24.568588316440582,
+          "request_id": "synthetic_pause_handling-53-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 26.54523465037346,
+          "request_id": "synthetic_pause_handling-53-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 29.15567259117961,
+          "request_id": "synthetic_pause_handling-53-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 32.21954498440027,
+          "request_id": "synthetic_pause_handling-53-r1"
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_pause_handling-70",
+      "original_seconds": 9.9306875,
+      "subset": "synthetic_pause_handling",
+      "id": "70",
+      "baseline_tor": 0,
+      "tor": 1,
+      "max_lag": 14.446915671825408,
+      "events": {
+        "reply_started": 1,
+        "cancel_requested": 1,
+        "assistant_history_pending": 1
+      },
+      "complete": [
+        {
+          "wall": 2.2999985367059708,
+          "observed": 2.08,
+          "text": "i'm really worried about climate change there are"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 72,
+          "wall": 21.730628352612257,
+          "text": "So many little things we could be doing to help like recycling more like reducing energy use in our home.",
+          "x2_text": "i'm really worried about climate change there are so many little things we could be doing to help like recycling more like reducing energy use in our homes"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 2.3001174218952656,
+          "request_id": "synthetic_pause_handling-70-r1",
+          "user_text": "i'm really worried about climate change there are"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 3.1615356504917145,
+          "request_id": "synthetic_pause_handling-70-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 5.13828082382679,
+          "request_id": "synthetic_pause_handling-70-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 7.4058164693415165,
+          "request_id": "synthetic_pause_handling-70-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 9.682093158364296,
+          "request_id": "synthetic_pause_handling-70-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 12.301229637116194,
+          "request_id": "synthetic_pause_handling-70-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 14.723163980990648,
+          "request_id": "synthetic_pause_handling-70-r1"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 15.362820219248533,
+          "request_id": "synthetic_pause_handling-70-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 15.3672219440341,
+          "request_id": "synthetic_pause_handling-70-r1",
+          "played_samples": 168618
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_user_interruption-104",
+      "original_seconds": 28.144,
+      "subset": "synthetic_user_interruption",
+      "id": "104",
+      "baseline_tor": 1,
+      "tor": 1,
+      "max_lag": 52.05746099859476,
+      "events": {
+        "reply_started": 2,
+        "cancel_requested": 0,
+        "assistant_history_pending": 0
+      },
+      "complete": [
+        {
+          "wall": 12.179771021008492,
+          "observed": 11.92,
+          "text": "told they start investing in stocks yeah but can we shift gears a bit"
+        },
+        {
+          "wall": 65.49806824699044,
+          "observed": 13.48,
+          "text": "told they start investing in stocks yeah but can we shift gears a bit how do i start a"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 20,
+          "wall": 3.5365148074924946,
+          "text": "Told I start investing in stocks.",
+          "x2_text": "told they start investing in stocks"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 12.179878767579794,
+          "request_id": "synthetic_user_interruption-104-r1",
+          "user_text": "told they start investing in stocks yeah but can we shift gears a bit"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 13.15242362394929,
+          "request_id": "synthetic_user_interruption-104-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 14.743701793253422,
+          "request_id": "synthetic_user_interruption-104-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 17.648082863539457,
+          "request_id": "synthetic_user_interruption-104-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 20.676936622709036,
+          "request_id": "synthetic_user_interruption-104-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 22.955096554011106,
+          "request_id": "synthetic_user_interruption-104-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 25.82733315229416,
+          "request_id": "synthetic_user_interruption-104-r1"
+        },
+        {
+          "event": "reply_started",
+          "time": 65.49822835996747,
+          "request_id": "synthetic_user_interruption-104-r2",
+          "user_text": "how do i start a"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 66.47855995967984,
+          "request_id": "synthetic_user_interruption-104-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 68.49361499398947,
+          "request_id": "synthetic_user_interruption-104-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 70.8379522152245,
+          "request_id": "synthetic_user_interruption-104-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 72.58164750412107,
+          "request_id": "synthetic_user_interruption-104-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 75.53107103705406,
+          "request_id": "synthetic_user_interruption-104-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 78.70534557104111,
+          "request_id": "synthetic_user_interruption-104-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 81.1323370821774,
+          "request_id": "synthetic_user_interruption-104-r2"
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_user_interruption-118",
+      "original_seconds": 27.4613125,
+      "subset": "synthetic_user_interruption",
+      "id": "118",
+      "baseline_tor": 1,
+      "tor": 0,
+      "max_lag": 25.361884062886237,
+      "events": {
+        "reply_started": 1,
+        "cancel_requested": 1,
+        "assistant_history_pending": 0
+      },
+      "complete": [
+        {
+          "wall": 26.480443350970745,
+          "observed": 1.28,
+          "text": "what should i do"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 21,
+          "wall": 27.669462766498327,
+          "text": "This weekend.",
+          "x2_text": "what should i do this weekend"
+        },
+        {
+          "step": 82,
+          "wall": 32.100199073553085,
+          "text": "Before I forget, set an alarm for am tomorrow.",
+          "x2_text": "what should i do this weekend oh before i forget set an alarm for am tomorrow"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 26.48055610433221,
+          "request_id": "synthetic_user_interruption-118-r1",
+          "user_text": "what should i do"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 26.662979774177074,
+          "request_id": "synthetic_user_interruption-118-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 26.66300666704774,
+          "request_id": "synthetic_user_interruption-118-r1",
+          "played_samples": 0
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_user_interruption-131",
+      "original_seconds": 30.0213125,
+      "subset": "synthetic_user_interruption",
+      "id": "131",
+      "baseline_tor": 1,
+      "tor": 0,
+      "max_lag": 4.265297358781099,
+      "events": {
+        "reply_started": 1,
+        "cancel_requested": 1,
+        "assistant_history_pending": 1
+      },
+      "complete": [
+        {
+          "wall": 4.605137791484594,
+          "observed": 3.36,
+          "text": "could you tell me about some interesting places to visit in europe"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 94,
+          "wall": 15.379977144300938,
+          "text": "Before I forget, do I need a visa to trap?",
+          "x2_text": "could you tell me about some interesting places to visit in europe oh before i forget do i need a visa to travel to europe"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 4.605242919176817,
+          "request_id": "synthetic_user_interruption-131-r1",
+          "user_text": "could you tell me about some interesting places to visit in europe"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 5.324604399502277,
+          "request_id": "synthetic_user_interruption-131-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 6.409288827329874,
+          "request_id": "synthetic_user_interruption-131-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 9.710230238735676,
+          "request_id": "synthetic_user_interruption-131-r1"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 11.697323560714722,
+          "request_id": "synthetic_user_interruption-131-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 11.700956758111715,
+          "request_id": "synthetic_user_interruption-131-r1",
+          "played_samples": 82687
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_user_interruption-136",
+      "original_seconds": 29.616,
+      "subset": "synthetic_user_interruption",
+      "id": "136",
+      "baseline_tor": 1,
+      "tor": 0,
+      "max_lag": 1.3765316928923124,
+      "events": {
+        "reply_started": 2,
+        "cancel_requested": 2,
+        "assistant_history_pending": 2
+      },
+      "complete": [
+        {
+          "wall": 2.416941400617361,
+          "observed": 2.24,
+          "text": "i'm looking for a good book to read"
+        },
+        {
+          "wall": 4.339840166270733,
+          "observed": 4.12,
+          "text": "i'm looking for a good book to read any genre is fine"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 102,
+          "wall": 16.686427880078554,
+          "text": "By the way, do you know any good poetry books instead?",
+          "x2_text": "i'm looking for a good book to read any genre is fine by the way do you know any good poetry books in"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 2.4170550033450127,
+          "request_id": "synthetic_user_interruption-136-r1",
+          "user_text": "i'm looking for a good book to read"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 3.27183198556304,
+          "request_id": "synthetic_user_interruption-136-r1"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 3.380329981446266,
+          "request_id": "synthetic_user_interruption-136-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 3.383760239928961,
+          "request_id": "synthetic_user_interruption-136-r1",
+          "played_samples": 1454
+        },
+        {
+          "event": "reply_started",
+          "time": 4.339940968900919,
+          "request_id": "synthetic_user_interruption-136-r2",
+          "user_text": "any genre is fine"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 5.252405993640423,
+          "request_id": "synthetic_user_interruption-136-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 7.093018800020218,
+          "request_id": "synthetic_user_interruption-136-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 9.225689321756363,
+          "request_id": "synthetic_user_interruption-136-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 11.946057453751564,
+          "request_id": "synthetic_user_interruption-136-r2"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 12.21665532514453,
+          "request_id": "synthetic_user_interruption-136-r2",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 12.22022956237197,
+          "request_id": "synthetic_user_interruption-136-r2",
+          "played_samples": 95902
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_user_interruption-164",
+      "original_seconds": 27.248,
+      "subset": "synthetic_user_interruption",
+      "id": "164",
+      "baseline_tor": 1,
+      "tor": 1,
+      "max_lag": 0.5840858583152286,
+      "events": {
+        "reply_started": 1,
+        "cancel_requested": 0,
+        "assistant_history_pending": 0
+      },
+      "complete": [
+        {
+          "wall": 12.818773604929447,
+          "observed": 12.48,
+          "text": "what are some recent advancements since space technology hold on how do i make a smoothie"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 26,
+          "wall": 4.501000475138426,
+          "text": "What are some recent advancements in space technology?",
+          "x2_text": "what are some recent advancements since space technology"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 12.818897746503353,
+          "request_id": "synthetic_user_interruption-164-r1",
+          "user_text": "what are some recent advancements since space technology hold on how do i make a smoothie"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 13.911179453134537,
+          "request_id": "synthetic_user_interruption-164-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 15.80003059655428,
+          "request_id": "synthetic_user_interruption-164-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 18.520616207271814,
+          "request_id": "synthetic_user_interruption-164-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 21.747431367635727,
+          "request_id": "synthetic_user_interruption-164-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 24.66243239864707,
+          "request_id": "synthetic_user_interruption-164-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 27.57673777267337,
+          "request_id": "synthetic_user_interruption-164-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 29.70389013364911,
+          "request_id": "synthetic_user_interruption-164-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 33.07468834891915,
+          "request_id": "synthetic_user_interruption-164-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 36.38688541203737,
+          "request_id": "synthetic_user_interruption-164-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 39.54074144735932,
+          "request_id": "synthetic_user_interruption-164-r1"
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_user_interruption-18",
+      "original_seconds": 27.8026875,
+      "subset": "synthetic_user_interruption",
+      "id": "18",
+      "baseline_tor": 1,
+      "tor": 1,
+      "max_lag": 1.1523591148853303,
+      "events": {
+        "reply_started": 1,
+        "cancel_requested": 0,
+        "assistant_history_pending": 0
+      },
+      "complete": [
+        {
+          "wall": 12.8588135689497,
+          "observed": 12.6,
+          "text": "how often should i water my succulents by the way have we set up a dinner plan for tonight"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 24,
+          "wall": 4.177598465234041,
+          "text": "How often should I water my succulent.",
+          "x2_text": "how often should i water my succulents"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 12.858945433050394,
+          "request_id": "synthetic_user_interruption-18-r1",
+          "user_text": "how often should i water my succulents by the way have we set up a dinner plan for tonight"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 14.060861825942993,
+          "request_id": "synthetic_user_interruption-18-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 16.06791292130947,
+          "request_id": "synthetic_user_interruption-18-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 19.109252523630857,
+          "request_id": "synthetic_user_interruption-18-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 21.711107417941093,
+          "request_id": "synthetic_user_interruption-18-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 23.26111773774028,
+          "request_id": "synthetic_user_interruption-18-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 25.874434545636177,
+          "request_id": "synthetic_user_interruption-18-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 28.61119719967246,
+          "request_id": "synthetic_user_interruption-18-r1"
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_user_interruption-20",
+      "original_seconds": 28.2293125,
+      "subset": "synthetic_user_interruption",
+      "id": "20",
+      "baseline_tor": 1,
+      "tor": 0,
+      "max_lag": 60.7279590241611,
+      "events": {
+        "reply_started": 3,
+        "cancel_requested": 1,
+        "assistant_history_pending": 1
+      },
+      "complete": [
+        {
+          "wall": 4.892666283994913,
+          "observed": 2.08,
+          "text": "i am looking for a new mystery"
+        },
+        {
+          "wall": 36.77154089510441,
+          "observed": 2.68,
+          "text": "i am looking for a new mystery novel to"
+        },
+        {
+          "wall": 68.71694439277053,
+          "observed": 13.48,
+          "text": "i am looking for a new mystery novel to read any suggestion angeli wait what's the weather tomorrow"
+        }
+      ],
+      "wait_fallback": [
+        {
+          "step": 32,
+          "wall": 64.89308629184961,
+          "text": "any suggestions.",
+          "x2_text": "i am looking for a new mystery novel to read any suggestion"
+        }
+      ],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 4.892784308642149,
+          "request_id": "synthetic_user_interruption-20-r1",
+          "user_text": "i am looking for a new mystery"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 5.983469340950251,
+          "request_id": "synthetic_user_interruption-20-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 7.070023547858,
+          "request_id": "synthetic_user_interruption-20-r1"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 7.0962026454508305,
+          "request_id": "synthetic_user_interruption-20-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 7.099362812936306,
+          "request_id": "synthetic_user_interruption-20-r1",
+          "played_samples": 15392
+        },
+        {
+          "event": "reply_started",
+          "time": 36.77170955762267,
+          "request_id": "synthetic_user_interruption-20-r2",
+          "user_text": "novel to"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 37.77043231576681,
+          "request_id": "synthetic_user_interruption-20-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 39.37127801403403,
+          "request_id": "synthetic_user_interruption-20-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 41.995149198919535,
+          "request_id": "synthetic_user_interruption-20-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 44.72964679449797,
+          "request_id": "synthetic_user_interruption-20-r2"
+        },
+        {
+          "event": "reply_started",
+          "time": 68.71706268191338,
+          "request_id": "synthetic_user_interruption-20-r3",
+          "user_text": "read any suggestion angeli wait what's the weather tomorrow"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 69.87337663769722,
+          "request_id": "synthetic_user_interruption-20-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 71.41313897445798,
+          "request_id": "synthetic_user_interruption-20-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 72.4106082469225,
+          "request_id": "synthetic_user_interruption-20-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 74.61164282262325,
+          "request_id": "synthetic_user_interruption-20-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 76.50087457150221,
+          "request_id": "synthetic_user_interruption-20-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 79.72094093263149,
+          "request_id": "synthetic_user_interruption-20-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 82.43226251751184,
+          "request_id": "synthetic_user_interruption-20-r3"
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_user_interruption-43",
+      "original_seconds": 27.2053125,
+      "subset": "synthetic_user_interruption",
+      "id": "43",
+      "baseline_tor": 1,
+      "tor": 1,
+      "max_lag": 26.884491955190896,
+      "events": {
+        "reply_started": 2,
+        "cancel_requested": 0,
+        "assistant_history_pending": 0
+      },
+      "complete": [
+        {
+          "wall": 4.3444219790399075,
+          "observed": 3.84,
+          "text": "i feel like i'm always behind on the latest"
+        },
+        {
+          "wall": 38.9177177362144,
+          "observed": 12.44,
+          "text": "i feel like i'm always behind on the latest can we talk about something else"
+        }
+      ],
+      "wait_fallback": [],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 4.344534680247307,
+          "request_id": "synthetic_user_interruption-43-r1",
+          "user_text": "i feel like i'm always behind on the latest"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 5.343543436378241,
+          "request_id": "synthetic_user_interruption-43-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 6.440649155527353,
+          "request_id": "synthetic_user_interruption-43-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 9.214333266019821,
+          "request_id": "synthetic_user_interruption-43-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 10.449057571589947,
+          "request_id": "synthetic_user_interruption-43-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 13.299056306481361,
+          "request_id": "synthetic_user_interruption-43-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 15.765645235776901,
+          "request_id": "synthetic_user_interruption-43-r1"
+        },
+        {
+          "event": "reply_started",
+          "time": 38.91783404350281,
+          "request_id": "synthetic_user_interruption-43-r2",
+          "user_text": "can we talk about something else"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 39.91911645233631,
+          "request_id": "synthetic_user_interruption-43-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 41.020310778170824,
+          "request_id": "synthetic_user_interruption-43-r2"
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_user_interruption-74",
+      "original_seconds": 28.8693125,
+      "subset": "synthetic_user_interruption",
+      "id": "74",
+      "baseline_tor": 1,
+      "tor": 1,
+      "max_lag": 20.523469131439924,
+      "events": {
+        "reply_started": 2,
+        "cancel_requested": 1,
+        "assistant_history_pending": 1
+      },
+      "complete": [
+        {
+          "wall": 20.683194555342197,
+          "observed": 2.72,
+          "text": "what are the newest missions to space"
+        },
+        {
+          "wall": 32.590510956943035,
+          "observed": 13.4,
+          "text": "what are the newest missions to space actually can you tell me about the technology used in space stations"
+        }
+      ],
+      "wait_fallback": [],
+      "actions": [
+        {
+          "event": "reply_started",
+          "time": 20.68332027643919,
+          "request_id": "synthetic_user_interruption-74-r1",
+          "user_text": "what are the newest missions to space"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 21.918442711234093,
+          "request_id": "synthetic_user_interruption-74-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 23.533923964947462,
+          "request_id": "synthetic_user_interruption-74-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 26.176720798015594,
+          "request_id": "synthetic_user_interruption-74-r1"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 29.68727096542716,
+          "request_id": "synthetic_user_interruption-74-r1"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 30.359987795352936,
+          "request_id": "synthetic_user_interruption-74-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 30.36385263875127,
+          "request_id": "synthetic_user_interruption-74-r1",
+          "played_samples": 115778
+        },
+        {
+          "event": "reply_started",
+          "time": 32.59063261374831,
+          "request_id": "synthetic_user_interruption-74-r2",
+          "user_text": "actually can you tell me about the technology used in space stations"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 34.002692978829145,
+          "request_id": "synthetic_user_interruption-74-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 35.549254667013884,
+          "request_id": "synthetic_user_interruption-74-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 38.440468203276396,
+          "request_id": "synthetic_user_interruption-74-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 41.36818052828312,
+          "request_id": "synthetic_user_interruption-74-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 43.99559985473752,
+          "request_id": "synthetic_user_interruption-74-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 46.909012995660305,
+          "request_id": "synthetic_user_interruption-74-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 50.06192611530423,
+          "request_id": "synthetic_user_interruption-74-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 52.925589956343174,
+          "request_id": "synthetic_user_interruption-74-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 53.71879279613495,
+          "request_id": "synthetic_user_interruption-74-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 56.14298427477479,
+          "request_id": "synthetic_user_interruption-74-r2"
+        }
+      ]
+    },
+    {
+      "case_id": "synthetic_user_interruption-9",
+      "original_seconds": 28.0373125,
+      "subset": "synthetic_user_interruption",
+      "id": "9",
+      "baseline_tor": 1,
+      "tor": 0,
+      "max_lag": 0.30716573253273793,
+      "events": {
+        "reply_started": 0,
+        "cancel_requested": 0,
+        "assistant_history_pending": 0
+      },
+      "complete": [],
+      "wait_fallback": [
+        {
+          "step": 24,
+          "wall": 4.180468536913395,
+          "text": "What makes a good smartphone camera.",
+          "x2_text": "what makes a good smartphone camera"
+        },
+        {
+          "step": 89,
+          "wall": 14.581834599375725,
+          "text": "By the way, what's the price of the latest model?",
+          "x2_text": "what makes a good smartphone camera by the way what's the price of the latest model"
+        }
+      ],
+      "actions": []
+    }
+  ],
+  "evidence_sha256": {
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/127/candor_pause_handling-127.frames.jsonl.gz": "0d3a9bbd9f1229e4084ea588d960ec87b6d8720ad2d4f2bbd01d2cb1d445bc1c",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/127/result.json": "d1074944c2ff05811acde69f9c56b5cf9a3080c8d40ccf228ce6e0da933b37ce",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/127/events.jsonl": "7c3c7436c1a5e4f8ab216a03d0830d050cc99ee37bef783770e4df9dd2341160",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/16/candor_pause_handling-16.frames.jsonl.gz": "49076296afac0e03a2557d9540570d1d7bad25f42057e43ac6c331bc4096c389",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/16/result.json": "d7d8b931abf3645a6ae4ba33e10b69e427aaceb1e9dea26327e944df444c01ae",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/16/events.jsonl": "6caf5a9e1601263296090aebb0f96bd63a713fb9ecc58f20b899ca5d1e23dad9",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/161/candor_pause_handling-161.frames.jsonl.gz": "77b2dc626b9e4626fed96bf12b942847a97cb355f4119bdcb96e9f5e38e6597a",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/161/result.json": "776cb1f886548adc7f38939abed7e9845e90211a5f2d88f832d32f1205ff0441",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/161/events.jsonl": "8bb8fefb704d2c29a57165c9f48a2d1d804a34a80c769f29f5fdb806d543c6fb",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/40/candor_pause_handling-40.frames.jsonl.gz": "21a369450237ed8c2605285df2a402187008cb93bb634fb77547271a9221447b",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/40/result.json": "976ad501ec981db78b1008c2c00e9bd7dce5b50b103038914bee29dbf5f95a02",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/40/events.jsonl": "8aa480a86daf4bf2da3b5ed4bb0372bda1a5319d22e67b07c78d90a661108f6b",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/50/candor_pause_handling-50.frames.jsonl.gz": "8743e3654de220803efb75cca9fc9d46818f831ddb29c99049b5cae22e13310b",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/50/result.json": "516786315a8935f0fac9317a34d1190de62404204dafb8b3c8ac8bc0bcf318d0",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_pause_handling/50/events.jsonl": "0723589e8ee1cf4b5c378ce0b4c05408ea6b408b32ffdd2deaabfc1c72261cd9",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/102/candor_turn_taking-102.frames.jsonl.gz": "55ec05d2ee230b6871bf2438abfde128997593cde39ddb98347b0e8f0c1976bf",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/102/result.json": "7e53b6656b4df974a4daa3c0f98346c050d6398405033fbeb4452ff3a3f315c2",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/102/events.jsonl": "d30f61ea38c9182dde313fc30455343684f5d132efc9b60cc50a9f4bdb8cf8fc",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/17/candor_turn_taking-17.frames.jsonl.gz": "8039a5a9cf2a66418556a4b8a14d56a5a2194ed4ebbdae72870e23624087926a",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/17/result.json": "d34399b0338ff2511ae3ece6622fd9f60f82583e06e54f0c398a2f285aadd594",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/17/events.jsonl": "b2c73ecd86ba5eba7790fa98f9b833f356cdfc1cff6fbfc62e1a75fc273e17cf",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/3/candor_turn_taking-3.frames.jsonl.gz": "efcc08b48c71c80c91df00fcab9fc712192117f51a1967d4dd90a2012e5c34f6",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/3/result.json": "1bf334930ec656c70b15d3a9506f5bac8f08c4ecb63a26f0e7c387c1aefa3222",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/3/events.jsonl": "d68fc7f390d2e1026be460e8a873fabe053f5626ed08231d117bb3649cd23e9a",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/39/candor_turn_taking-39.frames.jsonl.gz": "65bef49caad797f093ecbad51d130d64ff0d19b3e1353db44b2c99a4fc91945b",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/39/result.json": "61671c05aadbd1b506f84b2d4f06025e6a2650f5232c5a67fce3adb340f548a9",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/39/events.jsonl": "2f63c3d7723cc9d2622349794f6a94f0f26dff18f526ca0816e4227c1497a78e",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/51/candor_turn_taking-51.frames.jsonl.gz": "deb65977c5570c2bd60a1c5083b9f7e24a010a86532f9f4f9af3a79366991ead",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/51/result.json": "fe3001732533f67afc9e196a8f56591d379031be9ff1367a8310f534fbbbacd2",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/51/events.jsonl": "87d2da024a27b24c4c9af2a70211329d023fdaa90144190d642e42f4f766a6b6",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/54/candor_turn_taking-54.frames.jsonl.gz": "ebacc40c1957f5aa8d2ef99e8d8ab9861f08bfeb0639a75023cfa5bb51e404a1",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/54/result.json": "329d1461d00553284ec701e7e529be18df5c68b204ead48c627bb67a42e1d5a1",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/54/events.jsonl": "7aa279ac99744abfaf023d65aa50f932b5f144ec398fa8db681458b334a90836",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/56/candor_turn_taking-56.frames.jsonl.gz": "3ee6df9036ec1db1fb47fba961095d6c743b9161b5cb9a37a5300c6e2aa88374",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/56/result.json": "a7b41d60603eb1d7824bb7f15c3ec0f269e1b99a66f6b7899459a7ff3f72dbfe",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/56/events.jsonl": "89541cf3d61463647a4b54b240280e7282505bfa58e64fa4c885a60f4bb5a78c",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/76/candor_turn_taking-76.frames.jsonl.gz": "d8ac4dc0778a2756e06639d9050019487f88d5c4c2ec86d51aef10c49173f5d2",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/76/result.json": "03c55bd0053ce6fee23d4fb7453c1163c937272e4a0930f88baccb18fd305357",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/76/events.jsonl": "a604e34da9c16cb8aab8a357ec58c9ed85bfc49bffe7e471a730697a83b75339",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/83/candor_turn_taking-83.frames.jsonl.gz": "48df0342a0b9ea3833e5cd7ae992046c2a721a59ed26f7ca2795744a008d1e57",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/83/result.json": "b7cf5566d018846aba5aead137ea015fbb434d5b57ffe53f55a6e278359d5030",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/83/events.jsonl": "ea792f9de2c116f6c3719f9bf7b71670bfd598c0bd4b17571c13ecc88bbbfe18",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/91/candor_turn_taking-91.frames.jsonl.gz": "81da8ce2d90be98c04ee94fcdd9f4e8ced112160b07d1b2f5ab66b8a9bfe40e1",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/91/result.json": "b0e5cc17b6d19023fb31ea253aff0359e89a4f18310b389308f5362eca006b6f",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/candor_turn_taking/91/events.jsonl": "4d93c004d2591366a86a2194252d6ed8a201ffd5427d76d330a673a2a1f9bee2",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/131/synthetic_pause_handling-131.frames.jsonl.gz": "d0dbb7475068cda3d4b5e777fb23d1aca3061801d9e0702bf3e2e5a9d97ad457",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/131/result.json": "c621123a2b9e2466afd3403d158cb634417aab3d1f3f68bc20c2740d35a20b52",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/131/events.jsonl": "c1a3c1e1778baafc496fe9d5f7c3bd292d4a59ecadaf99f9e0029cca636e8b99",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/132/synthetic_pause_handling-132.frames.jsonl.gz": "57684b1a47ec00ee057ae78b35372a4578ac4068ae20869853117bd644f61923",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/132/result.json": "4fc3c5d263ae6e0699643c55709dd472302ea543aaf1c6c3796eb6e33631b1f5",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/132/events.jsonl": "7585cae89faf5cb351634bb5e4c908046ee7230a6cd6524de5ac42266ba9800b",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/41/synthetic_pause_handling-41.frames.jsonl.gz": "9f8f7b86b7406a6fca10c27f0591f2e757afa82d4defbc7766916d6fe2bf044d",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/41/result.json": "d928822ba13716023c68b5d631981e240f1fd633756c0f90444a934d191e9468",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/41/events.jsonl": "befe3c0f1d1e38044bd679660f03767bf66debdf3f04137ac1546ce7d266471e",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/53/synthetic_pause_handling-53.frames.jsonl.gz": "647df0c65cf5ca0871c0d4d847fdd3c23539b6cabb1e41637f4834a5dc92ccf7",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/53/result.json": "a8699acfb243d77271c1e79846b014f8d2366e9c13b3f13491370028e02eac95",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/53/events.jsonl": "b9051cca8721f85fb4d466a6b26d49dbcaf3cb97232de92d4d0473d3369361ef",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/70/synthetic_pause_handling-70.frames.jsonl.gz": "99e2b6ee58af5dced4fc1eaa1a0fb5234e9ed10fb9c6b43023e8c8000af65ad9",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/70/result.json": "078b66864d7ba25f0f194ef9acfe733a41438fb453846e041833349cc652a3b1",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_pause_handling/70/events.jsonl": "7020c98020cc44dd50e01be852afd96f053ae603b2cf92c65fcab71b684da11c",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/104/synthetic_user_interruption-104.frames.jsonl.gz": "6cefde80a3b9e53d45c9b8b6ba66bc5c2cf21b21756b70a59599692e54fa5fa6",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/104/result.json": "aab9b0eca52a9edebce6c0da962828c7428ebf5fb1872b484a5e6f34d8953770",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/104/events.jsonl": "9c124a3777ae4e924c0da5c1bc4cc926e0b576337b41f168c7ef8ab145ca017c",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/118/synthetic_user_interruption-118.frames.jsonl.gz": "9884423dc02591f757a104554be89c90b7b043e306dc0915e9e4cc17e9e4ccc9",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/118/result.json": "242ccb9493de615773cd32e0124eeb0a2eb2d3950a1023c74a7cf5e8012ac20c",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/118/events.jsonl": "56164706a4e23f10fd2b2a2dd5cba13d04d9d881605b4c9e954fba64499c7b20",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/131/synthetic_user_interruption-131.frames.jsonl.gz": "08b1243e1b90541085e02d9ee524548df0ff39f9e8452799ea3628bc1433d9fb",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/131/result.json": "fedfc04c1de22614a2f2a7a1ae0a170952ce1f0d5a41aff5dac4da607a3c0fad",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/131/events.jsonl": "1e2547cab642536d029e7a006199647bc68fa02139881e043e73f0501fc06455",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/136/synthetic_user_interruption-136.frames.jsonl.gz": "5cf77fec84c0c9c71f206a54d6197402c77ec0d7198d1a5aeb7ee5b5ea40c4e9",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/136/result.json": "08a66256ca3862993c840ed47f69d97143e0c88baf73a7345e02f8a25be84c0c",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/136/events.jsonl": "4b2faa78e1980d3ef237fdd099e60b0c1c1f82a2b4ab3cd6ecffefb3c2c6d75e",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/164/synthetic_user_interruption-164.frames.jsonl.gz": "16d506efe718c8aca14da84bbd16a6a0cc8ec7d45a1f2ada95e66cd1379b29d4",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/164/result.json": "6c29528963ec3923d9c9bb644eba65dfc6abc27130c03ce00134efa0e312a4a5",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/164/events.jsonl": "30c8301f01e476532fe24af90dccdd9598497b6d960e6cafa00ff4b751c40b8a",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/18/synthetic_user_interruption-18.frames.jsonl.gz": "4629f104fb5109634b4cef3ccd6d5ff043c41aa53f41a30358a125ae1bb76816",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/18/result.json": "0549adcfd8261cc4b57d042ba3e13f5c04547d7702a37cd5bc34882737227174",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/18/events.jsonl": "b7029bd8e50d7ce8212a14afcbb065ac5c2d343d79ae3509560f139be65eda16",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/20/synthetic_user_interruption-20.frames.jsonl.gz": "c7f645ebff0a599bfe652346e321e5a9811897472eede51ca57a2c69289703e9",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/20/result.json": "5d7621bfa8212ea25929f5d11ea16f1dc8797a8400b0f3456a59e7510f364c6f",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/20/events.jsonl": "13b9ad9ec67c785b5170edfd498988125ced6bd998e327eb99c1ca8ec6bb82d4",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/43/synthetic_user_interruption-43.frames.jsonl.gz": "9159206e7f847422e8026710c8884e7eddf9345d6e3c224cfbf5e91e372af654",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/43/result.json": "504f5f749a7fac650bda34d148159b5e985cb53154391740e91e61e158956a95",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/43/events.jsonl": "8ac89f71a6711bb4d63bdf8358c4b7fe0e5260576b2b0814eb2fcaac6f7e3d6b",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/74/synthetic_user_interruption-74.frames.jsonl.gz": "6d4fafe57b0fd78877a4a9ea259d75a4af07256617fa4277282b8ccb7d96c8fe",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/74/result.json": "509329d45bfe5b94d85eb20786ad4203b106870308b83cd6a74b162c765ce20c",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/74/events.jsonl": "d3e6747f94c668cec9da89f04f7cb5c029740ddb4ace05db9090f965caa07203",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/9/synthetic_user_interruption-9.frames.jsonl.gz": "8437530538ca5a3269b2d3c26a0eca35ea68619c4bfe7ae6ab201306ef4ed7f5",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/9/result.json": "684c1899db0cdc9ec7dcef0295b6d1fbde29197f01ce485a887c62c11485f0da",
+    "artifacts/soulx/20261105-fdb30-half-duplex/fdb30-half-formal-20261105-r2/frontend/samples/synthetic_user_interruption/9/events.jsonl": "864574eca0a44617f69a27057a8d99d5ffd04639f2a823a8a52ae4c92656a3ec"
+  },
+  "baseline": {
+    "path": "/home/vitalrubbish/TurnControlComparison/artifacts/remote/tts20-final-report.json",
+    "sha256": "cf1b49d865b1babd74444cc94987a7f12979ecc8ae27a1333519e6db7449411e",
+    "comparison": "same IDs; different runtime, not a controlled ablation"
+  },
+  "analysis_script_sha256": "b6f12caa9607c64c596fa117730674ee8e5dee23c6ec14ab1bac54ef283c8ed2"
+}

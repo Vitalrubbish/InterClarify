@@ -4,12 +4,15 @@
 
 ## 当前工作单
 
+NTF-050 已完成[最新 FDB30 控制积压与 TOR 归因](../reports/soulx/20261105-fdb30-half-duplex/control_backlog_analysis.md)并归档：逐批定位控制路长尾、服务层等待兜底消费差异，并按相同 ID 复核历史纯 SoulX 成绩；未修改推理或启动 GPU 作业。
+
 当前无活动工作单。NTF-049 已完成[训练数据构造、配比与分阶段时长方案](../dev/layer1_training/README.md)并归档：提出七类数据、10 万条决策样本及四阶段训练预算，吞吐待远端校准。当前[训练设计](../research_design/layer1_training.md)首轮采用 Qwen2.5-7B-Instruct，Qwen3 保留为后续候选；依次训练协议、含噪状态与取消恢复、附和及 thinking。此前 NTF-037、040—048 的分析与设计单均已归档，未启动语料生成、下游接入或训练。NTF-039 已完成前端文档与接口收口；NTF-038 的 [SoulX 原生 complete 行为审计](../reports/soulx/20261104-completion-strategy-audit/README.md)与 NTF-019 前端验收保持。
 
 ## 当前路线交付
 
 | 工作单 | 状态 | 交付 |
 | --- | --- | --- |
+| [NTF-050](../reports/soulx/20261105-fdb30-half-duplex/control_backlog_analysis.md) | 分析已完成并归档 | 4720 批计时、相同 ID 历史对照及 5 条接话失败归因；底层长尾机制待进一步计时 |
 | [NTF-015／016](../reports/soulx/20261102-native-independent-frontend/README.md) | 已完成并归档 | 原生控制封装、冻结加载器、同源 PCM、160ms 屏障和独立 X2 适配 |
 | [NTF-017](../reports/soulx/20261102-ntf017-joint-publication/README.md) | 已完成并归档 | 文本／状态／进度联合提交，移除前端停止旁路 |
 | [NTF-018](../reports/soulx/20261103-ntf018-warmup/README.md) | 已完成并归档 | 完整预热、真实权重对照和并发三轴 3/3 |
