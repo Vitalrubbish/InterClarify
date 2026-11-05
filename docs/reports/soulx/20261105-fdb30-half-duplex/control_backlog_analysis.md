@@ -2,6 +2,8 @@
 
 2026-11-05，NTF-050。只复核既有正式 r2 轨迹和历史结果，没有修改推理、重新评分或启动 GPU 作业。逐例摘要、4720 个批次计时及原始文件摘要见 [control_backlog_audit.json](control_backlog_audit.json)。4720 批包含每条末尾的 8 秒诊断静音，正式 TOR 仍只使用原输入窗口。
 
+后续 NTF-051 已结合历史 CPU profile、两轮执行线程差异及同版本 FunASR 源码形成[具体修复方案](../../../dev/SoulX-Duplug/frontend_repair_plan.md)。新增证据见[源码与长尾摘要](long_tail_source_audit.json)，尚未实施修复或运行新的 GPU 实验。
+
 **现有证据支持两个主要原因：控制支路发生以原生 SenseVoice 调用为主的异常长尾，160ms 屏障将阻塞传播到整个前端；同时，新版改变了回答触发合同，丢掉旧版服务层 `speak` 所包含的等待兜底。不能将 TOR 下降全部解释为 X2 推理慢，也不能将底层长尾的具体机制视为已经查明。**
 
 ## 1. 相同样本的历史结果

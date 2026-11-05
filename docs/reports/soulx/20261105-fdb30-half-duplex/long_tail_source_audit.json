@@ -1,0 +1,451 @@
+{
+  "scope": "offline_source_and_existing_trace_audit_no_new_model_execution",
+  "timing_units": "seconds_except_explicit_ms",
+  "funasr_reference": {
+    "version": "1.2.6",
+    "url": "https://pypi.org/project/funasr/1.2.6/",
+    "wheel_sha256": "74f339fa92d252e17616758bc94666908d02356281690e1e242110ac6676800c",
+    "installed_remote_source_byte_comparison": false,
+    "files": [
+      {
+        "path": "funasr/models/sense_voice/model.py",
+        "sha256": "0aa5864d4f40facae5f2bc849877f1c979461d00d07f154e82bd69a320e82d52",
+        "findings": [
+          {
+            "line": 844,
+            "code": "meta_data[\"extract_feat\"] = f\"{time3 - time2:0.3f}\""
+          }
+        ]
+      },
+      {
+        "path": "funasr/utils/load_utils.py",
+        "sha256": "73b55f1104ea5ee2304f0493a9b442a3b1ff90968183737b7cb24418cb673e23",
+        "findings": [
+          {
+            "line": 199,
+            "code": "data = torch.from_numpy(data)"
+          },
+          {
+            "line": 220,
+            "code": "return data.to(torch.float32), data_len.to(torch.int32)"
+          }
+        ]
+      },
+      {
+        "path": "funasr/auto/auto_model.py",
+        "sha256": "f04e9b984e0d12f109212e7a711e03eb276f20673e418165f88c9ac40417b520",
+        "findings": [
+          {
+            "line": 190,
+            "code": "torch.set_num_threads(kwargs.get(\"ncpu\", 4))"
+          },
+          {
+            "line": 375,
+            "code": "torch.cuda.empty_cache()"
+          }
+        ]
+      },
+      {
+        "path": "funasr/frontends/wav_frontend.py",
+        "sha256": "4771916cbbdc02ad095493ada7f2d9502a3f3c58befab0867d7e43769363d26f",
+        "findings": [
+          {
+            "line": 133,
+            "code": "mat = kaldi.fbank("
+          },
+          {
+            "line": 171,
+            "code": "mat = kaldi.fbank("
+          },
+          {
+            "line": 354,
+            "code": "mat = kaldi.fbank("
+          }
+        ]
+      }
+    ]
+  },
+  "historical_profile": {
+    "path": "/home/vitalrubbish/TurnControlComparison/artifacts/remote/asr-profile-r1-first.txt",
+    "sha256": "27f7c8684f35fd02979fb4e31f773f8bd52f97a2d7034083557768c6895abe92",
+    "total_seconds": 5.297,
+    "extract_fbank_seconds": 5.25,
+    "model_forward_seconds": 0.033
+  },
+  "current_warmup_sha256": "3ffae0dceb730df5821b6592e592f44c4fcf090223fa974ea7b338344372b0d4",
+  "current_warmup": [
+    {
+      "case_id": "warmup_0",
+      "lane_order": [
+        "controller",
+        "asr"
+      ],
+      "elapsed_seconds": 16.681240253150463,
+      "controller_compute_ms": {
+        "count": 59,
+        "p50": 90.84098413586617,
+        "p95": 226.67724415659558,
+        "max": 8469.33613717556
+      },
+      "sensevoice_by_length": {
+        "53760": {
+          "count": 33,
+          "p50": 36.25502437353134,
+          "p95": 52.422122657299035,
+          "max": 8406.13666176796
+        },
+        "97280": {
+          "count": 1,
+          "p50": 2275.4649817943573,
+          "p95": 2275.4649817943573,
+          "max": 2275.4649817943573
+        },
+        "76800": {
+          "count": 1,
+          "p50": 37.04129159450531,
+          "p95": 37.04129159450531,
+          "max": 37.04129159450531
+        }
+      },
+      "direct_sensevoice": [
+        {
+          "samples": 25600,
+          "sha256": "7feeffca48eb5129ac2452903b7a86b174b0cb3da4009df4fda66f2d390cb0af",
+          "dtype": "float64",
+          "text": "In many cases, enrolling on a.",
+          "seconds": 7.181566029787064,
+          "source": "cyclic_fixed_speech"
+        },
+        {
+          "samples": 51200,
+          "sha256": "4520b8082fde4d40df6110280d696df6a01e1b50890c6980f04876925a69fc2f",
+          "dtype": "float64",
+          "text": "In many cases, enrolling on a gap year course, abroad connection.",
+          "seconds": 0.04911189153790474,
+          "source": "cyclic_fixed_speech"
+        },
+        {
+          "samples": 53760,
+          "sha256": "854cfa307ae3c2d9c89d639f0a94a679270d6f27f295925670adbfa32fcc6e33",
+          "dtype": "float64",
+          "text": "In many cases, enrolling on a gap year course abroad can actually.",
+          "seconds": 0.03313031420111656,
+          "source": "cyclic_fixed_speech"
+        },
+        {
+          "samples": 107520,
+          "sha256": "32a77b05366fd9c1407ffaf37a5fd106159eb73aac11c96cf99e69282fcd6f46",
+          "dtype": "float64",
+          "text": "In many cases, enrolling on a gap year course abroad can actually improve your chances of moving into higher education back in your home.",
+          "seconds": 0.036548465490341187,
+          "source": "cyclic_fixed_speech"
+        },
+        {
+          "samples": 161280,
+          "sha256": "27f81ed58620b1bbe6800028b10f0be4180eceab384bf60cc2458bc9b86e37e0",
+          "dtype": "float64",
+          "text": "In many cases, enrolling on a gap year course abroad can actually improve your chances of moving into higher education back in your home country. In many cases, enrolling on a gap year course.",
+          "seconds": 0.04183206707239151,
+          "source": "cyclic_fixed_speech"
+        }
+      ]
+    },
+    {
+      "case_id": "warmup_1",
+      "lane_order": [
+        "asr",
+        "controller"
+      ],
+      "elapsed_seconds": 5.227711103856564,
+      "controller_compute_ms": {
+        "count": 59,
+        "p50": 90.30932188034058,
+        "p95": 109.96550954878329,
+        "max": 129.18219715356827
+      },
+      "sensevoice_by_length": {
+        "53760": {
+          "count": 33,
+          "p50": 36.31534054875374,
+          "p95": 43.49842816591263,
+          "max": 44.05586048960686
+        },
+        "97280": {
+          "count": 1,
+          "p50": 36.798182874917984,
+          "p95": 36.798182874917984,
+          "max": 36.798182874917984
+        },
+        "76800": {
+          "count": 1,
+          "p50": 36.51225194334984,
+          "p95": 36.51225194334984,
+          "max": 36.51225194334984
+        }
+      },
+      "direct_sensevoice": [
+        {
+          "samples": 25600,
+          "sha256": "7feeffca48eb5129ac2452903b7a86b174b0cb3da4009df4fda66f2d390cb0af",
+          "dtype": "float64",
+          "text": "In many cases, enrolling on a.",
+          "seconds": 0.03331413120031357,
+          "source": "cyclic_fixed_speech"
+        },
+        {
+          "samples": 51200,
+          "sha256": "4520b8082fde4d40df6110280d696df6a01e1b50890c6980f04876925a69fc2f",
+          "dtype": "float64",
+          "text": "In many cases, enrolling on a gap year course, abroad connection.",
+          "seconds": 0.03435910493135452,
+          "source": "cyclic_fixed_speech"
+        },
+        {
+          "samples": 53760,
+          "sha256": "854cfa307ae3c2d9c89d639f0a94a679270d6f27f295925670adbfa32fcc6e33",
+          "dtype": "float64",
+          "text": "In many cases, enrolling on a gap year course abroad can actually.",
+          "seconds": 0.033578936010599136,
+          "source": "cyclic_fixed_speech"
+        },
+        {
+          "samples": 107520,
+          "sha256": "32a77b05366fd9c1407ffaf37a5fd106159eb73aac11c96cf99e69282fcd6f46",
+          "dtype": "float64",
+          "text": "In many cases, enrolling on a gap year course abroad can actually improve your chances of moving into higher education back in your home.",
+          "seconds": 0.03744388371706009,
+          "source": "cyclic_fixed_speech"
+        },
+        {
+          "samples": 161280,
+          "sha256": "27f81ed58620b1bbe6800028b10f0be4180eceab384bf60cc2458bc9b86e37e0",
+          "dtype": "float64",
+          "text": "In many cases, enrolling on a gap year course abroad can actually improve your chances of moving into higher education back in your home country. In many cases, enrolling on a gap year course.",
+          "seconds": 0.04226255789399147,
+          "source": "cyclic_fixed_speech"
+        }
+      ]
+    }
+  ],
+  "sensevoice_by_samples": [
+    {
+      "samples": 33280,
+      "count": 4,
+      "over_one_second": 0,
+      "max_seconds": 0.033097848296165466
+    },
+    {
+      "samples": 35840,
+      "count": 4,
+      "over_one_second": 1,
+      "max_seconds": 11.671715714037418
+    },
+    {
+      "samples": 38400,
+      "count": 3,
+      "over_one_second": 0,
+      "max_seconds": 0.07315917313098907
+    },
+    {
+      "samples": 40960,
+      "count": 9,
+      "over_one_second": 0,
+      "max_seconds": 0.04264708608388901
+    },
+    {
+      "samples": 43520,
+      "count": 1,
+      "over_one_second": 0,
+      "max_seconds": 0.043895550072193146
+    },
+    {
+      "samples": 46080,
+      "count": 8,
+      "over_one_second": 0,
+      "max_seconds": 0.03407000005245209
+    },
+    {
+      "samples": 48640,
+      "count": 3,
+      "over_one_second": 0,
+      "max_seconds": 0.05369618907570839
+    },
+    {
+      "samples": 51200,
+      "count": 3,
+      "over_one_second": 0,
+      "max_seconds": 0.03641612082719803
+    },
+    {
+      "samples": 53760,
+      "count": 870,
+      "over_one_second": 39,
+      "max_seconds": 34.97753099352121
+    },
+    {
+      "samples": 56320,
+      "count": 1,
+      "over_one_second": 0,
+      "max_seconds": 0.06354355812072754
+    },
+    {
+      "samples": 58880,
+      "count": 3,
+      "over_one_second": 0,
+      "max_seconds": 0.049456655979156494
+    },
+    {
+      "samples": 61440,
+      "count": 2,
+      "over_one_second": 0,
+      "max_seconds": 0.06894642859697342
+    },
+    {
+      "samples": 64000,
+      "count": 4,
+      "over_one_second": 0,
+      "max_seconds": 0.07089399173855782
+    },
+    {
+      "samples": 66560,
+      "count": 5,
+      "over_one_second": 0,
+      "max_seconds": 0.038902152329683304
+    },
+    {
+      "samples": 69120,
+      "count": 3,
+      "over_one_second": 0,
+      "max_seconds": 0.062298212200403214
+    },
+    {
+      "samples": 71680,
+      "count": 6,
+      "over_one_second": 0,
+      "max_seconds": 0.04230579361319542
+    },
+    {
+      "samples": 74240,
+      "count": 2,
+      "over_one_second": 0,
+      "max_seconds": 0.050951287150382996
+    },
+    {
+      "samples": 79360,
+      "count": 3,
+      "over_one_second": 0,
+      "max_seconds": 0.05783374607563019
+    },
+    {
+      "samples": 81920,
+      "count": 1,
+      "over_one_second": 0,
+      "max_seconds": 0.045096442103385925
+    },
+    {
+      "samples": 84480,
+      "count": 1,
+      "over_one_second": 0,
+      "max_seconds": 0.04793834313750267
+    },
+    {
+      "samples": 87040,
+      "count": 2,
+      "over_one_second": 0,
+      "max_seconds": 0.07712827250361443
+    },
+    {
+      "samples": 89600,
+      "count": 1,
+      "over_one_second": 0,
+      "max_seconds": 0.043291181325912476
+    },
+    {
+      "samples": 92160,
+      "count": 1,
+      "over_one_second": 0,
+      "max_seconds": 0.038270577788352966
+    },
+    {
+      "samples": 94720,
+      "count": 1,
+      "over_one_second": 0,
+      "max_seconds": 0.10022702813148499
+    },
+    {
+      "samples": 99840,
+      "count": 1,
+      "over_one_second": 0,
+      "max_seconds": 0.05765850841999054
+    },
+    {
+      "samples": 104960,
+      "count": 2,
+      "over_one_second": 0,
+      "max_seconds": 0.038573313504457474
+    },
+    {
+      "samples": 107520,
+      "count": 1,
+      "over_one_second": 0,
+      "max_seconds": 0.03824107348918915
+    },
+    {
+      "samples": 112640,
+      "count": 1,
+      "over_one_second": 0,
+      "max_seconds": 0.056443795561790466
+    },
+    {
+      "samples": 128000,
+      "count": 2,
+      "over_one_second": 0,
+      "max_seconds": 0.04513565078377724
+    },
+    {
+      "samples": 148480,
+      "count": 1,
+      "over_one_second": 0,
+      "max_seconds": 0.04613679274916649
+    },
+    {
+      "samples": 158720,
+      "count": 1,
+      "over_one_second": 0,
+      "max_seconds": 0.04595290124416351
+    },
+    {
+      "samples": 181760,
+      "count": 1,
+      "over_one_second": 0,
+      "max_seconds": 0.045916397124528885
+    },
+    {
+      "samples": 194560,
+      "count": 1,
+      "over_one_second": 0,
+      "max_seconds": 0.0638030655682087
+    }
+  ],
+  "post_last_timed_event_gaps": [
+    {
+      "case_id": "synthetic_user_interruption-104",
+      "step_id": 84,
+      "post_last_timed_event_seconds": 16.956038936972618,
+      "service_completion_source": "model_complete"
+    },
+    {
+      "case_id": "candor_pause_handling-50",
+      "step_id": 44,
+      "post_last_timed_event_seconds": 5.59020134434104,
+      "service_completion_source": "wait_fallback"
+    },
+    {
+      "case_id": "candor_pause_handling-161",
+      "step_id": 39,
+      "post_last_timed_event_seconds": 2.5664136186242104,
+      "service_completion_source": "model_complete"
+    }
+  ],
+  "causal_limit": "Warmup round order and thread assignment are confounded; no controlled proof of the current long-tail mechanism."
+}
