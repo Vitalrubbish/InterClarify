@@ -177,7 +177,8 @@ def cleanup(frontend, worker):
     return record
 
 
-def replay(model, worker, audio, identity, output, realtime, order=('controller', 'asr'), compress=False):
+def replay(model, worker, audio, identity, output, realtime, order=('controller', 'asr'), compress=False,
+           on_batch=None, on_finish=None):
     frontend, context = fresh(model, worker, identity, realtime, order)
     stopped = threading.Event()
     ingress_errors, arrivals, rows = [], [], []
@@ -251,6 +252,8 @@ def replay(model, worker, audio, identity, output, realtime, order=('controller'
                     row['unread_samples']['asr'] = frontend.ledger.end - frontend.asr.processed_until
                 previous_release = row['released_at']
                 rows.append(row)
+                if on_batch is not None:
+                    on_batch(row, started)
                 stream.write(json.dumps(row, ensure_ascii=False, allow_nan=False) + '\n')
                 stream.flush()
         expected = (len(audio) + 2559) // 2560
@@ -269,7 +272,11 @@ def replay(model, worker, audio, identity, output, realtime, order=('controller'
                       diagnostics=frontend.diagnostics())
         if rows and context is not None:
             result['online_text'] = rows[-1]['snapshot']['text']
-        result['cleanup'] = cleanup(frontend, worker)
+        try:
+            if on_finish is not None:
+                on_finish(result)
+        finally:
+            result['cleanup'] = cleanup(frontend, worker)
         if not clean_session(result['cleanup'], worker is not None):
             result.update(passed=False, cleanup_error='Session state was not fully cleared')
         result['timing'] = summarize(rows)

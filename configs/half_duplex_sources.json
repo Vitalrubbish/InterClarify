@@ -1,0 +1,9 @@
+{
+  "source_project": "TurnControlComparison",
+  "files_sha256": {
+    "generation_worker.py": "d07221d924aeae9af0a1347f39ca639999f0a3792242edb469e94c385ba87267",
+    "duplex_playback.py": "0ed3fb3db8db143cc99c097cb2df2f305e29f9425e31dd2ced912c50ae5ad6b5",
+    "duplex_replies.py": "eccc73c5060ee3ce8065ab5d3ae768f20e38d265382e062e71336b522c2b9c3b",
+    "score_duplex.py": "f8ee91877d05fc84956ba44065ba99df99629958fe7046134c0c79596fa4f38c"
+  }
+}
