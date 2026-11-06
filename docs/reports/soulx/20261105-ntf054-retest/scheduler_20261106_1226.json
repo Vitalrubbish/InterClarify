@@ -1,0 +1,42 @@
+{
+  "checked_at_utc": "2026-11-06 04:26:10 UTC",
+  "checked_at_local": "2026-11-06 12:26:10 +08:00",
+  "smoke_job": "job-179392426378993291113-xuan-zhang",
+  "phase": "Pending",
+  "node_name": null,
+  "scheduler": "volcano",
+  "requests": {
+    "cpu": "12",
+    "memory": "64Gi",
+    "nvidia.com/gpu": "3"
+  },
+  "pod_scheduled": {
+    "status": "False",
+    "reason": "Schedulable",
+    "last_transition_time": "2026-11-06T00:17:45Z",
+    "message": "Pod ns-xuan-zhang/job-179392426378993291113-xuan-zhang-master-0 can possibly be assigned to d6-hpc-gpu-052"
+  },
+  "container_statuses": [],
+  "pod_events_observed": [],
+  "run_directory_exists": false,
+  "submission_log_exists": false,
+  "disabled_node": {
+    "name": "d6-hpc-gpu-069",
+    "unschedulable": true,
+    "taint": "node.kubernetes.io/unschedulable:NoSchedule"
+  },
+  "campaign_status": "waiting_smoke",
+  "followup_alive": true,
+  "remote_evidence": "analysis/ntf054-half-campaign-20261106-r4/scheduler_snapshot_20261106.json",
+  "remote_evidence_sha256": "88c849e0d4ee27bfb7fc9bb0d468007fbcfb5781fbfdf8fcdc72b83478866bdb",
+  "conclusions": [
+    "当前停在节点绑定前，尚未进入容器及应用服务启动阶段。",
+    "任务需要同一节点同时提供3GPU、12CPU及64GiB内存；GPU利用率低不等于这些资源已可分配。",
+    "提交时调度条件曾记录可分配至052；不能直接把资源碎片或容器镜像写成已确认根因。"
+  ],
+  "evidence_limits": [
+    "队列、PodGroup及全局Pod资源查询被RBAC拒绝，未取得具体调度等待原因及各节点剩余资源。",
+    "Schedulable条件最后更新时间是提交时，不能证明核验时仍有同样的资源。",
+    "本次仅核验及保存证据，未修改或重新提交作业。"
+  ]
+}

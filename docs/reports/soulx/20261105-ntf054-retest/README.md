@@ -1,5 +1,7 @@
 # NTF-054：执行线程与 complete 交接修复后的复测
 
+2026-11-06 12:26调度核验：r4 smoke仍为Pending，尚未绑定节点（nodeName为空、PodScheduled=False），无containerStatuses、运行目录或启动日志，尚未进入镜像拉取／容器执行阶段。提交时的调度条件为Schedulable，message记录可分配至d6-hpc-gpu-052，但没有实际绑定；当前没有Pod事件，不能据此确认资源碎片、镜像故障或特定队列策略。任务要求同一节点3GPU／12CPU／64GiB；069节点被禁止调度。账户无权查询队列、PodGroup及全局Pod请求，具体准入原因仍待调度侧核验。衔接进程正常、状态waiting_smoke，本次没有修改或重提任务。证据见[调度快照](scheduler_20261106_1226.json)。
+
 2026-11-06 08:19最新状态：用户明确要求重提，NTF-064已修复入口的输出父目录准备并恢复远端runs目录。源码4821efe已推送并部署至独立干净worktree，r4 smoke作业 **job-179392426378993291113-xuan-zhang** 于08:17提交，08:19为Pending。顺序衔接Python进程1836859（timeout包装1836858）正常，状态waiting_smoke；仅smoke离队、退出0且审计通过后才提交正式30条，再单卡评分。提交证据见[launch_r4.json](launch_r4.json)，此次重提尚无新模型成绩。
 
 2026-11-06 08:06最新核验：**r3 smoke在创建输出目录时失败，尚未加载模型，样本0/3；正式30条及评分均未提交，没有新的TOR／延迟成绩。** 远端campaign为failed，调度队列为空，衔接进程已退出。任务日志明确报runs父目录不存在；登录节点也确认该父目录缺失，尚未确定其消失时间与原因。此次仅只读核验，没有修改模型或重提作业。证据摘要见[状态快照](status_20261106_0806.json)。
@@ -27,7 +29,7 @@ r3提交前队列为空；账户存储约186.67GB／1TB，GPU配额8张。仅串
 | smoke-r3 | `ntf054-half-smoke-20261105-r3` | `job-179388489846387768877-xuan-zhang` | 创建输出目录失败；模型未加载，样本0/3，无退出标记 |
 | formal-r3 | `ntf054-half-20261105-r3-formal` | 未提交 | smoke未通过，衔接已停止 |
 | score-r3 | `ntf054-half-20261105-r3-score` | 未提交 | 无新正式推理结果 |
-| smoke-r4 | `ntf054-half-smoke-20261106-r4` | `job-179392426378993291113-xuan-zhang` | 08:19为Pending，父目录已恢复 |
+| smoke-r4 | `ntf054-half-smoke-20261106-r4` | `job-179392426378993291113-xuan-zhang` | 12:26仍为Pending，尚未绑定节点或启动容器 |
 | formal-r4 | `ntf054-half-20261106-r4-formal` | 待smoke通过后提交 | 顺序衔接正常 |
 | score-r4 | `ntf054-half-20261106-r4-score` | 待正式推理通过后提交 | 仅TOR／延迟 |
 
