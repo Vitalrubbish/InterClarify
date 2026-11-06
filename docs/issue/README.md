@@ -10,7 +10,7 @@ NTF-061／062 已按用户最终确认完成并归档：保留 X-Talk 工程框�
 
 NTF-058／059／060 已完成旧候选路线、入口文档与早期报告证据整理并归档。删除旧候选加载器和固定 25 条重放入口；保留现役基线及 NTF-054 活动证据。conda 本地 149 项回归通过，6 份迁移证据 SHA256 一致。清理清单见[维护记录](../runtime_baseline.md)。
 
-NTF-057已按用户最新指令取消本次完整系统的一致性检查并归档；源码固定82ff9ba，本地153项回归通过。[NTF-054](NTF-054.md)的r3 smoke作业job-179388489846387768877-xuan-zhang已于21:21提交，21:22为Pending，衔接PID3997827正在等待；通过后顺序提交正式30条和TOR／延迟评分。证据见[运行记录](../reports/soulx/20261105-ntf054-retest/README.md)及[launch_r3.json](../reports/soulx/20261105-ntf054-retest/launch_r3.json)。
+NTF-057已按用户最新指令取消本次完整系统的一致性检查并归档；源码固定82ff9ba，本地153项回归通过。[NTF-054](NTF-054.md)于2026-11-06 08:06核验：r3 smoke因runs父目录缺失，在加载模型前创建输出目录失败，样本0/3；campaign为failed，衔接已退出，当前队列为空，正式30条与评分未提交，没有新成绩。本次仅只读检查，未重提。证据见[运行记录](../reports/soulx/20261105-ntf054-retest/README.md)及[状态快照](../reports/soulx/20261105-ntf054-retest/status_20261106_0806.json)；[launch_r3.json](../reports/soulx/20261105-ntf054-retest/launch_r3.json)保留提交时历史状态。
 
 NTF-056已完成[NTF-054失败原因调查](../reports/soulx/20261105-ntf054-retest/failure_analysis.md)并归档：complete整段识别省略后，dither的CPU随机数消耗偏移；单卡基线完整复现3处差异，仅补齐特征提取后275条轨迹对照通过。用户随后取消本次对照，不实施RNG修复；调度查询已增加有限重试。
 

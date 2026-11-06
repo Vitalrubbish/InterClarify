@@ -1,0 +1,56 @@
+{
+  "checked_at_utc": "2026-11-06 00:06:42 UTC",
+  "checked_at_local": "2026-11-06 08:06:42 +08:00",
+  "scope": "read_only_remote_status_check",
+  "remote_host": "d6-hpc-debuggpu-001",
+  "root": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug",
+  "source_commit": "82ff9babcd77cdf19d53735020bb47871b028ff1",
+  "smoke_job": "job-179388489846387768877-xuan-zhang",
+  "campaign_state": {
+    "status": "failed",
+    "updated_at": "2026-11-05 17:51:50 UTC",
+    "scheduler_query_attempt": 1,
+    "scheduler_query_error": null,
+    "error": "RuntimeError: Job ended without successful exit marker: job-179388489846387768877-xuan-zhang"
+  },
+  "scheduler_jobs_observed": [],
+  "followup_process_observed": false,
+  "paths_observed": {
+    "root_exists": true,
+    "source_exists": true,
+    "runs_parent_exists": false,
+    "smoke_run_exists": false,
+    "formal_run_exists": false,
+    "score_output_exists": false
+  },
+  "smoke_result": {
+    "failure_stage": "output_directory_creation_before_model_loading",
+    "log_error": "mkdir: cannot create directory '/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/runs/ntf054-half-smoke-20261105-r3': No such file or directory",
+    "cases_started": 0,
+    "cases_expected": 3,
+    "exit_marker_exists": false,
+    "verified_job_exit_code": null
+  },
+  "formal_submitted": false,
+  "score_submitted": false,
+  "new_metrics_available": false,
+  "evidence": [
+    {
+      "remote_relative_path": "analysis/ntf054-half-campaign-20261105-r3/state.json",
+      "sha256": "f8369bdf378162d234a5d2d1f7c41ff17a3aadf103a03a70e08f9f2a537ee878"
+    },
+    {
+      "remote_relative_path": "analysis/ntf054-half-campaign-20261105-r3/campaign.log",
+      "sha256": "c1f99f446737fb8c35bbf54a0184edad8d1a126b0447f1a380eae2d93c5fe726"
+    },
+    {
+      "remote_relative_path": "submit_logs/ntf054-half-smoke-20261105-r3.log",
+      "sha256": "42fd80b82e9ae0f85c08000d4b96f4d5e830e38be0d4abc57cdab3224c223506"
+    }
+  ],
+  "limitations": [
+    "通过已认证SSH会话读取远端日志片段及摘要；本文件是结构化核验记录，不是原始证据归档。",
+    "登录节点目录检查及作业mkdir错误均确认runs父目录缺失；尚未查明其消失时间与原因。",
+    "本次没有修改模型配置，也没有提交新的远端作业。"
+  ]
+}

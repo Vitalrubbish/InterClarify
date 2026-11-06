@@ -1,6 +1,8 @@
 # NTF-054：执行线程与 complete 交接修复后的复测
 
-2026-11-05 21:22最新状态：按用户明确指令取消完整系统的原生控制一致性检查，停止修复短窗变化；新源码固定82ff9ba，r3 smoke作业job-179388489846387768877-xuan-zhang已提交，当前Pending。顺序衔接PID3997827已启动，状态waiting_smoke；smoke通过后才提交正式30条及TOR／延迟评分。完整预热、线程预算、跳过事件、录音和资源审计保留，未执行的对照明确记为disabled_by_user／passed=null。提交证据见[launch_r3.json](launch_r3.json)。
+2026-11-06 08:06最新核验：**r3 smoke在创建输出目录时失败，尚未加载模型，样本0/3；正式30条及评分均未提交，没有新的TOR／延迟成绩。** 远端campaign为failed，调度队列为空，衔接进程已退出。任务日志明确报runs父目录不存在；登录节点也确认该父目录缺失，尚未确定其消失时间与原因。此次仅只读核验，没有修改模型或重提作业。证据摘要见[状态快照](status_20261106_0806.json)。
+
+2026-11-05 21:22的Pending／waiting_smoke是提交时历史状态，见[launch_r3.json](launch_r3.json)，已由本次核验更新。r3源码固定82ff9ba，按用户明确指令取消完整系统的原生控制一致性检查、停止修复短窗变化；这一配置不代表本次已执行预热或取得模型结果。
 
 21:04后原因调查已完成，见[失败分析](failure_analysis.md)：真实权重基线完整复现原3处差异；仅补齐被省去的 CPU 特征提取后，随机状态与275条对照轨迹全部一致。根因为 complete 整段识别省略后 dither 的 CPU RNG 消耗发生偏移。诊断不代表正式复测已通过；推理修复、三条smoke、固定30条和评分仍待恢复。
 
@@ -20,15 +22,17 @@ r3提交前队列为空；账户存储约186.67GB／1TB，GPU配额8张。仅串
 | smoke-r2 | `ntf054-half-smoke-20261105-r2` | `job-179387030286102615198-xuan-zhang` | 约19:00退出1；控制对照失败，正式样本0/3 |
 | formal-r2 | `ntf054-half-20261105-r2-formal` | 未提交 | smoke未通过 |
 | score-r2 | `ntf054-half-20261105-r2-score` | 未提交 | 无正式推理结果 |
-| smoke-r3 | `ntf054-half-smoke-20261105-r3` | `job-179388489846387768877-xuan-zhang` | 21:22为Pending，已取消原生控制对照 |
-| formal-r3 | `ntf054-half-20261105-r3-formal` | 待smoke通过后提交 | 顺序衔接已启动 |
-| score-r3 | `ntf054-half-20261105-r3-score` | 待正式推理通过后提交 | 仅TOR／延迟 |
+| smoke-r3 | `ntf054-half-smoke-20261105-r3` | `job-179388489846387768877-xuan-zhang` | 创建输出目录失败；模型未加载，样本0/3，无退出标记 |
+| formal-r3 | `ntf054-half-20261105-r3-formal` | 未提交 | smoke未通过，衔接已停止 |
+| score-r3 | `ntf054-half-20261105-r3-score` | 未提交 | 无新正式推理结果 |
 
 验收需核对新execution／ready预算、预热与正式SoulX线程ID、complete识别跳过事件、播放实录及完整固定分母。r3只核对一致性检查的明确取消记录，不执行原生对照；r2限定差异对照结果保留作历史证据。完成作业和低延迟分别报告，不能由本地回归推定GPU性能。
 
 远端冻结目录为 `~/parathink-soulx-duplug/source/ntf054-65d15e6`，独立detached worktree，工作区干净。源码归档 `submit_logs/ntf054-65d15e6-source.tar.gz` 的SHA256为 `0b09c31e3054957869d59d7ce1f5f550f4971d97933f144e113252b4c8793e77`，与本地从同提交生成的scripts／configs归档一致；native_soulx.json的SHA256为 `128978377266770c1cdee4c244c81eefb3b3c85d7536b4707eff528e36412ba9`。四套推理conda均已核对存在，仅复用原资产。
 
 ## 顺序衔接
+
+2026-11-06核验：r3的state.json记录failed，updated_at为2026-11-05 17:51:50 UTC（北京时间11月6日01:51:50），报作业离队但没有成功退出标记。提交日志末尾为mkdir父目录不存在错误；入口脚本在创建RUN之后才安装退出清理trap，因此本次没有生成exit_code.txt。未取得调度器最终退出码，不将其补记为已验证退出1。runs目录、smoke输出和正式／评分目录均不存在，campaign内也没有后续提交回执或审计产物。当前仅保留历史提交日志和campaign证据，复测尚未完成。
 
 r3使用新源码内的衔接脚本，SHA256为7e876b2e2fdf58133d0dec0d64cf8b09b2367c986883e9a8c287f0e7d472c9db；PID3997827，绑定单CPU、2GiB地址空间、最长12小时。只读队列查询最多4次尝试，5／15／30秒退避，失败不按空队列处理；提交不自动重试。r3状态、日志及提交回执位于analysis/ntf054-half-campaign-20261105-r3/。r3源码目录为source/ntf054-82ff9ba，独立干净detached worktree；scripts／configs归档SHA256为e593ef2bc3b92c2800053ff4ff4b0f9d8e36b1577158dd32034e55e538f8bf05，与本地一致；配置及输入摘要与r2相同。本地153项完整回归及编译、空白检查通过。
 
