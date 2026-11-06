@@ -24,6 +24,7 @@ for executable in "$FRONTEND" "$QWEN" "$TTS" "$ASR"; do
   [[ -f "${executable%/bin/python}/conda-meta/history" ]] || exit 2
 done
 RUN="$ROOT/runs/$RUN_ID"
+mkdir -p "$ROOT/runs"
 mkdir "$RUN"
 exec 9>"$ROOT/.half-duplex.lock"
 flock -n 9 || exit 2
