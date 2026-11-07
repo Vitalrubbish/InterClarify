@@ -1,10 +1,10 @@
 # 架构图预览入口说明
 
-更新：2026-11-06。对应[预览入口](../../figures/parathink_method_preview.tex)，文件用standalone加载TikZ和[图源](../../figures/parathink_method.tex)，没有运行时类或方法。结构见[图示说明](parathink_method.md)。
+更新：2026-11-07。对应[预览入口](../../figures/parathink_method_preview.tex)，文件用standalone加载TikZ和[图源](../../figures/parathink_method.tex)，没有运行时类或方法。结构见[图示说明](parathink_method.md)。
 
 预览按用户要求精简为模块名称、步骤名称与连接标签，删除各框标题下方及图旁的叙述说明，并同步收紧布局。详细行为继续参见图示说明和架构设计。
 
-[PDF](../../figures/parathink_method_preview.pdf)和[PNG](../../figures/parathink_method_preview.png)已同步原生SoulX内部SenseVoice、独立X2、160ms联合写Context及下游共同快照消费，Layer 1统一负责附和时机与措辞及正式表达。图中Layer 2发布CoT按[当前周期协议](../dev/layer2/protocol.md)指正常结束时的result，中间analysis不注入下游；本次只澄清标签含义，图源与产物未变。普通回答读取已提交有效complete和当前正文，下游接入仍待后续工作单。
+[PDF](../../figures/parathink_method_preview.pdf)和[PNG](../../figures/parathink_method_preview.png)保留原生SoulX内部SenseVoice、独立X2及160ms联合发布。Layer 1仅以单个token表示系统附和，不附正文或定义发声；通往FIFO的箭头已改为 `Speech text` 并重新导出。Layer 2发布CoT按[当前周期协议](../dev/layer2/protocol.md)指最终result，中间analysis不注入下游。普通回答仍须读取有效complete，下游接入待后续实施。
 
 ## 构建与检查
 

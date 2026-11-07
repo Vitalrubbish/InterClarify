@@ -16,4 +16,6 @@
 
 后续 [Layer 2 周期设计](../../dev/layer2/protocol.md)采用冻结模型与提示词，不训练 Layer 2；每周期记录增量分析和三值进度，仅在正常结束时发布 `result`。本目录保留 pilot v1 原始正文目标、旧发布方式及实测摘要，`layer2_sft.json` 仅作历史诊断材料，不作为待训练语料，也不代表已经适配当前协议。
 
+当前 Layer 1 系统附和目标仅为单个 special token，不含正文；本目录旧附和文本保持原样，仅作历史试造记录，不作为当前附和内容监督，后续升级再按单 token 事件导出。
+
 当前 `messages` 不是已冻结的 Qwen 或 SoulX 输入格式。没有 tokenizer 级 `labels`、真实音频 token 或现役主动澄清接口，不可直接交给正式训练器。可首先通过[逐场景审阅稿](../../../datagen/pilot/review.md)检查监督内容，再查 JSON 的完整输入。

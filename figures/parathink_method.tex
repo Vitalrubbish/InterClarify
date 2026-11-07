@@ -55,7 +55,7 @@
 
   \node[wide,fill=blue!5,text width=22cm] (fifo) at (10.5,1.6)
     {\textbf{Text FIFO}};
-  \draw[write] (l1.south) -- node[label,right,pos=0.7] {Speech / backchannel text} (l1.south |- fifo.north);
+  \draw[write] (l1.south) -- node[label,right,pos=0.7] {Speech text} (l1.south |- fifo.north);
 
   \node[wide,fill=gray!8,text width=22cm,minimum height=1.25cm] (playback) at (10.5,-1)
     {\textbf{Output Runtime: Streaming TTS + Player}};
