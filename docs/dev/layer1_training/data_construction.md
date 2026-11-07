@@ -1,6 +1,6 @@
 # 话轮控制器与 Layer 1 训练数据构造设计
 
-日期：2026-11-07。状态：设计讨论稿；五场景文本试造及导出已完成，远端校验进行中（DCT-002—004）。设计工作单：DCT-001。
+日期：2026-11-07。状态：设计讨论稿；五场景文本试造、三模块视图及远端一致性校验已完成（DCT-002—004）。设计工作单：DCT-001。
 
 本文将基于 [DuplexOmni 阅读报告](DuplexOmni_reference.md) 的讨论整理为数据构造方案，说明如何从任务和交互剧本得到话轮控制器、Layer 1 及可选 Layer 2 的训练数据，并用具体轨迹解释监督边界。研究目标与运行合同分别以[研究方案](../../research_design.md)、[架构设计](../../research_design/architecture.md)和 [Layer 1 训练设计](../../research_design/layer1_training.md)为准。
 

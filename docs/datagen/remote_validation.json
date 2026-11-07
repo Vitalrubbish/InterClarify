@@ -1,0 +1,63 @@
+{
+  "verified_at_utc": "2026-11-07T06:52:59.171805+00:00",
+  "source_commit": "afd867f6aca2926e454e76378a722da8ee582922",
+  "source_root": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-datagen/source/afd867f6aca2926e454e76378a722da8ee582922",
+  "output_dir": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-datagen/runs/dct004-20261107-text-pilot-r1",
+  "build_exit_code": 0,
+  "test_exit_code": 0,
+  "test_count": 17,
+  "test_log": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-datagen/runs/dct004-20261107-text-pilot-r1.tests.log",
+  "execution": {
+    "status": "PASS",
+    "python": "3.10.21",
+    "python_executable": "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/interclarify-dev/bin/python",
+    "conda_prefix": "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/envs/interclarify-dev",
+    "conda_history_present": true,
+    "hostname": "d6-hpc-debuggpu-001",
+    "elapsed_seconds": 0.0809,
+    "cpu_affinity": [
+      0
+    ],
+    "thread_limits": {
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1",
+      "NUMEXPR_NUM_THREADS": "1"
+    },
+    "peak_rss_kib": 19636,
+    "output_bytes": 426749,
+    "limits": {
+      "address_space_bytes": 2147483648,
+      "file_bytes": 33554432,
+      "cpu_seconds": 110
+    }
+  },
+  "manifest_sha256": "163bb69223c830d28757f849b9837f67fc4c0bec756d559a445f1107a0392d93",
+  "manifest_matches_local": true,
+  "source_matches_manifest": true,
+  "generator_matches_manifest": true,
+  "artifact_checks": {
+    "layer1_sft.json": {
+      "sha256": "d03b61e576347b5b4045ad4a8b58434dfadd3435b79ff57442c1b945dbddf64b",
+      "matches_local": true
+    },
+    "layer2_sft.json": {
+      "sha256": "7ebcc62e5330ad443d9c724387549bfdbd3b81a7e31a5ab0069bb8655cce91a1",
+      "matches_local": true
+    },
+    "review.md": {
+      "sha256": "e90a6cf4c88d08694d473ec97d3cba9f604eb43b1bb6a4733bc056bef636527d",
+      "matches_local": true
+    },
+    "soulx_sft.json": {
+      "sha256": "80fcfa9dfcb4c622ba272d0e550a7b68e8dedd1687812f478028a3934571a399",
+      "matches_local": true
+    },
+    "trajectories.json": {
+      "sha256": "649a4efb0defd184c5ed2c0adf10d6c29a9608c39be9da1ee1cdee5d8151c1b3",
+      "matches_local": true
+    }
+  },
+  "total_output_bytes": 427421,
+  "workspace_clean": true
+}

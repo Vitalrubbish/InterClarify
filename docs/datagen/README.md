@@ -46,4 +46,4 @@ bash datagen/run_remote_pilot.sh /path/to/conda-env /path/to/new-output
 conda run --no-capture-output -n interclarify-dev python -m unittest discover -s tests -p test_datagen_pilot.py -v
 ```
 
-本地 17 项新增边界测试及 112 项完整回归通过。远端限一个工作进程、一个 CPU、2 GiB 地址空间、16 MiB 总产物和 120 秒；运行事实见[远端记录](remote_validation.md)。NTF-054 的正式复测保持独立。
+本地 17 项新增边界测试及 112 项完整回归通过。远端生成与 17 项边界测试均退出 0，五份主要产物及清单与本地 SHA256 一致；单 CPU、峰值 RSS 约 19.2 MiB，产物约 417 KiB。资源上限和实际路径见[远端记录](remote_validation.md)。DCT-002—004 均完成并归档；NTF-054 的正式复测保持独立。
