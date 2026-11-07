@@ -1,5 +1,7 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
+2026-11-07 用户确认 [Layer 1 周期协议](dev/layer1/protocol.md)（DCT-010）：前端逐周期交付新增转写和本批状态，Layer 1 在持久 Context 中继续解码，实际生成的 token 留在同一 Context。思考请求和系统附和分别使用专用 special token；Layer 2 最终结果在合法输入边界作为外部块写入。当前只形成设计，未实施逐批交付、tokenizer 适配或训练。
+
 2026-11-07 用户授权的 [Layer 2 周期协议](dev/layer2/protocol.md)已形成设计（DCT-005，DCT-007—009 修订）：Layer 2 固定为已有模型权重与提示词驱动的思考层，不训练或适配参数。每周期只读当前对话与上一轮 `analysis`，产生增量分析与三值进度，结束时另生成 `result`，仅将最终结果同源注入 SoulX 和 Layer 1。专项训练对象为两个下游；尚未实施运行时、升级 pilot v1 或开展训练。
 
 2026-11-07 用户授权五场景数据试造（DCT-002—004）已完成：在 `datagen` 构造五个独立来源、13 条模拟轨迹，导出 SoulX-Duplug、Layer 1 与 Layer 2 的 SFT 语义视图；远端既有 conda 生成退出 0，主要产物与清单 SHA256 一致。入口见[五场景试造](datagen/README.md)及[远端记录](datagen/remote_validation.md)。该步骤只验证文本协议与因果边界，不替代真实音频／冻结前端回放、独立审核或训练；主动澄清仍是未来协议样例。
@@ -72,6 +74,10 @@ docs/
 │   ├── listening.md
 │   └── speaking.md
 └── dev/
+    ├── layer1/
+    │   └── protocol.md
+    ├── layer2/
+    │   └── protocol.md
     └── layer1_training/
         └── README.md
 ```
@@ -79,6 +85,8 @@ docs/
 | 文档 | 职责 |
 | --- | --- |
 | [架构设计](research_design/architecture.md) | thinking/表达分工、异步时序、结果合同、动作边界、共同实验和训练约定 |
+| [Layer 1 周期协议](dev/layer1/protocol.md) | 持久 Context、前端增量输入、真实生成回写、思考请求与系统附和 special token |
+| [Layer 2 周期协议](dev/layer2/protocol.md) | 冻结思考层的对话与上一轮分析输入、增量分析与进度、最终结果发布 |
 | [Layer 1 训练设计](research_design/layer1_training.md) | 训练目标、基座选择、因果数据与监督原则、分阶段训练及评估思路 |
 | [Layer 1 数据构造与训练预算](dev/layer1_training/README.md) | 试标与扩量流程、七类数据及阶段配比、8×4090 假设下的时长与资源预算 |
 | [边听边想：主动介入 benchmark 与训练数据](research_design/listening.md) | 介入依据、分支案例、事件标注、行为指标、倾听训练轨迹与实验 |

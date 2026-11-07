@@ -10,6 +10,8 @@
 
 当前已确定不训练 Layer 2，其周期轨迹用于协议诊断、评测及构造两个下游的结果利用数据。既有 `layer2_sft.json` 保留为历史试造材料，不作为待训练语料；当前专项训练对象为 Layer 1 和后续适配的 SoulX-Duplug。
 
+后续 [Layer 1 周期设计](../dev/layer1/protocol.md)采用持久 token Context，并为思考请求与系统附和设置专用 special token。现有 pilot 只记录语义输入和目标，尚未适配逐批 token 交错、词表或实际生成回写，不能将旧 JSON 字段视为已实现的模型输出协议。
+
 ## 场景与监督统计
 
 | 来源 | 场景与关键对照 | 派生轨迹 |
