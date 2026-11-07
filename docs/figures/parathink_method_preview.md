@@ -4,7 +4,7 @@
 
 预览按用户要求精简为模块名称、步骤名称与连接标签，删除各框标题下方及图旁的叙述说明，并同步收紧布局。详细行为继续参见图示说明和架构设计。
 
-[PDF](../../figures/parathink_method_preview.pdf)和[PNG](../../figures/parathink_method_preview.png)已同步原生SoulX内部SenseVoice、独立X2、160ms联合写Context及下游共同快照消费，Layer 1统一负责附和时机与措辞及正式表达，Layer 2发布CoT。普通回答读取已提交有效complete和当前正文，下游接入仍待后续工作单。
+[PDF](../../figures/parathink_method_preview.pdf)和[PNG](../../figures/parathink_method_preview.png)已同步原生SoulX内部SenseVoice、独立X2、160ms联合写Context及下游共同快照消费，Layer 1统一负责附和时机与措辞及正式表达。图中Layer 2发布CoT按[当前周期协议](../dev/layer2/protocol.md)指正常结束时的result，中间analysis不注入下游；本次只澄清标签含义，图源与产物未变。普通回答读取已提交有效complete和当前正文，下游接入仍待后续工作单。
 
 ## 构建与检查
 
