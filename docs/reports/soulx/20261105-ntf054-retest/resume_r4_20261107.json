@@ -1,0 +1,171 @@
+{
+  "issue": "NTF-065",
+  "scope": "恢复已通过r4冒烟后的正式30条与评分衔接；完整结果由NTF-054验收。",
+  "preflight": {
+    "checked_at_utc": "2026-11-07T02:30:41.696323+00:00",
+    "passed": true,
+    "source_commit": "4821efed6e5947375558b22dc5cc7d5bc084208e",
+    "source_clean": true,
+    "input_files_sha256_verified": 70,
+    "conda_environments_verified": 6,
+    "asset_paths_verified": 10,
+    "manifest_sha256": "403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cde4f3c07",
+    "warmup_audio_sha256": "d733a878fbb3393dac0349cfa1293e4fad9a8bd5ec1f58ce6adc019de4b94f32",
+    "source_archive_sha256": "6de6ea65e003ab66376e3d7a1af3ebf24407ca5140d0337cb01487a4906ba577",
+    "smoke_result_sha256": "81623187c1395bdfe5491f8d3c2cef618a802f6d179393a91daf84757479f6da",
+    "script_sha256": {
+      "scripts/remote/fdb30_retest_followup.py": "7e876b2e2fdf58133d0dec0d64cf8b09b2367c986883e9a8c287f0e7d472c9db",
+      "scripts/remote/run_fdb30_half_duplex.sh": "91d6aa21c9bcc4b72061bcdf24716955f76deaa1dc457d855b0eee156ff8e74e",
+      "configs/native_soulx.json": "128978377266770c1cdee4c244c81eefb3b3c85d7536b4707eff528e36412ba9"
+    },
+    "queue_before_resume": "------------------------------------------------------------------------------------------------\nName | queue | CreationTime | Status | CPU | Mem | GPU | duration | jobDesc | reason | project\n------------------------------------------------------------------------------------------------\n\n",
+    "quota_before_resume": "[Quota]\nGPU:  8\nCPU:  256\nJOB:  200\n恢复默认配额的时间:  -\n------------------------------\n[Partition]\npdgpu-4090\npdgpu-a10\npdgpu-ezkws\npdcpu\npdcpu-ezkws\n------------------------------\n[是否允许资源配比超配]\nNO\n------------------------------\n[Storage quota]\nhpc_stor03  limit: 1.00 TB used:  186.67 GB\n\n",
+    "old_state": {
+      "source_commit": "4821efed6e5947375558b22dc5cc7d5bc084208e",
+      "source": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-4821efe",
+      "script_sha256": "7e876b2e2fdf58133d0dec0d64cf8b09b2367c986883e9a8c287f0e7d472c9db",
+      "smoke_job": "job-179392426378993291113-xuan-zhang",
+      "status": "waiting_smoke",
+      "updated_at": "2026-11-06 12:17:30 UTC",
+      "scheduler_query_attempt": 1,
+      "scheduler_query_error": null,
+      "scheduler_query_output": null
+    },
+    "old_state_sha256": "178e43e9d4c1ba4a97a098ee0017236cc3af591d4d28ad66ee432b7bc8cc0ff9",
+    "campaign_lock_available": true,
+    "followup_processes": [],
+    "formal_output_unused": true,
+    "score_output_unused": true,
+    "cpu_affinity_count": 1,
+    "address_space_bytes": 2147483648
+  },
+  "launch": {
+    "started_at_utc": "2026-11-07T02:31:41.524970+00:00",
+    "command": [
+      "timeout",
+      "--signal=TERM",
+      "--kill-after=10",
+      "43200",
+      "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/bin/python",
+      "-B",
+      "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-4821efe/scripts/remote/fdb30_retest_followup.py",
+      "--source",
+      "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-4821efe",
+      "--source-commit",
+      "4821efed6e5947375558b22dc5cc7d5bc084208e",
+      "--root",
+      "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug",
+      "--output",
+      "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/ntf054-half-campaign-20261106-r4",
+      "--audit-python",
+      "/hpc_stor03/sjtu_home/xuan.zhang/turncontrol-comparison/envs/soulx/bin/python",
+      "--smoke-run",
+      "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/runs/ntf054-half-smoke-20261106-r4",
+      "--smoke-job",
+      "job-179392426378993291113-xuan-zhang",
+      "--prefix",
+      "ntf054-half-20261106-r4"
+    ],
+    "timeout_wrapper_pid": 761588,
+    "deadline_at_utc": "2026-11-07T14:31:41.524970+00:00",
+    "log": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/ntf054-half-campaign-20261106-r4/resume_20261107.log",
+    "old_state_backup": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/ntf054-half-campaign-20261106-r4/state_before_resume_20261107.json",
+    "old_state_sha256": "178e43e9d4c1ba4a97a098ee0017236cc3af591d4d28ad66ee432b7bc8cc0ff9",
+    "followup_limits": {
+      "cpu_affinity_count": 1,
+      "address_space_bytes": 2147483648,
+      "wall_seconds": 43200,
+      "poll_seconds": 30,
+      "query_max_attempts": 4
+    },
+    "source_commit": "4821efed6e5947375558b22dc5cc7d5bc084208e",
+    "smoke_reused": true,
+    "native_equivalence": "disabled_by_user",
+    "judge": "excluded_by_user"
+  },
+  "verified": {
+    "checked_at_utc": "2026-11-07T02:32:15.770260+00:00",
+    "formal_job": "job-179401870522620182164-xuan-zhang",
+    "formal_status": "Pending",
+    "campaign_status": "waiting_formal",
+    "followup_python_pid": 761589,
+    "campaign_lock_held": true,
+    "scheduler_query_error": null,
+    "queue": "--------------------------------------------------------------------------------------------------------------------------------------------------------------------\nName                                 | queue      | CreationTime        | Status  | CPU | Mem | GPU | duration | jobDesc                        | reason | project\n--------------------------------------------------------------------------------------------------------------------------------------------------------------------\njob-179401870522620182164-xuan-zhang | pdgpu-4090 | 2026-11-07 10:31:45 | Pending | 12  | 64G | 3   | 0d0h0m0s | ntf054-half-20261106-r4-formal |        |        \n\n",
+    "smoke_audit": {
+      "passed": true,
+      "cases": 3,
+      "frames": 492,
+      "complete_recognition_skipped": 7,
+      "max_controller_main_lag_ms": 651.4964636415243,
+      "recordings_audited": 3,
+      "execution": {
+        "cpu_threads": 2,
+        "interop_threads": 1,
+        "sensevoice_ncpu": 2,
+        "thread_ident": 139958587213632,
+        "thread_native_id": 147,
+        "skip_complete_recognition": true
+      }
+    },
+    "processes": [
+      {
+        "pid": 761588,
+        "cmdline": "timeout --signal=TERM --kill-after=10 43200 /hpc_stor03/sjtu_home/xuan.zhang/miniconda3/bin/python -B /hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-4821efe/scripts/remote/fdb30_retest_followup.py --source /hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-4821efe --source-commit 4821efed6e5947375558b22dc5cc7d5bc084208e --root /hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug --output /hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/ntf054-half-campaign-20261106-r4 --audit-python /hpc_stor03/sjtu_home/xuan.zhang/turncontrol-comparison/envs/soulx/bin/python --smoke-run /hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/runs/ntf054-half-smoke-20261106-r4 --smoke-job job-179392426378993291113-xuan-zhang --prefix ntf054-half-20261106-r4 ",
+        "status": "Name:\ttimeout\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t761588\nNgid:\t0\nPid:\t761588\nPPid:\t1\nTracerPid:\t0\nUid:\t30225\t30225\t30225\t30225\nGid:\t20001\t20001\t20001\t20001\nFDSize:\t64\nGroups:\t20001 20009 20051 \nNStgid:\t761588\nNSpid:\t761588\nNSpgid:\t761588\nNSsid:\t761588\nVmPeak:\t   11596 kB\nVmSize:\t   11596 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t     960 kB\nVmRSS:\t     960 kB\nRssAnon:\t      96 kB\nRssFile:\t     864 kB\nRssShmem:\t       0 kB\nVmData:\t     212 kB\nVmStk:\t     136 kB\nVmExe:\t      36 kB\nVmLib:\t    2100 kB\nVmPTE:\t      72 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nThreads:\t1\nSigQ:\t1/1541148\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000000300000\nSigCgt:\t0000000180016007\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nCpus_allowed:\t0000,00000000,00000001\nCpus_allowed_list:\t0\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000003\nMems_allowed_list:\t0-1\nvoluntary_ctxt_switches:\t1\nnonvoluntary_ctxt_switches:\t0\n",
+        "limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            8388608              unlimited            bytes     \nMax core file size        0                    unlimited            bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             65535                65535                processes \nMax open files            65535                65535                files     \nMax locked memory         unlimited            unlimited            bytes     \nMax address space         2147483648           2147483648           bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       1541148              1541148              signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+        "cpu_affinity": [
+          0
+        ]
+      },
+      {
+        "pid": 761589,
+        "cmdline": "/hpc_stor03/sjtu_home/xuan.zhang/miniconda3/bin/python -B /hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-4821efe/scripts/remote/fdb30_retest_followup.py --source /hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-4821efe --source-commit 4821efed6e5947375558b22dc5cc7d5bc084208e --root /hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug --output /hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/ntf054-half-campaign-20261106-r4 --audit-python /hpc_stor03/sjtu_home/xuan.zhang/turncontrol-comparison/envs/soulx/bin/python --smoke-run /hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/runs/ntf054-half-smoke-20261106-r4 --smoke-job job-179392426378993291113-xuan-zhang --prefix ntf054-half-20261106-r4 ",
+        "status": "Name:\tpython\nUmask:\t0022\nState:\tS (sleeping)\nTgid:\t761589\nNgid:\t0\nPid:\t761589\nPPid:\t761588\nTracerPid:\t0\nUid:\t30225\t30225\t30225\t30225\nGid:\t20001\t20001\t20001\t20001\nFDSize:\t64\nGroups:\t20001 20009 20051 \nNStgid:\t761589\nNSpid:\t761589\nNSpgid:\t761588\nNSsid:\t761588\nVmPeak:\t   44324 kB\nVmSize:\t   44324 kB\nVmLck:\t       0 kB\nVmPin:\t       0 kB\nVmHWM:\t   21764 kB\nVmRSS:\t   21764 kB\nRssAnon:\t   10724 kB\nRssFile:\t   11040 kB\nRssShmem:\t       0 kB\nVmData:\t   16152 kB\nVmStk:\t     136 kB\nVmExe:\t    3536 kB\nVmLib:\t    7948 kB\nVmPTE:\t     116 kB\nVmSwap:\t       0 kB\nHugetlbPages:\t       0 kB\nCoreDumping:\t0\nTHP_enabled:\t1\nThreads:\t1\nSigQ:\t1/1541148\nSigPnd:\t0000000000000000\nShdPnd:\t0000000000000000\nSigBlk:\t0000000000000000\nSigIgn:\t0000000001001000\nSigCgt:\t0000000180000002\nCapInh:\t0000000000000000\nCapPrm:\t0000000000000000\nCapEff:\t0000000000000000\nCapBnd:\t000001ffffffffff\nCapAmb:\t0000000000000000\nNoNewPrivs:\t0\nSeccomp:\t0\nSpeculation_Store_Bypass:\tthread vulnerable\nCpus_allowed:\t0000,00000000,00000001\nCpus_allowed_list:\t0\nMems_allowed:\t00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000000,00000003\nMems_allowed_list:\t0-1\nvoluntary_ctxt_switches:\t305\nnonvoluntary_ctxt_switches:\t0\n",
+        "limits": "Limit                     Soft Limit           Hard Limit           Units     \nMax cpu time              unlimited            unlimited            seconds   \nMax file size             unlimited            unlimited            bytes     \nMax data size             unlimited            unlimited            bytes     \nMax stack size            8388608              unlimited            bytes     \nMax core file size        0                    unlimited            bytes     \nMax resident set          unlimited            unlimited            bytes     \nMax processes             65535                65535                processes \nMax open files            65535                65535                files     \nMax locked memory         unlimited            unlimited            bytes     \nMax address space         2147483648           2147483648           bytes     \nMax file locks            unlimited            unlimited            locks     \nMax pending signals       1541148              1541148              signals   \nMax msgqueue size         819200               819200               bytes     \nMax nice priority         0                    0                    \nMax realtime priority     0                    0                    \nMax realtime timeout      unlimited            unlimited            us        \n",
+        "cpu_affinity": [
+          0
+        ]
+      }
+    ],
+    "artifact_receipts": {
+      "state.json": {
+        "content": "{\n  \"source_commit\": \"4821efed6e5947375558b22dc5cc7d5bc084208e\",\n  \"source\": \"/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-4821efe\",\n  \"script_sha256\": \"7e876b2e2fdf58133d0dec0d64cf8b09b2367c986883e9a8c287f0e7d472c9db\",\n  \"smoke_job\": \"job-179392426378993291113-xuan-zhang\",\n  \"status\": \"waiting_formal\",\n  \"updated_at\": \"2026-11-07 02:31:46 UTC\",\n  \"scheduler_query_attempt\": 1,\n  \"scheduler_query_error\": null,\n  \"scheduler_query_output\": null,\n  \"smoke_audit\": \"/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/ntf054-half-campaign-20261106-r4/smoke.audit.json\",\n  \"submission_command\": [\n    \"vc\",\n    \"submit\",\n    \"--image\",\n    \"docker.v2.aispeech.com/sjtu/sjtu_yukai-xuanzhang-xtalk-round1:v0.4\",\n    \"--partition\",\n    \"pdgpu-4090\",\n    \"--job\",\n    \"ntf054-half-20261106-r4-formal\",\n    \"--num-task\",\n    \"1\",\n    \"--cpu-per-task\",\n    \"12\",\n    \"--mem-per-task\",\n    \"64G\",\n    \"--gpu-per-task\",\n    \"3\",\n    \"JOB=1:1\",\n    \"/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/submit_logs/ntf054-half-20261106-r4-formal.log\",\n    \"--cmd\",\n    \"env SOULX_SOURCE=/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-4821efe SOULX_RUN_ID=ntf054-half-20261106-r4-formal SOULX_MODE=formal timeout --signal=TERM --kill-after=10 7200 bash /hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-4821efe/scripts/remote/run_fdb30_half_duplex.sh\"\n  ],\n  \"formal_job\": \"job-179401870522620182164-xuan-zhang\"\n}\n",
+        "sha256": "bb3359778f4d60a8c54da4ca175ed6d1dc36f0717bab792754774b2a0493af80"
+      },
+      "smoke.audit.json": {
+        "content": "{\n  \"passed\": true,\n  \"cases\": 3,\n  \"frames\": 492,\n  \"complete_recognition_skipped\": 7,\n  \"max_controller_main_lag_ms\": 651.4964636415243,\n  \"recordings_audited\": 3,\n  \"execution\": {\n    \"cpu_threads\": 2,\n    \"interop_threads\": 1,\n    \"sensevoice_ncpu\": 2,\n    \"thread_ident\": 139958587213632,\n    \"thread_native_id\": 147,\n    \"skip_complete_recognition\": true\n  }\n}\n",
+        "sha256": "278ecbb412a71e337cd89dc54d7b140e0eac2f82e2f2bc330c15c7fc64499b8b"
+      },
+      "formal.submit.txt": {
+        "content": "job-179401870522620182164-xuan-zhang\n",
+        "sha256": "5dec46eca55bd4934fe82835e7db98c930f4d755a913a9c53c93817ef9037f3d"
+      },
+      "resume_20261107.log": {
+        "content": "",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  },
+  "inference_resources": {
+    "gpus": 3,
+    "cpus": 12,
+    "ram_gib": 64,
+    "timeout_seconds": 7200,
+    "gpu_limit_mib": 22528,
+    "output_limit_mib": 2048,
+    "pcm_limit_mib": 16
+  },
+  "scoring_resources": {
+    "gpus": 1,
+    "cpus": 4,
+    "ram_gib": 32,
+    "timeout_seconds": 3600,
+    "judge": "excluded_by_user"
+  },
+  "source_commit": "4821efed6e5947375558b22dc5cc7d5bc084208e",
+  "single_concurrent_job": true,
+  "native_equivalence_policy": "disabled_by_user",
+  "formal_run": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/runs/ntf054-half-20261106-r4-formal",
+  "score_output": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/analysis/ntf054-half-20261106-r4-score"
+}

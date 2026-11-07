@@ -1,5 +1,7 @@
 # NTF-054：执行线程与 complete 交接修复后的复测
 
+2026-11-07 10:32按用户指令恢复：NTF-065已保存旧状态并恢复同一r4 campaign，冻结源码4821efe和已通过冒烟保持。既有脚本重新CPU审计通过后，于10:31:45提交正式30条作业 **job-179401870522620182164-xuan-zhang**，当前Pending。衔接Python PID761589／timeout PID761588正常，状态waiting_formal、单实例锁已持有；正式退出0且完整审计通过后自动提交单卡TOR／延迟评分。衔接单CPU、2GiB地址空间、RSS约21MiB，12小时期限重新计至今日22:31:41。提交不代表实验完成，见[恢复证据](resume_r4_20261107.json)。
+
 2026-11-07 10:15结果复核：**r4 smoke已3/3完成、退出0；手动运行既有CPU审计通过，492批逐帧及3份实际播放录音完整，7次complete整段识别按配置跳过。** 三条控制最大积压分别为651.50／584.51／592.43ms，未重现历史数十秒长尾。打断104仍漏识别garden、实际回答股票话题，工程放行不等于内容通过。原衔接及timeout进程均已退出，campaign停留在过期waiting_smoke，正式30条和评分未提交，当前队列为空；与外层12小时期限早于长期排队结束相符，但无退出码可确证终止原因。本次没有恢复或重提作业，NTF-054保持未完成。详见[冒烟复核](smoke_r4_review.md)及[审计快照](smoke_r4_audit.json)。
 
 2026-11-06 12:26调度核验：r4 smoke仍为Pending，尚未绑定节点（nodeName为空、PodScheduled=False），无containerStatuses、运行目录或启动日志，尚未进入镜像拉取／容器执行阶段。提交时的调度条件为Schedulable，message记录可分配至d6-hpc-gpu-052，但没有实际绑定；当前没有Pod事件，不能据此确认资源碎片、镜像故障或特定队列策略。任务要求同一节点3GPU／12CPU／64GiB；069节点被禁止调度。账户无权查询队列、PodGroup及全局Pod请求，具体准入原因仍待调度侧核验。衔接进程正常、状态waiting_smoke，本次没有修改或重提任务。证据见[调度快照](scheduler_20261106_1226.json)。
@@ -32,7 +34,7 @@ r3提交前队列为空；账户存储约186.67GB／1TB，GPU配额8张。仅串
 | formal-r3 | `ntf054-half-20261105-r3-formal` | 未提交 | smoke未通过，衔接已停止 |
 | score-r3 | `ntf054-half-20261105-r3-score` | 未提交 | 无新正式推理结果 |
 | smoke-r4 | `ntf054-half-smoke-20261106-r4` | `job-179392426378993291113-xuan-zhang` | 11月7日08:32完成；3/3、退出0，手动CPU审计通过 |
-| formal-r4 | `ntf054-half-20261106-r4-formal` | 未提交 | 原衔接已退出，待恢复 |
+| formal-r4 | `ntf054-half-20261106-r4-formal` | `job-179401870522620182164-xuan-zhang` | 11月7日10:31:45提交，10:32为Pending；衔接已恢复 |
 | score-r4 | `ntf054-half-20261106-r4-score` | 未提交 | 待正式推理通过后提交，仅TOR／延迟 |
 
 验收需核对新execution／ready预算、预热与正式SoulX线程ID、complete识别跳过事件、播放实录及完整固定分母。r3只核对一致性检查的明确取消记录，不执行原生对照；r2限定差异对照结果保留作历史证据。完成作业和低延迟分别报告，不能由本地回归推定GPU性能。
@@ -40,6 +42,8 @@ r3提交前队列为空；账户存储约186.67GB／1TB，GPU配额8张。仅串
 远端冻结目录为 `~/parathink-soulx-duplug/source/ntf054-65d15e6`，独立detached worktree，工作区干净。源码归档 `submit_logs/ntf054-65d15e6-source.tar.gz` 的SHA256为 `0b09c31e3054957869d59d7ce1f5f550f4971d97933f144e113252b4c8793e77`，与本地从同提交生成的scripts／configs归档一致；native_soulx.json的SHA256为 `128978377266770c1cdee4c244c81eefb3b3c85d7536b4707eff528e36412ba9`。四套推理conda均已核对存在，仅复用原资产。
 
 ## 顺序衔接
+
+2026-11-07恢复：重新核对源码、入口／配置／衔接脚本、manifest与70份输入、预热音频、六套conda及十个资产路径；提交前队列为空、GPU配额8张、存储186.67GB／1TB。原state独占备份为campaign内 `state_before_resume_20261107.json`，SHA256为178e43e9d4c1ba4a97a098ee0017236cc3af591d4d28ad66ee432b7bc8cc0ff9。恢复使用原干净worktree和同一前缀，冒烟不重跑；仅重新CPU审计，再提交首次正式30条。恢复命令、PID、期限、资源实测、提交回执和审计摘要均写入resume_r4_20261107.json；原始冒烟与历史失败现场保持。该恢复继续使用既有12小时衔接限制，并非无限期守护。
 
 2026-11-06 r4：新campaign独立于r3失败记录；提交前核验六个conda环境、十个模型／源码／输出路径、manifest及70份输入相关文件SHA256、固定预热音频、源码清洁状态及归档与本地一致。存储186.62GB／1TB，GPU配额8张，队列为空。衔接进程实测RSS21620KiB、单CPU及2GiB地址空间，外层timeout与脚本均限制12小时。入口只恢复runs父目录，本次run仍独占创建，已有run拒绝覆盖；shell语法、缺失父目录恢复／重复run保留检查及6项衔接回归通过。源码／配置／脚本摘要和全部命令见launch_r4.json。
 
