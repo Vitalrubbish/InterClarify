@@ -14,6 +14,6 @@
 
 三份视图都包含 `input`、`target`、`messages`、`loss_boundary`、`training_blockers` 和 `audit`。`messages` 是通用语义包装：前两条条件消息损失为零，最后一条候选目标损失为一；不确定控制标签为零。`audit` 不进入模型提示。原始状态、候选标签与未来控制判断各有来源边界；固定错误只作为历史条件。
 
-后续 [Layer 2 周期设计](../../research_design/layer2_protocol.md)增加仅管理计算的三值进度；本目录保留 pilot v1 原始正文目标与实测摘要，不代表已经包含该进度监督。
+后续 [Layer 2 周期设计](../../dev/layer2/protocol.md)增加仅管理计算的三值进度；本目录保留 pilot v1 原始正文目标与实测摘要，不代表已经包含该进度监督。
 
 当前 `messages` 不是已冻结的 Qwen 或 SoulX 输入格式。没有 tokenizer 级 `labels`、真实音频 token 或现役主动澄清接口，不可直接交给正式训练器。可首先通过[逐场景审阅稿](../../../datagen/pilot/review.md)检查监督内容，再查 JSON 的完整输入。
