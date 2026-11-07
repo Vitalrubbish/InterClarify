@@ -1,0 +1,4372 @@
+[
+  {
+    "sample_id": "scene01/normal/l_idle",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "",
+        "raw_state": "user_idle",
+        "effective_complete": false,
+        "raw_ready_ms": 0
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":0,\"raw_state\":\"user_idle\",\"transcript\":\"\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene01",
+      "trace_id": "scene01/normal",
+      "decision_id": "l_idle",
+      "read_ms": 40,
+      "finish_ms": 70,
+      "consumed_event_ids": [
+        "p0"
+      ],
+      "frontend_snapshot": "p0",
+      "raw_state_simulated": "user_idle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "静音不等于有效 complete。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene01/normal/l_partial",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "把谢谢翻译成",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 310
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":310,\"raw_state\":\"user_nonidle\",\"transcript\":\"把谢谢翻译成\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene01",
+      "trace_id": "scene01/normal",
+      "decision_id": "l_partial",
+      "read_ms": 400,
+      "finish_ms": 430,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "当前文字不全，继续倾听。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene01/normal/l_before_publish",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "把谢谢翻译成",
+        "raw_state": "user_incomplete",
+        "effective_complete": false,
+        "raw_ready_ms": 630
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":630,\"raw_state\":\"user_incomplete\",\"transcript\":\"把谢谢翻译成\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene01",
+      "trace_id": "scene01/normal",
+      "decision_id": "l_before_publish",
+      "read_ms": 880,
+      "finish_ms": 910,
+      "consumed_event_ids": [
+        "p2"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_incomplete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "尾词虽在隐藏剧本中出现，但尚未联合发布，禁止使用。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene01/normal/l_answer",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "把谢谢翻译成英文。",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 950
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "speak",
+      "purpose": "ordinary",
+      "text": "Thank you.",
+      "response_key": "r1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":950,\"raw_state\":\"user_complete\",\"transcript\":\"把谢谢翻译成英文。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"speak\",\"purpose\":\"ordinary\",\"response_key\":\"r1\",\"text\":\"Thank you.\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene01",
+      "trace_id": "scene01/normal",
+      "decision_id": "l_answer",
+      "read_ms": 1000,
+      "finish_ms": 1030,
+      "consumed_event_ids": [
+        "p3"
+      ],
+      "frontend_snapshot": "p3",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "当前有效 complete 已读到，生成一次普通回答。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene01/normal/l_duplicate",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "把谢谢翻译成英文。",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 1270
+      },
+      "observations": [
+        {
+          "event_id": "g1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "Thank you.",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "q1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "Thank you.",
+          "phase": "submitted",
+          "heard_any": false
+        },
+        {
+          "event_id": "s1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "Thank you.",
+          "phase": "synthesized",
+          "heard_any": false
+        },
+        {
+          "event_id": "play1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "Thank you.",
+          "phase": "playing",
+          "heard_any": true
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":1270,\"raw_state\":\"user_complete\",\"transcript\":\"把谢谢翻译成英文。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"g1\",\"generated_text\":\"Thank you.\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"generated\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"q1\",\"generated_text\":\"Thank you.\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"submitted\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"s1\",\"generated_text\":\"Thank you.\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"synthesized\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"play1\",\"generated_text\":\"Thank you.\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"playing\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene01",
+      "trace_id": "scene01/normal",
+      "decision_id": "l_duplicate",
+      "read_ms": 1320,
+      "finish_ms": 1350,
+      "consumed_event_ids": [
+        "p4",
+        "g1",
+        "q1",
+        "s1",
+        "play1"
+      ],
+      "frontend_snapshot": "p4",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "同一 response_key 已回答，重复 complete 不再生成。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene02/before_audio/l_first",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我写一条周五开会的提醒。",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 790
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "speak",
+      "purpose": "ordinary",
+      "text": "提醒大家，会议安排在周五。",
+      "response_key": "r1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":790,\"raw_state\":\"user_complete\",\"transcript\":\"帮我写一条周五开会的提醒。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"speak\",\"purpose\":\"ordinary\",\"response_key\":\"r1\",\"text\":\"提醒大家，会议安排在周五。\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene02",
+      "trace_id": "scene02/before_audio",
+      "decision_id": "l_first",
+      "read_ms": 840,
+      "finish_ms": 870,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "当前有效 complete 已读到，生成一次普通回答。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene02/l_first",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene02/before_audio/l_cancelled",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t2",
+        "transcript": "改成周六，",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 1110
+      },
+      "observations": [
+        {
+          "event_id": "g1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "q1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "submitted",
+          "heard_any": false
+        },
+        {
+          "event_id": "s1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "synthesized",
+          "heard_any": false
+        },
+        {
+          "event_id": "stop1",
+          "kind": "runtime",
+          "event": "cancel_requested",
+          "output_id": "o1"
+        },
+        {
+          "event_id": "closed1",
+          "kind": "runtime",
+          "event": "cancel_confirmed",
+          "output_id": "o1",
+          "heard_any": false,
+          "grouping": "merge_user_segment"
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":1110,\"raw_state\":\"user_nonidle\",\"transcript\":\"改成周六，\",\"turn_id\":\"t2\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"g1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"generated\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"q1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"submitted\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"s1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"synthesized\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event\":\"cancel_requested\",\"event_id\":\"stop1\",\"kind\":\"runtime\",\"output_id\":\"o1\"},{\"event\":\"cancel_confirmed\",\"event_id\":\"closed1\",\"grouping\":\"merge_user_segment\",\"heard_any\":false,\"kind\":\"runtime\",\"output_id\":\"o1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene02",
+      "trace_id": "scene02/before_audio",
+      "decision_id": "l_cancelled",
+      "read_ms": 1240,
+      "finish_ms": 1270,
+      "consumed_event_ids": [
+        "p2",
+        "g1",
+        "q1",
+        "s1",
+        "stop1",
+        "closed1"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "取消已确认，用户仍在补充；不续播旧正文。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene02/before_audio/l_recover",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t2",
+        "transcript": "帮我写一条周五开会的提醒。改成周六，内容还是提醒大家开会。",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 1510
+      },
+      "observations": [
+        {
+          "event_id": "g1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "q1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "submitted",
+          "heard_any": false
+        },
+        {
+          "event_id": "s1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "synthesized",
+          "heard_any": false
+        },
+        {
+          "event_id": "stop1",
+          "kind": "runtime",
+          "event": "cancel_requested",
+          "output_id": "o1"
+        },
+        {
+          "event_id": "closed1",
+          "kind": "runtime",
+          "event": "cancel_confirmed",
+          "output_id": "o1",
+          "heard_any": false,
+          "grouping": "merge_user_segment"
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "speak",
+      "purpose": "ordinary",
+      "text": "提醒大家，会议安排在周六。",
+      "response_key": "r2"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":1510,\"raw_state\":\"user_complete\",\"transcript\":\"帮我写一条周五开会的提醒。改成周六，内容还是提醒大家开会。\",\"turn_id\":\"t2\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"g1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"generated\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"q1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"submitted\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"s1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"synthesized\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event\":\"cancel_requested\",\"event_id\":\"stop1\",\"kind\":\"runtime\",\"output_id\":\"o1\"},{\"event\":\"cancel_confirmed\",\"event_id\":\"closed1\",\"grouping\":\"merge_user_segment\",\"heard_any\":false,\"kind\":\"runtime\",\"output_id\":\"o1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"speak\",\"purpose\":\"ordinary\",\"response_key\":\"r2\",\"text\":\"提醒大家，会议安排在周六。\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene02",
+      "trace_id": "scene02/before_audio",
+      "decision_id": "l_recover",
+      "read_ms": 1560,
+      "finish_ms": 1590,
+      "consumed_event_ids": [
+        "p3",
+        "g1",
+        "q1",
+        "s1",
+        "stop1",
+        "closed1"
+      ],
+      "frontend_snapshot": "p3",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "首音前取消，用户片段合并；不声称用户听过旧回答。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene02/after_audio/l_first",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我写一条周五开会的提醒。",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 790
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "speak",
+      "purpose": "ordinary",
+      "text": "提醒大家，会议安排在周五。",
+      "response_key": "r1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":790,\"raw_state\":\"user_complete\",\"transcript\":\"帮我写一条周五开会的提醒。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"speak\",\"purpose\":\"ordinary\",\"response_key\":\"r1\",\"text\":\"提醒大家，会议安排在周五。\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene02",
+      "trace_id": "scene02/after_audio",
+      "decision_id": "l_first",
+      "read_ms": 840,
+      "finish_ms": 870,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "当前有效 complete 已读到，生成一次普通回答。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene02/l_first",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene02/after_audio/l_cancelled",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t2",
+        "transcript": "改成周六，",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 1110
+      },
+      "observations": [
+        {
+          "event_id": "g1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "q1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "submitted",
+          "heard_any": false
+        },
+        {
+          "event_id": "s1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "synthesized",
+          "heard_any": false
+        },
+        {
+          "event_id": "play1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "playing",
+          "heard_any": true
+        },
+        {
+          "event_id": "stop1",
+          "kind": "runtime",
+          "event": "cancel_requested",
+          "output_id": "o1"
+        },
+        {
+          "event_id": "closed1",
+          "kind": "runtime",
+          "event": "cancel_confirmed",
+          "output_id": "o1",
+          "heard_any": true,
+          "grouping": "new_user_segment"
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":1110,\"raw_state\":\"user_nonidle\",\"transcript\":\"改成周六，\",\"turn_id\":\"t2\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"g1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"generated\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"q1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"submitted\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"s1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"synthesized\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"play1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"playing\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event\":\"cancel_requested\",\"event_id\":\"stop1\",\"kind\":\"runtime\",\"output_id\":\"o1\"},{\"event\":\"cancel_confirmed\",\"event_id\":\"closed1\",\"grouping\":\"new_user_segment\",\"heard_any\":true,\"kind\":\"runtime\",\"output_id\":\"o1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene02",
+      "trace_id": "scene02/after_audio",
+      "decision_id": "l_cancelled",
+      "read_ms": 1240,
+      "finish_ms": 1270,
+      "consumed_event_ids": [
+        "p2",
+        "g1",
+        "q1",
+        "s1",
+        "play1",
+        "stop1",
+        "closed1"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "取消已确认，用户仍在补充；不续播旧正文。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene02/after_audio/l_recover",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t2",
+        "transcript": "改成周六，内容还是提醒大家开会。",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 1510
+      },
+      "observations": [
+        {
+          "event_id": "g1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "q1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "submitted",
+          "heard_any": false
+        },
+        {
+          "event_id": "s1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "synthesized",
+          "heard_any": false
+        },
+        {
+          "event_id": "play1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "playing",
+          "heard_any": true
+        },
+        {
+          "event_id": "stop1",
+          "kind": "runtime",
+          "event": "cancel_requested",
+          "output_id": "o1"
+        },
+        {
+          "event_id": "closed1",
+          "kind": "runtime",
+          "event": "cancel_confirmed",
+          "output_id": "o1",
+          "heard_any": true,
+          "grouping": "new_user_segment"
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "speak",
+      "purpose": "ordinary",
+      "text": "改为周六：提醒大家，会议安排在周六。",
+      "response_key": "r2"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":1510,\"raw_state\":\"user_complete\",\"transcript\":\"改成周六，内容还是提醒大家开会。\",\"turn_id\":\"t2\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"g1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"generated\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"q1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"submitted\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"s1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"synthesized\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"play1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"playing\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event\":\"cancel_requested\",\"event_id\":\"stop1\",\"kind\":\"runtime\",\"output_id\":\"o1\"},{\"event\":\"cancel_confirmed\",\"event_id\":\"closed1\",\"grouping\":\"new_user_segment\",\"heard_any\":true,\"kind\":\"runtime\",\"output_id\":\"o1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"speak\",\"purpose\":\"ordinary\",\"response_key\":\"r2\",\"text\":\"改为周六：提醒大家，会议安排在周六。\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene02",
+      "trace_id": "scene02/after_audio",
+      "decision_id": "l_recover",
+      "read_ms": 1560,
+      "finish_ms": 1590,
+      "consumed_event_ids": [
+        "p3",
+        "g1",
+        "q1",
+        "s1",
+        "play1",
+        "stop1",
+        "closed1"
+      ],
+      "frontend_snapshot": "p3",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "已播内容保留并衔接更正日期。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene03/backchannels/l_backchannel",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "我把这周的安排说一下，你听着就行。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 310
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "speak",
+      "purpose": "backchannel",
+      "text": "嗯，我在听。",
+      "response_key": "b1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":310,\"raw_state\":\"user_nonidle\",\"transcript\":\"我把这周的安排说一下，你听着就行。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"speak\",\"purpose\":\"backchannel\",\"response_key\":\"b1\",\"text\":\"嗯，我在听。\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene03",
+      "trace_id": "scene03/backchannels",
+      "decision_id": "l_backchannel",
+      "read_ms": 400,
+      "finish_ms": 430,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "用户明确要求倾听；存在可选附和机会，不把不发声记为错误。",
+      "acceptable_actions": [
+        "speak_backchannel",
+        "wait"
+      ],
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene03/backchannels/l_suppress",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "我把这周的安排说一下，你听着就行。先准备材料，",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "bg",
+          "kind": "output",
+          "output_id": "b1",
+          "response_key": "b1",
+          "purpose": "backchannel",
+          "generated_text": "嗯，我在听。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "bp",
+          "kind": "output",
+          "output_id": "b1",
+          "response_key": "b1",
+          "purpose": "backchannel",
+          "generated_text": "嗯，我在听。",
+          "phase": "closed",
+          "heard_any": true
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":630,\"raw_state\":\"user_nonidle\",\"transcript\":\"我把这周的安排说一下，你听着就行。先准备材料，\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"bg\",\"generated_text\":\"嗯，我在听。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"b1\",\"phase\":\"generated\",\"purpose\":\"backchannel\",\"response_key\":\"b1\"},{\"event_id\":\"bp\",\"generated_text\":\"嗯，我在听。\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"b1\",\"phase\":\"closed\",\"purpose\":\"backchannel\",\"response_key\":\"b1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene03",
+      "trace_id": "scene03/backchannels",
+      "decision_id": "l_suppress",
+      "read_ms": 680,
+      "finish_ms": 710,
+      "consumed_event_ids": [
+        "p2",
+        "bg",
+        "bp"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "刚刚已附和，继续听，不重复短回应。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene03/backchannels/l_no_agreement",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "我有点想把所有安排都取消，不过还没有决定。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 870
+      },
+      "observations": [
+        {
+          "event_id": "bg",
+          "kind": "output",
+          "output_id": "b1",
+          "response_key": "b1",
+          "purpose": "backchannel",
+          "generated_text": "嗯，我在听。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "bp",
+          "kind": "output",
+          "output_id": "b1",
+          "response_key": "b1",
+          "purpose": "backchannel",
+          "generated_text": "嗯，我在听。",
+          "phase": "closed",
+          "heard_any": true
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":870,\"raw_state\":\"user_nonidle\",\"transcript\":\"我有点想把所有安排都取消，不过还没有决定。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"bg\",\"generated_text\":\"嗯，我在听。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"b1\",\"phase\":\"generated\",\"purpose\":\"backchannel\",\"response_key\":\"b1\"},{\"event_id\":\"bp\",\"generated_text\":\"嗯，我在听。\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"b1\",\"phase\":\"closed\",\"purpose\":\"backchannel\",\"response_key\":\"b1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene03",
+      "trace_id": "scene03/backchannels",
+      "decision_id": "l_no_agreement",
+      "read_ms": 920,
+      "finish_ms": 950,
+      "consumed_event_ids": [
+        "p3",
+        "bg",
+        "bp"
+      ],
+      "frontend_snapshot": "p3",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "用户尚未决定，不能以“对，就全取消”形成错误赞同。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene03/backchannels/l_order",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "还是先准备材料，再安排周五会议。帮我整理一下。",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 1110
+      },
+      "observations": [
+        {
+          "event_id": "bg",
+          "kind": "output",
+          "output_id": "b1",
+          "response_key": "b1",
+          "purpose": "backchannel",
+          "generated_text": "嗯，我在听。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "bp",
+          "kind": "output",
+          "output_id": "b1",
+          "response_key": "b1",
+          "purpose": "backchannel",
+          "generated_text": "嗯，我在听。",
+          "phase": "closed",
+          "heard_any": true
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "speak",
+      "purpose": "ordinary",
+      "text": "先准备材料，再安排周五会议。",
+      "response_key": "r1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":1110,\"raw_state\":\"user_complete\",\"transcript\":\"还是先准备材料，再安排周五会议。帮我整理一下。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"bg\",\"generated_text\":\"嗯，我在听。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"b1\",\"phase\":\"generated\",\"purpose\":\"backchannel\",\"response_key\":\"b1\"},{\"event_id\":\"bp\",\"generated_text\":\"嗯，我在听。\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"b1\",\"phase\":\"closed\",\"purpose\":\"backchannel\",\"response_key\":\"b1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"speak\",\"purpose\":\"ordinary\",\"response_key\":\"r1\",\"text\":\"先准备材料，再安排周五会议。\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene03",
+      "trace_id": "scene03/backchannels",
+      "decision_id": "l_order",
+      "read_ms": 1200,
+      "finish_ms": 1230,
+      "consumed_event_ids": [
+        "p4",
+        "bg",
+        "bp"
+      ],
+      "frontend_snapshot": "p4",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "当前有效 complete 已读到，生成一次普通回答。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene03/backchannels/l_keep_expression",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t2",
+        "transcript": "嗯，对，你继续。",
+        "raw_state": "user_backchannel",
+        "effective_complete": false,
+        "raw_ready_ms": 1590
+      },
+      "observations": [
+        {
+          "event_id": "g1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "先准备材料，再安排周五会议。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "play1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "先准备材料，再安排周五会议。",
+          "phase": "playing",
+          "heard_any": true
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":1590,\"raw_state\":\"user_backchannel\",\"transcript\":\"嗯，对，你继续。\",\"turn_id\":\"t2\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"g1\",\"generated_text\":\"先准备材料，再安排周五会议。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"generated\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"play1\",\"generated_text\":\"先准备材料，再安排周五会议。\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"playing\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene03",
+      "trace_id": "scene03/backchannels",
+      "decision_id": "l_keep_expression",
+      "read_ms": 1680,
+      "finish_ms": 1710,
+      "consumed_event_ids": [
+        "p5",
+        "g1",
+        "play1"
+      ],
+      "frontend_snapshot": "p5",
+      "raw_state_simulated": "user_backchannel",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "用户为非打断性附和；不增加重复正文，不停止现有播放。wait 表示本边界不生成新文本。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/self_resolved/l_request",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 90
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "request_thinking",
+      "task_id": "think1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":90,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"request_thinking\",\"task_id\":\"think1\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/self_resolved",
+      "decision_id": "l_request",
+      "read_ms": 120,
+      "finish_ms": 150,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "类别缺口可能影响后续资料适用性，先请求分析，无需开口。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/l_request",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/self_resolved/l_task_active",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 90
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":90,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/self_resolved",
+      "decision_id": "l_task_active",
+      "read_ms": 300,
+      "finish_ms": 330,
+      "consumed_event_ids": [
+        "p1",
+        "task1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "已有活动任务，不为每个窗口重复请求。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/l_task_active",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/self_resolved/l_before_analysis",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。不过我报的是专硕，我直接念后面的专业学位部分。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":630,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。不过我报的是专硕，我直接念后面的专业学位部分。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/self_resolved",
+      "decision_id": "l_before_analysis",
+      "read_ms": 720,
+      "finish_ms": 850,
+      "consumed_event_ids": [
+        "p2",
+        "task1"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "本次输入构造早于 a1 发布；即使生成结束前结果到达也不追记。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/self_resolved/l_after_analysis",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。不过我报的是专硕，我直接念后面的专业学位部分。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        },
+        {
+          "event_id": "control_published",
+          "kind": "controller",
+          "protocol_scope": "future_cot_control",
+          "basis_frontend": "p2",
+          "judgment": {
+            "user_state": "user_nonidle",
+            "intervention": "continue_listening"
+          }
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 800,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      ]
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":630,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。不过我报的是专硕，我直接念后面的专业学位部分。\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":780,\"published_ms\":800,\"read_ms\":180,\"task_id\":\"think1\",\"version\":1}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"},{\"basis_frontend\":\"p2\",\"event_id\":\"control_published\",\"judgment\":{\"intervention\":\"continue_listening\",\"user_state\":\"user_nonidle\"},\"kind\":\"controller\",\"protocol_scope\":\"future_cot_control\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "analysis_injection_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/self_resolved",
+      "decision_id": "l_after_analysis",
+      "read_ms": 840,
+      "finish_ms": 870,
+      "consumed_event_ids": [
+        "p2",
+        "task1",
+        "a1",
+        "control_published"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "用户已自行补足类别；旧分析中的“尚未明确”已过期。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/relevant_long/l_request",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 90
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "request_thinking",
+      "task_id": "think1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":90,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"request_thinking\",\"task_id\":\"think1\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/relevant_long",
+      "decision_id": "l_request",
+      "read_ms": 120,
+      "finish_ms": 150,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "类别缺口可能影响后续资料适用性，先请求分析，无需开口。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/l_request",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/relevant_long/l_task_active",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 90
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":90,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/relevant_long",
+      "decision_id": "l_task_active",
+      "read_ms": 300,
+      "finish_ms": 330,
+      "consumed_event_ids": [
+        "p1",
+        "task1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "已有活动任务，不为每个窗口重复请求。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/l_task_active",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/relevant_long/l_before_analysis",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。我报的就是学硕，学硕部分有十几条，我逐条念。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":630,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。我报的就是学硕，学硕部分有十几条，我逐条念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/relevant_long",
+      "decision_id": "l_before_analysis",
+      "read_ms": 720,
+      "finish_ms": 850,
+      "consumed_event_ids": [
+        "p2",
+        "task1"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "本次输入构造早于 a1 发布；即使生成结束前结果到达也不追记。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/relevant_long/l_after_analysis",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。我报的就是学硕，学硕部分有十几条，我逐条念。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        },
+        {
+          "event_id": "control_published",
+          "kind": "controller",
+          "protocol_scope": "future_cot_control",
+          "basis_frontend": "p2",
+          "judgment": {
+            "user_state": "user_nonidle",
+            "intervention": "continue_listening"
+          }
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 800,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      ]
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":630,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。我报的就是学硕，学硕部分有十几条，我逐条念。\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":780,\"published_ms\":800,\"read_ms\":180,\"task_id\":\"think1\",\"version\":1}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"},{\"basis_frontend\":\"p2\",\"event_id\":\"control_published\",\"judgment\":{\"intervention\":\"continue_listening\",\"user_state\":\"user_nonidle\"},\"kind\":\"controller\",\"protocol_scope\":\"future_cot_control\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "analysis_injection_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/relevant_long",
+      "decision_id": "l_after_analysis",
+      "read_ms": 840,
+      "finish_ms": 870,
+      "consumed_event_ids": [
+        "p2",
+        "task1",
+        "a1",
+        "control_published"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "长篇内容仍然相关，不因为长就插话。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/unknown_long/l_request",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 90
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "request_thinking",
+      "task_id": "think1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":90,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"request_thinking\",\"task_id\":\"think1\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/unknown_long",
+      "decision_id": "l_request",
+      "read_ms": 120,
+      "finish_ms": 150,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "类别缺口可能影响后续资料适用性，先请求分析，无需开口。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/l_request",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/unknown_long/l_task_active",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 90
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":90,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/unknown_long",
+      "decision_id": "l_task_active",
+      "read_ms": 300,
+      "finish_ms": 330,
+      "consumed_event_ids": [
+        "p1",
+        "task1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "已有活动任务，不为每个窗口重复请求。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/l_task_active",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/unknown_long/l_before_analysis",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。这部分有十几条，我先念考核，再念材料和成绩计算。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":630,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。这部分有十几条，我先念考核，再念材料和成绩计算。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/unknown_long",
+      "decision_id": "l_before_analysis",
+      "read_ms": 720,
+      "finish_ms": 850,
+      "consumed_event_ids": [
+        "p2",
+        "task1"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "本次输入构造早于 a1 发布；即使生成结束前结果到达也不追记。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/unknown_long/l_clarify",
+    "module": "layer1",
+    "protocol_scope": "future_clarification",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。这部分有十几条，我先念考核，再念材料和成绩计算。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        },
+        {
+          "event_id": "control_published",
+          "kind": "controller",
+          "protocol_scope": "future_cot_control",
+          "basis_frontend": "p2",
+          "judgment": {
+            "user_state": "user_nonidle",
+            "intervention": "clarification_opportunity"
+          }
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 800,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      ]
+    },
+    "target": {
+      "action": "speak",
+      "purpose": "clarification",
+      "text": "先确认一下，你报的是学硕还是专硕？",
+      "response_key": "clarify1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":630,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。这部分有十几条，我先念考核，再念材料和成绩计算。\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":780,\"published_ms\":800,\"read_ms\":180,\"task_id\":\"think1\",\"version\":1}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"},{\"basis_frontend\":\"p2\",\"event_id\":\"control_published\",\"judgment\":{\"intervention\":\"clarification_opportunity\",\"user_state\":\"user_nonidle\"},\"kind\":\"controller\",\"protocol_scope\":\"future_cot_control\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"speak\",\"purpose\":\"clarification\",\"response_key\":\"clarify1\",\"text\":\"先确认一下，你报的是学硕还是专硕？\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "analysis_injection_unimplemented",
+      "future_protocol_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/unknown_long",
+      "decision_id": "l_clarify",
+      "read_ms": 840,
+      "finish_ms": 870,
+      "consumed_event_ids": [
+        "p2",
+        "task1",
+        "a1",
+        "control_published"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "独立未来生成边界，不伪造 complete，不作为当前可执行协议。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/unknown_long/l_no_repeat_clarify",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。这部分有十几条，我先念考核，再念材料和成绩计算。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        },
+        {
+          "event_id": "cg",
+          "kind": "output",
+          "output_id": "clarify1",
+          "response_key": "clarify1",
+          "purpose": "clarification",
+          "generated_text": "先确认一下，你报的是学硕还是专硕？",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "cp",
+          "kind": "output",
+          "output_id": "clarify1",
+          "response_key": "clarify1",
+          "purpose": "clarification",
+          "generated_text": "先确认一下，你报的是学硕还是专硕？",
+          "phase": "closed",
+          "heard_any": true
+        },
+        {
+          "event_id": "control_published",
+          "kind": "controller",
+          "protocol_scope": "future_cot_control",
+          "basis_frontend": "p2",
+          "judgment": {
+            "user_state": "user_nonidle",
+            "intervention": "clarification_opportunity"
+          }
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 800,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        },
+        {
+          "event_id": "a2",
+          "published_ms": 1120,
+          "task_id": "think1",
+          "version": 2,
+          "read_ms": 880,
+          "finished_ms": 1100,
+          "basis_frontend": "p2",
+          "analysis": "报考类别仍未知，接下来的多组专属条款依赖类别；当前尚不能确认学术学位条款适用。"
+        }
+      ]
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":630,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。这部分有十几条，我先念考核，再念材料和成绩计算。\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":780,\"published_ms\":800,\"read_ms\":180,\"task_id\":\"think1\",\"version\":1},{\"analysis\":\"报考类别仍未知，接下来的多组专属条款依赖类别；当前尚不能确认学术学位条款适用。\",\"basis_frontend\":\"p2\",\"event_id\":\"a2\",\"finished_ms\":1100,\"published_ms\":1120,\"read_ms\":880,\"task_id\":\"think1\",\"version\":2}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"},{\"event_id\":\"cg\",\"generated_text\":\"先确认一下，你报的是学硕还是专硕？\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"clarify1\",\"phase\":\"generated\",\"purpose\":\"clarification\",\"response_key\":\"clarify1\"},{\"event_id\":\"cp\",\"generated_text\":\"先确认一下，你报的是学硕还是专硕？\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"clarify1\",\"phase\":\"closed\",\"purpose\":\"clarification\",\"response_key\":\"clarify1\"},{\"basis_frontend\":\"p2\",\"event_id\":\"control_published\",\"judgment\":{\"intervention\":\"clarification_opportunity\",\"user_state\":\"user_nonidle\"},\"kind\":\"controller\",\"protocol_scope\":\"future_cot_control\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "analysis_injection_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/unknown_long",
+      "decision_id": "l_no_repeat_clarify",
+      "read_ms": 1200,
+      "finish_ms": 1230,
+      "consumed_event_ids": [
+        "p2",
+        "task1",
+        "a1",
+        "a2",
+        "cg",
+        "cp",
+        "control_published"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "同一缺口已经问过，等待用户回应，不重复澄清。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/short_transition/l_request",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 90
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "request_thinking",
+      "task_id": "think1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":90,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"request_thinking\",\"task_id\":\"think1\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/short_transition",
+      "decision_id": "l_request",
+      "read_ms": 120,
+      "finish_ms": 150,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "类别缺口可能影响后续资料适用性，先请求分析，无需开口。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/l_request",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/short_transition/l_task_active",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 90
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":90,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/short_transition",
+      "decision_id": "l_task_active",
+      "read_ms": 300,
+      "finish_ms": 330,
+      "consumed_event_ids": [
+        "p1",
+        "task1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "已有活动任务，不为每个窗口重复请求。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/l_task_active",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/short_transition/l_before_analysis",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。学硕部分就这一句，下面马上是专硕要求。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":630,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。学硕部分就这一句，下面马上是专硕要求。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/short_transition",
+      "decision_id": "l_before_analysis",
+      "read_ms": 720,
+      "finish_ms": 850,
+      "consumed_event_ids": [
+        "p2",
+        "task1"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "本次输入构造早于 a1 发布；即使生成结束前结果到达也不追记。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/short_transition/l_after_analysis",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。学硕部分就这一句，下面马上是专硕要求。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        },
+        {
+          "event_id": "control_published",
+          "kind": "controller",
+          "protocol_scope": "future_cot_control",
+          "basis_frontend": "p2",
+          "judgment": {
+            "user_state": "user_nonidle",
+            "intervention": "continue_listening"
+          }
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 800,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      ]
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":630,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。学硕部分就这一句，下面马上是专硕要求。\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":780,\"published_ms\":800,\"read_ms\":180,\"task_id\":\"think1\",\"version\":1}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"},{\"basis_frontend\":\"p2\",\"event_id\":\"control_published\",\"judgment\":{\"intervention\":\"continue_listening\",\"user_state\":\"user_nonidle\"},\"kind\":\"controller\",\"protocol_scope\":\"future_cot_control\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "analysis_injection_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/short_transition",
+      "decision_id": "l_after_analysis",
+      "read_ms": 840,
+      "finish_ms": 870,
+      "consumed_event_ids": [
+        "p2",
+        "task1",
+        "a1",
+        "control_published"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "即将自然转入另一部分，提前询问增益有限。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/self_searching/l_request",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 90
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "request_thinking",
+      "task_id": "think1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":90,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"request_thinking\",\"task_id\":\"think1\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/self_searching",
+      "decision_id": "l_request",
+      "read_ms": 120,
+      "finish_ms": 150,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "类别缺口可能影响后续资料适用性，先请求分析，无需开口。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/l_request",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/self_searching/l_task_active",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 90
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":90,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/self_searching",
+      "decision_id": "l_task_active",
+      "read_ms": 300,
+      "finish_ms": 330,
+      "consumed_event_ids": [
+        "p1",
+        "task1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "已有活动任务，不为每个窗口重复请求。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/l_task_active",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/self_searching/l_before_analysis",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。我报的类别是……我看一下报名信息。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":630,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。我报的类别是……我看一下报名信息。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/self_searching",
+      "decision_id": "l_before_analysis",
+      "read_ms": 720,
+      "finish_ms": 850,
+      "consumed_event_ids": [
+        "p2",
+        "task1"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "本次输入构造早于 a1 发布；即使生成结束前结果到达也不追记。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/self_searching/l_after_analysis",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。我报的类别是……我看一下报名信息。",
+        "raw_state": "user_nonidle",
+        "effective_complete": false,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        },
+        {
+          "event_id": "control_published",
+          "kind": "controller",
+          "protocol_scope": "future_cot_control",
+          "basis_frontend": "p2",
+          "judgment": {
+            "user_state": "user_nonidle",
+            "intervention": "continue_listening"
+          }
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 800,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      ]
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":false,\"raw_ready_ms\":630,\"raw_state\":\"user_nonidle\",\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。我报的类别是……我看一下报名信息。\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":780,\"published_ms\":800,\"read_ms\":180,\"task_id\":\"think1\",\"version\":1}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"},{\"basis_frontend\":\"p2\",\"event_id\":\"control_published\",\"judgment\":{\"intervention\":\"continue_listening\",\"user_state\":\"user_nonidle\"},\"kind\":\"controller\",\"protocol_scope\":\"future_cot_control\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "analysis_injection_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/self_searching",
+      "decision_id": "l_after_analysis",
+      "read_ms": 840,
+      "finish_ms": 870,
+      "consumed_event_ids": [
+        "p2",
+        "task1",
+        "a1",
+        "control_published"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "当前正在自行检索；既不能抢问，也不能提前标成缺口已消解。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/progressive/l_request",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 630
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "request_thinking",
+      "task_id": "think1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":630,\"raw_state\":\"user_complete\",\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"request_thinking\",\"task_id\":\"think1\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/progressive",
+      "decision_id": "l_request",
+      "read_ms": 680,
+      "finish_ms": 710,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "多约束组合有进一步核验需求，保留不先说空泛进展话术的路径。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene05/l_request",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/progressive/l_partial_answer",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 1000,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 760,
+          "finished_ms": 980,
+          "basis_frontend": "p1",
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        }
+      ]
+    },
+    "target": {
+      "action": "speak",
+      "purpose": "ordinary",
+      "text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+      "response_key": "r1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":630,\"raw_state\":\"user_complete\",\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":980,\"published_ms\":1000,\"read_ms\":760,\"task_id\":\"think1\",\"version\":1}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"speak\",\"purpose\":\"ordinary\",\"response_key\":\"r1\",\"text\":\"最多只能装三件，因为四件至少重二十四公斤，超过容量。\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "analysis_injection_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/progressive",
+      "decision_id": "l_partial_answer",
+      "read_ms": 1040,
+      "finish_ms": 1070,
+      "consumed_event_ids": [
+        "p1",
+        "task1",
+        "a1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "当前有效 complete 已读到，生成一次普通回答。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/progressive/l_no_unarrived_result",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        },
+        {
+          "event_id": "g1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "q1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+          "phase": "submitted",
+          "heard_any": false
+        },
+        {
+          "event_id": "s1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+          "phase": "synthesized",
+          "heard_any": false
+        },
+        {
+          "event_id": "play1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+          "phase": "playing",
+          "heard_any": true
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 1000,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 760,
+          "finished_ms": 980,
+          "basis_frontend": "p1",
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        }
+      ]
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":630,\"raw_state\":\"user_complete\",\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":980,\"published_ms\":1000,\"read_ms\":760,\"task_id\":\"think1\",\"version\":1}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"},{\"event_id\":\"g1\",\"generated_text\":\"最多只能装三件，因为四件至少重二十四公斤，超过容量。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"generated\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"q1\",\"generated_text\":\"最多只能装三件，因为四件至少重二十四公斤，超过容量。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"submitted\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"s1\",\"generated_text\":\"最多只能装三件，因为四件至少重二十四公斤，超过容量。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"synthesized\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"play1\",\"generated_text\":\"最多只能装三件，因为四件至少重二十四公斤，超过容量。\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"playing\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "analysis_injection_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/progressive",
+      "decision_id": "l_no_unarrived_result",
+      "read_ms": 1440,
+      "finish_ms": 1470,
+      "consumed_event_ids": [
+        "p1",
+        "task1",
+        "a1",
+        "g1",
+        "q1",
+        "s1",
+        "play1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "分析 v2 尚未发布，不凭最终答案虚构当前可见结果；等待不停止既有播放。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/progressive/l_final_answer",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        },
+        {
+          "event_id": "g1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "play1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+          "phase": "playing",
+          "heard_any": true
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 1000,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 760,
+          "finished_ms": 980,
+          "basis_frontend": "p1",
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        },
+        {
+          "event_id": "a2",
+          "published_ms": 1640,
+          "task_id": "think1",
+          "version": 2,
+          "read_ms": 1280,
+          "finished_ms": 1620,
+          "basis_frontend": "p1",
+          "analysis": "三件混合组合中，2A+1B重20kg、花费80元，可行；1A+2B重22kg，不可行。因此最优为2A+1B，共三件。"
+        }
+      ]
+    },
+    "target": {
+      "action": "continue_expression",
+      "purpose": "ordinary",
+      "output_id": "o1",
+      "text": "选两件A和一件B，正好二十公斤、八十元，达到三件的上限。"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":630,\"raw_state\":\"user_complete\",\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":980,\"published_ms\":1000,\"read_ms\":760,\"task_id\":\"think1\",\"version\":1},{\"analysis\":\"三件混合组合中，2A+1B重20kg、花费80元，可行；1A+2B重22kg，不可行。因此最优为2A+1B，共三件。\",\"basis_frontend\":\"p1\",\"event_id\":\"a2\",\"finished_ms\":1620,\"published_ms\":1640,\"read_ms\":1280,\"task_id\":\"think1\",\"version\":2}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"},{\"event_id\":\"g1\",\"generated_text\":\"最多只能装三件，因为四件至少重二十四公斤，超过容量。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"generated\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"play1\",\"generated_text\":\"最多只能装三件，因为四件至少重二十四公斤，超过容量。\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"playing\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"continue_expression\",\"output_id\":\"o1\",\"purpose\":\"ordinary\",\"text\":\"选两件A和一件B，正好二十公斤、八十元，达到三件的上限。\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "analysis_injection_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/progressive",
+      "decision_id": "l_final_answer",
+      "read_ms": 1680,
+      "finish_ms": 1710,
+      "consumed_event_ids": [
+        "p1",
+        "task1",
+        "a1",
+        "a2",
+        "g1",
+        "play1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "在新的输入边界利用实际已注入的增量组合结论。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/progressive/l_no_new_value",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        },
+        {
+          "event_id": "task_end",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "completed",
+          "reason": null
+        },
+        {
+          "event_id": "g1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "play1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+          "phase": "playing",
+          "heard_any": true
+        },
+        {
+          "event_id": "continue1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。选两件A和一件B，正好二十公斤、八十元，达到三件的上限。",
+          "phase": "playing",
+          "heard_any": true
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 1000,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 760,
+          "finished_ms": 980,
+          "basis_frontend": "p1",
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        },
+        {
+          "event_id": "a2",
+          "published_ms": 1640,
+          "task_id": "think1",
+          "version": 2,
+          "read_ms": 1280,
+          "finished_ms": 1620,
+          "basis_frontend": "p1",
+          "analysis": "三件混合组合中，2A+1B重20kg、花费80元，可行；1A+2B重22kg，不可行。因此最优为2A+1B，共三件。"
+        }
+      ]
+    },
+    "target": {
+      "action": "wait"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":630,\"raw_state\":\"user_complete\",\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":980,\"published_ms\":1000,\"read_ms\":760,\"task_id\":\"think1\",\"version\":1},{\"analysis\":\"三件混合组合中，2A+1B重20kg、花费80元，可行；1A+2B重22kg，不可行。因此最优为2A+1B，共三件。\",\"basis_frontend\":\"p1\",\"event_id\":\"a2\",\"finished_ms\":1620,\"published_ms\":1640,\"read_ms\":1280,\"task_id\":\"think1\",\"version\":2}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"},{\"event_id\":\"task_end\",\"kind\":\"task\",\"reason\":null,\"state\":\"completed\",\"task_id\":\"think1\"},{\"event_id\":\"g1\",\"generated_text\":\"最多只能装三件，因为四件至少重二十四公斤，超过容量。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"generated\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"play1\",\"generated_text\":\"最多只能装三件，因为四件至少重二十四公斤，超过容量。\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"playing\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"continue1\",\"generated_text\":\"最多只能装三件，因为四件至少重二十四公斤，超过容量。选两件A和一件B，正好二十公斤、八十元，达到三件的上限。\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"playing\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"wait\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "analysis_injection_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/progressive",
+      "decision_id": "l_no_new_value",
+      "read_ms": 1800,
+      "finish_ms": 1830,
+      "consumed_event_ids": [
+        "p1",
+        "task1",
+        "a1",
+        "a2",
+        "task_end",
+        "g1",
+        "play1",
+        "continue1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "相同分析没有新增价值，不复述、不重启思考。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/fixed_error_recovery/l_request",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 630
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "request_thinking",
+      "task_id": "think1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":630,\"raw_state\":\"user_complete\",\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"request_thinking\",\"task_id\":\"think1\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/fixed_error_recovery",
+      "decision_id": "l_request",
+      "read_ms": 680,
+      "finish_ms": 710,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "多约束组合有进一步核验需求，保留不先说空泛进展话术的路径。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene05/l_request",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/fixed_error_recovery/l_correct",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        },
+        {
+          "event_id": "wrong_generated",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "一件A和一件B共十六公斤。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "wrong_played",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "一件A和一件B共十六公斤。",
+          "phase": "playing",
+          "heard_any": true
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 1000,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 760,
+          "finished_ms": 980,
+          "basis_frontend": "p1",
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        },
+        {
+          "event_id": "afix",
+          "published_ms": 1640,
+          "task_id": "think1",
+          "version": 2,
+          "read_ms": 1280,
+          "finished_ms": 1620,
+          "basis_frontend": "p1",
+          "analysis": "单件重量为6kg与8kg，1A+1B实际合计14kg，先前16kg的合计不成立；2A+1B为20kg、80元，可达到三件上限。"
+        }
+      ]
+    },
+    "target": {
+      "action": "continue_expression",
+      "purpose": "ordinary",
+      "output_id": "o1",
+      "text": "刚才的合计应是十四公斤，不是十六公斤。最多可装两件A和一件B，合计二十公斤、八十元。"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":630,\"raw_state\":\"user_complete\",\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":980,\"published_ms\":1000,\"read_ms\":760,\"task_id\":\"think1\",\"version\":1},{\"analysis\":\"单件重量为6kg与8kg，1A+1B实际合计14kg，先前16kg的合计不成立；2A+1B为20kg、80元，可达到三件上限。\",\"basis_frontend\":\"p1\",\"event_id\":\"afix\",\"finished_ms\":1620,\"published_ms\":1640,\"read_ms\":1280,\"task_id\":\"think1\",\"version\":2}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"},{\"event_id\":\"wrong_generated\",\"generated_text\":\"一件A和一件B共十六公斤。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"generated\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"wrong_played\",\"generated_text\":\"一件A和一件B共十六公斤。\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"playing\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"continue_expression\",\"output_id\":\"o1\",\"purpose\":\"ordinary\",\"text\":\"刚才的合计应是十四公斤，不是十六公斤。最多可装两件A和一件B，合计二十公斤、八十元。\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "analysis_injection_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/fixed_error_recovery",
+      "decision_id": "l_correct",
+      "read_ms": 1680,
+      "finish_ms": 1710,
+      "consumed_event_ids": [
+        "p1",
+        "task1",
+        "a1",
+        "afix",
+        "wrong_generated",
+        "wrong_played"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "错误来自显式固定前缀，仅作恢复上下文；错误 token 屏蔽损失，纠正已听错误。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/timeout/l_request",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 630
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "request_thinking",
+      "task_id": "think1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":630,\"raw_state\":\"user_complete\",\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"request_thinking\",\"task_id\":\"think1\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/timeout",
+      "decision_id": "l_request",
+      "read_ms": 680,
+      "finish_ms": 710,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "多约束组合有进一步核验需求，保留不先说空泛进展话术的路径。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene05/l_request",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/timeout/l_fallback",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        },
+        {
+          "event_id": "task_end",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "timeout",
+          "reason": "simulated_budget_exhausted"
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 1000,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 760,
+          "finished_ms": 980,
+          "basis_frontend": "p1",
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        }
+      ]
+    },
+    "target": {
+      "action": "speak",
+      "purpose": "ordinary",
+      "text": "最多装三件。两件A加一件B重二十公斤，花八十元；一件A加两件B超重。",
+      "response_key": "r1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":630,\"raw_state\":\"user_complete\",\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":980,\"published_ms\":1000,\"read_ms\":760,\"task_id\":\"think1\",\"version\":1}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"},{\"event_id\":\"task_end\",\"kind\":\"task\",\"reason\":\"simulated_budget_exhausted\",\"state\":\"timeout\",\"task_id\":\"think1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"speak\",\"purpose\":\"ordinary\",\"response_key\":\"r1\",\"text\":\"最多装三件。两件A加一件B重二十公斤，花八十元；一件A加两件B超重。\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "analysis_injection_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/timeout",
+      "decision_id": "l_fallback",
+      "read_ms": 1360,
+      "finish_ms": 1390,
+      "consumed_event_ids": [
+        "p1",
+        "task1",
+        "a1",
+        "task_end"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "失败不等于用户让轮；当前已有有效 complete，Layer 1 可独立核算，不伪造 v2 或自动重试。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/failed/l_request",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 630
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "action": "request_thinking",
+      "task_id": "think1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":630,\"raw_state\":\"user_complete\",\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"request_thinking\",\"task_id\":\"think1\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/failed",
+      "decision_id": "l_request",
+      "read_ms": 680,
+      "finish_ms": 710,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "多约束组合有进一步核验需求，保留不先说空泛进展话术的路径。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene05/l_request",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/failed/l_fallback",
+    "module": "layer1",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_state": "user_complete",
+        "effective_complete": true,
+        "raw_ready_ms": 630
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        },
+        {
+          "event_id": "task_end",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "failed",
+          "reason": "simulated_worker_failure"
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 1000,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 760,
+          "finished_ms": 980,
+          "basis_frontend": "p1",
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        }
+      ]
+    },
+    "target": {
+      "action": "speak",
+      "purpose": "ordinary",
+      "text": "最多装三件。两件A加一件B重二十公斤，花八十元；一件A加两件B超重。",
+      "response_key": "r1"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "根据当前输入组织自身行为。普通回答须读到有效 complete；保留取消与播放事实。分析仅作条件，不朗读。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"effective_complete\":true,\"raw_ready_ms\":630,\"raw_state\":\"user_complete\",\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":980,\"published_ms\":1000,\"read_ms\":760,\"task_id\":\"think1\",\"version\":1}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"},{\"event_id\":\"task_end\",\"kind\":\"task\",\"reason\":\"simulated_worker_failure\",\"state\":\"failed\",\"task_id\":\"think1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"action\":\"speak\",\"purpose\":\"ordinary\",\"response_key\":\"r1\",\"text\":\"最多装三件。两件A加一件B重二十公斤，花八十元；一件A加两件B超重。\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "analysis_injection_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/failed",
+      "decision_id": "l_fallback",
+      "read_ms": 1360,
+      "finish_ms": 1390,
+      "consumed_event_ids": [
+        "p1",
+        "task1",
+        "a1",
+        "task_end"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "失败不等于用户让轮；当前已有有效 complete，Layer 1 可独立核算，不伪造 v2 或自动重试。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  }
+]

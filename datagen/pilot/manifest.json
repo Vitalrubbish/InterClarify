@@ -1,0 +1,102 @@
+{
+  "schema_version": "parathink.pilot.v1",
+  "source_sha256": "e85c1f09b27b71238d394a3b5cae589d6f955172390c2baecdd6cb953c613eb7",
+  "generator_sha256": "9595454b7af8a3aa3a98cd4234bd467e3ac390e1038ffbb36ca46226f4d7482e",
+  "independent_sources": 5,
+  "derived_trajectories": 13,
+  "decisions": {
+    "soulx": 26,
+    "layer1": 48,
+    "layer2": 16
+  },
+  "unique_supervision": {
+    "soulx": 18,
+    "layer1": 36,
+    "layer2": 9
+  },
+  "coverage": [
+    "active_clarification",
+    "analysis_arrival_during_generation",
+    "analysis_not_arrived",
+    "cancel_after_audio",
+    "cancel_before_audio",
+    "cancellation",
+    "condition_change",
+    "duplicate_complete",
+    "error_history_masked",
+    "false_agreement",
+    "fixed_error_prefix",
+    "idle",
+    "incomplete_pause",
+    "interruption",
+    "late_analysis",
+    "merged_user_segment",
+    "no_automatic_retry",
+    "no_new_user_information",
+    "no_new_value",
+    "no_thinking",
+    "normal_handoff",
+    "optional_backchannel",
+    "played_history",
+    "progressive_answer",
+    "publication_lag",
+    "relevant_long_content",
+    "repeated_backchannel_suppression",
+    "retained_relevant_fact",
+    "self_correction",
+    "self_resolved",
+    "self_searching",
+    "shared_prefix",
+    "short_transition",
+    "stale_analysis",
+    "system_backchannel",
+    "task_completed",
+    "thinking_failure",
+    "thinking_request_merge",
+    "thinking_timeout",
+    "thinking_while_speaking",
+    "thinking_worker_failure",
+    "uncertain_control",
+    "unknown_category",
+    "user_backchannel",
+    "waiting_for_observation"
+  ],
+  "all_samples_training_disabled": true,
+  "audio_seconds": 0,
+  "token_count": null,
+  "timing_origin": "simulated",
+  "source_counts": {
+    "scene01": {
+      "soulx": 4,
+      "layer1": 5,
+      "layer2": 0
+    },
+    "scene02": {
+      "soulx": 6,
+      "layer1": 6,
+      "layer2": 0
+    },
+    "scene03": {
+      "soulx": 2,
+      "layer1": 5,
+      "layer2": 0
+    },
+    "scene04": {
+      "soulx": 10,
+      "layer1": 21,
+      "layer2": 10
+    },
+    "scene05": {
+      "soulx": 4,
+      "layer1": 11,
+      "layer2": 6
+    }
+  },
+  "artifacts": {
+    "layer1_sft.json": "d03b61e576347b5b4045ad4a8b58434dfadd3435b79ff57442c1b945dbddf64b",
+    "layer2_sft.json": "7ebcc62e5330ad443d9c724387549bfdbd3b81a7e31a5ab0069bb8655cce91a1",
+    "review.md": "e90a6cf4c88d08694d473ec97d3cba9f604eb43b1bb6a4733bc056bef636527d",
+    "soulx_sft.json": "80fcfa9dfcb4c622ba272d0e550a7b68e8dedd1687812f478028a3934571a399",
+    "trajectories.json": "649a4efb0defd184c5ed2c0adf10d6c29a9608c39be9da1ee1cdee5d8151c1b3"
+  }
+}

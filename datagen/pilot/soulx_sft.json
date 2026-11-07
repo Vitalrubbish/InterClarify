@@ -1,0 +1,2244 @@
+[
+  {
+    "sample_id": "scene01/normal/c_idle",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "",
+        "raw_ready_ms": 0,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 0,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_idle"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":0,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":0,\"transcript\":\"\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_idle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene01",
+      "trace_id": "scene01/normal",
+      "decision_id": "c_idle",
+      "read_ms": 20,
+      "finish_ms": 50,
+      "consumed_event_ids": [
+        "p0"
+      ],
+      "frontend_snapshot": "p0",
+      "raw_state_simulated": "user_idle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene01/normal/c_active",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "把谢谢翻译成",
+        "raw_ready_ms": 310,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 280,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_nonidle"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":280,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":310,\"transcript\":\"把谢谢翻译成\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_nonidle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene01",
+      "trace_id": "scene01/normal",
+      "decision_id": "c_active",
+      "read_ms": 360,
+      "finish_ms": 390,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene01/normal/c_pause",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "把谢谢翻译成",
+        "raw_ready_ms": 630,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 600,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": null
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":600,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":630,\"transcript\":\"把谢谢翻译成\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":null}",
+        "loss_weight": 0
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 0,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented",
+      "uncertain_control_target"
+    ],
+    "audit": {
+      "source_id": "scene01",
+      "trace_id": "scene01/normal",
+      "decision_id": "c_pause",
+      "read_ms": 680,
+      "finish_ms": 710,
+      "consumed_event_ids": [
+        "p2"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_incomplete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "仅凭文本无法确定停顿是否结束；不确定状态目标损失为零。",
+      "acceptable_actions": null,
+      "uncertain": true,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene01/normal/c_complete",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "把谢谢翻译成英文。",
+        "raw_ready_ms": 950,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 920,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_complete"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":920,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":950,\"transcript\":\"把谢谢翻译成英文。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_complete\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene01",
+      "trace_id": "scene01/normal",
+      "decision_id": "c_complete",
+      "read_ms": 980,
+      "finish_ms": 1010,
+      "consumed_event_ids": [
+        "p3"
+      ],
+      "frontend_snapshot": "p3",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene02/before_audio/c_first",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我写一条周五开会的提醒。",
+        "raw_ready_ms": 790,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 760,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_complete"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":760,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":790,\"transcript\":\"帮我写一条周五开会的提醒。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_complete\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene02",
+      "trace_id": "scene02/before_audio",
+      "decision_id": "c_first",
+      "read_ms": 820,
+      "finish_ms": 850,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene02/c_first",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene02/before_audio/c_interrupt",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t2",
+        "transcript": "改成周六，",
+        "raw_ready_ms": 1110,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 1080,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "g1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "q1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "submitted",
+          "heard_any": false
+        },
+        {
+          "event_id": "s1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "synthesized",
+          "heard_any": false
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_nonidle"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":1080,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":1110,\"transcript\":\"改成周六，\",\"turn_id\":\"t2\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"g1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"generated\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"q1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"submitted\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"s1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"synthesized\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_nonidle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene02",
+      "trace_id": "scene02/before_audio",
+      "decision_id": "c_interrupt",
+      "read_ms": 1160,
+      "finish_ms": 1190,
+      "consumed_event_ids": [
+        "p2",
+        "g1",
+        "q1",
+        "s1"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene02/before_audio/c_second",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t2",
+        "transcript": "帮我写一条周五开会的提醒。改成周六，内容还是提醒大家开会。",
+        "raw_ready_ms": 1510,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 1480,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "closed1",
+          "kind": "runtime",
+          "event": "cancel_confirmed",
+          "output_id": "o1",
+          "heard_any": false,
+          "grouping": "merge_user_segment"
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_complete"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":1480,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":1510,\"transcript\":\"帮我写一条周五开会的提醒。改成周六，内容还是提醒大家开会。\",\"turn_id\":\"t2\"},\"external_analysis\":[],\"observations\":[{\"event\":\"cancel_confirmed\",\"event_id\":\"closed1\",\"grouping\":\"merge_user_segment\",\"heard_any\":false,\"kind\":\"runtime\",\"output_id\":\"o1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_complete\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene02",
+      "trace_id": "scene02/before_audio",
+      "decision_id": "c_second",
+      "read_ms": 1540,
+      "finish_ms": 1570,
+      "consumed_event_ids": [
+        "p3",
+        "closed1"
+      ],
+      "frontend_snapshot": "p3",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene02/after_audio/c_first",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我写一条周五开会的提醒。",
+        "raw_ready_ms": 790,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 760,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_complete"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":760,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":790,\"transcript\":\"帮我写一条周五开会的提醒。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_complete\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene02",
+      "trace_id": "scene02/after_audio",
+      "decision_id": "c_first",
+      "read_ms": 820,
+      "finish_ms": 850,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene02/c_first",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene02/after_audio/c_interrupt",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t2",
+        "transcript": "改成周六，",
+        "raw_ready_ms": 1110,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 1080,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "g1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "q1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "submitted",
+          "heard_any": false
+        },
+        {
+          "event_id": "s1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "synthesized",
+          "heard_any": false
+        },
+        {
+          "event_id": "play1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "playing",
+          "heard_any": true
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_nonidle"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":1080,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":1110,\"transcript\":\"改成周六，\",\"turn_id\":\"t2\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"g1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"generated\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"q1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"submitted\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"s1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"synthesized\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"play1\",\"generated_text\":\"提醒大家，会议安排在周五。\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"playing\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_nonidle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene02",
+      "trace_id": "scene02/after_audio",
+      "decision_id": "c_interrupt",
+      "read_ms": 1160,
+      "finish_ms": 1190,
+      "consumed_event_ids": [
+        "p2",
+        "g1",
+        "q1",
+        "s1",
+        "play1"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene02/after_audio/c_second",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t2",
+        "transcript": "改成周六，内容还是提醒大家开会。",
+        "raw_ready_ms": 1510,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 1480,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "closed1",
+          "kind": "runtime",
+          "event": "cancel_confirmed",
+          "output_id": "o1",
+          "heard_any": true,
+          "grouping": "new_user_segment"
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_complete"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":1480,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":1510,\"transcript\":\"改成周六，内容还是提醒大家开会。\",\"turn_id\":\"t2\"},\"external_analysis\":[],\"observations\":[{\"event\":\"cancel_confirmed\",\"event_id\":\"closed1\",\"grouping\":\"new_user_segment\",\"heard_any\":true,\"kind\":\"runtime\",\"output_id\":\"o1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_complete\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene02",
+      "trace_id": "scene02/after_audio",
+      "decision_id": "c_second",
+      "read_ms": 1540,
+      "finish_ms": 1570,
+      "consumed_event_ids": [
+        "p3",
+        "closed1"
+      ],
+      "frontend_snapshot": "p3",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene03/backchannels/c_story",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "我把这周的安排说一下，你听着就行。",
+        "raw_ready_ms": 310,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 280,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_nonidle"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":280,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":310,\"transcript\":\"我把这周的安排说一下，你听着就行。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_nonidle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene03",
+      "trace_id": "scene03/backchannels",
+      "decision_id": "c_story",
+      "read_ms": 340,
+      "finish_ms": 370,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene03/backchannels/c_user_backchannel",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t2",
+        "transcript": "嗯，对，你继续。",
+        "raw_ready_ms": 1590,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 1560,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "g1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "先准备材料，再安排周五会议。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        {
+          "event_id": "play1",
+          "kind": "output",
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "先准备材料，再安排周五会议。",
+          "phase": "playing",
+          "heard_any": true
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_backchannel"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":1560,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":1590,\"transcript\":\"嗯，对，你继续。\",\"turn_id\":\"t2\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"g1\",\"generated_text\":\"先准备材料，再安排周五会议。\",\"heard_any\":false,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"generated\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"},{\"event_id\":\"play1\",\"generated_text\":\"先准备材料，再安排周五会议。\",\"heard_any\":true,\"kind\":\"output\",\"output_id\":\"o1\",\"phase\":\"playing\",\"purpose\":\"ordinary\",\"response_key\":\"r1\"}],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_backchannel\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene03",
+      "trace_id": "scene03/backchannels",
+      "decision_id": "c_user_backchannel",
+      "read_ms": 1640,
+      "finish_ms": 1670,
+      "consumed_event_ids": [
+        "p5",
+        "g1",
+        "play1"
+      ],
+      "frontend_snapshot": "p5",
+      "raw_state_simulated": "user_backchannel",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/self_resolved/c_shared",
+    "module": "soulx",
+    "protocol_scope": "future_cot_control",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_ready_ms": 90,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 60,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_nonidle",
+      "intervention": "continue_listening"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":60,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":90,\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"intervention\":\"continue_listening\",\"user_state\":\"user_nonidle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented",
+      "future_protocol_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/self_resolved",
+      "decision_id": "c_shared",
+      "read_ms": 440,
+      "finish_ms": 470,
+      "consumed_event_ids": [
+        "p1",
+        "task1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "分支差异尚未可见，使用一致判断，不提前知道用户类别。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/c_shared",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/self_resolved/c_after_branch",
+    "module": "soulx",
+    "protocol_scope": "future_cot_control",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。不过我报的是专硕，我直接念后面的专业学位部分。",
+        "raw_ready_ms": 630,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 600,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 800,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      ]
+    },
+    "target": {
+      "user_state": "user_nonidle",
+      "intervention": "continue_listening"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":600,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":630,\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。不过我报的是专硕，我直接念后面的专业学位部分。\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":780,\"published_ms\":800,\"read_ms\":180,\"task_id\":\"think1\",\"version\":1}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"intervention\":\"continue_listening\",\"user_state\":\"user_nonidle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented",
+      "analysis_injection_unimplemented",
+      "future_protocol_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/self_resolved",
+      "decision_id": "c_after_branch",
+      "read_ms": 820,
+      "finish_ms": 825,
+      "consumed_event_ids": [
+        "p2",
+        "task1",
+        "a1"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "用户已自行补足类别；旧分析中的“尚未明确”已过期。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/relevant_long/c_shared",
+    "module": "soulx",
+    "protocol_scope": "future_cot_control",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_ready_ms": 90,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 60,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_nonidle",
+      "intervention": "continue_listening"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":60,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":90,\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"intervention\":\"continue_listening\",\"user_state\":\"user_nonidle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented",
+      "future_protocol_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/relevant_long",
+      "decision_id": "c_shared",
+      "read_ms": 440,
+      "finish_ms": 470,
+      "consumed_event_ids": [
+        "p1",
+        "task1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "分支差异尚未可见，使用一致判断，不提前知道用户类别。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/c_shared",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/relevant_long/c_after_branch",
+    "module": "soulx",
+    "protocol_scope": "future_cot_control",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。我报的就是学硕，学硕部分有十几条，我逐条念。",
+        "raw_ready_ms": 630,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 600,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 800,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      ]
+    },
+    "target": {
+      "user_state": "user_nonidle",
+      "intervention": "continue_listening"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":600,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":630,\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。我报的就是学硕，学硕部分有十几条，我逐条念。\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":780,\"published_ms\":800,\"read_ms\":180,\"task_id\":\"think1\",\"version\":1}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"intervention\":\"continue_listening\",\"user_state\":\"user_nonidle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented",
+      "analysis_injection_unimplemented",
+      "future_protocol_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/relevant_long",
+      "decision_id": "c_after_branch",
+      "read_ms": 820,
+      "finish_ms": 825,
+      "consumed_event_ids": [
+        "p2",
+        "task1",
+        "a1"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "长篇内容仍然相关，不因为长就插话。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/unknown_long/c_shared",
+    "module": "soulx",
+    "protocol_scope": "future_cot_control",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_ready_ms": 90,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 60,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_nonidle",
+      "intervention": "continue_listening"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":60,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":90,\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"intervention\":\"continue_listening\",\"user_state\":\"user_nonidle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented",
+      "future_protocol_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/unknown_long",
+      "decision_id": "c_shared",
+      "read_ms": 440,
+      "finish_ms": 470,
+      "consumed_event_ids": [
+        "p1",
+        "task1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "分支差异尚未可见，使用一致判断，不提前知道用户类别。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/c_shared",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/unknown_long/c_after_branch",
+    "module": "soulx",
+    "protocol_scope": "future_cot_control",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。这部分有十几条，我先念考核，再念材料和成绩计算。",
+        "raw_ready_ms": 630,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 600,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 800,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      ]
+    },
+    "target": {
+      "user_state": "user_nonidle",
+      "intervention": "clarification_opportunity"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":600,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":630,\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。这部分有十几条，我先念考核，再念材料和成绩计算。\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":780,\"published_ms\":800,\"read_ms\":180,\"task_id\":\"think1\",\"version\":1}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"intervention\":\"clarification_opportunity\",\"user_state\":\"user_nonidle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented",
+      "analysis_injection_unimplemented",
+      "future_protocol_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/unknown_long",
+      "decision_id": "c_after_branch",
+      "read_ms": 820,
+      "finish_ms": 825,
+      "consumed_event_ids": [
+        "p2",
+        "task1",
+        "a1"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "类别仍未知且用户准备长篇展开；语义边界存在，单列未来澄清机会。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/short_transition/c_shared",
+    "module": "soulx",
+    "protocol_scope": "future_cot_control",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_ready_ms": 90,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 60,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_nonidle",
+      "intervention": "continue_listening"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":60,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":90,\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"intervention\":\"continue_listening\",\"user_state\":\"user_nonidle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented",
+      "future_protocol_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/short_transition",
+      "decision_id": "c_shared",
+      "read_ms": 440,
+      "finish_ms": 470,
+      "consumed_event_ids": [
+        "p1",
+        "task1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "分支差异尚未可见，使用一致判断，不提前知道用户类别。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/c_shared",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/short_transition/c_after_branch",
+    "module": "soulx",
+    "protocol_scope": "future_cot_control",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。学硕部分就这一句，下面马上是专硕要求。",
+        "raw_ready_ms": 630,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 600,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 800,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      ]
+    },
+    "target": {
+      "user_state": "user_nonidle",
+      "intervention": "continue_listening"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":600,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":630,\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。学硕部分就这一句，下面马上是专硕要求。\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":780,\"published_ms\":800,\"read_ms\":180,\"task_id\":\"think1\",\"version\":1}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"intervention\":\"continue_listening\",\"user_state\":\"user_nonidle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented",
+      "analysis_injection_unimplemented",
+      "future_protocol_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/short_transition",
+      "decision_id": "c_after_branch",
+      "read_ms": 820,
+      "finish_ms": 825,
+      "consumed_event_ids": [
+        "p2",
+        "task1",
+        "a1"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "即将自然转入另一部分，提前询问增益有限。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/self_searching/c_shared",
+    "module": "soulx",
+    "protocol_scope": "future_cot_control",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+        "raw_ready_ms": 90,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 60,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_nonidle",
+      "intervention": "continue_listening"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":60,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":90,\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"intervention\":\"continue_listening\",\"user_state\":\"user_nonidle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented",
+      "future_protocol_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/self_searching",
+      "decision_id": "c_shared",
+      "read_ms": 440,
+      "finish_ms": 470,
+      "consumed_event_ids": [
+        "p1",
+        "task1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "分支差异尚未可见，使用一致判断，不提前知道用户类别。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene04/c_shared",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene04/self_searching/c_after_branch",
+    "module": "soulx",
+    "protocol_scope": "future_cot_control",
+    "split": "pilot",
+    "input": {
+      "task_information": {
+        "document": "通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。"
+      },
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。我报的类别是……我看一下报名信息。",
+        "raw_ready_ms": 630,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 600,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [
+        {
+          "event_id": "task1",
+          "kind": "task",
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      ],
+      "external_analysis": [
+        {
+          "event_id": "a1",
+          "published_ms": 800,
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      ]
+    },
+    "target": {
+      "user_state": "user_nonidle",
+      "intervention": "continue_listening"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":600,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":630,\"transcript\":\"帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。我报的类别是……我看一下报名信息。\",\"turn_id\":\"t1\"},\"external_analysis\":[{\"analysis\":\"报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。\",\"basis_frontend\":\"p1\",\"event_id\":\"a1\",\"finished_ms\":780,\"published_ms\":800,\"read_ms\":180,\"task_id\":\"think1\",\"version\":1}],\"observations\":[{\"event_id\":\"task1\",\"kind\":\"task\",\"reason\":null,\"state\":\"active\",\"task_id\":\"think1\"}],\"task_information\":{\"document\":\"通知包含共同要求、学术学位专属要求及专业学位专属要求；用户只需理解其报考类别适用的要求。\"}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"intervention\":\"continue_listening\",\"user_state\":\"user_nonidle\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented",
+      "analysis_injection_unimplemented",
+      "future_protocol_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene04",
+      "trace_id": "scene04/self_searching",
+      "decision_id": "c_after_branch",
+      "read_ms": 820,
+      "finish_ms": 825,
+      "consumed_event_ids": [
+        "p2",
+        "task1",
+        "a1"
+      ],
+      "frontend_snapshot": "p2",
+      "raw_state_simulated": "user_nonidle",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "当前正在自行检索；既不能抢问，也不能提前标成缺口已消解。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": null,
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/progressive/c_task_complete",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_ready_ms": 630,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 600,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_complete"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":600,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":630,\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_complete\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/progressive",
+      "decision_id": "c_task_complete",
+      "read_ms": 660,
+      "finish_ms": 690,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene05/c_task_complete",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/fixed_error_recovery/c_task_complete",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_ready_ms": 630,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 600,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_complete"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":600,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":630,\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_complete\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/fixed_error_recovery",
+      "decision_id": "c_task_complete",
+      "read_ms": 660,
+      "finish_ms": 690,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene05/c_task_complete",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/timeout/c_task_complete",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_ready_ms": 630,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 600,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_complete"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":600,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":630,\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_complete\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/timeout",
+      "decision_id": "c_task_complete",
+      "read_ms": 660,
+      "finish_ms": 690,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene05/c_task_complete",
+      "publication": null
+    }
+  },
+  {
+    "sample_id": "scene05/failed/c_task_complete",
+    "module": "soulx",
+    "protocol_scope": "semantic_pilot",
+    "split": "pilot",
+    "input": {
+      "task_information": {},
+      "current_user": {
+        "turn_id": "t1",
+        "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+        "raw_ready_ms": 630,
+        "audio": {
+          "uri": null,
+          "observed_until_ms": 600,
+          "origin": "missing_text_pilot"
+        }
+      },
+      "observations": [],
+      "external_analysis": []
+    },
+    "target": {
+      "user_state": "user_complete"
+    },
+    "messages": [
+      {
+        "role": "system",
+        "content": "依据当前可见观察判断用户状态。未来澄清语义单列，不扩充原生五状态。分析是外部条件，不是话轮指令。",
+        "loss_weight": 0
+      },
+      {
+        "role": "user",
+        "content": "{\"current_user\":{\"audio\":{\"observed_until_ms\":600,\"origin\":\"missing_text_pilot\",\"uri\":null},\"raw_ready_ms\":630,\"transcript\":\"箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？\",\"turn_id\":\"t1\"},\"external_analysis\":[],\"observations\":[],\"task_information\":{}}",
+        "loss_weight": 0
+      },
+      {
+        "role": "assistant",
+        "content": "{\"user_state\":\"user_complete\"}",
+        "loss_weight": 1
+      }
+    ],
+    "loss_boundary": {
+      "input": 0,
+      "target": 1,
+      "unit": "message_semantics_only"
+    },
+    "eligible_for_training": false,
+    "training_blockers": [
+      "pilot_only",
+      "independent_review_pending",
+      "tokenizer_adapter_unimplemented",
+      "audio_missing",
+      "frontend_predictions_simulated",
+      "control_input_adapter_unimplemented"
+    ],
+    "audit": {
+      "source_id": "scene05",
+      "trace_id": "scene05/failed",
+      "decision_id": "c_task_complete",
+      "read_ms": 660,
+      "finish_ms": 690,
+      "consumed_event_ids": [
+        "p1"
+      ],
+      "frontend_snapshot": "p1",
+      "raw_state_simulated": "user_complete",
+      "label_origin": "hand_authored_prefix_candidate",
+      "independent_review": "pending",
+      "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+      "acceptable_actions": null,
+      "uncertain": false,
+      "shared_prefix_group": "scene05/c_task_complete",
+      "publication": null
+    }
+  }
+]

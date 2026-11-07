@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "python": "3.10.22",
+  "python_executable": "/home/vitalrubbish/miniconda3/envs/interclarify-dev/bin/python",
+  "conda_prefix": "/home/vitalrubbish/miniconda3/envs/interclarify-dev",
+  "conda_history_present": true,
+  "hostname": "Vitalrubbish",
+  "elapsed_seconds": 0.0187,
+  "cpu_affinity": [
+    0
+  ],
+  "thread_limits": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "NUMEXPR_NUM_THREADS": "1"
+  },
+  "peak_rss_kib": 19712,
+  "output_bytes": 426749,
+  "limits": {
+    "address_space_bytes": 2147483648,
+    "file_bytes": 33554432,
+    "cpu_seconds": 110
+  }
+}

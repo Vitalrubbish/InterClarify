@@ -1,0 +1,3085 @@
+[
+  {
+    "trace_id": "scene01/normal",
+    "source_id": "scene01",
+    "split": "pilot",
+    "schedule": "simulated",
+    "events": [
+      {
+        "id": "p0",
+        "at_ms": 0,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "",
+          "raw_state": "user_idle",
+          "effective_complete": false,
+          "raw_ready_ms": 0,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 0,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "p1",
+        "at_ms": 320,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "把谢谢翻译成",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 310,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 280,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "p2",
+        "at_ms": 640,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "把谢谢翻译成",
+          "raw_state": "user_incomplete",
+          "effective_complete": false,
+          "raw_ready_ms": 630,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 600,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "hidden_tail",
+        "at_ms": 800,
+        "kind": "script",
+        "payload": {
+          "script_text": "英文",
+          "visibility": "audit_only_audio_not_synthesized"
+        }
+      },
+      {
+        "id": "p3",
+        "at_ms": 960,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "把谢谢翻译成英文。",
+          "raw_state": "user_complete",
+          "effective_complete": true,
+          "raw_ready_ms": 950,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 920,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "g1",
+        "at_ms": 1080,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "Thank you.",
+          "phase": "generated",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "q1",
+        "at_ms": 1120,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "Thank you.",
+          "phase": "submitted",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "s1",
+        "at_ms": 1160,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "Thank you.",
+          "phase": "synthesized",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "play1",
+        "at_ms": 1200,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "Thank you.",
+          "phase": "playing",
+          "heard_any": true
+        },
+        "audit": {
+          "played_text": "Thank",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "p4",
+        "at_ms": 1280,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "把谢谢翻译成英文。",
+          "raw_state": "user_complete",
+          "effective_complete": true,
+          "raw_ready_ms": 1270,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 1240,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "done1",
+        "at_ms": 1440,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "Thank you.",
+          "phase": "closed",
+          "heard_any": true
+        },
+        "audit": {
+          "played_text": "Thank you.",
+          "origin": "simulated_generation"
+        }
+      }
+    ],
+    "decisions": [
+      {
+        "id": "c_idle",
+        "module": "soulx",
+        "read_ms": 20,
+        "finish_ms": 50,
+        "seen": [
+          "p0"
+        ],
+        "target": {
+          "user_state": "user_idle"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。"
+      },
+      {
+        "id": "l_idle",
+        "module": "layer1",
+        "read_ms": 40,
+        "finish_ms": 70,
+        "seen": [
+          "p0"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "静音不等于有效 complete。"
+      },
+      {
+        "id": "c_active",
+        "module": "soulx",
+        "read_ms": 360,
+        "finish_ms": 390,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "user_state": "user_nonidle"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。"
+      },
+      {
+        "id": "l_partial",
+        "module": "layer1",
+        "read_ms": 400,
+        "finish_ms": 430,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "当前文字不全，继续倾听。"
+      },
+      {
+        "id": "c_pause",
+        "module": "soulx",
+        "read_ms": 680,
+        "finish_ms": 710,
+        "seen": [
+          "p2"
+        ],
+        "target": {
+          "user_state": null
+        },
+        "rationale": "仅凭文本无法确定停顿是否结束；不确定状态目标损失为零。",
+        "uncertain": true
+      },
+      {
+        "id": "l_before_publish",
+        "module": "layer1",
+        "read_ms": 880,
+        "finish_ms": 910,
+        "seen": [
+          "p2"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "尾词虽在隐藏剧本中出现，但尚未联合发布，禁止使用。"
+      },
+      {
+        "id": "c_complete",
+        "module": "soulx",
+        "read_ms": 980,
+        "finish_ms": 1010,
+        "seen": [
+          "p3"
+        ],
+        "target": {
+          "user_state": "user_complete"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。"
+      },
+      {
+        "id": "l_answer",
+        "module": "layer1",
+        "read_ms": 1000,
+        "finish_ms": 1030,
+        "seen": [
+          "p3"
+        ],
+        "target": {
+          "action": "speak",
+          "purpose": "ordinary",
+          "text": "Thank you.",
+          "response_key": "r1"
+        },
+        "rationale": "当前有效 complete 已读到，生成一次普通回答。"
+      },
+      {
+        "id": "l_duplicate",
+        "module": "layer1",
+        "read_ms": 1320,
+        "finish_ms": 1350,
+        "seen": [
+          "p4",
+          "g1",
+          "q1",
+          "s1",
+          "play1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "同一 response_key 已回答，重复 complete 不再生成。"
+      }
+    ]
+  },
+  {
+    "trace_id": "scene02/before_audio",
+    "source_id": "scene02",
+    "split": "pilot",
+    "schedule": "simulated",
+    "events": [
+      {
+        "id": "p1",
+        "at_ms": 800,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "帮我写一条周五开会的提醒。",
+          "raw_state": "user_complete",
+          "effective_complete": true,
+          "raw_ready_ms": 790,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 760,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "g1",
+        "at_ms": 920,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "q1",
+        "at_ms": 960,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "submitted",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "s1",
+        "at_ms": 1000,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "synthesized",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "p2",
+        "at_ms": 1120,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t2",
+          "transcript": "改成周六，",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 1110,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 1080,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "stop1",
+        "at_ms": 1140,
+        "kind": "runtime",
+        "payload": {
+          "event": "cancel_requested",
+          "output_id": "o1"
+        }
+      },
+      {
+        "id": "closed1",
+        "at_ms": 1200,
+        "kind": "runtime",
+        "payload": {
+          "event": "cancel_confirmed",
+          "output_id": "o1",
+          "heard_any": false,
+          "grouping": "merge_user_segment"
+        }
+      },
+      {
+        "id": "p3",
+        "at_ms": 1520,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t2",
+          "transcript": "帮我写一条周五开会的提醒。改成周六，内容还是提醒大家开会。",
+          "raw_state": "user_complete",
+          "effective_complete": true,
+          "raw_ready_ms": 1510,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 1480,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "g2",
+        "at_ms": 1640,
+        "kind": "output",
+        "payload": {
+          "output_id": "o2",
+          "response_key": "r2",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周六。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "play2",
+        "at_ms": 1800,
+        "kind": "output",
+        "payload": {
+          "output_id": "o2",
+          "response_key": "r2",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周六。",
+          "phase": "playing",
+          "heard_any": true
+        },
+        "audit": {
+          "played_text": "提醒大家，会议安排在周六。",
+          "origin": "simulated_generation"
+        }
+      }
+    ],
+    "decisions": [
+      {
+        "id": "c_first",
+        "module": "soulx",
+        "read_ms": 820,
+        "finish_ms": 850,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "user_state": "user_complete"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+        "shared_prefix_group": "scene02/c_first"
+      },
+      {
+        "id": "l_first",
+        "module": "layer1",
+        "read_ms": 840,
+        "finish_ms": 870,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "action": "speak",
+          "purpose": "ordinary",
+          "text": "提醒大家，会议安排在周五。",
+          "response_key": "r1"
+        },
+        "rationale": "当前有效 complete 已读到，生成一次普通回答。",
+        "shared_prefix_group": "scene02/l_first"
+      },
+      {
+        "id": "c_interrupt",
+        "module": "soulx",
+        "read_ms": 1160,
+        "finish_ms": 1190,
+        "seen": [
+          "p2",
+          "g1",
+          "q1",
+          "s1"
+        ],
+        "target": {
+          "user_state": "user_nonidle"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。"
+      },
+      {
+        "id": "l_cancelled",
+        "module": "layer1",
+        "read_ms": 1240,
+        "finish_ms": 1270,
+        "seen": [
+          "p2",
+          "g1",
+          "q1",
+          "s1",
+          "stop1",
+          "closed1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "取消已确认，用户仍在补充；不续播旧正文。"
+      },
+      {
+        "id": "c_second",
+        "module": "soulx",
+        "read_ms": 1540,
+        "finish_ms": 1570,
+        "seen": [
+          "p3",
+          "closed1"
+        ],
+        "target": {
+          "user_state": "user_complete"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。"
+      },
+      {
+        "id": "l_recover",
+        "module": "layer1",
+        "read_ms": 1560,
+        "finish_ms": 1590,
+        "seen": [
+          "p3",
+          "g1",
+          "q1",
+          "s1",
+          "stop1",
+          "closed1"
+        ],
+        "target": {
+          "action": "speak",
+          "purpose": "ordinary",
+          "text": "提醒大家，会议安排在周六。",
+          "response_key": "r2"
+        },
+        "rationale": "首音前取消，用户片段合并；不声称用户听过旧回答。"
+      }
+    ]
+  },
+  {
+    "trace_id": "scene02/after_audio",
+    "source_id": "scene02",
+    "split": "pilot",
+    "schedule": "simulated",
+    "events": [
+      {
+        "id": "p1",
+        "at_ms": 800,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "帮我写一条周五开会的提醒。",
+          "raw_state": "user_complete",
+          "effective_complete": true,
+          "raw_ready_ms": 790,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 760,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "g1",
+        "at_ms": 920,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "q1",
+        "at_ms": 960,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "submitted",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "s1",
+        "at_ms": 1000,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "synthesized",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "play1",
+        "at_ms": 1040,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "提醒大家，会议安排在周五。",
+          "phase": "playing",
+          "heard_any": true
+        },
+        "audit": {
+          "played_text": "提醒大家，会议安排在周五",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "p2",
+        "at_ms": 1120,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t2",
+          "transcript": "改成周六，",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 1110,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 1080,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "stop1",
+        "at_ms": 1140,
+        "kind": "runtime",
+        "payload": {
+          "event": "cancel_requested",
+          "output_id": "o1"
+        }
+      },
+      {
+        "id": "closed1",
+        "at_ms": 1200,
+        "kind": "runtime",
+        "payload": {
+          "event": "cancel_confirmed",
+          "output_id": "o1",
+          "heard_any": true,
+          "grouping": "new_user_segment"
+        }
+      },
+      {
+        "id": "p3",
+        "at_ms": 1520,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t2",
+          "transcript": "改成周六，内容还是提醒大家开会。",
+          "raw_state": "user_complete",
+          "effective_complete": true,
+          "raw_ready_ms": 1510,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 1480,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "g2",
+        "at_ms": 1640,
+        "kind": "output",
+        "payload": {
+          "output_id": "o2",
+          "response_key": "r2",
+          "purpose": "ordinary",
+          "generated_text": "改为周六：提醒大家，会议安排在周六。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "play2",
+        "at_ms": 1800,
+        "kind": "output",
+        "payload": {
+          "output_id": "o2",
+          "response_key": "r2",
+          "purpose": "ordinary",
+          "generated_text": "改为周六：提醒大家，会议安排在周六。",
+          "phase": "playing",
+          "heard_any": true
+        },
+        "audit": {
+          "played_text": "改为周六：提醒大家，会议安排在周六。",
+          "origin": "simulated_generation"
+        }
+      }
+    ],
+    "decisions": [
+      {
+        "id": "c_first",
+        "module": "soulx",
+        "read_ms": 820,
+        "finish_ms": 850,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "user_state": "user_complete"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+        "shared_prefix_group": "scene02/c_first"
+      },
+      {
+        "id": "l_first",
+        "module": "layer1",
+        "read_ms": 840,
+        "finish_ms": 870,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "action": "speak",
+          "purpose": "ordinary",
+          "text": "提醒大家，会议安排在周五。",
+          "response_key": "r1"
+        },
+        "rationale": "当前有效 complete 已读到，生成一次普通回答。",
+        "shared_prefix_group": "scene02/l_first"
+      },
+      {
+        "id": "c_interrupt",
+        "module": "soulx",
+        "read_ms": 1160,
+        "finish_ms": 1190,
+        "seen": [
+          "p2",
+          "g1",
+          "q1",
+          "s1",
+          "play1"
+        ],
+        "target": {
+          "user_state": "user_nonidle"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。"
+      },
+      {
+        "id": "l_cancelled",
+        "module": "layer1",
+        "read_ms": 1240,
+        "finish_ms": 1270,
+        "seen": [
+          "p2",
+          "g1",
+          "q1",
+          "s1",
+          "play1",
+          "stop1",
+          "closed1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "取消已确认，用户仍在补充；不续播旧正文。"
+      },
+      {
+        "id": "c_second",
+        "module": "soulx",
+        "read_ms": 1540,
+        "finish_ms": 1570,
+        "seen": [
+          "p3",
+          "closed1"
+        ],
+        "target": {
+          "user_state": "user_complete"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。"
+      },
+      {
+        "id": "l_recover",
+        "module": "layer1",
+        "read_ms": 1560,
+        "finish_ms": 1590,
+        "seen": [
+          "p3",
+          "g1",
+          "q1",
+          "s1",
+          "play1",
+          "stop1",
+          "closed1"
+        ],
+        "target": {
+          "action": "speak",
+          "purpose": "ordinary",
+          "text": "改为周六：提醒大家，会议安排在周六。",
+          "response_key": "r2"
+        },
+        "rationale": "已播内容保留并衔接更正日期。"
+      }
+    ]
+  },
+  {
+    "trace_id": "scene03/backchannels",
+    "source_id": "scene03",
+    "split": "pilot",
+    "schedule": "simulated",
+    "events": [
+      {
+        "id": "p1",
+        "at_ms": 320,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "我把这周的安排说一下，你听着就行。",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 310,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 280,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "bg",
+        "at_ms": 480,
+        "kind": "output",
+        "payload": {
+          "output_id": "b1",
+          "response_key": "b1",
+          "purpose": "backchannel",
+          "generated_text": "嗯，我在听。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "bp",
+        "at_ms": 560,
+        "kind": "output",
+        "payload": {
+          "output_id": "b1",
+          "response_key": "b1",
+          "purpose": "backchannel",
+          "generated_text": "嗯，我在听。",
+          "phase": "closed",
+          "heard_any": true
+        },
+        "audit": {
+          "played_text": "嗯，我在听。",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "p2",
+        "at_ms": 640,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "我把这周的安排说一下，你听着就行。先准备材料，",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 630,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 600,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "p3",
+        "at_ms": 880,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "我有点想把所有安排都取消，不过还没有决定。",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 870,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 840,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "p4",
+        "at_ms": 1120,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "还是先准备材料，再安排周五会议。帮我整理一下。",
+          "raw_state": "user_complete",
+          "effective_complete": true,
+          "raw_ready_ms": 1110,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 1080,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "g1",
+        "at_ms": 1280,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "先准备材料，再安排周五会议。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "play1",
+        "at_ms": 1440,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "先准备材料，再安排周五会议。",
+          "phase": "playing",
+          "heard_any": true
+        },
+        "audit": {
+          "played_text": "先准备材料，",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "p5",
+        "at_ms": 1600,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t2",
+          "transcript": "嗯，对，你继续。",
+          "raw_state": "user_backchannel",
+          "effective_complete": false,
+          "raw_ready_ms": 1590,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 1560,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "done1",
+        "at_ms": 1880,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "先准备材料，再安排周五会议。",
+          "phase": "closed",
+          "heard_any": true
+        },
+        "audit": {
+          "played_text": "先准备材料，再安排周五会议。",
+          "origin": "simulated_generation"
+        }
+      }
+    ],
+    "decisions": [
+      {
+        "id": "c_story",
+        "module": "soulx",
+        "read_ms": 340,
+        "finish_ms": 370,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "user_state": "user_nonidle"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。"
+      },
+      {
+        "id": "l_backchannel",
+        "module": "layer1",
+        "read_ms": 400,
+        "finish_ms": 430,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "action": "speak",
+          "purpose": "backchannel",
+          "text": "嗯，我在听。",
+          "response_key": "b1"
+        },
+        "rationale": "用户明确要求倾听；存在可选附和机会，不把不发声记为错误。",
+        "acceptable_actions": [
+          "speak_backchannel",
+          "wait"
+        ]
+      },
+      {
+        "id": "l_suppress",
+        "module": "layer1",
+        "read_ms": 680,
+        "finish_ms": 710,
+        "seen": [
+          "p2",
+          "bg",
+          "bp"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "刚刚已附和，继续听，不重复短回应。"
+      },
+      {
+        "id": "l_no_agreement",
+        "module": "layer1",
+        "read_ms": 920,
+        "finish_ms": 950,
+        "seen": [
+          "p3",
+          "bg",
+          "bp"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "用户尚未决定，不能以“对，就全取消”形成错误赞同。"
+      },
+      {
+        "id": "l_order",
+        "module": "layer1",
+        "read_ms": 1200,
+        "finish_ms": 1230,
+        "seen": [
+          "p4",
+          "bg",
+          "bp"
+        ],
+        "target": {
+          "action": "speak",
+          "purpose": "ordinary",
+          "text": "先准备材料，再安排周五会议。",
+          "response_key": "r1"
+        },
+        "rationale": "当前有效 complete 已读到，生成一次普通回答。"
+      },
+      {
+        "id": "c_user_backchannel",
+        "module": "soulx",
+        "read_ms": 1640,
+        "finish_ms": 1670,
+        "seen": [
+          "p5",
+          "g1",
+          "play1"
+        ],
+        "target": {
+          "user_state": "user_backchannel"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。"
+      },
+      {
+        "id": "l_keep_expression",
+        "module": "layer1",
+        "read_ms": 1680,
+        "finish_ms": 1710,
+        "seen": [
+          "p5",
+          "g1",
+          "play1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "用户为非打断性附和；不增加重复正文，不停止现有播放。wait 表示本边界不生成新文本。"
+      }
+    ]
+  },
+  {
+    "trace_id": "scene04/self_resolved",
+    "source_id": "scene04",
+    "split": "pilot",
+    "schedule": "simulated",
+    "events": [
+      {
+        "id": "p1",
+        "at_ms": 100,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 90,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 60,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "task1",
+        "at_ms": 160,
+        "kind": "task",
+        "payload": {
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      },
+      {
+        "id": "p2",
+        "at_ms": 640,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。不过我报的是专硕，我直接念后面的专业学位部分。",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 630,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 600,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "a1",
+        "at_ms": 800,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      },
+      {
+        "id": "control_published",
+        "at_ms": 830,
+        "kind": "controller",
+        "payload": {
+          "protocol_scope": "future_cot_control",
+          "basis_frontend": "p2",
+          "judgment": {
+            "user_state": "user_nonidle",
+            "intervention": "continue_listening"
+          }
+        }
+      },
+      {
+        "id": "a2",
+        "at_ms": 1120,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 2,
+          "read_ms": 880,
+          "finished_ms": 1100,
+          "basis_frontend": "p2",
+          "analysis": "已明确报考专业学位，阅读方向同步转向专业学位。两类专属条款不同的事实仍有效，原类别缺口已经消解。"
+        }
+      }
+    ],
+    "decisions": [
+      {
+        "id": "l_request",
+        "module": "layer1",
+        "read_ms": 120,
+        "finish_ms": 150,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "action": "request_thinking",
+          "task_id": "think1"
+        },
+        "rationale": "类别缺口可能影响后续资料适用性，先请求分析，无需开口。",
+        "shared_prefix_group": "scene04/l_request"
+      },
+      {
+        "id": "a_first",
+        "module": "layer2",
+        "read_ms": 180,
+        "finish_ms": 780,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        },
+        "rationale": "本次只读到共同前缀，不能预知用户类别。",
+        "publication": "a1",
+        "shared_prefix_group": "scene04/a_first"
+      },
+      {
+        "id": "l_task_active",
+        "module": "layer1",
+        "read_ms": 300,
+        "finish_ms": 330,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "已有活动任务，不为每个窗口重复请求。",
+        "shared_prefix_group": "scene04/l_task_active"
+      },
+      {
+        "id": "c_shared",
+        "module": "soulx",
+        "read_ms": 440,
+        "finish_ms": 470,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "user_state": "user_nonidle",
+          "intervention": "continue_listening"
+        },
+        "rationale": "分支差异尚未可见，使用一致判断，不提前知道用户类别。",
+        "scope": "future_cot_control",
+        "shared_prefix_group": "scene04/c_shared"
+      },
+      {
+        "id": "l_before_analysis",
+        "module": "layer1",
+        "read_ms": 720,
+        "finish_ms": 850,
+        "seen": [
+          "p2",
+          "task1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "本次输入构造早于 a1 发布；即使生成结束前结果到达也不追记。"
+      },
+      {
+        "id": "c_after_branch",
+        "module": "soulx",
+        "read_ms": 820,
+        "finish_ms": 825,
+        "seen": [
+          "p2",
+          "task1",
+          "a1"
+        ],
+        "target": {
+          "user_state": "user_nonidle",
+          "intervention": "continue_listening"
+        },
+        "rationale": "用户已自行补足类别；旧分析中的“尚未明确”已过期。",
+        "scope": "future_cot_control"
+      },
+      {
+        "id": "l_after_analysis",
+        "module": "layer1",
+        "read_ms": 840,
+        "finish_ms": 870,
+        "seen": [
+          "p2",
+          "task1",
+          "a1",
+          "control_published"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "用户已自行补足类别；旧分析中的“尚未明确”已过期。"
+      },
+      {
+        "id": "a_update",
+        "module": "layer2",
+        "read_ms": 880,
+        "finish_ms": 1100,
+        "seen": [
+          "p2",
+          "task1",
+          "a1"
+        ],
+        "target": {
+          "analysis": "已明确报考专业学位，阅读方向同步转向专业学位。两类专属条款不同的事实仍有效，原类别缺口已经消解。"
+        },
+        "rationale": "同一活动任务在后续短推理边界读取新观察并更新依据。",
+        "publication": "a2"
+      }
+    ]
+  },
+  {
+    "trace_id": "scene04/relevant_long",
+    "source_id": "scene04",
+    "split": "pilot",
+    "schedule": "simulated",
+    "events": [
+      {
+        "id": "p1",
+        "at_ms": 100,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 90,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 60,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "task1",
+        "at_ms": 160,
+        "kind": "task",
+        "payload": {
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      },
+      {
+        "id": "p2",
+        "at_ms": 640,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。我报的就是学硕，学硕部分有十几条，我逐条念。",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 630,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 600,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "a1",
+        "at_ms": 800,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      },
+      {
+        "id": "control_published",
+        "at_ms": 830,
+        "kind": "controller",
+        "payload": {
+          "protocol_scope": "future_cot_control",
+          "basis_frontend": "p2",
+          "judgment": {
+            "user_state": "user_nonidle",
+            "intervention": "continue_listening"
+          }
+        }
+      },
+      {
+        "id": "a2",
+        "at_ms": 1120,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 2,
+          "read_ms": 880,
+          "finished_ms": 1100,
+          "basis_frontend": "p2",
+          "analysis": "用户报考学术学位；当前长篇内容属于适用类别，类别缺口消解。"
+        }
+      }
+    ],
+    "decisions": [
+      {
+        "id": "l_request",
+        "module": "layer1",
+        "read_ms": 120,
+        "finish_ms": 150,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "action": "request_thinking",
+          "task_id": "think1"
+        },
+        "rationale": "类别缺口可能影响后续资料适用性，先请求分析，无需开口。",
+        "shared_prefix_group": "scene04/l_request"
+      },
+      {
+        "id": "a_first",
+        "module": "layer2",
+        "read_ms": 180,
+        "finish_ms": 780,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        },
+        "rationale": "本次只读到共同前缀，不能预知用户类别。",
+        "publication": "a1",
+        "shared_prefix_group": "scene04/a_first"
+      },
+      {
+        "id": "l_task_active",
+        "module": "layer1",
+        "read_ms": 300,
+        "finish_ms": 330,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "已有活动任务，不为每个窗口重复请求。",
+        "shared_prefix_group": "scene04/l_task_active"
+      },
+      {
+        "id": "c_shared",
+        "module": "soulx",
+        "read_ms": 440,
+        "finish_ms": 470,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "user_state": "user_nonidle",
+          "intervention": "continue_listening"
+        },
+        "rationale": "分支差异尚未可见，使用一致判断，不提前知道用户类别。",
+        "scope": "future_cot_control",
+        "shared_prefix_group": "scene04/c_shared"
+      },
+      {
+        "id": "l_before_analysis",
+        "module": "layer1",
+        "read_ms": 720,
+        "finish_ms": 850,
+        "seen": [
+          "p2",
+          "task1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "本次输入构造早于 a1 发布；即使生成结束前结果到达也不追记。"
+      },
+      {
+        "id": "c_after_branch",
+        "module": "soulx",
+        "read_ms": 820,
+        "finish_ms": 825,
+        "seen": [
+          "p2",
+          "task1",
+          "a1"
+        ],
+        "target": {
+          "user_state": "user_nonidle",
+          "intervention": "continue_listening"
+        },
+        "rationale": "长篇内容仍然相关，不因为长就插话。",
+        "scope": "future_cot_control"
+      },
+      {
+        "id": "l_after_analysis",
+        "module": "layer1",
+        "read_ms": 840,
+        "finish_ms": 870,
+        "seen": [
+          "p2",
+          "task1",
+          "a1",
+          "control_published"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "长篇内容仍然相关，不因为长就插话。"
+      },
+      {
+        "id": "a_update",
+        "module": "layer2",
+        "read_ms": 880,
+        "finish_ms": 1100,
+        "seen": [
+          "p2",
+          "task1",
+          "a1"
+        ],
+        "target": {
+          "analysis": "用户报考学术学位；当前长篇内容属于适用类别，类别缺口消解。"
+        },
+        "rationale": "同一活动任务在后续短推理边界读取新观察并更新依据。",
+        "publication": "a2"
+      }
+    ]
+  },
+  {
+    "trace_id": "scene04/unknown_long",
+    "source_id": "scene04",
+    "split": "pilot",
+    "schedule": "simulated",
+    "events": [
+      {
+        "id": "p1",
+        "at_ms": 100,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 90,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 60,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "task1",
+        "at_ms": 160,
+        "kind": "task",
+        "payload": {
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      },
+      {
+        "id": "p2",
+        "at_ms": 640,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。这部分有十几条，我先念考核，再念材料和成绩计算。",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 630,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 600,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "a1",
+        "at_ms": 800,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      },
+      {
+        "id": "control_published",
+        "at_ms": 830,
+        "kind": "controller",
+        "payload": {
+          "protocol_scope": "future_cot_control",
+          "basis_frontend": "p2",
+          "judgment": {
+            "user_state": "user_nonidle",
+            "intervention": "clarification_opportunity"
+          }
+        }
+      },
+      {
+        "id": "cg",
+        "at_ms": 960,
+        "kind": "output",
+        "payload": {
+          "output_id": "clarify1",
+          "response_key": "clarify1",
+          "purpose": "clarification",
+          "generated_text": "先确认一下，你报的是学硕还是专硕？",
+          "phase": "generated",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "cp",
+        "at_ms": 1040,
+        "kind": "output",
+        "payload": {
+          "output_id": "clarify1",
+          "response_key": "clarify1",
+          "purpose": "clarification",
+          "generated_text": "先确认一下，你报的是学硕还是专硕？",
+          "phase": "closed",
+          "heard_any": true
+        },
+        "audit": {
+          "played_text": "先确认一下，你报的是学硕还是专硕？",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "a2",
+        "at_ms": 1120,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 2,
+          "read_ms": 880,
+          "finished_ms": 1100,
+          "basis_frontend": "p2",
+          "analysis": "报考类别仍未知，接下来的多组专属条款依赖类别；当前尚不能确认学术学位条款适用。"
+        }
+      }
+    ],
+    "decisions": [
+      {
+        "id": "l_request",
+        "module": "layer1",
+        "read_ms": 120,
+        "finish_ms": 150,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "action": "request_thinking",
+          "task_id": "think1"
+        },
+        "rationale": "类别缺口可能影响后续资料适用性，先请求分析，无需开口。",
+        "shared_prefix_group": "scene04/l_request"
+      },
+      {
+        "id": "a_first",
+        "module": "layer2",
+        "read_ms": 180,
+        "finish_ms": 780,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        },
+        "rationale": "本次只读到共同前缀，不能预知用户类别。",
+        "publication": "a1",
+        "shared_prefix_group": "scene04/a_first"
+      },
+      {
+        "id": "l_task_active",
+        "module": "layer1",
+        "read_ms": 300,
+        "finish_ms": 330,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "已有活动任务，不为每个窗口重复请求。",
+        "shared_prefix_group": "scene04/l_task_active"
+      },
+      {
+        "id": "c_shared",
+        "module": "soulx",
+        "read_ms": 440,
+        "finish_ms": 470,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "user_state": "user_nonidle",
+          "intervention": "continue_listening"
+        },
+        "rationale": "分支差异尚未可见，使用一致判断，不提前知道用户类别。",
+        "scope": "future_cot_control",
+        "shared_prefix_group": "scene04/c_shared"
+      },
+      {
+        "id": "l_before_analysis",
+        "module": "layer1",
+        "read_ms": 720,
+        "finish_ms": 850,
+        "seen": [
+          "p2",
+          "task1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "本次输入构造早于 a1 发布；即使生成结束前结果到达也不追记。"
+      },
+      {
+        "id": "c_after_branch",
+        "module": "soulx",
+        "read_ms": 820,
+        "finish_ms": 825,
+        "seen": [
+          "p2",
+          "task1",
+          "a1"
+        ],
+        "target": {
+          "user_state": "user_nonidle",
+          "intervention": "clarification_opportunity"
+        },
+        "rationale": "类别仍未知且用户准备长篇展开；语义边界存在，单列未来澄清机会。",
+        "scope": "future_cot_control"
+      },
+      {
+        "id": "l_clarify",
+        "module": "layer1",
+        "read_ms": 840,
+        "finish_ms": 870,
+        "seen": [
+          "p2",
+          "task1",
+          "a1",
+          "control_published"
+        ],
+        "target": {
+          "action": "speak",
+          "purpose": "clarification",
+          "text": "先确认一下，你报的是学硕还是专硕？",
+          "response_key": "clarify1"
+        },
+        "rationale": "独立未来生成边界，不伪造 complete，不作为当前可执行协议。",
+        "scope": "future_clarification"
+      },
+      {
+        "id": "a_update",
+        "module": "layer2",
+        "read_ms": 880,
+        "finish_ms": 1100,
+        "seen": [
+          "p2",
+          "task1",
+          "a1"
+        ],
+        "target": {
+          "analysis": "报考类别仍未知，接下来的多组专属条款依赖类别；当前尚不能确认学术学位条款适用。"
+        },
+        "rationale": "同一活动任务在后续短推理边界读取新观察并更新依据。",
+        "publication": "a2"
+      },
+      {
+        "id": "l_no_repeat_clarify",
+        "module": "layer1",
+        "read_ms": 1200,
+        "finish_ms": 1230,
+        "seen": [
+          "p2",
+          "task1",
+          "a1",
+          "a2",
+          "cg",
+          "cp",
+          "control_published"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "同一缺口已经问过，等待用户回应，不重复澄清。"
+      }
+    ]
+  },
+  {
+    "trace_id": "scene04/short_transition",
+    "source_id": "scene04",
+    "split": "pilot",
+    "schedule": "simulated",
+    "events": [
+      {
+        "id": "p1",
+        "at_ms": 100,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 90,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 60,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "task1",
+        "at_ms": 160,
+        "kind": "task",
+        "payload": {
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      },
+      {
+        "id": "p2",
+        "at_ms": 640,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。学硕部分就这一句，下面马上是专硕要求。",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 630,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 600,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "a1",
+        "at_ms": 800,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      },
+      {
+        "id": "control_published",
+        "at_ms": 830,
+        "kind": "controller",
+        "payload": {
+          "protocol_scope": "future_cot_control",
+          "basis_frontend": "p2",
+          "judgment": {
+            "user_state": "user_nonidle",
+            "intervention": "continue_listening"
+          }
+        }
+      },
+      {
+        "id": "a2",
+        "at_ms": 1120,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 2,
+          "read_ms": 880,
+          "finished_ms": 1100,
+          "basis_frontend": "p2",
+          "analysis": "用户即将从很短的学术学位部分转向专业学位部分，类别尚未知。"
+        }
+      }
+    ],
+    "decisions": [
+      {
+        "id": "l_request",
+        "module": "layer1",
+        "read_ms": 120,
+        "finish_ms": 150,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "action": "request_thinking",
+          "task_id": "think1"
+        },
+        "rationale": "类别缺口可能影响后续资料适用性，先请求分析，无需开口。",
+        "shared_prefix_group": "scene04/l_request"
+      },
+      {
+        "id": "a_first",
+        "module": "layer2",
+        "read_ms": 180,
+        "finish_ms": 780,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        },
+        "rationale": "本次只读到共同前缀，不能预知用户类别。",
+        "publication": "a1",
+        "shared_prefix_group": "scene04/a_first"
+      },
+      {
+        "id": "l_task_active",
+        "module": "layer1",
+        "read_ms": 300,
+        "finish_ms": 330,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "已有活动任务，不为每个窗口重复请求。",
+        "shared_prefix_group": "scene04/l_task_active"
+      },
+      {
+        "id": "c_shared",
+        "module": "soulx",
+        "read_ms": 440,
+        "finish_ms": 470,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "user_state": "user_nonidle",
+          "intervention": "continue_listening"
+        },
+        "rationale": "分支差异尚未可见，使用一致判断，不提前知道用户类别。",
+        "scope": "future_cot_control",
+        "shared_prefix_group": "scene04/c_shared"
+      },
+      {
+        "id": "l_before_analysis",
+        "module": "layer1",
+        "read_ms": 720,
+        "finish_ms": 850,
+        "seen": [
+          "p2",
+          "task1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "本次输入构造早于 a1 发布；即使生成结束前结果到达也不追记。"
+      },
+      {
+        "id": "c_after_branch",
+        "module": "soulx",
+        "read_ms": 820,
+        "finish_ms": 825,
+        "seen": [
+          "p2",
+          "task1",
+          "a1"
+        ],
+        "target": {
+          "user_state": "user_nonidle",
+          "intervention": "continue_listening"
+        },
+        "rationale": "即将自然转入另一部分，提前询问增益有限。",
+        "scope": "future_cot_control"
+      },
+      {
+        "id": "l_after_analysis",
+        "module": "layer1",
+        "read_ms": 840,
+        "finish_ms": 870,
+        "seen": [
+          "p2",
+          "task1",
+          "a1",
+          "control_published"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "即将自然转入另一部分，提前询问增益有限。"
+      },
+      {
+        "id": "a_update",
+        "module": "layer2",
+        "read_ms": 880,
+        "finish_ms": 1100,
+        "seen": [
+          "p2",
+          "task1",
+          "a1"
+        ],
+        "target": {
+          "analysis": "用户即将从很短的学术学位部分转向专业学位部分，类别尚未知。"
+        },
+        "rationale": "同一活动任务在后续短推理边界读取新观察并更新依据。",
+        "publication": "a2"
+      }
+    ]
+  },
+  {
+    "trace_id": "scene04/self_searching",
+    "source_id": "scene04",
+    "split": "pilot",
+    "schedule": "simulated",
+    "events": [
+      {
+        "id": "p1",
+        "at_ms": 100,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 90,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 60,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "task1",
+        "at_ms": 160,
+        "kind": "task",
+        "payload": {
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      },
+      {
+        "id": "p2",
+        "at_ms": 640,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "帮我看看复试通知。通知分学术学位和专业学位，我先从学术学位部分开始念。我报的类别是……我看一下报名信息。",
+          "raw_state": "user_nonidle",
+          "effective_complete": false,
+          "raw_ready_ms": 630,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 600,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "a1",
+        "at_ms": 800,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 180,
+          "finished_ms": 780,
+          "basis_frontend": "p1",
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        }
+      },
+      {
+        "id": "control_published",
+        "at_ms": 830,
+        "kind": "controller",
+        "payload": {
+          "protocol_scope": "future_cot_control",
+          "basis_frontend": "p2",
+          "judgment": {
+            "user_state": "user_nonidle",
+            "intervention": "continue_listening"
+          }
+        }
+      },
+      {
+        "id": "a2",
+        "at_ms": 1120,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 2,
+          "read_ms": 880,
+          "finished_ms": 1100,
+          "basis_frontend": "p2",
+          "analysis": "用户正在查找报考类别；具体类别尚未得到，缺口仍在。"
+        }
+      }
+    ],
+    "decisions": [
+      {
+        "id": "l_request",
+        "module": "layer1",
+        "read_ms": 120,
+        "finish_ms": 150,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "action": "request_thinking",
+          "task_id": "think1"
+        },
+        "rationale": "类别缺口可能影响后续资料适用性，先请求分析，无需开口。",
+        "shared_prefix_group": "scene04/l_request"
+      },
+      {
+        "id": "a_first",
+        "module": "layer2",
+        "read_ms": 180,
+        "finish_ms": 780,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "analysis": "报考类别尚未明确；两类专属要求不同，类别会影响后续条款的适用性。"
+        },
+        "rationale": "本次只读到共同前缀，不能预知用户类别。",
+        "publication": "a1",
+        "shared_prefix_group": "scene04/a_first"
+      },
+      {
+        "id": "l_task_active",
+        "module": "layer1",
+        "read_ms": 300,
+        "finish_ms": 330,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "已有活动任务，不为每个窗口重复请求。",
+        "shared_prefix_group": "scene04/l_task_active"
+      },
+      {
+        "id": "c_shared",
+        "module": "soulx",
+        "read_ms": 440,
+        "finish_ms": 470,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "user_state": "user_nonidle",
+          "intervention": "continue_listening"
+        },
+        "rationale": "分支差异尚未可见，使用一致判断，不提前知道用户类别。",
+        "scope": "future_cot_control",
+        "shared_prefix_group": "scene04/c_shared"
+      },
+      {
+        "id": "l_before_analysis",
+        "module": "layer1",
+        "read_ms": 720,
+        "finish_ms": 850,
+        "seen": [
+          "p2",
+          "task1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "本次输入构造早于 a1 发布；即使生成结束前结果到达也不追记。"
+      },
+      {
+        "id": "c_after_branch",
+        "module": "soulx",
+        "read_ms": 820,
+        "finish_ms": 825,
+        "seen": [
+          "p2",
+          "task1",
+          "a1"
+        ],
+        "target": {
+          "user_state": "user_nonidle",
+          "intervention": "continue_listening"
+        },
+        "rationale": "当前正在自行检索；既不能抢问，也不能提前标成缺口已消解。",
+        "scope": "future_cot_control"
+      },
+      {
+        "id": "l_after_analysis",
+        "module": "layer1",
+        "read_ms": 840,
+        "finish_ms": 870,
+        "seen": [
+          "p2",
+          "task1",
+          "a1",
+          "control_published"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "当前正在自行检索；既不能抢问，也不能提前标成缺口已消解。"
+      },
+      {
+        "id": "a_update",
+        "module": "layer2",
+        "read_ms": 880,
+        "finish_ms": 1100,
+        "seen": [
+          "p2",
+          "task1",
+          "a1"
+        ],
+        "target": {
+          "analysis": "用户正在查找报考类别；具体类别尚未得到，缺口仍在。"
+        },
+        "rationale": "同一活动任务在后续短推理边界读取新观察并更新依据。",
+        "publication": "a2"
+      }
+    ]
+  },
+  {
+    "trace_id": "scene05/progressive",
+    "source_id": "scene05",
+    "split": "pilot",
+    "schedule": "simulated",
+    "events": [
+      {
+        "id": "p1",
+        "at_ms": 640,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+          "raw_state": "user_complete",
+          "effective_complete": true,
+          "raw_ready_ms": 630,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 600,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "task1",
+        "at_ms": 720,
+        "kind": "task",
+        "payload": {
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      },
+      {
+        "id": "a1",
+        "at_ms": 1000,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 760,
+          "finished_ms": 980,
+          "basis_frontend": "p1",
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        }
+      },
+      {
+        "id": "g1",
+        "at_ms": 1120,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "q1",
+        "at_ms": 1160,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+          "phase": "submitted",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "s1",
+        "at_ms": 1200,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+          "phase": "synthesized",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "play1",
+        "at_ms": 1240,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+          "phase": "playing",
+          "heard_any": true
+        },
+        "audit": {
+          "played_text": "最多只能装三件，",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "a2",
+        "at_ms": 1640,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 2,
+          "read_ms": 1280,
+          "finished_ms": 1620,
+          "basis_frontend": "p1",
+          "analysis": "三件混合组合中，2A+1B重20kg、花费80元，可行；1A+2B重22kg，不可行。因此最优为2A+1B，共三件。"
+        }
+      },
+      {
+        "id": "task_end",
+        "at_ms": 1720,
+        "kind": "task",
+        "payload": {
+          "task_id": "think1",
+          "state": "completed",
+          "reason": null
+        }
+      },
+      {
+        "id": "continue1",
+        "at_ms": 1760,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。选两件A和一件B，正好二十公斤、八十元，达到三件的上限。",
+          "phase": "playing",
+          "heard_any": true
+        },
+        "audit": {
+          "played_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+          "origin": "simulated_generation"
+        }
+      },
+      {
+        "id": "done1",
+        "at_ms": 2200,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。选两件A和一件B，正好二十公斤、八十元，达到三件的上限。",
+          "phase": "closed",
+          "heard_any": true
+        },
+        "audit": {
+          "played_text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。选两件A和一件B，正好二十公斤、八十元，达到三件的上限。",
+          "origin": "simulated_generation"
+        }
+      }
+    ],
+    "decisions": [
+      {
+        "id": "c_task_complete",
+        "module": "soulx",
+        "read_ms": 660,
+        "finish_ms": 690,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "user_state": "user_complete"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+        "shared_prefix_group": "scene05/c_task_complete"
+      },
+      {
+        "id": "l_request",
+        "module": "layer1",
+        "read_ms": 680,
+        "finish_ms": 710,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "action": "request_thinking",
+          "task_id": "think1"
+        },
+        "rationale": "多约束组合有进一步核验需求，保留不先说空泛进展话术的路径。",
+        "shared_prefix_group": "scene05/l_request"
+      },
+      {
+        "id": "a_upper_bound",
+        "module": "layer2",
+        "read_ms": 760,
+        "finish_ms": 980,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        },
+        "rationale": "本次只发布件数上界，组合仍待后续计算。",
+        "publication": "a1",
+        "shared_prefix_group": "scene05/a_upper_bound"
+      },
+      {
+        "id": "l_partial_answer",
+        "module": "layer1",
+        "read_ms": 1040,
+        "finish_ms": 1070,
+        "seen": [
+          "p1",
+          "task1",
+          "a1"
+        ],
+        "target": {
+          "action": "speak",
+          "purpose": "ordinary",
+          "text": "最多只能装三件，因为四件至少重二十四公斤，超过容量。",
+          "response_key": "r1"
+        },
+        "rationale": "当前有效 complete 已读到，生成一次普通回答。"
+      },
+      {
+        "id": "a_combinations",
+        "module": "layer2",
+        "read_ms": 1280,
+        "finish_ms": 1620,
+        "seen": [
+          "p1",
+          "task1",
+          "a1",
+          "g1",
+          "q1",
+          "s1",
+          "play1"
+        ],
+        "target": {
+          "analysis": "三件混合组合中，2A+1B重20kg、花费80元，可行；1A+2B重22kg，不可行。因此最优为2A+1B，共三件。"
+        },
+        "rationale": "本次短推理在表达开始后才构造输入，继续检验组合；仅为模拟调度证据。",
+        "publication": "a2"
+      },
+      {
+        "id": "l_no_unarrived_result",
+        "module": "layer1",
+        "read_ms": 1440,
+        "finish_ms": 1470,
+        "seen": [
+          "p1",
+          "task1",
+          "a1",
+          "g1",
+          "q1",
+          "s1",
+          "play1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "分析 v2 尚未发布，不凭最终答案虚构当前可见结果；等待不停止既有播放。"
+      },
+      {
+        "id": "l_final_answer",
+        "module": "layer1",
+        "read_ms": 1680,
+        "finish_ms": 1710,
+        "seen": [
+          "p1",
+          "task1",
+          "a1",
+          "a2",
+          "g1",
+          "play1"
+        ],
+        "target": {
+          "action": "continue_expression",
+          "purpose": "ordinary",
+          "output_id": "o1",
+          "text": "选两件A和一件B，正好二十公斤、八十元，达到三件的上限。"
+        },
+        "rationale": "在新的输入边界利用实际已注入的增量组合结论。"
+      },
+      {
+        "id": "l_no_new_value",
+        "module": "layer1",
+        "read_ms": 1800,
+        "finish_ms": 1830,
+        "seen": [
+          "p1",
+          "task1",
+          "a1",
+          "a2",
+          "task_end",
+          "g1",
+          "play1",
+          "continue1"
+        ],
+        "target": {
+          "action": "wait"
+        },
+        "rationale": "相同分析没有新增价值，不复述、不重启思考。"
+      }
+    ]
+  },
+  {
+    "trace_id": "scene05/fixed_error_recovery",
+    "source_id": "scene05",
+    "split": "pilot",
+    "schedule": "simulated",
+    "events": [
+      {
+        "id": "p1",
+        "at_ms": 640,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+          "raw_state": "user_complete",
+          "effective_complete": true,
+          "raw_ready_ms": 630,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 600,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "task1",
+        "at_ms": 720,
+        "kind": "task",
+        "payload": {
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      },
+      {
+        "id": "a1",
+        "at_ms": 1000,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 760,
+          "finished_ms": 980,
+          "basis_frontend": "p1",
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        }
+      },
+      {
+        "id": "wrong_generated",
+        "at_ms": 1120,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "一件A和一件B共十六公斤。",
+          "phase": "generated",
+          "heard_any": false
+        },
+        "audit": {
+          "played_text": "",
+          "origin": "fixed_error_prefix"
+        }
+      },
+      {
+        "id": "wrong_played",
+        "at_ms": 1240,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "一件A和一件B共十六公斤。",
+          "phase": "playing",
+          "heard_any": true
+        },
+        "audit": {
+          "played_text": "一件A和一件B共十六公斤。",
+          "origin": "fixed_error_prefix"
+        }
+      },
+      {
+        "id": "afix",
+        "at_ms": 1640,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 2,
+          "read_ms": 1280,
+          "finished_ms": 1620,
+          "basis_frontend": "p1",
+          "analysis": "单件重量为6kg与8kg，1A+1B实际合计14kg，先前16kg的合计不成立；2A+1B为20kg、80元，可达到三件上限。"
+        }
+      },
+      {
+        "id": "task_end",
+        "at_ms": 1720,
+        "kind": "task",
+        "payload": {
+          "task_id": "think1",
+          "state": "completed",
+          "reason": null
+        }
+      },
+      {
+        "id": "corrected_playback",
+        "at_ms": 1840,
+        "kind": "output",
+        "payload": {
+          "output_id": "o1",
+          "response_key": "r1",
+          "purpose": "ordinary",
+          "generated_text": "一件A和一件B共十六公斤。刚才的合计应是十四公斤，不是十六公斤。最多可装两件A和一件B，合计二十公斤、八十元。",
+          "phase": "playing",
+          "heard_any": true
+        },
+        "audit": {
+          "played_text": "一件A和一件B共十六公斤。刚才的合计应是十四公斤，不是十六公斤。最多可装两件A和一件B，合计二十公斤、八十元。",
+          "origin": "simulated_generation"
+        }
+      }
+    ],
+    "decisions": [
+      {
+        "id": "c_task_complete",
+        "module": "soulx",
+        "read_ms": 660,
+        "finish_ms": 690,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "user_state": "user_complete"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+        "shared_prefix_group": "scene05/c_task_complete"
+      },
+      {
+        "id": "l_request",
+        "module": "layer1",
+        "read_ms": 680,
+        "finish_ms": 710,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "action": "request_thinking",
+          "task_id": "think1"
+        },
+        "rationale": "多约束组合有进一步核验需求，保留不先说空泛进展话术的路径。",
+        "shared_prefix_group": "scene05/l_request"
+      },
+      {
+        "id": "a_upper_bound",
+        "module": "layer2",
+        "read_ms": 760,
+        "finish_ms": 980,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        },
+        "rationale": "本次只发布件数上界，组合仍待后续计算。",
+        "publication": "a1",
+        "shared_prefix_group": "scene05/a_upper_bound"
+      },
+      {
+        "id": "a_check_error",
+        "module": "layer2",
+        "read_ms": 1280,
+        "finish_ms": 1620,
+        "seen": [
+          "p1",
+          "task1",
+          "a1",
+          "wrong_generated",
+          "wrong_played"
+        ],
+        "target": {
+          "analysis": "单件重量为6kg与8kg，1A+1B实际合计14kg，先前16kg的合计不成立；2A+1B为20kg、80元，可达到三件上限。"
+        },
+        "rationale": "检查实际生成历史与任务重量，给出变化依据，不写纠正话术。",
+        "publication": "afix"
+      },
+      {
+        "id": "l_correct",
+        "module": "layer1",
+        "read_ms": 1680,
+        "finish_ms": 1710,
+        "seen": [
+          "p1",
+          "task1",
+          "a1",
+          "afix",
+          "wrong_generated",
+          "wrong_played"
+        ],
+        "target": {
+          "action": "continue_expression",
+          "purpose": "ordinary",
+          "output_id": "o1",
+          "text": "刚才的合计应是十四公斤，不是十六公斤。最多可装两件A和一件B，合计二十公斤、八十元。"
+        },
+        "rationale": "错误来自显式固定前缀，仅作恢复上下文；错误 token 屏蔽损失，纠正已听错误。"
+      }
+    ]
+  },
+  {
+    "trace_id": "scene05/timeout",
+    "source_id": "scene05",
+    "split": "pilot",
+    "schedule": "simulated",
+    "events": [
+      {
+        "id": "p1",
+        "at_ms": 640,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+          "raw_state": "user_complete",
+          "effective_complete": true,
+          "raw_ready_ms": 630,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 600,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "task1",
+        "at_ms": 720,
+        "kind": "task",
+        "payload": {
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      },
+      {
+        "id": "a1",
+        "at_ms": 1000,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 760,
+          "finished_ms": 980,
+          "basis_frontend": "p1",
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        }
+      },
+      {
+        "id": "task_end",
+        "at_ms": 1280,
+        "kind": "task",
+        "payload": {
+          "task_id": "think1",
+          "state": "timeout",
+          "reason": "simulated_budget_exhausted"
+        }
+      }
+    ],
+    "decisions": [
+      {
+        "id": "c_task_complete",
+        "module": "soulx",
+        "read_ms": 660,
+        "finish_ms": 690,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "user_state": "user_complete"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+        "shared_prefix_group": "scene05/c_task_complete"
+      },
+      {
+        "id": "l_request",
+        "module": "layer1",
+        "read_ms": 680,
+        "finish_ms": 710,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "action": "request_thinking",
+          "task_id": "think1"
+        },
+        "rationale": "多约束组合有进一步核验需求，保留不先说空泛进展话术的路径。",
+        "shared_prefix_group": "scene05/l_request"
+      },
+      {
+        "id": "a_upper_bound",
+        "module": "layer2",
+        "read_ms": 760,
+        "finish_ms": 980,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        },
+        "rationale": "本次只发布件数上界，组合仍待后续计算。",
+        "publication": "a1",
+        "shared_prefix_group": "scene05/a_upper_bound"
+      },
+      {
+        "id": "l_fallback",
+        "module": "layer1",
+        "read_ms": 1360,
+        "finish_ms": 1390,
+        "seen": [
+          "p1",
+          "task1",
+          "a1",
+          "task_end"
+        ],
+        "target": {
+          "action": "speak",
+          "purpose": "ordinary",
+          "text": "最多装三件。两件A加一件B重二十公斤，花八十元；一件A加两件B超重。",
+          "response_key": "r1"
+        },
+        "rationale": "失败不等于用户让轮；当前已有有效 complete，Layer 1 可独立核算，不伪造 v2 或自动重试。"
+      }
+    ]
+  },
+  {
+    "trace_id": "scene05/failed",
+    "source_id": "scene05",
+    "split": "pilot",
+    "schedule": "simulated",
+    "events": [
+      {
+        "id": "p1",
+        "at_ms": 640,
+        "kind": "frontend",
+        "payload": {
+          "turn_id": "t1",
+          "transcript": "箱子最多装20kg，预算100元。A每件6kg、25元，B每件8kg、30元，两种都至少一件，怎样装件数最多？",
+          "raw_state": "user_complete",
+          "effective_complete": true,
+          "raw_ready_ms": 630,
+          "audio": {
+            "uri": null,
+            "observed_until_ms": 600,
+            "origin": "missing_text_pilot"
+          }
+        }
+      },
+      {
+        "id": "task1",
+        "at_ms": 720,
+        "kind": "task",
+        "payload": {
+          "task_id": "think1",
+          "state": "active",
+          "reason": null
+        }
+      },
+      {
+        "id": "a1",
+        "at_ms": 1000,
+        "kind": "analysis",
+        "payload": {
+          "task_id": "think1",
+          "version": 1,
+          "read_ms": 760,
+          "finished_ms": 980,
+          "basis_frontend": "p1",
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        }
+      },
+      {
+        "id": "task_end",
+        "at_ms": 1280,
+        "kind": "task",
+        "payload": {
+          "task_id": "think1",
+          "state": "failed",
+          "reason": "simulated_worker_failure"
+        }
+      }
+    ],
+    "decisions": [
+      {
+        "id": "c_task_complete",
+        "module": "soulx",
+        "read_ms": 660,
+        "finish_ms": 690,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "user_state": "user_complete"
+        },
+        "rationale": "候选状态仅按当前前缀编写，待独立音频审核。",
+        "shared_prefix_group": "scene05/c_task_complete"
+      },
+      {
+        "id": "l_request",
+        "module": "layer1",
+        "read_ms": 680,
+        "finish_ms": 710,
+        "seen": [
+          "p1"
+        ],
+        "target": {
+          "action": "request_thinking",
+          "task_id": "think1"
+        },
+        "rationale": "多约束组合有进一步核验需求，保留不先说空泛进展话术的路径。",
+        "shared_prefix_group": "scene05/l_request"
+      },
+      {
+        "id": "a_upper_bound",
+        "module": "layer2",
+        "read_ms": 760,
+        "finish_ms": 980,
+        "seen": [
+          "p1",
+          "task1"
+        ],
+        "target": {
+          "analysis": "每件至少重6kg，四件至少重24kg，超过20kg容量，因此件数上限为三件；仍需检验混合组合与预算。"
+        },
+        "rationale": "本次只发布件数上界，组合仍待后续计算。",
+        "publication": "a1",
+        "shared_prefix_group": "scene05/a_upper_bound"
+      },
+      {
+        "id": "l_fallback",
+        "module": "layer1",
+        "read_ms": 1360,
+        "finish_ms": 1390,
+        "seen": [
+          "p1",
+          "task1",
+          "a1",
+          "task_end"
+        ],
+        "target": {
+          "action": "speak",
+          "purpose": "ordinary",
+          "text": "最多装三件。两件A加一件B重二十公斤，花八十元；一件A加两件B超重。",
+          "response_key": "r1"
+        },
+        "rationale": "失败不等于用户让轮；当前已有有效 complete，Layer 1 可独立核算，不伪造 v2 或自动重试。"
+      }
+    ]
+  }
+]
