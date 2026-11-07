@@ -1,5 +1,7 @@
 # NTF-054：执行线程与 complete 交接修复后的复测
 
+2026-11-07 10:15结果复核：**r4 smoke已3/3完成、退出0；手动运行既有CPU审计通过，492批逐帧及3份实际播放录音完整，7次complete整段识别按配置跳过。** 三条控制最大积压分别为651.50／584.51／592.43ms，未重现历史数十秒长尾。打断104仍漏识别garden、实际回答股票话题，工程放行不等于内容通过。原衔接及timeout进程均已退出，campaign停留在过期waiting_smoke，正式30条和评分未提交，当前队列为空；与外层12小时期限早于长期排队结束相符，但无退出码可确证终止原因。本次没有恢复或重提作业，NTF-054保持未完成。详见[冒烟复核](smoke_r4_review.md)及[审计快照](smoke_r4_audit.json)。
+
 2026-11-06 12:26调度核验：r4 smoke仍为Pending，尚未绑定节点（nodeName为空、PodScheduled=False），无containerStatuses、运行目录或启动日志，尚未进入镜像拉取／容器执行阶段。提交时的调度条件为Schedulable，message记录可分配至d6-hpc-gpu-052，但没有实际绑定；当前没有Pod事件，不能据此确认资源碎片、镜像故障或特定队列策略。任务要求同一节点3GPU／12CPU／64GiB；069节点被禁止调度。账户无权查询队列、PodGroup及全局Pod请求，具体准入原因仍待调度侧核验。衔接进程正常、状态waiting_smoke，本次没有修改或重提任务。证据见[调度快照](scheduler_20261106_1226.json)。
 
 2026-11-06 08:19最新状态：用户明确要求重提，NTF-064已修复入口的输出父目录准备并恢复远端runs目录。源码4821efe已推送并部署至独立干净worktree，r4 smoke作业 **job-179392426378993291113-xuan-zhang** 于08:17提交，08:19为Pending。顺序衔接Python进程1836859（timeout包装1836858）正常，状态waiting_smoke；仅smoke离队、退出0且审计通过后才提交正式30条，再单卡评分。提交证据见[launch_r4.json](launch_r4.json)，此次重提尚无新模型成绩。
@@ -29,9 +31,9 @@ r3提交前队列为空；账户存储约186.67GB／1TB，GPU配额8张。仅串
 | smoke-r3 | `ntf054-half-smoke-20261105-r3` | `job-179388489846387768877-xuan-zhang` | 创建输出目录失败；模型未加载，样本0/3，无退出标记 |
 | formal-r3 | `ntf054-half-20261105-r3-formal` | 未提交 | smoke未通过，衔接已停止 |
 | score-r3 | `ntf054-half-20261105-r3-score` | 未提交 | 无新正式推理结果 |
-| smoke-r4 | `ntf054-half-smoke-20261106-r4` | `job-179392426378993291113-xuan-zhang` | 12:26仍为Pending，尚未绑定节点或启动容器 |
-| formal-r4 | `ntf054-half-20261106-r4-formal` | 待smoke通过后提交 | 顺序衔接正常 |
-| score-r4 | `ntf054-half-20261106-r4-score` | 待正式推理通过后提交 | 仅TOR／延迟 |
+| smoke-r4 | `ntf054-half-smoke-20261106-r4` | `job-179392426378993291113-xuan-zhang` | 11月7日08:32完成；3/3、退出0，手动CPU审计通过 |
+| formal-r4 | `ntf054-half-20261106-r4-formal` | 未提交 | 原衔接已退出，待恢复 |
+| score-r4 | `ntf054-half-20261106-r4-score` | 未提交 | 待正式推理通过后提交，仅TOR／延迟 |
 
 验收需核对新execution／ready预算、预热与正式SoulX线程ID、complete识别跳过事件、播放实录及完整固定分母。r3只核对一致性检查的明确取消记录，不执行原生对照；r2限定差异对照结果保留作历史证据。完成作业和低延迟分别报告，不能由本地回归推定GPU性能。
 

@@ -1,8 +1,10 @@
 # 工作单管理
 
-更新：2026-11-06。当前前端路线为 **SoulX-Duplug 官方配置＋并行 X2Streaming-ASR**。第一阶段 ASR-Frontend 已收口；Layer 1 首轮从官方 Qwen2.5-7B-Instruct 开始协议适配，Qwen3 为后续候选，接入与训练尚未实施。
+更新：2026-11-07。当前前端路线为 **SoulX-Duplug 官方配置＋并行 X2Streaming-ASR**。第一阶段 ASR-Frontend 已收口；Layer 1 首轮从官方 Qwen2.5-7B-Instruct 开始协议适配，Qwen3 为后续候选，接入与训练尚未实施。
 
 ## 当前工作单
+
+NTF-054于2026-11-07 10:15复核：r4冒烟3/3完成、退出0，492批及3份实际播放录音审计通过；三条最大控制积压低于652ms。打断104仍漏掉garden并回答股票话题，工程放行不代表内容或正式TOR通过。原衔接与timeout进程已退出，campaign的waiting_smoke已过期，正式30条和评分均未提交；当前队列为空。此次未重提作业，完整复测保持未完成，见[冒烟复核](../reports/soulx/20261105-ntf054-retest/smoke_r4_review.md)及[审计快照](../reports/soulx/20261105-ntf054-retest/smoke_r4_audit.json)。
 
 NTF-054于2026-11-06 12:26核验：r4仍在节点绑定前Pending，尚未启动容器；提交时曾有可分配到052的调度条件，但没有实际绑定。069节点禁止调度，具体队列准入原因受查询权限限制尚不确定；衔接正常。本次仅查询，未修改任务，见[调度证据](../reports/soulx/20261105-ntf054-retest/scheduler_20261106_1226.json)。
 
@@ -14,7 +16,7 @@ NTF-061／062 已按用户最终确认完成并归档：保留 X-Talk 工程框�
 
 NTF-058／059／060 已完成旧候选路线、入口文档与早期报告证据整理并归档。删除旧候选加载器和固定 25 条重放入口；保留现役基线及 NTF-054 活动证据。conda 本地 149 项回归通过，6 份迁移证据 SHA256 一致。清理清单见[维护记录](../runtime_baseline.md)。
 
-NTF-057已按用户指令取消完整系统原生控制一致性检查并归档；r4继续保持该范围。[NTF-054](NTF-054.md)的r3因runs父目录缺失在加载模型前失败、样本0/3；用户随后要求重提，NTF-064已完成父目录修复及r4提交。当前r4排队，正式30条及评分待前阶段审计通过后顺序提交，完整复测尚未完成。最新证据见[运行记录](../reports/soulx/20261105-ntf054-retest/README.md)及[launch_r4.json](../reports/soulx/20261105-ntf054-retest/launch_r4.json)，r3失败证据保留。
+NTF-057已按用户指令取消完整系统原生控制一致性检查并归档；r4继续保持该范围。[NTF-054](NTF-054.md)的r3因runs父目录缺失在加载模型前失败、样本0/3；用户随后要求重提，NTF-064已完成父目录修复及r4提交。r4冒烟现已通过工程审计，原衔接已退出，正式30条及评分待恢复，完整复测尚未完成。最新证据见[运行记录](../reports/soulx/20261105-ntf054-retest/README.md)及[冒烟复核](../reports/soulx/20261105-ntf054-retest/smoke_r4_review.md)，r3失败证据保留。
 
 NTF-056已完成[NTF-054失败原因调查](../reports/soulx/20261105-ntf054-retest/failure_analysis.md)并归档：complete整段识别省略后，dither的CPU随机数消耗偏移；单卡基线完整复现3处差异，仅补齐特征提取后275条轨迹对照通过。用户随后取消本次对照，不实施RNG修复；调度查询已增加有限重试。
 

@@ -1,0 +1,1061 @@
+{
+  "checked_at_utc": "2026-11-07T02:15:16.190161+00:00",
+  "source_commit": "4821efed6e5947375558b22dc5cc7d5bc084208e",
+  "source_worktree_status": "",
+  "smoke_job": "job-179392426378993291113-xuan-zhang",
+  "smoke_run": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/runs/ntf054-half-smoke-20261106-r4",
+  "exit_code": 0,
+  "manifest_sha256": "403be34448e0b011fa0b6a26216c0390ea3ed46ce77335e4bbe7a20cde4f3c07",
+  "passed": true,
+  "scope": "smoke",
+  "audit": {
+    "passed": true,
+    "cases": 3,
+    "frames": 492,
+    "complete_recognition_skipped": 7,
+    "max_controller_main_lag_ms": 651.4964636415243,
+    "recordings_audited": 3,
+    "execution": {
+      "cpu_threads": 2,
+      "interop_threads": 1,
+      "sensevoice_ncpu": 2,
+      "thread_ident": 139958587213632,
+      "thread_native_id": 147,
+      "skip_complete_recognition": true
+    }
+  },
+  "execution": {
+    "cpu_threads": 2,
+    "interop_threads": 1,
+    "sensevoice_ncpu": 2,
+    "thread_ident": 139958587213632,
+    "thread_native_id": 147,
+    "skip_complete_recognition": true
+  },
+  "backend_budgets": {
+    "qwen": {
+      "cpu_threads": 2,
+      "interop_threads": 1
+    },
+    "indextts": {
+      "cpu_threads": 2,
+      "interop_threads": 1
+    }
+  },
+  "x2_budget": {
+    "cpu_threads": 2,
+    "interop_threads": 1
+  },
+  "warmup": {
+    "passed": true,
+    "equivalence": {
+      "executed": false,
+      "status": "disabled_by_user",
+      "comparison_policy": "disabled_by_user",
+      "passed": null
+    },
+    "reset_rng_equal": true,
+    "missing_by_round": [
+      {},
+      {}
+    ],
+    "rounds": [
+      {
+        "passed": true,
+        "frames": 59,
+        "coverage": {
+          "sensevoice_text": true,
+          "text_revision": true,
+          "native_complete": true,
+          "reset": true,
+          "wait": true,
+          "multi_token_eos": true,
+          "joint_complete": true,
+          "joint_wait": true
+        },
+        "direct_lengths": [
+          25600,
+          51200,
+          53760,
+          107520,
+          161280
+        ],
+        "controller_compute_ms": {
+          "count": 59,
+          "p50": 101.39179229736328,
+          "p95": 175.44417828321457,
+          "max": 990.5222058296204
+        }
+      },
+      {
+        "passed": true,
+        "frames": 59,
+        "coverage": {
+          "sensevoice_text": true,
+          "text_revision": true,
+          "native_complete": true,
+          "reset": true,
+          "wait": true,
+          "multi_token_eos": true,
+          "joint_complete": true,
+          "joint_wait": true
+        },
+        "direct_lengths": [
+          25600,
+          51200,
+          53760,
+          107520,
+          161280
+        ],
+        "controller_compute_ms": {
+          "count": 59,
+          "p50": 96.6490637511015,
+          "p95": 155.16454782336947,
+          "max": 165.46964459121227
+        }
+      }
+    ]
+  },
+  "cases": [
+    {
+      "case_id": "candor_turn_taking-17",
+      "passed": true,
+      "frames": 117,
+      "elapsed_seconds": 18.736371295526624,
+      "original_seconds": 10.5999375,
+      "online_text": "oh okay cool nice so what part of the arizona are you in",
+      "coverage": {
+        "sensevoice_text": true,
+        "text_revision": true,
+        "native_complete": true,
+        "reset": true,
+        "wait": true,
+        "multi_token_eos": true,
+        "joint_complete": true,
+        "joint_wait": true
+      },
+      "event_counts": {
+        "joint_state_consumed": 117,
+        "reply_started": 3,
+        "generation_dispatched": 3,
+        "llm_request": 3,
+        "llm_first_text": 3,
+        "llm_text_delta": 57,
+        "tts_segment_ready": 13,
+        "tts_request": 8,
+        "llm_result": 3,
+        "cancel_requested": 2,
+        "playback_cancelled": 2,
+        "cancel_acknowledged": 4,
+        "tts_result": 8,
+        "late_audio_discarded": 2,
+        "cancelled_tts_drained": 2,
+        "audio_queued": 6,
+        "playback_segment_start": 6,
+        "assistant_history_pending": 1,
+        "assistant_text_visible": 6,
+        "playback_segment_end": 5,
+        "playback_complete": 1
+      },
+      "recording": {
+        "kind": "live_monotonic_playback_capture",
+        "posthoc_audio_synthesis": false,
+        "audio_sha256": "cb065b7c2fd60e35f245ae85352e2cb1f3e6ecbada489ffd91f8af3c20e8367c",
+        "frames_sha256": "205ce489eb7abc5b79b9fa1f51bc0f35012e42076a8713d5e6f7a6f2bc032663",
+        "events_sha256": "96a216c74b1e335166f16b99ef8396413e9407c8da49530d605b030ed8c8bbb9"
+      },
+      "timing": {
+        "controller_compute_ms": {
+          "count": 117,
+          "p50": 69.09741275012493,
+          "p95": 171.76161482930164,
+          "max": 382.7534317970276
+        },
+        "controller_main_lag_ms": {
+          "count": 117,
+          "p50": 398.19841384887764,
+          "p95": 537.2293041944503,
+          "max": 651.4964636415243
+        },
+        "controller_queue_ms": {
+          "count": 117,
+          "p50": 0.7936619222164154,
+          "p95": 152.1383155137298,
+          "max": 334.79996025562286
+        },
+        "sensevoice_by_length": {
+          "53760": {
+            "count": 18,
+            "p50": 46.01459391415119,
+            "p95": 134.79978265240788,
+            "max": 136.85888424515724
+          }
+        },
+        "joint_commit_ms": {
+          "count": 117,
+          "p50": 0.6899051368236542,
+          "p95": 1.0692272335290907,
+          "max": 1.5034638345241547
+        },
+        "asr_compute_ms": {
+          "count": 233,
+          "p50": 36.98433004319668,
+          "p95": 91.3296315819025,
+          "max": 210.72687581181526
+        }
+      },
+      "complete_recognition_skipped": 3,
+      "sensevoice_ms": {
+        "count": 18,
+        "p50": 46.01459391415119,
+        "p95": 134.79978265240788,
+        "max": 136.85888424515724
+      },
+      "completions": [
+        {
+          "step_id": 4,
+          "observed_until_seconds": 0.8,
+          "wall_seconds": 1.028164118528366,
+          "text": "oh okay"
+        },
+        {
+          "step_id": 17,
+          "observed_until_seconds": 2.84,
+          "wall_seconds": 3.05789091065526,
+          "text": "oh okay cool nice"
+        },
+        {
+          "step_id": 34,
+          "observed_until_seconds": 5.44,
+          "wall_seconds": 5.752815091982484,
+          "text": "oh okay cool nice so what part of the arizona are you in"
+        }
+      ],
+      "reply_timeline": [
+        {
+          "event": "reply_started",
+          "time": 1.0291987881064415,
+          "request_id": "candor_turn_taking-17-r1",
+          "user_text": "oh okay"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 1.8519345074892044,
+          "request_id": "candor_turn_taking-17-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 1.8522695265710354,
+          "request_id": "candor_turn_taking-17-r1",
+          "played_samples": 0
+        },
+        {
+          "event": "reply_started",
+          "time": 3.0589384958148003,
+          "request_id": "candor_turn_taking-17-r2",
+          "user_text": "cool nice"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 4.032441895455122,
+          "request_id": "candor_turn_taking-17-r2"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 4.1327885910868645,
+          "request_id": "candor_turn_taking-17-r2",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 4.136005515232682,
+          "request_id": "candor_turn_taking-17-r2",
+          "played_samples": 1342
+        },
+        {
+          "event": "reply_started",
+          "time": 5.753632675856352,
+          "request_id": "candor_turn_taking-17-r3",
+          "user_text": "so what part of the arizona are you in"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 7.1770554427057505,
+          "request_id": "candor_turn_taking-17-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 10.143290605396032,
+          "request_id": "candor_turn_taking-17-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 13.011914011090994,
+          "request_id": "candor_turn_taking-17-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 16.2744791097939,
+          "request_id": "candor_turn_taking-17-r3"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 18.78541769273579,
+          "request_id": "candor_turn_taking-17-r3"
+        },
+        {
+          "event": "playback_complete",
+          "time": 20.87859215028584,
+          "request_id": "candor_turn_taking-17-r3"
+        }
+      ],
+      "playback_ledger": {
+        "frames": 608,
+        "first_frame": {
+          "request_id": "candor_turn_taking-17-r2",
+          "start_sample": 64522,
+          "samples": 320,
+          "time": 4.032615313306451
+        },
+        "last_frame": {
+          "request_id": "candor_turn_taking-17-r3",
+          "start_sample": 333771,
+          "samples": 235,
+          "time": 20.860685708001256
+        }
+      }
+    },
+    {
+      "case_id": "candor_pause_handling-16",
+      "passed": true,
+      "frames": 149,
+      "elapsed_seconds": 23.985876565799117,
+      "original_seconds": 15.84,
+      "online_text": "yeah i don't have anything particularly memorable like that at most it was like my first call was with an excop and this was around the time of the whole like police like protest and i was kind of like ooh i don't know what to say",
+      "coverage": {
+        "sensevoice_text": true,
+        "text_revision": true,
+        "native_complete": true,
+        "reset": true,
+        "wait": true,
+        "multi_token_eos": true,
+        "joint_complete": true,
+        "joint_wait": true
+      },
+      "event_counts": {
+        "joint_state_consumed": 149,
+        "reply_started": 2,
+        "generation_dispatched": 2,
+        "llm_request": 2,
+        "cancel_requested": 2,
+        "playback_cancelled": 2,
+        "cancel_acknowledged": 3,
+        "llm_first_text": 1,
+        "llm_text_delta": 14,
+        "tts_segment_ready": 3,
+        "tts_request": 1,
+        "tts_result": 1,
+        "late_audio_discarded": 1,
+        "cancelled_tts_drained": 1
+      },
+      "recording": {
+        "kind": "live_monotonic_playback_capture",
+        "posthoc_audio_synthesis": false,
+        "audio_sha256": "f477fd1adf190937b63c422bec8b9a5590b566ae94270ada14fd70703a7a0635",
+        "frames_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "events_sha256": "d833f8abaa4f58109b21d72e6f5fca24d3c0341fa514d610c5246f0ad47ec483"
+      },
+      "timing": {
+        "controller_compute_ms": {
+          "count": 149,
+          "p50": 81.58396370708942,
+          "p95": 165.10411612689495,
+          "max": 228.4555919468403
+        },
+        "controller_main_lag_ms": {
+          "count": 149,
+          "p50": 418.0210114270455,
+          "p95": 510.5368892103439,
+          "max": 584.5070876926184
+        },
+        "controller_queue_ms": {
+          "count": 149,
+          "p50": 0.7270965725183487,
+          "p95": 104.00085896253583,
+          "max": 196.90976664423943
+        },
+        "sensevoice_by_length": {
+          "43520": {
+            "count": 1,
+            "p50": 41.82806611061096,
+            "p95": 41.82806611061096,
+            "max": 41.82806611061096
+          },
+          "53760": {
+            "count": 55,
+            "p50": 43.97346451878548,
+            "p95": 98.24807476252316,
+            "max": 114.58991654217243
+          },
+          "179200": {
+            "count": 1,
+            "p50": 81.33856020867825,
+            "p95": 81.33856020867825,
+            "max": 81.33856020867825
+          }
+        },
+        "joint_commit_ms": {
+          "count": 149,
+          "p50": 0.7134191691875458,
+          "p95": 1.018760725855827,
+          "max": 1.480473205447197
+        },
+        "asr_compute_ms": {
+          "count": 298,
+          "p50": 37.38997504115105,
+          "p95": 83.61522424966094,
+          "max": 163.477074354887
+        }
+      },
+      "complete_recognition_skipped": 2,
+      "sensevoice_ms": {
+        "count": 57,
+        "p50": 43.97346451878548,
+        "p95": 97.54509478807446,
+        "max": 114.58991654217243
+      },
+      "completions": [
+        {
+          "step_id": 14,
+          "observed_until_seconds": 2.32,
+          "wall_seconds": 2.6495832353830338,
+          "text": "yeah i don't have anything"
+        },
+        {
+          "step_id": 20,
+          "observed_until_seconds": 3.24,
+          "wall_seconds": 3.5648744478821754,
+          "text": "yeah i don't have anything particularly memorable"
+        }
+      ],
+      "reply_timeline": [
+        {
+          "event": "reply_started",
+          "time": 2.650614643469453,
+          "request_id": "candor_pause_handling-16-r1",
+          "user_text": "yeah i don't have anything"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 2.8105104696005583,
+          "request_id": "candor_pause_handling-16-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 2.810623001307249,
+          "request_id": "candor_pause_handling-16-r1",
+          "played_samples": 0
+        },
+        {
+          "event": "reply_started",
+          "time": 3.5669874604791403,
+          "request_id": "candor_pause_handling-16-r2",
+          "user_text": "particularly memorable"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 4.064894573763013,
+          "request_id": "candor_pause_handling-16-r2",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 4.06501124612987,
+          "request_id": "candor_pause_handling-16-r2",
+          "played_samples": 0
+        }
+      ],
+      "playback_ledger": {
+        "frames": 0,
+        "first_frame": null,
+        "last_frame": null
+      }
+    },
+    {
+      "case_id": "synthetic_user_interruption-104",
+      "passed": true,
+      "frames": 226,
+      "elapsed_seconds": 36.25183962844312,
+      "original_seconds": 28.144,
+      "online_text": "told they start investing in stocks yeah but can we shift gears a bit how do i start a",
+      "coverage": {
+        "sensevoice_text": true,
+        "text_revision": true,
+        "native_complete": true,
+        "reset": true,
+        "wait": true,
+        "multi_token_eos": true,
+        "joint_complete": true,
+        "joint_wait": true
+      },
+      "event_counts": {
+        "joint_state_consumed": 226,
+        "reply_started": 2,
+        "generation_dispatched": 2,
+        "llm_request": 2,
+        "llm_first_text": 2,
+        "llm_text_delta": 54,
+        "tts_segment_ready": 11,
+        "tts_request": 8,
+        "cancel_requested": 1,
+        "playback_cancelled": 1,
+        "cancel_acknowledged": 2,
+        "tts_result": 8,
+        "late_audio_discarded": 1,
+        "cancelled_tts_drained": 1,
+        "audio_queued": 7,
+        "playback_segment_start": 7,
+        "playback_segment_end": 7,
+        "assistant_text_visible": 7,
+        "llm_result": 1,
+        "playback_complete": 1
+      },
+      "recording": {
+        "kind": "live_monotonic_playback_capture",
+        "posthoc_audio_synthesis": false,
+        "audio_sha256": "af664e531fb1ea7d1016550ed0b4df5ad242e49d2a51194c39a8c94bf91679bf",
+        "frames_sha256": "306373f73ed219fe5d53afbe204bb3954a5fb38968688a26f3bd38f27638a520",
+        "events_sha256": "f2ffc41134e498e065c244fff52a5336d8b954db70aa242f83061712d1fe9c1c"
+      },
+      "timing": {
+        "controller_compute_ms": {
+          "count": 226,
+          "p50": 63.47443349659443,
+          "p95": 143.86271592229605,
+          "max": 199.66103695333004
+        },
+        "controller_main_lag_ms": {
+          "count": 226,
+          "p50": 354.8437913879763,
+          "p95": 429.235262721777,
+          "max": 592.4328754842279
+        },
+        "controller_queue_ms": {
+          "count": 226,
+          "p50": 0.6131278350949287,
+          "p95": 13.615536969155073,
+          "max": 193.05196776986122
+        },
+        "sensevoice_by_length": {
+          "53760": {
+            "count": 24,
+            "p50": 42.555165477097034,
+            "p95": 81.7991083487868,
+            "max": 94.9217677116394
+          },
+          "58880": {
+            "count": 1,
+            "p50": 38.484543561935425,
+            "p95": 38.484543561935425,
+            "max": 38.484543561935425
+          }
+        },
+        "joint_commit_ms": {
+          "count": 226,
+          "p50": 0.6804820150136948,
+          "p95": 0.9718243964016438,
+          "max": 2.4261213839054108
+        },
+        "asr_compute_ms": {
+          "count": 452,
+          "p50": 37.278078496456146,
+          "p95": 77.2810623049736,
+          "max": 226.62059776484966
+        }
+      },
+      "complete_recognition_skipped": 2,
+      "sensevoice_ms": {
+        "count": 25,
+        "p50": 42.45602898299694,
+        "p95": 81.12295940518375,
+        "max": 94.9217677116394
+      },
+      "completions": [
+        {
+          "step_id": 74,
+          "observed_until_seconds": 11.92,
+          "wall_seconds": 12.152266465127468,
+          "text": "told they start investing in stocks yeah but can we shift gears a bit"
+        },
+        {
+          "step_id": 84,
+          "observed_until_seconds": 13.48,
+          "wall_seconds": 13.752777062356472,
+          "text": "told they start investing in stocks yeah but can we shift gears a bit how do i start a"
+        }
+      ],
+      "reply_timeline": [
+        {
+          "event": "reply_started",
+          "time": 12.153162265196443,
+          "request_id": "synthetic_user_interruption-104-r1",
+          "user_text": "told they start investing in stocks yeah but can we shift gears a bit"
+        },
+        {
+          "event": "cancel_requested",
+          "time": 13.02450180798769,
+          "request_id": "synthetic_user_interruption-104-r1",
+          "reason": "soulx_nonidle"
+        },
+        {
+          "event": "playback_cancelled",
+          "time": 13.024537907913327,
+          "request_id": "synthetic_user_interruption-104-r1",
+          "played_samples": 0
+        },
+        {
+          "event": "reply_started",
+          "time": 13.753490794450045,
+          "request_id": "synthetic_user_interruption-104-r2",
+          "user_text": "how do i start a"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 14.611602764576674,
+          "request_id": "synthetic_user_interruption-104-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 16.012827932834625,
+          "request_id": "synthetic_user_interruption-104-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 16.977683613076806,
+          "request_id": "synthetic_user_interruption-104-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 19.65457977540791,
+          "request_id": "synthetic_user_interruption-104-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 22.661118799820542,
+          "request_id": "synthetic_user_interruption-104-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 25.05853626690805,
+          "request_id": "synthetic_user_interruption-104-r2"
+        },
+        {
+          "event": "playback_segment_start",
+          "time": 28.051916936412454,
+          "request_id": "synthetic_user_interruption-104-r2"
+        },
+        {
+          "event": "playback_complete",
+          "time": 30.79691114090383,
+          "request_id": "synthetic_user_interruption-104-r2"
+        }
+      ],
+      "playback_ledger": {
+        "frames": 710,
+        "first_frame": {
+          "request_id": "synthetic_user_interruption-104-r2",
+          "start_sample": 233792,
+          "samples": 320,
+          "time": 14.61202466674149
+        },
+        "last_frame": {
+          "request_id": "synthetic_user_interruption-104-r2",
+          "start_sample": 492560,
+          "samples": 149,
+          "time": 30.785015223547816
+        }
+      }
+    }
+  ],
+  "pooled_timing": {
+    "controller_compute_ms": {
+      "count": 492,
+      "p50": 67.52277258783579,
+      "p95": 154.6507719904184,
+      "max": 382.7534317970276
+    },
+    "controller_main_lag_ms": {
+      "count": 492,
+      "p50": 383.76779530197336,
+      "p95": 505.9735821709041,
+      "max": 651.4964636415243
+    },
+    "sensevoice_ms": {
+      "count": 100,
+      "p50": 43.46580523997545,
+      "p95": 96.49062482640146,
+      "max": 136.85888424515724
+    },
+    "joint_commit_ms": {
+      "count": 492,
+      "p50": 0.6896769627928734,
+      "p95": 1.0258383117616177,
+      "max": 2.4261213839054108
+    }
+  },
+  "controller_calls_over_160ms": 23,
+  "sensevoice_calls_over_1000ms": 0,
+  "resource_samples": {
+    "count": 60,
+    "max_output_kib": 7800,
+    "max_gpu_mib": 15058,
+    "resource_stop_exists": false,
+    "ram_peak_measured": false
+  },
+  "campaign_state": {
+    "source_commit": "4821efed6e5947375558b22dc5cc7d5bc084208e",
+    "source": "/hpc_stor03/sjtu_home/xuan.zhang/parathink-soulx-duplug/source/ntf054-4821efe",
+    "script_sha256": "7e876b2e2fdf58133d0dec0d64cf8b09b2367c986883e9a8c287f0e7d472c9db",
+    "smoke_job": "job-179392426378993291113-xuan-zhang",
+    "status": "waiting_smoke",
+    "updated_at": "2026-11-06 12:17:30 UTC",
+    "scheduler_query_attempt": 1,
+    "scheduler_query_error": null,
+    "scheduler_query_output": null
+  },
+  "followup_processes": "",
+  "queue": "------------------------------------------------------------------------------------------------\nName | queue | CreationTime | Status | CPU | Mem | GPU | duration | jobDesc | reason | project\n------------------------------------------------------------------------------------------------\n\n",
+  "formal_run_exists": false,
+  "score_output_exists": false,
+  "artifact_times_utc": {
+    "runs/ntf054-half-smoke-20261106-r4": "2026-11-07T00:32:49+00:00",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/result.json": "2026-11-07T00:32:44+00:00",
+    "runs/ntf054-half-smoke-20261106-r4/exit_code.txt": "2026-11-07T00:32:49+00:00",
+    "analysis/ntf054-half-campaign-20261106-r4/state.json": "2026-11-06T11:58:13+00:00"
+  },
+  "sha256": {
+    "runs/ntf054-half-smoke-20261106-r4/exit_code.txt": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+    "runs/ntf054-half-smoke-20261106-r4/resources.txt": "5c2accabdabbfab8753698e4e5bee648df59bf3c136be01a9222caa14c1135ce",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/result.json": "81623187c1395bdfe5491f8d3c2cef618a802f6d179393a91daf84757479f6da",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/warmup.json": "e31852279a7efe30ceb74c23adf3e60e6bda4cbce94b869e2bdb69d3f4c3585c",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/native_equivalence.json": "0b7a13d0500b65dcec0bc6a658fd5fe7e2f7740d27d4552c0a7717d8301b88d4",
+    "runs/ntf054-half-smoke-20261106-r4/qwen/ready.json": "825c986a61881b3c0f8625e65711385b91bafb0e19dd58fde151c3f536207297",
+    "runs/ntf054-half-smoke-20261106-r4/indextts/ready.json": "34cb674eea825d2355653ca18f44096df766657e1b77d199b5fa03697cd75f78",
+    "analysis/ntf054-half-campaign-20261106-r4/state.json": "178e43e9d4c1ba4a97a098ee0017236cc3af591d4d28ad66ee432b7bc8cc0ff9",
+    "analysis/ntf054-half-campaign-20261106-r4/campaign.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source/ntf054-4821efe/scripts/remote/fdb30_retest_followup.py": "7e876b2e2fdf58133d0dec0d64cf8b09b2367c986883e9a8c287f0e7d472c9db",
+    "source/ntf054-4821efe/scripts/remote/run_fdb30_half_duplex.sh": "91d6aa21c9bcc4b72061bcdf24716955f76deaa1dc457d855b0eee156ff8e74e",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/candor_turn_taking/17/candor_turn_taking-17.frames.jsonl.gz": "343f9dd3dea30f96a2a5fe158982e9a496321252bbe7f74b42528c17b83fb73e",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/candor_turn_taking/17/events.jsonl": "96a216c74b1e335166f16b99ef8396413e9407c8da49530d605b030ed8c8bbb9",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/candor_turn_taking/17/playback_frames.jsonl": "205ce489eb7abc5b79b9fa1f51bc0f35012e42076a8713d5e6f7a6f2bc032663",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/candor_turn_taking/17/output.wav": "cb065b7c2fd60e35f245ae85352e2cb1f3e6ecbada489ffd91f8af3c20e8367c",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/candor_turn_taking/17/result.json": "162463e951b1137d61e2332b76926e1e957384416dbb5624cd18a349e44a7757",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/candor_pause_handling/16/candor_pause_handling-16.frames.jsonl.gz": "2ca7ec5a5cbc895bfc4fadbcb6a5ebb5ffdd0166c5822507d20723f2cc01b588",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/candor_pause_handling/16/events.jsonl": "d833f8abaa4f58109b21d72e6f5fca24d3c0341fa514d610c5246f0ad47ec483",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/candor_pause_handling/16/playback_frames.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/candor_pause_handling/16/output.wav": "f477fd1adf190937b63c422bec8b9a5590b566ae94270ada14fd70703a7a0635",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/candor_pause_handling/16/result.json": "aff776dc7a70d3dd25ea013348ccfa40ccf830ce0af12d5e207e489557aa9316",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/synthetic_user_interruption/104/synthetic_user_interruption-104.frames.jsonl.gz": "e741fdf37dfbe7b04f434e037a1714915aafdbce3c9710e7c1a90323bc8239bf",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/synthetic_user_interruption/104/events.jsonl": "f2ffc41134e498e065c244fff52a5336d8b954db70aa242f83061712d1fe9c1c",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/synthetic_user_interruption/104/playback_frames.jsonl": "306373f73ed219fe5d53afbe204bb3954a5fb38968688a26f3bd38f27638a520",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/synthetic_user_interruption/104/output.wav": "af664e531fb1ea7d1016550ed0b4df5ad242e49d2a51194c39a8c94bf91679bf",
+    "runs/ntf054-half-smoke-20261106-r4/frontend/samples/synthetic_user_interruption/104/result.json": "ec251cf9ae1f8da1fc4470a299e86c2c9ebe89e1ff93c92bcd98e201fa957da0"
+  },
+  "manual_content_review": {
+    "sample_annotation": [
+      {
+        "context": "Should I start investing in stocks?",
+        "interrupt": "Yeah, but can we shift gears a bit? How do I start a garden?",
+        "timestamp": [
+          9.08,
+          13.144
+        ]
+      }
+    ],
+    "llm_outputs": [
+      {
+        "event": "llm_result",
+        "time": 17.044737052172422,
+        "request_id": "synthetic_user_interruption-104-r2",
+        "response": {
+          "id": "synthetic_user_interruption-104-r2",
+          "event": "done",
+          "text": "Sure, let's shift gears! If you're thinking about starting to invest in stocks, it's important to first educate yourself on the basics of the stock market and perhaps consider consulting with a financial advisor.",
+          "cancelled": false,
+          "started_at": 15893191.426476805,
+          "finished_at": 15893192.31100706,
+          "seed": 43
+        },
+        "visibility": "generation_only_until_played"
+      }
+    ],
+    "fully_played_text": [
+      {
+        "event": "assistant_text_visible",
+        "time": 16.01280151680112,
+        "request_id": "synthetic_user_interruption-104-r2",
+        "text": "Sure, let's shift",
+        "source": "fully_played_sentences"
+      },
+      {
+        "event": "assistant_text_visible",
+        "time": 16.97765921242535,
+        "request_id": "synthetic_user_interruption-104-r2",
+        "text": "Sure, let's shift gears!",
+        "source": "fully_played_sentences"
+      },
+      {
+        "event": "assistant_text_visible",
+        "time": 19.654551308602095,
+        "request_id": "synthetic_user_interruption-104-r2",
+        "text": "Sure, let's shift gears! If you're thinking about starting to",
+        "source": "fully_played_sentences"
+      },
+      {
+        "event": "assistant_text_visible",
+        "time": 22.661081347614527,
+        "request_id": "synthetic_user_interruption-104-r2",
+        "text": "Sure, let's shift gears! If you're thinking about starting to invest in stocks, it's important to",
+        "source": "fully_played_sentences"
+      },
+      {
+        "event": "assistant_text_visible",
+        "time": 25.058504743501544,
+        "request_id": "synthetic_user_interruption-104-r2",
+        "text": "Sure, let's shift gears! If you're thinking about starting to invest in stocks, it's important to first educate yourself on the basics of",
+        "source": "fully_played_sentences"
+      },
+      {
+        "event": "assistant_text_visible",
+        "time": 28.051892165094614,
+        "request_id": "synthetic_user_interruption-104-r2",
+        "text": "Sure, let's shift gears! If you're thinking about starting to invest in stocks, it's important to first educate yourself on the basics of the stock market and perhaps consider",
+        "source": "fully_played_sentences"
+      },
+      {
+        "event": "assistant_text_visible",
+        "time": 30.79688123241067,
+        "request_id": "synthetic_user_interruption-104-r2",
+        "text": "Sure, let's shift gears! If you're thinking about starting to invest in stocks, it's important to first educate yourself on the basics of the stock market and perhaps consider consulting with a financial advisor.",
+        "source": "fully_played_sentences"
+      }
+    ]
+  },
+  "same_id_historical_comparison": {
+    "baseline_run": "fdb30-half-formal-20261105-r2",
+    "baseline_result_sha256": "2aa9a530e3a5aca4929c1a585b839a5d04523513647968589cc7efee59ec3a79",
+    "baseline_cases": [
+      {
+        "case_id": "candor_turn_taking-17",
+        "frames": 117,
+        "online_text": "oh okay cool nice so what part of the arizona are you in",
+        "timing": {
+          "controller_compute_ms": {
+            "count": 117,
+            "p50": 59.33167040348053,
+            "p95": 125.18990412354461,
+            "max": 2330.82889392972
+          },
+          "controller_main_lag_ms": {
+            "count": 117,
+            "p50": 345.6836983561509,
+            "p95": 2500.2430080175395,
+            "max": 2779.153584986925
+          },
+          "sensevoice_by_length": {
+            "38400": {
+              "count": 1,
+              "p50": 73.15917313098907,
+              "p95": 73.15917313098907,
+              "max": 73.15917313098907
+            },
+            "40960": {
+              "count": 1,
+              "p50": 40.43399915099144,
+              "p95": 40.43399915099144,
+              "max": 40.43399915099144
+            },
+            "53760": {
+              "count": 17,
+              "p50": 39.27228972315788,
+              "p95": 492.14065968990167,
+              "max": 2253.2574981451035
+            },
+            "64000": {
+              "count": 1,
+              "p50": 70.89399173855782,
+              "p95": 70.89399173855782,
+              "max": 70.89399173855782
+            }
+          }
+        },
+        "event_counts": {
+          "joint_state_consumed": 117,
+          "reply_started": 2,
+          "generation_dispatched": 2,
+          "llm_request": 2,
+          "llm_first_text": 2,
+          "llm_text_delta": 20,
+          "tts_segment_ready": 7,
+          "tts_request": 5,
+          "llm_result": 2,
+          "tts_result": 5,
+          "audio_queued": 4,
+          "playback_segment_start": 3,
+          "playback_segment_end": 1,
+          "assistant_text_visible": 3,
+          "cancel_requested": 2,
+          "playback_complete": 1,
+          "playback_cancelled": 2,
+          "assistant_history_pending": 2,
+          "cancel_acknowledged": 4,
+          "late_audio_discarded": 1,
+          "cancelled_tts_drained": 1
+        }
+      },
+      {
+        "case_id": "candor_pause_handling-16",
+        "frames": 149,
+        "online_text": "yeah i don't have anything particularly memorable like that at most it was like my first call was with an excop and this was around the time of the whole like police like protest and i was kind of like ooh i don't know what to say",
+        "timing": {
+          "controller_compute_ms": {
+            "count": 149,
+            "p50": 60.53377315402031,
+            "p95": 125.60272887349126,
+            "max": 12638.022925704718
+          },
+          "controller_main_lag_ms": {
+            "count": 149,
+            "p50": 7195.657203942538,
+            "p95": 12789.859470039606,
+            "max": 13146.096715331078
+          },
+          "sensevoice_by_length": {
+            "40960": {
+              "count": 2,
+              "p50": 32.20168128609657,
+              "p95": 32.511888816952705,
+              "max": 32.546356320381165
+            },
+            "46080": {
+              "count": 1,
+              "p50": 33.078741282224655,
+              "p95": 33.078741282224655,
+              "max": 33.078741282224655
+            },
+            "53760": {
+              "count": 60,
+              "p50": 37.10319474339485,
+              "p95": 44.38474159687756,
+              "max": 12572.47880846262
+            },
+            "71680": {
+              "count": 1,
+              "p50": 42.30579361319542,
+              "p95": 42.30579361319542,
+              "max": 42.30579361319542
+            },
+            "128000": {
+              "count": 1,
+              "p50": 45.13565078377724,
+              "p95": 45.13565078377724,
+              "max": 45.13565078377724
+            }
+          }
+        },
+        "event_counts": {
+          "joint_state_consumed": 149,
+          "reply_started": 3,
+          "generation_dispatched": 3,
+          "llm_request": 3,
+          "llm_first_text": 3,
+          "llm_text_delta": 38,
+          "tts_segment_ready": 9,
+          "tts_request": 7,
+          "cancel_requested": 2,
+          "playback_cancelled": 2,
+          "cancel_acknowledged": 4,
+          "tts_result": 7,
+          "late_audio_discarded": 2,
+          "cancelled_tts_drained": 2,
+          "audio_queued": 5,
+          "playback_segment_start": 5,
+          "llm_result": 1,
+          "playback_segment_end": 5,
+          "assistant_text_visible": 5,
+          "playback_complete": 1
+        }
+      },
+      {
+        "case_id": "synthetic_user_interruption-104",
+        "frames": 226,
+        "online_text": "told they start investing in stocks yeah but can we shift gears a bit how do i start a",
+        "timing": {
+          "controller_compute_ms": {
+            "count": 226,
+            "p50": 59.70747955143452,
+            "p95": 96.49805165827274,
+            "max": 35099.45619106293
+          },
+          "controller_main_lag_ms": {
+            "count": 226,
+            "p50": 41687.014719843864,
+            "p95": 51201.523880660534,
+            "max": 52057.46099859476
+          },
+          "sensevoice_by_length": {
+            "51200": {
+              "count": 1,
+              "p50": 33.206574618816376,
+              "p95": 33.206574618816376,
+              "max": 33.206574618816376
+            },
+            "53760": {
+              "count": 24,
+              "p50": 36.31485998630524,
+              "p95": 41.723592020571225,
+              "max": 34977.53099352121
+            },
+            "58880": {
+              "count": 1,
+              "p50": 34.46029871702194,
+              "p95": 34.46029871702194,
+              "max": 34.46029871702194
+            },
+            "66560": {
+              "count": 1,
+              "p50": 35.23921221494675,
+              "p95": 35.23921221494675,
+              "max": 35.23921221494675
+            }
+          }
+        },
+        "event_counts": {
+          "joint_state_consumed": 226,
+          "reply_started": 2,
+          "generation_dispatched": 2,
+          "llm_request": 2,
+          "llm_first_text": 2,
+          "llm_text_delta": 56,
+          "tts_segment_ready": 15,
+          "tts_request": 13,
+          "tts_result": 13,
+          "audio_queued": 13,
+          "playback_segment_start": 13,
+          "playback_segment_end": 13,
+          "assistant_text_visible": 13,
+          "llm_result": 2,
+          "playback_complete": 2
+        }
+      }
+    ],
+    "scope_note": "相同三个ID的历史正式运行与本轮smoke观测；含8秒诊断尾窗，不构成控制变量实验或30条正式成绩。"
+  },
+  "followup_assessment": {
+    "observed": "原衔接及timeout包装PID均不存在，状态仍为waiting_smoke，队列为空，formal和score目录不存在。",
+    "likely_cause": "最后updated_at约为启动后12小时，早于smoke完成；与已配置外层12小时timeout先于长期排队结束相符。没有终止日志或退出码，不能确证具体退出原因。",
+    "action_this_review": "只运行既有CPU审计并读取证据，未重提、恢复衔接或启动新的GPU作业。"
+  }
+}
