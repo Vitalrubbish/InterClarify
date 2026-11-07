@@ -23,7 +23,7 @@ Layer 1 从通用指令模型出发，学习在持续输入下组织自己的表
 
 首轮以官方 [Qwen2.5-7B-Instruct](https://huggingface.co/Qwen/Qwen2.5-7B-Instruct) 为训练起点，Qwen3 可作为后续底座候选。若采用支持 thinking 切换的 Qwen3 模型，Layer 1 先使用非 thinking 模式，以便单独评价外部 Layer 2 的收益。
 
-采用参数高效微调，输入输出按 [Layer 1 周期协议](../dev/layer1/protocol.md)组织为持久 Context 中的 token 流。每周期读入前端新转写与本批新发布的 SoulX 状态，Layer 1 继续解码并保留实际生成 token；历史已有内容不重复注入。新增执行事实及 Layer 2 已发布的最终 `result` 在合法边界作为外部块写入，不读取中间 `analysis` 或 `progress`。
+采用参数高效微调，输入输出按 [Layer 1 周期协议](../dev/layer1/protocol.md)组织为持久 Context 中的 token 流。首轮常规周期为三拍 480ms，每周期按顺序读入三个前端批次的新增转写与各自 SoulX 状态，再解码并保留实际生成 token；历史不重复注入，普通回答可跨周期继续。新增执行事实及最终 `result` 在合法边界作为外部块写入，不读取中间 `analysis` 或 `progress`。训练切片匹配三拍输入，周期对照须说明训练与推理节拍是否一致。
 
 思考请求与系统附和使用各自专用的 special token；附和 token 标记随后表达片段的用途，措辞仍由 Layer 1 生成。具体 token 字符串、ID、片段结束与等待编码在实施时冻结。新增词表 token 时，训练须覆盖其词表及输出参数。监督实际生成的两类标记与正文；外部转写、状态、结果和执行事实均为条件，不计算相应预测损失。
 

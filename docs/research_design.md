@@ -1,6 +1,6 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
-2026-11-07 用户确认 [Layer 1 周期协议](dev/layer1/protocol.md)（DCT-010）：前端逐周期交付新增转写和本批状态，Layer 1 在持久 Context 中继续解码，实际生成的 token 留在同一 Context。思考请求和系统附和分别使用专用 special token；Layer 2 最终结果在合法输入边界作为外部块写入。当前只形成设计，未实施逐批交付、tokenizer 适配或训练。
+2026-11-07 用户确认 [Layer 1 周期协议](dev/layer1/protocol.md)（DCT-010／011）：首轮常规周期取三拍 480ms，按序读入三个前端 160ms 批次的新增转写与状态，继续解码并将实际生成 token 保留在持久 Context。思考请求和系统附和使用专用 special token，最终 result 在后续边界注入；有效打断不等待三拍。该周期是设计起点，持续吞吐待远端验证，当前未实施运行时或训练。
 
 2026-11-07 用户授权的 [Layer 2 周期协议](dev/layer2/protocol.md)已形成设计（DCT-005，DCT-007—009 修订）：Layer 2 固定为已有模型权重与提示词驱动的思考层，不训练或适配参数。每周期只读当前对话与上一轮 `analysis`，产生增量分析与三值进度，结束时另生成 `result`，仅将最终结果同源注入 SoulX 和 Layer 1。专项训练对象为两个下游；尚未实施运行时、升级 pilot v1 或开展训练。
 
