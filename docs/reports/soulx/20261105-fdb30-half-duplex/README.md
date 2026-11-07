@@ -25,7 +25,7 @@
 
 本次未评价打断回答相关性，TOR不保证回答了新问题；没有backchannel样本，不包含ICC／JSD。固定FDB30不是完整FDB总体，也不能与TurnControlComparison的672条全量系统成绩直接比较。
 
-后续代码修复NTF-052／053已完成[固定执行线程、CPU预算与取消complete重识别](../../../dev/SoulX-Duplug/runtime_execution_update.md)，本地146项回归通过。尚未进行修复后GPU复测，本页指标保持正式r2原值。
+后续代码修复 NTF-052／053 已完成固定执行线程、CPU 预算与取消 complete 重识别，本地 146 项回归通过。修复后验收见 [NTF-054](../../../issue/NTF-054.md)，本页指标保持正式 r2 原值。
 
 ## 系统与评分口径
 

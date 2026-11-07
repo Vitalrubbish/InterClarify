@@ -34,7 +34,7 @@ cp "$MANIFEST" "$RUN/frozen_manifest.json"
 git -C "$SOURCE" rev-parse HEAD > "$RUN/source_commit.txt"
 git -C "$SOURCE" ls-files scripts/runtime scripts/remote/native_frontend_probe.py \
   scripts/remote/native_frontend_worker.py scripts/remote/x2_streaming_probe.py scripts/remote/run_native_frontend_probe.sh \
-  scripts/remote/run_native_frontend_fdb.sh configs/native_soulx.json \
+  configs/native_soulx.json \
   configs/x2_streaming_probe.json | while IFS= read -r file; do sha256sum "$SOURCE/$file"; done > "$RUN/source.sha256"
 printf '%s\n' "$GROUP" > "$RUN/group.txt"
 PID=''

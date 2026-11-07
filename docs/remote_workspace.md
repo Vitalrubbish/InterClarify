@@ -31,13 +31,9 @@
 
 旧 DuplexCascade／Nemotron／Kokoro 的服务器目录、模型和环境属于历史资产，已退出父仓库当前入口；本次只清理仓库，不删除远端内容或改变运行中的冻结作业。当前下游模型、TTS 与 conda 路径以[半双工方案](dev/SoulX-Duplug/fdb30_half_duplex.md)和 [NTF-054](issue/NTF-054.md) 为准。
 
-## 3. 当前前端结果
+## 3. 运行记录与历史产物
 
-| 记录 | 证据与状态 |
-| --- | --- |
-| 完整预热与三轴预检 | `parathink-soulx-duplug/runs/ntf018-matrix-20261103-r3`，3/3 完整、退出 0，见[报告](../docs/reports/soulx/20261103-ntf018-warmup/README.md) |
-| 固定 FDB30 验收 | `parathink-soulx-duplug/runs/ntf019-dual-20261103-r2`，用户审核通过并归档，见[报告](../docs/reports/soulx/20261103-ntf019-fdb30/README.md) |
-| 取消 800ms 停止条件 | 单／双路与分析器修订，169 项本地检查通过，见[记录](../docs/reports/soulx/20261103-latency-limit-removal/README.md) |
+当前完整半双工评测与 NTF-054 复测见[报告索引](../reports/README.md)。早期前端预检与单／双路独立验收已结束，源码及报告从 Git 历史追溯，原 run 路径继续保留，不恢复为当前执行入口。
 
 历史 run、日志和原始产物保留在远端或本地 `artifacts/`，不作为当前路线入口。
 

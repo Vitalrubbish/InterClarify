@@ -25,10 +25,10 @@ ParaThink 使用独立根目录 `~/parathink-soulx-duplug/`，源码、提交日
 
 | 入口 | 用途 |
 | --- | --- |
-| [run_native_frontend_probe.sh](../../scripts/remote/run_native_frontend_probe.md) | NTF-018 完整预热、有限预热对照和单卡三轴预检 |
-| [run_native_frontend_fdb.sh](../../scripts/remote/run_native_frontend_fdb.md) | NTF-019 固定 FDB30 单／双路验收 |
+| [run_native_frontend_probe.sh](../../scripts/remote/run_native_frontend_probe.md) | 通用前端预热、回放与单卡诊断 |
 | [run_x2_streaming_probe.sh](../../scripts/remote/run_x2_streaming_probe.md) | X2 单路离线实时探针 |
 | [native_frontend_probe.py](../../scripts/remote/native_frontend_probe.md) | 双路调度、联合提交和资源记账 |
+| [run_fdb30_half_duplex.sh](../../scripts/remote/run_fdb30_half_duplex.md) | 当前完整半双工评测，资源见对应说明 |
 
 预热音频由 `SOULX_WARMUP_AUDIO` 指定为本地 7.8 秒英文语音，不绑定特定数据集路径。远端作业使用 1×RTX 4090、4 CPU、32GiB RAM、单并发；显存停止线 22GiB，PCM 总量 4MiB，输出 128MiB，单作业 1800 秒。资源触限保留失败，不自动扩容、重试或减速送音。
 

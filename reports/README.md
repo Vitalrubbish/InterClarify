@@ -1,25 +1,13 @@
 # 实验报告
 
-当前路线为 **SoulX-Duplug 官方配置＋并行 X2Streaming-ASR**。第一阶段 ASR-Frontend 的验收报告位于 [docs/reports/soulx](../docs/reports/soulx)，本目录只保留报告索引与原始产物规则。
+当前路线为 SoulX-Duplug 原生控制＋独立 X2Streaming-ASR，以及普通半双工 LLM／TTS 评测。Layer 1／2 接入与专项训练尚未实施。
 
-## 当前前端结果
-
-| 报告 | 状态与用途 |
+| 报告 | 用途 |
 | --- | --- |
-| [原生控制与独立 X2 交付](../docs/reports/soulx/20261102-native-independent-frontend/README.md) | NTF-015／016 本地实现与契约验收 |
-| [联合提交交付](../docs/reports/soulx/20261102-ntf017-joint-publication/README.md) | NTF-017 文本／状态／进度联合写入 |
-| [完整预热与三轴预检](../docs/reports/soulx/20261103-ntf018-warmup/README.md) | NTF-018 完整预热、真实权重对照、并发三轴 3/3 |
-| [固定 FDB30 验收](../docs/reports/soulx/20261103-ntf019-fdb30/README.md) | NTF-019 独立正文与原生状态验收，用户审核通过 |
-| [取消 800ms 停止条件](../docs/reports/soulx/20261103-latency-limit-removal/README.md) | NTF-030 延迟照实记录，容量与资源保护保持 |
-| [原生 complete 行为审计](../docs/reports/soulx/20261104-completion-strategy-audit/README.md) | 原始预测、官方规则与提前事件分别计数 |
-| [提前 complete 与官方运行时分析](../docs/dev/SoulX-Duplug/completion_runtime_analysis.md) | 具体案例、取消／上下文恢复及对当前设计的影响 |
-| [半双工 LLM／TTS 首轮评测](../docs/reports/soulx/20261105-fdb30-half-duplex/README.md) | 30 条 TOR／延迟与控制积压归因，保留原始低分及限制 |
-| [修复后复测](../docs/reports/soulx/20261105-ntf054-retest/README.md) | NTF-054 活动记录，完整复测尚未完成 |
+| [半双工首轮评测](../docs/reports/soulx/20261105-fdb30-half-duplex/README.md) | 固定 30 条 TOR／延迟、原始低分与限制 |
+| [控制积压归因](../docs/reports/soulx/20261105-fdb30-half-duplex/control_backlog_analysis.md) | 首轮延迟长尾与接话失败的逐例依据 |
+| [修复后复测](../docs/reports/soulx/20261105-ntf054-retest/README.md) | NTF-054 活动证据；完整复测尚未完成 |
 
-## 原始产物规则
+早期独立前端验收和 complete 审计已结束，其报告与退役工具可从 Git 历史追溯，不再作为当前入口。原始 run、日志和产物保留在远端及本地 `artifacts/`，本轮不修改或删除。
 
-Git 只保留审阅后的 README 汇总：结论、关键分母、限制、源码／模型版本和原始产物位置。逐例 JSON／CSV、trace、样本正文、资源采样与完整 manifest 保存在远端 run 及本地 `artifacts/`，不推送到 GitHub，也不使用 `git add -f` 绕过此规则。
-
-权重、音频、大日志和本地实验产物不提交 Git；Git 历史不重写。
-
-2026-11-05 整理：11 月 2—4 日已结束报告的 JSON／诊断图片迁到本地 `artifacts/soulx/<原报告目录>/`，报告中的证据链接同步更新；原始字节与历史失败记录保留。11 月 5 日评测及活动复测的已跟踪证据本次保持。
+Git 保留审阅后的结论、分母、限制、源码／模型版本及必要审计摘要；已跟踪的 11 月 5 日评测与活动复测 JSON 继续保留。权重、音频、大日志和后续原始逐帧输出不提交，不使用 `git add -f` 绕过忽略规则，也不重写 Git 历史。

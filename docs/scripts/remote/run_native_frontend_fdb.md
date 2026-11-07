@@ -1,5 +1,0 @@
-# NTF-019固定FDB30作业包装
-
-对应`scripts/remote/run_native_frontend_fdb.sh`，没有模型类。要求NTF019_LANE为dual或single，设置统一执行器的正式套件组，再exec受限运行脚本；每臂独立作业／新进程，提交前检查队列为空。必须提供NTF_ACCEPTANCE_GATE及NTF_ACCEPTANCE_GATE_SHA256，入口在模型加载前校验018 r3真实通过证据。
-
-沿用SOULX_SOURCE、SOULX_RUN_ID、SOULX_FDB_MANIFEST和NTF_SCHEDULED_RUN；同一manifest摘要、原生权重、归一化预热、种子42与160ms屏障。双路并发但每路worker各1；单路只运行控制。单作业≤1800秒／128MiB、1×4090／4CPU／32GiB，显存22GiB保持；NTF-030按用户指令取消在线800ms停止条件，PCM容量4MiB及资源保护仍有效。用户已撤销提交次数限制，仍不并发堆叠作业。

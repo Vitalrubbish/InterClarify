@@ -1,23 +1,19 @@
 # ParaThink
 
-现有服务器资产路径、历史记录和 GitHub 地址保留原名，详见[远端约定](docs/remote_workspace.md)。
+ParaThink 研究独立 thinking 流在语音 Agent 倾听与表达期间持续工作的收益，包括 Agent 框架、两组 benchmark 及对话数据与训练。研究范围见[研究方案](docs/research_design.md)，已确认的模块协作见[总体架构](docs/research_design/architecture.md)。
 
-ParaThink 研究独立 thinking 流在语音 Agent 倾听与表达期间持续工作带来的优势，工作包括 Agent 框架、边听边想与边说边想两组 benchmark，以及大规模对话数据与训练。研究背景、目标、参考文章和三篇子文档见 [docs/research_design.md](docs/research_design.md)，工程安排见 [docs/engineering_implementation.md](docs/engineering_implementation.md)。
+当前前端为 SoulX-Duplug 原生控制＋独立 X2Streaming-ASR，同源音频每 160ms 联合提交正文和状态。可执行基线是 SoulX＋X2＋Qwen2.5-7B-Instruct＋IndexTTS 的独立半双工评测；Layer 1／2 协议已设计，持久 Context、thinking 接入和专项训练尚未实施。X-Talk 保留为工程框架，尚未完成常驻集成。
 
-X-Talk 保留为工程框架；当前运行基线采用 SoulX＋X2＋Qwen2.5-7B-Instruct＋IndexTTS，DuplexCascade 旧链路已清理。当前以官方 **SoulX-Duplug** 源码为起点。本地源码在 [third_party/soulx-duplug](third_party/soulx-duplug)，作为 Git 子模块固定官方提交；clone 父仓库时使用 `--recurse-submodules`，已有仓库执行 `git submodule update --init third_party/soulx-duplug`。源码与依赖说明见[子模块说明](docs/third_party/soulx-duplug.md)。
-
-第一阶段 ASR-Frontend 采用 **SoulX-Duplug 官方配置＋并行 X2Streaming-ASR**：SoulX 保留内部 SenseVoice 控制与原生五状态，独立 X2 只向 SharedContext 提供 EOS 闭合的完整词正文，两路每 160ms 完成后联合提交。合同见[独立流式前端](docs/dev/SoulX-Duplug/independent_streaming_frontend.md)，交付与验收见[NTF-015/016](docs/reports/soulx/20261102-native-independent-frontend/README.md)、[NTF-017](docs/reports/soulx/20261102-ntf017-joint-publication/README.md)、[NTF-018](docs/reports/soulx/20261103-ntf018-warmup/README.md)、[NTF-019](docs/reports/soulx/20261103-ntf019-fdb30/README.md)和[NTF-030](docs/reports/soulx/20261103-latency-limit-removal/README.md)。前端已验收；独立半双工 LLM／TTS 评测已完成首轮，修复后复测由 [NTF-054](docs/issue/NTF-054.md) 跟踪。Layer 1 训练与现役 Agent 切换尚未实施。
-
-| 内容 | 位置 |
+| 内容 | 入口 |
 | --- | --- |
-| 研究方案与评测范围 | [docs/research_design.md](docs/research_design.md) |
-| 工程实施计划 | [docs/engineering_implementation.md](docs/engineering_implementation.md) |
-| SoulX 前端路线 | [docs/dev/SoulX-Duplug](docs/dev/SoulX-Duplug/README.md) |
-| 本地 conda 环境 | [docs/local_environment.md](docs/local_environment.md)（`parathink-dev`） |
-| 工作单 | [docs/issue/README.md](docs/issue/README.md) |
-| 已采用的运行时配置 | [docs/runtime_baseline.md](docs/runtime_baseline.md) |
-| FDB 固定 30 条验收 | [docs/reports/soulx/20261103-ntf019-fdb30](docs/reports/soulx/20261103-ntf019-fdb30/README.md) |
-| X-Talk 源码版本 | [configs/xtalk_runtime_source.json](configs/xtalk_runtime_source.json) |
-| 当前运行基线 | [docs/runtime_baseline.md](docs/runtime_baseline.md) |
+| 研究方案与总体架构 | [研究方案](docs/research_design.md)、[架构](docs/research_design/architecture.md) |
+| Layer 1／2 协议 | [表达协议](docs/dev/layer1/protocol.md)、[思考协议](docs/dev/layer2/protocol.md) |
+| 工程实施与运行基线 | [工程计划](docs/engineering_implementation.md)、[运行基线](docs/runtime_baseline.md) |
+| SoulX＋X2 前端 | [路线入口](docs/dev/SoulX-Duplug/README.md) |
+| 数据构造与文本试造 | [数据设计](docs/dev/layer1_training/data_construction.md)、[pilot](docs/datagen/README.md) |
+| 活动工作与评测证据 | [工作单](docs/issue/README.md)、[报告索引](reports/README.md) |
+| 环境与源码 | [本地 conda](docs/local_environment.md)、[远端约定](docs/remote_workspace.md)、[X-Talk 版本](configs/xtalk_runtime_source.json) |
 
-本地与远端统一使用 conda。通用开发环境依据 `environment.yml` 与 `requirements.txt` 创建；ASR、TTS、模型服务与 FDB 评分依赖分别隔离。真实模型训练和集群测试在远端调度作业中执行。新代码同步提供 `docs` 同路径中文说明；权重、音频与大日志不提交 Git。
+官方 SoulX 源码固定在 [Git 子模块](third_party/soulx-duplug)，clone 时使用 `--recurse-submodules`，已有仓库执行 `git submodule update --init third_party/soulx-duplug`。依赖与版本见[源码说明](docs/third_party/soulx-duplug.md)。服务器资产路径和 GitHub 地址保留原名。
+
+本地与远端统一使用 conda，新建通用环境名为 `parathink-dev`，已有 `interclarify-dev` 可复用；真实模型训练和集群测试在远端调度作业执行。实现与同路径中文文档同步，权重、音频和大日志不提交 Git。
