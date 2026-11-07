@@ -1,38 +1,10 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
-2026-11-07 用户确认 [Layer 1 周期协议](dev/layer1/protocol.md)（DCT-010—012）：首轮常规周期取三拍 480ms，按序读入三个前端批次的新增转写与状态，解码生成 token 留在持久 Context。思考请求和系统附和使用专用 special token；系统附和仅为单个事件，不附正文，内容与发声暂不设计。最终 result 在后续边界注入，有效打断不等待三拍。当前未实施运行时或训练，持续吞吐待远端验证。
-
-2026-11-07 用户授权的 [Layer 2 周期协议](dev/layer2/protocol.md)已形成设计（DCT-005，DCT-007—009 修订）：Layer 2 固定为已有模型权重与提示词驱动的思考层，不训练或适配参数。每周期只读当前对话与上一轮 `analysis`，产生增量分析与三值进度，结束时另生成 `result`，仅将最终结果同源注入 SoulX 和 Layer 1。专项训练对象为两个下游；尚未实施运行时、升级 pilot v1 或开展训练。
-
-2026-11-07 用户授权五场景数据试造（DCT-002—004）已完成：在 `datagen` 构造五个独立来源、13 条模拟轨迹，导出 SoulX-Duplug、Layer 1 与 Layer 2 的 SFT 语义视图；远端既有 conda 生成退出 0，主要产物与清单 SHA256 一致。入口见[五场景试造](datagen/README.md)及[远端记录](datagen/remote_validation.md)。该步骤只验证文本协议与因果边界，不替代真实音频／冻结前端回放、独立审核或训练；主动澄清仍是未来协议样例。
-
-2026-11-05 用户确认清理范围：保留 X-Talk 工程框架，删除父仓库中的 DuplexCascade 模型与旧 Nemotron／Kokoro 组合链路。当前运行基线为 SoulX＋独立 X2＋Qwen2.5-7B-Instruct＋IndexTTS 半双工评测链路；Layer 1 训练与框架常驻集成仍未实施。历史报告及 NTF-054 冻结作业保留。
-
-2026-11-05 用户追加授权NTF-057：取消NTF-054完整系统FDB30复测中的原生控制一致性检查，停止修复短窗转写变化；检查状态明确记为未执行，不声明原生等价。保留完整预热、执行与资源预算、160ms联合提交、complete-only回答及样本／录音审计，随后按原流程重提复测。该修订不改变模型、dtype、缓存或既有历史前端验收结论。
-
-2026-11-05 用户追加授权修复[前端执行线程、资源与complete交接](dev/SoulX-Duplug/runtime_execution_update.md)：SoulX固定在回放线程，X2使用常驻辅助线程，各模型进程计算线程预算统一为2；取消有效complete后的整段SenseVoice重识别，保留状态预测所需的短窗识别、reset及X2正文。此次不改回答触发条件或160ms联合提交，不扩展Layer 1训练范围；实现与本地验证见NTF-052／053，真实性能需远端另验。
-
-2026-11-05 新增用户授权的 FDB30 完整系统评测：将当前 SoulX＋独立 X2 前端接入普通半双工 LLM 与可取消 TTS，按 FDB v1.0 统计实际播放指标。此次解除的只是该独立评测的下游接入限制；不实施 Layer 1 训练、thinking 或现役 Agent 切换。使用既有固定 30 条，先验证生成、取消和播放实录，再正式回放与评分。30/30已完成，按用户最新指令仅测TOR／延迟，实测与实时积压限制见[报告](reports/soulx/20261105-fdb30-half-duplex/README.md)。具体范围与资源见[评测方案](dev/SoulX-Duplug/fdb30_half_duplex.md)。按用户要求不新建 issue。
-
-2026-11-03，当前采用 SoulX-Duplug 官方配置＋并行 X2Streaming-ASR：原生 SenseVoice 控制、独立 X2 完整词正文及 160ms 联合提交。前端实现、[NTF-018](reports/soulx/20261103-ntf018-warmup/README.md)真实权重预检和[NTF-019](reports/soulx/20261103-ntf019-fdb30/README.md)固定 FDB30 验收已归档；[NTF-030](reports/soulx/20261103-latency-limit-removal/README.md)已取消 800ms 时长停止条件，保留容量与作业资源保护。后续 LLM 接入暂缓，当前未接 LLM／CoT／TTS 或切换现役 Agent。合同见[独立前端](dev/SoulX-Duplug/independent_streaming_frontend.md)与[Context 接口](dev/SoulX-Duplug/shared_context_interface.md)。
-
-SoulX 官方源码已纳入固定子模块，见[源码说明](third_party/soulx-duplug.md)。当前 SoulX 前端模型权重固定，不训练，尚未切换现役下游 Agent。
-
-2026-11-03 后续讨论已确认：将原 Layer 0 的系统附和时机判断并入 Layer 1；当前经 DCT-012 收敛为单个 token 的选择与时机，不生成附和内容。2026-11-05 将 [Layer 1 训练设计](research_design/layer1_training.md)精简为目标、基座、因果数据、监督与评估思路：首轮以 Qwen2.5-7B-Instruct 开始协议适配，再训练含噪状态与取消恢复、系统附和和 thinking 利用，Qwen3 保留为后续底座候选。SoulX 继续提供外部用户状态，普通回答的 complete 边界与单一输出执行点保持。训练收益通过同底座的阶段检查点和消融验证；尚未生成语料、训练或接入流式 TTS。
-
-当前前端保持两路职责：SoulX 通过原生 SenseVoice 教师和音频预测五状态，X2 独立以真实 EOS 闭合组提供完整词正文，不进入状态 KV。两路同源 PCM；每 160ms 等 X2 两个 80ms 步及 SoulX 本步均结束后，将文本和状态 token 一次原子写入 SharedContext，成功后推进下一周期，实际采样／前瞻范围另记。先完成结果只在内部暂存，不写 PCM、不设前端停止旁路。内部 reset 不清空外接正文；已提交的有效 complete 携当前正文直接供下游使用，不再增加独立交接等待。原始状态、联合发布延迟和正文覆盖分别评价。前端工作已收口。用户片段按首段实际播放分组的合同保留，下游暂不实施。
-
-已确认的下游分工与普通回答生成边界保留：五状态在所属 160ms 批次联合提交后供下游消费，Layer 1 在正常输入边界读到已提交的有效 complete 及当前正文后可在当前 turn 生成普通回答；同步不保证尾词必齐。具体[接口合同](dev/SoulX-Duplug/shared_context_interface.md)的联合提交已由 NTF-017 交付。保留 CoT 条件下的主动澄清与话轮决策目标，后续让 SoulX 联合读取音频、转写和 Layer 2 已发布 CoT；后续扩展见[架构第 2.5 节](research_design/architecture.md#25-soulx-的-cot-条件化控制)。
-
-2026-11-04 已整理[提前 complete 与官方运行时恢复分析](dev/SoulX-Duplug/completion_runtime_analysis.md)：区分原生状态、服务交接和实际播放，用固定案例解释首音前取消、已播后停止及上下文恢复。分析支持按可取消输出设计闭环，保留当前普通回答边界；没有接入官方运行时或启动新评测。
-
-研究任务与单一仲裁执行点、单一 TTS 播放所有权及已听内容不可撤销的边界保持。用户状态统一随正文联合提交，前端不再为 `user_nonidle` 设置专用停止钩子；下游读取同一快照后，由既有唯一输出运行时按准备／播放生命周期处理有效打断。其他状态不进入输出运行时，不映射成 start 或 keep；`user_complete` 不额外发起 LLM 回答调用，`user_backchannel` 由 LLM 读取并决定表达行为。具体路径见[架构第 2.2 节](research_design/architecture.md#22-前端状态与系统附和)。状态输入编码待后续讨论。
-
 ## 1. 研究背景
 
 传统的“听完—思考—回答”流程把推理集中在话轮交接后的等待期。流式输入和流式语音输出提供了在倾听、表达期间继续计算的机会，但并行执行本身不能证明交互更好。我们研究：独立于表达的 thinking 流，能否将这些计算转化为更及时、可靠且有任务价值的语言行为？
 
-研究主线从原先的主动澄清扩展为 thinking 流的收益。主动澄清保留为“边听边想”的核心任务，回答递进与自我修正作为“边说边想”的任务。原有介入合理性分析与共享前缀案例保留在倾听文档中；本次拆分不另行扩大应用范围。
+研究主线从原先的主动澄清扩展为 thinking 流的收益。主动澄清保留为“边听边想”的核心任务，回答递进与自我修正作为“边说边想”的任务；具体任务、数据与评分方案留待后续讨论。
 
 thinking 流是与表达分工的内部任务分析过程。“独立”表示职责与调度分开，不要求不同模型权重。Layer 2 的周期增量分析仅供自身续算，正常结束时将 `result` 发布到共享上下文，供后续完成条件化训练的话轮控制器和 Layer 1 使用。本文下游可见的 CoT 指该结果，不包含中间 `analysis`，也不向用户直接公开或播放。边听边想处理持续到达的信息，边说边想在已经开始表达后继续完成任务分析。
 
@@ -61,7 +33,7 @@ thinking 流是与表达分工的内部任务分析过程。“独立”表示�
 
 系统主动纠正用户、提醒遗漏、调整用户任务顺序，以及紧急提醒、闲聊插话和情绪支持留作后续扩展。系统自我修正属于表达任务，不能据此扩展为主动纠正用户。
 
-两项任务采用同一 Agent。Layer 2 只发布 CoT，不提供话轮状态转移建议或候选表达文本，Layer 1 负责思考请求与语言表达。目标控制器 SoulX-Duplug 后续结合音频、转写和 CoT 共同判断等待与介入，保留主动澄清能力的研究目标；当前不实现 CoT 注入或相应训练，普通状态预测不等于已经具备该能力。CoT 的序列组织、边界编码、缓存与训练方式待后续设计。本项目不设 Layer 3，本轮不新增修订或回滚实现。所有输出经单一仲裁器与单一 TTS 播放路径，已听内容不可撤销。具体合同统一写在架构文档。
+两项任务采用同一 Agent。Layer 2 只发布 CoT，不提供话轮状态转移建议或候选表达文本，Layer 1 负责思考请求与语言表达。目标控制器 SoulX-Duplug 后续结合音频、转写和 CoT 共同判断等待与介入，保留主动澄清能力的研究目标；当前不实现 CoT 注入或相应训练，普通状态预测不等于已经具备该能力。CoT 的序列组织、边界编码、缓存与训练方式待后续设计。本项目不设 Layer 3；首音前取消的上下文删除与用户片段合并按 Layer 1 协议处理，尚未实施。所有输出经单一仲裁器与单一 TTS 播放路径，已听内容不可撤销。具体合同统一写在架构文档。
 
 ## 4. 文档树与阅读顺序
 
@@ -69,32 +41,28 @@ thinking 流是与表达分工的内部任务分析过程。“独立”表示�
 docs/
 ├── research_design.md
 ├── research_design/
-│   ├── architecture.md
-│   ├── layer1_training.md
-│   ├── listening.md
-│   └── speaking.md
+│   └── architecture.md
 └── dev/
     ├── layer1/
     │   └── protocol.md
     ├── layer2/
     │   └── protocol.md
     └── layer1_training/
-        └── README.md
+        ├── data_construction.md
+        └── DuplexOmni_reference.md
 ```
 
 | 文档 | 职责 |
 | --- | --- |
-| [架构设计](research_design/architecture.md) | thinking/表达分工、异步时序、结果合同、动作边界、共同实验和训练约定 |
+| [架构设计](research_design/architecture.md) | 模块分工、两层周期、结果交付、输出执行与训练范围 |
 | [Layer 1 周期协议](dev/layer1/protocol.md) | 持久 Context、前端增量输入、真实生成回写、思考请求与系统附和 special token |
 | [Layer 2 周期协议](dev/layer2/protocol.md) | 冻结思考层的对话与上一轮分析输入、增量分析与进度、最终结果发布 |
-| [Layer 1 训练设计](research_design/layer1_training.md) | 训练目标、基座选择、因果数据与监督原则、分阶段训练及评估思路 |
-| [Layer 1 数据构造与训练预算](dev/layer1_training/README.md) | 试标与扩量流程、七类数据及阶段配比、8×4090 假设下的时长与资源预算 |
-| [边听边想：主动介入 benchmark 与训练数据](research_design/listening.md) | 介入依据、分支案例、事件标注、行为指标、倾听训练轨迹与实验 |
-| [边说边想：benchmark 与训练数据](research_design/speaking.md) | 回答递进、自我修正、实际可听评分、表达训练轨迹与实验 |
+| [话轮控制器与 Layer 1 数据构造设计](dev/layer1_training/data_construction.md) | Writer／Director、真实前端回放、跨模块监督、因果时间线示例与试标流程；配比和预算待验证 |
+| [DuplexOmni 阅读报告](dev/layer1_training/DuplexOmni_reference.md) | 参考方法与初始问题；本项目的构造方案及协议差异见数据构造设计 |
 
-主文档维护研究目标；架构文档维护两项能力共享的运行与训练合同；两篇能力文档只定义各自任务、数据和评分，并链接共享合同。涉及共同规则的变更应同时核对两篇能力文档，不能在子任务中另设播放路径或文本修订层。
+主文档维护研究目标，架构文档概述系统分工，两份协议维护已确认的输入输出与周期细节。独立的 Layer 1 训练、倾听和表达文档已移除，专项任务、数据和评分方案后续重新讨论。
 
-[工程实施计划](engineering_implementation.md)和[工作单](issue/README.md)记录实施阶段。文档拆分不表示框架接入、数据生成或训练已经完成，不启动远端作业，也不恢复已取消的 FDB 测试。后续工作单按用户明确指令建立。
+[工程实施计划](engineering_implementation.md)和[工作单](issue/README.md)记录实施阶段。文档整理不表示框架接入或训练已经完成，不启动远端作业，也不恢复已取消的 FDB 测试。后续工作单按用户明确指令建立。
 
 ## 5. 参考文章
 
@@ -110,4 +78,4 @@ docs/
 
 此前核对 AdaptDuplex 附录 C.4、D.1、D.4：外部结果作为工具块进入后续上下文，工具块屏蔽训练损失，动作与助手正文参与监督；其数据采用自动生成和人工抽检，论文没有完整公开异步返回内容的专用生成流程。该文的 Thinker/Talker 与本项目层号不能直接对应。
 
-本项目借鉴外部结果与表达监督分离的方式，具体训练合同见[架构设计](research_design/architecture.md#7-共同训练与数据约定)。当前前缀下的教师轨迹、两种能力的数据构造及审核属于本项目方案，不能表述为参考文章已经公开的实现。
+本项目借鉴外部结果与表达监督分离的方式，当前监督边界见 [Layer 1 协议](dev/layer1/protocol.md#6-训练与验证)。当前前缀下的教师轨迹、两种能力的数据构造及审核属于本项目方案，不能表述为参考文章已经公开的实现。

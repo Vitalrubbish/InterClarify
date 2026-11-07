@@ -18,6 +18,6 @@ Layer 1 负责等待、系统附和 token 的触发与正式回答，读取已�
 
 下游从 Context 读取已提交的有效 nonidle，核对活动 output_id 与 preparing／playing 生命周期，由唯一输出执行点进行幂等停止。停止不等待 FIFO、TTS 完成或当前 LLM 推理。
 
-底部依次关闭失效 output_id、停止并取消未播内容、取得实际关闭确认后发布 Listen、读取后续有效 complete 后开始新回答。实际表达正文经过唯一 Text FIFO 和 TTS／播放器，系统附和单 token 不进入该文本路径。已听内容不可撤销，真实生成及播放历史保留。
+底部依次关闭失效 output_id、停止并取消未播内容、取得实际关闭确认后发布 Listen、读取后续有效 complete 后开始新回答。实际表达正文经过唯一 Text FIFO 和 TTS／播放器，系统附和单 token 不进入该文本路径。上下文按首音分支整理：尚未播放则删除本次回答并合并用户前后两段，已播放则保留全部生成文本、按正常打断处理。原始生成与播放事实留在审计，已听内容不可撤销；详细规则见 [Layer 1 协议](../dev/layer1/protocol.md#51-首音前与首音后取消)。
 
 [PDF／PNG 构建方法](parathink_method_preview.md)与图源同步；图示不表示已实现下游接入或真实播放。
