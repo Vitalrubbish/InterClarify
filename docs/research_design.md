@@ -1,5 +1,7 @@
 # Thinking 流驱动的语音 Agent：研究方案
 
+2026-11-07 用户授权的 [Layer 2 周期协议](research_design/layer2_protocol.md)已形成设计（DCT-005）：每次短推理读取当前输入快照，产生简短分析与三值任务进度；分析以同源版本提供给 SoulX 和 Layer 1，任务进度仅管理思考任务。明确晚到结果、取消／播放事实和训练损失边界；尚未实施运行时、升级 pilot v1 或开展训练。
+
 2026-11-07 用户授权五场景数据试造（DCT-002—004）已完成：在 `datagen` 构造五个独立来源、13 条模拟轨迹，导出 SoulX-Duplug、Layer 1 与 Layer 2 的 SFT 语义视图；远端既有 conda 生成退出 0，主要产物与清单 SHA256 一致。入口见[五场景试造](datagen/README.md)及[远端记录](datagen/remote_validation.md)。该步骤只验证文本协议与因果边界，不替代真实音频／冻结前端回放、独立审核或训练；主动澄清仍是未来协议样例。
 
 2026-11-05 用户确认清理范围：保留 X-Talk 工程框架，删除父仓库中的 DuplexCascade 模型与旧 Nemotron／Kokoro 组合链路。当前运行基线为 SoulX＋独立 X2＋Qwen2.5-7B-Instruct＋IndexTTS 半双工评测链路；Layer 1 训练与框架常驻集成仍未实施。历史报告及 NTF-054 冻结作业保留。
